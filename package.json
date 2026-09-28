@@ -1,0 +1,9 @@
+{
+  "name": "cotizador-suscripcion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cotizador de articulos personalizados con cuentas y suscripcion por Mercado Pago",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
