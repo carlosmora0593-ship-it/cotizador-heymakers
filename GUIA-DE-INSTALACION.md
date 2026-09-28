@@ -237,7 +237,6 @@ public/
 netlify/functions/
   crear-suscripcion.js      crea el cobro en Mercado Pago
   webhook-mercadopago.js    recibe el aviso y activa la cuenta
-netlify/functions/
   invitar-usuario.js        alta, cambio de rol y baja del equipo
 sql/
   01-esquema.sql            tablas, seguridad y límites por plan
