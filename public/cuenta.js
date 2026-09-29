@@ -96,16 +96,26 @@ async function pruebaConexion(){
   }
 }
 const plan = () => (CUENTA && CUENTA.plan) || "prueba";
-const vigente = () => !!(CUENTA && CUENTA.estado === "activa" && new Date(CUENTA.vence) > new Date());
+const vigente = () => !!(CUENTA && CUENTA.plan !== "ninguno" &&
+  CUENTA.estado === "activa" && new Date(CUENTA.vence) > new Date());
 
 /* Los planes van en escalera: lo que abre uno sigue abierto en los de
    arriba. La prueba abre todo para que el cliente vea qué está comprando.
      1 Básico · 2 Maker · 3 Pro                                          */
-const NIVEL = {basico:1, maker:2, pro:3, prueba:3};
+/* 'ninguno' es la cuenta recién creada sin código: existe, entra y mira,
+   pero no guarda nada hasta contratar. 'prueba' queda por compatibilidad
+   con las cuentas viejas. */
+const NIVEL = {ninguno:0, basico:1, maker:2, pro:3, prueba:3};
 const nivelPlan = () => NIVEL[plan()] || 0;
 const esPro   = () => vigente() && nivelPlan() >= 3;   // caja, ventas, utilidad
 const esMaker = () => vigente() && nivelPlan() >= 2;   // compras, inventario, equipo
-const nombrePlan = () => { const p = CONFIG.PLANES[plan()]; return p ? p.nombre : plan()==="prueba" ? "Prueba" : plan(); };
+const sinPlan = () => plan() === "ninguno";
+const esPrueba = () => !!(CUENTA && CUENTA.es_prueba) || plan() === "prueba";
+const nombrePlan = () => {
+  if(sinPlan()) return "Sin plan";
+  const p = CONFIG.PLANES[plan()];
+  return p ? p.nombre : plan() === "prueba" ? "Prueba" : plan();
+};
 const TOPE_USUARIOS = {basico:1, maker:3, pro:0, prueba:0};   // 0 = sin límite
 
 /* ---------- Puente: almacén de documentos ---------- */
@@ -228,6 +238,11 @@ function enElPlan(t){
 function puede(seccion){
   return (PERMISOS[rol()] || PERMISOS.admin).indexOf(seccion) >= 0 && enElPlan(seccion);
 }
+
+/* El cotizador reparte sus pestañas por rol y no sabe de planes. Le
+   dejamos esta puerta para que pregunte antes de mostrar una sección que
+   la suscripción no incluye. */
+window.__enElPlan = enElPlan;
 
 /* El cotizador pregunta por aquí qué rol tiene quien está adentro, y con eso
    decide quién autoriza una requisición, quién ve la caja y todo lo demás.
@@ -535,11 +550,26 @@ q("#authForm").addEventListener("submit", async e=>{
   q("#authOk").disabled = true;
   try{
     if(alta){
+      /* El código se revisa antes de nada: si no sirve, no creamos el
+         correo. Así puede corregirlo y volver a intentar con el mismo. */
+      const escrito = (q("#authCodigo").value || "").trim();
+      if(escrito){
+        const bueno = await revisaCodigo(true);
+        if(!bueno){ avisoAuth("Revisa el código del curso, o bórralo para crear tu cuenta sin él."); return; }
+      }
+
       const {error} = await SB.auth.signUp({email:correo, password:pass, options:{data:{
         nombre: q("#authNombre").value.trim(), negocio: q("#authNegocio").value.trim() || "Mi taller"}}});
       if(error) throw error;
       const {data} = await SB.auth.getSession();
       if(!data.session){ avisoAuth("Te mandamos un correo para confirmar tu cuenta. Ábrelo y regresa a entrar.", true); return; }
+
+      if(CODIGO_OK){
+        try{
+          const r = await SB.rpc("canjear_codigo", {p_codigo: CODIGO_OK});
+          if(!(r.data && r.data.ok)) console.warn("El código no se pudo canjear:", r.data);
+        }catch(e){ console.warn("El código no se pudo canjear:", e.message); }
+      }
     } else {
       const {error} = await SB.auth.signInWithPassword({email:correo, password:pass});
       if(error) throw error;
@@ -558,6 +588,56 @@ q("#authForm").addEventListener("submit", async e=>{
     }
   }finally{ q("#authOk").disabled = false; }
 });
+
+/* ---------- El código del curso ----------
+   Se revisa ANTES de crear la cuenta. Dejar a alguien con el correo ya
+   registrado y un código que no servía es la peor manera de empezar: no
+   puede volver a intentarlo con ese correo y no entiende por qué. */
+let CODIGO_OK = null;
+
+async function revisaCodigo(mostrar){
+  const campo = q("#authCodigo"), avi = q("#authCodMsg");
+  if(!campo) return null;
+  const txt = (campo.value || "").trim().toUpperCase();
+  CODIGO_OK = null;
+  if(!txt){ if(avi) avi.hidden = true; return null; }
+
+  try{
+    const {data, error} = await SB.rpc("revisa_codigo", {p_codigo: txt});
+    if(error) throw error;
+    if(data && data.ok){
+      CODIGO_OK = txt;
+      if(mostrar && avi){
+        avi.hidden = false; avi.className = "authCodMsg bien";
+        avi.textContent = "Código válido" + (data.curso ? " · " + data.curso : "") +
+          ". Empiezas con plan " + (data.plan === "pro" ? "Pro" : data.plan === "basico" ? "Básico" : "Maker") +
+          " por " + data.dias + " días.";
+      }
+      return data;
+    }
+    if(mostrar && avi){
+      avi.hidden = false; avi.className = "authCodMsg mal";
+      avi.textContent = (data && data.motivo) || "Ese código no sirve.";
+    }
+  }catch(e){
+    /* Si la base todavía no tiene la parte de códigos, no estorbamos:
+       quien no traiga código se registra igual. */
+    if(mostrar && avi){ avi.hidden = false; avi.className = "authCodMsg mal";
+      avi.textContent = "No pude revisar el código ahora mismo. Puedes crear tu cuenta y usarlo después."; }
+  }
+  return null;
+}
+
+const campoCod = q("#authCodigo");
+if(campoCod){
+  let reloj = null;
+  campoCod.addEventListener("input", ()=>{
+    clearTimeout(reloj);
+    const avi = q("#authCodMsg"); if(avi) avi.hidden = true;
+    reloj = setTimeout(()=> revisaCodigo(true), 500);
+  });
+  campoCod.addEventListener("blur", ()=> revisaCodigo(true));
+}
 
 q("#authProbar").addEventListener("click", async ()=>{
   avisoAuth("Probando la conexión con Supabase…", true);
@@ -626,18 +706,31 @@ window.addEventListener("resize", ()=>{
 
 function pintaCuenta(){
   const dias = Math.max(0, Math.ceil((new Date(CUENTA.vence) - new Date())/86400000));
-  const etiqueta = plan()==="prueba" ? "Prueba · "+dias+" día(s)" : "Plan "+nombrePlan();
+  /* Las cuentas viejas tienen plan 'prueba' a secas; las nuevas traen el
+     plan real más la marca de cortesía. "Prueba Prueba" no se lo decimos
+     a nadie. */
+  const etiqueta = sinPlan()          ? "Sin plan"
+                 : plan() === "prueba" ? "Prueba · " + dias + " día(s)"
+                 : esPrueba()          ? "Prueba " + nombrePlan() + " · " + dias + " día(s)"
+                 : "Plan " + nombrePlan();
   const chip = q("#cuentaPlan");
   chip.textContent = etiqueta;
   chip.style.color = vigente() ? "" : "var(--warn)";
   pintaPerfil();
   q("#cuentaMail").textContent = (PERFIL && PERFIL.correo) || SESION.user.email;
   q("#avisoPago").hidden = vigente();
-  if(!vigente()) q("#avisoPagoTxt").textContent =
-    "Tu suscripción terminó el "+String(CUENTA.vence).slice(0,10)+". Puedes seguir consultando lo que ya tienes, pero para guardar cambios hay que reactivarla.";
-  else if(plan()==="prueba" && dias<=5){
+  if(sinPlan()){
+    q("#avisoPagoTxt").textContent =
+      "Tu cuenta está lista, pero todavía no tiene plan. Puedes moverte y ver cómo funciona; " +
+      "para guardar tu trabajo elige uno. Si tomaste un curso Hey Makers y traes código, escríbenos y te lo activamos.";
+  } else if(!vigente()){
+    q("#avisoPagoTxt").textContent =
+      "Tu " + (esPrueba() ? "prueba" : "suscripción") + " terminó el " + String(CUENTA.vence).slice(0,10) +
+      ". Puedes seguir consultando lo que ya tienes, pero para guardar cambios hay que " +
+      (esPrueba() ? "elegir un plan." : "reactivarla.");
+  } else if(esPrueba() && dias <= 5){
     q("#avisoPago").hidden = false;
-    q("#avisoPagoTxt").textContent = "Te quedan "+dias+" día(s) de prueba. Elige un plan para no perder tu información.";
+    q("#avisoPagoTxt").textContent = "Te quedan " + dias + " día(s) de prueba. Elige un plan para no perder tu información.";
   }
 }
 function aplicaPlan(){
@@ -706,15 +799,33 @@ const fechaLarga = d => {
 function pintaSuscripcion(){
   const caja = q("#suscResumen"); if(!caja) return;
   const dias = Math.max(0, Math.ceil((new Date(CUENTA.vence) - new Date())/86400000));
-  const enPrueba = plan() === "prueba";
+  const enPrueba = esPrueba();
   const viva = vigente();
+
+  /* Una cuenta sin plan no es una suscripción vencida: nunca empezó.
+     Decirle "se terminó" a quien acaba de registrarse confunde. */
+  if(sinPlan()){
+    caja.className = "suscResumen";
+    caja.innerHTML =
+      '<div><span class="grande">Sin plan</span>' +
+      '<div style="font-size:13px;color:var(--ink-2);margin-top:2px">' +
+      'Tu cuenta existe y puedes moverte por ella. Para guardar tu trabajo hace falta contratar.' +
+      '</div></div>';
+    q("#suscPago").innerHTML = '<div class="suscFila">Todavía no hay nada que cobrar. ' +
+      'Elige un plan en la pestaña de al lado y ahí se define la forma de pago.</div>';
+    q("#suscFactura").innerHTML = '<div class="suscFila">Cuando contrates, las facturas salen con ' +
+      'los datos fiscales que cargues en Ajustes.</div>';
+    q("#suscBaja").innerHTML = '<div class="suscFila">No hay nada que dar de baja. ' +
+      'Tu cuenta y tu información se quedan donde están.</div>';
+    return;
+  }
 
   caja.className = "suscResumen" + (viva ? "" : " vencida");
   caja.innerHTML =
-    '<div><span class="grande">' + escTxt(enPrueba ? "Prueba" : nombrePlan()) + '</span>' +
+    '<div><span class="grande">' + escTxt(nombrePlan()) + '</span>' +
       '<div style="font-size:13px;color:var(--ink-2);margin-top:2px">' +
         (viva
-          ? (enPrueba ? "Tienes todo abierto para que lo pruebes" : "Suscripción activa")
+          ? (enPrueba ? "Prueba de cortesía · sin cargo" : "Suscripción activa")
           : "Se terminó. Puedes seguir consultando lo que ya tienes, pero no guardar cambios.") +
       '</div></div>' +
     '<div class="aLado">' + (viva ? (enPrueba ? "Te quedan" : "Se renueva el") : "Terminó el") +
