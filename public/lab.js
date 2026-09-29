@@ -349,11 +349,15 @@ if(q("#puertaForm")) q("#puertaForm").addEventListener("submit", async e=>{
 if(q("#puertaSalir")) q("#puertaSalir").addEventListener("click", async ()=>{
   await SB.auth.signOut(); location.reload();
 });
-if(q("#puertaInicio")) q("#puertaInicio").addEventListener("click", ()=>{ location.href = "/"; });
+/* El sitio puede estar publicado en una subcarpeta (GitHub Pages lo hace
+   así: /cotizador-heymakers/). Mandar a "/" saldría del proyecto, así que
+   siempre volvemos al index que está junto a esta página. */
+const ALCOTIZADOR = "index.html";
+if(q("#puertaInicio")) q("#puertaInicio").addEventListener("click", ()=>{ location.href = ALCOTIZADOR; });
 if(q("#labSalir")) q("#labSalir").addEventListener("click", async ()=>{
-  await SB.auth.signOut(); location.href = "/";
+  await SB.auth.signOut(); location.href = ALCOTIZADOR;
 });
-if(q("#labCotizador")) q("#labCotizador").addEventListener("click", ()=>{ location.href = "/"; });
+if(q("#labCotizador")) q("#labCotizador").addEventListener("click", ()=>{ location.href = ALCOTIZADOR; });
 
-if(SB) SB.auth.onAuthStateChange(evt=>{ if(evt === "SIGNED_OUT") location.href = "/"; });
+if(SB) SB.auth.onAuthStateChange(evt=>{ if(evt === "SIGNED_OUT") location.href = ALCOTIZADOR; });
 arranca();

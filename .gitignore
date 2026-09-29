@@ -3,7 +3,11 @@ node_modules/
 .env
 .env.*
 
-# Lo que Claude deja en la carpeta y no es parte del sitio:
-# el respaldo comprimido y el archivo de publicar.
+# Lo que Claude deja en la carpeta y no es parte del sitio.
 Claude outputs/
 *.zip
+workflow-github-pages.txt
+
+# Las copias del SQL con tu correo escrito. El repositorio es publico:
+# estas NO deben subir nunca. Las versiones de sql/ van con marcador.
+CORRER-*.sql

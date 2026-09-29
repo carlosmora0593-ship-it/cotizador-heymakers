@@ -48,6 +48,32 @@ function revisaConfig(){
   return null;
 }
 
+/* ---------- ¿Este sitio tiene funciones de servidor? ----------
+   El cotizador entero vive entre el navegador y Supabase, así que corre en
+   cualquier lado. Pero tres cosas necesitan un servidor que guarde la llave
+   de servicio en secreto: crear el cobro en Mercado Pago, recibir el aviso
+   de pago, y dar de alta a alguien del equipo.
+
+   En Netlify existen. En GitHub Pages no, porque ahí solo se sirven
+   archivos. En vez de dejar que el botón truene con un error incomprensible,
+   lo preguntamos una vez y lo decimos con todas sus letras. */
+const FUNCIONES = "/.netlify/functions/";
+const SIN_SERVIDOR = "SIN_SERVIDOR";
+
+/* Preguntar de antemano "¿hay servidor?" sale mal: cada hosting contesta
+   distinto a una petición a la nada (404, 405, 501, una página de error).
+   Así que no adivinamos: hacemos la llamada de verdad y miramos QUÉ
+   contestó. Una función siempre contesta JSON; un sitio de puros archivos
+   contesta su página de error en HTML. Eso no falla en ningún lado. */
+async function leeJson(r){
+  const tipo = (r.headers.get("content-type") || "").toLowerCase();
+  if(tipo.indexOf("json") < 0){
+    const e = new Error(SIN_SERVIDOR); e.code = SIN_SERVIDOR; throw e;
+  }
+  try{ return await r.json(); }
+  catch(err){ const e = new Error(SIN_SERVIDOR); e.code = SIN_SERVIDOR; throw e; }
+}
+
 const PROBLEMA_CONFIG = revisaConfig();
 const URL_SB = String((window.CONFIG && CONFIG.SUPABASE_URL) || "").trim().replace(/\/+$/,"");
 const SB = PROBLEMA_CONFIG ? null : window.supabase.createClient(URL_SB, CONFIG.SUPABASE_ANON_KEY);
@@ -301,12 +327,12 @@ async function renderEquipo(){
   }
 }
 async function llamaEquipo(cuerpo){
-  const r = await fetch("/.netlify/functions/invitar-usuario", {
+  const r = await fetch(FUNCIONES + "invitar-usuario", {
     method:"POST",
     headers:{"Content-Type":"application/json","Authorization":"Bearer "+SESION.access_token},
     body: JSON.stringify(cuerpo)
   });
-  const data = await r.json();
+  const data = await leeJson(r);
   if(!r.ok) throw new Error(data.error || "No se pudo completar");
   return data;
 }
@@ -340,6 +366,12 @@ document.addEventListener("click", async e=>{
       await renderEquipo();
     }catch(err){
       const m = String(err.message||"");
+      if(err.code === SIN_SERVIDOR){
+        alert("Dar de alta a alguien necesita un servidor, y esta publicación no lo tiene.\n\n" +
+              "Mientras tanto se hace desde Supabase: Authentication → Users → Add user con su " +
+              "correo, y luego agregas su renglón en la tabla membresias con el rol que le toca.");
+        return;
+      }
       alert(m.indexOf("administrador") >= 0
         ? "La base de datos dice que no eres administrador de esta cuenta. Es el mismo problema del aviso rojo: corre sql/03-arreglo-roles.sql y vuelve a intentarlo."
         : m);
@@ -519,7 +551,10 @@ q("#authProbar").addEventListener("click", async ()=>{
 q("#authOlvide").addEventListener("click", async ()=>{
   const correo = q("#authMail").value.trim();
   if(!correo){ avisoAuth("Escribe tu correo arriba y vuelve a darle"); return; }
-  await SB.auth.resetPasswordForEmail(correo, {redirectTo: location.origin});
+  /* De vuelta a ESTA página, no a la raíz del dominio: en GitHub Pages el
+     sitio vive en una subcarpeta y la raíz es de otro. */
+  const aqui = location.origin + location.pathname.replace(/[^/]*$/, "");
+  await SB.auth.resetPasswordForEmail(correo, {redirectTo: aqui});
   avisoAuth("Te mandamos un correo para cambiar tu contraseña", true);
 });
 
@@ -574,19 +609,25 @@ q("#planesCerrar").addEventListener("click", ()=> q("#modalPlanes").hidden = tru
 
 q("#planesGrid").addEventListener("click", async e=>{
   const b = e.target.closest("[data-contratar]"); if(!b) return;
+
   b.disabled = true; b.textContent = "Abriendo Mercado Pago…";
   try{
-    const r = await fetch("/.netlify/functions/crear-suscripcion", {
+    const r = await fetch(FUNCIONES + "crear-suscripcion", {
       method:"POST",
       headers:{"Content-Type":"application/json","Authorization":"Bearer "+SESION.access_token},
       body: JSON.stringify({plan:b.dataset.contratar, ciclo:q("#cicloSel").value})
     });
-    const data = await r.json();
+    const data = await leeJson(r);
     if(!r.ok || !data.init_point) throw new Error(data.error || "No se pudo crear la suscripción");
     location.href = data.init_point;
   }catch(err){
     b.disabled = false; b.textContent = "Suscribirme";
-    alert("No se pudo abrir el cobro: "+err.message);
+    const plan = (CONFIG.PLANES[b.dataset.contratar] || {}).nombre || b.dataset.contratar;
+    alert(err.code === SIN_SERVIDOR
+      ? "El cobro en línea todavía no está conectado en esta publicación.\n\n" +
+        "Para contratar el plan " + plan + ", escríbele a Hey Makers: te lo activan " +
+        "y sigues trabajando con todo lo que ya tienes, sin perder nada."
+      : "No se pudo abrir el cobro: " + err.message);
   }
 });
 

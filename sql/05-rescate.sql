@@ -1,4 +1,6 @@
 -- ============================================================
+--  ANTES DE CORRERLO: cambia TU-CORREO-DE-DUENO@EJEMPLO.COM por tu correo.
+-- ============================================================
 --  RESCATE — arregla el rol del dueño y le pone a una cuenta el plan
 --  que tú decidas, a mano.
 --
@@ -61,7 +63,7 @@ update public.perfiles p
 
 do $$
 declare
-  v_correo text := 'carlosmora0593@gmail.com';
+  v_correo text := 'TU-CORREO-DE-DUENO@EJEMPLO.COM';
   v_plan   text := 'pro';
   v_meses  int  := 120;
   cuantas  int;

@@ -1,4 +1,9 @@
 -- ============================================================
+--  ANTES DE CORRERLO: busca TU-CORREO-DE-DUENO@EJEMPLO.COM (sale tres veces)
+--  y ponlo con tu correo. Va con marcador porque este repositorio es
+--  publico, y un correo escrito aqui lo acaban recogiendo los que
+--  mandan basura.
+-- ============================================================
 --  06 · VARIAS EMPRESAS BAJO UN MISMO CORREO, Y TU PUERTA DE DUEÑO
 --  Correr DESPUÉS de 01, 02, 03 y 04. Es seguro repetirlo.
 -- ============================================================
@@ -232,7 +237,7 @@ as $$ select exists (select 1 from public.staff where id = auth.uid() and rol = 
 
 do $$
 declare
-  v_correo text := 'carlosmora0593@gmail.com';   -- <<< tu correo de dueño
+  v_correo text := 'TU-CORREO-DE-DUENO@EJEMPLO.COM';   -- <<< tu correo de dueño
   v_id uuid;
 begin
   select id into v_id from auth.users where lower(email) = lower(v_correo) limit 1;
@@ -383,11 +388,11 @@ comment on table public.lab_datos is
 --  COMPROBACIÓN
 -- ============================================================
 select 'Tus empresas' as que, count(*)::text as cuantas from public.membresias
- where usuario_id = (select id from auth.users where lower(email) = lower('carlosmora0593@gmail.com'))
+ where usuario_id = (select id from auth.users where lower(email) = lower('TU-CORREO-DE-DUENO@EJEMPLO.COM'))
 union all
 select 'Eres dueño', case when exists (
   select 1 from public.staff s join auth.users u on u.id = s.id
-   where lower(u.email) = lower('carlosmora0593@gmail.com') and s.rol = 'dueno')
+   where lower(u.email) = lower('TU-CORREO-DE-DUENO@EJEMPLO.COM') and s.rol = 'dueno')
   then 'sí' else 'no' end
 union all
 select 'Cuentas en total', count(*)::text from public.cuentas;
