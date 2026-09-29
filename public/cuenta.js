@@ -250,6 +250,11 @@ function aplicaPermisos(){
   document.body.classList.toggle("rol-ventas", rol()==="ventas");
   document.body.classList.toggle("rol-diseno", rol()==="diseno");
   document.body.classList.toggle("rol-produccion", rol()==="produccion");
+  /* Sin acceso a Ajustes no tiene sentido ofrecerlos: un menú que enseña
+     puertas cerradas hace perder el tiempo. */
+  const hayAjustes = permitidas.indexOf("set") >= 0;
+  ["#btnEquipo", "#btnAjustes"].forEach(sel=>{ const b = q(sel); if(b) b.hidden = !hayAjustes; });
+
   const chip = q("#cuentaRol");
   if(chip){
     chip.textContent = (ROLES_NOMBRE[rol()] || "Sin rol asignado") + (rolRaro() ? " ⚠" : "");
@@ -423,21 +428,33 @@ async function cargaCuenta(){
    las vistas de Makers Lab te contestan cero renglones aunque las pidas a
    mano; esto solo se ahorra enseñarte un botón que no lleva a ningún lado. */
 async function revisaStaff(){
+  SOY_STAFF = false;
+  /* Primero la pregunta directa. Si la base contesta un error —una regla
+     mal puesta, por ejemplo— no nos quedamos con "no eres del equipo":
+     volvemos a preguntar por la función, que es la que de verdad manda.
+     Un error de configuración no debe verse igual que un "no". */
   try{
-    const {data} = await SB.from("staff").select("rol").eq("id", SESION.user.id).maybeSingle();
-    SOY_STAFF = !!data;
-  }catch(e){ SOY_STAFF = false; }
+    const {data, error} = await SB.from("staff").select("rol").eq("id", SESION.user.id).maybeSingle();
+    if(!error){ SOY_STAFF = !!data; }
+    else {
+      const r = await SB.rpc("es_staff");
+      SOY_STAFF = r.data === true;
+      if(r.data === true) console.warn("La tabla staff no se deja leer (" + error.message + "). Revisa la política staff_ver.");
+    }
+  }catch(e){
+    try{ const r = await SB.rpc("es_staff"); SOY_STAFF = r.data === true; }catch(e2){ SOY_STAFF = false; }
+  }
   const b = q("#btnLab");
   if(b) b.hidden = !SOY_STAFF;
 }
 
 /* ---------- El selector de empresa ---------- */
 function pintaEmpresas(){
-  const sel = q("#empresaSel");
+  const sel = q("#empresaSel"), caja = q("#perfilEmpresas");
   if(!sel) return;
   const varias = EMPRESAS.length > 1;
-  sel.hidden = !varias && !SOY_STAFF;   // con una sola empresa no estorba, salvo que seas tú
-  if(sel.hidden) return;
+  if(caja) caja.hidden = !varias && !SOY_STAFF;   // con una sola empresa no estorba, salvo que seas tú
+  if(caja && caja.hidden) return;
 
   sel.innerHTML = EMPRESAS.map(e=>
       '<option value="'+e.id+'"'+(e.activa?" selected":"")+'>'+escTxt(e.nombre||"Sin nombre")+'</option>'
@@ -559,11 +576,40 @@ q("#authOlvide").addEventListener("click", async ()=>{
 });
 
 /* ---------- Encabezado de cuenta ---------- */
+/* El nombre que se enseña: el que pusiste al registrarte y, si no hay,
+   la parte del correo antes de la arroba. "carlosmora0593" se lee mejor
+   que un correo completo cortado a la mitad. */
+function nombreCorto(){
+  const n = (PERFIL && PERFIL.nombre || "").trim();
+  if(n) return n;
+  const c = (PERFIL && PERFIL.correo) || (SESION && SESION.user && SESION.user.email) || "";
+  return c.split("@")[0] || "Mi perfil";
+}
+
+function pintaPerfil(){
+  const nom = nombreCorto();
+  const ini = nom.trim().charAt(0) || "·";
+  [["#perfilNombre", nom], ["#perfilNombre2", nom], ["#perfilAv", ini], ["#perfilAv2", ini]]
+    .forEach(([sel, txt]) => { const el = q(sel); if(el) el.textContent = txt; });
+  const v = q("#perfilVersion");
+  if(v) v.textContent = VERSION_SITIO;
+}
+
+function abrePerfil(abrir){
+  const m = q("#perfilMenu"), b = q("#perfilBtn");
+  if(!m || !b) return;
+  const va = abrir === undefined ? m.hidden : abrir;
+  m.hidden = !va;
+  b.setAttribute("aria-expanded", va ? "true" : "false");
+}
+
 function pintaCuenta(){
   const dias = Math.max(0, Math.ceil((new Date(CUENTA.vence) - new Date())/86400000));
   const etiqueta = plan()==="prueba" ? "Prueba · "+dias+" día(s)" : "Plan "+nombrePlan();
-  q("#cuentaPlan").textContent = etiqueta;
-  q("#cuentaPlan").className = "chip-store " + (vigente() ? (nivelPlan()>=2 ? "pro" : "ok") : "malo");
+  const chip = q("#cuentaPlan");
+  chip.textContent = etiqueta;
+  chip.style.color = vigente() ? "" : "var(--warn)";
+  pintaPerfil();
   q("#cuentaMail").textContent = (PERFIL && PERFIL.correo) || SESION.user.email;
   q("#avisoPago").hidden = vigente();
   if(!vigente()) q("#avisoPagoTxt").textContent =
@@ -586,6 +632,40 @@ if(selEmp) selEmp.addEventListener("change", e=> cambiaEmpresa(e.target.value));
 
 const btnLab = q("#btnLab");
 if(btnLab) btnLab.addEventListener("click", ()=>{ location.href = "lab.html"; });
+
+/* ---------- El menú de perfil ---------- */
+const btnPerfil = q("#perfilBtn");
+if(btnPerfil) btnPerfil.addEventListener("click", e=>{ e.stopPropagation(); abrePerfil(); });
+
+/* Se cierra al hacer clic fuera, con Escape, y al elegir cualquier cosa:
+   un menú que se queda abierto tapando la pantalla es una molestia. */
+document.addEventListener("click", e=>{
+  const m = q("#perfilMenu");
+  if(m && !m.hidden && !e.target.closest(".perfilBox")) abrePerfil(false);
+});
+document.addEventListener("keydown", e=>{
+  if(e.key === "Escape"){ const m = q("#perfilMenu"); if(m && !m.hidden) abrePerfil(false); }
+});
+const listaPerfil = q("#perfilMenu");
+if(listaPerfil) listaPerfil.addEventListener("click", e=>{
+  if(e.target.closest("#perfilEmpresas")) return;      // elegir empresa no debe cerrarlo
+  if(e.target.closest("button")) abrePerfil(false);
+});
+
+/* Llevar a una pestaña y, si hace falta, a una tarjeta dentro de ella. */
+function vaA(pestana, ancla){
+  const b = document.querySelector('#tabs [data-tab="' + pestana + '"]');
+  if(!b || b.hidden){ alert("Esa sección no está disponible con tu plan o tu rol."); return; }
+  b.click();
+  if(ancla) setTimeout(()=>{
+    const el = q(ancla);
+    if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
+  }, 260);
+}
+const btnEquipo = q("#btnEquipo");
+if(btnEquipo) btnEquipo.addEventListener("click", ()=> vaA("set", "#equipoCaja"));
+const btnAjustes = q("#btnAjustes");
+if(btnAjustes) btnAjustes.addEventListener("click", ()=> vaA("set"));
 q("#btnPlanes").addEventListener("click", ()=> abrePlanes());
 q("#avisoPagoBtn").addEventListener("click", ()=> abrePlanes());
 

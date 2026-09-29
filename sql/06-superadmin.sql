@@ -213,11 +213,14 @@ create table if not exists public.staff (
 );
 alter table public.staff enable row level security;
 
-drop policy if exists staff_ver on public.staff;
-create policy staff_ver on public.staff
-  for select using (id = auth.uid() or exists (select 1 from public.staff s where s.id = auth.uid()));
-
--- Nadie se da de alta solo: se agrega desde aquí, con la llave de servicio.
+-- Las dos preguntas van PRIMERO, porque la política de abajo las usa y
+-- Postgres exige que la función exista cuando se crea la política.
+--
+-- Y van como security definer por una razón de fondo: la versión evidente
+-- de la política —"deja ver la tabla a quien esté en la tabla"— se pregunta
+-- a sí misma, y Postgres contesta "infinite recursion detected". Una
+-- función security definer lee sin volver a pasar por la política, y ahí se
+-- rompe el círculo.
 
 create or replace function public.es_staff()
 returns boolean
@@ -228,6 +231,12 @@ create or replace function public.es_super()
 returns boolean
 language sql stable security definer set search_path = public
 as $$ select exists (select 1 from public.staff where id = auth.uid() and rol = 'dueno') $$;
+
+drop policy if exists staff_ver on public.staff;
+create policy staff_ver on public.staff
+  for select using (id = auth.uid() or public.es_staff());
+
+-- Nadie se da de alta solo: se agrega desde aquí, con la llave de servicio.
 
 
 -- ---------- 2.2 Tu correo, dado de alta solo ----------

@@ -47,8 +47,22 @@ const VERSION_LAB = window.BUILD || "sin sello";
    un tablero vacío. */
 
 async function quienSoy(){
-  const {data} = await SB.from("staff").select("*").eq("id", SESION.user.id).maybeSingle();
-  return data || null;
+  const {data, error} = await SB.from("staff").select("*").eq("id", SESION.user.id).maybeSingle();
+  if(!error) return data || null;
+
+  /* La tabla no se dejó leer. Antes de darte con la puerta en las narices
+     preguntamos por la función, que es la que manda: si resulta que sí eres
+     del equipo, te dejamos pasar y avisamos que hay una regla mal puesta.
+     Cerrarle a quien sí tiene permiso, por un error de configuración, es
+     peor que enseñar el tablero. */
+  try{
+    const r = await SB.rpc("es_staff");
+    if(r.data === true){
+      console.warn("La tabla staff no se deja leer (" + error.message + "). Corre el arreglo de la política staff_ver.");
+      return {id: SESION.user.id, correo: SESION.user.email, nombre: SESION.user.email, rol: "soporte", parcial: true};
+    }
+  }catch(e){}
+  return null;
 }
 
 async function arranca(){

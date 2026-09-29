@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20260928-2014"></script>
+<script src="config.js?v=20260929-0806"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -624,9 +624,53 @@ body.sin-acceso .wrap,body.sin-acceso header.top{display:none}
 }
 
 
-/* ---- cuenta, acceso y planes ---- */
-.cuentaBox{display:flex;align-items:center;gap:8px}
-.cuentaMail{font-size:12px;color:var(--ink-3);max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ---- el menú de perfil ----
+   Todo lo de la cuenta cabe aquí: el plan, la empresa, el equipo, los
+   ajustes, Makers Lab y la salida. Antes eran seis cosas sueltas peleando
+   por el ancho del encabezado. */
+.perfilBox{position:relative}
+.perfilBtn{display:flex;align-items:center;gap:9px;font:inherit;cursor:pointer;
+  background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:4px 12px 4px 5px;
+  color:var(--ink);transition:border-color .15s,box-shadow .15s}
+.perfilBtn:hover{border-color:var(--ink-3)}
+.perfilBtn[aria-expanded="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.perfilBtn .chev{color:var(--ink-3);font-size:11px;transition:transform .2s}
+.perfilBtn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.perfilAv{width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;
+  background:var(--accent);color:var(--accent-ink);font-family:"Fredoka",system-ui,sans-serif;
+  font-weight:600;font-size:13px;text-transform:uppercase}
+.perfilAv.xl{width:42px;height:42px;font-size:18px}
+.perfilQuien{display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;min-width:0}
+.perfilQuien b{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:13.5px;
+  max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.perfilQuien small{font-size:10.5px;color:var(--ink-3);font-weight:600;letter-spacing:.03em}
+@media (max-width:620px){.perfilQuien{display:none}.perfilBtn{padding:4px 9px 4px 5px}}
+
+.perfilMenu{position:absolute;top:calc(100% + 8px);right:0;z-index:45;width:min(310px,calc(100vw - 32px));
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+  overflow:hidden;animation:pop .16s ease-out}
+.perfilCab{display:flex;gap:11px;align-items:center;padding:14px 15px;background:var(--surface-2);
+  border-bottom:1px solid var(--line-soft)}
+.perfilQuien2{min-width:0;display:flex;flex-direction:column;gap:2px;align-items:flex-start}
+.perfilQuien2 b{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:15px}
+.perfilQuien2 small{font-size:11.5px;color:var(--ink-3);max-width:195px;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.perfilEmp{padding:12px 15px;border-bottom:1px solid var(--line-soft)}
+.perfilEmp label.f{margin-bottom:4px}
+.perfilLista{display:grid;gap:1px;padding:6px}
+.perfilLista button{display:grid;gap:1px;text-align:left;font:inherit;border:0;background:transparent;
+  color:var(--ink);padding:9px 11px;border-radius:9px;cursor:pointer;transition:background .15s}
+.perfilLista button b{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:14px}
+.perfilLista button small{color:var(--ink-3);font-size:11px}
+.perfilLista button:hover{background:var(--surface-2)}
+.perfilLista button.esLab b{color:var(--accent)}
+.perfilLista button.esLab:hover{background:var(--accent-soft)}
+.perfilPie{display:flex;align-items:center;gap:10px;padding:10px 15px;border-top:1px solid var(--line-soft);
+  background:var(--surface-2)}
+.perfilPie button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink-2);border-radius:8px;padding:6px 12px;cursor:pointer}
+.perfilPie button:hover{border-color:var(--accent);color:var(--accent)}
+.perfilVer{margin-left:auto;font-size:10px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace}
 .chip-store.ok{border-color:var(--good);color:var(--good)}
 .chip-store.pro{border-color:var(--accent);color:var(--accent);font-weight:700}
 .chip-store.malo{border-color:var(--warn);color:var(--warn)}
@@ -657,10 +701,7 @@ body.sin-sesion .wrap,body.sin-sesion header.top,body.sin-sesion .avisoPago{disp
 #t_equipo{display:none!important}
 
 /* ---- lo que cada rol no debe ver ---- */
-.empresaSel{width:auto;max-width:190px;font-weight:600;font-family:"Fredoka",system-ui,sans-serif;
-  padding:5px 9px;font-size:13px;border-radius:8px}
-.btn.lab{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:700}
-.btn.lab:hover{filter:brightness(1.25)}
+.empresaSel{width:100%;font-weight:600;font-family:"Fredoka",system-ui,sans-serif;font-size:13.5px}
 body.rol-ventas .solo-admin,
 body.rol-diseno .solo-admin,
 body.rol-produccion .solo-admin{display:none!important}
@@ -733,14 +774,40 @@ body.rol-produccion #btnPrint{display:none!important}
       <span class="av" id="userAv">A</span>
       <span><span id="userNombre">Administrador</span> <span class="rolTxt" id="userRol">Admin</span></span>
     </button>
-    <div class="cuentaBox">
-      <select class="empresaSel" id="empresaSel" hidden aria-label="Empresa"></select>
-      <span class="chip-store" id="cuentaPlan">…</span>
-      <span class="chip-store" id="cuentaRol"></span>
-      <span class="cuentaMail" id="cuentaMail"></span>
-      <button class="btn sm" id="btnPlanes">Mi plan</button>
-      <button class="btn sm lab" id="btnLab" hidden title="Consola interna de Hey Makers">Makers Lab</button>
-      <button class="btn sm ghost" id="btnSalir">Salir</button>
+    <div class="perfilBox">
+      <button class="perfilBtn" id="perfilBtn" aria-expanded="false" aria-haspopup="true">
+        <span class="perfilAv" id="perfilAv">·</span>
+        <span class="perfilQuien"><b id="perfilNombre">Mi perfil</b><small id="cuentaPlan">…</small></span>
+        <span class="chev">▾</span>
+      </button>
+
+      <div class="perfilMenu" id="perfilMenu" hidden role="menu">
+        <div class="perfilCab">
+          <span class="perfilAv xl" id="perfilAv2">·</span>
+          <div class="perfilQuien2">
+            <b id="perfilNombre2">—</b>
+            <small id="cuentaMail"></small>
+            <span class="chip-store" id="cuentaRol"></span>
+          </div>
+        </div>
+
+        <div class="perfilEmp" id="perfilEmpresas" hidden>
+          <label class="f" for="empresaSel">Empresa</label>
+          <select class="empresaSel" id="empresaSel" aria-label="Empresa"></select>
+        </div>
+
+        <div class="perfilLista">
+          <button role="menuitem" id="btnPlanes"><b>Mi plan</b><small>Ver, cambiar o renovar tu suscripción</small></button>
+          <button role="menuitem" id="btnEquipo"><b>Equipo y permisos</b><small>Quién entra y qué puede hacer</small></button>
+          <button role="menuitem" id="btnAjustes"><b>Ajustes</b><small>Utilidad, IVA y datos de tu empresa</small></button>
+          <button role="menuitem" id="btnLab" hidden class="esLab"><b>Makers Lab</b><small>La consola interna de Hey Makers</small></button>
+        </div>
+
+        <div class="perfilPie">
+          <button id="btnSalir">Cerrar sesión</button>
+          <span class="perfilVer" id="perfilVersion"></span>
+        </div>
+      </div>
     </div>
   </div>
 </header>
@@ -5859,8 +5926,8 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20260928-2014";</script>
+<script>window.BUILD="20260929-0806";</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20260928-2014"></script>
+<script src="cuenta.js?v=20260929-0806"></script>
 </body>
 </html>
