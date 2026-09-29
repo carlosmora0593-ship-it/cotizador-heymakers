@@ -80,13 +80,36 @@ En **Site configuration → Environment variables** agrega:
 | `SUPABASE_SERVICE_KEY` | La llave **service_role** (la secreta) |
 | `MP_ACCESS_TOKEN` | El Access Token de Mercado Pago (paso 3) |
 | `SITE_URL` | La dirección final de tu sitio, sin diagonal al final |
-| `WEBHOOK_CLAVE` | Una palabra secreta que tú inventes, sin espacios |
+| `WEBHOOK_CLAVE` | Una cadena larga y al azar, sin espacios. **No una palabra** — abajo se explica por qué |
 
 La función que da de alta al equipo usa estas mismas variables, así que con
 ponerlas una vez queda todo listo.
 
 Después de agregarlas dale **Deploys → Trigger deploy → Deploy site** para que
 las tome.
+
+### Por qué la clave del webhook tiene que ser al azar
+
+Netlify revisa cada despliegue buscando si el **valor** de alguna de tus
+variables aparece escrito en los archivos. Si pones como `WEBHOOK_CLAVE` una
+palabra normal —tu nombre, tu marca, "soporte"— tarde o temprano esa palabra
+aparece en algún comentario o en una guía, y el despliegue **falla** con un
+mensaje de secretos encontrados.
+
+Pero el problema de fondo no es el despliegue: es que **una palabra se adivina**.
+Esa clave es lo único que separa tu webhook de que cualquiera te mande avisos
+falsos de pago. Usa algo así, de 40 caracteres al azar:
+
+```
+H7NE2M9Q3hcv9Wn5YrlKub3BDsf7zrVVKMCRZqp3
+```
+
+Genera la tuya, no copies ésa. Y si cambias la clave, acuérdate de cambiarla
+también en la dirección del webhook que registraste en Mercado Pago.
+
+Si aun así un despliegue falla por el revisor de secretos, el `netlify.toml`
+ya deja fuera las carpetas que no forman parte del sitio (`sql/` y los `.md`),
+que es donde suelen estar las coincidencias inocentes.
 
 Regresa a Supabase → **Authentication → URL Configuration** y pon ahí la
 dirección de tu sitio como *Site URL*.
@@ -120,7 +143,7 @@ https://TU-SITIO.netlify.app/.netlify/functions/webhook-mercadopago?clave=LA-CLA
 ## Paso 4 — Pruébalo de punta a punta
 
 1. Abre tu sitio y crea una cuenta con tu correo.
-2. Debe entrar directo con **14 días de prueba** y todo abierto.
+2. Debe entrar directo con **15 días de prueba** y todo abierto.
 3. Arma una cotización, sube un diseño, guárdala, cóbrala y revisa que aparezca
    en Ventas.
 4. Dale a **Mi plan → Suscribirme** y completa el pago con una tarjeta de prueba
@@ -134,24 +157,27 @@ llamada; ahí aparece qué respondió Mercado Pago.
 
 ---
 
-## Los tres roles
+## Los cuatro roles
 
 Quien crea la cuenta queda como **administrador**. Desde **Ajustes → Equipo**
 da de alta al resto con el correo y el rol; el sistema devuelve una contraseña
 temporal que le pasas a la persona para que entre y la cambie.
 
-| | Administrador | Ventas | Producción |
-|---|---|---|---|
-| Cotizar y confirmar pedidos | sí | sí | no |
-| Clientes y expedientes | sí | sí | no |
-| Catálogo | edita | solo consulta | no |
-| Tablero de producción | sí | solo consulta | **sí, es lo único** |
-| Cambiar estatus y checklist | sí | **no** | sí |
-| Dejar notas en la bitácora | sí | **no** | sí |
-| Prioridad y pendientes de la orden | **solo admin** | no | no |
-| Caja y cortes | sí | no | no |
-| Ventas, utilidades y análisis | sí | no | no |
-| Ajustes y equipo | sí | no | no |
+| | Administrador | Ventas | Diseño | Producción |
+|---|---|---|---|---|
+| Cotizar y confirmar pedidos | sí | sí | no | no |
+| Clientes y expedientes | sí | sí | no | no |
+| Catálogo | edita | solo consulta | no | no |
+| Mesa de diseño (archivos) | sí | sí | **sí, es lo suyo** | no |
+| Tablero de producción | sí | solo consulta | sí | **sí** |
+| Cambiar estatus y checklist | sí | **no** | no | sí |
+| Dejar notas en la bitácora | sí | **no** | sí | sí |
+| Compras y requisiciones | sí | levanta | no | recibe material |
+| Autorizar una requisición | **solo admin** | no | no | no |
+| Prioridad y pendientes de la orden | **solo admin** | no | no | no |
+| Caja y cortes | sí | no | no | no |
+| Ventas, utilidades y análisis | sí | no | no | no |
+| Ajustes y equipo | sí | no | no | no |
 
 **Producción no ve precios en ninguna pantalla**: ni el resumen de la
 cotización, ni los botones de cobro, ni el catálogo. Su tablero muestra folio,
@@ -173,23 +199,82 @@ reordena el tablero, así que lo urgente sube solo hasta arriba.
 ("pedido listo hoy a las 4"), y ventas y administración lo leen en el tablero,
 en el paso de Producción de la cotización y en la orden impresa.
 
-El plan Básico es de un solo usuario; para trabajar en equipo hay que estar en Pro.
+El plan Básico es de un solo usuario. Maker permite tres y Pro no tiene límite.
+
+**Si entraste y no te deja ver el equipo ni los ajustes**, tu renglón de la tabla
+`perfiles` no dice `admin`. Pasa cuando se corre `01-esquema.sql` después de
+`02-roles.sql`. Córrele `sql/03-arreglo-roles.sql`: deja el disparador correcto y
+pone como administrador al primero que entró en cada cuenta.
+
+## Tus propias empresas y tu consola de dueño
+
+Esto lo enciende `sql/06-superadmin.sql`. Córrelo después de los otros.
+
+**Un correo, varias empresas.** Antes un correo pertenecía a una sola empresa.
+Ahora puede pertenecer a varias y cambiar entre ellas con el selector que
+aparece arriba, junto a tu plan. Cada una va completamente aparte: su catálogo,
+sus clientes, sus precios, sus cotizaciones y sus números. Nada se mezcla, ni
+siquiera entre dos empresas tuyas, porque la separación no la hace la pantalla
+sino las reglas por fila de la base: al cambiar de empresa cambia la respuesta
+de `mi_cuenta()`, y con eso cambia todo lo que la base te deja ver.
+
+El selector solo aparece cuando de verdad tienes más de una. Un taller suscrito
+que tiene una sola nunca lo ve.
+
+**Tu consola.** El botón de Makers Lab solo le sale a quien está en la tabla
+`staff`. Y no es un botón escondido: es la base la que decide. Las vistas que
+Makers Lab lee (`v_cuentas`, `v_resumen`, `v_uso`, `v_altas`) empiezan todas
+con `where public.es_staff()`, así que a cualquier otro usuario le contestan
+cero renglones aunque las pida a mano desde fuera del sitio. Esconder el botón
+sin esa regla no habría protegido nada.
+
+El archivo da de alta tu correo solo, buscándolo en `auth.users`; no tienes que
+copiar ningún uuid. Si todavía no has entrado nunca al sitio, te avisa: entra
+una vez y vuelve a correrlo.
+
+**Lo que Makers Lab puede ver, y lo que no.** Ve cuántas cuentas hay, en qué
+plan están, cuándo vencen, cuántas cotizaciones llevan, cuándo entraron por
+última vez y qué tickets abrieron. No ve el contenido de una sola cotización,
+ni los clientes de un taller, ni sus precios, ni sus archivos.
+
+Eso no es una decisión de la pantalla que se pueda revertir quitando un botón:
+las vistas simplemente no traen esa información, así que no hay forma de
+pedirla. La única excepción son los tickets de soporte, que sí traen su
+conversación, porque el cliente la escribió para que tú la leas.
+
+**Lo que tú anotas.** Tu equipo, tus alianzas, tus citas y las notas
+comerciales de cada cuenta (de dónde llegó, quién la atiende, su RFC) son datos
+de Hey Makers, no de tus clientes. Viven en la tabla `lab_datos`, que también es
+solo para `staff`. Cuando guardas una cuenta desde Makers Lab se guardan esas
+notas, nunca los números: los números son de la base y no se editan a mano.
 
 ## Cómo quedaron los planes
 
 Los defines en `public/config.js`. Así vienen de fábrica:
 
+Los precios ya traen IVA: quien paga $199 ve $199 en su estado de cuenta.
+
 **Básico — $199/mes o $1,990/año.** Para quien sale de tu curso: cotizador
-completo, catálogo propio, orden de producción, carga de archivos, hasta 150
-cotizaciones guardadas, un usuario.
+completo, catálogo propio, orden de producción con folio, clientes y
+expedientes, hasta 150 cotizaciones guardadas, un usuario. Es el que se prueba
+y el que se vende solo.
 
-**Pro — $499/mes o $4,990/año.** Para talleres con equipo: todo lo anterior sin
-límite, más el registro de ventas con cortes diario, semanal y mensual, utilidad
-y margen real por periodo, y varios usuarios en la misma cuenta.
+**Maker — $449/mes o $4,490/año.** Cuando ya son dos o tres en el taller: todo
+lo de Básico más los roles de ventas, diseño y producción, compras con
+requisiciones foliadas y proveedores, inventario y bitácora, hasta 600
+cotizaciones y hasta tres usuarios.
 
-El gancho para subir a Pro es el **registro de ventas**: cotizar lo hace
-cualquiera, pero saber cuánto ganaste el mes pasado es lo que vuelve indispensable
-la herramienta.
+**Pro — $899/mes o $8,990/año.** Para la empresa que mide: todo lo de Maker sin
+límite de cotizaciones, más caja y registro de ventas con cortes, utilidad y
+margen real por periodo, reportes en Excel y usuarios sin límite. No se muestra
+en frío: lo trabaja el equipo de ventas con cita.
+
+El gancho para subir de Básico a Maker es **trabajar en equipo**; el de Maker a
+Pro es **el registro de ventas**: cotizar lo hace cualquiera, pero saber cuánto
+ganaste el mes pasado es lo que vuelve indispensable la herramienta.
+
+Si cambias un precio, cámbialo en los dos lados: `public/config.js` (lo que ve el
+cliente) y `netlify/functions/crear-suscripcion.js` (lo que se le cobra).
 
 Los límites no están solo escondidos en la pantalla: viven en la base de datos
 (`sql/01-esquema.sql`, sección *Límites por plan*), así que nadie los brinca
@@ -237,6 +322,7 @@ public/
 netlify/functions/
   crear-suscripcion.js      crea el cobro en Mercado Pago
   webhook-mercadopago.js    recibe el aviso y activa la cuenta
+netlify/functions/
   invitar-usuario.js        alta, cambio de rol y baja del equipo
 sql/
   01-esquema.sql            tablas, seguridad y límites por plan

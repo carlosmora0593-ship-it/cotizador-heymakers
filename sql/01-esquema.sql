@@ -8,9 +8,9 @@
 create table if not exists public.cuentas (
   id                uuid primary key default gen_random_uuid(),
   nombre            text        not null default 'Mi taller',
-  plan              text        not null default 'prueba',   -- prueba | basico | pro
+  plan              text        not null default 'prueba',   -- prueba | basico | maker | pro
   estado            text        not null default 'activa',   -- activa | vencida | cancelada
-  vence             timestamptz not null default (now() + interval '14 days'),
+  vence             timestamptz not null default (now() + interval '15 days'),
   ciclo             text,                                    -- mensual | anual
   mp_preapproval_id text,
   creada            timestamptz not null default now()
@@ -22,7 +22,7 @@ create table if not exists public.perfiles (
   cuenta_id  uuid not null references public.cuentas(id) on delete cascade,
   nombre     text,
   correo     text,
-  rol        text not null default 'dueno',                  -- dueno | miembro
+  rol        text not null default 'admin',                  -- admin | ventas | diseno | produccion
   creado     timestamptz not null default now()
 );
 create index if not exists perfiles_cuenta_idx on public.perfiles(cuenta_id);
@@ -59,8 +59,11 @@ begin
   insert into public.cuentas (nombre)
     values (coalesce(new.raw_user_meta_data->>'negocio', 'Mi taller'))
     returning id into nueva;
-  insert into public.perfiles (id, cuenta_id, nombre, correo)
-    values (new.id, nueva, new.raw_user_meta_data->>'nombre', new.email);
+  -- Quien abre la cuenta es su administrador. Va explícito a propósito:
+  -- si este archivo se corre después de 02-roles.sql, el dueño no se queda
+  -- sin permisos.
+  insert into public.perfiles (id, cuenta_id, nombre, correo, rol)
+    values (new.id, nueva, new.raw_user_meta_data->>'nombre', new.email, 'admin');
   return new;
 end $$;
 
@@ -117,15 +120,19 @@ create policy documentos_todo on public.documentos
   with check (cuenta_id = public.mi_cuenta());
 
 -- ---------- 5. Límites por plan ----------
---  prueba  : 14 días con todo abierto
---  basico  : 150 cotizaciones, 50 clientes, 1 usuario, sin ventas ni caja
+--  prueba  : 15 días con todo abierto, para que vea qué está comprando
+--  basico  : 150 cotizaciones, 50 clientes, 1 usuario. Sin caja, ventas ni compras
+--  maker   : 600 cotizaciones, 400 clientes, 3 usuarios. Con compras e inventario
 --  pro     : sin límites
+--  Los topes viven en una sola tabla para no repetir la regla en cinco lugares.
 
 create or replace function public.limite_del_plan()
 returns trigger
 language plpgsql security definer set search_path = public
 as $$
-declare c record; cuantos int;
+declare
+  c record; cuantos int;
+  nivel int; tope_cot int; tope_cli int;
 begin
   select * into c from public.cuentas where id = new.cuenta_id;
 
@@ -133,22 +140,39 @@ begin
     raise exception 'SUSCRIPCION_VENCIDA';
   end if;
 
-  if c.plan = 'basico' and new.coleccion in ('ventas','caja') then
+  -- Los planes van en escalera: 1 Básico, 2 Maker, 3 Pro. La prueba abre todo.
+  nivel := case c.plan
+             when 'basico' then 1
+             when 'maker'  then 2
+             when 'pro'    then 3
+             when 'prueba' then 3
+             else 1
+           end;
+  tope_cot := case nivel when 1 then 150 when 2 then 600 else 0 end;   -- 0 = sin tope
+  tope_cli := case nivel when 1 then  50 when 2 then 400 else 0 end;
+
+  -- Caja y ventas son del plan Pro
+  if nivel < 3 and new.coleccion in ('ventas','caja') then
     raise exception 'FUNCION_PRO';
   end if;
 
-  if c.plan = 'basico' and new.coleccion = 'clientes' then
+  -- Compras, proveedores e inventario son del plan Maker en adelante
+  if nivel < 2 and new.coleccion in ('compras','proveedores','inventario') then
+    raise exception 'FUNCION_MAKER';
+  end if;
+
+  if tope_cli > 0 and new.coleccion = 'clientes' then
     select count(*) into cuantos from public.documentos
       where cuenta_id = new.cuenta_id and coleccion = 'clientes' and doc_id <> new.doc_id;
-    if cuantos >= 50 then
+    if cuantos >= tope_cli then
       raise exception 'LIMITE_CLIENTES';
     end if;
   end if;
 
-  if c.plan = 'basico' and new.coleccion = 'cotizaciones' then
+  if tope_cot > 0 and new.coleccion = 'cotizaciones' then
     select count(*) into cuantos from public.documentos
       where cuenta_id = new.cuenta_id and coleccion = 'cotizaciones' and doc_id <> new.doc_id;
-    if cuantos >= 150 then
+    if cuantos >= tope_cot then
       raise exception 'LIMITE_COTIZACIONES';
     end if;
   end if;

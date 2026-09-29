@@ -2,8 +2,30 @@
   publish = "public"
   functions = "netlify/functions"
 
+  # Los archivos de sql/ y las guías no forman parte del sitio: son las
+  # instrucciones que corres una vez en Supabase. No se publican en la web,
+  # pero el revisor de secretos de Netlify también los lee, y ahí hay
+  # nombres y palabras de ejemplo que pueden coincidir con alguna de tus
+  # claves. Se quedan fuera de esa revisión.
+  [build.environment]
+    SECRETS_SCAN_OMIT_PATHS = "sql/*,*.md"
+
+    # Estas dos llaves son públicas por diseño: viven en config.js porque el
+    # navegador las necesita, y no dan acceso a los datos de nadie (la base
+    # está protegida con reglas por fila). El revisor de secretos no tiene
+    # por qué alarmarse de encontrarlas ahí. La llave de servicio y el token
+    # de Mercado Pago NO están en esta lista, y nunca deben estarlo.
+    SECRETS_SCAN_OMIT_KEYS = "SUPABASE_URL,SUPABASE_ANON_KEY"
+
 [functions]
   node_bundler = "esbuild"
+
+# Makers Lab responde también en /lab, que es más fácil de teclear.
+# Va ANTES del comodín de abajo, porque el primero que coincide gana.
+[[redirects]]
+  from = "/lab"
+  to = "/lab.html"
+  status = 200
 
 [[redirects]]
   from = "/*"

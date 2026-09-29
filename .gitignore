@@ -2,3 +2,8 @@ node_modules/
 .netlify/
 .env
 .env.*
+
+# Lo que Claude deja en la carpeta y no es parte del sitio:
+# el respaldo comprimido y el archivo de publicar.
+Claude outputs/
+*.zip

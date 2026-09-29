@@ -16,38 +16,54 @@ window.CONFIG = {
   MARCA: "Hey Makers",
   ESLOGAN: "Cursos y Talleres",
 
-  // Precios de la suscripción (MXN). Cámbialos cuando quieras:
-  // el cobro se crea con estos montos al momento de suscribirse.
+  // Precios de la suscripción (MXN, IVA incluido). Cámbialos cuando
+  // quieras: el cobro se crea con estos montos al momento de suscribirse.
+  // El orden de aquí es el orden en que se pintan las tarjetas.
   PLANES: {
     basico: {
       nombre: "Básico",
       mensual: 199,
       anual: 1990,
-      para: "Para quien toma el curso y cotiza por su cuenta",
+      destacado: true,
+      para: "El que se prueba y el que arranca",
       incluye: [
         "Cotizador completo con todas las técnicas",
         "Catálogo propio de artículos y precios",
-        "Orden de producción con tallas y checklist",
-        "Carga de los archivos de impresión",
+        "Orden de producción con folio, tallas y checklist",
+        "Clientes y expedientes",
         "Hasta 150 cotizaciones guardadas",
         "1 usuario"
       ]
     },
+    maker: {
+      nombre: "Maker",
+      mensual: 449,
+      anual: 4490,
+      para: "Cuando ya son dos o tres en el taller",
+      incluye: [
+        "Todo lo del plan Básico",
+        "Roles de ventas, diseño y producción",
+        "Compras: requisiciones foliadas y proveedores",
+        "Inventario y bitácora de movimientos",
+        "Hasta 600 cotizaciones guardadas",
+        "Hasta 3 usuarios"
+      ]
+    },
     pro: {
       nombre: "Pro",
-      mensual: 499,
-      anual: 4990,
-      para: "Para talleres con equipo y control de ventas",
+      mensual: 899,
+      anual: 8990,
+      para: "Para la empresa que mide",
       incluye: [
-        "Todo lo del plan Básico, sin límite de cotizaciones",
-        "Registro de ventas con cortes diario, semanal y mensual",
+        "Todo lo del plan Maker, sin límite de cotizaciones",
+        "Caja y registro de ventas con cortes",
         "Utilidad y margen real por periodo",
-        "Exportación de datos",
-        "Varios usuarios en la misma cuenta",
+        "Reportes en Excel por área",
+        "Usuarios sin límite",
         "Soporte prioritario"
       ]
     }
   },
 
-  DIAS_DE_PRUEBA: 14
+  DIAS_DE_PRUEBA: 15
 };

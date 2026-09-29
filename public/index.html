@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js"></script>
+<script src="config.js?v=20260928-1936"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,6 +20,7 @@
   --accent:#D6127F; --accent-soft:#FDE8F3; --accent-ink:#FFFFFF;
   --cyan:#0680AB; --cyan-soft:#E0F3FA;
   --yellow:#FFEC30; --yellow-ink:#141414;
+  --guinda:#7A1231; --guinda-2:#A81B4A; --guinda-tenue:#F8E7ED; --guinda-medio:#E8B9CA;
   --good:#0E7C57; --good-soft:#DFF3EA; --warn:#96600A; --warn-soft:#FBEFD7;
   --shadow:0 1px 2px rgba(20,20,20,.05), 0 10px 26px -14px rgba(6,96,130,.30);
 }
@@ -30,6 +31,7 @@
     --accent:#FF63B4; --accent-soft:#35132A; --accent-ink:#20040F;
     --cyan:#4FC6F0; --cyan-soft:#0F2A35;
     --yellow:#FFE566; --yellow-ink:#141414;
+    --guinda:#8E1A3C; --guinda-2:#C4295C; --guinda-tenue:#2B1520; --guinda-medio:#43202F;
     --good:#54D6A5; --good-soft:#0F2A22; --warn:#F0BC62; --warn-soft:#2B2214;
     --shadow:0 1px 2px rgba(0,0,0,.45), 0 12px 30px -16px rgba(0,0,0,.8);
   }
@@ -40,6 +42,7 @@
   --accent:#FF63B4; --accent-soft:#35132A; --accent-ink:#20040F;
   --cyan:#4FC6F0; --cyan-soft:#0F2A35;
   --yellow:#FFE566; --yellow-ink:#141414;
+  --guinda:#8E1A3C; --guinda-2:#C4295C; --guinda-tenue:#2B1520; --guinda-medio:#43202F;
   --good:#54D6A5; --good-soft:#0F2A22; --warn:#F0BC62; --warn-soft:#2B2214;
   --shadow:0 1px 2px rgba(0,0,0,.45), 0 12px 30px -16px rgba(0,0,0,.8);
 }
@@ -575,29 +578,38 @@ body.sin-acceso .wrap,body.sin-acceso header.top{display:none}
 /* ---- ayuda y soporte ---- */
 .ayudaBtn{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:70;
   display:inline-flex;align-items:center;gap:8px;border:0;border-radius:26px;cursor:pointer;
-  background:var(--ink);color:var(--paper);padding:11px 18px;font:inherit;font-weight:700;font-size:14px;
-  box-shadow:0 10px 26px -10px rgba(0,0,0,.45);transition:transform .16s}
-.ayudaBtn:hover{transform:translateY(-2px)}
-.ayudaBtn .pin{background:var(--magenta);color:#fff;border-radius:20px;font-size:11px;padding:1px 7px;font-weight:800}
+  background:linear-gradient(135deg,var(--guinda-2),var(--guinda));color:#FFFFFF;
+  padding:11px 18px;font:inherit;font-weight:700;font-size:14px;
+  box-shadow:0 10px 26px -10px rgba(122,18,49,.55);transition:transform .16s,box-shadow .16s}
+.ayudaBtn:hover{transform:translateY(-2px);box-shadow:0 14px 30px -10px rgba(122,18,49,.65)}
+.ayudaBtn:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.ayudaBtn .pin{background:var(--yellow);color:var(--yellow-ink);border-radius:20px;font-size:11px;padding:1px 7px;font-weight:800}
 .ayudaPanel{position:fixed;right:18px;bottom:calc(74px + env(safe-area-inset-bottom,0px));width:min(390px,calc(100vw - 32px));
-  max-height:min(620px,calc(100vh - 120px));z-index:71;background:var(--paper);border:1px solid var(--line);
-  border-radius:16px;box-shadow:0 22px 60px -22px rgba(0,0,0,.5);display:flex;flex-direction:column;overflow:hidden;
+  max-height:min(620px,calc(100vh - 120px));z-index:71;
+  /* fondo sólido: del blanco de arriba al guinda de abajo */
+  background:var(--surface);
+  background-image:linear-gradient(180deg,var(--surface) 0%,var(--guinda-tenue) 52%,var(--guinda-medio) 100%);
+  border:1px solid var(--guinda-medio);
+  border-radius:16px;box-shadow:0 22px 60px -22px rgba(122,18,49,.45);display:flex;flex-direction:column;overflow:hidden;
   animation:rise .22s cubic-bezier(.2,.8,.3,1)}
-.ayudaPanel header{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);background:var(--surface-2)}
-.ayudaPanel header b{font-family:"Fredoka";font-size:15px;font-weight:600;margin-right:auto}
+.ayudaPanel header{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:0;
+  background:linear-gradient(135deg,var(--guinda-2),var(--guinda));color:#FFFFFF}
+.ayudaPanel header b{font-family:"Fredoka";font-size:15px;font-weight:600;margin-right:auto;color:#FFFFFF}
+.ayudaPanel header .btn{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.45);color:#FFFFFF}
+.ayudaPanel header .btn:hover{background:rgba(255,255,255,.26)}
 .ayudaCuerpo{overflow:auto;padding:14px 16px 18px;display:flex;flex-direction:column;gap:12px}
 .ayudaCuerpo h4{margin:0;font-size:14px;font-weight:700}
 .ayudaCuerpo p{font-size:13px;color:var(--ink-2);line-height:1.5;margin:0}
-.ayudaTema{text-align:left;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;
+.ayudaTema{text-align:left;background:var(--surface);border:1px solid var(--guinda-tenue);border-radius:10px;
   padding:10px 12px;cursor:pointer;font:inherit;font-size:13px;display:flex;flex-direction:column;gap:3px}
-.ayudaTema:hover{border-color:var(--cyan)}
+.ayudaTema:hover{border-color:var(--guinda-2)}
 .ayudaTema b{font-size:13px}
 .ayudaTema small{color:var(--ink-3);font-size:11.5px}
 .ayudaAqui{background:var(--cyan-soft);border-radius:10px;padding:11px 13px;font-size:13px;line-height:1.5}
 .ayudaAqui b{display:block;margin-bottom:3px}
-.ayudaCtx{background:var(--surface-2);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;
+.ayudaCtx{background:var(--surface);border:1px dashed var(--guinda-2);border-radius:10px;padding:10px 12px;
   font-size:11.5px;color:var(--ink-3);line-height:1.55;font-family:"IBM Plex Mono",monospace}
-.ayudaMsg{border-radius:10px;padding:9px 12px;font-size:13px;line-height:1.5;background:var(--surface-2);border:1px solid var(--line)}
+.ayudaMsg{border-radius:10px;padding:9px 12px;font-size:13px;line-height:1.5;background:var(--surface);border:1px solid var(--guinda-tenue)}
 .ayudaMsg.mio{background:var(--cyan-soft);border-color:transparent}
 .ayudaMsg b{display:block;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
 .ayudaEstado{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;align-self:flex-start}
@@ -645,9 +657,15 @@ body.sin-sesion .wrap,body.sin-sesion header.top,body.sin-sesion .avisoPago{disp
 #t_equipo{display:none!important}
 
 /* ---- lo que cada rol no debe ver ---- */
+.empresaSel{width:auto;max-width:190px;font-weight:600;font-family:"Fredoka",system-ui,sans-serif;
+  padding:5px 9px;font-size:13px;border-radius:8px}
+.btn.lab{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:700}
+.btn.lab:hover{filter:brightness(1.25)}
 body.rol-ventas .solo-admin,
+body.rol-diseno .solo-admin,
 body.rol-produccion .solo-admin{display:none!important}
 body.rol-ventas [data-solo-admin],
+body.rol-diseno [data-solo-admin],
 body.rol-produccion [data-solo-admin]{display:none!important}
 /* Ventas consulta el catálogo pero no lo edita */
 body.rol-ventas #tab-cat input,
@@ -655,6 +673,7 @@ body.rol-ventas #tab-cat select{pointer-events:none;background:var(--surface-2);
 body.rol-ventas #tab-cat button,
 body.rol-ventas .pricebar{display:none!important}
 /* Producción no ve dinero por ningún lado */
+body.rol-diseno .summary,
 body.rol-produccion .summary,
 body.rol-produccion #btnCobrar,
 body.rol-produccion #btnPrint{display:none!important}
@@ -715,10 +734,12 @@ body.rol-produccion #btnPrint{display:none!important}
       <span><span id="userNombre">Administrador</span> <span class="rolTxt" id="userRol">Admin</span></span>
     </button>
     <div class="cuentaBox">
+      <select class="empresaSel" id="empresaSel" hidden aria-label="Empresa"></select>
       <span class="chip-store" id="cuentaPlan">…</span>
       <span class="chip-store" id="cuentaRol"></span>
       <span class="cuentaMail" id="cuentaMail"></span>
       <button class="btn sm" id="btnPlanes">Mi plan</button>
+      <button class="btn sm lab" id="btnLab" hidden title="Consola interna de Hey Makers">Makers Lab</button>
       <button class="btn sm ghost" id="btnSalir">Salir</button>
     </div>
   </div>
@@ -1153,10 +1174,11 @@ body.rol-produccion #btnPrint{display:none!important}
   <div class="card" data-solo-admin>
     <header><h2>Equipo</h2><span class="hint">quién entra y qué puede hacer</span></header>
     <div class="body">
-      <p class="note" style="margin:0 0 14px"><b>Administrador:</b> todo, incluidos caja, ventas y ajustes.
-      <b>Ventas:</b> cotiza, confirma pedidos, lleva clientes y consulta el catálogo, sin ver caja ni utilidades.
-      <b>Producción:</b> solo el tablero de órdenes, donde mueve el estatus y baja los archivos. No ve precios.</p>
-      <div class="grid g4" style="align-items:end">
+      <p class="note" style="margin:0 0 14px"><b>Administrador:</b> todo, incluidos caja, ventas, compras y ajustes.
+      <b>Ventas:</b> cotiza, confirma pedidos, lleva clientes, consulta el catálogo y levanta requisiciones, sin ver caja ni utilidades.
+      <b>Diseño:</b> los archivos de las órdenes y sus notas. No ve precios.
+      <b>Producción:</b> el tablero de órdenes, donde mueve el estatus y baja los archivos, y la recepción del material. No ve precios.</p>
+      <div class="grid g4" id="equipoAlta" style="align-items:end">
         <div><label class="f" for="equipoNombre">Nombre</label><input id="equipoNombre" placeholder="Nombre de la persona"></div>
         <div><label class="f" for="equipoCorreo">Correo</label><input id="equipoCorreo" type="email" placeholder="correo@ejemplo.com"></div>
         <div><label class="f" for="equipoRol">Rol</label><select id="equipoRol">
@@ -1164,8 +1186,10 @@ body.rol-produccion #btnPrint{display:none!important}
         </select></div>
         <button class="btn primary" id="equipoInvitar">Dar de alta</button>
       </div>
+      <p class="note" id="equipoAlarma" hidden style="margin:0 0 14px;border-left-color:var(--accent);background:var(--accent-soft)"></p>
       <p class="note" id="equipoAviso" hidden style="margin-top:12px;border-left-color:var(--good)"></p>
       <div class="saved" id="equipoCaja" style="margin-top:16px"></div>
+      <p class="hint" id="equipoNota" hidden style="margin-top:10px"></p>
     </div>
   </div>
   <div class="card">
@@ -4527,16 +4551,14 @@ function abreFactura(v){
     ["Subtotal", mx(subtotal)], ["IVA "+P.iva+"%", mx(iva)], ["Total", mx(v.total)]
   ];
   if(f.folioFiscal) datos.push(["Folio fiscal (UUID)", f.folioFiscal]);
-  $("#docTitle").textContent = "Datos para facturar · "+v.folio;
-  $("#docPaper").innerHTML = membrete()+
+  muestraDoc("Datos para facturar · "+v.folio, membrete()+
     '<h1 style="margin-bottom:4px">Datos para facturar</h1>'+
     '<p style="color:#555">Copia estos datos en tu sistema de facturación o mándaselos a tu contador.</p>'+
     '<table><tbody>'+datos.map(d=>'<tr><th style="width:38%">'+esc(d[0])+'</th><td>'+esc(d[1]||"—")+'</td></tr>').join("")+'</tbody></table>'+
     '<div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap">'+
       '<button class="btn primary" id="factCopiar" type="button">Copiar los datos</button>'+
       '<button class="btn" id="factHecha" data-folio="'+esc(v.folio)+'" type="button">'+
-      (f.estado==="facturada" ? "Marcar como NO facturada" : "Ya la facturé")+'</button></div>';
-  $("#docview").hidden = false; document.body.style.overflow="hidden";
+      (f.estado==="facturada" ? "Marcar como NO facturada" : "Ya la facturé")+'</button></div>');
   $("#factCopiar").addEventListener("click", ()=>{
     const txt = datos.map(d=>d[0]+": "+(d[1]||"")).join("\n");
     if(navigator.clipboard) navigator.clipboard.writeText(txt).then(()=>toast("Datos copiados"),()=>toast("No se pudo copiar"));
@@ -4949,6 +4971,26 @@ function calcReq(){
   $("#reqAvisoAut").style.borderLeftColor = nec ? "var(--warn)" : "var(--line)";
 }
 
+/* ---------- enseñar un documento y dejarlo listo para imprimir ----------
+   Ojo: la hoja que sale en papel es #hoja, no #docPaper. El estilo de
+   impresión esconde toda la pantalla y solo deja #hoja, así que un documento
+   que se pinte nada más en #docPaper se ve bien en la pantalla y sale una
+   página en blanco en la impresora. Esta función llena las dos: la de
+   pantalla con todo, y la de papel sin botones ni campos, y sin repetir
+   ids para que los clics sigan pegando donde deben. */
+function muestraDoc(titulo, html){
+  $("#docTitle").textContent = titulo;
+  const papel = $("#docPaper");
+  papel.innerHTML = html;
+  const molde = document.createElement("div");
+  molde.innerHTML = html;
+  molde.querySelectorAll("button, input, select, textarea, .no-print").forEach(x=> x.remove());
+  molde.querySelectorAll("[id]").forEach(x=> x.removeAttribute("id"));
+  $("#hoja").innerHTML = molde.innerHTML;
+  $("#docview").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
 /* ---------- el documento ---------- */
 function docReq(r){
   const pv = provDe(r.provId) || {};
@@ -4958,8 +5000,7 @@ function docReq(r){
     '<td style="text-align:right">'+mx(num(x.costo))+'</td>' +
     '<td style="text-align:right">'+mx(num(x.cant)*num(x.costo))+'</td></tr>').join("");
   $("#modalReq").hidden = true;   // si no, el documento queda debajo del modal
-  $("#docTitle").textContent = "Requisición · " + r.folio;
-  $("#docPaper").innerHTML = membrete() +
+  muestraDoc("Requisición · " + r.folio, membrete() +
     '<h1 style="margin-bottom:4px">Requisición de compra</h1>' +
     '<p style="color:#555">Folio <b>'+esc(r.folio)+'</b> · '+esc(r.fecha)+' '+esc(r.hora||"")+' · '+e.txt+'</p>' +
     '<table><tbody>' +
@@ -4980,8 +5021,7 @@ function docReq(r){
       '<div style="flex:1;border-top:1px solid #999;padding-top:6px;font-size:12px;color:#555">Quien la pide</div>' +
       '<div style="flex:1;border-top:1px solid #999;padding-top:6px;font-size:12px;color:#555">Quien autoriza</div>' +
       '<div style="flex:1;border-top:1px solid #999;padding-top:6px;font-size:12px;color:#555">Quien recibe</div>' +
-    '</div>';
-  $("#docview").hidden = false; document.body.style.overflow="hidden";
+    '</div>');
 }
 
 /* ---------- el acuse de cancelación ----------
@@ -4997,8 +5037,7 @@ function acuseCancel(r){
     '<td style="text-align:right">'+mx(num(x.cant)*num(x.costo))+'</td></tr>').join("");
   const recibido = (r.partidas||[]).some(x=> num(x.recibido) > 0);
   $("#modalReq").hidden = true;
-  $("#docTitle").textContent = "Acuse de cancelación · " + r.folio;
-  $("#docPaper").innerHTML = membrete() +
+  muestraDoc("Acuse de cancelación · " + r.folio, membrete() +
     '<h1 style="margin-bottom:4px">Acuse de cancelación</h1>' +
     '<p style="color:#555">De la requisición de compra <b>'+esc(r.folio)+'</b></p>' +
     '<p style="margin:14px 0;padding:10px 12px;border:2px solid #000;font-weight:700;text-align:center;letter-spacing:.08em">CANCELADA</p>' +
@@ -5027,8 +5066,7 @@ function acuseCancel(r){
     '</div>' +
     ((pv.tel || pv.correo) && !c.avisado
       ? '<div style="margin-top:18px" class="no-print"><button class="btn" id="acuseAvisa" data-folio="'+esc(r.folio)+'" type="button">Avisarle al proveedor que se canceló</button></div>'
-      : '');
-  $("#docview").hidden = false; document.body.style.overflow="hidden";
+      : ''));
   const btn = $("#acuseAvisa");
   if(btn) btn.addEventListener("click", ()=>avisaCancel(r.folio));
 }
@@ -5821,7 +5859,8 @@ async function accionAyuda(e) {
 }
 </script>
 
+<script>window.BUILD="20260928-1936";</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js"></script>
+<script src="cuenta.js?v=20260928-1936"></script>
 </body>
 </html>

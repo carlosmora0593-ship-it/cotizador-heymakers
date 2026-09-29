@@ -1,0 +1,2565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0A7FA8">
+<script src="config.js?v=20260928-1936"></script>
+<style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Makers Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#EFF3F7; --surface:#FFFFFF; --surface-2:#F6F9FC; --surface-3:#E8EEF4;
+  --line:#D9E1EA; --line-2:#BECAD6;
+  --ink:#151A21; --ink-2:#4B5764; --ink-3:#77838F;
+  --acento:#0A7FA8; --acento-2:#065B79; --acento-suave:#E2F1F8;
+  --bien:#0E7A53; --bien-suave:#E0F3EB;
+  --aviso:#96620A; --aviso-suave:#FBF0DB;
+  --critico:#B01660; --critico-suave:#FBE5EF;
+  --r1:#9AD8ED; --r2:#2BA3CB; --r3:#0A5E7D;
+  --sombra:0 1px 2px rgba(18,28,38,.05), 0 10px 26px -14px rgba(18,28,38,.22);
+  --rad:10px; --nav:236px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --ground:#0E1216; --surface:#171C22; --surface-2:#1E242B; --surface-3:#262E37;
+  --line:#2A323B; --line-2:#3B454F;
+  --ink:#ECF1F6; --ink-2:#A8B5C1; --ink-3:#7B8794;
+  --acento:#43B5DC; --acento-2:#8AD3EC; --acento-suave:#123342;
+  --bien:#41C48E; --bien-suave:#11352A;
+  --aviso:#DFA342; --aviso-suave:#382A10;
+  --critico:#F172A8; --critico-suave:#3A1128;
+  --r1:#14536B; --r2:#2E9CC4; --r3:#8FD0E8;
+  --sombra:0 1px 2px rgba(0,0,0,.4), 0 10px 26px -14px rgba(0,0,0,.6);
+}}
+:root[data-theme="dark"]{
+  --ground:#0E1216; --surface:#171C22; --surface-2:#1E242B; --surface-3:#262E37;
+  --line:#2A323B; --line-2:#3B454F;
+  --ink:#ECF1F6; --ink-2:#A8B5C1; --ink-3:#7B8794;
+  --acento:#43B5DC; --acento-2:#8AD3EC; --acento-suave:#123342;
+  --bien:#41C48E; --bien-suave:#11352A;
+  --aviso:#DFA342; --aviso-suave:#382A10;
+  --critico:#F172A8; --critico-suave:#3A1128;
+  --r1:#14536B; --r2:#2E9CC4; --r3:#8FD0E8;
+  --sombra:0 1px 2px rgba(0,0,0,.4), 0 10px 26px -14px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,Segoe UI,Roboto,sans-serif;font-size:14px;line-height:1.5}
+h1,h2,h3{margin:0;font-family:Fredoka,"IBM Plex Sans",sans-serif;font-weight:500;letter-spacing:-.01em}
+p{margin:0}
+a{color:var(--acento-2)}
+button{font:inherit;color:inherit}
+.num,.mono{font-variant-numeric:tabular-nums}
+
+.app{display:flex;min-height:100vh}
+.side{width:var(--nav);flex:0 0 var(--nav);background:var(--surface);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;padding:18px 12px 12px}
+.marca{display:flex;align-items:center;gap:10px;padding:0 8px 18px}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--ink);display:grid;
+  grid-template-columns:1fr 1fr;overflow:hidden;flex:0 0 34px}
+.logo i{display:block}
+.logo i:nth-child(1){background:#06A1D7}.logo i:nth-child(2){background:#F51B95}
+.logo i:nth-child(3){background:#FFEC30}.logo i:nth-child(4){background:var(--ink)}
+.marca b{font-family:Fredoka,sans-serif;font-size:17px;font-weight:600;display:block}
+.marca small{color:var(--ink-3);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;
+  background:none;border:0;padding:9px 10px;border-radius:8px;cursor:pointer;text-align:left;
+  color:var(--ink-2);font-weight:500}
+.nav button:hover{background:var(--surface-2);color:var(--ink)}
+.nav button[aria-current="true"]{background:var(--acento-suave);color:var(--acento-2);font-weight:600}
+.nav .cuenta{font-size:11px;font-variant-numeric:tabular-nums;background:var(--surface-3);
+  color:var(--ink-2);border-radius:20px;padding:1px 7px;font-weight:600}
+.nav .cuenta.urge{background:var(--critico-suave);color:var(--critico)}
+.nav button[aria-current="true"] .cuenta{background:var(--surface);color:var(--acento-2)}
+.sidepie{margin-top:auto;padding:10px 6px 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+
+main{flex:1;min-width:0;display:flex;flex-direction:column}
+.barra{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;background:var(--ground);
+  border-bottom:1px solid var(--line);padding:16px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.barra h1{font-size:21px;margin-right:auto}
+.hoja{padding:22px 24px 60px;display:flex;flex-direction:column;gap:20px}
+.aviso-demo{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--aviso-suave);
+  color:var(--aviso);border:1px solid var(--line);border-radius:var(--rad);padding:9px 14px;font-size:12.5px;font-weight:500}
+
+.tarjeta{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad)}
+.tarjeta>header{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tarjeta>header h2{font-size:15px;margin-right:auto}
+.tarjeta>header .pista{color:var(--ink-3);font-size:12px}
+.cuerpo{padding:16px}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--surface);color:var(--ink-2);
+  border:1px solid var(--line-2);border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:500;
+  font-size:13px;text-decoration:none}
+.btn:hover{background:var(--surface-2);color:var(--ink)}
+.btn.p{background:var(--acento);border-color:var(--acento);color:#fff}
+.btn.p:hover{background:var(--acento-2);border-color:var(--acento-2);color:#fff}
+.btn.mal{color:var(--critico);border-color:var(--line-2)}
+.btn.mal:hover{background:var(--critico-suave)}
+.btn.sm{padding:4px 9px;font-size:12px}
+.btn:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,
+.nav button:focus-visible,tbody tr:focus-visible,.pend:focus-visible{outline:2px solid var(--acento);outline-offset:2px}
+input,select,textarea{background:var(--surface);color:var(--ink);border:1px solid var(--line-2);
+  border-radius:8px;padding:7px 10px;font:inherit;font-size:13px;width:100%}
+textarea{min-height:72px;resize:vertical}
+label.f{display:block;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:5px}
+.campo{display:flex;flex-direction:column}
+.busca{max-width:260px}
+
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;
+  padding:2px 9px;border-radius:20px;white-space:nowrap}
+.chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex:0 0 6px}
+.chip.bien{background:var(--bien-suave);color:var(--bien)}
+.chip.aviso{background:var(--aviso-suave);color:var(--aviso)}
+.chip.mal{background:var(--critico-suave);color:var(--critico)}
+.chip.gris{background:var(--surface-3);color:var(--ink-2)}
+.chip.info{background:var(--acento-suave);color:var(--acento-2)}
+.plan{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:6px;
+  border:1px solid var(--line-2);color:var(--ink-2);white-space:nowrap}
+.plan.basico{border-color:var(--r2);color:var(--acento-2)}
+.plan.maker{border-color:var(--r2);background:var(--acento-suave);color:var(--acento-2)}
+.plan.pro{border-color:var(--ink);background:var(--ink);color:var(--surface)}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);padding:16px 18px;
+  display:flex;flex-direction:column;gap:5px}
+.tile .et{font-size:11.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.tile .v{font-family:Fredoka,sans-serif;font-size:31px;font-weight:500;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;line-height:1.1}
+.tile .sub{font-size:12px;color:var(--ink-2)}
+.tile.destacada{border-left:3px solid var(--acento)}
+
+.marco{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:660px;font-size:13px}
+th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink-3);padding:9px 14px;border-bottom:1px solid var(--line);white-space:nowrap;
+  background:var(--surface-2);position:sticky;top:0}
+td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr.clic{cursor:pointer}
+tbody tr.clic:hover td{background:var(--surface-2)}
+tbody tr:last-child td{border-bottom:0}
+td.der,th.der{text-align:right;font-variant-numeric:tabular-nums}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-2)}
+.taller{font-weight:600;color:var(--ink)}
+.sitio{font-size:11.5px;color:var(--ink-3)}
+
+.pendientes{display:flex;flex-direction:column}
+.pend{display:flex;gap:12px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line)}
+.pend.clic{cursor:pointer}
+.pend:last-child{border-bottom:0}
+.pend.clic:hover{background:var(--surface-2)}
+.pend .raya{width:3px;align-self:stretch;border-radius:3px;background:var(--ink-3);flex:0 0 3px}
+.pend.urge .raya{background:var(--critico)}
+.pend.pronto .raya{background:var(--aviso)}
+.pend.info .raya{background:var(--acento)}
+.pend.ok .raya{background:var(--bien)}
+.pend .txt{flex:1;min-width:0}
+.pend .txt b{display:block;font-size:13.5px}
+.pend .txt small{color:var(--ink-2);font-size:12px;display:block}
+.vacio{padding:28px 16px;text-align:center;color:var(--ink-3);font-size:13px}
+
+.graf{display:block;width:100%;height:auto;overflow:visible}
+.leyenda{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-top:12px}
+.leyenda span{display:inline-flex;align-items:center;gap:6px}
+.leyenda i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.globo{position:fixed;z-index:60;pointer-events:none;background:var(--ink);color:var(--ground);
+  border-radius:7px;padding:7px 10px;font-size:12px;line-height:1.35;box-shadow:var(--sombra);white-space:nowrap}
+
+.telon{position:fixed;inset:0;background:rgba(10,16,22,.42);z-index:40;opacity:0;transition:opacity .18s}
+.telon[hidden]{display:none!important}
+.ficha{position:fixed;top:0;right:0;bottom:0;width:min(520px,100%);background:var(--surface);
+  border-left:1px solid var(--line);z-index:50;display:flex;flex-direction:column;
+  transform:translateX(100%);transition:transform .22s cubic-bezier(.2,.8,.3,1);box-shadow:var(--sombra)}
+.ficha.abierta{transform:none}
+.ficha>header{display:flex;align-items:flex-start;gap:12px;padding:18px 20px;border-bottom:1px solid var(--line)}
+.ficha>header h2{font-size:19px}
+.ficha .desliza{overflow:auto;padding:18px 20px 40px;display:flex;flex-direction:column;gap:16px;flex:1}
+.pares{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:12px;margin:0}
+.par{display:flex;flex-direction:column;gap:2px}
+.par dt{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.par dd{margin:0;font-size:14px;font-variant-numeric:tabular-nums}
+.bloque{border:1px solid var(--line);border-radius:var(--rad);padding:14px;display:flex;flex-direction:column;gap:11px}
+.bloque h3{font-size:12px;font-family:"IBM Plex Sans",sans-serif;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.bloque.jugada{border-left:3px solid var(--acento);background:var(--surface-2)}
+.bloque.jugada.urge{border-left-color:var(--critico)}
+.bloque.jugada.pronto{border-left-color:var(--aviso)}
+.bloque.jugada h4{margin:0;font-size:16px;font-family:Fredoka,sans-serif;font-weight:500}
+.porque{font-size:12.5px;color:var(--ink-2)}
+.guion{background:var(--surface);border:1px dashed var(--line-2);border-radius:8px;padding:11px 12px;
+  font-size:13px;line-height:1.5;color:var(--ink-2);white-space:pre-wrap}
+.fila{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.hist{display:flex;flex-direction:column;gap:9px;max-height:210px;overflow:auto}
+.hist div{display:flex;gap:9px;font-size:12.5px;color:var(--ink-2);line-height:1.45}
+.hist time{color:var(--ink-3);font-family:"IBM Plex Mono",monospace;font-size:11px;flex:0 0 74px}
+.hilo{display:flex;flex-direction:column;gap:10px}
+.msg{border-radius:9px;padding:9px 12px;font-size:13px;background:var(--surface-2);border:1px solid var(--line)}
+.msg.mio{background:var(--acento-suave);border-color:var(--acento-suave)}
+.msg b{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
+.senal{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--line)}
+.senal:last-child{border-bottom:0}
+.senal b{font-variant-numeric:tabular-nums;font-weight:600}
+.senal.mala b{color:var(--critico)}
+.senal.tibia b{color:var(--aviso)}
+.senal.buena b{color:var(--bien)}
+.apoyo{background:var(--aviso-suave);color:var(--aviso);border-radius:8px;padding:8px 11px;font-size:12.5px;font-weight:600}
+.seg{display:inline-flex;gap:4px;background:var(--surface);border:1px solid var(--line);
+  border-radius:10px;padding:4px;flex-wrap:wrap}
+.seg button{background:none;border:0;border-radius:7px;padding:6px 13px;cursor:pointer;
+  color:var(--ink-2);font-weight:500;font-size:13px;display:inline-flex;align-items:center;gap:7px}
+.seg button:hover{background:var(--surface-2);color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--acento-suave);color:var(--acento-2);font-weight:600}
+.rejilla2{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:20px;align-items:start}
+.nota{font-size:12.5px;color:var(--ink-2);line-height:1.55;max-width:70ch}
+
+@media (max-width:860px){
+  .app{flex-direction:column}
+  .side{width:auto;flex:none;height:auto;position:static;flex-direction:row;align-items:center;
+    gap:10px;padding:10px 16px;border-right:0;border-bottom:1px solid var(--line);overflow-x:auto}
+  .marca{padding:0;flex:0 0 auto}
+  .marca .txt{display:none}
+  .nav{flex-direction:row;gap:4px;flex:1}
+  .nav button{white-space:nowrap;padding:7px 11px}
+  .nav .cuenta{display:none}
+  .sidepie{display:none}
+  .barra{padding:14px 16px}
+  .hoja{padding:16px 16px 60px}
+  .busca{max-width:none;flex:1}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---- la puerta de Makers Lab ---- */
+body.sin-sesion .app,
+body.sin-sesion .ficha,
+body.sin-sesion .telon{display:none!important}
+.puerta{position:fixed;inset:0;z-index:200;background:var(--ground);display:grid;place-items:center;padding:20px 16px;overflow:auto}
+.puertaCard{width:min(430px,100%);background:var(--surface);border:1px solid var(--line);border-radius:16px;
+  box-shadow:var(--sombra);padding:30px;display:flex;flex-direction:column;gap:6px}
+.puertaCard .logo{margin-bottom:10px}
+.puertaCard h1{font-family:"Fredoka",system-ui,sans-serif;font-size:24px;font-weight:600;margin:0}
+.puertaCard p{color:var(--ink-2);font-size:14px;line-height:1.55;margin:0 0 12px}
+.puertaCard form{display:flex;flex-direction:column;gap:6px}
+.puertaCard label.f{font-size:11px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em;margin-top:8px}
+.puertaCard button[type=submit]{margin-top:16px;justify-content:center}
+.puertaMsg{margin-top:12px!important;color:var(--critico);font-size:13px;font-weight:500}
+.puertaPie{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.labPie{font-size:11px;color:var(--ink-3);line-height:1.5;margin:10px 0 0}
+</style>
+
+</head>
+<body class="sin-sesion">
+
+<div class="puerta" id="labPuerta" hidden>
+  <div class="puertaCard">
+    <span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <h1 id="puertaTitulo">Makers Lab</h1>
+    <p id="puertaTexto">Entra con tu correo de Hey Makers.</p>
+    <form id="puertaForm">
+      <label class="f" for="puertaMail">Correo</label>
+      <input id="puertaMail" type="email" autocomplete="username" required>
+      <label class="f" for="puertaPass">Contraseña</label>
+      <input id="puertaPass" type="password" autocomplete="current-password" required>
+      <button class="btn p" type="submit">Entrar</button>
+    </form>
+    <p class="puertaMsg" id="puertaMsg" hidden></p>
+    <div class="puertaPie">
+      <button class="btn sm" id="puertaInicio" hidden>Ir al cotizador</button>
+      <button class="btn sm" id="puertaSalir" hidden>Salir de esta sesión</button>
+    </div>
+  </div>
+</div>
+<div class="app">
+  <nav class="side">
+    <div class="marca">
+      <span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="txt"><b>Makers Lab</b><small>Hey Makers</small></span>
+    </div>
+    <div class="nav" id="nav">
+      <button data-v="tablero" aria-current="true">Tablero</button>
+      <button data-v="cuentas">Cuentas <span class="cuenta" id="n_cuentas">0</span></button>
+      <button data-v="agenda">Agenda <span class="cuenta" id="n_agenda">0</span></button>
+      <button data-v="soporte">Soporte <span class="cuenta" id="n_soporte">0</span></button>
+      <button data-v="cobros">Cobros <span class="cuenta" id="n_cobros">0</span></button>
+      <button data-v="equipo">Equipo</button>
+      <button data-v="numeros">Números</button>
+    </div>
+    <div class="sidepie">
+      <button class="btn sm" id="btnExporta">Exportar cuentas</button>
+      <button class="btn sm" id="labCotizador">Ir al cotizador</button>
+      <button class="btn sm mal" id="labSalir">Salir</button>
+      <p class="labPie"><span id="labQuien"></span><br><span id="labVersion"></span></p>
+    </div>
+  </nav>
+
+  <main>
+    <div class="barra">
+      <h1 id="titulo">Tablero</h1>
+      <input class="busca" id="busca" type="search" placeholder="Buscar taller, correo o ciudad" hidden>
+      <select id="filtroEstado" style="width:auto" hidden></select>
+      <select id="filtroPlan" style="width:auto" hidden></select>
+      <button class="btn p" id="btnNueva" hidden>Alta manual</button>
+    </div>
+    <div class="hoja">
+      <div class="aviso-demo" id="avisoDemo" hidden>
+        Ves cuántas cuentas hay, en qué plan están y cuánto usan. Las cotizaciones, los clientes y los precios de cada taller no salen de su cuenta: ni aquí ni en ningún lado.
+      </div>
+      <div id="vista"></div>
+    </div>
+  </main>
+</div>
+
+<div class="telon" id="telon" hidden></div>
+<aside class="ficha" id="ficha" aria-label="Detalle" aria-hidden="true"></aside>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Math.random().toString(36).slice(2, 9);
+
+const PLANES = {
+  basico: { nombre: "Básico", mes: 199, anio: 1990 },
+  maker:  { nombre: "Maker",  mes: 449, anio: 4490 },
+  pro:    { nombre: "Pro",    mes: 899, anio: 8990 }
+};
+const ESTADOS = {
+  prueba:  { nombre: "En prueba", chip: "aviso" },
+  activa:  { nombre: "Activa",    chip: "bien" },
+  pausada: { nombre: "Pausada",   chip: "gris" },
+  vencida: { nombre: "Vencida",   chip: "mal" },
+  baja:    { nombre: "Baja",      chip: "gris" }
+};
+const ORIGENES = { curso: "Curso Hey Makers", alianza: "Cámara aliada", referido: "Referido de un cliente", organico: "Llegó solo" };
+const ROLES = { dueno: "Dueño", ventas: "Ventas", soporte: "Soporte" };
+const TIPOCITA = { llamada: "Llamada", video: "Videollamada", visita: "Visita" };
+const DIAS_PRUEBA = 15;
+const YO = "Carlos";
+
+const HOY = new Date();
+const iso = d => d.toISOString().slice(0, 10);
+const dObj = s => { const p = String(s).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); };
+const masDias = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const difDias = (a, b) => Math.round((dObj(a) - dObj(b)) / 86400000);
+const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+const fFecha = s => { if (!s) return "—"; const d = dObj(s); return d.getDate() + " " + MESES[d.getMonth()] + " " + d.getFullYear(); };
+const fCorta = s => { if (!s) return "—"; const d = dObj(s); return d.getDate() + " " + MESES[d.getMonth()]; };
+const $$$ = n => "$" + Math.round(n).toLocaleString("es-MX");
+const dias = n => n + (n === 1 ? " día" : " días");
+
+/* ---------- impuestos y datos del emisor ----------
+   Los precios de lista son CON IVA incluido, que es como el mercado mexicano
+   espera verlos. El IVA no es ingreso tuyo: se entera al SAT. Por eso el
+   tablero separa siempre lo que cobras de lo que te queda. */
+let CFG = {
+  iva: 16, ivaIncluido: true,
+  rfc: "MOCA900412H73", razon: "CARLOS MORA — HEY MAKERS", regimen: "612",
+  cp: "58000", serie: "A", folio: 1050
+};
+const REGIMENES = {
+  "601": "General de Ley Personas Morales",
+  "603": "Personas Morales con Fines no Lucrativos",
+  "612": "Personas Físicas con Actividades Empresariales",
+  "621": "Incorporación Fiscal",
+  "626": "RESICO",
+  "616": "Sin obligaciones fiscales"
+};
+const USOS = { "G03": "Gastos en general", "G01": "Adquisición de mercancías", "S01": "Sin efectos fiscales" };
+const RFC_PUBLICO = "XAXX010101000";
+
+const baseDe  = t => CFG.ivaIncluido ? t / (1 + CFG.iva / 100) : t;
+const ivaDe   = t => CFG.ivaIncluido ? t - baseDe(t) : t * CFG.iva / 100;
+const totalDe = t => CFG.ivaIncluido ? t : t * (1 + CFG.iva / 100);
+const cargo = p => totalDe(p.total);   // lo que de verdad se le carga a la tarjeta
+
+/* ---------- sellos de tiempo, para medir al soporte ---------- */
+const ahoraSello = () => { const d = new Date();
+  return iso(d) + "T" + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
+const sello = (d, h) => iso(d) + "T" + h;
+const horasEntre = (a, b) => (a && b) ? (new Date(b) - new Date(a)) / 3600000 : null;
+const fDur = h => h == null ? "—" : h < 1 ? Math.max(1, Math.round(h * 60)) + " min"
+  : h < 24 ? (Math.round(h * 10) / 10) + " h" : Math.floor(h / 24) + " d " + Math.round(h % 24) + " h";
+const fSello = s => s ? fCorta(String(s).slice(0, 10)) + " " + String(s).slice(11, 16) : "—";
+const META_RESP = 4, META_RES = 24;   // horas comprometidas
+
+/* ---------- fallas del programa ----------
+   Un ticket de "no me deja subir el archivo" no se arregla contestando el chat:
+   se arregla en el código y se publica una versión. Aquí viven esas fallas,
+   con los tickets y los errores que las delatan colgando de ellas. */
+const SEVERIDAD = {
+  bloquea:   { nombre: "No puede trabajar", chip: "mal",   orden: 0 },
+  molesta:   { nombre: "Estorba",            chip: "aviso", orden: 1 },
+  cosmetica: { nombre: "Cosmético",          chip: "gris",  orden: 2 }
+};
+const PASOS = {
+  reportada:  { nombre: "Reportada",      chip: "gris",  que: "Falta reproducirla" },
+  confirmada: { nombre: "Confirmada",     chip: "aviso", que: "Ya se reprodujo, falta arreglarla" },
+  arreglando: { nombre: "En arreglo",     chip: "info",  que: "Alguien la está corrigiendo" },
+  corregida:  { nombre: "Corregida",      chip: "bien",  que: "Salió en una versión, falta avisar" },
+  verificada: { nombre: "Verificada",     chip: "bien",  que: "El cliente confirmó que ya quedó" }
+};
+const fallaDe = id => ficheros.fallas.find(f => f.id === id);
+function afectadasDe(f) {
+  const ids = {};
+  ficheros.tickets.filter(t => t.fallaId === f.id).forEach(t => { if (t.cuentaId) ids[t.cuentaId] = 1; });
+  ficheros.errores.filter(e => e.fallaId === f.id).forEach(e => { if (e.cuentaId) ids[e.cuentaId] = 1; });
+  return Object.keys(ids).map(cuentaDe).filter(Boolean);
+}
+const ticketsDe = f => ficheros.tickets.filter(t => t.fallaId === f.id);
+const erroresDe = f => ficheros.errores.filter(e => e.fallaId === f.id);
+const vecesDe = f => erroresDe(f).reduce((s, e) => s + (e.veces || 0), 0);
+function ordenFallas(a, b) {
+  const viva = f => f.estado === "verificada" ? 2 : f.estado === "corregida" ? 1 : 0;
+  return viva(a) - viva(b) || SEVERIDAD[a.severidad].orden - SEVERIDAD[b.severidad].orden
+    || afectadasDe(b).length - afectadasDe(a).length;
+}
+
+function slaTicket(t) {
+  const resp = horasEntre(t.creado, t.primeraResp);
+  const res = horasEntre(t.creado, t.confirmado || t.resuelto);
+  return { resp, res, vivo: horasEntre(t.creado, ahoraSello()),
+    respOk: resp == null ? null : resp <= META_RESP,
+    resOk: res == null ? null : res <= META_RES };
+}
+function desempeno() {
+  const prom = a => a.length ? a.reduce((s, x) => s + x, 0) / a.length : null;
+  return ficheros.equipo.filter(e => e.rol === "soporte" || e.rol === "dueno").map(e => {
+    const mios = ficheros.tickets.filter(t => t.atiende === e.id);
+    const conResp = mios.filter(t => t.primeraResp), conRes = mios.filter(t => t.confirmado);
+    return { e: e, n: mios.length,
+      resp: prom(conResp.map(t => horasEntre(t.creado, t.primeraResp))),
+      res: prom(conRes.map(t => horasEntre(t.creado, t.confirmado))),
+      aTiempo: conResp.filter(t => horasEntre(t.creado, t.primeraResp) <= META_RESP).length,
+      reab: mios.reduce((s, t) => s + (t.reaperturas || 0), 0),
+      confirmados: mios.filter(t => t.confirmado).length,
+      cerrados: mios.filter(t => t.estado === "resuelto").length,
+      esperando: mios.filter(t => t.estado === "esperando").length };
+  });
+}
+
+let DB = null;
+let ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [] };
+const COLS = ["cuentas", "tickets", "errores", "equipo", "alianzas", "citas", "cobros", "fallas"];
+let vista = "tablero", abierta = null, esEjemplo = false, listo = false;
+let filtro = { texto: "", estado: "", plan: "" };
+
+const cobroMes = c => c.periodo === "anual" ? PLANES[c.plan].anio / 12 : PLANES[c.plan].mes;  // lo que le cargas
+const cobroCiclo = c => c.periodo === "anual" ? PLANES[c.plan].anio : PLANES[c.plan].mes;      // lo que se cobra cada vez
+const mensual = c => baseDe(cobroMes(c));   // lo tuyo, ya sin IVA
+const paga = c => c.estado === "activa";
+const mrr = () => ficheros.cuentas.filter(paga).reduce((s, c) => s + mensual(c), 0);
+const cuentaDe = id => ficheros.cuentas.find(c => c.id === id);
+const aliDe = id => ficheros.alianzas.find(a => a.id === id);
+const eqDe = id => ficheros.equipo.find(e => e.id === id);
+const chipEstado = c => '<span class="chip ' + ESTADOS[c.estado].chip + '">' + ESTADOS[c.estado].nombre + '</span>';
+const chipPlan = c => '<span class="plan ' + c.plan + '">' + PLANES[c.plan].nombre + '</span>';
+
+/* ================= EL MOTOR COMERCIAL =================
+   Por cada cuenta, una sola jugada: qué sigue, por qué, y el mensaje
+   listo para mandar. Nadie tiene que decidir qué escribirle a quién. */
+function jugadaBase(c) {
+  const sin = difDias(iso(HOY), c.ultimo);
+  const dv = difDias(c.vence, iso(HOY));
+  const n = c.contacto || "qué tal";
+  const abre = "Hola " + n + ", soy " + YO + " de Hey Makers. ";
+
+  if (c.estado === "prueba") {
+    if (dv < 0) return {
+      clave: "rescate", urg: "urge", cita: "video", titulo: "Se le acabó la prueba",
+      porque: "Venció hace " + dias(-dv) + " y alcanzó a hacer " + c.cotizaciones + " cotizaciones. Todavía está caliente.",
+      guion: abre + "se terminó tu prueba de " + c.taller + ". No se borró nada: tu catálogo y tus " + c.cotizaciones +
+        " cotizaciones siguen ahí tal cual. Si quieres te doy 7 días más y lo vemos juntos. ¿Cuándo te marco?" };
+    if (dv <= 3) return {
+      clave: "cierre", urg: "urge", cita: "video", titulo: "Cerrar antes de que venza",
+      porque: dv === 0 ? "Vence hoy." : "Vence en " + dias(dv) + ". Es el momento de pedir la videollamada.",
+      guion: abre + "vi que tu prueba de " + c.taller + " termina el " + fFecha(c.vence) + " y ya llevas " +
+        c.cotizaciones + " cotizaciones adentro. ¿Te late si nos vemos 15 minutos por videollamada antes de que se cierre? " +
+        "Te dejo listo el paso a Básico y no pierdes nada de lo que cargaste." };
+    if (c.cotizaciones < 3) return {
+      clave: "arranque", urg: "pronto", cita: "llamada", titulo: "No ha arrancado",
+      porque: "Lleva " + c.cotizaciones + " cotizaciones. Si no llega a 3 no se queda, y le quedan " + dias(dv) + ".",
+      guion: abre + "¿cómo vas con el cotizador? Vi que todavía no terminas de cargar tu catálogo, y ahí es donde se siente " +
+        "la diferencia. ¿Te apoyo 15 minutos por llamada para dejarlo listo? Te quedan " + dias(dv) + " de prueba." };
+    return {
+      clave: "acompana", urg: "info", cita: "llamada", titulo: "Va bien, acompáñalo",
+      porque: "Lleva " + c.cotizaciones + " cotizaciones y le quedan " + dias(dv) + ". Una llamada corta a medio camino sube el cierre.",
+      guion: abre + "qué tal va " + c.taller + " con el cotizador. Veo que ya le agarraste. ¿Hay algo que no encuentres? " +
+        "Te marco 10 minutos y de paso te enseño lo de la orden de producción." };
+  }
+
+  if (c.estado === "vencida") return {
+    clave: "cobro", urg: "urge", cita: "llamada", titulo: "Recuperar el pago",
+    porque: "Venció el " + fFecha(c.vence) + ". Casi siempre es la tarjeta, no una decisión de irse.",
+    guion: abre + "no nos entró el pago de " + c.taller + " este mes y la cuenta quedó bloqueada desde el " +
+      fFecha(c.vence) + ". Casi siempre es que la tarjeta cambió. ¿Te paso el enlace para actualizarla o prefieres que te marque?" };
+
+  if (c.estado === "pausada") return {
+    clave: "reactiva", urg: "pronto", cita: "llamada", titulo: "Reactivar",
+    porque: "Pausada desde el " + fFecha(c.vence) + ". Sus datos siguen completos.",
+    guion: abre + "tienes pausada la cuenta de " + c.taller + ". Todo está tal cual lo dejaste: tu catálogo, tus clientes y " +
+      c.cotizaciones + " cotizaciones. ¿La reactivo?" };
+
+  if (c.estado === "baja") return {
+    clave: "regreso", urg: "info", cita: "video", titulo: "Invitarlo de vuelta",
+    porque: "Se dio de baja el " + fFecha(c.baja) + ". Vale un intento cada tres meses, no más.",
+    guion: abre + "hace rato que dejaste " + c.taller + " en Hey Makers. Cambió bastante desde entonces. " +
+      "¿Te muestro en 10 minutos qué hay de nuevo? Sin compromiso." };
+
+  if (sin >= 14) return {
+    clave: "uso", urg: "pronto", cita: "llamada", titulo: "Paga y no lo usa",
+    porque: "Lleva " + dias(sin) + " sin entrar. Así empiezan las bajas, tres meses antes de que pasen.",
+    guion: abre + "vi que llevas " + dias(sin) + " sin entrar al cotizador y sí estás pagando. ¿Algo se atoró? " +
+      "Si quieres te marco y lo vemos, no me gusta que pagues algo que no estás usando." };
+
+  if (c.plan === "basico" && (c.cotizaciones >= 60 || c.usuarios > 1)) return {
+    clave: "maker", urg: "pronto", cita: "video", titulo: "Ya le toca Maker",
+    porque: "Lleva " + c.cotizaciones + " cotizaciones en Básico" + (c.usuarios > 1 ? " y ya son varios en el taller" : "") +
+      ". Subirlo son " + $$$(PLANES.maker.mes - PLANES.basico.mes) + " más al mes.",
+    guion: abre + c.taller + " ya lleva " + c.cotizaciones + " cotizaciones en Básico. A ese ritmo te sirve Maker: " +
+      "das de alta a tu diseñador y a producción, cada quien ve solo lo suyo y te queda la bitácora de cada pedido. " +
+      "Son $449 al mes. ¿Te lo enseño en 10 minutos?" };
+
+  if (c.plan === "maker" && c.cotizaciones >= 120) return {
+    clave: "pro", urg: "info", cita: "video", titulo: "Prospecto de Pro",
+    porque: "Lleva " + c.cotizaciones + " cotizaciones en Maker. Este sí amerita cita formal.",
+    guion: abre + "con el volumen que trae " + c.taller + " creo que ya te toca ver el plan Pro: corte de caja, " +
+      "utilidad real por periodo y reportes por área. ¿Agendamos una videollamada de 20 minutos para verlo con tus propios números?" };
+
+  if (c.plan === "basico") return {
+    clave: "maker-suave", urg: "info", cita: "llamada", titulo: "Sembrar Maker",
+    porque: "Va bien en Básico. Todavía no tiene volumen para Maker, pero conviene que sepa que existe.",
+    guion: abre + "qué tal va " + c.taller + ". Cuando entre alguien más al taller avísame: con Maker cada quien ve " +
+      "solo lo suyo y te ahorra las llamadas de '¿ya está el pedido?'." };
+
+  return {
+    clave: "referido", urg: "ok", cita: "llamada", titulo: "Pedirle un referido",
+    porque: "Cuenta sana, entró hace " + dias(sin) + ". Es a quien sí se le puede pedir el favor.",
+    guion: abre + "qué gusto ver que " + c.taller + " va bien. Oye, ¿conoces a alguien que esté batallando para cotizar? " +
+      "Si lo recomiendas y se queda, les damos un mes a los dos." };
+}
+/* Un saludo seguido de punto deja la frase en minúscula; aquí se corrige
+   la mayúscula al inicio de cada oración del guion. */
+function jugada(c) {
+  const j = jugadaBase(c);
+  j.guion = j.guion.replace(/([.!?])(\s+)([a-záéíóúñ])/g, (m, p, e, l) => p + e + l.toUpperCase());
+  return j;
+}
+const waLink = (c, txt) => "https://wa.me/52" + String(c.tel || "").replace(/\D/g, "") + "?text=" + encodeURIComponent(txt);
+/* Un enlace normal navega el marco del artefacto y se lo lleva consigo.
+   Todo lo que salga de la página pasa por aquí, en una pestaña aparte. */
+function abreFuera(url) {
+  try { const w = window.open(url, "_blank", "noopener"); return !!w; }
+  catch (e) { return false; }
+}
+
+/* ---------- señales de salud, para soporte ---------- */
+function senales(c) {
+  const sin = difDias(iso(HOY), c.ultimo);
+  const errs = ficheros.errores.filter(e => e.cuentaId === c.id && e.estado !== "resuelto");
+  const tks = ficheros.tickets.filter(t => t.cuentaId === c.id && t.estado !== "resuelto");
+  const tope = c.plan === "pro" ? 3072 : c.plan === "maker" ? 1024 : 300;
+  return [
+    { k: "Artículos en su catálogo", v: c.catalogo, n: c.catalogo >= 10 ? "buena" : c.catalogo > 0 ? "tibia" : "mala" },
+    { k: "Cotizaciones hechas", v: c.cotizaciones, n: c.cotizaciones >= 10 ? "buena" : c.cotizaciones >= 3 ? "tibia" : "mala" },
+    { k: "Usuarios dados de alta", v: c.usuarios, n: c.usuarios > 1 ? "buena" : "" },
+    { k: "Último acceso", v: sin === 0 ? "hoy" : "hace " + dias(sin), n: sin <= 3 ? "buena" : sin <= 13 ? "tibia" : "mala" },
+    { k: "Archivos guardados", v: c.archivosMb + " MB de " + tope + " MB", n: c.archivosMb / tope > 0.85 ? "mala" : "" },
+    { k: "Errores sin resolver", v: errs.length, n: errs.length ? "mala" : "buena" },
+    { k: "Tickets abiertos", v: tks.length, n: tks.length ? "tibia" : "buena" },
+    { k: "Versión que corre", v: c.version, n: "" },
+    { k: "Desde dónde entra", v: c.navegador, n: "" }
+  ];
+}
+
+/* ================= almacén ================= */
+async function arranca() {
+  try { DB = await (window.claude && window.claude.use ? window.claude.use("db") : null); } catch (e) { DB = null; }
+  if (!DB) { generaEjemplo(true); listo = true; pinta(); return; }
+  const cfg = await DB.doc("meta/config").get().catch(() => ({ exists: false }));
+  if (cfg.exists) CFG = Object.assign(CFG, cfg.data());
+  const meta = await DB.doc("meta/estado").get().catch(() => ({ exists: false }));
+  if (!meta.exists) {
+    const l = await DB.doc("meta/semilla").acquire({ holder: "arranque", ttlMs: 20000 }).catch(() => ({ acquired: true }));
+    if (l.acquired) await siembra();
+  } else {
+    esEjemplo = !!(meta.data() || {}).ejemplo;
+  }
+  COLS.forEach(col => {
+    DB.collection(col).onSnapshot(snap => {
+      ficheros[col] = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+      listo = true; pinta();
+    }, () => { listo = true; pinta(); });
+  });
+  setTimeout(() => { if (!listo) { listo = true; pinta(); } }, 4000);
+}
+
+async function siembra() {
+  const d = generaEjemplo(false), tareas = [];
+  COLS.forEach(col => (d[col] || []).forEach(r => {
+    const cuerpo = Object.assign({}, r); delete cuerpo.id;
+    tareas.push(DB.collection(col).doc(r.id).set(cuerpo));
+  }));
+  tareas.push(DB.doc("meta/estado").set({ ejemplo: true, creado: iso(HOY) }));
+  try { await Promise.all(tareas); } catch (e) {}
+  esEjemplo = true;
+}
+
+async function guarda(col, reg) {
+  const cuerpo = Object.assign({}, reg); delete cuerpo.id;
+  const i = ficheros[col].findIndex(x => x.id === reg.id);
+  if (i >= 0) ficheros[col][i] = reg; else ficheros[col].push(reg);
+  pinta();
+  if (DB) { try { await DB.collection(col).doc(reg.id).set(cuerpo); } catch (e) { aviso("No se pudo guardar. Vuelve a intentar."); } }
+}
+async function elimina(col, id) {
+  ficheros[col] = ficheros[col].filter(x => x.id !== id);
+  pinta();
+  if (DB) { try { await DB.collection(col).doc(id).delete(); } catch (e) {} }
+}
+function anota(c, texto) {
+  c.historial = c.historial || [];
+  c.historial.unshift({ f: iso(HOY), t: texto });
+  if (c.historial.length > 40) c.historial.length = 40;
+}
+
+/* ================= datos de ejemplo ================= */
+function generaEjemplo(enMemoria) {
+  const talleres = [
+    ["Estampa Roja","Morelia, Mich."],["Taller Kolibrí","Uruapan, Mich."],["Punto Textil","Guadalajara, Jal."],
+    ["DTF del Bajío","León, Gto."],["Serigrafía Quetzal","Querétaro, Qro."],["Gorras y Más","Toluca, Méx."],
+    ["Impresos Valle","Puebla, Pue."],["Sublima Norte","Monterrey, N.L."],["La Prensa Caliente","Mérida, Yuc."],
+    ["Textiles Ánimo","Cancún, Q. Roo"],["Vinil y Corte","Tijuana, B.C."],["Bordados Lupita","Culiacán, Sin."],
+    ["Playera Viva","Aguascalientes, Ags."],["Creativo Lab","Pachuca, Hgo."],["Imagen Total","CDMX"],
+    ["Taller 33","Zapopan, Jal."],["Estampería Azteca","Puebla, Pue."],["PrintHouse Qro","Querétaro, Qro."],
+    ["Kaktus Prints","Hermosillo, Son."],["Norte Uniformes","Saltillo, Coah."],["Sur Estampa","Oaxaca, Oax."],
+    ["Tinta y Tela","Morelia, Mich."],["Maker Studio MX","CDMX"],["Gráfica Pátzcuaro","Pátzcuaro, Mich."]
+  ];
+  const nombres = ["Ana","Luis","Mariana","Jorge","Paola","Ricardo","Ximena","Daniel","Gabriela","Óscar",
+    "Fernanda","Héctor","Karla","Sergio","Andrea","Iván","Rocío","Tomás","Lucía","Emilio","Diana","Raúl","Sofía","Beto"];
+  const navs = ["Chrome 141 · Windows","Chrome 140 · Android","Safari 19 · Mac","Edge 140 · Windows","Safari 19 · iPhone"];
+
+  const alianzas = [
+    { id:"a1", nombre:"CANAGRAF Michoacán", tipo:"Cámara de artes gráficas", contacto:"Ing. Salgado",
+      codigo:"CANAGRAF", trato:"Dos meses libres al contratar anual", vigencia:"31 dic 2026" },
+    { id:"a2", nombre:"CANACINTRA Querétaro", tipo:"Cámara de la industria", contacto:"Lic. Ordaz",
+      codigo:"CINTRAQRO", trato:"15% de descuento permanente para socios", vigencia:"30 jun 2027" },
+    { id:"a3", nombre:"CANACO Morelia", tipo:"Cámara de comercio", contacto:"C.P. Villanueva",
+      codigo:"CANACOMOR", trato:"Primer mes sin costo y capacitación en su sede", vigencia:"31 mar 2027" },
+    { id:"a4", nombre:"CANAIVE Occidente", tipo:"Cámara del vestido", contacto:"Sra. Delgadillo",
+      codigo:"VESTIDO", trato:"15% de descuento el primer año", vigencia:"por firmar" }
+  ];
+  const equipo = [
+    { id:"e1", nombre:"Carlos Mora", correo:"carlos@heymakers.mx", rol:"dueno", activo:true,
+      ultimo:iso(HOY), comision:{ tipo:"ninguna", valor:0 } },
+    { id:"e2", nombre:"Vendedor de Occidente", correo:"ventas@heymakers.mx", rol:"ventas", activo:true,
+      ultimo:iso(HOY), comision:{ tipo:"primermes", valor:100 } },
+    { id:"e3", nombre:"Vendedora del Bajío", correo:"ventas2@heymakers.mx", rol:"ventas", activo:true,
+      ultimo:iso(masDias(HOY,-9)), comision:{ tipo:"recurrente", valor:10 } },
+    { id:"e4", nombre:"Soporte de turno", correo:"soporte@heymakers.mx", rol:"soporte", activo:true,
+      ultimo:iso(HOY), comision:{ tipo:"ninguna", valor:0 } }
+  ];
+
+  // estado, plan, periodo, origen, alianza, alta, último acceso, quién la cerró, factura
+  const guion = [
+    ["activa","basico","mensual","curso",null,-210,-1,"e1",false], ["activa","basico","anual","curso",null,-186,-3,"e1",true],
+    ["activa","maker","mensual","alianza","a1",-165,-2,"e2",true],  ["activa","pro","anual","alianza","a2",-152,-1,"e2",true],
+    ["activa","basico","mensual","curso",null,-140,-9,"e1",false],  ["activa","maker","anual","organico",null,-128,-4,"e3",true],
+    ["activa","basico","mensual","alianza","a3",-119,-1,"e3",false],["activa","maker","mensual","curso",null,-96,-6,"e2",true],
+    ["activa","basico","mensual","referido",null,-88,-2,"e1",false],["activa","pro","mensual","organico",null,-74,-1,"e2",true],
+    ["activa","basico","anual","alianza","a1",-66,-5,"e3",true],     ["activa","maker","mensual","alianza","a2",-52,-1,"e2",true],
+    ["activa","basico","mensual","curso",null,-44,-17,"e1",false],   ["activa","basico","mensual","curso",null,-33,-3,"e1",false],
+    ["activa","maker","mensual","referido",null,-27,-1,"e3",true],   ["activa","basico","mensual","alianza","a3",-19,-2,"e3",false],
+    ["prueba","basico","mensual","curso",null,-13,-1,"e1",false],    ["prueba","basico","mensual","curso",null,-11,-4,"e1",false],
+    ["prueba","basico","mensual","organico",null,-6,-1,"e2",false],  ["prueba","maker","mensual","alianza","a1",-3,0,"e2",false],
+    ["vencida","basico","mensual","curso",null,-58,-22,"e1",false],  ["vencida","basico","mensual","organico",null,-41,-30,"e2",false],
+    ["pausada","maker","mensual","alianza","a2",-102,-12,"e2",true], ["baja","basico","mensual","organico",null,-171,-64,"e1",false]
+  ];
+
+  const cuentas = guion.map((g, i) => {
+    const alta = iso(masDias(HOY, g[5])), est = g[0];
+    const cot = est === "prueba" ? (i % 4) + (i > 18 ? 6 : 0) : (18 + (i * 13) % 140);
+    const c = {
+      id: "c" + (i + 1), taller: talleres[i][0], sitio: talleres[i][1], contacto: nombres[i],
+      correo: talleres[i][0].toLowerCase().replace(/[^a-z0-9]+/g, "") + "@correo.mx",
+      tel: "44" + (30000000 + i * 123457).toString().slice(0, 8),
+      plan: g[1], periodo: g[2], estado: est, origen: g[3], alianza: g[4],
+      alta: alta, baja: est === "baja" ? iso(masDias(HOY, -12)) : null,
+      ultimo: iso(masDias(HOY, g[6])), cerradoPor: g[7],
+      cotizaciones: cot, catalogo: est === "prueba" ? (i % 3) * 7 : 14 + (i * 5) % 40,
+      usuarios: g[1] === "pro" ? 5 : g[1] === "maker" ? 3 : 1,
+      archivosMb: est === "prueba" ? (i % 9) * 3 : 25 + (i * 17) % 240,
+      version: i % 7 === 0 ? "19" : "20", navegador: navs[i % navs.length],
+      requiereFactura: g[8],
+      rfc: g[8] ? "XAXX0101" + String(100 + i).slice(-3) : "",
+      razon: g[8] ? talleres[i][0].toUpperCase() + " SA DE CV" : "",
+      cp: g[8] ? String(58000 + i * 37) : "", regimen: g[8] ? (i % 3 === 0 ? "626" : i % 3 === 1 ? "612" : "601") : "",
+      uso: g[8] ? "G03" : "S01",
+      apoyo: null,
+      historial: [{ f: alta, t: "Se abrió la cuenta. Llegó por " + ORIGENES[g[3]] + "." }]
+    };
+    c.vence = est === "prueba" ? iso(masDias(dObj(alta), DIAS_PRUEBA))
+            : est === "vencida" ? iso(masDias(HOY, -(3 + i % 9)))
+            : iso(masDias(HOY, 2 + (i * 7) % 28));
+    return c;
+  });
+
+  const citas = [
+    { id:"q1", cuentaId:"c17", tipo:"video", fecha:iso(HOY), hora:"11:30", quien:"e2",
+      motivo:"Cerrar antes de que venza la prueba", estado:"pendiente", resultado:"" },
+    { id:"q2", cuentaId:"c21", tipo:"llamada", fecha:iso(HOY), hora:"16:00", quien:"e2",
+      motivo:"Recuperar el pago: la tarjeta fue rechazada", estado:"pendiente", resultado:"" },
+    { id:"q3", cuentaId:"c13", tipo:"llamada", fecha:iso(masDias(HOY,1)), hora:"10:00", quien:"e3",
+      motivo:"Paga y no lo usa: 17 días sin entrar", estado:"pendiente", resultado:"" },
+    { id:"q4", cuentaId:"c1", tipo:"video", fecha:iso(masDias(HOY,2)), hora:"13:00", quien:"e2",
+      motivo:"Subirlo de Básico a Maker", estado:"pendiente", resultado:"" },
+    { id:"q5", cuentaId:"c10", tipo:"video", fecha:iso(masDias(HOY,4)), hora:"09:30", quien:"e2",
+      motivo:"Cita formal de plan Pro con sus números", estado:"pendiente", resultado:"" },
+    { id:"q6", cuentaId:"c23", tipo:"llamada", fecha:iso(masDias(HOY,-2)), hora:"12:00", quien:"e3",
+      motivo:"Reactivar la cuenta pausada", estado:"hecha", resultado:"Pidió esperar al cierre de mes. Volver a marcar el 1." },
+    { id:"q7", cuentaId:"c19", tipo:"visita", fecha:iso(masDias(HOY,-1)), hora:"17:00", quien:"e2",
+      motivo:"Visita en su taller, llegó por CANAGRAF", estado:"nohubo", resultado:"No estaba. Reagendar." }
+  ];
+
+  const H = (d, h) => sello(masDias(HOY, d), h);
+  const tickets = [
+    { id:"t1", cuentaId:"c13", asunto:"No me deja subir el archivo de la playera", prioridad:"alta",
+      estado:"abierto", creado:H(-1,"09:14"), atiende:null, primeraResp:null, resuelto:null, confirmado:null, reaperturas:0,
+      mensajes:[{de:"cliente",txt:"Subo el PDF de la impresión y me dice que no se puede.",f:H(-1,"09:14")}] },
+    { id:"t2", cuentaId:"c5", asunto:"¿Cómo doy de alta a mi diseñador?", prioridad:"normal",
+      estado:"encurso", creado:H(-2,"11:40"), atiende:"e4", primeraResp:H(-2,"13:05"), resuelto:null, confirmado:null, reaperturas:0,
+      mensajes:[{de:"cliente",txt:"Entré a Ajustes y no encuentro dónde agregarlo.",f:H(-2,"11:40")},
+                {de:"soporte",txt:"Va en Ajustes → Equipo, pero solo aparece si eres administrador. ¿Con qué perfil entraste?",f:H(-2,"13:05")}] },
+    { id:"t3", cuentaId:"c21", asunto:"Quiero recuperar mi cuenta vencida", prioridad:"alta",
+      estado:"esperando", creado:H(-3,"08:20"), atiende:"e4", primeraResp:H(-3,"08:55"), resuelto:H(-2,"10:10"), confirmado:null, reaperturas:0,
+      mensajes:[{de:"cliente",txt:"Se me pasó el pago, ¿pierdo mis cotizaciones?",f:H(-3,"08:20")},
+                {de:"soporte",txt:"No se pierde nada. Reactivamos y sigue todo ahí.",f:H(-3,"08:55")},
+                {de:"soporte",txt:"Ya quedó reactivada. Revísala y me dices.",f:H(-2,"10:10")}] },
+    { id:"t4", cuentaId:"c9", asunto:"El corte de caja no cuadra con mis ventas", prioridad:"alta",
+      estado:"encurso", creado:H(-4,"16:30"), atiende:"e4", primeraResp:H(-3,"09:40"), resuelto:null, confirmado:null, reaperturas:1,
+      mensajes:[{de:"cliente",txt:"Me salen $1,200 de diferencia el viernes.",f:H(-4,"16:30")},
+                {de:"soporte",txt:"Revisé y era una venta cobrada después del corte. Ya quedó.",f:H(-3,"09:40")},
+                {de:"cliente",txt:"Sigue sin cuadrar, ahora son $400.",f:H(-2,"18:05")}] },
+    { id:"t5", cuentaId:"c3", asunto:"Quiero factura de mi suscripción", prioridad:"normal",
+      estado:"abierto", creado:H(-5,"10:02"), atiende:null, primeraResp:null, resuelto:null, confirmado:null, reaperturas:0,
+      mensajes:[{de:"cliente",txt:"Necesito el CFDI del pago de este mes.",f:H(-5,"10:02")}] },
+    { id:"t6", cuentaId:"c16", asunto:"Cambiar de mensual a anual", prioridad:"normal",
+      estado:"resuelto", creado:H(-9,"12:15"), atiende:"e1", primeraResp:H(-9,"12:48"), resuelto:H(-8,"09:30"), confirmado:H(-8,"11:00"), reaperturas:0,
+      mensajes:[{de:"cliente",txt:"¿Me conviene el anual?",f:H(-9,"12:15")},
+                {de:"soporte",txt:"Sí: son dos meses libres. ¿Lo cambio?",f:H(-9,"12:48")},
+                {de:"cliente",txt:"Sí por favor.",f:H(-8,"08:50")},
+                {de:"soporte",txt:"Listo, ya está en anual y te llegó la factura.",f:H(-8,"09:30")},
+                {de:"cliente",txt:"Confirmado, gracias.",f:H(-8,"11:00")}] },
+    { id:"t7", cuentaId:"c11", asunto:"Se me borró una cotización", prioridad:"alta",
+      estado:"resuelto", creado:H(-14,"19:40"), atiende:"e4", primeraResp:H(-13,"10:20"), resuelto:H(-12,"17:00"), confirmado:H(-12,"19:15"), reaperturas:1,
+      mensajes:[{de:"cliente",txt:"Cotización COT-0142, ya no aparece.",f:H(-14,"19:40")},
+                {de:"soporte",txt:"La recuperamos del respaldo.",f:H(-13,"10:20")},
+                {de:"cliente",txt:"Aparece pero sin los archivos.",f:H(-13,"15:00")},
+                {de:"soporte",txt:"Ya quedaron los tres archivos.",f:H(-12,"17:00")},
+                {de:"cliente",txt:"Ahora sí, gracias.",f:H(-12,"19:15")}] }
+  ];
+
+  const errores = [
+    { id:"x1", mensaje:"TypeError: no se pudo leer 'tallas' de undefined", donde:"Paso 3 del cotizador",
+      navegador:"Chrome 141 · Windows", rol:"ventas", veces:7, ultimo:iso(HOY), estado:"abierto", cuentaId:"c13", version:"19" },
+    { id:"x2", mensaje:"La subida del archivo se cortó a la mitad", donde:"Mesa de diseño",
+      navegador:"Safari 19 · iPhone", rol:"diseno", veces:4, ultimo:iso(masDias(HOY,-1)), estado:"abierto", cuentaId:"c8", version:"20" },
+    { id:"x3", mensaje:"El reporte de Excel salió sin la hoja de utilidad", donde:"Reportes",
+      navegador:"Edge 140 · Windows", rol:"admin", veces:2, ultimo:iso(masDias(HOY,-2)), estado:"revisando", cuentaId:"c4", version:"20" },
+    { id:"x4", mensaje:"La orden de producción imprimió sin el folio", donde:"Producción",
+      navegador:"Chrome 140 · Android", rol:"produccion", veces:1, ultimo:iso(masDias(HOY,-6)), estado:"resuelto", cuentaId:"c12", version:"19" },
+    { id:"x5", mensaje:"Se cerró la sesión a media cotización", donde:"Cotizador",
+      navegador:"Chrome 141 · Windows", rol:"ventas", veces:3, ultimo:iso(masDias(HOY,-1)), estado:"abierto", cuentaId:"c9", version:"20" }
+  ];
+
+  // Cobros: tres meses de movimientos de las cuentas que pagan, más rechazos reales.
+  const cobros = [];
+  cuentas.forEach((c, i) => {
+    if (c.estado === "prueba") return;
+    const veces = c.periodo === "anual" ? 1 : 3;
+    for (let k = 0; k < veces; k++) {
+      const f = masDias(HOY, -(k * 30) - (i % 22));
+      if (f < dObj(c.alta)) continue;
+      const rechazado = (c.estado === "vencida" && k === 0);
+      const total = c.periodo === "anual" ? PLANES[c.plan].anio : PLANES[c.plan].mes;
+      const delMes = iso(f).slice(0, 7) === iso(HOY).slice(0, 7);
+      cobros.push({
+        id: "p" + c.id + "-" + k, cuentaId: c.id, fecha: iso(f),
+        concepto: "Suscripción " + PLANES[c.plan].nombre + " " + (c.periodo === "anual" ? "anual" : "mensual"),
+        total: total, metodo: i % 3 === 0 ? "Tarjeta de débito" : "Tarjeta de crédito",
+        estado: rechazado ? "rechazado" : "aprobado",
+        liquida: iso(masDias(f, 2)),
+        depositado: !rechazado && difDias(iso(HOY), iso(masDias(f, 2))) >= 0,
+        // factura: "global" (público en general) · "pendiente" (nominativa por emitir) · "emitida"
+        factura: rechazado ? "global" : c.requiereFactura ? (delMes && k === 0 ? "pendiente" : "emitida") : "global",
+        cfdi: "", uuid: "", enviada: false, emitida: ""
+      });
+    }
+  });
+  cobros.forEach((p, n) => {
+    if (p.factura === "emitida") {
+      p.cfdi = "A-" + (1000 + n); p.uuid = "F3B" + (100000 + n * 7) + "-CDA4";
+      p.enviada = true; p.emitida = p.fecha;
+    }
+  });
+
+  const fallas = [
+    { id:"f1", titulo:"El paso 3 se queda en blanco con artículos que no son textiles",
+      donde:"Cotizador · paso 3", severidad:"bloquea", estado:"arreglando", version:"21",
+      sintoma:"Al elegir una taza o una gorra sin tallas, la pantalla del paso 3 se queda vacía y ya no deja avanzar al paso 4.",
+      reproducir:"1. Abrir una cotización nueva.\n2. En el paso 2 elegir Taza cerámica.\n3. Abrir el paso 3.\nLa tarjeta aparece vacía y el botón de siguiente no responde.",
+      reportada:iso(masDias(HOY,-4)), confirmada:iso(masDias(HOY,-3)), corregida:null, verificada:null,
+      quien:"e1", avisados:false, notas:[{f:iso(masDias(HOY,-3)),t:"Reproducida en Chrome y en Edge. Pasa solo cuando el artículo no tiene tallas."}] },
+    { id:"f2", titulo:"La subida del archivo se corta a la mitad en iPhone",
+      donde:"Mesa de diseño", severidad:"molesta", estado:"confirmada", version:"",
+      sintoma:"En Safari de iPhone, al subir una foto de más de 3 MB la barra llega al 60% y se detiene.",
+      reproducir:"1. Entrar desde un iPhone con Safari.\n2. Mesa de diseño, reemplazar el archivo de una orden.\n3. Elegir una foto de la cámara sin recortar.",
+      reportada:iso(masDias(HOY,-6)), confirmada:iso(masDias(HOY,-5)), corregida:null, verificada:null,
+      quien:"e1", avisados:false, notas:[] },
+    { id:"f3", titulo:"El reporte de Excel sale sin la hoja de utilidad",
+      donde:"Reportes", severidad:"molesta", estado:"corregida", version:"20",
+      sintoma:"El archivo baja con las hojas de ventas y de caja, pero falta la de utilidad por periodo.",
+      reproducir:"1. Entrar como administrador.\n2. Ventas, Descargar reporte del mes.\n3. Abrir el archivo: solo trae dos hojas.",
+      reportada:iso(masDias(HOY,-12)), confirmada:iso(masDias(HOY,-11)), corregida:iso(masDias(HOY,-2)), verificada:null,
+      quien:"e1", avisados:false, notas:[{f:iso(masDias(HOY,-2)),t:"Corregido en la versión 20. Falta avisar a los afectados."}] },
+    { id:"f4", titulo:"La orden de producción se imprime sin el folio",
+      donde:"Producción", severidad:"bloquea", estado:"verificada", version:"20",
+      sintoma:"El documento sale completo pero el número de OP aparece vacío en el encabezado.",
+      reproducir:"1. Confirmar un pedido.\n2. Abrir la orden de producción y darle imprimir.",
+      reportada:iso(masDias(HOY,-20)), confirmada:iso(masDias(HOY,-19)), corregida:iso(masDias(HOY,-14)), verificada:iso(masDias(HOY,-12)),
+      quien:"e1", avisados:true, notas:[{f:iso(masDias(HOY,-12)),t:"El taller confirmó que ya sale el folio."}] },
+    { id:"f5", titulo:"Se cierra la sesión a media cotización",
+      donde:"Cotizador", severidad:"bloquea", estado:"reportada", version:"",
+      sintoma:"Después de un rato sin guardar, al darle a cotizar regresa a la pantalla de acceso y se pierde lo capturado.",
+      reproducir:"Todavía no se ha logrado reproducir. Pasa en jornadas largas, según el cliente después de una hora.",
+      reportada:iso(masDias(HOY,-1)), confirmada:null, corregida:null, verificada:null,
+      quien:null, avisados:false, notas:[] },
+    { id:"f6", titulo:"El corte de caja no toma las ventas cobradas después de la hora de corte",
+      donde:"Caja", severidad:"bloquea", estado:"confirmada", version:"21",
+      sintoma:"Una venta cobrada a las 19:10, con el corte hecho a las 19:00, no entra ni en ese corte ni en el del día siguiente.",
+      reproducir:"1. Hacer el corte del día.\n2. Cobrar una venta después.\n3. Revisar el corte del día siguiente: esa venta no aparece.",
+      reportada:iso(masDias(HOY,-4)), confirmada:iso(masDias(HOY,-3)), corregida:null, verificada:null,
+      quien:"e1", avisados:false, notas:[{f:iso(masDias(HOY,-3)),t:"Confirmado: el corte filtra por día pero la venta guarda la hora del cobro."}] }
+  ];
+  tickets.forEach(t => { t.fallaId = null; });
+  // Los que entraron por el botón de ayuda del cotizador traen su contexto solos.
+  const ctx = (cid, pant, bloquea, errs) => {
+    const c = cuentas.find(x => x.id === cid) || {};
+    return { origen: "widget", bloquea: bloquea, pantalla: pant,
+      contexto: { taller: c.taller, usuario: c.contacto, rol: "Ventas", pantalla: pant,
+        version: c.version, navegador: c.navegador, pantallaPx: "1366×768",
+        cotizaciones: c.cotizaciones, articulos: c.catalogo, almacen: "en la nube" },
+      errores: errs };
+  };
+  Object.assign(tickets.find(t => t.id === "t1"), ctx("c13", "Cotizar", true,
+    [{ msg: "TypeError: no se pudo leer 'tallas' de undefined", donde: "cotizador:1842", hora: "09:12", pantalla: "Cotizar" }]));
+  Object.assign(tickets.find(t => t.id === "t4"), ctx("c9", "Caja", false,
+    [{ msg: "Quedó algo sin terminar: corte sin movimientos", donde: "", hora: "16:28", pantalla: "Caja" }]));
+  Object.assign(tickets.find(t => t.id === "t2"), ctx("c5", "Ajustes", false, []));
+  Object.assign(tickets.find(t => t.id === "t5"), ctx("c3", "Cotizaciones / Pedidos", false, []));
+  tickets.forEach(t => {
+    if (t.id === "t1") t.fallaId = "f1";
+    if (t.id === "t4") t.fallaId = "f6";
+  });
+  errores.forEach(e => {
+    e.fallaId = e.id === "x1" ? "f1" : e.id === "x2" ? "f2" : e.id === "x3" ? "f3"
+      : e.id === "x4" ? "f4" : e.id === "x5" ? "f5" : null;
+  });
+
+  const datos = { cuentas, tickets, errores, equipo, alianzas, citas, cobros, fallas };
+  if (enMemoria) { ficheros = datos; esEjemplo = true; }
+  return datos;
+}
+
+/* ================= avisos ================= */
+function aviso(txt) {
+  let el = document.querySelector(".globo.fijo");
+  if (!el) { el = document.createElement("div"); el.className = "globo fijo"; document.body.appendChild(el); }
+  el.textContent = txt;
+  el.style.left = "50%"; el.style.top = "auto"; el.style.bottom = "24px"; el.style.transform = "translateX(-50%)";
+  clearTimeout(el._t); el._t = setTimeout(() => el.remove(), 3400);
+}
+
+/* ================= pendientes ================= */
+function pendientes() {
+  const l = [];
+  ficheros.cuentas.forEach(c => {
+    const j = jugada(c);
+    if (j.urg === "urge" || j.urg === "pronto")
+      l.push({ p: j.urg === "urge" ? 0 : 2, cls: j.urg, id: c.id, t: c.taller + ": " + j.titulo.toLowerCase(), s: j.porque });
+  });
+  ficheros.tickets.filter(t => t.estado !== "resuelto" && t.prioridad === "alta").forEach(t => {
+    const c = cuentaDe(t.cuentaId);
+    l.push({ p: 1, cls: "urge", tick: t.id, t: (c ? c.taller : "Cuenta") + ": " + t.asunto,
+      s: "Ticket urgente abierto el " + fFecha(t.creado) + "." });
+  });
+  ficheros.fallas.filter(f => f.severidad === "bloquea" && f.estado !== "verificada" && f.estado !== "corregida").forEach(f => {
+    const af = afectadasDe(f);
+    l.push({ p: 0, cls: "urge", falla: f.id, t: "Falla que bloquea: " + f.titulo,
+      s: af.length ? "Le pega a " + af.length + (af.length === 1 ? " cuenta" : " cuentas") + " · " + PASOS[f.estado].que
+                   : PASOS[f.estado].que });
+  });
+  ficheros.fallas.filter(f => f.estado === "corregida" && !f.avisados).forEach(f => {
+    l.push({ p: 2, cls: "pronto", falla: f.id, t: "Ya se arregló y el cliente no sabe: " + f.titulo,
+      s: "Salió en la versión " + f.version + ". Avisarles cierra sus tickets." });
+  });
+  ficheros.cobros.filter(p => p.estado === "rechazado").forEach(p => {
+    const c = cuentaDe(p.cuentaId);
+    l.push({ p: 0, cls: "urge", id: p.cuentaId, t: (c ? c.taller : "Cuenta") + ": el cobro fue rechazado",
+      s: $$$(cargo(p)) + " el " + fFecha(p.fecha) + " con " + p.metodo.toLowerCase() + "." });
+  });
+  return l.sort((a, b) => a.p - b.p);
+}
+const citasHoy = () => ficheros.citas.filter(q => q.estado === "pendiente" && difDias(q.fecha, iso(HOY)) <= 0);
+const citasProximas = () => ficheros.citas.filter(q => q.estado === "pendiente")
+  .sort((a, b) => (a.fecha + a.hora).localeCompare(b.fecha + b.hora));
+
+/* ================= gráficas ================= */
+function historico(meses) {
+  const out = [];
+  for (let i = meses - 1; i >= 0; i--) {
+    const f = new Date(HOY.getFullYear(), HOY.getMonth() - i + 1, 0), corte = iso(f);
+    let total = 0;
+    ficheros.cuentas.forEach(c => {
+      if (c.estado === "prueba") return;
+      if (difDias(corte, c.alta) < 0) return;
+      const fin = c.baja || (paga(c) ? null : c.vence);
+      if (fin && difDias(corte, fin) >= 0) return;
+      total += mensual(c);
+    });
+    out.push({ et: MESES[f.getMonth()], v: total });
+  }
+  return out;
+}
+function grafIngreso() {
+  const d = historico(6); if (!d.length) return "";
+  const W = 640, H = 200, ejeI = 54, ejeB = 26, top = 12;
+  const max = Math.max(1, Math.max.apply(null, d.map(x => x.v))) * 1.15;
+  const ancho = (W - ejeI - 8) / d.length, barra = Math.min(46, ancho * 0.56);
+  let s = '<svg class="graf" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Ingreso recurrente de los últimos seis meses">';
+  for (let i = 0; i <= 2; i++) {
+    const v = max * i / 2, y = top + (H - top - ejeB) * (1 - i / 2);
+    s += '<line x1="' + ejeI + '" y1="' + y.toFixed(1) + '" x2="' + (W - 4) + '" y2="' + y.toFixed(1) + '" stroke="var(--line)" stroke-width="1"/>' +
+      '<text x="' + (ejeI - 8) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="end" font-size="11" fill="var(--ink-3)" font-family="IBM Plex Mono, monospace">' +
+      (v >= 1000 ? Math.round(v / 1000) + "k" : Math.round(v)) + '</text>';
+  }
+  d.forEach((p, i) => {
+    const alto = Math.max(2, (H - top - ejeB) * (p.v / max));
+    const x = ejeI + i * ancho + (ancho - barra) / 2, y = H - ejeB - alto;
+    s += '<rect class="barra" data-i="' + i + '" x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + barra.toFixed(1) +
+      '" height="' + alto.toFixed(1) + '" rx="4" fill="var(--acento)"/>' +
+      '<text x="' + (x + barra / 2).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="11" fill="var(--ink-3)">' + p.et + '</text>';
+    if (i === d.length - 1) s += '<text x="' + (x + barra / 2).toFixed(1) + '" y="' + (y - 6).toFixed(1) +
+      '" text-anchor="middle" font-size="12" font-weight="600" fill="var(--ink)" font-family="IBM Plex Mono, monospace">' + $$$(p.v) + '</text>';
+  });
+  return s + '</svg>';
+}
+function grafPlanes() {
+  const act = ficheros.cuentas.filter(paga);
+  const ord = ["basico", "maker", "pro"], col = ["var(--r1)", "var(--r2)", "var(--r3)"];
+  const por = ord.map(p => ({ p, n: act.filter(c => c.plan === p).length, v: act.filter(c => c.plan === p).reduce((s, c) => s + mensual(c), 0) }));
+  const tot = por.reduce((s, x) => s + x.v, 0) || 1;
+  const W = 640, H = 46; let x = 0;
+  let s = '<svg class="graf" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Reparto del ingreso por plan">';
+  por.forEach((q, i) => {
+    const w = Math.max(0, (W * q.v / tot) - (i < 2 ? 2 : 0));
+    if (w > 0) {
+      s += '<rect x="' + x.toFixed(1) + '" y="0" width="' + w.toFixed(1) + '" height="28" rx="4" fill="' + col[i] + '"/>';
+      if (w > 62) s += '<text x="' + (x + w / 2).toFixed(1) + '" y="' + (H - 4) + '" text-anchor="middle" font-size="11" fill="var(--ink-2)" font-family="IBM Plex Mono, monospace">' +
+        Math.round(q.v / tot * 100) + '%</text>';
+    }
+    x += w + 2;
+  });
+  return s + '</svg><div class="leyenda">' + por.map((q, i) =>
+    '<span><i style="background:' + col[i] + '"></i>' + PLANES[q.p].nombre + ' · ' + q.n + (q.n === 1 ? " cuenta" : " cuentas") + ' · ' + $$$(q.v) + '</span>').join("") + '</div>';
+}
+const tile = (et, v, sub, dest) => '<div class="tile' + (dest ? " destacada" : "") + '"><span class="et">' + esc(et) +
+  '</span><span class="v">' + esc(v) + '</span><span class="sub">' + esc(sub) + '</span></div>';
+
+/* ================= vistas ================= */
+function vTablero() {
+  const act = ficheros.cuentas.filter(paga).length;
+  const pru = ficheros.cuentas.filter(c => c.estado === "prueba").length;
+  const ven = ficheros.cuentas.filter(c => c.estado === "vencida").length;
+  const h = historico(6), prev = h.length > 1 ? h[h.length - 2].v : 0, ahora = mrr();
+  const delta = prev ? Math.round((ahora - prev) / prev * 100) : 0;
+  const pend = pendientes(), hoy = citasHoy();
+  const porCobrar = ficheros.cobros.filter(p => p.estado === "aprobado" && !p.depositado).reduce((s, p) => s + cargo(p), 0);
+
+  return '<div style="display:flex;flex-direction:column;gap:20px">' +
+    '<div class="tiles">' +
+      tile("Ingreso recurrente", $$$(ahora), (delta >= 0 ? "+" : "") + delta + "% contra el mes pasado", true) +
+      tile("Cuentas pagando", act, pru + " en prueba ahora mismo") +
+      tile("Citas de hoy", hoy.length, hoy.length ? "La siguiente a las " + hoy[0].hora : "Sin citas agendadas") +
+      tile("Por depositar", $$$(porCobrar), ven ? ven + " cobro(s) rechazado(s) por revisar" : "Nada rechazado") +
+    '</div>' +
+    '<div class="rejilla2">' +
+      '<div class="tarjeta"><header><h2>Para hoy</h2><span class="pista">' + pend.length + (pend.length === 1 ? " pendiente" : " pendientes") + '</span></header>' +
+        (pend.length ? '<div class="pendientes">' + pend.slice(0, 10).map(p =>
+          '<div class="pend clic ' + p.cls + '"' + (p.tick ? ' data-tick="' + p.tick + '"' : p.falla ? ' data-falla="' + p.falla + '"' : ' data-abre="' + p.id + '"') +
+          ' tabindex="0" role="button"><span class="raya"></span><span class="txt"><b>' + esc(p.t) + '</b><small>' + esc(p.s) + '</small></span></div>').join("") + '</div>'
+          : '<div class="vacio">Nada urgente. Aprovecha para grabar contenido.</div>') + '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:20px">' +
+        '<div class="tarjeta"><header><h2>Agenda de hoy y mañana</h2></header>' + listaCitas(citasProximas().filter(q => difDias(q.fecha, iso(HOY)) <= 1), true) + '</div>' +
+        '<div class="tarjeta"><header><h2>Ingreso recurrente</h2><span class="pista">últimos 6 meses</span></header><div class="cuerpo">' + grafIngreso() + '</div></div>' +
+        '<div class="tarjeta"><header><h2>De dónde viene el ingreso</h2></header><div class="cuerpo">' + grafPlanes() + '</div></div>' +
+      '</div></div></div>';
+}
+
+function vCuentas() {
+  const t = filtro.texto.toLowerCase();
+  const lista = ficheros.cuentas.filter(c =>
+    (!filtro.estado || c.estado === filtro.estado) && (!filtro.plan || c.plan === filtro.plan) &&
+    (!t || (c.taller + " " + c.correo + " " + c.sitio + " " + c.contacto).toLowerCase().indexOf(t) >= 0)
+  );
+  const orden = { urge: 0, pronto: 1, info: 2, ok: 3 };
+  lista.forEach(c => c._j = jugada(c));
+  lista.sort((a, b) => orden[a._j.urg] - orden[b._j.urg] || a.taller.localeCompare(b.taller));
+  if (!lista.length) return '<div class="tarjeta"><div class="vacio">Ninguna cuenta coincide con esa búsqueda.</div></div>';
+
+  return '<div class="tarjeta"><header><h2>Cuentas</h2>' +
+    '<span class="pista">' + lista.length + ' de ' + ficheros.cuentas.length + ' · ordenadas por lo que urge atender</span></header>' +
+    '<div class="marco"><table style="min-width:840px"><thead><tr>' +
+      '<th>Taller</th><th>Estado</th><th>Plan</th><th class="der">Al mes</th><th>Qué sigue</th><th>Vence</th><th>Último acceso</th><th></th>' +
+    '</tr></thead><tbody>' + lista.map(c => {
+      const sin = difDias(iso(HOY), c.ultimo), j = c._j;
+      return '<tr class="clic" data-abre="' + c.id + '" tabindex="0">' +
+        '<td><span class="taller">' + esc(c.taller) + '</span><br><span class="sitio">' + esc(c.sitio) + ' · ' + esc(c.contacto) + '</span></td>' +
+        '<td>' + chipEstado(c) + '</td>' +
+        '<td>' + chipPlan(c) + ' <span class="sitio">' + (c.periodo === "anual" ? "anual" : "mensual") + '</span></td>' +
+        '<td class="der mono">' + (paga(c) ? $$$(cobroMes(c)) : "—") + '</td>' +
+        '<td><span class="chip ' + (j.urg === "urge" ? "mal" : j.urg === "pronto" ? "aviso" : j.urg === "ok" ? "bien" : "info") + '">' + esc(j.titulo) + '</span></td>' +
+        '<td class="mono">' + fCorta(c.vence) + '</td>' +
+        '<td class="mono"' + (sin >= 14 ? ' style="color:var(--aviso)"' : '') + '>' + (sin === 0 ? "hoy" : "hace " + sin + " d") + '</td>' +
+        '<td class="der"><a class="btn sm" href="' + esc(waLink(c, j.guion)) + '" target="_blank" rel="noopener" data-alto>WhatsApp</a></td>' +
+      '</tr>';
+    }).join("") + '</tbody></table></div></div>';
+}
+
+function listaCitas(lista, compacta) {
+  if (!lista.length) return '<div class="vacio">Sin citas por ahora.</div>';
+  return '<div class="pendientes">' + lista.map(q => {
+    const c = cuentaDe(q.cuentaId) || { taller: "Cuenta borrada" }, e = eqDe(q.quien);
+    const d = difDias(q.fecha, iso(HOY));
+    const cuando = d < 0 ? "fue el " + fCorta(q.fecha) : d === 0 ? "hoy" : d === 1 ? "mañana" : fCorta(q.fecha);
+    const cls = q.estado === "hecha" ? "ok" : q.estado === "nohubo" ? "pronto" : d <= 0 ? "urge" : "info";
+    return '<div class="pend ' + cls + ' clic" data-abre="' + q.cuentaId + '" tabindex="0" role="button">' +
+      '<span class="raya"></span><span class="txt"><b>' + TIPOCITA[q.tipo] + ' · ' + esc(c.taller) + '</b>' +
+      '<small>' + cuando + ' a las ' + esc(q.hora) + (e ? " · " + esc(e.nombre) : "") + ' · ' + esc(q.motivo) + '</small>' +
+      (q.resultado ? '<small style="color:var(--ink-3)">Resultado: ' + esc(q.resultado) + '</small>' : '') + '</span>' +
+      (compacta ? '' : '<span class="fila">' +
+        (q.estado === "pendiente"
+          ? '<button class="btn sm" data-cita="hecha" data-id="' + q.id + '">Se hizo</button>' +
+            '<button class="btn sm" data-cita="nohubo" data-id="' + q.id + '">No hubo</button>'
+          : '<span class="chip ' + (q.estado === "hecha" ? "bien" : "gris") + '">' + (q.estado === "hecha" ? "Hecha" : "No hubo") + '</span>') +
+        '<button class="btn sm mal" data-cita="borra" data-id="' + q.id + '">Quitar</button></span>') +
+    '</div>';
+  }).join("") + '</div>';
+}
+
+function vAgenda() {
+  const prox = citasProximas(), pasadas = ficheros.citas.filter(q => q.estado !== "pendiente")
+    .sort((a, b) => (b.fecha + b.hora).localeCompare(a.fecha + a.hora));
+  const porQuien = ficheros.equipo.filter(e => e.rol !== "soporte").map(e => ({
+    e: e, n: prox.filter(q => q.quien === e.id).length }));
+  return '<div style="display:flex;flex-direction:column;gap:20px">' +
+    '<div class="tiles">' +
+      tile("Citas de hoy", citasHoy().length, citasHoy().length ? "La siguiente a las " + citasHoy()[0].hora : "Nada agendado hoy", true) +
+      tile("Agendadas", prox.length, "en los próximos días") +
+      porQuien.slice(0, 2).map(x => tile(x.e.nombre.split(" ").slice(0, 2).join(" "), x.n, "citas pendientes")).join("") +
+    '</div>' +
+    '<div class="rejilla2">' +
+      '<div class="tarjeta"><header><h2>Lo que viene</h2><span class="pista">agenda desde la ficha de cada cuenta</span></header>' + listaCitas(prox) + '</div>' +
+      '<div class="tarjeta"><header><h2>Ya pasaron</h2></header>' + listaCitas(pasadas) + '</div>' +
+    '</div></div>';
+}
+
+function estadoTicket(t) {
+  return t.estado === "abierto" ? { txt: "Sin contestar", chip: "mal" }
+    : t.estado === "encurso" ? { txt: "En curso", chip: "aviso" }
+    : t.estado === "esperando" ? { txt: "Espera al cliente", chip: "info" }
+    : { txt: "Resuelto y confirmado", chip: "bien" };
+}
+
+let subSop = "tickets";
+
+function vSoporte() {
+  const abiertos = ficheros.tickets.filter(t => t.estado !== "resuelto");
+  const sinAtender = ficheros.tickets.filter(t => t.estado === "abierto");
+  const esperando = ficheros.tickets.filter(t => t.estado === "esperando");
+  const conResp = ficheros.tickets.filter(t => t.primeraResp);
+  const promResp = conResp.length ? conResp.reduce((s, t) => s + horasEntre(t.creado, t.primeraResp), 0) / conResp.length : null;
+  const vivas = ficheros.fallas.filter(f => f.estado !== "verificada");
+  const porAvisar = ficheros.fallas.filter(f => f.estado === "corregida" && !f.avisados);
+  const bloquean = vivas.filter(f => f.severidad === "bloquea" && f.estado !== "corregida");
+
+  const seg = '<div class="seg" role="tablist">' +
+    [["tickets", "Tickets", abiertos.length], ["fallas", "Fallas del programa", vivas.length],
+     ["errores", "Errores capturados", ficheros.errores.filter(e => e.estado === "abierto").length]]
+    .map(x => '<button data-sub="' + x[0] + '" aria-pressed="' + (subSop === x[0]) + '">' + x[1] +
+      (x[2] ? ' <span class="cuenta">' + x[2] + '</span>' : '') + '</button>').join("") + '</div>';
+
+  return '<div style="display:flex;flex-direction:column;gap:20px">' +
+    '<div class="tiles">' +
+      tile("Sin asignar", sinAtender.length, sinAtender.length ? "nadie los ha tomado" : "todos tienen dueño", true) +
+      tile("Primera respuesta", fDur(promResp), "en promedio · meta " + META_RESP + " h") +
+      tile("Fallas que bloquean", bloquean.length, bloquean.length ? "nadie puede trabajar con eso" : "ninguna abierta") +
+      tile("Por avisar", porAvisar.length, porAvisar.length ? "ya se arreglaron y el cliente no sabe" : "todos avisados") +
+    '</div>' + seg +
+    (subSop === "tickets" ? vSopTickets(esperando) : subSop === "fallas" ? vSopFallas() : vSopErrores());
+}
+
+function vSopTickets(esperando) {
+  const abiertos = ficheros.tickets.filter(t => t.estado !== "resuelto");
+  const cerrados = ficheros.tickets.filter(t => t.estado === "resuelto");
+  const dnp = desempeno();
+
+  const fila = t => {
+    const c = cuentaDe(t.cuentaId) || { taller: "Cuenta borrada" };
+    const k = slaTicket(t), e = eqDe(t.atiende), st = estadoTicket(t), f = t.fallaId ? fallaDe(t.fallaId) : null;
+    const marca = (ok, txt) => ok == null ? '' : '<span class="chip ' + (ok ? "bien" : "mal") + '">' + txt + '</span>';
+    return '<div class="pend clic ' + (t.estado === "abierto" ? "urge" : t.estado === "resuelto" ? "ok" : "info") +
+      '" data-tick="' + t.id + '" tabindex="0" role="button"><span class="raya"></span><span class="txt">' +
+      '<b>' + esc(t.asunto) + '</b>' +
+      '<small>' + esc(c.taller) + ' · ' + fSello(t.creado) + (e ? ' · lo lleva ' + esc(e.nombre) : ' · <b style="color:var(--critico)">sin asignar</b>') +
+        (t.origen === "widget" ? ' · entró por el botón de ayuda' : '') +
+        (t.reaperturas ? ' · se reabrió ' + t.reaperturas + (t.reaperturas === 1 ? " vez" : " veces") : '') + '</small>' +
+      (t.bloquea ? '<small><b style="color:var(--critico)">Dijo que no puede trabajar</b></small>' : '') +
+      (f ? '<small style="color:var(--acento-2)">Es la falla: ' + esc(f.titulo) + ' · ' + PASOS[f.estado].nombre +
+           (f.version ? ' en la versión ' + esc(f.version) : '') + '</small>' : '') +
+      '<small class="fila" style="margin-top:5px">' +
+        (k.resp != null ? marca(k.respOk, "Contestó en " + fDur(k.resp))
+                        : '<span class="chip mal">Lleva ' + fDur(k.vivo) + ' sin contestar</span>') +
+        (t.confirmado ? marca(k.resOk, "Resuelto en " + fDur(k.res))
+          : t.resuelto ? '<span class="chip info">Dice estar resuelto · falta que confirme</span>'
+          : t.estado !== "abierto" ? '<span class="chip gris">Abierto hace ' + fDur(k.vivo) + '</span>' : '') +
+      '</small></span><span class="chip ' + st.chip + '">' + st.txt + '</span></div>';
+  };
+
+  return '<div style="display:flex;flex-direction:column;gap:20px">' +
+    '<div class="tarjeta"><header><h2>Sin cerrar</h2><span class="pista">' + abiertos.length +
+      (esperando.length ? ' · ' + esperando.length + ' esperan que el cliente confirme' : '') + '</span></header>' +
+      (abiertos.length ? '<div class="pendientes">' + abiertos.map(fila).join("") + '</div>' : '<div class="vacio">Nadie está esperando respuesta.</div>') + '</div>' +
+    '<div class="tarjeta"><header><h2>Cómo va cada quien</h2>' +
+      '<span class="pista">un ticket solo cuenta como resuelto cuando el cliente lo confirma</span></header>' +
+      '<div class="marco"><table style="min-width:760px"><thead><tr>' +
+        '<th>Persona</th><th class="der">Atendidos</th><th class="der">1ª respuesta</th><th class="der">Dentro de meta</th>' +
+        '<th class="der">Resolución<br><span style="font-weight:400;text-transform:none;letter-spacing:0">confirmada</span></th>' +
+        '<th class="der">Reaperturas</th><th class="der">Confirmados</th><th class="der">En espera</th>' +
+      '</tr></thead><tbody>' + (dnp.length ? dnp.map(d =>
+        '<tr><td><span class="taller">' + esc(d.e.nombre) + '</span><br><span class="sitio">' + ROLES[d.e.rol] + '</span></td>' +
+        '<td class="der mono">' + d.n + '</td>' +
+        '<td class="der mono"' + (d.resp != null && d.resp > META_RESP ? ' style="color:var(--critico);font-weight:600"' : '') + '>' + fDur(d.resp) + '</td>' +
+        '<td class="der mono">' + (d.n ? d.aTiempo + " de " + d.n : "—") + '</td>' +
+        '<td class="der mono"' + (d.res != null && d.res > META_RES ? ' style="color:var(--aviso);font-weight:600"' : '') + '>' + fDur(d.res) + '</td>' +
+        '<td class="der mono"' + (d.reab ? ' style="color:var(--critico);font-weight:600"' : '') + '>' + d.reab + '</td>' +
+        '<td class="der mono"' + (d.confirmados ? ' style="color:var(--bien);font-weight:600"' : '') + '>' + d.confirmados + '</td>' +
+        '<td class="der mono">' + d.esperando + '</td></tr>').join("")
+        : '<tr><td colspan="8" class="sitio">Todavía nadie ha atendido tickets.</td></tr>') + '</tbody></table></div>' +
+      '<div class="cuerpo" style="border-top:1px solid var(--line)"><p class="nota">' +
+      'Un ticket que resultó ser una falla del programa <b>no se cierra contestando</b>: se cierra cuando sale la versión que la corrige. ' +
+      'Por eso el reloj de esos tickets sigue corriendo aunque soporte ya haya explicado qué pasa — y por eso conviene ' +
+      'mirar la pestaña de fallas antes de juzgar un promedio malo.</p></div></div>' +
+    (cerrados.length ? '<div class="tarjeta"><header><h2>Cerrados con confirmación</h2><span class="pista">' + cerrados.length + '</span></header>' +
+      '<div class="pendientes">' + cerrados.map(fila).join("") + '</div></div>' : "") +
+    '</div>';
+}
+
+function vSopFallas() {
+  const lista = ficheros.fallas.slice().sort(ordenFallas);
+  if (!lista.length) return '<div class="tarjeta"><div class="vacio">Ninguna falla registrada.</div></div>';
+  const porAvisar = lista.filter(f => f.estado === "corregida" && !f.avisados);
+
+  return '<div style="display:flex;flex-direction:column;gap:20px">' +
+    (porAvisar.length ? '<div class="aviso-demo" style="background:var(--bien-suave);color:var(--bien)">' +
+      porAvisar.length + (porAvisar.length === 1 ? ' falla ya está corregida y el cliente todavía no lo sabe.' : ' fallas ya están corregidas y los clientes todavía no lo saben.') +
+      ' Avísales desde su ficha: es lo que cierra sus tickets.</div>' : '') +
+    '<div class="tarjeta"><header><h2>Fallas del programa</h2>' +
+      '<span class="pista">lo que no se arregla contestando un chat</span></header>' +
+      '<div class="pendientes">' + lista.map(f => {
+        const af = afectadasDe(f), tks = ticketsDe(f), vs = vecesDe(f);
+        const abierta = difDias(iso(HOY), f.reportada);
+        const cls = f.estado === "verificada" ? "ok" : f.estado === "corregida" ? "ok"
+          : f.severidad === "bloquea" ? "urge" : "pronto";
+        return '<div class="pend clic ' + cls + '" data-falla="' + f.id + '" tabindex="0" role="button">' +
+          '<span class="raya"></span><span class="txt">' +
+          '<b>' + esc(f.titulo) + '</b>' +
+          '<small>' + esc(f.donde) + ' · reportada hace ' + dias(abierta) +
+            (f.version ? ' · ' + (f.estado === "corregida" || f.estado === "verificada" ? 'salió en la versión ' : 'va para la versión ') + esc(f.version) : '') + '</small>' +
+          '<small class="fila" style="margin-top:5px">' +
+            '<span class="chip ' + SEVERIDAD[f.severidad].chip + '">' + SEVERIDAD[f.severidad].nombre + '</span>' +
+            '<span class="chip ' + PASOS[f.estado].chip + '">' + PASOS[f.estado].nombre + '</span>' +
+            (af.length ? '<span class="chip gris">' + af.length + (af.length === 1 ? ' cuenta afectada' : ' cuentas afectadas') + '</span>' : '') +
+            (tks.length ? '<span class="chip gris">' + tks.length + (tks.length === 1 ? ' ticket' : ' tickets') + '</span>' : '') +
+            (vs ? '<span class="chip gris">' + vs + (vs === 1 ? ' vez detectada' : ' veces detectada') + '</span>' : '') +
+            (f.estado === "corregida" && !f.avisados ? '<span class="chip aviso">Falta avisarles</span>' : '') +
+          '</small></span></div>';
+      }).join("") + '</div>' +
+      '<div class="cuerpo" style="border-top:1px solid var(--line)"><p class="nota">' +
+      'Aquí no se arregla nada: aquí se <b>ordena</b>. La falla junta todos los tickets y todos los errores que son la misma cosa, ' +
+      'para que sepas <b>a cuánta gente le pega</b> antes de decidir qué arreglas primero. Una falla que bloquea a seis cuentas va antes ' +
+      'que una que estorba a una, aunque la segunda haya llegado antes y el cliente grite más fuerte.<br><br>' +
+      'El ciclo completo es: se reporta, se reproduce, se arregla, <b>sale en una versión</b>, se avisa a los afectados y ellos confirman. ' +
+      'Mientras no salga la versión, ninguno de sus tickets se puede cerrar de verdad.</p></div></div></div>';
+}
+
+function vSopErrores() {
+  const errs = ficheros.errores.slice().sort((a, b) =>
+    (a.estado === "resuelto" ? 1 : 0) - (b.estado === "resuelto" ? 1 : 0) || b.veces - a.veces);
+  const conApoyo = ficheros.cuentas.filter(c => c.apoyo && difDias(c.apoyo.hasta, iso(HOY)) >= 0);
+  const enV19 = ficheros.cuentas.filter(c => c.version !== "20" && c.estado !== "baja");
+
+  return '<div class="rejilla2">' +
+    '<div class="tarjeta"><header><h2>Lo que el cotizador reporta solo</h2>' +
+      '<span class="pista">nadie los escribe: llegan del navegador del cliente</span></header>' +
+      (errs.length ? '<div class="pendientes">' + errs.map(e => {
+        const c = cuentaDe(e.cuentaId), f = e.fallaId ? fallaDe(e.fallaId) : null;
+        return '<div class="pend ' + (e.estado === "abierto" ? "urge" : e.estado === "revisando" ? "pronto" : "") + '">' +
+          '<span class="raya"></span><span class="txt"><b>' + esc(e.donde) + ' — ' + esc(e.mensaje) + '</b>' +
+          '<small>' + e.veces + (e.veces === 1 ? " vez" : " veces") + ' · última el ' + fFecha(e.ultimo) + ' · ' + esc(e.navegador) +
+          ' · perfil ' + esc(e.rol) + ' · versión ' + esc(e.version) + (c ? ' · ' + esc(c.taller) : "") + '</small>' +
+          (f ? '<small style="color:var(--acento-2)">Pertenece a: ' + esc(f.titulo) + '</small>'
+             : '<small style="color:var(--critico)">Sin falla asignada</small>') + '</span>' +
+          '<span class="fila">' + (f ? '<button class="btn sm" data-falla="' + f.id + '">Ver falla</button>'
+            : '<button class="btn sm p" data-nuevafalla="' + e.id + '">Volverlo falla</button>') +
+          (c ? '<button class="btn sm" data-abre="' + c.id + '">Cuenta</button>' : '') + '</span></div>';
+      }).join("") + '</div>' : '<div class="vacio">Ningún error reportado.</div>') + '</div>' +
+
+    '<div style="display:flex;flex-direction:column;gap:20px">' +
+      '<div class="tarjeta"><header><h2>Quién no se ha actualizado</h2>' +
+        '<span class="pista">' + enV19.length + ' en versión vieja</span></header>' +
+        (enV19.length ? '<div class="pendientes">' + enV19.map(c =>
+          '<div class="pend pronto clic" data-abre="' + c.id + '" tabindex="0" role="button"><span class="raya"></span>' +
+          '<span class="txt"><b>' + esc(c.taller) + '</b><small>Corre la versión ' + esc(c.version) +
+          ' · entró ' + (difDias(iso(HOY), c.ultimo) === 0 ? "hoy" : "hace " + dias(difDias(iso(HOY), c.ultimo))) + '</small></span></div>').join("") + '</div>'
+          : '<div class="vacio">Todos están en la última versión.</div>') +
+        '<div class="cuerpo" style="border-top:1px solid var(--line)"><p class="nota">' +
+        'Antes de perseguir una falla, mira esta lista: la mitad de los reportes son de alguien que tiene la pestaña abierta ' +
+        'desde hace días con una versión vieja. Basta con que recargue.</p></div></div>' +
+      (conApoyo.length ? '<div class="tarjeta"><header><h2>Accesos de apoyo abiertos</h2></header><div class="pendientes">' +
+        conApoyo.map(c => '<div class="pend pronto clic" data-abre="' + c.id + '" tabindex="0" role="button"><span class="raya"></span>' +
+        '<span class="txt"><b>' + esc(c.taller) + '</b><small>Autorizado para ' + esc(c.apoyo.quien) + ' hasta el ' + fFecha(c.apoyo.hasta) + '</small></span></div>').join("") +
+        '</div></div>' : "") +
+      '<div class="tarjeta"><header><h2>Cómo se comprueba el trabajo</h2></header><div class="cuerpo">' +
+        '<p class="nota">Cada ticket guarda cuatro sellos de tiempo: <b>cuándo entró</b>, <b>cuándo se contestó</b>, ' +
+        '<b>cuándo soporte dijo haberlo resuelto</b> y <b>cuándo el cliente lo confirmó</b>. Soporte no puede cerrar un ticket: ' +
+        'cuando dice que ya quedó, pasa a espera del cliente, y solo se cierra cuando el cliente confirma.<br><br>' +
+        'Y si el ticket resultó ser una falla del programa, ni siquiera eso alcanza: hasta que no salga la versión corregida, ' +
+        'el problema del cliente sigue ahí, por más bien redactada que esté la respuesta.</p>' +
+      '</div></div>' +
+    '</div></div>';
+}
+
+function vCobros() {
+  const mes = iso(HOY).slice(0, 7);
+  const delMes = ficheros.cobros.filter(p => p.fecha.slice(0, 7) === mes && p.estado === "aprobado");
+  const cobrado = delMes.reduce((s, p) => s + p.total, 0);
+  const rechazados = ficheros.cobros.filter(p => p.estado === "rechazado");
+  const porDepositar = ficheros.cobros.filter(p => p.estado === "aprobado" && !p.depositado);
+  const porEmitir = ficheros.cobros.filter(p => p.factura === "pendiente");
+  const globalMes = delMes.filter(p => p.factura === "global");
+  const globalTotal = globalMes.reduce((s, p) => s + p.total, 0);
+
+  const grupos = {};
+  porDepositar.forEach(p => { grupos[p.liquida] = (grupos[p.liquida] || 0) + cargo(p); });
+  const depos = Object.keys(grupos).sort();
+  const ultimos = ficheros.cobros.slice().sort((a, b) => b.fecha.localeCompare(a.fecha)).slice(0, 30);
+
+  const marcaFactura = p => p.factura === "emitida"
+      ? '<span class="chip bien">' + esc(p.cfdi) + (p.enviada ? '' : ' · sin enviar') + '</span>'
+    : p.factura === "pendiente" ? '<span class="chip aviso">Por emitir</span>'
+    : '<span class="chip gris">Global</span>';
+
+  return '<div style="display:flex;flex-direction:column;gap:20px">' +
+    '<div class="tiles">' +
+      tile("Cobrado este mes", $$$(totalDe(cobrado)), delMes.length + " cobros aprobados, con IVA", true) +
+      tile("Tuyo, sin IVA", $$$(baseDe(cobrado)), "esto es lo que de verdad te queda") +
+      tile("IVA por enterar", $$$(ivaDe(cobrado)), "no es tuyo: va al SAT") +
+      tile("Facturas por emitir", porEmitir.length, porEmitir.length ? "con RFC ya capturado" : "todo al corriente") +
+    '</div>' +
+    '<div class="aviso-demo">Estos movimientos son de ejemplo. En vivo los trae Mercado Pago por su aviso automático; mientras no esté conectado, se capturan a mano.</div>' +
+
+    '<div class="rejilla2">' +
+      /* --- nominativas pendientes --- */
+      '<div class="tarjeta"><header><h2>Facturas por emitir</h2>' +
+        '<span class="pista">' + porEmitir.length + ' · se emiten y se mandan por correo</span></header>' +
+        (porEmitir.length ? '<div class="pendientes">' + porEmitir.map(p => {
+          const c = cuentaDe(p.cuentaId) || {};
+          const falta = !c.rfc || !c.razon || !c.cp || !c.regimen;
+          return '<div class="pend ' + (falta ? "urge" : "pronto") + '"><span class="raya"></span><span class="txt">' +
+            '<b>' + esc(c.razon || c.taller || "Cuenta") + ' · ' + $$$(cargo(p)) + '</b>' +
+            '<small>' + esc(p.concepto) + ' · cobrado el ' + fFecha(p.fecha) + '</small>' +
+            '<small>' + (falta ? '<b style="color:var(--critico)">Le faltan datos fiscales</b>'
+              : 'RFC ' + esc(c.rfc) + ' · CP ' + esc(c.cp) + ' · ' + esc(REGIMENES[c.regimen] || c.regimen) + ' · uso ' + esc(c.uso || "G03")) + '</small>' +
+            '</span>' + (falta
+              ? '<button class="btn sm" data-abre="' + c.id + '">Capturarlos</button>'
+              : '<button class="btn sm p" data-emite="' + p.id + '">Emitir y enviar</button>') + '</div>';
+        }).join("") + '</div>' : '<div class="vacio">No hay facturas pendientes.</div>') +
+        '<div class="cuerpo" style="border-top:1px solid var(--line)"><p class="nota">' +
+        'Al entrar un pago de una cuenta que pidió factura, el CFDI se emite y se manda a su correo sin que nadie lo pida. ' +
+        'Aquí solo aparecen los que no salieron solos, casi siempre porque faltan datos fiscales.</p></div></div>' +
+
+      /* --- global del mes + facturar a solicitud --- */
+      '<div class="tarjeta"><header><h2>Factura global del mes</h2>' +
+        '<span class="pista">público en general</span></header>' +
+        '<div class="cuerpo" style="display:flex;flex-direction:column;gap:12px">' +
+          '<dl class="pares">' +
+            par("Pagos incluidos", globalMes.length) +
+            par("Total con IVA", $$$(totalDe(globalTotal))) +
+            par("Base", $$$(baseDe(globalTotal))) +
+            par("IVA", $$$(ivaDe(globalTotal))) +
+          '</dl>' +
+          '<p class="nota">Se emite a nombre de <b>PÚBLICO EN GENERAL</b>, RFC ' + RFC_PUBLICO + ', uso S01, con periodicidad mensual. ' +
+          'Junta a todos los que no pidieron factura.</p>' +
+        '</div>' +
+        '<div class="cuerpo" style="border-top:1px solid var(--line);display:flex;flex-direction:column;gap:11px">' +
+          '<h3 style="font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);font-family:\'IBM Plex Sans\',sans-serif;font-weight:700">Facturar un pago a nombre del cliente</h3>' +
+          '<p class="nota">Si alguien que no pedía factura la pide después, aquí se saca — <b>solo mientras el pago sea de este mes</b>, ' +
+          'antes de cerrar la global. Un pago de un mes anterior ya se fue en la global de ese mes y no se puede mover.</p>' +
+          (globalMes.length ? '<div class="pendientes" style="border:1px solid var(--line);border-radius:8px">' + globalMes.map(p => {
+            const c = cuentaDe(p.cuentaId) || {};
+            return '<div class="pend info"><span class="raya"></span><span class="txt">' +
+              '<b>' + esc(c.taller || "Cuenta") + ' · ' + $$$(cargo(p)) + '</b>' +
+              '<small>' + esc(p.concepto) + ' · ' + fFecha(p.fecha) + '</small></span>' +
+              '<button class="btn sm" data-pide="' + p.id + '">Facturársela</button></div>';
+          }).join("") + '</div>' : '<p class="sitio">Este mes no hay pagos sin factura.</p>') +
+        '</div></div>' +
+    '</div>' +
+
+    /* --- lo que sale --- */
+    (function () {
+      const gente = ficheros.equipo.filter(e => e.comision && e.comision.tipo !== "ninguna").map(e => ({ e: e, k: comisionDe(e) }));
+      const total = gente.reduce((s, g) => s + g.k.monto, 0);
+      return '<div class="tarjeta"><header><h2>Comisiones por pagar</h2>' +
+        '<span class="pista">' + $$$(total) + ' este mes</span></header>' +
+        (gente.length ? '<div class="marco"><table style="min-width:680px"><thead><tr>' +
+          '<th>Persona</th><th>Trato</th><th class="der">Cerró este mes</th><th class="der">Sus cuentas pagando</th><th class="der">Se le debe</th>' +
+        '</tr></thead><tbody>' + gente.map(g =>
+          '<tr><td class="taller">' + esc(g.e.nombre) + '</td>' +
+          '<td class="sitio">' + esc(tratoDe(g.e)) + '</td>' +
+          '<td class="der mono">' + g.k.nuevas + '</td><td class="der mono">' + g.k.pagando + '</td>' +
+          '<td class="der mono"' + (g.k.monto ? ' style="color:var(--critico);font-weight:600"' : '') + '>' + (g.k.monto ? $$$(g.k.monto) : "—") + '</td></tr>').join("") +
+          '<tr><td colspan="4" class="der"><b>Total a pagar</b></td><td class="der mono"><b>' + $$$(total) + '</b></td></tr>' +
+          '</tbody></table></div>' : '<div class="vacio">Nadie tiene comisión configurada.</div>') +
+        '<div class="cuerpo" style="border-top:1px solid var(--line)"><p class="nota">' +
+        'Se calcula sobre la <b>base sin IVA</b>, no sobre lo cobrado: el IVA no es tuyo y no se comisiona. ' +
+        'De los ' + $$$(baseDe(cobrado)) + ' que te quedan este mes, ' + $$$(total) + ' son de comisiones, así que tu margen real del mes es ' +
+        $$$(baseDe(cobrado) - total) + '.</p></div></div>';
+    })() +
+
+    '<div class="rejilla2">' +
+      '<div class="tarjeta"><header><h2>Estado de cuenta</h2><span class="pista">lo aprobado que todavía no cae al banco</span></header>' +
+        (depos.length ? '<div class="pendientes">' + depos.map(f =>
+          '<div class="pend ' + (difDias(iso(HOY), f) >= 0 ? "pronto" : "info") + '"><span class="raya"></span>' +
+          '<span class="txt"><b>' + $$$(grupos[f]) + '</b><small>se deposita el ' + fFecha(f) +
+          (difDias(iso(HOY), f) >= 0 ? " · ya debería haber caído" : "") + '</small></span></div>').join("") + '</div>'
+          : '<div class="vacio">No hay nada pendiente de depositar.</div>') +
+        (rechazados.length ? '<div class="cuerpo" style="border-top:1px solid var(--line)"><p class="nota">' +
+          '<b>' + rechazados.length + (rechazados.length === 1 ? ' cobro rechazado' : ' cobros rechazados') + '.</b> Están arriba en <i>Para hoy</i>: ' +
+          'atendidos el mismo día casi siempre se recuperan.</p></div>' : "") + '</div>' +
+
+      '<div class="tarjeta"><header><h2>Tus datos de emisor</h2></header>' +
+        '<div class="cuerpo" style="display:grid;grid-template-columns:1fr 1fr;gap:11px">' +
+          '<div class="campo"><label class="f" for="cfRfc">RFC</label><input id="cfRfc" value="' + esc(CFG.rfc) + '"></div>' +
+          '<div class="campo"><label class="f" for="cfRazon">Razón social</label><input id="cfRazon" value="' + esc(CFG.razon) + '"></div>' +
+          '<div class="campo"><label class="f" for="cfRegimen">Régimen</label><select id="cfRegimen">' +
+            Object.keys(REGIMENES).map(k => '<option value="' + k + '"' + (CFG.regimen === k ? " selected" : "") + '>' + k + ' · ' + REGIMENES[k] + '</option>').join("") + '</select></div>' +
+          '<div class="campo"><label class="f" for="cfSerie">Serie y folio</label><input id="cfSerie" value="' + esc(CFG.serie + "-" + CFG.folio) + '"></div>' +
+          '<div class="campo"><label class="f" for="cfIva">IVA</label><select id="cfIva">' +
+            '<option value="16"' + (CFG.iva === 16 ? " selected" : "") + '>16%</option>' +
+            '<option value="8"' + (CFG.iva === 8 ? " selected" : "") + '>8% (frontera)</option>' +
+            '<option value="0"' + (CFG.iva === 0 ? " selected" : "") + '>0%</option></select></div>' +
+          '<div class="campo"><label class="f" for="cfModo">Los precios de lista</label><select id="cfModo">' +
+            '<option value="si"' + (CFG.ivaIncluido ? " selected" : "") + '>Ya traen el IVA incluido</option>' +
+            '<option value="no"' + (!CFG.ivaIncluido ? " selected" : "") + '>Son más IVA</option></select></div>' +
+        '</div>' +
+        '<div class="cuerpo" style="border-top:1px solid var(--line)">' +
+          '<div class="marco"><table style="min-width:420px"><thead><tr><th>Plan</th><th class="der">Base</th><th class="der">IVA</th><th class="der">Lo que paga</th></tr></thead><tbody>' +
+          Object.keys(PLANES).map(k => '<tr><td class="taller">' + PLANES[k].nombre + '</td>' +
+            '<td class="der mono">' + $$$(baseDe(PLANES[k].mes)) + '</td>' +
+            '<td class="der mono">' + $$$(ivaDe(PLANES[k].mes)) + '</td>' +
+            '<td class="der mono"><b>' + $$$(totalDe(PLANES[k].mes)) + '</b></td></tr>').join("") +
+          '</tbody></table></div>' +
+          '<p class="nota" style="margin-top:12px">Con el IVA incluido, de cada $199 te quedan ' + $$$(baseDe(199)) + '. ' +
+          'Es lo correcto para el que no factura, que es tu alumno: ve un precio y paga ese precio. Si algún día lo cambias a ' +
+          '"más IVA", súbele el precio a todos los planes el mismo día o tu ingreso baja 14%.</p>' +
+        '</div></div>' +
+    '</div>' +
+
+    '<div class="tarjeta"><header><h2>Movimientos</h2><span class="pista">últimos 30</span></header>' +
+      '<div class="marco"><table style="min-width:900px"><thead><tr>' +
+        '<th>Fecha</th><th>Taller</th><th>Concepto</th><th class="der">Base</th><th class="der">IVA</th><th class="der">Total</th>' +
+        '<th>Cobro</th><th>Depósito</th><th>Factura</th>' +
+      '</tr></thead><tbody>' + ultimos.map(p => {
+        const c = cuentaDe(p.cuentaId) || { taller: "Cuenta borrada" };
+        return '<tr class="clic" data-abre="' + p.cuentaId + '" tabindex="0">' +
+          '<td class="mono">' + fCorta(p.fecha) + '</td><td class="taller">' + esc(c.taller) + '</td>' +
+          '<td>' + esc(p.concepto) + '<br><span class="sitio">' + esc(p.metodo) + '</span></td>' +
+          '<td class="der mono">' + $$$(baseDe(p.total)) + '</td>' +
+          '<td class="der mono">' + $$$(ivaDe(p.total)) + '</td>' +
+          '<td class="der mono"><b>' + $$$(cargo(p)) + '</b></td>' +
+          '<td><span class="chip ' + (p.estado === "aprobado" ? "bien" : "mal") + '">' + (p.estado === "aprobado" ? "Aprobado" : "Rechazado") + '</span></td>' +
+          '<td>' + (p.estado !== "aprobado" ? '<span class="sitio">—</span>' :
+            p.depositado ? '<span class="chip bien">Depositado</span>' : '<span class="chip aviso">' + fCorta(p.liquida) + '</span>') + '</td>' +
+          '<td>' + marcaFactura(p) + '</td></tr>';
+      }).join("") + '</tbody></table></div></div></div>';
+}
+
+function comisionDe(e) {
+  const mes = iso(HOY).slice(0, 7);
+  const suyas = ficheros.cuentas.filter(c => c.cerradoPor === e.id);
+  const pagando = suyas.filter(paga);
+  const nuevas = suyas.filter(c => c.alta.slice(0, 7) === mes && paga(c));
+  let monto = 0;
+  if (e.comision.tipo === "primermes") monto = nuevas.reduce((s, c) => s + mensual(c) * e.comision.valor / 100, 0);
+  else if (e.comision.tipo === "recurrente") monto = pagando.reduce((s, c) => s + mensual(c) * e.comision.valor / 100, 0);
+  return { total: suyas.length, pagando: pagando.length, nuevas: nuevas.length, monto: monto, cuentas: nuevas };
+}
+const tratoDe = e => e.comision.tipo === "primermes" ? "El primer mes de cada cuenta que cierre"
+  : e.comision.tipo === "recurrente" ? e.comision.valor + "% de lo que paguen sus cuentas, cada mes" : "Sin comisión";
+
+/* Qué trae encima cada persona. Es la pregunta que se hace el dueño cuando ya
+   no lo hace todo él: quién está saturado y qué quedó sin dueño. */
+function cargaDe(e) {
+  const mes = iso(HOY).slice(0, 7);
+  const cuentas = ficheros.cuentas.filter(c => c.cerradoPor === e.id);
+  const citas = ficheros.citas.filter(q => q.quien === e.id);
+  const tks = ficheros.tickets.filter(t => t.atiende === e.id);
+  const urg = cuentas.filter(c => jugada(c).urg === "urge");
+  return {
+    cuentas: cuentas, pagando: cuentas.filter(paga).length,
+    prueba: cuentas.filter(c => c.estado === "prueba").length,
+    urgentes: urg.length, urg: urg,
+    cerradasMes: cuentas.filter(c => c.alta.slice(0, 7) === mes && paga(c)).length,
+    citasPend: citas.filter(q => q.estado === "pendiente"),
+    citasHoy: citas.filter(q => q.estado === "pendiente" && difDias(q.fecha, iso(HOY)) <= 0).length,
+    citasHechas: citas.filter(q => q.estado === "hecha").length,
+    citasNoHubo: citas.filter(q => q.estado === "nohubo").length,
+    tickets: tks, tkAbiertos: tks.filter(t => t.estado !== "resuelto"),
+    tkEsperando: tks.filter(t => t.estado === "esperando").length,
+    fallas: ficheros.fallas.filter(f => f.quien === e.id && f.estado !== "verificada")
+  };
+}
+const PERMISOS = [
+  ["Cuentas y su ficha",     "Todo", "Todo",     "Solo el diagnóstico"],
+  ["Agenda y citas",         "Todo", "Todo",     "No"],
+  ["Tickets y fallas",       "Todo", "Solo ver", "Todo"],
+  ["Acceso de apoyo",        "Sí",   "No",       "Sí, con permiso del cliente"],
+  ["Cobros y facturación",   "Todo", "No",       "No"],
+  ["Comisiones",             "Todo", "La suya",  "No"],
+  ["Equipo y alianzas",      "Todo", "Solo ver", "No"],
+  ["Números del negocio",    "Todo", "Todo",     "No"],
+  ["Dar de baja una cuenta", "Sí",   "No",       "No"]
+];
+
+function vEquipo() {
+  const cuentasAli = a => ficheros.cuentas.filter(c => c.alianza === a.id);
+  const referidos = ficheros.cuentas.filter(c => c.origen === "referido").length;
+  const gente = ficheros.equipo.slice().sort((a, b) => (a.rol === "dueno" ? -1 : 0) - (b.rol === "dueno" ? -1 : 0));
+  const sinDuenoTk = ficheros.tickets.filter(t => t.estado !== "resuelto" && !t.atiende).length;
+  const sinVendedor = ficheros.cuentas.filter(c => !c.cerradoPor && c.estado !== "baja").length;
+  const vencidas = ficheros.citas.filter(q => q.estado === "pendiente" && difDias(q.fecha, iso(HOY)) < 0).length;
+  const fallasSinDueno = ficheros.fallas.filter(f => f.estado !== "verificada" && !f.quien).length;
+  const activos = gente.filter(e => e.activo !== false).length;
+
+  return '<div style="display:flex;flex-direction:column;gap:20px">' +
+    '<div class="tiles">' +
+      tile("Personas con acceso", activos, gente.length > activos ? (gente.length - activos) + " con acceso quitado" : "todas activas", true) +
+      tile("Tickets sin dueño", sinDuenoTk, sinDuenoTk ? "nadie los ha tomado" : "todos asignados") +
+      tile("Citas vencidas", vencidas, vencidas ? "se pasó el día y siguen pendientes" : "la agenda está al corriente") +
+      tile("Fallas sin dueño", fallasSinDueno, fallasSinDueno ? "nadie las está arreglando" : "todas tienen responsable") +
+    '</div>' +
+    (sinVendedor ? '<div class="aviso-demo">' + sinVendedor + (sinVendedor === 1 ? ' cuenta no tiene vendedor asignado' : ' cuentas no tienen vendedor asignado') +
+      '. Nadie les va a dar seguimiento por su cuenta.</div>' : '') +
+
+    '<div class="tarjeta"><header><h2>Quién trae qué encima</h2>' +
+      '<span class="pista">da clic en una persona para ver su carga y repartirla</span></header>' +
+      '<div class="marco"><table style="min-width:900px"><thead><tr>' +
+        '<th>Persona</th><th>Último acceso</th><th class="der">Cuentas</th><th class="der">Por atender hoy</th>' +
+        '<th class="der">Citas</th><th class="der">Tickets</th><th class="der">Fallas</th><th>Cómo se le paga</th>' +
+      '</tr></thead><tbody>' + gente.map(e => {
+        const k = cargaDe(e), sin = difDias(iso(HOY), e.ultimo || iso(HOY));
+        const pend = k.urgentes + k.citasHoy + k.tkAbiertos.length;
+        return '<tr class="clic" data-persona="' + e.id + '" tabindex="0">' +
+          '<td><span class="taller">' + esc(e.nombre) + '</span><br><span class="sitio">' + ROLES[e.rol] +
+            (e.activo === false ? ' · <b style="color:var(--critico)">sin acceso</b>' : '') + '</span></td>' +
+          '<td class="mono"' + (sin >= 7 ? ' style="color:var(--aviso)"' : '') + '>' + (sin === 0 ? "hoy" : "hace " + dias(sin)) + '</td>' +
+          '<td class="der mono">' + k.cuentas.length + (k.pagando ? ' <span class="sitio">(' + k.pagando + ' pagan)</span>' : '') + '</td>' +
+          '<td class="der"><span class="chip ' + (pend > 4 ? "mal" : pend ? "aviso" : "bien") + '">' + pend + '</span></td>' +
+          '<td class="der mono">' + k.citasPend.length + (k.citasHoy ? ' <span style="color:var(--critico)">(' + k.citasHoy + ' hoy)</span>' : '') + '</td>' +
+          '<td class="der mono">' + k.tkAbiertos.length + (k.tkEsperando ? ' <span class="sitio">(' + k.tkEsperando + ' en espera)</span>' : '') + '</td>' +
+          '<td class="der mono">' + k.fallas.length + '</td>' +
+          '<td class="sitio">' + esc(tratoDe(e)) + '</td></tr>';
+      }).join("") +
+      '</tbody></table></div>' +
+      '<div class="cuerpo" style="border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr auto auto auto;gap:10px;align-items:end">' +
+        '<div class="campo"><label class="f" for="eqNombre">Nombre</label><input id="eqNombre" placeholder="Nombre de la persona"></div>' +
+        '<div class="campo"><label class="f" for="eqCorreo">Correo</label><input id="eqCorreo" type="email" placeholder="correo@heymakers.mx"></div>' +
+        '<div class="campo"><label class="f" for="eqRol">Rol</label><select id="eqRol" style="width:auto">' +
+          '<option value="ventas">Ventas</option><option value="soporte">Soporte</option><option value="dueno">Dueño</option></select></div>' +
+        '<div class="campo"><label class="f" for="eqCom">Comisión</label><select id="eqCom" style="width:auto">' +
+          '<option value="primermes">Primer mes completo</option><option value="recurrente">10% recurrente</option><option value="ninguna">Sin comisión</option></select></div>' +
+        '<button class="btn p" id="eqAlta">Dar de alta</button></div>' +
+      '<div class="cuerpo" style="border-top:1px solid var(--line)"><p class="nota">' +
+        '<b>Por atender hoy</b> junta lo que de verdad no puede esperar: cuentas con una jugada urgente, citas de hoy y tickets abiertos. ' +
+        'Si a alguien le sale rojo dos semanas seguidas, no es que trabaje mal: es que trae más de lo que cabe.<br><br>' +
+        'Los montos de comisión están en <b>Cobros</b>, junto con lo que entra.</p></div>' +
+    '</div>' +
+
+    '<div class="rejilla2">' +
+      '<div class="tarjeta"><header><h2>Qué puede ver cada quien</h2></header>' +
+        '<div class="marco"><table style="min-width:520px"><thead><tr>' +
+          '<th></th><th>Dueño</th><th>Ventas</th><th>Soporte</th></tr></thead><tbody>' +
+          PERMISOS.map(r => '<tr><td class="taller">' + esc(r[0]) + '</td>' +
+            r.slice(1).map(v => '<td class="sitio"' + (v === "No" ? ' style="color:var(--ink-3)"' : '') + '>' + esc(v) + '</td>').join("") + '</tr>').join("") +
+        '</tbody></table></div>' +
+        '<div class="cuerpo" style="border-top:1px solid var(--line)"><p class="nota">' +
+        'Ventas no toca tickets ni fallas. Soporte no ve dinero ni la cuenta completa, solo el diagnóstico de la que está atendiendo. ' +
+        'Dar de baja una cuenta es solo tuyo.</p></div></div>' +
+
+      '<div class="tarjeta"><header><h2>Cámaras y alianzas</h2>' +
+        '<span class="pista">precio especial para sus socios, sin comisión</span></header>' +
+        '<div class="marco"><table style="min-width:520px"><thead><tr>' +
+          '<th>Organismo</th><th>Código</th><th class="der">Trajo</th><th>Vigencia</th></tr></thead><tbody>' +
+        ficheros.alianzas.map(a => { const cs = cuentasAli(a);
+          return '<tr><td><span class="taller">' + esc(a.nombre) + '</span><br><span class="sitio">' + esc(a.trato) + '</span></td>' +
+            '<td class="mono">' + esc(a.codigo) + '</td>' +
+            '<td class="der mono">' + cs.length + (cs.length ? ' <span class="sitio">(' + cs.filter(paga).length + ' pagan)</span>' : '') + '</td>' +
+            '<td class="sitio"' + (a.vigencia === "por firmar" ? ' style="color:var(--aviso)"' : '') + '>' + esc(a.vigencia) + '</td></tr>';
+        }).join("") + '</tbody></table></div>' +
+        '<div class="cuerpo" style="border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end">' +
+          '<div class="campo"><label class="f" for="alNombre">Organismo</label><input id="alNombre" placeholder="CANAGRAF Jalisco"></div>' +
+          '<div class="campo"><label class="f" for="alTrato">Trato</label><input id="alTrato" placeholder="15% para socios"></div>' +
+          '<button class="btn p" id="alAlta">Agregar</button></div>' +
+        '<div class="cuerpo" style="border-top:1px solid var(--line)"><p class="nota">' +
+        'La cámara no vende por ti: te presta su padrón y su respaldo a cambio de un precio que sus socios no consiguen solos.<br><br>' +
+        '<b>Referidos entre clientes:</b> ' + referidos + (referidos === 1 ? " cuenta llegó" : " cuentas llegaron") + ' recomendadas por otro taller.</p></div>' +
+      '</div>' +
+    '</div></div>';
+}
+
+function vNumeros() {
+  const tot = ficheros.cuentas.length;
+  const pagando = ficheros.cuentas.filter(paga);
+  const enPrueba = ficheros.cuentas.filter(c => c.estado === "prueba").length;
+  const salieron = ficheros.cuentas.filter(c => c.estado === "baja" || c.estado === "vencida");
+  const conv = tot ? Math.round(pagando.length / Math.max(1, tot - enPrueba) * 100) : 0;
+  const act = tot ? Math.round(ficheros.cuentas.filter(c => c.cotizaciones >= 3).length / tot * 100) : 0;
+  const bajas = tot ? Math.round(salieron.length / tot * 100) : 0;
+  const anuales = pagando.filter(c => c.periodo === "anual").length;
+  const porOrigen = ["curso", "alianza", "referido", "organico"].map(o => ({
+    o, n: ficheros.cuentas.filter(c => c.origen === o).length,
+    pagan: ficheros.cuentas.filter(c => c.origen === o && paga(c)).length,
+    v: ficheros.cuentas.filter(c => c.origen === o && paga(c)).reduce((s, c) => s + mensual(c), 0)
+  }));
+
+  return '<div style="display:flex;flex-direction:column;gap:20px">' +
+    '<div class="tiles">' +
+      tile("Conversión a pago", conv + "%", "de las pruebas que ya terminaron", true) +
+      tile("Activación", act + "%", "hizo 3 o más cotizaciones") +
+      tile("Se han ido", bajas + "%", salieron.length + " entre bajas y vencidas") +
+      tile("Pagan anual", anuales, "de " + pagando.length + " cuentas que pagan") +
+    '</div>' +
+    '<div class="rejilla2">' +
+      '<div class="tarjeta"><header><h2>De dónde llegan</h2><span class="pista">y cuáles pagan</span></header>' +
+        '<div class="marco"><table style="min-width:420px"><thead><tr><th>Canal</th><th class="der">Cuentas</th><th class="der">Pagan</th><th class="der">Al mes</th></tr></thead><tbody>' +
+        porOrigen.map(x => '<tr><td class="taller">' + ORIGENES[x.o] + '</td><td class="der mono">' + x.n + '</td>' +
+          '<td class="der mono">' + x.pagan + '</td><td class="der mono">' + $$$(x.v) + '</td></tr>').join("") +
+        '</tbody></table></div></div>' +
+      '<div class="tarjeta"><header><h2>Ingreso recurrente</h2><span class="pista">últimos 6 meses</span></header><div class="cuerpo">' + grafIngreso() + '</div></div>' +
+    '</div>' +
+    '<div class="tarjeta"><header><h2>Qué mirar aquí</h2></header><div class="cuerpo"><p class="nota">' +
+      'La <b>activación</b> es la que manda: si alguien no llega a tres cotizaciones, no se queda, y eso no se arregla bajando el precio ' +
+      'sino arreglando el arranque. La <b>conversión</b> dice si el plan Básico está bien puesto. Las <b>bajas</b> importan por su razón, ' +
+      'no por su número: llámales.</p></div></div></div>';
+}
+
+/* ================= ficha de la cuenta ================= */
+function abreFicha(id) {
+  const c = cuentaDe(id); if (!c) return;
+  abierta = id;
+  const j = jugada(c), sin = difDias(iso(HOY), c.ultimo), dv = difDias(c.vence, iso(HOY));
+  const tk = ficheros.tickets.filter(t => t.cuentaId === id);
+  const qs = ficheros.citas.filter(q => q.cuentaId === id).sort((a, b) => (b.fecha).localeCompare(a.fecha));
+  const ali = c.alianza ? aliDe(c.alianza) : null;
+  const vend = c.cerradoPor ? eqDe(c.cerradoPor) : null;
+  const apoyoVivo = c.apoyo && difDias(c.apoyo.hasta, iso(HOY)) >= 0;
+  const pagos = ficheros.cobros.filter(p => p.cuentaId === id).sort((a, b) => b.fecha.localeCompare(a.fecha)).slice(0, 4);
+
+  $("#ficha").innerHTML =
+    '<header><div style="flex:1;min-width:0"><h2>' + esc(c.taller) + '</h2>' +
+      '<p class="sitio" style="margin-top:3px">' + esc(c.sitio) + ' · ' + esc(c.contacto) + '</p>' +
+      '<div class="fila" style="margin-top:9px">' + chipEstado(c) + chipPlan(c) +
+      (c.requiereFactura ? '<span class="chip info">Pide factura</span>' : '') + '</div>' +
+    '</div><button class="btn sm" id="cerrarFicha" aria-label="Cerrar">Cerrar</button></header>' +
+    '<div class="desliza">' +
+
+    /* --- la jugada --- */
+    '<div class="bloque jugada ' + j.urg + '"><h3>Qué sigue con este cliente</h3>' +
+      '<h4>' + esc(j.titulo) + '</h4>' +
+      '<p class="porque">' + esc(j.porque) + '</p>' +
+      '<div class="guion" id="guion">' + esc(j.guion) + '</div>' +
+      '<div class="fila">' +
+        '<button class="btn p sm" data-acc="wa">Mandar por WhatsApp</button>' +
+        '<button class="btn sm" data-acc="correo">Correo</button>' +
+        '<button class="btn sm" data-acc="copia">Copiar el texto</button>' +
+        '<button class="btn sm" data-acc="agenda">Agendar ' + (j.cita === "video" ? "videollamada" : "llamada") + '</button>' +
+      '</div></div>' +
+
+    '<dl class="pares">' +
+      par("Al mes", paga(c) ? $$$(cobroMes(c)) + " con IVA" : "—") +
+      par("De eso, tuyo", paga(c) ? $$$(mensual(c)) : "—") +
+      par(c.estado === "prueba" ? "La prueba vence" : "Vence",
+          fFecha(c.vence) + (dv < 0 ? " (hace " + dias(-dv) + ")" : dv === 0 ? " (hoy)" : " (en " + dias(dv) + ")")) +
+      par("Cliente desde", fFecha(c.alta)) +
+      par("Último acceso", sin === 0 ? "hoy" : "hace " + dias(sin)) +
+      par("Cotizaciones", c.cotizaciones) +
+      par("La cerró", vend ? vend.nombre : "—") +
+    '</dl>' +
+
+    (apoyoVivo ? '<p class="apoyo">Acceso de apoyo abierto hasta el ' + fFecha(c.apoyo.hasta) + ', autorizado para ' + esc(c.apoyo.quien) + '.</p>' : '') +
+
+    '<div class="bloque"><h3>Contacto</h3>' +
+      '<div class="fila"><span class="mono">' + esc(c.correo) + '</span></div>' +
+      '<p class="sitio">Llegó por ' + esc(ali ? ali.nombre + " (" + ali.codigo + ")" : ORIGENES[c.origen]) + '.</p></div>' +
+
+    /* --- citas --- */
+    '<div class="bloque"><h3>Citas y seguimientos</h3>' +
+      (qs.length ? qs.map(q => '<div class="fila" style="justify-content:space-between;font-size:12.5px">' +
+        '<span>' + TIPOCITA[q.tipo] + ' · ' + fCorta(q.fecha) + ' ' + esc(q.hora) + ' · ' + esc((eqDe(q.quien) || {}).nombre || "") + '</span>' +
+        '<span class="chip ' + (q.estado === "pendiente" ? "info" : q.estado === "hecha" ? "bien" : "gris") + '">' +
+        (q.estado === "pendiente" ? "Pendiente" : q.estado === "hecha" ? "Hecha" : "No hubo") + '</span></div>' +
+        (q.resultado ? '<p class="sitio">' + esc(q.resultado) + '</p>' : '')).join("")
+        : '<p class="sitio">Todavía no hay ninguna agendada.</p>') +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">' +
+        '<div class="campo"><label class="f" for="qTipo">Tipo</label><select id="qTipo">' +
+          '<option value="llamada"' + (j.cita === "llamada" ? " selected" : "") + '>Llamada</option>' +
+          '<option value="video"' + (j.cita === "video" ? " selected" : "") + '>Videollamada</option>' +
+          '<option value="visita">Visita</option></select></div>' +
+        '<div class="campo"><label class="f" for="qQuien">Quién la atiende</label><select id="qQuien">' +
+          ficheros.equipo.filter(e => e.rol !== "soporte").map(e => '<option value="' + e.id + '">' + esc(e.nombre) + '</option>').join("") + '</select></div>' +
+        '<div class="campo"><label class="f" for="qFecha">Día</label><input id="qFecha" type="date" value="' + iso(masDias(HOY, 1)) + '"></div>' +
+        '<div class="campo"><label class="f" for="qHora">Hora</label><input id="qHora" type="time" value="11:00"></div>' +
+      '</div>' +
+      '<button class="btn p sm" data-acc="guardacita" style="align-self:flex-start">Agendar</button></div>' +
+
+    /* --- suscripción --- */
+    '<div class="bloque"><h3>Suscripción</h3>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+        '<div class="campo"><label class="f" for="fPlan">Plan</label><select id="fPlan">' +
+          Object.keys(PLANES).map(p => '<option value="' + p + '"' + (c.plan === p ? " selected" : "") + '>' + PLANES[p].nombre + ' · ' + $$$(PLANES[p].mes) + '</option>').join("") + '</select></div>' +
+        '<div class="campo"><label class="f" for="fPeriodo">Periodo</label><select id="fPeriodo">' +
+          '<option value="mensual"' + (c.periodo === "mensual" ? " selected" : "") + '>Mensual</option>' +
+          '<option value="anual"' + (c.periodo === "anual" ? " selected" : "") + '>Anual</option></select></div></div>' +
+      '<div class="fila">' +
+        '<button class="btn sm" data-acc="mas7">+7 días</button>' +
+        '<button class="btn sm" data-acc="mas15">+15 días</button>' +
+        (c.estado === "pausada" || c.estado === "vencida" || c.estado === "baja"
+          ? '<button class="btn sm p" data-acc="reactiva">Reactivar</button>'
+          : '<button class="btn sm" data-acc="pausa">Pausar</button>') +
+        (c.estado === "prueba" ? '<button class="btn sm p" data-acc="cobra">Marcar como pagada</button>' : '') +
+        (c.estado !== "baja" ? '<button class="btn sm mal" data-acc="baja">Dar de baja</button>' : '') +
+      '</div></div>' +
+
+    /* --- datos fiscales --- */
+    '<div class="bloque"><h3>Datos fiscales</h3>' +
+      '<div class="campo"><label class="f" for="fxPide">¿Pide factura?</label><select id="fxPide">' +
+        '<option value="no"' + (!c.requiereFactura ? " selected" : "") + '>No · entra en la global de público en general</option>' +
+        '<option value="si"' + (c.requiereFactura ? " selected" : "") + '>Sí · factura a su nombre en cada pago</option></select></div>' +
+      (c.requiereFactura ?
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+          '<div class="campo"><label class="f" for="fxRfc">RFC</label><input id="fxRfc" value="' + esc(c.rfc || "") + '" placeholder="XAXX010101000"></div>' +
+          '<div class="campo"><label class="f" for="fxCp">Código postal</label><input id="fxCp" value="' + esc(c.cp || "") + '" placeholder="58000"></div>' +
+          '<div class="campo" style="grid-column:1/-1"><label class="f" for="fxRazon">Razón social, igual que en su constancia</label>' +
+            '<input id="fxRazon" value="' + esc(c.razon || "") + '" placeholder="TALLER EJEMPLO SA DE CV"></div>' +
+          '<div class="campo"><label class="f" for="fxRegimen">Régimen fiscal</label><select id="fxRegimen">' +
+            Object.keys(REGIMENES).map(k => '<option value="' + k + '"' + (c.regimen === k ? " selected" : "") + '>' + k + ' · ' + REGIMENES[k] + '</option>').join("") + '</select></div>' +
+          '<div class="campo"><label class="f" for="fxUso">Uso del CFDI</label><select id="fxUso">' +
+            Object.keys(USOS).map(k => '<option value="' + k + '"' + ((c.uso || "G03") === k ? " selected" : "") + '>' + k + ' · ' + USOS[k] + '</option>').join("") + '</select></div>' +
+        '</div>' +
+        '<button class="btn p sm" data-acc="guardafiscal" style="align-self:flex-start">Guardar los datos</button>' +
+        '<p class="sitio">Con estos datos, cada pago suyo genera su CFDI y se le manda al correo sin que nadie lo pida.</p>'
+        : '<button class="btn sm" data-acc="guardafiscal" style="align-self:flex-start">Guardar</button>' +
+          '<p class="sitio">Sus pagos entran en la factura global del mes como público en general. Si después pide factura, se le puede emitir mientras el pago sea del mes en curso.</p>') +
+    '</div>' +
+
+    /* --- cobros --- */
+    (pagos.length ? '<div class="bloque"><h3>Últimos cobros</h3>' + pagos.map(p =>
+      '<div class="fila" style="justify-content:space-between;font-size:12.5px">' +
+      '<span>' + fCorta(p.fecha) + ' · ' + esc(p.concepto) + '</span>' +
+      '<span class="fila"><b class="mono">' + $$$(cargo(p)) + '</b>' +
+      '<span class="chip ' + (p.estado === "aprobado" ? (p.depositado ? "bien" : "aviso") : "mal") + '">' +
+      (p.estado !== "aprobado" ? "Rechazado" : p.depositado ? "Depositado" : "Por depositar") + '</span>' +
+      (p.factura === "emitida" ? '<span class="chip bien">' + esc(p.cfdi) + '</span>'
+        : p.factura === "pendiente" ? '<span class="chip aviso">Por facturar</span>'
+        : '<span class="chip gris">Global</span>') + '</span></div>').join("") +
+      (c.requiereFactura ? '<p class="sitio">Pide factura. RFC ' + esc(c.rfc || "sin capturar") + ' · ' + esc(c.razon || "") + '</p>' : '') + '</div>' : "") +
+
+    /* --- diagnóstico --- */
+    '<div class="bloque"><h3>Diagnóstico</h3>' +
+      senales(c).map(s => '<div class="senal ' + s.n + '"><span>' + esc(s.k) + '</span><b>' + esc(s.v) + '</b></div>').join("") +
+      '<div class="fila"><button class="btn sm" data-acc="ticket">Abrir ticket a su nombre</button>' +
+      (apoyoVivo ? '<button class="btn sm mal" data-acc="cierraapoyo">Cerrar el acceso de apoyo</button>'
+                 : '<button class="btn sm" data-acc="apoyo">Pedir acceso de apoyo</button>') + '</div>' +
+      '<p class="sitio">El acceso de apoyo dura 2 horas, lo autoriza el cliente y queda registrado. Sin él no se miran sus cotizaciones ni sus precios.</p>' +
+    '</div>' +
+
+    (tk.length ? '<div class="bloque"><h3>Tickets</h3>' + tk.map(t =>
+      '<div class="pend clic" data-tick="' + t.id + '" tabindex="0" role="button" style="padding:7px 0;border:0">' +
+      '<span class="raya"></span><span class="txt"><b>' + esc(t.asunto) + '</b><small>' + fFecha(t.creado) + ' · ' +
+      (t.estado === "resuelto" ? "resuelto" : "sin cerrar") + '</small></span></div>').join("") + '</div>' : "") +
+
+    '<div class="bloque"><h3>Nota</h3>' +
+      '<textarea id="fNota" placeholder="Qué platicaste con este cliente"></textarea>' +
+      '<button class="btn sm" data-acc="nota" style="align-self:flex-start">Guardar la nota</button></div>' +
+
+    '<div class="bloque"><h3>Historial</h3><div class="hist">' +
+      (c.historial || []).map(h => '<div><time>' + fCorta(h.f) + '</time><span>' + esc(h.t) + '</span></div>').join("") +
+    '</div></div></div>';
+  muestraPanel();
+}
+const par = (k, v) => '<div class="par"><dt>' + esc(k) + '</dt><dd>' + esc(v) + '</dd></div>';
+
+function abreTicket(id) {
+  const t = ficheros.tickets.find(x => x.id === id); if (!t) return;
+  const c = cuentaDe(t.cuentaId) || { taller: "Cuenta borrada" };
+  const k = slaTicket(t), st = estadoTicket(t), e = eqDe(t.atiende);
+  abierta = null;
+  const reloj = (et, v, ok) => '<div class="senal ' + (ok === true ? "buena" : ok === false ? "mala" : "") + '">' +
+    '<span>' + et + '</span><b>' + v + '</b></div>';
+
+  $("#ficha").innerHTML =
+    '<header><div style="flex:1;min-width:0"><h2>' + esc(t.asunto) + '</h2>' +
+      '<p class="sitio" style="margin-top:3px">' + esc(c.taller) + ' · entró el ' + fSello(t.creado) + '</p>' +
+      '<div class="fila" style="margin-top:9px"><span class="chip ' + (t.prioridad === "alta" ? "mal" : "gris") + '">' +
+      (t.prioridad === "alta" ? "Urgente" : "Normal") + '</span><span class="chip ' + st.chip + '">' + st.txt + '</span>' +
+      (t.reaperturas ? '<span class="chip mal">Reabierto ' + t.reaperturas + '×</span>' : '') + '</div>' +
+    '</div><button class="btn sm" id="cerrarFicha" aria-label="Cerrar">Cerrar</button></header>' +
+    '<div class="desliza">' +
+
+      '<div class="bloque"><h3>El reloj de este ticket</h3>' +
+        reloj("Entró", fSello(t.creado)) +
+        reloj("Primera respuesta", t.primeraResp ? fSello(t.primeraResp) + " · " + fDur(k.resp) : "todavía nada · lleva " + fDur(k.vivo), k.respOk) +
+        reloj("Soporte lo dio por resuelto", t.resuelto ? fSello(t.resuelto) : "todavía no") +
+        reloj("El cliente lo confirmó", t.confirmado ? fSello(t.confirmado) + " · " + fDur(k.res) : "todavía no", k.resOk) +
+        reloj("Quién lo lleva", e ? e.nombre : "sin asignar", e ? null : false) +
+        '<div class="campo"><label class="f" for="tkQuien">Asignar a</label><select id="tkQuien" data-tkq="' + t.id + '">' +
+          '<option value="">Sin asignar</option>' +
+          ficheros.equipo.map(x => '<option value="' + x.id + '"' + (t.atiende === x.id ? " selected" : "") + '>' + esc(x.nombre) + '</option>').join("") +
+        '</select></div>' +
+        '<p class="sitio">Metas: contestar en ' + META_RESP + ' h y resolver en ' + META_RES + ' h. ' +
+        'El ticket no se cierra solo porque soporte lo diga: lo cierra el cliente.</p>' +
+      '</div>' +
+
+      (function () {
+        const f = t.fallaId ? fallaDe(t.fallaId) : null;
+        if (f) return '<div class="bloque jugada ' + (f.estado === "corregida" || f.estado === "verificada" ? "" : "urge") + '">' +
+          '<h3>Esto no es una duda: es una falla del programa</h3>' +
+          '<h4>' + esc(f.titulo) + '</h4>' +
+          '<p class="porque">' + esc(f.sintoma) + '</p>' +
+          '<div class="fila"><span class="chip ' + PASOS[f.estado].chip + '">' + PASOS[f.estado].nombre + '</span>' +
+          (f.version ? '<span class="chip gris">Versión ' + esc(f.version) + '</span>' : '') + '</div>' +
+          '<p class="porque">' + (f.estado === "corregida" || f.estado === "verificada"
+            ? "Ya salió corregida. Avísale y pídele que confirme."
+            : "Mientras no salga la versión corregida, este ticket no se puede cerrar de verdad. Contestar solo explica, no resuelve.") + '</p>' +
+          '<button class="btn sm" data-falla="' + f.id + '">Ver la falla</button></div>';
+        return '<div class="bloque"><h3>¿Se arregla contestando?</h3>' +
+          '<p class="porque">Si el cliente no puede hacer algo que el programa debería dejarle hacer, no es una duda suya: ' +
+          'es una falla nuestra, y se arregla en el código.</p>' +
+          '<div class="fila"><button class="btn sm p" data-escala="' + t.id + '">Es una falla del programa</button>' +
+          (ficheros.fallas.filter(x => x.estado !== "verificada").length
+            ? '<select id="tkFalla" data-liga="' + t.id + '" style="width:auto"><option value="">Ligar a una falla ya registrada…</option>' +
+              ficheros.fallas.filter(x => x.estado !== "verificada").map(x => '<option value="' + x.id + '">' + esc(x.titulo) + '</option>').join("") + '</select>'
+            : '') + '</div></div>';
+      })() +
+      (t.origen === "widget" ? '<div class="bloque"><h3>Lo que mandó el cotizador solo</h3>' +
+        '<p class="porque">El cliente no escribió nada de esto: viaja con el reporte desde el botón de ayuda.</p>' +
+        (t.bloquea ? '<p class="apoyo">Dijo que <b>no puede seguir trabajando</b>.</p>' : '') +
+        (function () { const x = t.contexto || {};
+          return [["Taller", x.taller], ["Quién reporta", (x.usuario || "") + (x.rol ? " · " + x.rol : "")],
+                  ["Pantalla", x.pantalla], ["Versión", x.version], ["Navegador", x.navegador],
+                  ["Tamaño de pantalla", x.pantallaPx], ["Cotizaciones hechas", x.cotizaciones],
+                  ["Artículos en catálogo", x.articulos], ["Dónde guarda", x.almacen]]
+            .filter(r => r[1] != null && r[1] !== "")
+            .map(r => '<div class="senal"><span>' + esc(r[0]) + '</span><b>' + esc(r[1]) + '</b></div>').join("");
+        })() +
+        ((t.errores || []).length ? '<h3 style="margin-top:6px">Errores de esa sesión</h3>' +
+          '<div class="guion">' + t.errores.map(x => esc(x.hora + " · " + x.pantalla + " · " + x.msg + (x.donde ? " (" + x.donde + ")" : ""))).join("\n") + '</div>' : '') +
+      '</div>' : '') +
+      (c.version ? '<div class="bloque"><h3>Contexto técnico</h3>' +
+        senales(c).slice(3).map(x => '<div class="senal ' + x.n + '"><span>' + esc(x.k) + '</span><b>' + esc(x.v) + '</b></div>').join("") +
+        (c.id ? '<button class="btn sm" data-abre="' + c.id + '" style="align-self:flex-start">Ver la cuenta completa</button>' : '') + '</div>' : "") +
+
+      '<div class="hilo">' + t.mensajes.map(m =>
+        '<div class="msg' + (m.de === "soporte" ? " mio" : "") + '"><b>' + (m.de === "soporte" ? "Nosotros" : esc(c.taller)) +
+        ' · ' + fSello(m.f) + '</b>' + esc(m.txt) + '</div>').join("") + '</div>' +
+
+      '<div class="bloque"><h3>Contestar</h3>' +
+        '<div class="fila"><button class="btn sm" data-sug="' + t.id + '" id="btnSug" hidden>Proponme una respuesta</button>' +
+        '<span class="sitio" id="sugNota" hidden>Revísala y edítala antes de enviarla. La escribió la IA, no soporte.</span></div>' +
+        '<textarea id="tkResp" placeholder="Escribe la respuesta que verá el cliente"></textarea>' +
+        '<div class="fila"><button class="btn p sm" data-tk="responde" data-id="' + t.id + '">Enviar respuesta</button>' +
+        (t.estado === "abierto" || t.estado === "encurso"
+          ? '<button class="btn sm" data-tk="resuelto" data-id="' + t.id + '">Ya lo resolví</button>' : '') +
+        (t.estado === "esperando"
+          ? '<button class="btn sm p" data-tk="confirma" data-id="' + t.id + '">El cliente confirmó</button>' +
+            '<button class="btn sm mal" data-tk="niega" data-id="' + t.id + '">El cliente dice que no</button>' : '') +
+        (t.estado === "resuelto" ? '<button class="btn sm mal" data-tk="reabre" data-id="' + t.id + '">Reabrir</button>' : '') +
+        '</div>' +
+        (t.estado === "esperando" ? '<p class="sitio">Está esperando que el cliente confirme. Mientras no lo haga, el ticket sigue contando como abierto.</p>' : '') +
+      '</div>' +
+    '</div>';
+  muestraPanel();
+}
+
+let personaAbierta = null;
+function abrePersona(id) {
+  const e = eqDe(id); if (!e) return;
+  abierta = null; fallaAbierta = null; personaAbierta = id;
+  const k = cargaDe(e), sin = difDias(iso(HOY), e.ultimo || iso(HOY));
+  const otros = ficheros.equipo.filter(x => x.id !== e.id);
+  const esVentas = e.rol === "ventas" || e.rol === "dueno";
+  const esSop = e.rol === "soporte" || e.rol === "dueno";
+  const d = desempeno().find(x => x.e.id === e.id);
+  const linea = (t, v, cls) => '<div class="senal ' + (cls || "") + '"><span>' + t + '</span><b>' + v + '</b></div>';
+
+  $("#ficha").innerHTML =
+    '<header><div style="flex:1;min-width:0"><h2>' + esc(e.nombre) + '</h2>' +
+      '<p class="sitio" style="margin-top:3px">' + esc(e.correo) + '</p>' +
+      '<div class="fila" style="margin-top:9px"><span class="plan">' + ROLES[e.rol] + '</span>' +
+      '<span class="chip ' + (e.activo === false ? "mal" : sin >= 7 ? "aviso" : "bien") + '">' +
+      (e.activo === false ? "Sin acceso" : sin === 0 ? "Entró hoy" : "Entró hace " + dias(sin)) + '</span></div>' +
+    '</div><button class="btn sm" id="cerrarFicha" aria-label="Cerrar">Cerrar</button></header>' +
+    '<div class="desliza">' +
+
+      (k.urgentes || k.citasHoy || k.tkAbiertos.length
+        ? '<div class="bloque jugada ' + (k.urgentes + k.citasHoy + k.tkAbiertos.length > 4 ? "urge" : "pronto") + '">' +
+          '<h3>Lo que trae encima hoy</h3>' +
+          (k.urgentes ? '<h4>' + k.urgentes + (k.urgentes === 1 ? " cuenta que urge atender" : " cuentas que urgen atender") + '</h4>' : '') +
+          (k.citasHoy ? '<p class="porque">' + k.citasHoy + (k.citasHoy === 1 ? " cita hoy." : " citas hoy.") + '</p>' : '') +
+          (k.tkAbiertos.length ? '<p class="porque">' + k.tkAbiertos.length + (k.tkAbiertos.length === 1 ? " ticket abierto" : " tickets abiertos") +
+            (k.tkEsperando ? ", " + k.tkEsperando + " esperando que el cliente confirme" : "") + '.</p>' : '') +
+          (k.fallas.length ? '<p class="porque">' + k.fallas.length + (k.fallas.length === 1 ? " falla asignada" : " fallas asignadas") + '.</p>' : '') +
+        '</div>'
+        : '<div class="bloque"><h3>Lo que trae encima hoy</h3><p class="porque">Nada pendiente. Buen momento para darle más.</p></div>') +
+
+      (esVentas ? '<div class="bloque"><h3>Cómo va vendiendo</h3>' +
+        linea("Cuentas que atiende", k.cuentas.length) +
+        linea("De esas, pagando", k.pagando, k.pagando ? "buena" : "") +
+        linea("En prueba ahora", k.prueba, k.prueba ? "tibia" : "") +
+        linea("Cerró este mes", k.cerradasMes, k.cerradasMes ? "buena" : "") +
+        linea("Citas hechas", k.citasHechas) +
+        linea("Citas que no se dieron", k.citasNoHubo, k.citasNoHubo > k.citasHechas ? "mala" : "") +
+        '</div>' : '') +
+
+      (esSop && d && d.n ? '<div class="bloque"><h3>Cómo va en soporte</h3>' +
+        linea("Tickets atendidos", d.n) +
+        linea("Primera respuesta", fDur(d.resp), d.resp != null && d.resp > META_RESP ? "mala" : "buena") +
+        linea("Dentro de la meta", d.aTiempo + " de " + d.n) +
+        linea("Resolución confirmada", fDur(d.res), d.res != null && d.res > META_RES ? "tibia" : "buena") +
+        linea("Reaperturas", d.reab, d.reab ? "mala" : "buena") +
+        '</div>' : '') +
+
+      (k.urg.length ? '<div class="bloque"><h3>Sus cuentas que urgen</h3>' + k.urg.map(c =>
+        '<div class="pend clic" data-abre="' + c.id + '" tabindex="0" role="button" style="padding:7px 0;border:0">' +
+        '<span class="raya"></span><span class="txt"><b>' + esc(c.taller) + '</b><small>' + esc(jugada(c).titulo) + '</small></span></div>').join("") + '</div>' : '') +
+
+      (k.citasPend.length ? '<div class="bloque"><h3>Sus citas pendientes</h3>' + k.citasPend.map(q => {
+        const c = cuentaDe(q.cuentaId) || {};
+        return '<div class="fila" style="justify-content:space-between;font-size:12.5px">' +
+          '<span>' + TIPOCITA[q.tipo] + ' · ' + esc(c.taller || "") + '</span>' +
+          '<span class="mono">' + fCorta(q.fecha) + ' ' + esc(q.hora) + '</span></div>';
+      }).join("") + '</div>' : '') +
+
+      (k.tkAbiertos.length ? '<div class="bloque"><h3>Sus tickets abiertos</h3>' + k.tkAbiertos.map(t =>
+        '<div class="pend clic" data-tick="' + t.id + '" tabindex="0" role="button" style="padding:7px 0;border:0">' +
+        '<span class="raya"></span><span class="txt"><b>' + esc(t.asunto) + '</b>' +
+        '<small>' + esc((cuentaDe(t.cuentaId) || {}).taller || "") + ' · ' + estadoTicket(t).txt.toLowerCase() + '</small></span></div>').join("") + '</div>' : '') +
+
+      '<div class="bloque"><h3>Ajustes de esta persona</h3>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+          '<div class="campo"><label class="f" for="pRol">Rol</label><select id="pRol" data-pid="' + e.id + '">' +
+            Object.keys(ROLES).map(r => '<option value="' + r + '"' + (e.rol === r ? " selected" : "") + '>' + ROLES[r] + '</option>').join("") + '</select></div>' +
+          '<div class="campo"><label class="f" for="pCom">Comisión</label><select id="pCom" data-pid="' + e.id + '">' +
+            '<option value="primermes"' + (e.comision.tipo === "primermes" ? " selected" : "") + '>El primer mes completo</option>' +
+            '<option value="recurrente"' + (e.comision.tipo === "recurrente" ? " selected" : "") + '>10% recurrente</option>' +
+            '<option value="ninguna"' + (e.comision.tipo === "ninguna" ? " selected" : "") + '>Sin comisión</option></select></div>' +
+        '</div>' +
+        (otros.length ? '<div class="campo"><label class="f" for="pPasa">Pasarle todo su trabajo a</label>' +
+          '<select id="pPasa"><option value="">Elige a quién…</option>' +
+          otros.map(x => '<option value="' + x.id + '">' + esc(x.nombre) + ' · ' + ROLES[x.rol] + '</option>').join("") + '</select></div>' +
+          '<button class="btn sm" data-pasa="' + e.id + '" style="align-self:flex-start">Pasar cuentas, citas y tickets</button>' : '') +
+        '<div class="fila">' +
+          (e.rol !== "dueno" ? '<button class="btn sm ' + (e.activo === false ? "p" : "mal") + '" data-acceso="' + e.id + '">' +
+            (e.activo === false ? "Devolverle el acceso" : "Quitarle el acceso") + '</button>' : '') +
+          (e.rol !== "dueno" ? '<button class="btn sm mal" data-quita="' + e.id + '">Borrarlo del equipo</button>' : '') +
+        '</div>' +
+        '<p class="sitio">Quitar el acceso no borra nada: sus cuentas y sus tickets siguen a su nombre hasta que los pases a otra persona.</p>' +
+      '</div>' +
+    '</div>';
+  muestraPanel();
+}
+
+let fallaAbierta = null;
+function abreFalla(id) {
+  const f = fallaDe(id); if (!f) return;
+  abierta = null; fallaAbierta = id;
+  const af = afectadasDe(f), tks = ticketsDe(f), ers = erroresDe(f);
+  const abierto = difDias(iso(HOY), f.reportada);
+  const q = eqDe(f.quien);
+  const paso = (k, sello, txt) => '<div class="senal ' + (sello ? "buena" : "") + '"><span>' + k + '</span><b>' +
+    (sello ? fCorta(sello) : txt || "todavía no") + '</b></div>';
+
+  $("#ficha").innerHTML =
+    '<header><div style="flex:1;min-width:0"><h2>' + esc(f.titulo) + '</h2>' +
+      '<p class="sitio" style="margin-top:3px">' + esc(f.donde) + ' · reportada hace ' + dias(abierto) + '</p>' +
+      '<div class="fila" style="margin-top:9px">' +
+        '<span class="chip ' + SEVERIDAD[f.severidad].chip + '">' + SEVERIDAD[f.severidad].nombre + '</span>' +
+        '<span class="chip ' + PASOS[f.estado].chip + '">' + PASOS[f.estado].nombre + '</span>' +
+        (f.version ? '<span class="chip gris">Versión ' + esc(f.version) + '</span>' : '') + '</div>' +
+    '</div><button class="btn sm" id="cerrarFicha" aria-label="Cerrar">Cerrar</button></header>' +
+    '<div class="desliza">' +
+
+      '<div class="bloque"><h3>Qué le pasa al cliente</h3><p style="font-size:13.5px">' + esc(f.sintoma) + '</p></div>' +
+
+      '<div class="bloque"><h3>Cómo se reproduce</h3>' +
+        '<div class="guion">' + esc(f.reproducir) + '</div>' +
+        '<button class="btn sm" data-fx="copiareporte">Copiar el reporte para el programador</button>' +
+        '<p class="sitio">Se copia con el síntoma, los pasos, las versiones y los navegadores donde pasa.</p></div>' +
+
+      '<div class="bloque"><h3>A quién le pega</h3>' +
+        (af.length ? af.map(c => '<div class="fila" style="justify-content:space-between;font-size:13px">' +
+          '<span><b>' + esc(c.taller) + '</b> <span class="sitio">· ' + PLANES[c.plan].nombre + ' · versión ' + esc(c.version) + '</span></span>' +
+          '<button class="btn sm" data-abre="' + c.id + '">Ver</button></div>').join("")
+          : '<p class="sitio">Todavía no se ha ligado a ninguna cuenta.</p>') +
+        (vecesDe(f) ? '<p class="sitio">Los errores automáticos la han detectado ' + vecesDe(f) + ' veces.</p>' : '') +
+      '</div>' +
+
+      '<div class="bloque"><h3>El ciclo</h3>' +
+        paso("Reportada", f.reportada) +
+        paso("Reproducida", f.confirmada, "falta lograrlo") +
+        paso("Corregida en el código", f.corregida, f.version ? "va para la versión " + f.version : "sin versión asignada") +
+        paso("Confirmada por el cliente", f.verificada) +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+          '<div class="campo"><label class="f" for="fxSev">Severidad</label><select id="fxSev" data-fxid="' + f.id + '">' +
+            Object.keys(SEVERIDAD).map(k => '<option value="' + k + '"' + (f.severidad === k ? " selected" : "") + '>' + SEVERIDAD[k].nombre + '</option>').join("") + '</select></div>' +
+          '<div class="campo"><label class="f" for="fxQuien">Quién la arregla</label><select id="fxQuien" data-fxid="' + f.id + '">' +
+            '<option value="">Sin asignar</option>' +
+            ficheros.equipo.map(e => '<option value="' + e.id + '"' + (f.quien === e.id ? " selected" : "") + '>' + esc(e.nombre) + '</option>').join("") + '</select></div>' +
+        '</div>' +
+        '<div class="fila">' +
+          (f.estado === "reportada" ? '<button class="btn sm p" data-fx="confirma">Ya la reproduje</button>' : '') +
+          (f.estado === "confirmada" ? '<button class="btn sm p" data-fx="arreglando">La estoy arreglando</button>' : '') +
+          (f.estado === "arreglando" || f.estado === "confirmada" ? '<button class="btn sm p" data-fx="corregida">Salió corregida</button>' : '') +
+          (f.estado === "corregida" && !f.avisados ? '<button class="btn sm p" data-fx="avisa">Avisar a los ' + af.length + ' afectados</button>' : '') +
+          (f.estado === "corregida" && f.avisados ? '<button class="btn sm p" data-fx="verifica">El cliente confirmó</button>' : '') +
+          (f.estado !== "reportada" ? '<button class="btn sm mal" data-fx="reabre">Volvió a pasar</button>' : '') +
+        '</div>' +
+        '<p class="sitio">' + PASOS[f.estado].que + (q ? " · la lleva " + esc(q.nombre) : "") + '</p>' +
+      '</div>' +
+
+      (tks.length ? '<div class="bloque"><h3>Tickets que son esta falla</h3>' + tks.map(t => {
+        const c = cuentaDe(t.cuentaId) || {}, st = estadoTicket(t);
+        return '<div class="pend clic" data-tick="' + t.id + '" tabindex="0" role="button" style="padding:7px 0;border:0">' +
+          '<span class="raya"></span><span class="txt"><b>' + esc(c.taller || "Cuenta") + '</b>' +
+          '<small>' + esc(t.asunto) + ' · abierto hace ' + fDur(horasEntre(t.creado, ahoraSello())) + '</small></span>' +
+          '<span class="chip ' + st.chip + '">' + st.txt + '</span></div>';
+      }).join("") + '</div>' : '') +
+
+      (ers.length ? '<div class="bloque"><h3>Errores automáticos ligados</h3>' + ers.map(e =>
+        '<div class="senal"><span>' + esc(e.mensaje) + '</span><b>' + e.veces + '×</b></div>').join("") + '</div>' : '') +
+
+      '<div class="bloque"><h3>Bitácora</h3>' +
+        '<div class="hist">' + ((f.notas || []).length ? f.notas.map(n =>
+          '<div><time>' + fCorta(n.f) + '</time><span>' + esc(n.t) + '</span></div>').join("")
+          : '<div><span class="sitio">Sin anotaciones.</span></div>') + '</div>' +
+        '<textarea id="fxNota" placeholder="Qué encontraste, qué falta"></textarea>' +
+        '<button class="btn sm" data-fx="nota" style="align-self:flex-start">Anotar</button></div>' +
+    '</div>';
+  muestraPanel();
+  prendeSugerencia();
+}
+
+/* La IA le propone la respuesta a quien da soporte, nunca se la manda sola al
+   cliente. Así ayuda con la velocidad sin poder inventarle nada a nadie. */
+let IA = undefined;
+async function prendeSugerencia() {
+  const b = $("#btnSug"); if (!b) return;
+  if (IA === undefined) { try { IA = await (window.claude && window.claude.use ? window.claude.use("sample") : null); } catch (e) { IA = null; } }
+  if (IA) b.hidden = false;
+}
+async function sugiere(id) {
+  const t = ficheros.tickets.find(x => x.id === id); if (!t || !IA) return;
+  const c = cuentaDe(t.cuentaId) || {}, f = t.fallaId ? fallaDe(t.fallaId) : null;
+  const b = $("#btnSug"); if (b) { b.disabled = true; b.textContent = "Pensando…"; }
+  const ta = $("#tkResp");
+  const saber =
+    "Eres quien da soporte del cotizador Hey Makers, una herramienta mexicana para talleres de playeras, gorras y tazas. " +
+    "Reglas del producto que debes respetar:\n" +
+    "- Los archivos de diseño solo pueden ser PNG, JPG o WebP de hasta 5 MB. Los de preprensa (AI, PSD, PDF de impresión, TIFF, CDR) se rechazan a propósito.\n" +
+    "- La orden de producción, con su folio OP, nace solo cuando se confirma el pedido, no al guardar la cotización.\n" +
+    "- El paso 3 de tallas solo aparece si el artículo es textil.\n" +
+    "- Producción nunca ve precios. Ventas no mueve el estatus de una orden.\n" +
+    "- Las existencias del inventario solo se mueven con requisición y su archivo adjunto.\n" +
+    "- El precio sale de la utilidad, la merma y la mano de obra que estén en Ajustes, más el costo del artículo y el mínimo de la técnica.\n\n" +
+    "Escribe la respuesta para este cliente. En español de México, de tú, cálida y breve: máximo 4 renglones. " +
+    "Nada de 'estimado cliente' ni de disculpas largas. Ve al grano y dile qué hacer.\n" +
+    "Si es una falla del programa, dilo con todas sus letras y no inventes pasos para darle la vuelta.\n" +
+    "Si te falta un dato para resolverlo, pregúntalo en una sola pregunta concreta.\n" +
+    "Nunca inventes menús, botones ni pantallas que no estén en las reglas de arriba.\n\n" +
+    "TALLER: " + (c.taller || "") + " · plan " + (c.plan ? PLANES[c.plan].nombre : "?") + " · versión " + (c.version || "?") + " · " + (c.navegador || "") + "\n" +
+    "PANTALLA DONDE PASÓ: " + (t.pantalla || (t.contexto || {}).pantalla || "no dice") + "\n" +
+    (t.bloquea ? "EL CLIENTE DICE QUE NO PUEDE TRABAJAR.\n" : "") +
+    ((t.errores || []).length ? "ERRORES TÉCNICOS DE SU SESIÓN:\n" + t.errores.map(x => "- " + x.msg).join("\n") + "\n" : "") +
+    (f ? "YA SABEMOS QUE ES UNA FALLA NUESTRA: \"" + f.titulo + "\". Estado: " + PASOS[f.estado].nombre +
+         (f.version ? ", " + (f.estado === "corregida" || f.estado === "verificada" ? "salió corregida en la versión " : "va para la versión ") + f.version : "") + ".\n" : "") +
+    "\nCONVERSACIÓN:\n" + (t.mensajes || []).map(m => (m.de === "cliente" ? "CLIENTE: " : "NOSOTROS: ") + m.txt).join("\n");
+  try {
+    const r = await IA(saber, { modelTier: "quick", onText: o => { if (ta) ta.value = o.text; } });
+    if (ta) { ta.value = (r && r.text ? r.text : ta.value).trim(); ta.focus(); }
+    const n = $("#sugNota"); if (n) n.hidden = false;
+  } catch (err) {
+    const cod = err && err.code;
+    aviso(cod === "not_granted" ? "Falta autorizar la ayuda de la IA" : cod === "rate_limited" ? "La IA está saturada, intenta en un momento" : "No se pudo proponer una respuesta");
+  }
+  if (b) { b.disabled = false; b.textContent = "Proponme otra"; }
+}
+
+function muestraPanel() {
+  const f = $("#ficha"), t = $("#telon");
+  t.hidden = false; requestAnimationFrame(() => { t.style.opacity = "1"; f.classList.add("abierta"); });
+  f.setAttribute("aria-hidden", "false");
+  const b = f.querySelector("#cerrarFicha"); if (b) b.focus();
+}
+function cierraPanel() {
+  const f = $("#ficha"), t = $("#telon");
+  f.classList.remove("abierta"); f.setAttribute("aria-hidden", "true");
+  t.style.opacity = "0"; setTimeout(() => { t.hidden = true; }, 200);
+  abierta = null;
+}
+
+/* ================= fallas ================= */
+function anotaFalla(f, t) { f.notas = f.notas || []; f.notas.unshift({ f: iso(HOY), t: t }); if (f.notas.length > 30) f.notas.length = 30; }
+
+async function accionFalla(acc) {
+  const f = fallaDe(fallaAbierta); if (!f) return;
+
+  if (acc === "copiareporte") {
+    const af = afectadasDe(f);
+    const txt = "FALLA: " + f.titulo + "\n\nDónde: " + f.donde +
+      "\nSeveridad: " + SEVERIDAD[f.severidad].nombre +
+      "\n\nQué le pasa al cliente:\n" + f.sintoma +
+      "\n\nCómo se reproduce:\n" + f.reproducir +
+      "\n\nDetectada automáticamente " + vecesDe(f) + " veces." +
+      "\nCuentas afectadas (" + af.length + "): " + af.map(c => c.taller + " [v" + c.version + ", " + c.navegador + "]").join("; ") +
+      "\n\nErrores en consola:\n" + erroresDe(f).map(e => "- " + e.mensaje + " (" + e.donde + ", " + e.navegador + ", v" + e.version + ")").join("\n");
+    try { await navigator.clipboard.writeText(txt); aviso("Reporte copiado"); }
+    catch (e) { aviso("No se pudo copiar. Selecciónalo a mano."); }
+    return;
+  }
+  if (acc === "nota") {
+    const t = ($("#fxNota").value || "").trim();
+    if (!t) { aviso("Escribe la nota primero."); return; }
+    anotaFalla(f, t);
+  } else if (acc === "confirma") {
+    f.estado = "confirmada"; f.confirmada = iso(HOY); anotaFalla(f, "Se logró reproducir.");
+  } else if (acc === "arreglando") {
+    f.estado = "arreglando"; anotaFalla(f, "Alguien la está corrigiendo.");
+    const v = prompt("¿En qué versión va a salir?", "21"); if (v) f.version = v.trim();
+  } else if (acc === "corregida") {
+    const v = prompt("¿En qué versión salió corregida?", f.version || "21"); if (!v) return;
+    f.version = v.trim(); f.estado = "corregida"; f.corregida = iso(HOY); f.avisados = false;
+    if (!f.confirmada) f.confirmada = iso(HOY);
+    anotaFalla(f, "Corregida y publicada en la versión " + f.version + ".");
+    aviso("Falta avisarles: es lo que cierra sus tickets");
+  } else if (acc === "avisa") {
+    const af = afectadasDe(f), tks = ticketsDe(f);
+    for (const t of tks) {
+      t.mensajes = (t.mensajes || []).concat([{ de: "soporte", f: ahoraSello(),
+        txt: "Ya quedó: era una falla nuestra (" + f.titulo.toLowerCase() + ") y salió corregida en la versión " + f.version +
+             ". Recarga la página y pruébalo, y me dices si ya te funciona." }]);
+      if (!t.primeraResp) t.primeraResp = ahoraSello();
+      t.resuelto = ahoraSello(); t.estado = "esperando";
+      await guarda("tickets", t);
+    }
+    for (const c of af) { anota(c, "Se le avisó que la falla \"" + f.titulo + "\" salió corregida en la versión " + f.version + "."); await guarda("cuentas", c); }
+    f.avisados = true; anotaFalla(f, "Se avisó a " + af.length + " cuenta(s) afectada(s).");
+    aviso("Avisados. Sus tickets quedaron esperando confirmación.");
+  } else if (acc === "verifica") {
+    f.estado = "verificada"; f.verificada = iso(HOY); anotaFalla(f, "El cliente confirmó que ya quedó.");
+  } else if (acc === "reabre") {
+    f.estado = "confirmada"; f.corregida = null; f.verificada = null; f.avisados = false;
+    anotaFalla(f, "Volvió a pasar después de darla por corregida.");
+    aviso("Reabierta");
+  }
+  await guarda("fallas", f);
+  abreFalla(f.id);
+}
+
+/* ================= facturación ================= */
+async function emiteCFDI(pagoId, silencioso) {
+  const p = ficheros.cobros.find(x => x.id === pagoId); if (!p) return false;
+  const c = cuentaDe(p.cuentaId) || {};
+  if (!c.rfc || !c.razon || !c.cp || !c.regimen) {
+    if (!silencioso) aviso("Primero captura los datos fiscales de " + (c.taller || "la cuenta") + ".");
+    return false;
+  }
+  CFG.folio++;
+  p.factura = "emitida";
+  p.cfdi = CFG.serie + "-" + CFG.folio;
+  p.uuid = "F3B" + String(100000 + CFG.folio * 7) + "-CDA4";
+  p.emitida = iso(HOY);
+  p.enviada = true;
+  await guardaCfg();
+  await guarda("cobros", p);
+  anota(c, "Se emitió el CFDI " + p.cfdi + " por " + $$$(cargo(p)) + " y se envió a " + (c.correo || "su correo") + ".");
+  await guarda("cuentas", c);
+  if (!silencioso) aviso("CFDI " + p.cfdi + " emitido y enviado a " + (c.correo || "su correo"));
+  return true;
+}
+async function guardaCfg() {
+  if (DB) { try { await DB.doc("meta/config").set(CFG); } catch (e) {} }
+}
+
+/* ================= acciones ================= */
+async function accion(acc) {
+  const c = cuentaDe(abierta); if (!c) return;
+  const j = jugada(c);
+
+  if (acc === "copia" || acc === "wa" || acc === "correo") {
+    if (acc === "copia") {
+      try { await navigator.clipboard.writeText(j.guion); aviso("Texto copiado"); }
+      catch (e) { aviso("Selecciona el texto y cópialo a mano."); }
+      return;
+    }
+    const url = acc === "wa" ? waLink(c, j.guion)
+      : "mailto:" + encodeURIComponent(c.correo || "") +
+        "?subject=" + encodeURIComponent("Hey Makers · " + c.taller) +
+        "&body=" + encodeURIComponent(j.guion);
+    if (!abreFuera(url)) {
+      try { await navigator.clipboard.writeText(j.guion); } catch (e) {}
+      aviso("Tu navegador no dejó abrir " + (acc === "wa" ? "WhatsApp" : "el correo") + ". El texto ya quedó copiado.");
+    }
+    return;
+  }
+  if (acc === "agenda") { const el = $("#qFecha"); if (el) { el.focus(); el.scrollIntoView({ block: "center" }); } return; }
+  if (acc === "guardafiscal") {
+    const pide = $("#fxPide").value === "si";
+    if (pide) {
+      const rfc = ($("#fxRfc").value || "").trim().toUpperCase();
+      const razon = ($("#fxRazon").value || "").trim().toUpperCase();
+      const cp = ($("#fxCp").value || "").trim();
+      if (rfc.length < 12 || !razon || cp.length !== 5) { aviso("Revisa el RFC, la razón social y el código postal."); return; }
+      c.requiereFactura = true; c.rfc = rfc; c.razon = razon; c.cp = cp;
+      c.regimen = $("#fxRegimen").value; c.uso = $("#fxUso").value;
+      anota(c, "Pidió factura. RFC " + rfc + ", régimen " + c.regimen + ".");
+      const suyos = ficheros.cobros.filter(x => x.cuentaId === c.id && x.estado === "aprobado" &&
+        x.factura === "global" && x.fecha.slice(0, 7) === iso(HOY).slice(0, 7));
+      await guarda("cuentas", c);
+      let n = 0;
+      for (const x of suyos) { x.factura = "pendiente"; await guarda("cobros", x); n++; }
+      abreFicha(c.id);
+      aviso(n ? "Guardado. " + n + " pago(s) de este mes quedaron por facturar." : "Datos fiscales guardados");
+    } else {
+      c.requiereFactura = false;
+      anota(c, "Ya no pide factura: sus pagos entran en la global.");
+      await guarda("cuentas", c); abreFicha(c.id); aviso("Guardado");
+    }
+    return;
+  }
+  if (acc === "guardacita") {
+    const f = $("#qFecha").value, h = $("#qHora").value;
+    if (!f || !h) { aviso("Falta el día o la hora."); return; }
+    await guarda("citas", { id: uid(), cuentaId: c.id, tipo: $("#qTipo").value, fecha: f, hora: h,
+      quien: $("#qQuien").value, motivo: j.titulo, estado: "pendiente", resultado: "" });
+    anota(c, TIPOCITA[$("#qTipo").value] + " agendada para el " + fFecha(f) + " a las " + h + ": " + j.titulo.toLowerCase() + ".");
+    await guarda("cuentas", c); abreFicha(c.id); aviso("Agendada para el " + fFecha(f)); return;
+  }
+  if (acc === "ticket") {
+    const asunto = prompt("¿Qué problema reporta " + c.taller + "?"); if (!asunto) return;
+    await guarda("tickets", { id: uid(), cuentaId: c.id, asunto: asunto.trim(), prioridad: "normal", estado: "abierto",
+      creado: iso(HOY), mensajes: [{ de: "cliente", txt: asunto.trim(), f: iso(HOY) }] });
+    anota(c, "Se abrió un ticket a su nombre: " + asunto.trim());
+    await guarda("cuentas", c); abreFicha(c.id); aviso("Ticket abierto"); return;
+  }
+  if (acc === "apoyo") {
+    const quien = prompt("¿Quién va a entrar? (queda registrado)", "Soporte de turno"); if (!quien) return;
+    c.apoyo = { hasta: iso(HOY), quien: quien.trim(), desde: iso(HOY) };
+    anota(c, "El cliente autorizó acceso de apoyo por 2 horas para " + quien.trim() + ".");
+    await guarda("cuentas", c); abreFicha(c.id); aviso("Acceso abierto, queda registrado"); return;
+  }
+  if (acc === "cierraapoyo") {
+    anota(c, "Se cerró el acceso de apoyo de " + (c.apoyo || {}).quien + ".");
+    c.apoyo = null; await guarda("cuentas", c); abreFicha(c.id); return;
+  }
+
+  if (acc === "mas7" || acc === "mas15") {
+    const n = acc === "mas7" ? 7 : 15;
+    c.vence = iso(masDias(dObj(c.vence < iso(HOY) ? iso(HOY) : c.vence), n));
+    if (c.estado === "vencida") c.estado = "prueba";
+    anota(c, "Se le dieron " + dias(n) + " más. Ahora vence el " + fFecha(c.vence) + ".");
+    aviso("Vence el " + fFecha(c.vence));
+  } else if (acc === "pausa") { c.estado = "pausada"; anota(c, "Cuenta pausada. Los datos se conservan.");
+  } else if (acc === "reactiva") {
+    c.estado = "activa"; c.baja = null; c.vence = iso(masDias(HOY, 30));
+    anota(c, "Cuenta reactivada. Siguiente cobro el " + fFecha(c.vence) + ".");
+  } else if (acc === "cobra") {
+    c.estado = "activa"; c.vence = iso(masDias(HOY, c.periodo === "anual" ? 365 : 30));
+    anota(c, "Pasó de prueba a " + PLANES[c.plan].nombre + " " + c.periodo + ".");
+    aviso("Bien: " + c.taller + " ya está pagando");
+  } else if (acc === "baja") {
+    if (!confirm("¿Dar de baja a " + c.taller + "? Deja de cobrarse, pero sus datos se conservan.")) return;
+    c.estado = "baja"; c.baja = iso(HOY); anota(c, "Se dio de baja la cuenta.");
+  } else if (acc === "nota") {
+    const t = ($("#fNota").value || "").trim();
+    if (!t) { aviso("Escribe la nota antes de guardarla."); return; }
+    anota(c, t); aviso("Nota guardada");
+  }
+  await guarda("cuentas", c);
+  abreFicha(c.id);
+}
+
+/* ================= pintar ================= */
+function pinta() {
+  const titulos = { tablero: "Tablero", cuentas: "Cuentas", agenda: "Agenda", soporte: "Soporte",
+    cobros: "Cobros y facturación", equipo: "Equipo y alianzas", numeros: "Números" };
+  $("#titulo").textContent = titulos[vista];
+  $("#n_cuentas").textContent = ficheros.cuentas.length;
+  $("#n_agenda").textContent = citasHoy().length;
+  $("#n_agenda").className = "cuenta" + (citasHoy().length ? " urge" : "");
+  const sop = ficheros.tickets.filter(t => t.estado !== "resuelto").length +
+              ficheros.fallas.filter(f => f.estado !== "verificada" && f.severidad === "bloquea").length;
+  $("#n_soporte").textContent = sop;
+  const rech = ficheros.cobros.filter(p => p.estado === "rechazado").length;
+  $("#n_cobros").textContent = rech;
+  $("#n_cobros").className = "cuenta" + (rech ? " urge" : "");
+  $("#avisoDemo").hidden = !esEjemplo;
+  ["busca", "filtroEstado", "filtroPlan", "btnNueva"].forEach(i => { $("#" + i).hidden = vista !== "cuentas"; });
+  document.querySelectorAll("#nav button").forEach(b => b.setAttribute("aria-current", String(b.dataset.v === vista)));
+  if (!listo) { $("#vista").innerHTML = '<div class="tarjeta"><div class="vacio">Cargando tus cuentas…</div></div>'; return; }
+  $("#vista").innerHTML = vista === "tablero" ? vTablero() : vista === "cuentas" ? vCuentas()
+    : vista === "agenda" ? vAgenda() : vista === "soporte" ? vSoporte()
+    : vista === "cobros" ? vCobros() : vista === "equipo" ? vEquipo() : vNumeros();
+  ponGlobos();
+}
+
+function ponGlobos() {
+  const d = historico(6);
+  document.querySelectorAll("rect.barra").forEach(r => {
+    r.addEventListener("mouseenter", () => {
+      const p = d[+r.dataset.i]; if (!p) return;
+      const g = document.createElement("div"); g.className = "globo"; g.id = "globoBarra";
+      g.innerHTML = p.et + "<br><b class='num'>" + $$$(p.v) + " al mes</b>";
+      document.body.appendChild(g);
+      const b = r.getBoundingClientRect();
+      g.style.left = Math.max(8, Math.min(window.innerWidth - g.offsetWidth - 8, b.left + b.width / 2 - g.offsetWidth / 2)) + "px";
+      g.style.top = Math.max(8, b.top - g.offsetHeight - 8) + "px";
+    });
+    r.addEventListener("mouseleave", () => { const g = document.getElementById("globoBarra"); if (g) g.remove(); });
+  });
+}
+
+/* ================= eventos ================= */
+$("#nav").addEventListener("click", e => {
+  const b = e.target.closest("button[data-v]"); if (!b) return;
+  vista = b.dataset.v; pinta();
+});
+$("#telon").addEventListener("click", cierraPanel);
+document.addEventListener("keydown", e => { if (e.key === "Escape") cierraPanel(); });
+
+document.addEventListener("click", async e => {
+  if (e.target.closest("a[href]")) { if (e.target.closest("[data-abre],[data-tick]")) e.stopPropagation(); return; }
+  if (e.target.closest("#cerrarFicha")) { cierraPanel(); return; }
+
+  const cita = e.target.closest("[data-cita]");
+  if (cita) {
+    const q = ficheros.citas.find(x => x.id === cita.dataset.id); if (!q) return;
+    if (cita.dataset.cita === "borra") { await elimina("citas", q.id); aviso("Cita quitada"); return; }
+    q.estado = cita.dataset.cita;
+    if (q.estado === "hecha") {
+      const r = prompt("¿Cómo te fue? (queda en la cuenta)", "");
+      q.resultado = (r || "").trim();
+      const c = cuentaDe(q.cuentaId);
+      if (c) { anota(c, TIPOCITA[q.tipo] + " del " + fFecha(q.fecha) + ": " + (q.resultado || "sin nota")); await guarda("cuentas", c); }
+    }
+    await guarda("citas", q); return;
+  }
+
+  const emite = e.target.closest("[data-emite]");
+  if (emite) { await emiteCFDI(emite.dataset.emite); return; }
+
+  const pide = e.target.closest("[data-pide]");
+  if (pide) {
+    const p = ficheros.cobros.find(x => x.id === pide.dataset.pide); if (!p) return;
+    if (p.fecha.slice(0, 7) !== iso(HOY).slice(0, 7)) {
+      aviso("Ese pago es de un mes anterior: ya se fue en la global de ese mes."); return;
+    }
+    const c = cuentaDe(p.cuentaId);
+    if (!c) return;
+    if (!c.rfc || !c.razon || !c.cp || !c.regimen) {
+      aviso("Captura primero sus datos fiscales."); abreFicha(c.id); return;
+    }
+    if (!c.requiereFactura) { c.requiereFactura = true; anota(c, "Pidió factura después del pago."); await guarda("cuentas", c); }
+    await emiteCFDI(p.id);
+    return;
+  }
+
+  const sub2 = e.target.closest("[data-sub]");
+  if (sub2) { subSop = sub2.dataset.sub; pinta(); return; }
+
+  const per = e.target.closest("[data-persona]");
+  if (per) { abrePersona(per.dataset.persona); return; }
+
+  const acc2 = e.target.closest("[data-acceso]");
+  if (acc2) {
+    const x = eqDe(acc2.dataset.acceso); if (!x) return;
+    x.activo = x.activo === false;
+    await guarda("equipo", x); abrePersona(x.id);
+    aviso(x.activo ? "Ya puede entrar otra vez" : "Se le quitó el acceso"); return;
+  }
+
+  const pasa = e.target.closest("[data-pasa]");
+  if (pasa) {
+    const de = eqDe(pasa.dataset.pasa), aId = $("#pPasa") ? $("#pPasa").value : "";
+    if (!de || !aId) { aviso("Elige primero a quién se lo pasas."); return; }
+    const a = eqDe(aId); if (!a) return;
+    if (!confirm("¿Pasarle a " + a.nombre + " todas las cuentas, citas y tickets de " + de.nombre + "?")) return;
+    let n = 0;
+    for (const c of ficheros.cuentas.filter(c => c.cerradoPor === de.id)) {
+      c.cerradoPor = a.id; anota(c, "Pasó de " + de.nombre + " a " + a.nombre + "."); await guarda("cuentas", c); n++;
+    }
+    for (const q of ficheros.citas.filter(q => q.quien === de.id && q.estado === "pendiente")) { q.quien = a.id; await guarda("citas", q); n++; }
+    for (const t of ficheros.tickets.filter(t => t.atiende === de.id && t.estado !== "resuelto")) { t.atiende = a.id; await guarda("tickets", t); n++; }
+    for (const f of ficheros.fallas.filter(f => f.quien === de.id && f.estado !== "verificada")) { f.quien = a.id; await guarda("fallas", f); n++; }
+    abrePersona(de.id); aviso(n === 1 ? "Una cosa pasó a " + a.nombre : n + " cosas pasaron a " + a.nombre); return;
+  }
+
+  const vf = e.target.closest("[data-falla]");
+  if (vf) { abreFalla(vf.dataset.falla); return; }
+
+  const nf = e.target.closest("[data-nuevafalla]");
+  if (nf) {
+    const x = ficheros.errores.find(z => z.id === nf.dataset.nuevafalla); if (!x) return;
+    const f = { id: uid(), titulo: x.donde + ": " + x.mensaje, donde: x.donde, severidad: "molesta",
+      estado: "reportada", version: "", sintoma: x.mensaje,
+      reproducir: "Detectado automáticamente " + x.veces + (x.veces === 1 ? " vez" : " veces") + " en " + x.navegador +
+        ", perfil " + x.rol + ", versión " + x.version + ". Falta reproducirlo a mano.",
+      reportada: iso(HOY), confirmada: null, corregida: null, verificada: null, quien: null, avisados: false, notas: [] };
+    await guarda("fallas", f);
+    x.fallaId = f.id; await guarda("errores", x);
+    abreFalla(f.id); aviso("Falla registrada"); return;
+  }
+
+  const esc2 = e.target.closest("[data-escala]");
+  if (esc2) {
+    const t = ficheros.tickets.find(x => x.id === esc2.dataset.escala); if (!t) return;
+    const c = cuentaDe(t.cuentaId) || {};
+    const f = { id: uid(), titulo: t.asunto, donde: "Por ubicar", severidad: "molesta", estado: "reportada", version: "",
+      sintoma: (t.mensajes[0] || {}).txt || t.asunto,
+      reproducir: "Reportado por " + (c.taller || "un cliente") + " en " + (c.navegador || "navegador sin registrar") +
+        ", versión " + (c.version || "?") + ". Falta escribir los pasos exactos.",
+      reportada: iso(HOY), confirmada: null, corregida: null, verificada: null, quien: null, avisados: false, notas: [] };
+    await guarda("fallas", f);
+    t.fallaId = f.id; await guarda("tickets", t);
+    abreFalla(f.id); aviso("Queda registrada como falla del programa"); return;
+  }
+
+  const sug = e.target.closest("[data-sug]");
+  if (sug) { await sugiere(sug.dataset.sug); return; }
+
+  const fx = e.target.closest("[data-fx]");
+  if (fx) { await accionFalla(fx.dataset.fx); return; }
+
+  const tick = e.target.closest("[data-tick]"); if (tick) { abreTicket(tick.dataset.tick); return; }
+  const abre = e.target.closest("[data-abre]"); if (abre) { abreFicha(abre.dataset.abre); return; }
+  const acc = e.target.closest("[data-acc]"); if (acc) { accion(acc.dataset.acc); return; }
+
+  const tk = e.target.closest("[data-tk]");
+  if (tk) {
+    const t = ficheros.tickets.find(x => x.id === tk.dataset.id); if (!t) return;
+    const q = tk.dataset.tk;
+    if (q === "responde") {
+      const txt = ($("#tkResp").value || "").trim();
+      if (!txt) { aviso("Escribe la respuesta primero."); return; }
+      t.mensajes = t.mensajes.concat([{ de: "soporte", txt: txt, f: ahoraSello() }]);
+      if (!t.primeraResp) t.primeraResp = ahoraSello();
+      if (!t.atiende) t.atiende = (ficheros.equipo.find(x => x.rol === "soporte") || ficheros.equipo[0] || {}).id || null;
+      t.estado = "encurso";
+      aviso(slaTicket(t).respOk === false ? "Enviada, pero tardó más de " + META_RESP + " h en contestarse" : "Respuesta enviada");
+    } else if (q === "resuelto") {
+      if (!t.primeraResp) t.primeraResp = ahoraSello();
+      t.resuelto = ahoraSello(); t.estado = "esperando";
+      aviso("Queda en espera de que el cliente confirme");
+    } else if (q === "confirma") {
+      t.confirmado = ahoraSello(); t.estado = "resuelto";
+      const c = cuentaDe(t.cuentaId);
+      if (c) { anota(c, "Se cerró el ticket \"" + t.asunto + "\" con su confirmación. Tardó " + fDur(horasEntre(t.creado, t.confirmado)) + "."); await guarda("cuentas", c); }
+      aviso("Cerrado. Tardó " + fDur(horasEntre(t.creado, t.confirmado)));
+    } else if (q === "niega") {
+      t.resuelto = null; t.estado = "encurso"; t.reaperturas = (t.reaperturas || 0) + 1;
+      t.mensajes = t.mensajes.concat([{ de: "cliente", txt: "Todavía no queda.", f: ahoraSello() }]);
+      aviso("Reabierto. El reloj nunca se reinició.");
+    } else if (q === "reabre") {
+      t.estado = "encurso"; t.resuelto = null; t.confirmado = null; t.reaperturas = (t.reaperturas || 0) + 1;
+    }
+    await guarda("tickets", t); abreTicket(t.id);
+    return;
+  }
+
+  const err = e.target.closest("[data-err]");
+  if (err) {
+    const x = ficheros.errores.find(z => z.id === err.dataset.err); if (!x) return;
+    x.estado = x.estado === "abierto" ? "revisando" : x.estado === "revisando" ? "resuelto" : "abierto";
+    await guarda("errores", x); return;
+  }
+
+  const quita = e.target.closest("[data-quita]");
+  if (quita) { await elimina("equipo", quita.dataset.quita); aviso("Se quitó del equipo"); return; }
+
+  if (e.target.closest("#eqAlta")) {
+    const n = ($("#eqNombre").value || "").trim(), co = ($("#eqCorreo").value || "").trim();
+    if (!n || co.indexOf("@") < 0) { aviso("Falta el nombre o el correo."); return; }
+    const tipo = $("#eqCom").value;
+    await guarda("equipo", { id: uid(), nombre: n, correo: co, rol: $("#eqRol").value,
+      comision: { tipo: tipo, valor: tipo === "primermes" ? 100 : tipo === "recurrente" ? 10 : 0 } });
+    aviso("Listo, ya tiene acceso"); return;
+  }
+  if (e.target.closest("#alAlta")) {
+    const n = ($("#alNombre").value || "").trim();
+    if (!n) { aviso("Escribe el nombre del organismo."); return; }
+    const cod = n.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 8);
+    await guarda("alianzas", { id: uid(), nombre: n, tipo: "Organismo del sector",
+      contacto: "", codigo: cod, trato: ($("#alTrato").value || "").trim() || "Por definir", vigencia: "por firmar" });
+    aviso("Su código es " + cod); return;
+  }
+  if (e.target.closest("#btnNueva")) { nuevaCuenta(); return; }
+  if (e.target.closest("#btnExporta")) { exporta(); return; }
+  if (e.target.closest("#btnBorrar")) { borraEjemplo(); return; }
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const t = e.target.closest("tr[data-abre], .pend[data-abre], .pend[data-tick]");
+  if (t) { e.preventDefault(); t.click(); }
+});
+
+$("#busca").addEventListener("input", e => { filtro.texto = e.target.value; if (vista === "cuentas") pinta(); });
+$("#filtroEstado").innerHTML = '<option value="">Todos los estados</option>' +
+  Object.keys(ESTADOS).map(k => '<option value="' + k + '">' + ESTADOS[k].nombre + '</option>').join("");
+$("#filtroPlan").innerHTML = '<option value="">Todos los planes</option>' +
+  Object.keys(PLANES).map(k => '<option value="' + k + '">' + PLANES[k].nombre + '</option>').join("");
+$("#filtroEstado").addEventListener("change", e => { filtro.estado = e.target.value; pinta(); });
+$("#filtroPlan").addEventListener("change", e => { filtro.plan = e.target.value; pinta(); });
+
+document.addEventListener("change", async e => {
+  const pid = e.target.closest("[data-pid]");
+  if (pid) {
+    const x = eqDe(pid.dataset.pid); if (!x) return;
+    if (e.target.id === "pRol") x.rol = e.target.value;
+    if (e.target.id === "pCom") {
+      const t = e.target.value;
+      x.comision = { tipo: t, valor: t === "primermes" ? 100 : t === "recurrente" ? 10 : 0 };
+    }
+    await guarda("equipo", x); abrePersona(x.id); return;
+  }
+  const fxid = e.target.closest("[data-fxid]");
+  if (fxid) {
+    const f = fallaDe(fxid.dataset.fxid); if (!f) return;
+    if (e.target.id === "fxSev") f.severidad = e.target.value;
+    if (e.target.id === "fxQuien") f.quien = e.target.value || null;
+    await guarda("fallas", f); abreFalla(f.id); return;
+  }
+  const liga = e.target.closest("[data-liga]");
+  if (liga) {
+    const t = ficheros.tickets.find(x => x.id === liga.dataset.liga); if (!t || !e.target.value) return;
+    t.fallaId = e.target.value;
+    await guarda("tickets", t); abreTicket(t.id);
+    aviso("Ligado a: " + (fallaDe(e.target.value) || {}).titulo); return;
+  }
+  const tq = e.target.closest("[data-tkq]");
+  if (tq) {
+    const t = ficheros.tickets.find(x => x.id === tq.dataset.tkq); if (!t) return;
+    t.atiende = e.target.value || null;
+    await guarda("tickets", t); abreTicket(t.id);
+    aviso(t.atiende ? "Asignado a " + (eqDe(t.atiende) || {}).nombre : "Sin asignar");
+    return;
+  }
+  if (["cfRfc","cfRazon","cfRegimen","cfSerie","cfIva","cfModo"].indexOf(e.target.id) >= 0) {
+    if (e.target.id === "cfRfc") CFG.rfc = e.target.value.trim().toUpperCase();
+    if (e.target.id === "cfRazon") CFG.razon = e.target.value.trim();
+    if (e.target.id === "cfRegimen") CFG.regimen = e.target.value;
+    if (e.target.id === "cfIva") CFG.iva = +e.target.value;
+    if (e.target.id === "cfModo") CFG.ivaIncluido = e.target.value === "si";
+    if (e.target.id === "cfSerie") {
+      const t = e.target.value.split("-");
+      CFG.serie = (t[0] || "A").trim(); CFG.folio = parseInt(t[1], 10) || CFG.folio;
+    }
+    await guardaCfg(); pinta();
+    if (e.target.id === "cfModo") aviso(CFG.ivaIncluido ? "Los precios ya traen IVA" : "Ahora los precios son más IVA");
+    return;
+  }
+  if (!abierta) return;
+  const c = cuentaDe(abierta); if (!c) return;
+  if (e.target.id === "fPlan") {
+    const antes = PLANES[c.plan].nombre; c.plan = e.target.value;
+    anota(c, "Cambió de " + antes + " a " + PLANES[c.plan].nombre + ".");
+    await guarda("cuentas", c); abreFicha(c.id); aviso("Ahora es plan " + PLANES[c.plan].nombre);
+  } else if (e.target.id === "fPeriodo") {
+    c.periodo = e.target.value; anota(c, "Pasó a pago " + c.periodo + ".");
+    await guarda("cuentas", c); abreFicha(c.id);
+  }
+});
+
+async function nuevaCuenta() {
+  const taller = prompt("¿Cómo se llama el taller?"); if (!taller) return;
+  const pideFactura = confirm("¿Va a pedir factura?\n\nAceptar: sí, capturas su RFC en la ficha y cada pago genera su CFDI.\nCancelar: no, sus pagos entran en la factura global de público en general.");
+  const c = { id: uid(), taller: taller.trim(), sitio: "", contacto: "", correo: "", tel: "",
+    plan: "basico", periodo: "mensual", estado: "prueba", origen: "curso", alianza: null,
+    alta: iso(HOY), baja: null, vence: iso(masDias(HOY, DIAS_PRUEBA)), ultimo: iso(HOY),
+    cerradoPor: (ficheros.equipo[0] || {}).id || null, cotizaciones: 0, catalogo: 0, usuarios: 1,
+    archivosMb: 0, version: "20", navegador: "—",
+    requiereFactura: pideFactura, rfc: "", razon: "", cp: "", regimen: pideFactura ? "612" : "", uso: pideFactura ? "G03" : "S01",
+    apoyo: null,
+    historial: [{ f: iso(HOY), t: "Alta manual desde Makers Lab. " + dias(DIAS_PRUEBA) + " de prueba." }] };
+  await guarda("cuentas", c); abreFicha(c.id);
+  if (pideFactura) aviso("Captura su RFC abajo, en Datos fiscales");
+}
+
+async function exporta() {
+  const cab = ["Taller","Ciudad","Contacto","Correo","Telefono","Estado","Plan","Periodo","Al mes","Alta","Vence",
+    "Ultimo acceso","Cotizaciones","Origen","La cerro","Que sigue","Pide factura","RFC"];
+  const filas = ficheros.cuentas.map(c => [c.taller, c.sitio, c.contacto, c.correo, c.tel, ESTADOS[c.estado].nombre,
+    PLANES[c.plan].nombre, c.periodo, paga(c) ? Math.round(mensual(c)) : 0, c.alta, c.vence, c.ultimo, c.cotizaciones,
+    c.alianza ? (aliDe(c.alianza) || {}).nombre : ORIGENES[c.origen],
+    c.cerradoPor ? (eqDe(c.cerradoPor) || {}).nombre : "", jugada(c).titulo,
+    c.requiereFactura ? "Sí" : "No", c.rfc]);
+  const csv = "﻿" + [cab].concat(filas).map(f => f.map(v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"').join(",")).join("\r\n");
+  let d = null;
+  try { d = await (window.claude && window.claude.use ? window.claude.use("downloads") : null); } catch (e) { d = null; }
+  if (!d) { aviso("La descarga no está disponible en esta vista."); return; }
+  try { await d.save({ filename: "cuentas-makerslab-" + iso(HOY) + ".csv", data: csv }); aviso("Archivo listo"); }
+  catch (e) { aviso("No se descargó el archivo."); }
+}
+
+async function borraEjemplo() {
+  if (!confirm("Esto borra TODO lo que hay ahora: cuentas, citas, cobros, tickets, errores, equipo y alianzas. ¿Seguir?")) return;
+  if (DB) {
+    const bajas = [];
+    COLS.forEach(col => ficheros[col].forEach(r => bajas.push(DB.collection(col).doc(r.id).delete())));
+    bajas.push(DB.doc("meta/estado").set({ ejemplo: false, creado: iso(HOY) }));
+    try { await Promise.all(bajas); } catch (e) {}
+  }
+  ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [] };
+  esEjemplo = false; pinta(); aviso("Listo, quedó vacío");
+}
+
+window.__arranca = arranca;
+</script>
+
+<script>window.BUILD="20260928-1936";</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
+<script src="lab.js?v=20260928-1936"></script>
+</body>
+</html>

@@ -8,6 +8,27 @@
 "use strict";
 
 const q = s => document.querySelector(s);
+const VERSION_SITIO = window.BUILD || "sin sello";
+console.log("Cotizador Hey Makers · versión " + VERSION_SITIO);
+
+/* El arreglo de roles, tal cual viene en sql/03-arreglo-roles.sql, para
+   poder ponerlo en el portapapeles sin que nadie busque el archivo. */
+const SQL_ARREGLO_ROLES = "-- ============================================================\n--  Arreglo de roles — córrelo si entraste y te quedaste como\n--  \"ventas\" aunque seas el dueño de la cuenta.\n--  Es seguro repetirlo las veces que quieras.\n-- ============================================================\n\n-- ¿Por qué pasa? Si se corrió 01-esquema.sql DESPUÉS de 02-roles.sql,\n-- el disparador de alta volvió a la versión vieja y los usuarios nuevos\n-- nacieron con el rol por defecto, que es 'ventas'.\n\n-- 1. Vuelve a dejar el disparador correcto: quien abre la cuenta es admin.\ncreate or replace function public.al_crear_usuario()\nreturns trigger\nlanguage plpgsql security definer set search_path = public\nas $$\ndeclare nueva uuid;\nbegin\n  insert into public.cuentas (nombre)\n    values (coalesce(new.raw_user_meta_data->>'negocio', 'Mi taller'))\n    returning id into nueva;\n  insert into public.perfiles (id, cuenta_id, nombre, correo, rol)\n    values (new.id, nueva, new.raw_user_meta_data->>'nombre', new.email, 'admin');\n  return new;\nend $$;\n\n-- 2. Toda cuenta que se haya quedado sin administrador: el primero que\n--    entró pasa a serlo.\nupdate public.perfiles p\n   set rol = 'admin'\n where not exists (\n         select 1 from public.perfiles q\n          where q.cuenta_id = p.cuenta_id and q.rol = 'admin')\n   and p.creado = (\n         select min(r.creado) from public.perfiles r\n          where r.cuenta_id = p.cuenta_id);\n\n-- 3. Revisa cómo quedó tu equipo (esto solo muestra, no cambia nada).\nselect c.nombre as cuenta, p.correo, p.rol, p.creado\n  from public.perfiles p\n  join public.cuentas c on c.id = p.cuenta_id\n order by c.nombre, p.creado;\n";
+
+/* La dirección del editor SQL del proyecto, sacada de la misma URL de Supabase */
+function urlEditorSQL(){
+  const m = String((window.CONFIG && CONFIG.SUPABASE_URL) || "").match(/https:\/\/([a-z0-9-]+)\.supabase\./i);
+  return m ? "https://supabase.com/dashboard/project/" + m[1] + "/sql/new" : "https://supabase.com/dashboard";
+}
+
+/* Roles que la base todavía no conoce. Pasa cuando se corrió 01-esquema.sql
+   después de 02-roles.sql: el dueño se queda con un rol viejo y la base le
+   niega cosas aunque la pantalla se las muestre. Se arregla corriendo
+   sql/03-arreglo-roles.sql una vez. */
+function rolRaro(){
+  const r = (PERFIL && PERFIL.rol) || "";
+  return !!PERFIL && ["admin","ventas","diseno","produccion"].indexOf(r) < 0;
+}
 
 /* ---------- Revisión de la configuración ----------
    La causa número uno de "Failed to fetch" es que config.js se subió
@@ -31,6 +52,8 @@ const PROBLEMA_CONFIG = revisaConfig();
 const URL_SB = String((window.CONFIG && CONFIG.SUPABASE_URL) || "").trim().replace(/\/+$/,"");
 const SB = PROBLEMA_CONFIG ? null : window.supabase.createClient(URL_SB, CONFIG.SUPABASE_ANON_KEY);
 let SESION = null, CUENTA = null, PERFIL = null;
+let EMPRESAS = [];      // todas las empresas a las que pertenece este correo
+let SOY_STAFF = false;  // ¿es alguien de Hey Makers? lo decide la base, no la pantalla
 
 /* Prueba directa contra Supabase: dice si el problema es la dirección,
    la llave, o si todo está bien y el error viene de otro lado. */
@@ -48,7 +71,16 @@ async function pruebaConexion(){
 }
 const plan = () => (CUENTA && CUENTA.plan) || "prueba";
 const vigente = () => !!(CUENTA && CUENTA.estado === "activa" && new Date(CUENTA.vence) > new Date());
-const esPro = () => vigente() && (plan() === "pro" || plan() === "prueba");
+
+/* Los planes van en escalera: lo que abre uno sigue abierto en los de
+   arriba. La prueba abre todo para que el cliente vea qué está comprando.
+     1 Básico · 2 Maker · 3 Pro                                          */
+const NIVEL = {basico:1, maker:2, pro:3, prueba:3};
+const nivelPlan = () => NIVEL[plan()] || 0;
+const esPro   = () => vigente() && nivelPlan() >= 3;   // caja, ventas, utilidad
+const esMaker = () => vigente() && nivelPlan() >= 2;   // compras, inventario, equipo
+const nombrePlan = () => { const p = CONFIG.PLANES[plan()]; return p ? p.nombre : plan()==="prueba" ? "Prueba" : plan(); };
+const TOPE_USUARIOS = {basico:1, maker:3, pro:0, prueba:0};   // 0 = sin límite
 
 /* ---------- Puente: almacén de documentos ---------- */
 const TABLA = "documentos";
@@ -111,9 +143,11 @@ const PUENTE_ASSETS = {
 function traduce(error){
   const m = (error && error.message) || "";
   if(m.indexOf("SUSCRIPCION_VENCIDA")>=0) return {code:"vencida", message:"Tu suscripción venció"};
-  if(m.indexOf("FUNCION_PRO")>=0)        return {code:"pro",     message:"El registro de ventas es del plan Pro"};
-  if(m.indexOf("LIMITE_COTIZACIONES")>=0)return {code:"limite",  message:"Llegaste al límite de cotizaciones del plan Básico"};
-  if(m.indexOf("LIMITE_CLIENTES")>=0)   return {code:"limite",  message:"Llegaste al límite de clientes del plan Básico"};
+  if(m.indexOf("FUNCION_PRO")>=0)        return {code:"pro",     message:"La caja y el registro de ventas son del plan Pro"};
+  if(m.indexOf("FUNCION_MAKER")>=0)      return {code:"pro",     message:"Compras e inventario son del plan Maker en adelante"};
+  if(m.indexOf("LIMITE_COTIZACIONES")>=0)return {code:"limite",  message:"Llegaste al límite de cotizaciones de tu plan"};
+  if(m.indexOf("LIMITE_CLIENTES")>=0)   return {code:"limite",  message:"Llegaste al límite de clientes de tu plan"};
+  if(m.indexOf("LIMITE_USUARIOS")>=0)   return {code:"limite",  message:"Llegaste al límite de usuarios de tu plan"};
   if(m.indexOf("PRODUCCION_SOLO_ESTATUS")>=0) return {code:"rol", message:"Producción solo puede mover el estatus, la bitácora y el checklist"};
   if(m.indexOf("VENTAS_NO_TOCA_PRODUCCION")>=0) return {code:"rol", message:"Ventas solo puede consultar la producción"};
   if(m.indexOf("DISENO_SOLO_ARCHIVOS")>=0) return {code:"rol", message:"Diseño solo puede cambiar los archivos y dejar notas"};
@@ -138,20 +172,45 @@ window.claude = { use: async nombre =>
 
 /* ---------- Permisos por rol ----------
    admin      : todo
-   ventas     : cotizar, cotizaciones, clientes, ver catálogo y producción
-   produccion : solo el tablero de órdenes                                   */
-const rol = () => (PERFIL && PERFIL.rol) || "admin";
+   ventas     : cotizar, cotizaciones, clientes, catálogo, compras, ver producción
+   diseno     : archivos de diseño y el tablero de órdenes
+   produccion : el tablero de órdenes y la recepción de material              */
+const ROLES_NOMBRE = {admin:"Administrador", ventas:"Ventas", diseno:"Diseño", produccion:"Producción"};
+/* Nombres viejos que quedaron en bases ya instaladas: quien abrió la cuenta
+   es su administrador, se llame como se llame en la tabla. */
+const ALIAS_ROL = {dueno:"admin", owner:"admin", propietario:"admin", miembro:"ventas"};
+const rolCrudo = () => (PERFIL && PERFIL.rol) || "";
+const escTxt = t => String(t==null?"":t).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function rol(){
+  const r = ALIAS_ROL[rolCrudo()] || rolCrudo();
+  return ROLES_NOMBRE[r] ? r : "admin";     // rol desconocido o sin perfil: no le escondemos nada
+}
 const PERMISOS = {
-  admin:      ["cot","sav","pro","dis","cli","arc","caj","ven","cat","set"],
-  ventas:     ["cot","sav","pro","dis","cli","arc","cat"],
+  admin:      ["cot","sav","pro","dis","cli","arc","caj","ven","cat","com","set"],
+  ventas:     ["cot","sav","pro","dis","cli","arc","cat","com"],
   diseno:     ["dis","pro"],
-  produccion: ["pro"]
+  produccion: ["pro","com"]
 };
-function puede(seccion){ return (PERMISOS[rol()] || PERMISOS.admin).indexOf(seccion) >= 0; }
+/* Secciones que no vienen en el plan Básico */
+const SOLO_PRO   = ["caj","ven"];
+const SOLO_MAKER = ["com"];
+function enElPlan(t){
+  if(SOLO_PRO.indexOf(t) >= 0)   return esPro();
+  if(SOLO_MAKER.indexOf(t) >= 0) return esMaker();
+  return true;
+}
+function puede(seccion){
+  return (PERMISOS[rol()] || PERMISOS.admin).indexOf(seccion) >= 0 && enElPlan(seccion);
+}
 
-window.__rolServidor = () => (PERFIL && PERFIL.rol) || null;
+/* El cotizador pregunta por aquí qué rol tiene quien está adentro, y con eso
+   decide quién autoriza una requisición, quién ve la caja y todo lo demás.
+   Va el rol YA normalizado: si la base todavía dice "dueno", aquí sale
+   "admin". Si devolviéramos el texto crudo, el cotizador no reconocería el
+   rol y le negaría al dueño hasta autorizar sus propias compras. */
+window.__rolServidor = () => PERFIL ? rol() : null;
 function aplicaPermisos(){
-  const permitidas = (PERMISOS[rol()] || PERMISOS.admin).filter(t=> (t!=="ven" && t!=="caj") || esPro());
+  const permitidas = (PERMISOS[rol()] || PERMISOS.admin).filter(enElPlan);
   document.querySelectorAll('#tabs [data-tab]').forEach(b=>{
     b.hidden = permitidas.indexOf(b.dataset.tab) < 0;
   });
@@ -163,30 +222,83 @@ function aplicaPermisos(){
   }
   // Ventas no edita precios del catálogo; producción no ve dinero.
   document.body.classList.toggle("rol-ventas", rol()==="ventas");
+  document.body.classList.toggle("rol-diseno", rol()==="diseno");
   document.body.classList.toggle("rol-produccion", rol()==="produccion");
   const chip = q("#cuentaRol");
-  if(chip) chip.textContent = rol()==="admin" ? "Administrador" : rol()==="ventas" ? "Ventas" : "Producción";
+  if(chip){
+    chip.textContent = (ROLES_NOMBRE[rol()] || "Sin rol asignado") + (rolRaro() ? " ⚠" : "");
+    chip.title = rolRaro()
+      ? 'Tu perfil dice "' + rolCrudo() + '", que no es un rol válido. Corre sql/03-arreglo-roles.sql en Supabase. · Versión ' + VERSION_SITIO
+      : "Versión " + VERSION_SITIO;
+  }
 }
 
 /* ---------- Equipo ---------- */
 async function cargaEquipo(){
+  if(!SB) return [];
   const {data} = await SB.from("mi_equipo").select("*").order("creado");
   return data || [];
 }
 async function renderEquipo(){
   const caja = q("#equipoCaja"); if(!caja) return;
-  if(rol() !== "admin"){ caja.innerHTML = '<div class="empty">Solo un administrador puede ver y cambiar el equipo.</div>'; return; }
+  const manda = rol() === "admin";                 // quién puede cambiar roles y dar de baja
   const gente = await cargaEquipo();
-  caja.innerHTML = gente.map(u=>
-    '<div class="saved-item"><div class="meta"><b>'+(u.nombre||u.correo||"Sin nombre")+'</b>'+
-    '<small>'+(u.correo||"")+'</small></div>'+
-    '<select data-rol="'+u.id+'" style="width:auto"'+(u.id===SESION.user.id?" disabled":"")+'>'+
-      ['admin','ventas','produccion'].map(r=>'<option value="'+r+'"'+(r===u.rol?" selected":"")+'>'+
-        (r==="admin"?"Administrador":r==="ventas"?"Ventas":"Producción")+'</option>').join("")+
-    '</select>'+
-    (u.id===SESION.user.id ? '<span class="pill good">Eres tú</span>'
-      : '<button class="btn sm icon" data-quitar="'+u.id+'" title="Quitar del equipo">✕</button>')+
-    '</div>').join("") || '<div class="empty">Solo estás tú.</div>';
+  const alta = q("#equipoAlta");
+  if(alta) alta.hidden = !manda;                   // el formulario de alta sí es solo del admin
+
+  caja.innerHTML = (gente || []).map(u=>{
+    const yo = u.id === SESION.user.id;
+    const nombre = u.nombre || u.correo || "Sin nombre";
+    const selector = manda
+      ? '<select data-rol="'+u.id+'" style="width:auto"'+(yo?" disabled":"")+'>'+
+          Object.keys(ROLES_NOMBRE).map(r=>'<option value="'+r+'"'+(r===u.rol?" selected":"")+'>'+
+            ROLES_NOMBRE[r]+'</option>').join("")+
+        '</select>'
+      : '<span class="pill">'+(ROLES_NOMBRE[u.rol] || "Sin rol asignado")+'</span>';
+    return '<div class="saved-item"><div class="meta"><b>'+nombre+'</b>'+
+      '<small>'+(u.correo||"")+'</small></div>'+ selector +
+      (yo ? '<span class="pill good">Eres tú</span>'
+          : (manda ? '<button class="btn sm icon" data-quitar="'+u.id+'" title="Quitar del equipo">✕</button>' : ''))+
+      '</div>';
+  }).join("") || '<div class="empty">Solo estás tú.</div>';
+
+  const alarma = q("#equipoAlarma");
+  if(alarma){
+    alarma.hidden = !rolRaro();
+    if(rolRaro()) alarma.innerHTML =
+      'Tu perfil en la base dice el rol <b>' + escTxt(rolCrudo() || "(vacío)") + '</b>, que no es ninguno de los cuatro. ' +
+      'Por eso no puedes dar de alta a nadie ni ver a tu equipo: la base de datos te lo niega, aunque la pantalla te deje pasar. ' +
+      'Se arregla una sola vez, con este SQL.' +
+      '<span style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">' +
+        '<button class="btn sm primary" id="rolCopiar" type="button">Copiar el SQL</button>' +
+        '<button class="btn sm" id="rolAbrir" type="button">Abrir el editor de Supabase</button>' +
+      '</span>';
+  }
+
+  const copiar = q("#rolCopiar");
+  if(copiar) copiar.addEventListener("click", ()=>{
+    const listo = ()=>{ copiar.textContent = "Copiado ✓"; setTimeout(()=>copiar.textContent = "Copiar el SQL", 2500); };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(SQL_ARREGLO_ROLES).then(listo, ()=>alert(SQL_ARREGLO_ROLES));
+    } else alert(SQL_ARREGLO_ROLES);
+  });
+  const abrir = q("#rolAbrir");
+  if(abrir) abrir.addEventListener("click", ()=>{
+    const v = window.open(urlEditorSQL(), "_blank", "noopener");
+    if(!v) alert("Tu navegador bloqueó la ventana. Entra a mano a Supabase → SQL Editor.");
+  });
+
+  const nota = q("#equipoNota");
+  if(nota){
+    const tope = TOPE_USUARIOS[plan()];
+    nota.hidden = false;
+    nota.textContent = (!manda
+      ? "La lista completa del equipo la ve el administrador de la cuenta."
+      : tope
+        ? "Tu plan "+nombrePlan()+" permite "+tope+" usuario(s). Ahora van "+(gente||[]).length+"."
+        : "Tu plan "+nombrePlan()+" no tiene límite de usuarios. Ahora van "+(gente||[]).length+".")
+      + "  ·  Versión " + VERSION_SITIO;
+  }
 }
 async function llamaEquipo(cuerpo){
   const r = await fetch("/.netlify/functions/invitar-usuario", {
@@ -204,6 +316,19 @@ document.addEventListener("click", async e=>{
     const nombre = (q("#equipoNombre").value||"").trim();
     const rolNuevo = q("#equipoRol").value;
     const b = e.target.closest("#equipoInvitar");
+
+    /* Errores que se ven antes de molestar al servidor */
+    const mio = String((PERFIL && PERFIL.correo) || (SESION && SESION.user && SESION.user.email) || "").toLowerCase();
+    if(!correo || correo.indexOf("@") < 0){ alert("Escribe el correo de la persona que vas a dar de alta."); return; }
+    if(correo.toLowerCase() === mio){
+      alert("Ese es tu propio correo. Cada persona del equipo entra con el suyo: ponle a "+(nombre||"esta persona")+" un correo distinto.");
+      return;
+    }
+    if(rolRaro()){
+      alert("Antes de dar de alta a nadie hay que arreglar tu rol en la base: corre el SQL que aparece arriba en rojo. Mientras tanto la base de datos va a rechazar el alta.");
+      return;
+    }
+
     b.disabled = true; b.textContent = "Dando de alta…";
     try{
       const d = await llamaEquipo({accion:"invitar", correo, nombre, rol:rolNuevo});
@@ -213,7 +338,12 @@ document.addEventListener("click", async e=>{
         "Contraseña temporal: <b style='font-family:monospace;font-size:15px'>"+d.temporal+"</b><br>"+
         "<span style='font-size:12px'>Que entre y la cambie desde “Olvidé mi contraseña”. Este aviso no se vuelve a mostrar.</span>";
       await renderEquipo();
-    }catch(err){ alert(err.message); }
+    }catch(err){
+      const m = String(err.message||"");
+      alert(m.indexOf("administrador") >= 0
+        ? "La base de datos dice que no eres administrador de esta cuenta. Es el mismo problema del aviso rojo: corre sql/03-arreglo-roles.sql y vuelve a intentarlo."
+        : m);
+    }
     finally{ b.disabled = false; b.textContent = "Dar de alta"; }
     return;
   }
@@ -236,9 +366,71 @@ async function cargaCuenta(){
   const {data: perfil} = await SB.from("perfiles").select("*").eq("id", SESION.user.id).maybeSingle();
   if(!perfil) return false;
   PERFIL = perfil;
-  const {data: cuenta} = await SB.from("cuentas").select("*").eq("id", perfil.cuenta_id).maybeSingle();
-  CUENTA = cuenta;
-  return !!cuenta;
+
+  /* mis_empresas ya sabe cuál está activa y con qué rol entro en cada una.
+     Si la base todavía no tiene la parte de varias empresas (06-superadmin.sql
+     sin correr), esto viene vacío y seguimos con la de siempre. */
+  const {data: empresas} = await SB.from("mis_empresas").select("*");
+  EMPRESAS = empresas || [];
+  const activa = EMPRESAS.find(e=> e.activa) || EMPRESAS[0] || null;
+
+  if(activa){
+    const {data: cuenta} = await SB.from("cuentas").select("*").eq("id", activa.id).maybeSingle();
+    CUENTA = cuenta;
+    PERFIL = Object.assign({}, perfil, {rol: activa.rol});   // el rol es de ESTA empresa
+  } else {
+    const {data: cuenta} = await SB.from("cuentas").select("*").eq("id", perfil.cuenta_id).maybeSingle();
+    CUENTA = cuenta;
+  }
+  return !!CUENTA;
+}
+
+/* ---------- ¿Eres de Hey Makers? ----------
+   La puerta de Makers Lab no es una dirección secreta: quien la adivinara
+   entraría igual. Quien decide es la base. Si tu correo no está en `staff`,
+   las vistas de Makers Lab te contestan cero renglones aunque las pidas a
+   mano; esto solo se ahorra enseñarte un botón que no lleva a ningún lado. */
+async function revisaStaff(){
+  try{
+    const {data} = await SB.from("staff").select("rol").eq("id", SESION.user.id).maybeSingle();
+    SOY_STAFF = !!data;
+  }catch(e){ SOY_STAFF = false; }
+  const b = q("#btnLab");
+  if(b) b.hidden = !SOY_STAFF;
+}
+
+/* ---------- El selector de empresa ---------- */
+function pintaEmpresas(){
+  const sel = q("#empresaSel");
+  if(!sel) return;
+  const varias = EMPRESAS.length > 1;
+  sel.hidden = !varias && !SOY_STAFF;   // con una sola empresa no estorba, salvo que seas tú
+  if(sel.hidden) return;
+
+  sel.innerHTML = EMPRESAS.map(e=>
+      '<option value="'+e.id+'"'+(e.activa?" selected":"")+'>'+escTxt(e.nombre||"Sin nombre")+'</option>'
+    ).join("") + '<option value="__nueva">+ Abrir otra empresa…</option>';
+}
+
+async function cambiaEmpresa(destino){
+  const sel = q("#empresaSel");
+  if(destino === "__nueva"){
+    const nombre = prompt("¿Cómo se llama la nueva empresa?\n\nVa completamente aparte: su propio catálogo, sus clientes y sus números. Nada se mezcla con la que ya tienes.");
+    if(!nombre){ pintaEmpresas(); return; }
+    if(sel) sel.disabled = true;
+    const {error} = await SB.rpc("crear_empresa", {nombre});
+    if(error){ alert("No se pudo crear: "+error.message); if(sel) sel.disabled = false; pintaEmpresas(); return; }
+    location.reload();
+    return;
+  }
+  if(sel) sel.disabled = true;
+  const {error} = await SB.rpc("cambiar_empresa", {destino});
+  if(error){
+    alert(String(error.message).indexOf("NO_ERES_DE_ESA_EMPRESA") >= 0
+      ? "No perteneces a esa empresa." : error.message);
+    if(sel) sel.disabled = false; pintaEmpresas(); return;
+  }
+  location.reload();   // se recarga entera: el catálogo y todo lo demás son otros
 }
 
 async function arrancaSesion(){
@@ -258,6 +450,8 @@ async function arrancaSesion(){
   q("#auth").hidden = true;
   document.body.classList.remove("sin-sesion");
   pintaCuenta();
+  pintaEmpresas();
+  revisaStaff();
   aplicaPlan();
   aplicaPermisos();
   renderEquipo();
@@ -332,10 +526,9 @@ q("#authOlvide").addEventListener("click", async ()=>{
 /* ---------- Encabezado de cuenta ---------- */
 function pintaCuenta(){
   const dias = Math.max(0, Math.ceil((new Date(CUENTA.vence) - new Date())/86400000));
-  const etiqueta = plan()==="prueba" ? "Prueba · "+dias+" días"
-                 : plan()==="pro" ? "Plan Pro" : "Plan Básico";
+  const etiqueta = plan()==="prueba" ? "Prueba · "+dias+" día(s)" : "Plan "+nombrePlan();
   q("#cuentaPlan").textContent = etiqueta;
-  q("#cuentaPlan").className = "chip-store " + (vigente() ? (plan()==="pro"?"pro":"ok") : "malo");
+  q("#cuentaPlan").className = "chip-store " + (vigente() ? (nivelPlan()>=2 ? "pro" : "ok") : "malo");
   q("#cuentaMail").textContent = (PERFIL && PERFIL.correo) || SESION.user.email;
   q("#avisoPago").hidden = vigente();
   if(!vigente()) q("#avisoPagoTxt").textContent =
@@ -348,9 +541,16 @@ function pintaCuenta(){
 function aplicaPlan(){
   if(typeof aplicaPermisos === "function") aplicaPermisos();
   document.querySelectorAll("[data-solo-pro]").forEach(el=> el.hidden = !esPro());
+  document.querySelectorAll("[data-solo-maker]").forEach(el=> el.hidden = !esMaker());
 }
 
 q("#btnSalir").addEventListener("click", async ()=>{ await SB.auth.signOut(); location.reload(); });
+
+const selEmp = q("#empresaSel");
+if(selEmp) selEmp.addEventListener("change", e=> cambiaEmpresa(e.target.value));
+
+const btnLab = q("#btnLab");
+if(btnLab) btnLab.addEventListener("click", ()=>{ location.href = "lab.html"; });
 q("#btnPlanes").addEventListener("click", ()=> abrePlanes());
 q("#avisoPagoBtn").addEventListener("click", ()=> abrePlanes());
 
@@ -360,11 +560,11 @@ function abrePlanes(){
   q("#planesGrid").innerHTML = Object.keys(CONFIG.PLANES).map(k=>{
     const p = CONFIG.PLANES[k], precio = ciclo==="anual" ? p.anual : p.mensual;
     const actual = plan()===k && vigente();
-    return '<div class="planCard'+(k==="pro"?" destacado":"")+'">'+
+    return '<div class="planCard'+(p.destacado?" destacado":"")+'">'+
       '<h3>'+p.nombre+'</h3><p class="para">'+p.para+'</p>'+
       '<div class="precio">$'+precio.toLocaleString("es-MX")+'<span> MXN / '+(ciclo==="anual"?"año":"mes")+'</span></div>'+
       '<ul>'+p.incluye.map(i=>"<li>"+i+"</li>").join("")+'</ul>'+
-      '<button class="btn '+(k==="pro"?"primary":"")+'" data-contratar="'+k+'"'+(actual?" disabled":"")+'>'+
+      '<button class="btn '+(p.destacado?"primary":"")+'" data-contratar="'+k+'"'+(actual?" disabled":"")+'>'+
       (actual?"Es tu plan actual":"Suscribirme")+'</button></div>';
   }).join("");
   q("#modalPlanes").hidden = false;
@@ -404,5 +604,7 @@ async function revisaTrasPago(){
   pintaCuenta();
 }
 
-SB.auth.onAuthStateChange((evt)=>{ if(evt==="SIGNED_OUT") location.reload(); });
+/* Si config.js todavía no tiene las llaves, SB no existe: no le pedimos nada,
+   y dejamos que arrancaSesion pinte el aviso de qué falta configurar. */
+if(SB) SB.auth.onAuthStateChange((evt)=>{ if(evt==="SIGNED_OUT") location.reload(); });
 arrancaSesion().then(revisaTrasPago);

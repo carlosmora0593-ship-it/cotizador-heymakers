@@ -3,8 +3,9 @@
 const { createClient } = require("@supabase/supabase-js");
 
 const PRECIOS = {
-  basico: { mensual: 199,  anual: 1990 },
-  pro:    { mensual: 499,  anual: 4990 }
+  basico: { mensual: 199, anual: 1990, nombre: "Básico" },
+  maker:  { mensual: 449, anual: 4490, nombre: "Maker"  },
+  pro:    { mensual: 899, anual: 8990, nombre: "Pro"    }
 };
 
 exports.handler = async (event) => {
@@ -34,7 +35,7 @@ exports.handler = async (event) => {
     // Referencia: API de suscripciones (preapproval) de Mercado Pago.
     // Si Mercado Pago cambia algún nombre de campo, se ajusta SOLO aquí.
     const cuerpo = {
-      reason: "Cotizador " + (plan === "pro" ? "Pro" : "Básico"),
+      reason: "Cotizador " + PRECIOS[plan].nombre,
       external_reference: [perfil.cuenta_id, plan, periodo].join("|"),
       payer_email: user.email,
       back_url: sitio + "/?pago=ok",
