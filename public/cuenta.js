@@ -238,7 +238,7 @@ window.__rolServidor = () => PERFIL ? rol() : null;
 function aplicaPermisos(){
   const permitidas = (PERMISOS[rol()] || PERMISOS.admin).filter(enElPlan);
   document.querySelectorAll('#tabs [data-tab]').forEach(b=>{
-    b.hidden = permitidas.indexOf(b.dataset.tab) < 0;
+    b.hidden = b.dataset.tab === "set" || permitidas.indexOf(b.dataset.tab) < 0;
   });
   // Si está parado en una sección que ya no le toca, lo mandamos a la primera suya.
   const actual = document.querySelector('#tabs [data-tab][aria-selected="true"]');
@@ -253,7 +253,7 @@ function aplicaPermisos(){
   /* Sin acceso a Ajustes no tiene sentido ofrecerlos: un menú que enseña
      puertas cerradas hace perder el tiempo. */
   const hayAjustes = permitidas.indexOf("set") >= 0;
-  ["#btnEquipo", "#btnAjustes"].forEach(sel=>{ const b = q(sel); if(b) b.hidden = !hayAjustes; });
+  const bAj = q("#btnAjustes"); if(bAj) bAj.hidden = !hayAjustes;
 
   const chip = q("#cuentaRol");
   if(chip){
@@ -601,7 +601,28 @@ function abrePerfil(abrir){
   const va = abrir === undefined ? m.hidden : abrir;
   m.hidden = !va;
   b.setAttribute("aria-expanded", va ? "true" : "false");
+
+  /* En teléfono el encabezado se parte en dos renglones y el botón acaba a
+     la izquierda; colgar el menú de su borde derecho lo sacaba de la
+     pantalla. Aquí lo pegamos a la pantalla y solo tomamos del botón la
+     altura a la que empieza, que es lo único que de verdad varía. */
+  const angosta = window.matchMedia("(max-width:620px)").matches;
+  if(va && angosta){
+    const r = b.getBoundingClientRect();
+    const alto = Math.max(160, window.innerHeight - r.bottom - 24);
+    m.style.cssText = "position:fixed;left:12px;right:12px;width:auto;top:" +
+      Math.round(r.bottom + 8) + "px;max-height:" + Math.round(alto) + "px;overflow:auto";
+  } else {
+    m.style.cssText = "";
+  }
 }
+
+/* Si gira el teléfono con el menú abierto, la posición calculada deja de
+   valer. Más simple cerrarlo que recalcularlo. */
+window.addEventListener("resize", ()=>{
+  const m = q("#perfilMenu");
+  if(m && !m.hidden) abrePerfil(false);
+});
 
 function pintaCuenta(){
   const dias = Math.max(0, Math.ceil((new Date(CUENTA.vence) - new Date())/86400000));
@@ -652,10 +673,12 @@ if(listaPerfil) listaPerfil.addEventListener("click", e=>{
   if(e.target.closest("button")) abrePerfil(false);
 });
 
-/* Llevar a una pestaña y, si hace falta, a una tarjeta dentro de ella. */
+/* Llevar a una pestaña y, si hace falta, a una tarjeta dentro de ella.
+   Ajustes ya no está en el menú de secciones —vive en el de perfil— así que
+   su botón está oculto; aquí lo usamos igual, que para eso sigue existiendo. */
 function vaA(pestana, ancla){
   const b = document.querySelector('#tabs [data-tab="' + pestana + '"]');
-  if(!b || b.hidden){ alert("Esa sección no está disponible con tu plan o tu rol."); return; }
+  if(!b){ alert("Esa sección no está disponible con tu plan o tu rol."); return; }
   b.click();
   if(ancla) setTimeout(()=>{
     const el = q(ancla);
@@ -670,7 +693,78 @@ q("#btnPlanes").addEventListener("click", ()=> abrePlanes());
 q("#avisoPagoBtn").addEventListener("click", ()=> abrePlanes());
 
 /* ---------- Planes y cobro ---------- */
+const fechaLarga = d => {
+  try{ return new Date(d).toLocaleDateString("es-MX", {day:"numeric", month:"long", year:"numeric"}); }
+  catch(e){ return String(d).slice(0,10); }
+};
+
+/* ---------- Tu suscripción ----------
+   Lo que se puede decir con certeza va primero; lo que depende de un
+   servidor que aquí no existe se dice tal cual, sin botones que no llevan
+   a ningún lado. Prometer un "cambiar tarjeta" que no funciona es peor que
+   explicar por qué todavía no está. */
+function pintaSuscripcion(){
+  const caja = q("#suscResumen"); if(!caja) return;
+  const dias = Math.max(0, Math.ceil((new Date(CUENTA.vence) - new Date())/86400000));
+  const enPrueba = plan() === "prueba";
+  const viva = vigente();
+
+  caja.className = "suscResumen" + (viva ? "" : " vencida");
+  caja.innerHTML =
+    '<div><span class="grande">' + escTxt(enPrueba ? "Prueba" : nombrePlan()) + '</span>' +
+      '<div style="font-size:13px;color:var(--ink-2);margin-top:2px">' +
+        (viva
+          ? (enPrueba ? "Tienes todo abierto para que lo pruebes" : "Suscripción activa")
+          : "Se terminó. Puedes seguir consultando lo que ya tienes, pero no guardar cambios.") +
+      '</div></div>' +
+    '<div class="aLado">' + (viva ? (enPrueba ? "Te quedan" : "Se renueva el") : "Terminó el") +
+      '<b>' + (viva && enPrueba ? dias + " día(s)" : fechaLarga(CUENTA.vence)) + '</b></div>';
+
+  /* --- Forma de pago --- */
+  const conMP = !!(CUENTA.mp_preapproval_id);
+  q("#suscPago").innerHTML = '<div class="suscFila">' + (
+    conMP
+      ? "Pagas por Mercado Pago, con cargo automático " +
+        (CUENTA.ciclo === "anual" ? "cada año" : "cada mes") + ". La tarjeta y los recibos se " +
+        "cambian desde tu propia cuenta de Mercado Pago: entra a Suscripciones y busca Hey Makers." +
+        '<button class="btn sm" id="suscMP" type="button">Abrir Mercado Pago</button>'
+      : enPrueba
+        ? "Todavía no hay nada que cobrar: estás en la prueba y no pediste tarjeta. " +
+          "Cuando elijas un plan te pedimos la forma de pago en ese momento."
+        : "Esta cuenta no tiene un cargo automático dado de alta. El plan lo activó " +
+          "Hey Makers a mano, así que la renovación también se hace hablando con ellos."
+  ) + '</div>';
+
+  /* --- Facturación --- */
+  const par = (typeof P !== "undefined" && P) ? P : {};
+  const f = !!par.rfc;
+  q("#suscFactura").innerHTML = '<div class="suscFila">' + (
+    f ? "Tus datos fiscales están cargados en Ajustes, así que las facturas salen a nombre de <b>" +
+        escTxt(par.razon || par.rfc) + "</b>."
+      : "Todavía no cargas tus datos fiscales. Ponlos en Ajustes → Datos de tu empresa y las " +
+        "facturas salen con ellos."
+  ) + '<button class="btn sm" id="suscDatos" type="button">Ir a Ajustes</button></div>';
+
+  /* --- Baja --- */
+  q("#suscBaja").innerHTML = '<div class="suscFila">' + (
+    conMP
+      ? "Para dar de baja la suscripción, cancélala en Mercado Pago. Tu plan sigue funcionando " +
+        "hasta que termine el periodo que ya pagaste, y tu información se queda donde está."
+      : "No hay ningún cargo automático corriendo, así que no hay nada que cancelar. " +
+        "Al vencer, la cuenta pasa a solo consulta y tus datos se quedan intactos."
+  ) + '</div>';
+
+  const mp = q("#suscMP");
+  if(mp) mp.addEventListener("click", ()=>{
+    const v = window.open("https://www.mercadopago.com.mx/subscriptions", "_blank", "noopener");
+    if(!v) alert("Tu navegador bloqueó la ventana. Entra a mercadopago.com.mx → Suscripciones.");
+  });
+  const dt = q("#suscDatos");
+  if(dt) dt.addEventListener("click", ()=>{ q("#modalPlanes").hidden = true; vaA("set"); });
+}
+
 function abrePlanes(){
+  pintaSuscripcion();
   const ciclo = q("#cicloSel").value;
   q("#planesGrid").innerHTML = Object.keys(CONFIG.PLANES).map(k=>{
     const p = CONFIG.PLANES[k], precio = ciclo==="anual" ? p.anual : p.mensual;
@@ -685,6 +779,15 @@ function abrePlanes(){
   q("#modalPlanes").hidden = false;
 }
 q("#cicloSel").addEventListener("change", abrePlanes);
+
+const tabsPlan = document.querySelector(".planTabs");
+if(tabsPlan) tabsPlan.addEventListener("click", e=>{
+  const b = e.target.closest("[data-plantab]"); if(!b) return;
+  const cual = b.dataset.plantab;
+  tabsPlan.querySelectorAll("[data-plantab]").forEach(x=>
+    x.setAttribute("aria-selected", x === b ? "true" : "false"));
+  document.querySelectorAll("[data-planpanel]").forEach(p=> p.hidden = p.dataset.planpanel !== cual);
+});
 q("#planesCerrar").addEventListener("click", ()=> q("#modalPlanes").hidden = true);
 
 q("#planesGrid").addEventListener("click", async e=>{

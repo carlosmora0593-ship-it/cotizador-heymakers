@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20260929-0806"></script>
+<script src="config.js?v=20260929-1135"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -671,6 +671,52 @@ body.sin-acceso .wrap,body.sin-acceso header.top{display:none}
   background:var(--surface);color:var(--ink-2);border-radius:8px;padding:6px 12px;cursor:pointer}
 .perfilPie button:hover{border-color:var(--accent);color:var(--accent)}
 .perfilVer{margin-left:auto;font-size:10px;color:var(--ink-3);font-family:"IBM Plex Mono",monospace}
+
+/* ---- que quepa en un teléfono ----
+   Dos arreglos de fondo, no parches:
+
+   1. La rejilla de dos columnas usaba 1fr, que por debajo no baja del
+      ancho mínimo de su contenido. Con una tarjeta que pide 379px dentro
+      de una columna de 358, el resultado era una página 5px más ancha que
+      la pantalla y ese bamboleo lateral tan feo al arrastrar.
+      minmax(0,1fr) sí deja encoger, y lo que no cabe se resuelve dentro. */
+@media (max-width:980px){
+  .cols{grid-template-columns:minmax(0,1fr)}
+}
+.card,.cols>div{min-width:0}
+.tbl-wrap{max-width:100%}
+
+/*  2. En pantalla angosta el encabezado se acomoda en dos renglones y el
+       botón de perfil queda a la izquierda. El menú colgaba de su borde
+       derecho, así que se salía por la izquierda. En teléfono lo fijamos a
+       la pantalla, no al botón: la posición exacta la calcula el programa
+       al abrirlo, porque la altura del encabezado cambia. */
+@media (max-width:620px){
+  .perfilMenu{width:auto}
+}
+
+/* ---- Mi plan ---- */
+.planTabs{display:flex;gap:2px;padding:10px 16px 0;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.planTabs button{font:inherit;font-weight:600;font-size:13.5px;border:0;background:transparent;color:var(--ink-2);
+  padding:9px 14px;border-radius:9px 9px 0 0;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.planTabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent);background:var(--surface)}
+.suscTit{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);font-weight:700;
+  margin:22px 0 9px;padding-bottom:5px;border-bottom:1px solid var(--line-soft)}
+.suscResumen{display:flex;gap:14px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);
+  border-radius:12px;padding:15px 16px;background:var(--surface-2)}
+.suscResumen.vencida{border-color:var(--warn);background:var(--warn-soft)}
+.suscResumen .grande{font-family:"Fredoka",system-ui,sans-serif;font-weight:600;font-size:26px;line-height:1.1}
+.suscResumen .aLado{margin-left:auto;text-align:right;font-size:13px;color:var(--ink-2)}
+.suscResumen .aLado b{display:block;font-family:"IBM Plex Mono",monospace;font-size:15px;color:var(--ink)}
+.suscFila{display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13.5px;color:var(--ink-2);line-height:1.55}
+.suscFila .btn{margin-left:auto}
+.cicloFila{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+@media (max-width:560px){
+  .planTabs{padding:8px 10px 0}
+  .planTabs button{flex:1;padding:9px 6px;font-size:13px}
+  .suscResumen .aLado{margin-left:0;text-align:left;width:100%}
+  .suscFila .btn{margin-left:0;width:100%;justify-content:center}
+}
 .chip-store.ok{border-color:var(--good);color:var(--good)}
 .chip-store.pro{border-color:var(--accent);color:var(--accent);font-weight:700}
 .chip-store.malo{border-color:var(--warn);color:var(--warn)}
@@ -767,7 +813,7 @@ body.rol-produccion #btnPrint{display:none!important}
         <button role="menuitem" data-tab="ven" aria-selected="false"><b>Ventas</b><small>Cortes, análisis y proyección</small></button>
         <button role="menuitem" data-tab="cat" aria-selected="false"><b>Catálogo / Artículos</b><small>Artículos, técnicas, precios e inventario</small></button>
         <button role="menuitem" data-tab="com" aria-selected="false"><b>Compras <span class="mbadge" hidden>0</span></b><small>Requisiciones, proveedores y facturas</small></button>
-        <button role="menuitem" data-tab="set" aria-selected="false"><b>Ajustes</b><small>Utilidad, IVA y datos de tu empresa</small></button>
+        <button role="menuitem" data-tab="set" aria-selected="false" hidden><b>Ajustes</b><small>Utilidad, IVA y datos de tu empresa</small></button>
       </nav>
     </div>
     <button class="userChip" id="userChip" title="Cambiar de usuario">
@@ -797,9 +843,8 @@ body.rol-produccion #btnPrint{display:none!important}
         </div>
 
         <div class="perfilLista">
-          <button role="menuitem" id="btnPlanes"><b>Mi plan</b><small>Ver, cambiar o renovar tu suscripción</small></button>
-          <button role="menuitem" id="btnEquipo"><b>Equipo y permisos</b><small>Quién entra y qué puede hacer</small></button>
-          <button role="menuitem" id="btnAjustes"><b>Ajustes</b><small>Utilidad, IVA y datos de tu empresa</small></button>
+          <button role="menuitem" id="btnPlanes"><b>Mi plan</b><small>Tu suscripción, el pago y el cambio de plan</small></button>
+          <button role="menuitem" id="btnAjustes"><b>Ajustes</b><small>Utilidad, IVA, equipo y datos de tu empresa</small></button>
           <button role="menuitem" id="btnLab" hidden class="esLab"><b>Makers Lab</b><small>La consola interna de Hey Makers</small></button>
         </div>
 
@@ -1441,15 +1486,39 @@ body.rol-produccion #btnPrint{display:none!important}
 
 <div class="modal" id="modalPlanes" hidden>
   <div class="card planesCard">
-    <header><h2>Elige tu plan</h2>
-      <select id="cicloSel" style="width:auto;margin-left:auto">
-        <option value="mensual">Pago mensual</option>
-        <option value="anual">Pago anual</option>
-      </select>
-      <button class="btn sm" id="planesCerrar">Cerrar</button>
+    <header><h2>Mi plan</h2>
+      <button class="btn sm" id="planesCerrar" style="margin-left:auto">Cerrar</button>
     </header>
-    <div class="body"><div class="planes" id="planesGrid"></div>
-      <p class="note" style="margin-top:14px">El cobro se hace por Mercado Pago. Puedes cancelar cuando quieras desde tu cuenta de Mercado Pago; tu plan sigue activo hasta que termine el periodo pagado.</p>
+
+    <div class="planTabs" role="tablist">
+      <button role="tab" data-plantab="susc" aria-selected="true">Tu suscripción</button>
+      <button role="tab" data-plantab="cambiar" aria-selected="false">Cambiar de plan</button>
+    </div>
+
+    <div class="body">
+      <section data-planpanel="susc">
+        <div class="suscResumen" id="suscResumen"></div>
+
+        <h3 class="suscTit">Forma de pago</h3>
+        <div id="suscPago"></div>
+
+        <h3 class="suscTit">Facturación</h3>
+        <div id="suscFactura"></div>
+
+        <h3 class="suscTit">Dar de baja</h3>
+        <div id="suscBaja"></div>
+      </section>
+
+      <section data-planpanel="cambiar" hidden>
+        <div class="cicloFila">
+          <span class="f">Cómo quieres pagar</span>
+          <select id="cicloSel" style="width:auto">
+            <option value="mensual">Mes con mes</option>
+            <option value="anual">Por año — dos meses libres</option>
+          </select>
+        </div>
+        <div class="planes" id="planesGrid"></div>
+      </section>
     </div>
   </div>
 </div>
@@ -5926,8 +5995,8 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20260929-0806";</script>
+<script>window.BUILD="20260929-1135";</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20260929-0806"></script>
+<script src="cuenta.js?v=20260929-1135"></script>
 </body>
 </html>
