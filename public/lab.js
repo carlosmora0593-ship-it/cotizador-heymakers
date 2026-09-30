@@ -122,10 +122,11 @@ function pideEntrar(msg){
    en un solo estado, que es como se habla del negocio: "está en
    prueba", "ya venció". Esta función traduce de uno al otro. */
 function estadoDe(r){
-  const vigente = r.estado === "activa" && new Date(r.vence) > new Date();
-  if(r.estado === "cancelada") return "baja";
-  if(!vigente)                 return "vencida";
-  if(r.plan === "prueba")      return "prueba";
+  const viva = r.estado === "activa" && r.plan !== "ninguno" && new Date(r.vence) > new Date();
+  if(r.estado === "cancelada")            return "baja";
+  if(r.plan === "ninguno")                return "vencida";   // nunca contrató
+  if(!viva)                               return "vencida";
+  if(r.es_prueba || r.plan === "prueba")  return "prueba";
   return "activa";
 }
 
@@ -137,7 +138,10 @@ function cuentaDeVista(r, nota){
     id: r.id,
     taller: r.taller || "Sin nombre",
     correo: r.correo_dueno || "",
-    plan: r.plan,
+    plan: (r.plan === "ninguno" || r.plan === "prueba") ? "basico" : r.plan,
+    planReal: r.plan,
+    esPrueba: !!r.es_prueba,
+    codigo: r.codigo || null,
     periodo: r.ciclo || "mensual",
     estado: estadoDe(r),
     alta: String(r.creada || "").slice(0,10),
@@ -207,6 +211,10 @@ async function leeColeccion(col){
     ]);
     const porId = {};
     (notas||[]).forEach(n=> porId[n.doc_id] = n.cuerpo);
+    /* Nos quedamos con el renglón tal cual viene de la base. Al guardar,
+       comparamos contra esto para mandar solo lo que de verdad cambió. */
+    window.__cuentasCrudas = {};
+    (filas||[]).forEach(r=> window.__cuentasCrudas[r.id] = r);
     return (filas||[]).map(r=> cuentaDeVista(r, porId[r.id]));
   }
 
@@ -230,6 +238,11 @@ async function leeColeccion(col){
       }));
     });
     return fuera;
+  }
+
+  if(col === "codigos"){
+    const {data} = await SB.from("v_codigos").select("*");
+    return (data||[]).map(r=> Object.assign({id: r.codigo}, r));
   }
 
   const {data} = await SB.from("lab_datos").select("doc_id,cuerpo").eq("coleccion", col);

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0A7FA8">
-<script src="config.js?v=20260929-0022"></script>
+<script src="config.js?v=20260929-1802"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Makers Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -284,6 +284,7 @@ body.sin-sesion .telon{display:none!important}
       <button data-v="agenda">Agenda <span class="cuenta" id="n_agenda">0</span></button>
       <button data-v="soporte">Soporte <span class="cuenta" id="n_soporte">0</span></button>
       <button data-v="cobros">Cobros <span class="cuenta" id="n_cobros">0</span></button>
+      <button data-v="codigos">Códigos</button>
       <button data-v="equipo">Equipo</button>
       <button data-v="numeros">Números</button>
     </div>
@@ -441,8 +442,8 @@ function desempeno() {
 }
 
 let DB = null;
-let ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [] };
-const COLS = ["cuentas", "tickets", "errores", "equipo", "alianzas", "citas", "cobros", "fallas"];
+let ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [], codigos: [] };
+const COLS = ["cuentas", "tickets", "errores", "equipo", "alianzas", "citas", "cobros", "fallas", "codigos"];
 let vista = "tablero", abierta = null, esEjemplo = false, listo = false;
 let filtro = { texto: "", estado: "", plan: "" };
 
@@ -2224,7 +2225,7 @@ async function accion(acc) {
 /* ================= pintar ================= */
 function pinta() {
   const titulos = { tablero: "Tablero", cuentas: "Cuentas", agenda: "Agenda", soporte: "Soporte",
-    cobros: "Cobros y facturación", equipo: "Equipo y alianzas", numeros: "Números" };
+    cobros: "Cobros y facturación", codigos: "Códigos de curso", equipo: "Equipo y alianzas", numeros: "Números" };
   $("#titulo").textContent = titulos[vista];
   $("#n_cuentas").textContent = ficheros.cuentas.length;
   $("#n_agenda").textContent = citasHoy().length;
@@ -2241,7 +2242,8 @@ function pinta() {
   if (!listo) { $("#vista").innerHTML = '<div class="tarjeta"><div class="vacio">Cargando tus cuentas…</div></div>'; return; }
   $("#vista").innerHTML = vista === "tablero" ? vTablero() : vista === "cuentas" ? vCuentas()
     : vista === "agenda" ? vAgenda() : vista === "soporte" ? vSoporte()
-    : vista === "cobros" ? vCobros() : vista === "equipo" ? vEquipo() : vNumeros();
+    : vista === "cobros" ? vCobros() : vista === "codigos" ? vCodigos()
+    : vista === "equipo" ? vEquipo() : vNumeros();
   ponGlobos();
 }
 
@@ -2556,10 +2558,119 @@ async function borraEjemplo() {
 }
 
 window.__arranca = arranca;
+
+/* ================= códigos de curso =================
+   Un código por curso. Lo dictas en clase y con él tus alumnos entran a
+   una prueba de verdad; sin él, quien se registre tendrá que contratar.
+   Eso es lo que evita que alguien abra un correo nuevo cada quince días. */
+function vCodigos() {
+  const cs = ficheros.codigos || [];
+  const vivos = cs.filter(c => c.activo && (!c.vence || c.vence >= iso(HOY)));
+  const cuentasPorCodigo = c => ficheros.cuentas.filter(x => x.codigo === c.codigo).length;
+
+  return '<div class="tarjeta"><header><h2>Abrir un curso</h2>' +
+      '<span class="pista">el código que vas a dictar en clase</span></header>' +
+      '<div class="cuerpo">' +
+      '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;align-items:end">' +
+        '<div class="campo"><label class="f" for="cgCurso">Qué curso es</label>' +
+          '<input id="cgCurso" placeholder="Serigrafía · octubre 2026"></div>' +
+        '<div class="campo"><label class="f" for="cgLugares">Lugares</label>' +
+          '<input id="cgLugares" type="number" min="0" value="30"></div>' +
+        '<div class="campo"><label class="f" for="cgDias">Días de prueba</label>' +
+          '<input id="cgDias" type="number" min="1" max="365" value="15"></div>' +
+        '<div class="campo"><label class="f" for="cgPlan">Plan</label><select id="cgPlan">' +
+          '<option value="maker" selected>Maker</option>' +
+          '<option value="basico">Básico</option>' +
+          '<option value="pro">Pro</option></select></div>' +
+      '</div>' +
+      '<p class="nota" style="margin:12px 0 0">Lugares en 0 es sin tope. El código sirve 60 días ' +
+        'para registrarse; los días de prueba empiezan a contar cuando cada alumno lo usa.</p>' +
+      '<button class="btn p" id="cgCrear" style="margin-top:12px">Generar el código</button>' +
+      '<div id="cgResultado"></div>' +
+      '</div></div>' +
+
+    '<div class="tarjeta"><header><h2>Tus códigos</h2>' +
+      '<span class="pista">' + vivos.length + ' en uso de ' + cs.length + '</span></header>' +
+      (cs.length ? '<table class="tabla"><thead><tr><th>Código</th><th>Curso</th><th>Da</th>' +
+        '<th>Usos</th><th>Cuentas</th><th>Sirve hasta</th><th></th></tr></thead><tbody>' +
+        cs.map(c => '<tr' + (c.activo ? '' : ' style="opacity:.5"') + '>' +
+          '<td><b style="font-family:ui-monospace,monospace">' + esc(c.codigo) + '</b></td>' +
+          '<td>' + esc(c.curso || "—") + '</td>' +
+          '<td>' + esc((PLANES[c.plan] || {}).nombre || c.plan) + ' · ' + c.dias + ' días</td>' +
+          '<td>' + c.usos + (c.usos_max ? ' de ' + c.usos_max : ' · sin tope') + '</td>' +
+          '<td>' + cuentasPorCodigo(c) + '</td>' +
+          '<td>' + (c.vence ? fFecha(String(c.vence).slice(0,10)) : "siempre") + '</td>' +
+          '<td><button class="btn sm" data-cg="' + esc(c.codigo) + '">' +
+            (c.activo ? 'Cerrar' : 'Reabrir') + '</button></td></tr>').join("") +
+        '</tbody></table>'
+      : '<div class="cuerpo"><div class="vacio">Todavía no has abierto ningún curso. ' +
+        'Genera el primero arriba.</div></div>') +
+    '</div>';
+}
+
+document.addEventListener("click", async e => {
+  if (e.target.closest("#cgCrear")) {
+    const curso = ($("#cgCurso").value || "").trim();
+    if (!curso) { aviso("Escribe de qué curso es, para que sepas cuál es cuál después."); return; }
+    const b = e.target.closest("#cgCrear");
+    b.disabled = true; b.textContent = "Generando…";
+    try {
+      const r = await SB.rpc("nuevo_codigo", {
+        p_curso: curso,
+        p_lugares: Math.max(0, parseInt($("#cgLugares").value || "0", 10)),
+        p_dias: Math.max(1, parseInt($("#cgDias").value || "15", 10)),
+        p_plan: $("#cgPlan").value
+      });
+      if (r.error) throw new Error(r.error.message);
+      const d = r.data || {};
+      $("#cgCurso").value = "";
+      // Primero repintamos la lista, porque eso rehace la tarjeta entera y
+      // borraría el código recién generado si lo escribiéramos antes.
+      await recarga("codigos");
+      $("#cgResultado").innerHTML =
+        '<div class="bloque" style="margin-top:14px;border-color:var(--bien)">' +
+        '<h3>Listo, dicta este código</h3>' +
+        '<p style="font-family:ui-monospace,monospace;font-size:30px;font-weight:600;' +
+        'letter-spacing:.1em;margin:8px 0">' + esc(d.codigo) + '</p>' +
+        '<p class="porque">Para ' + esc(d.curso) + '. Cada alumno que lo use entra con plan ' +
+        esc((PLANES[d.plan] || {}).nombre || d.plan) + ' por ' + d.dias + ' días.</p>' +
+        '<button class="btn sm" id="cgCopiar">Copiar</button></div>';
+      const bc = $("#cgCopiar");
+      if (bc) bc.addEventListener("click", () => {
+        navigator.clipboard && navigator.clipboard.writeText(d.codigo)
+          .then(() => aviso("Código copiado"), () => aviso("No se pudo copiar"));
+      });
+    } catch (err) { aviso(err.message); }
+    finally { b.disabled = false; b.textContent = "Generar el código"; }
+    return;
+  }
+  const cg = e.target.closest("[data-cg]");
+  if (cg) {
+    const c = (ficheros.codigos || []).find(x => x.codigo === cg.dataset.cg);
+    if (!c) return;
+    try {
+      const r = await SB.rpc("staff_codigo_activo", {p_codigo: c.codigo, p_activo: !c.activo});
+      if (r.error) throw new Error(r.error.message);
+      aviso(c.activo ? "Código cerrado" : "Código reabierto");
+      await recarga("codigos");
+    } catch (err) { aviso(err.message); }
+  }
+});
+
+/* Vuelve a leer una colección y repinta, sin esperar al refresco de cada minuto. */
+async function recarga(col) {
+  if (!DB) return;
+  try {
+    const snap = await DB.collection(col).get();
+    ficheros[col] = snap.docs.map(d => Object.assign({id: d.id}, d.data()));
+    pinta();
+  } catch (e) {}
+}
+
 </script>
 
-<script>window.BUILD="20260929-0022";</script>
+<script>window.BUILD="20260929-1802";</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="lab.js?v=20260929-0022"></script>
+<script src="lab.js?v=20260929-1802"></script>
 </body>
 </html>
