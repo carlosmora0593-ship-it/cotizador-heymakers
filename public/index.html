@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20260929-2227"></script>
+<script src="config.js?v=20260929-2310"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -479,6 +479,10 @@ body.rol-produccion .estadoPedido{display:none!important}
   padding:1px 7px;border-radius:5px}
 .clase-oc{background:var(--cyan-soft);color:var(--cyan)}
 .clase-factura{background:var(--good-soft);color:var(--good)}
+.avisoSello{border:1px solid var(--accent);border-radius:10px;padding:12px 14px;
+  background:var(--accent-soft);font-size:13px;line-height:1.55;color:var(--ink)}
+.avisoSello b{display:block;margin-bottom:4px}
+#fiscalCandado,#timbradoCandado{margin:0}
 .clase-otro{background:var(--surface);color:var(--ink-3)}
 .carpeta{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden;background:var(--surface)}
 .carpeta>header{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer;background:var(--surface-2);
@@ -1334,6 +1338,67 @@ body.rol-produccion #btnPrint{display:none!important}
       <input type="file" id="fileIn" accept="application/json" hidden>
     </div>
   </div>
+
+  <div class="card" id="cardFiscal">
+    <header><h2>Datos fiscales y domicilio</h2><span class="hint">con los que emites tus facturas</span></header>
+    <div class="body">
+      <p class="note" id="fiscalCandado" hidden></p>
+      <div id="fiscalCampos">
+        <div class="grid g2">
+          <div><label class="f" for="e_razon">Razón social</label><input id="e_razon" placeholder="Como está en tu constancia del SAT"></div>
+          <div><label class="f" for="e_rfc">RFC</label><input id="e_rfc" placeholder="XAXX010101000" style="text-transform:uppercase" maxlength="13"></div>
+        </div>
+        <div class="grid g2" style="margin-top:10px">
+          <div><label class="f" for="e_regimen">Régimen fiscal</label><select id="e_regimen"></select></div>
+          <div><label class="f" for="e_cpFiscal">Código postal fiscal</label><input id="e_cpFiscal" inputmode="numeric" maxlength="5" placeholder="58000"></div>
+        </div>
+        <p class="note" style="margin-top:8px">El código postal fiscal es el <b>lugar de expedición</b> de tus facturas. Si no coincide con tu constancia, el SAT rechaza el timbrado.</p>
+
+        <div class="grid g3" style="margin-top:14px">
+          <div><label class="f" for="e_calle">Calle</label><input id="e_calle"></div>
+          <div><label class="f" for="e_numExt">Número exterior</label><input id="e_numExt"></div>
+          <div><label class="f" for="e_numInt">Número interior</label><input id="e_numInt" placeholder="Opcional"></div>
+        </div>
+        <div class="grid g4" style="margin-top:10px">
+          <div><label class="f" for="e_colonia">Colonia</label><input id="e_colonia"></div>
+          <div><label class="f" for="e_municipio">Municipio o alcaldía</label><input id="e_municipio"></div>
+          <div><label class="f" for="e_estado">Estado</label><input id="e_estado"></div>
+          <div><label class="f" for="e_pais">País</label><input id="e_pais"></div>
+        </div>
+        <p class="note" style="margin-top:10px">La dirección aparece en tus cotizaciones y órdenes impresas, y es la que va en la factura.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="cardTimbrado">
+    <header><h2>Facturación electrónica</h2><span class="hint">cómo se timbran tus facturas</span></header>
+    <div class="body">
+      <p class="note" id="timbradoCandado" hidden></p>
+      <div id="timbradoCampos">
+        <div class="avisoSello">
+          <b>Tus sellos del SAT no se guardan aquí, y es a propósito.</b>
+          Tu archivo .cer, tu .key y la contraseña de tu llave son tu firma: quien los tiene
+          puede facturar a tu nombre. Se suben directo con el PAC, que es quien está autorizado
+          por el SAT para guardarlos y timbrar. Este programa nunca los ve ni los pide.
+        </div>
+        <div class="grid g3" style="margin-top:14px">
+          <div><label class="f" for="e_pac">Tu PAC</label><select id="e_pac">
+            <option value="">— Todavía no elijo —</option>
+            <option value="facturama">Facturama</option>
+            <option value="facturapi">Facturapi</option>
+            <option value="sw">SW sapien (Smarter Web)</option>
+            <option value="finkok">Finkok</option>
+            <option value="prodigia">Prodigia</option>
+            <option value="otro">Otro</option>
+          </select></div>
+          <div><label class="f" for="e_serie">Serie</label><input id="e_serie" maxlength="8" placeholder="A"></div>
+          <div><label class="f" for="e_folioFactura">Siguiente folio</label><input id="e_folioFactura" type="number" min="1" step="1"></div>
+        </div>
+        <label class="sw" style="margin-top:14px"><input type="checkbox" id="e_sellosAlta"> Ya di de alta mis sellos con mi PAC</label>
+        <p class="note" id="pacNota" style="margin-top:10px"></p>
+      </div>
+    </div>
+  </div>
 </section>
 </div>
 
@@ -1716,6 +1781,12 @@ const CHECKS = ["Diseño aprobado por el cliente","Material en almacén","Archiv
 function defaultParams(){ return {origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
   compras:{tope:2000, siempre:false},
   empresa:{nombre:"Hey Makers",eslogan:"Cursos y Talleres",tel:"",mail:"",logo:"",
+  /* Lo fiscal va aparte de lo comercial a propósito: el nombre comercial es
+     con el que te conocen y la razón social es con la que facturas, y casi
+     nunca son el mismo. Mezclarlos es de donde salen las facturas rechazadas. */
+  razon:"",rfc:"",regimen:"612",cpFiscal:"",
+  calle:"",numExt:"",numInt:"",colonia:"",municipio:"",estado:"",pais:"México",
+  pac:"",serie:"A",folioFactura:1,sellosAlta:false,
   cond:"Precios en pesos mexicanos. 60% de anticipo para iniciar producción. Tiempo de entrega de 5 a 7 días hábiles a partir de la aprobación del diseño."}};}
 
 let cat = defaults();
@@ -2217,7 +2288,89 @@ function renderSet(){
     : "El precio se arma sumando costos y aplicándoles tu utilidad. Los precios públicos del catálogo se ignoran.";
   $("#e_nombre").value=P.empresa.nombre; $("#e_slogan").value=P.empresa.eslogan||""; $("#e_tel").value=P.empresa.tel;
   $("#e_mail").value=P.empresa.mail; $("#e_cond").value=P.empresa.cond;
+  renderFiscal();
   aplicaMarca();
+}
+
+/* Una cuenta vieja no tiene los campos fiscales, y pedirle al resto del
+   programa que pregunte "¿y si no existe?" en cada línea es cómo se llena
+   de remiendos. Se completan una vez, aquí. */
+function empresaFiscal(){
+  const d = defaultParams().empresa;
+  ["razon","rfc","regimen","cpFiscal","calle","numExt","numInt","colonia",
+   "municipio","estado","pais","pac","serie","folioFactura","sellosAlta"].forEach(k=>{
+    if(P.empresa[k] === undefined) P.empresa[k] = d[k];
+  });
+  return P.empresa;
+}
+
+const PAC_SITIO = {
+  facturama:["Facturama","https://facturama.mx"],
+  facturapi:["Facturapi","https://facturapi.io"],
+  sw:["SW sapien","https://sw.com.mx"],
+  finkok:["Finkok","https://finkok.com"],
+  prodigia:["Prodigia","https://prodigia.com.mx"]
+};
+
+function renderFiscal(){
+  const E = empresaFiscal();
+  const reg = $("#e_regimen");
+  if(reg && !reg.options.length) reg.innerHTML = opcionesSelect(REGIMENES, E.regimen);
+  if(reg) reg.value = E.regimen || "612";
+  [["e_razon","razon"],["e_rfc","rfc"],["e_cpFiscal","cpFiscal"],["e_calle","calle"],
+   ["e_numExt","numExt"],["e_numInt","numInt"],["e_colonia","colonia"],["e_municipio","municipio"],
+   ["e_estado","estado"],["e_pais","pais"],["e_serie","serie"],["e_folioFactura","folioFactura"]
+  ].forEach(par=>{ const c = $("#"+par[0]); if(c) c.value = E[par[1]] == null ? "" : E[par[1]]; });
+  const pac = $("#e_pac"); if(pac) pac.value = E.pac || "";
+  const sel = $("#e_sellosAlta"); if(sel) sel.checked = !!E.sellosAlta;
+  notaPac();
+  candadoFiscal();
+}
+
+function notaPac(){
+  const nota = $("#pacNota"); if(!nota) return;
+  const E = empresaFiscal();
+  const sitio = PAC_SITIO[E.pac];
+  if(!E.pac){
+    nota.innerHTML = "Cuando elijas tu PAC aquí te digo a dónde ir a subir tus sellos.";
+  } else if(sitio){
+    nota.innerHTML = "Tus sellos se dan de alta en el portal de " + esc(sitio[0]) +
+      ' (<a href="' + esc(sitio[1]) + '" target="_blank" rel="noopener">' + esc(sitio[1]) + "</a>), " +
+      "con tu propia cuenta. Ni tu .cer ni tu .key pasan por aquí.";
+  } else {
+    nota.innerHTML = "Sube tus sellos en el portal de tu PAC, con tu propia cuenta. Ni tu .cer ni tu .key pasan por aquí.";
+  }
+}
+
+/* El candado del plan. El cotizador suelto no sabe de planes y contesta
+   que sí a todo; la versión con suscripción le cuelga su respuesta en
+   window.__enElPlan. Los datos NO se borran ni se ocultan de la base: se
+   deja de mostrar el formulario, y si mañana sube de plan, todo sigue ahí. */
+function puedeFacturar(){
+  return !(window.__enElPlan && !window.__enElPlan("fac"));
+}
+window.__candadoFiscal = function(){ candadoFiscal(); };
+function candadoFiscal(){
+  const abierto = puedeFacturar();
+  const recado = "Los datos fiscales y la facturación vienen en el plan <b>Maker</b>. " +
+    "Lo que ya hayas escrito aquí no se borra: si cambias de plan vuelve a aparecer tal cual.";
+  [["fiscalCampos","fiscalCandado"], ["timbradoCampos","timbradoCandado"]].forEach(par=>{
+    const campos = $("#"+par[0]), aviso = $("#"+par[1]);
+    if(!campos || !aviso) return;
+    campos.hidden = !abierto;
+    aviso.hidden  = abierto;
+    if(!abierto) aviso.innerHTML = recado;
+  });
+}
+
+/* Faltantes para poder facturar. No es una validación que estorbe: es la
+   lista de lo que el SAT va a reclamar, dicha antes y no después. */
+function faltaParaFacturar(){
+  const E = empresaFiscal(), f = [];
+  if(!String(E.razon||"").trim()) f.push("la razón social");
+  if(String(E.rfc||"").trim().length < 12) f.push("el RFC");
+  if(String(E.cpFiscal||"").trim().length !== 5) f.push("el código postal fiscal");
+  return f;
 }
 function logoSrc(){ return P.empresa.logo || LOGO_MARCA; }
 function aplicaMarca(){
@@ -2457,6 +2610,14 @@ $("#tab-set").addEventListener("input", e=>{
   if(t.id==="e_tel") P.empresa.tel=t.value;
   if(t.id==="e_mail") P.empresa.mail=t.value;
   if(t.id==="e_cond") P.empresa.cond=t.value;
+  const fiscales={e_razon:"razon",e_rfc:"rfc",e_cpFiscal:"cpFiscal",e_calle:"calle",
+    e_numExt:"numExt",e_numInt:"numInt",e_colonia:"colonia",e_municipio:"municipio",
+    e_estado:"estado",e_pais:"pais",e_serie:"serie"};
+  if(fiscales[t.id]){
+    empresaFiscal();
+    P.empresa[fiscales[t.id]] = (t.id==="e_rfc") ? t.value.toUpperCase().trim() : t.value;
+  }
+  if(t.id==="e_folioFactura"){ empresaFiscal(); P.empresa.folioFactura = Math.max(1, num(t.value)); }
   persist(); renderResumen();
 });
 $("#tab-set").addEventListener("change", e=>{
@@ -2465,6 +2626,9 @@ $("#tab-set").addEventListener("change", e=>{
   if(t.id==="p_origen"){ P.origen=t.value; renderSet(); renderApps(); }
   if(t.id==="p_redondeo") P.redondeo=num(t.value);
   if(t.id==="p_ivaOn") P.ivaOn=t.checked;
+  if(t.id==="e_regimen"){ empresaFiscal(); P.empresa.regimen=t.value; }
+  if(t.id==="e_pac"){ empresaFiscal(); P.empresa.pac=t.value; notaPac(); }
+  if(t.id==="e_sellosAlta"){ empresaFiscal(); P.empresa.sellosAlta=t.checked; }
   persist(); renderResumen();
 });
 $("#btnReset").addEventListener("click", ()=>{ cat=defaults(); P=defaultParams(); persist(); renderCatalogo(); renderSet(); renderCot(); toast("Catálogo de ejemplo restaurado"); });
@@ -4684,7 +4848,16 @@ function abreFactura(v){
   const uso = (USOS_CFDI.find(u=>u[0]===f.uso)||["",""])[1];
   const subtotal = P.ivaOn ? v.total/(1+num(P.iva)/100) : v.total;
   const iva = v.total - subtotal;
+  /* El emisor —o sea tú— faltaba por completo. Sin él, el paquete servía
+     para que el contador supiera A QUIÉN facturar, pero no DE PARTE DE
+     QUIÉN, y eso se acababa escribiendo a mano cada vez. */
+  const E = empresaFiscal();
+  const regE = (REGIMENES.find(r=>r[0]===E.regimen)||["",""])[1];
   const datos = [
+    ["Emisor", E.razon || P.empresa.nombre], ["RFC del emisor", E.rfc],
+    ["Régimen del emisor", E.regimen ? E.regimen+" — "+regE : ""],
+    ["Lugar de expedición (CP)", E.cpFiscal],
+    ["Serie y folio", (E.serie||"") + (E.folioFactura ? "-"+E.folioFactura : "")],
     ["Folio interno", v.folio], ["Fecha", v.fecha],
     ["Receptor", f.razon || v.cliente], ["RFC", f.rfc],
     ["Código postal", f.cp], ["Régimen fiscal", f.regimen+" — "+reg],
@@ -4699,6 +4872,11 @@ function abreFactura(v){
   muestraDoc("Datos para facturar · "+v.folio, membrete()+
     '<h1 style="margin-bottom:4px">Datos para facturar</h1>'+
     '<p style="color:#555">Copia estos datos en tu sistema de facturación o mándaselos a tu contador.</p>'+
+    (faltaParaFacturar().length
+      ? '<p style="color:#B01660;font-weight:600">Te falta capturar ' +
+        esc(faltaParaFacturar().join(", ").replace(/, ([^,]*)$/, " y $1")) +
+        ' en Ajustes. El SAT lo va a pedir.</p>'
+      : '')+
     '<table><tbody>'+datos.map(d=>'<tr><th style="width:38%">'+esc(d[0])+'</th><td>'+esc(d[1]||"—")+'</td></tr>').join("")+'</tbody></table>'+
     '<div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap">'+
       '<button class="btn primary" id="factCopiar" type="button">Copiar los datos</button>'+
@@ -4786,7 +4964,21 @@ function membrete(){
     '<img src="'+esc(P.empresa.logo || LOGO_FULL)+'" alt="" style="height:64px;width:auto">'+
     '<div style="flex:1;display:flex;height:6px;border-radius:3px;overflow:hidden">'+
     '<i style="flex:1;background:#06A1D7"></i><i style="flex:1;background:#F51B95"></i>'+
-    '<i style="flex:1;background:#FFEC30"></i><i style="flex:1;background:#141414"></i></div></div>';
+    '<i style="flex:1;background:#FFEC30"></i><i style="flex:1;background:#141414"></i></div></div>'+
+    (domicilioUnaLinea() ? '<p style="margin:0 0 10px;color:#555;font-size:10.5px">'+esc(domicilioUnaLinea())+'</p>' : '');
+}
+
+/* El domicilio en un solo renglón, saltándose lo que esté vacío. Una cuenta
+   recién abierta no tiene nada de esto y debe verse igual de limpia que
+   antes: sin comas sueltas ni renglón vacío. */
+function domicilioUnaLinea(){
+  const E = empresaFiscal();
+  const calle = [E.calle, E.numExt, E.numInt ? "int. "+E.numInt : ""].filter(Boolean).join(" ");
+  const partes = [calle, E.colonia, [E.cpFiscal, E.municipio].filter(Boolean).join(" "),
+                  E.estado, E.pais && E.pais !== "México" ? E.pais : ""].filter(x=>String(x||"").trim());
+  const dir = partes.join(", ");
+  const fiscal = [E.razon, E.rfc].filter(Boolean).join(" · RFC ");
+  return [fiscal, dir].filter(Boolean).join(" — ");
 }
 function miniatura(f){
   if(!f) return '<div style="border:1px dashed #999;padding:14px;text-align:center;color:#666;font-size:10px">SIN ARCHIVO</div>';
@@ -6015,10 +6207,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20260929-2227";</script>
+<script>window.BUILD="20260929-2310";</script>
 <script>
 (function(){
-  var mio = "20260929-2227";
+  var mio = "20260929-2310";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -6041,6 +6233,6 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20260929-2227"></script>
+<script src="cuenta.js?v=20260929-2310"></script>
 </body>
 </html>

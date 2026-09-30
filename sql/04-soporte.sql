@@ -145,8 +145,20 @@ end $$;
 -- Plana y cómoda: un renglón por reporte, con su cuenta, su plan y sus tiempos
 -- ya calculados. Solo la ven quienes están en staff.
 
-create or replace view public.v_soporte
-with (security_invoker = true) as
+drop view if exists public.v_soporte;
+
+--  OJO, y esto costó un rato de encontrar: esta vista NO puede correr con
+--  security_invoker. Con esa opción la vista se ejecuta con los permisos de
+--  quien pregunta, y eso incluye la tabla cuentas, donde cada quien solo ve
+--  la suya. El join de abajo entonces tiraba TODOS los reportes de los demás
+--  talleres y la vista contestaba cero, aunque los reportes estuvieran ahí.
+--
+--  Corre como su dueño, y quien cuida la puerta es el "and public.es_staff()"
+--  del final: si no eres del equipo, la vista contesta vacío. La promesa no
+--  cambia, porque lo único que esta vista puede alcanzar son documentos de la
+--  colección 'soporte'; las cotizaciones, los clientes y los precios de cada
+--  taller siguen fuera de su alcance.
+create or replace view public.v_soporte as
 select
   d.cuenta_id,
   c.nombre                                    as taller,
@@ -176,7 +188,8 @@ select
   d.actualizado
 from public.documentos d
 join public.cuentas c on c.id = d.cuenta_id
-where d.coleccion = 'soporte';
+where d.coleccion = 'soporte'
+  and public.es_staff();
 
 
 -- ---------- 6. Da de alta a tu primer soporte ----------

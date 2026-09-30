@@ -229,7 +229,11 @@ const PERMISOS = {
 };
 /* Secciones que no vienen en el plan Básico */
 const SOLO_PRO   = ["caj","ven"];
-const SOLO_MAKER = ["com"];
+/* "fac" no es una pestaña: es el bloque de datos fiscales y facturación
+   que vive dentro de Ajustes. Se cuela en la misma lista porque el
+   cotizador pregunta por el mismo lugar, y así hay UNA sola tabla de
+   qué incluye cada plan en lugar de dos que se desincronizan. */
+const SOLO_MAKER = ["com", "fac"];
 function enElPlan(t){
   if(SOLO_PRO.indexOf(t) >= 0)   return esPro();
   if(SOLO_MAKER.indexOf(t) >= 0) return esMaker();
@@ -738,6 +742,11 @@ function aplicaPlan(){
   if(typeof aplicaPermisos === "function") aplicaPermisos();
   document.querySelectorAll("[data-solo-pro]").forEach(el=> el.hidden = !esPro());
   document.querySelectorAll("[data-solo-maker]").forEach(el=> el.hidden = !esMaker());
+  /* Los datos fiscales no son una pestaña que se pueda esconder con un
+     atributo: son dos bloques dentro de Ajustes que el cotizador pinta.
+     Cuando tu equipo le sube el plan a alguien desde Makers Lab, esto tiene
+     que abrirse en el momento, sin recargar. */
+  if(typeof window.__candadoFiscal === "function") window.__candadoFiscal();
 }
 
 q("#btnSalir").addEventListener("click", async ()=>{ await SB.auth.signOut(); location.reload(); });
