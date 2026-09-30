@@ -149,7 +149,7 @@ create or replace view public.v_soporte
 with (security_invoker = true) as
 select
   d.cuenta_id,
-  c.negocio                                   as taller,
+  c.nombre                                    as taller,
   c.plan,
   c.estado                                    as estado_cuenta,
   d.doc_id                                    as ticket_id,
@@ -189,3 +189,35 @@ where d.coleccion = 'soporte';
 --
 -- Comprueba que quedó:
 --   select * from public.v_soporte order by entro desc;
+
+
+-- ============================================================
+--  Y que los cambios de suscripción también lleguen solos
+-- ============================================================
+--  Cuando tu equipo cambia un plan desde Makers Lab, el taller no tiene
+--  por qué recargar la página para enterarse. Con la tabla de cuentas en
+--  tiempo real, el cotizador se actualiza solo en cuanto pasa.
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'cuentas')
+  then
+    alter publication supabase_realtime add table public.cuentas;
+  end if;
+end $$;
+
+
+-- ---------- Comprobación ----------
+select 'v_soporte existe' as que,
+       case when exists (select 1 from information_schema.views
+                          where table_schema='public' and table_name='v_soporte')
+            then 'sí' else 'no' end as respuesta
+union all
+select 'Tickets que veo', count(*)::text from public.v_soporte
+union all
+select 'Cuentas en tiempo real',
+       case when exists (select 1 from pg_publication_tables
+                          where pubname='supabase_realtime' and tablename='cuentas')
+            then 'sí' else 'no' end;

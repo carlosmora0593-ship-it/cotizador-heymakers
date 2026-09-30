@@ -118,6 +118,26 @@ function pideEntrar(msg){
    2. Traducción: la base de datos → lo que Makers Lab espera
    ============================================================ */
 
+/* La base habla en UTC y con milésimas; Makers Lab habla en la hora del
+   reloj de quien está mirando, con el formato AAAA-MM-DDTHH:MM que usan
+   todos sus cálculos de tiempo. Sin esta traducción un ticket que entró
+   a las 9 de la mañana aparecería a las 3 de la tarde. */
+function aSello(ts){
+  if(!ts) return null;
+  const d = new Date(ts);
+  if(isNaN(d)) return null;
+  const dd = n => String(n).padStart(2,"0");
+  return d.getFullYear() + "-" + dd(d.getMonth()+1) + "-" + dd(d.getDate()) +
+         "T" + dd(d.getHours()) + ":" + dd(d.getMinutes());
+}
+
+/* Los dos programas le dicen distinto a lo mismo. El cotizador habla
+   desde el cliente ("lo envié", "ya lo cerré"); Makers Lab habla desde
+   soporte ("nadie lo ha tomado", "está en curso"). Es el mismo ticket
+   visto desde los dos lados del mostrador, y aquí se traduce. */
+const TK_A_LAB  = {enviado:"abierto", contestado:"encurso", esperando:"esperando", cerrado:"resuelto"};
+const TK_A_BASE = {abierto:"enviado", encurso:"contestado", esperando:"esperando", resuelto:"cerrado"};
+
 /* Supabase guarda plan y estado por separado; Makers Lab los junta
    en un solo estado, que es como se habla del negocio: "está en
    prueba", "ya venció". Esta función traduce de uno al otro. */
@@ -138,7 +158,10 @@ function cuentaDeVista(r, nota){
     id: r.id,
     taller: r.taller || "Sin nombre",
     correo: r.correo_dueno || "",
-    plan: (r.plan === "ninguno" || r.plan === "prueba") ? "basico" : r.plan,
+    /* El plan que se muestra es el que la cuenta tiene de verdad.
+       Disfrazar un "sin plan" de "Básico" inflaba el ingreso del mes y
+       hacía que soporte le hablara de un plan que nadie contrató. */
+    plan: r.plan || "ninguno",
     planReal: r.plan,
     esPrueba: !!r.es_prueba,
     codigo: r.codigo || null,
@@ -169,29 +192,61 @@ function cuentaDeVista(r, nota){
 }
 
 /* Un ticket de v_soporte con la forma de Makers Lab. */
-function ticketDeVista(r){
-  return {
+function ticketDeVista(r, nota){
+  const t = {
     id: r.ticket_id,
     cuentaId: r.cuenta_id,
     taller: r.taller,
+    plan: r.plan || "ninguno",
     folio: r.folio,
     asunto: r.asunto,
-    estado: r.estado,
+    /* El estado traducido, y la prioridad sacada de lo que el cliente
+       contestó cuando pidió ayuda: si dijo que no puede seguir
+       trabajando, esto es urgente y no hay que adivinarlo. */
+    estado: TK_A_LAB[r.estado] || "abierto",
+    prioridad: r.bloquea ? "alta" : "normal",
     bloquea: !!r.bloquea,
+    origen: "widget",
     pantalla: r.pantalla,
     version: r.version,
     navegador: r.navegador,
     reaperturas: Number(r.reaperturas || 0),
-    entro: r.entro,
-    contestado: r.contestado,
-    resuelto: r.resuelto,
-    confirmado: r.confirmado,
+    /* Los nombres que Makers Lab usa para el reloj. Los sellos los puso
+       la base, no el navegador del cliente: no se pueden maquillar. */
+    creado:     aSello(r.entro),
+    primeraResp: aSello(r.contestado),
+    resuelto:   aSello(r.resuelto),
+    confirmado: aSello(r.confirmado),
     horasEnContestar: r.horas_en_contestar,
     horasEnResolver: r.horas_en_resolver,
-    mensajes: r.mensajes || [],
     contexto: r.contexto || {},
-    errores: r.errores || []
+    errores: (r.errores || []).map(e => ({
+      hora: e.hora || e.cuando || "",
+      pantalla: e.pantalla || r.pantalla || "",
+      msg: e.msg || e.mensaje || String(e),
+      donde: e.donde || ""
+    })),
+    /* El cotizador guarda la hora del mensaje en "hora"; Makers Lab la
+       busca en "f". Se rellenan las dos para que ninguno de los dos se
+       quede mirando un hueco. */
+    mensajes: (r.mensajes || []).map(m => ({
+      de: m.de === "soporte" ? "soporte" : "cliente",
+      txt: m.txt || "",
+      f: m.f || (m.hora && String(m.hora).length > 5 ? m.hora
+                 : (aSello(r.entro) || "").slice(0,10) + "T" + String(m.hora || "00:00").slice(0,5)),
+      hora: m.hora || null
+    })),
+    atiende: null,
+    fallaId: null
   };
+  /* Quién lo lleva y si es una falla del programa son cosas TUYAS: no
+     tienen por qué viajar al documento del cliente. Viven en tu
+     cuaderno y se le montan encima al ticket al leerlo. */
+  const mio = nota || {};
+  ["atiende","fallaId","prioridad","nota"].forEach(k=>{
+    if(mio[k] !== undefined && mio[k] !== null) t[k] = mio[k];
+  });
+  return t;
 }
 
 /* ============================================================
@@ -201,7 +256,36 @@ function ticketDeVista(r){
    set(), delete(), onSnapshot(). Por dentro cada colección sabe si
    es de solo lectura o del cuaderno. */
 
-const SOLO_LECTURA = {cuentas: true, tickets: true, errores: true};
+/* De solo lectura quiere decir "no se borra desde aquí". Los tickets sí
+   se contestan —eso es su razón de ser— pero borrar el reporte de un
+   cliente no es algo que Makers Lab deba poder hacer. */
+const SOLO_LECTURA = {cuentas: true, tickets: true, errores: true, codigos: true};
+
+/* La vista de soporte es la última pieza que se instala, y si falta, lo
+   que aparece es "no existe la tabla v_soporte": cierto y perfectamente
+   inútil. Aquí se traduce a la instrucción de qué correr, una sola vez,
+   y el resto de Makers Lab sigue funcionando en lugar de caerse entero.
+
+   Los reportes no se pierden mientras eso pasa: están guardados en la
+   cuenta de cada taller, esperando que la vista exista. */
+let avisoSoporte = false;
+async function leeSoporte(){
+  const r = await SB.from("v_soporte").select("*").order("entro", {ascending:false});
+  if(r.error){
+    const m = String(r.error.message || "");
+    if(m.indexOf("v_soporte") >= 0 || m.indexOf("schema cache") >= 0){
+      if(!avisoSoporte){
+        avisoSoporte = true;
+        if(window.aviso) setTimeout(()=> window.aviso(
+          "Falta correr CORRER-6-soporte.sql en Supabase: sin eso los reportes de los talleres no llegan aqu\u00ed."), 800);
+        console.warn("v_soporte no existe todav\u00eda:", m);
+      }
+      return {data: []};
+    }
+    throw new Error(r.error.message);
+  }
+  return {data: r.data || []};
+}
 
 async function leeColeccion(col){
   if(col === "cuentas"){
@@ -219,14 +303,19 @@ async function leeColeccion(col){
   }
 
   if(col === "tickets"){
-    const {data} = await SB.from("v_soporte").select("*").order("entro", {ascending:false});
-    return (data||[]).map(ticketDeVista);
+    const [{data}, {data: notas}] = await Promise.all([
+      leeSoporte(),
+      SB.from("lab_datos").select("doc_id,cuerpo").eq("coleccion","notas_ticket")
+    ]);
+    const porId = {};
+    (notas||[]).forEach(n=> porId[n.doc_id] = n.cuerpo);
+    return (data||[]).map(r=> ticketDeVista(r, porId[r.ticket_id]));
   }
 
   /* Los errores no son una tabla: son lo que el cotizador capturó
      dentro de cada reporte. Se sacan de ahí y se aplanan. */
   if(col === "errores"){
-    const {data} = await SB.from("v_soporte").select("*").order("entro", {ascending:false});
+    const {data} = await leeSoporte();
     const fuera = [];
     (data||[]).forEach(t=>{
       (t.errores||[]).forEach((e,i)=> fuera.push({
@@ -286,22 +375,71 @@ function refDoc(ruta){
   };
 }
 
-/* Contestar un ticket escribe en el documento del cliente, en su
-   cuenta. Es lo único que Makers Lab escribe del lado de un taller,
-   y la base solo lo permite para la colección 'soporte'. */
+/* Contestar un ticket escribe en dos lados, y la diferencia importa:
+
+     · Lo que el cliente tiene que ver —tu respuesta y en qué va— se
+       escribe en SU documento. La base solo nos deja tocar la colección
+       'soporte', así que no hay forma de que esto se desvíe a una
+       cotización o a un precio de nadie.
+     · Lo que es asunto tuyo —quién lo lleva, si es una falla del
+       programa, tus notas— se queda en tu cuaderno. El cliente no
+       necesita ver el nombre de quién lo está atendiendo por dentro.
+
+   Y una regla que no se negocia: un ticket lo cierra el cliente. Si
+   soporte marca "resuelto", del lado del cliente queda 'esperando' y él
+   decide. La base además lo impide, pero es mejor que aquí ni se
+   intente y se diga por qué. */
 async function contestaTicket(id, t){
   const cuenta = t.cuentaId;
-  if(!cuenta) return;
-  const {data: actual} = await SB.from("documentos").select("cuerpo")
-    .eq("cuenta_id", cuenta).eq("coleccion","soporte").eq("doc_id", id).maybeSingle();
-  if(!actual) return;
-  const cuerpo = Object.assign({}, actual.cuerpo, {
-    mensajes: t.mensajes || actual.cuerpo.mensajes,
-    estado:   t.estado   || actual.cuerpo.estado
+  if(!cuenta) throw new Error("Ese ticket no trae cuenta.");
+
+  /* Primero tu cuaderno: nunca se pierde por un problema del otro lado. */
+  const mio = {};
+  ["atiende","fallaId","prioridad","nota"].forEach(k=>{
+    if(t[k] !== undefined) mio[k] = t[k];
   });
+  const {error: e1} = await SB.from("lab_datos").upsert(
+    {coleccion:"notas_ticket", doc_id:id, cuerpo:mio}, {onConflict:"coleccion,doc_id"});
+  if(e1) throw new Error(e1.message);
+
+  const {data: actual, error: e0} = await SB.from("documentos").select("cuerpo")
+    .eq("cuenta_id", cuenta).eq("coleccion","soporte").eq("doc_id", id).maybeSingle();
+  if(e0) throw new Error(e0.message);
+  if(!actual) throw new Error("Ese reporte ya no está en la cuenta del cliente.");
+
+  const antes = actual.cuerpo || {};
+
+  /* Los mensajes se mandan como los guarda el cotizador: con "hora". Se
+     deja también "f" para que Makers Lab los pinte igual sin recargar. */
+  const mensajes = (t.mensajes || antes.mensajes || []).map(m=>{
+    const f = m.f || m.hora || "";
+    return {de: m.de, txt: m.txt,
+            hora: (m.hora && String(m.hora).length <= 5) ? m.hora : String(f).slice(11,16) || String(f).slice(0,5),
+            f: f};
+  });
+
+  let estado = TK_A_BASE[t.estado] || antes.estado || "enviado";
+  let recado = null;
+  if(estado === "cerrado" && antes.estado !== "cerrado"){
+    estado = "esperando";
+    recado = "Queda en espera: el cierre lo confirma el cliente desde su cotizador.";
+  }
+  /* Si soporte contestó, el cliente tiene algo nuevo que leer. */
+  const hayRespuestaNueva = mensajes.length > (antes.mensajes || []).length &&
+                            mensajes[mensajes.length-1].de === "soporte";
+
+  const cuerpo = Object.assign({}, antes, {
+    mensajes: mensajes,
+    estado:   estado,
+    sinLeer:  hayRespuestaNueva ? true : !!antes.sinLeer
+  });
+
   const {error} = await SB.from("documentos").update({cuerpo})
     .eq("cuenta_id", cuenta).eq("coleccion","soporte").eq("doc_id", id);
   if(error) throw new Error(error.message);
+  /* Se guardó bien; esto no es un fallo, es una aclaración. Va como
+     recado y no como error, porque el error diría "no se guardó". */
+  if(recado && window.aviso) setTimeout(()=> window.aviso(recado), 400);
 }
 
 function refCol(col){

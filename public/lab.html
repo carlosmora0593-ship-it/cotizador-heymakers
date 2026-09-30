@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0A7FA8">
-<script src="config.js?v=20260929-1802"></script>
+<script src="config.js?v=20260929-2227"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Makers Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -243,6 +243,8 @@ body.sin-sesion .telon{display:none!important}
 .puertaCard h1{font-family:"Fredoka",system-ui,sans-serif;font-size:24px;font-weight:600;margin:0}
 .puertaCard p{color:var(--ink-2);font-size:14px;line-height:1.55;margin:0 0 12px}
 .puertaCard form{display:flex;flex-direction:column;gap:6px}
+.plan.ninguno{border-color:var(--line-2);background:transparent;color:var(--ink-3)}
+.plan.prueba{border-color:var(--aviso);background:var(--aviso-suave);color:var(--aviso)}
 .puertaCard label.f{font-size:11px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.06em;margin-top:8px}
 .puertaCard button[type=submit]{margin-top:16px;justify-content:center}
 .puertaMsg{margin-top:12px!important;color:var(--critico);font-size:13px;font-weight:500}
@@ -323,6 +325,8 @@ const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp
 const uid = () => Math.random().toString(36).slice(2, 9);
 
 const PLANES = {
+  ninguno: { nombre: "Sin plan",     mes: 0,   anio: 0 },
+  prueba:  { nombre: "Prueba Maker", mes: 0,   anio: 0 },
   basico: { nombre: "Básico", mes: 199, anio: 1990 },
   maker:  { nombre: "Maker",  mes: 449, anio: 4490 },
   pro:    { nombre: "Pro",    mes: 899, anio: 8990 }
@@ -341,8 +345,9 @@ const DIAS_PRUEBA = 15;
 const YO = "Carlos";
 
 const HOY = new Date();
-const iso = d => d.toISOString().slice(0, 10);
-const dObj = s => { const p = String(s).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); };
+const iso = d => { const x = new Date(d); const dd = n => String(n).padStart(2, "0");
+  return x.getFullYear() + "-" + dd(x.getMonth() + 1) + "-" + dd(x.getDate()); };
+const dObj = s => { const p = String(s).slice(0, 10).split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); };
 const masDias = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
 const difDias = (a, b) => Math.round((dObj(a) - dObj(b)) / 86400000);
 const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
@@ -447,8 +452,9 @@ const COLS = ["cuentas", "tickets", "errores", "equipo", "alianzas", "citas", "c
 let vista = "tablero", abierta = null, esEjemplo = false, listo = false;
 let filtro = { texto: "", estado: "", plan: "" };
 
-const cobroMes = c => c.periodo === "anual" ? PLANES[c.plan].anio / 12 : PLANES[c.plan].mes;  // lo que le cargas
-const cobroCiclo = c => c.periodo === "anual" ? PLANES[c.plan].anio : PLANES[c.plan].mes;      // lo que se cobra cada vez
+const planDe = c => PLANES[(c && c.plan) || "ninguno"] || PLANES.ninguno;
+const cobroMes = c => c.periodo === "anual" ? planDe(c).anio / 12 : planDe(c).mes;  // lo que le cargas
+const cobroCiclo = c => c.periodo === "anual" ? planDe(c).anio : planDe(c).mes;      // lo que se cobra cada vez
 const mensual = c => baseDe(cobroMes(c));   // lo tuyo, ya sin IVA
 const paga = c => c.estado === "activa";
 const mrr = () => ficheros.cuentas.filter(paga).reduce((s, c) => s + mensual(c), 0);
@@ -456,7 +462,7 @@ const cuentaDe = id => ficheros.cuentas.find(c => c.id === id);
 const aliDe = id => ficheros.alianzas.find(a => a.id === id);
 const eqDe = id => ficheros.equipo.find(e => e.id === id);
 const chipEstado = c => '<span class="chip ' + ESTADOS[c.estado].chip + '">' + ESTADOS[c.estado].nombre + '</span>';
-const chipPlan = c => '<span class="plan ' + c.plan + '">' + PLANES[c.plan].nombre + '</span>';
+const chipPlan = c => '<span class="plan ' + ((c && c.plan) || "ninguno") + '">' + planDe(c).nombre + '</span>';
 
 /* ================= EL MOTOR COMERCIAL =================
    Por cada cuenta, una sola jugada: qué sigue, por qué, y el mensaje
@@ -613,7 +619,7 @@ async function guarda(col, reg) {
   const i = ficheros[col].findIndex(x => x.id === reg.id);
   if (i >= 0) ficheros[col][i] = reg; else ficheros[col].push(reg);
   pinta();
-  if (DB) { try { await DB.collection(col).doc(reg.id).set(cuerpo); } catch (e) { aviso("No se pudo guardar. Vuelve a intentar."); } }
+  if (DB) { try { await DB.collection(col).doc(reg.id).set(cuerpo); } catch (e) { aviso("No se guardó: " + (e && e.message ? e.message : "error desconocido")); console.error("Al guardar en", col, e); } }
 }
 async function elimina(col, id) {
   ficheros[col] = ficheros[col].filter(x => x.id !== id);
@@ -784,11 +790,11 @@ function generaEjemplo(enMemoria) {
       const f = masDias(HOY, -(k * 30) - (i % 22));
       if (f < dObj(c.alta)) continue;
       const rechazado = (c.estado === "vencida" && k === 0);
-      const total = c.periodo === "anual" ? PLANES[c.plan].anio : PLANES[c.plan].mes;
+      const total = c.periodo === "anual" ? planDe(c).anio : planDe(c).mes;
       const delMes = iso(f).slice(0, 7) === iso(HOY).slice(0, 7);
       cobros.push({
         id: "p" + c.id + "-" + k, cuentaId: c.id, fecha: iso(f),
-        concepto: "Suscripción " + PLANES[c.plan].nombre + " " + (c.periodo === "anual" ? "anual" : "mensual"),
+        concepto: "Suscripción " + planDe(c).nombre + " " + (c.periodo === "anual" ? "anual" : "mensual"),
         total: total, metodo: i % 3 === 0 ? "Tarjeta de débito" : "Tarjeta de crédito",
         estado: rechazado ? "rechazado" : "aprobado",
         liquida: iso(masDias(f, 2)),
@@ -1805,7 +1811,7 @@ function abreTicket(id) {
         (t.estado === "abierto" || t.estado === "encurso"
           ? '<button class="btn sm" data-tk="resuelto" data-id="' + t.id + '">Ya lo resolví</button>' : '') +
         (t.estado === "esperando"
-          ? '<button class="btn sm p" data-tk="confirma" data-id="' + t.id + '">El cliente confirmó</button>' +
+          ? '<button class="btn sm p" data-tk="confirma" data-id="' + t.id + '" title="El cierre lo confirma el cliente en su cotizador">Marcar que el cliente confirmó</button>' +
             '<button class="btn sm mal" data-tk="niega" data-id="' + t.id + '">El cliente dice que no</button>' : '') +
         (t.estado === "resuelto" ? '<button class="btn sm mal" data-tk="reabre" data-id="' + t.id + '">Reabrir</button>' : '') +
         '</div>' +
@@ -1932,7 +1938,7 @@ function abreFalla(id) {
 
       '<div class="bloque"><h3>A quién le pega</h3>' +
         (af.length ? af.map(c => '<div class="fila" style="justify-content:space-between;font-size:13px">' +
-          '<span><b>' + esc(c.taller) + '</b> <span class="sitio">· ' + PLANES[c.plan].nombre + ' · versión ' + esc(c.version) + '</span></span>' +
+          '<span><b>' + esc(c.taller) + '</b> <span class="sitio">· ' + planDe(c).nombre + ' · versión ' + esc(c.version) + '</span></span>' +
           '<button class="btn sm" data-abre="' + c.id + '">Ver</button></div>').join("")
           : '<p class="sitio">Todavía no se ha ligado a ninguna cuenta.</p>') +
         (vecesDe(f) ? '<p class="sitio">Los errores automáticos la han detectado ' + vecesDe(f) + ' veces.</p>' : '') +
@@ -2010,7 +2016,7 @@ async function sugiere(id) {
     "Si es una falla del programa, dilo con todas sus letras y no inventes pasos para darle la vuelta.\n" +
     "Si te falta un dato para resolverlo, pregúntalo en una sola pregunta concreta.\n" +
     "Nunca inventes menús, botones ni pantallas que no estén en las reglas de arriba.\n\n" +
-    "TALLER: " + (c.taller || "") + " · plan " + (c.plan ? PLANES[c.plan].nombre : "?") + " · versión " + (c.version || "?") + " · " + (c.navegador || "") + "\n" +
+    "TALLER: " + (c.taller || "") + " · plan " + planDe(c).nombre + " · versión " + (c.version || "?") + " · " + (c.navegador || "") + "\n" +
     "PANTALLA DONDE PASÓ: " + (t.pantalla || (t.contexto || {}).pantalla || "no dice") + "\n" +
     (t.bloquea ? "EL CLIENTE DICE QUE NO PUEDE TRABAJAR.\n" : "") +
     ((t.errores || []).length ? "ERRORES TÉCNICOS DE SU SESIÓN:\n" + t.errores.map(x => "- " + x.msg).join("\n") + "\n" : "") +
@@ -2208,7 +2214,7 @@ async function accion(acc) {
     anota(c, "Cuenta reactivada. Siguiente cobro el " + fFecha(c.vence) + ".");
   } else if (acc === "cobra") {
     c.estado = "activa"; c.vence = iso(masDias(HOY, c.periodo === "anual" ? 365 : 30));
-    anota(c, "Pasó de prueba a " + PLANES[c.plan].nombre + " " + c.periodo + ".");
+    anota(c, "Pasó de prueba a " + planDe(c).nombre + " " + c.periodo + ".");
     aviso("Bien: " + c.taller + " ya está pagando");
   } else if (acc === "baja") {
     if (!confirm("¿Dar de baja a " + c.taller + "? Deja de cobrarse, pero sus datos se conservan.")) return;
@@ -2505,9 +2511,9 @@ document.addEventListener("change", async e => {
   if (!abierta) return;
   const c = cuentaDe(abierta); if (!c) return;
   if (e.target.id === "fPlan") {
-    const antes = PLANES[c.plan].nombre; c.plan = e.target.value;
-    anota(c, "Cambió de " + antes + " a " + PLANES[c.plan].nombre + ".");
-    await guarda("cuentas", c); abreFicha(c.id); aviso("Ahora es plan " + PLANES[c.plan].nombre);
+    const antes = planDe(c).nombre; c.plan = e.target.value;
+    anota(c, "Cambió de " + antes + " a " + planDe(c).nombre + ".");
+    await guarda("cuentas", c); abreFicha(c.id); aviso("Ahora es plan " + planDe(c).nombre);
   } else if (e.target.id === "fPeriodo") {
     c.periodo = e.target.value; anota(c, "Pasó a pago " + c.periodo + ".");
     await guarda("cuentas", c); abreFicha(c.id);
@@ -2533,7 +2539,7 @@ async function exporta() {
   const cab = ["Taller","Ciudad","Contacto","Correo","Telefono","Estado","Plan","Periodo","Al mes","Alta","Vence",
     "Ultimo acceso","Cotizaciones","Origen","La cerro","Que sigue","Pide factura","RFC"];
   const filas = ficheros.cuentas.map(c => [c.taller, c.sitio, c.contacto, c.correo, c.tel, ESTADOS[c.estado].nombre,
-    PLANES[c.plan].nombre, c.periodo, paga(c) ? Math.round(mensual(c)) : 0, c.alta, c.vence, c.ultimo, c.cotizaciones,
+    planDe(c).nombre, c.periodo, paga(c) ? Math.round(mensual(c)) : 0, c.alta, c.vence, c.ultimo, c.cotizaciones,
     c.alianza ? (aliDe(c.alianza) || {}).nombre : ORIGENES[c.origen],
     c.cerradoPor ? (eqDe(c.cerradoPor) || {}).nombre : "", jugada(c).titulo,
     c.requiereFactura ? "Sí" : "No", c.rfc]);
@@ -2596,7 +2602,7 @@ function vCodigos() {
         cs.map(c => '<tr' + (c.activo ? '' : ' style="opacity:.5"') + '>' +
           '<td><b style="font-family:ui-monospace,monospace">' + esc(c.codigo) + '</b></td>' +
           '<td>' + esc(c.curso || "—") + '</td>' +
-          '<td>' + esc((PLANES[c.plan] || {}).nombre || c.plan) + ' · ' + c.dias + ' días</td>' +
+          '<td>' + esc(planDe(c).nombre) + ' · ' + c.dias + ' días</td>' +
           '<td>' + c.usos + (c.usos_max ? ' de ' + c.usos_max : ' · sin tope') + '</td>' +
           '<td>' + cuentasPorCodigo(c) + '</td>' +
           '<td>' + (c.vence ? fFecha(String(c.vence).slice(0,10)) : "siempre") + '</td>' +
@@ -2669,8 +2675,32 @@ async function recarga(col) {
 
 </script>
 
-<script>window.BUILD="20260929-1802";</script>
+<script>window.BUILD="20260929-2227";</script>
+<script>
+(function(){
+  var mio = "20260929-2227";
+  /* Un solo reintento por versión: si el servidor insistiera en
+     mandar la vieja, mejor una página vieja que un parpadeo eterno. */
+  function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
+  function anota(v){ try{ sessionStorage.setItem("hm-recarga", v); }catch(e){} }
+  function revisa(){
+    fetch("version.json?t=" + Date.now(), {cache:"no-store"})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        var suyo = d["lab"] || d.build;
+        if(!suyo || suyo === mio) return;
+        if(yaLoIntente(suyo)) return;
+        anota(suyo);
+        var base = location.pathname.split("?")[0];
+        location.replace(base + "?v=" + suyo);
+      })
+      .catch(function(){});
+  }
+  setTimeout(revisa, 1500);
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden) revisa(); });
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="lab.js?v=20260929-1802"></script>
+<script src="lab.js?v=20260929-2227"></script>
 </body>
 </html>

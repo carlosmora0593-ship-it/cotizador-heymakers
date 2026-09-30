@@ -519,6 +519,7 @@ async function arrancaSesion(){
   aplicaPlan();
   aplicaPermisos();
   renderEquipo();
+  escuchaCuenta();
   if(window.__arranca) window.__arranca();
 }
 
@@ -941,5 +942,70 @@ async function revisaTrasPago(){
 
 /* Si config.js todavía no tiene las llaves, SB no existe: no le pedimos nada,
    y dejamos que arrancaSesion pinte el aviso de qué falta configurar. */
+/* ---------- Que los cambios del panel lleguen solos ----------
+   Cuando Hey Makers cambia tu plan desde Makers Lab, no tienes por qué
+   recargar la página ni enterarte al día siguiente. Tres caminos, del más
+   rápido al más terco, porque uno solo siempre falla en algún navegador:
+     1. Tiempo real: la base avisa en cuanto cambia la fila.
+     2. Al volver a la pestaña: el caso de "me lo activaron por teléfono
+        mientras yo miraba otra cosa".
+     3. Cada dos minutos, por si los dos anteriores no llegaron. */
+function huella(){ return CUENTA ? [CUENTA.plan, CUENTA.estado, CUENTA.vence, CUENTA.es_prueba].join("|") : ""; }
+
+async function refrescaCuenta(avisar){
+  if(!SESION || !CUENTA) return;
+  const antes = huella();
+  try{ await cargaCuenta(); }catch(e){ return; }
+  if(huella() === antes) return;
+
+  pintaCuenta();
+  pintaEmpresas();
+  aplicaPlan();
+  aplicaPermisos();
+
+  if(avisar !== false && typeof toast === "function"){
+    toast(sinPlan()      ? "Tu plan cambió: la cuenta quedó sin plan"
+        : esPrueba()     ? "Tu cuenta quedó en prueba de " + nombrePlan()
+        : "Tu plan cambió a " + nombrePlan());
+  }
+}
+
+function escuchaCuenta(){
+  if(!CUENTA) return;
+  try{
+    SB.channel("mi-cuenta")
+      .on("postgres_changes",
+          {event:"UPDATE", schema:"public", table:"cuentas", filter:"id=eq." + CUENTA.id},
+          ()=> refrescaCuenta())
+      .subscribe();
+  }catch(e){ /* sin tiempo real seguimos con los otros dos caminos */ }
+
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) refrescaCuenta(); });
+  setInterval(()=> refrescaCuenta(), 120000);
+
+  escuchaSoporte();
+}
+
+/* Cuando soporte contesta un reporte desde Makers Lab, escribe en el
+   documento de esta cuenta. Esto se entera en ese momento y le prende el
+   punto rojo al botón de ayuda, sin que nadie recargue nada: el cliente
+   pidió ayuda y le contestaron; enterarse media hora después, cuando
+   vuelva a abrir el panel por su cuenta, es tarde.
+
+   El botón de ayuda y el panel son del cotizador, no de este archivo, así
+   que aquí solo se toca el timbre: quien sabe repintar es él. */
+function escuchaSoporte(){
+  if(!CUENTA) return;
+  const timbre = ()=>{ if(typeof window.__recargaSoporte === "function") window.__recargaSoporte(); };
+  try{
+    SB.channel("mi-soporte")
+      .on("postgres_changes",
+          {event:"*", schema:"public", table:"documentos", filter:"cuenta_id=eq." + CUENTA.id},
+          (m)=>{ const f = m.new || m.old || {}; if(f.coleccion === "soporte") timbre(); })
+      .subscribe();
+  }catch(e){ /* sin tiempo real, queda el de abajo */ }
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden) timbre(); });
+}
+
 if(SB) SB.auth.onAuthStateChange((evt)=>{ if(evt==="SIGNED_OUT") location.reload(); });
 arrancaSesion().then(revisaTrasPago);

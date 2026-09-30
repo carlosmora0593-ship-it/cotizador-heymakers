@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20260929-1739"></script>
+<script src="config.js?v=20260929-2227"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -5847,6 +5847,16 @@ function contextoAhora() {
 function arrancaAyuda() {
   cargaSoporte();
   $("#ayudaBtn").addEventListener("click", () => ($("#ayudaPanel").hidden ? abreAyuda() : cierraAyuda()));
+  /* El timbre de cuenta.js: soporte contestó. Si el panel está abierto se
+     repinta al instante; si no, basta con que aparezca el punto rojo. */
+  window.__recargaSoporte = async () => {
+    const abierto = !$("#ayudaPanel").hidden;
+    const antes = JSON.stringify((tk() || {}).mensajes || []);
+    await cargaSoporte();
+    if (abierto) pintaAyuda();
+    const ahora = JSON.stringify((tk() || {}).mensajes || []);
+    if (!abierto && antes !== ahora) toast("Soporte contestó tu reporte");
+  };
   $("#ayudaCerrar").addEventListener("click", cierraAyuda);
   $("#ayudaAtras").addEventListener("click", () => { ayudaVista = ticketAbierto ? "hilo" : "inicio"; if (!ticketAbierto) ayudaBorrador = {}; pintaAyuda(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#ayudaPanel").hidden) cierraAyuda(); });
@@ -5868,7 +5878,8 @@ async function guardaTicket(t) {
   if (DB) { try { const c = JSON.parse(JSON.stringify(t)); delete c.id; await DB.collection("soporte").doc(t.id).set(c); } catch (e) {} }
   else lsSet("soporte", soporte);
 }
-function abreAyuda() {
+async function abreAyuda() {
+  await cargaSoporte();
   const vivo = soporte.find(t => t.estado !== "cerrado");
   ticketAbierto = vivo ? vivo.id : null;
   ayudaVista = vivo ? "hilo" : "inicio";
@@ -6004,8 +6015,32 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20260929-1739";</script>
+<script>window.BUILD="20260929-2227";</script>
+<script>
+(function(){
+  var mio = "20260929-2227";
+  /* Un solo reintento por versión: si el servidor insistiera en
+     mandar la vieja, mejor una página vieja que un parpadeo eterno. */
+  function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
+  function anota(v){ try{ sessionStorage.setItem("hm-recarga", v); }catch(e){} }
+  function revisa(){
+    fetch("version.json?t=" + Date.now(), {cache:"no-store"})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        var suyo = d["cotizador"] || d.build;
+        if(!suyo || suyo === mio) return;
+        if(yaLoIntente(suyo)) return;
+        anota(suyo);
+        var base = location.pathname.split("?")[0];
+        location.replace(base + "?v=" + suyo);
+      })
+      .catch(function(){});
+  }
+  setTimeout(revisa, 1500);
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden) revisa(); });
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20260929-1739"></script>
+<script src="cuenta.js?v=20260929-2227"></script>
 </body>
 </html>
