@@ -2,6 +2,10 @@
    Se llama desde el navegador con el token de sesión del usuario. */
 const { createClient } = require("@supabase/supabase-js");
 
+/* Los precios viven AQUÍ, en el servidor, y no se leen de lo que manda el
+   navegador: si el monto viniera del navegador, cualquiera podría contratar
+   el plan Pro por un peso. El costo de esta decisión es que hay que
+   cambiarlos en dos lados —aquí y en public/config.js— cuando suban. */
 const PRECIOS = {
   basico: { mensual: 199, anual: 1990, nombre: "Básico" },
   maker:  { mensual: 449, anual: 4490, nombre: "Maker"  },
@@ -26,8 +30,24 @@ exports.handler = async (event) => {
     if (errUser || !userData || !userData.user) return resp(401, { error: "Sesión no válida" });
     const user = userData.user;
 
-    const { data: perfil } = await admin.from("perfiles").select("cuenta_id").eq("id", user.id).maybeSingle();
+    const { data: perfil } = await admin.from("perfiles")
+      .select("cuenta_id, cuenta_activa, rol").eq("id", user.id).maybeSingle();
     if (!perfil) return resp(404, { error: "La cuenta no existe todavía" });
+
+    /* Desde que una persona puede tener varias empresas, "su cuenta" ya no es
+       una sola: es la que trae abierta. Cobrarle a perfiles.cuenta_id —la
+       primera que abrió— le cobraría la suscripción a la empresa equivocada. */
+    const cuentaId = perfil.cuenta_activa || perfil.cuenta_id;
+    if (!cuentaId) return resp(404, { error: "La cuenta no existe todavía" });
+
+    /* Y contratar no es cualquier cosa: solo el administrador de ESA empresa.
+       Quien entró como ventas o producción no le cambia el plan a nadie. */
+    const { data: mem } = await admin.from("membresias")
+      .select("rol").eq("usuario_id", user.id).eq("cuenta_id", cuentaId).maybeSingle();
+    const miRol = (mem && mem.rol) || perfil.rol || "admin";
+    if (miRol !== "admin" && miRol !== "dueno") {
+      return resp(403, { error: "Solo un administrador puede contratar o cambiar el plan" });
+    }
 
     const sitio = process.env.SITE_URL || "https://" + (event.headers.host || "");
 
@@ -36,9 +56,15 @@ exports.handler = async (event) => {
     // Si Mercado Pago cambia algún nombre de campo, se ajusta SOLO aquí.
     const cuerpo = {
       reason: "Cotizador " + PRECIOS[plan].nombre,
-      external_reference: [perfil.cuenta_id, plan, periodo].join("|"),
+      external_reference: [cuentaId, plan, periodo].join("|"),
       payer_email: user.email,
       back_url: sitio + "/?pago=ok",
+      /* Sin esto, Mercado Pago no tiene a dónde avisar que ya cobró, y la
+         cuenta se queda en "pendiente" para siempre aunque el dinero haya
+         entrado. La clave va en la dirección porque el webhook no tiene otra
+         forma de saber que quien toca es Mercado Pago y no un curioso. */
+      notification_url: sitio + "/.netlify/functions/webhook-mercadopago"
+                        + (process.env.WEBHOOK_CLAVE ? "?clave=" + encodeURIComponent(process.env.WEBHOOK_CLAVE) : ""),
       status: "pending",
       auto_recurring: {
         frequency: 1,
@@ -63,7 +89,7 @@ exports.handler = async (event) => {
       return resp(502, { error: (mp && mp.message) || "Mercado Pago rechazó la solicitud" });
     }
 
-    await admin.from("cuentas").update({ mp_preapproval_id: mp.id }).eq("id", perfil.cuenta_id);
+    await admin.from("cuentas").update({ mp_preapproval_id: mp.id }).eq("id", cuentaId);
 
     return resp(200, { init_point: mp.init_point || mp.sandbox_init_point, id: mp.id });
   } catch (e) {

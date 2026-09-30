@@ -1,72 +1,88 @@
 @echo off
 chcp 65001 >nul
 cd /d "%~dp0"
-title Publicar el cotizador en Netlify
+title Publicar Hey Makers
 color 0F
 
 echo.
 echo  ============================================================
-echo   PUBLICAR EL COTIZADOR
+echo   PUBLICAR
 echo  ============================================================
 echo.
-echo   Carpeta: %CD%
+echo   Un solo empujon publica los dos lados:
+echo     - GitHub Pages  (el sitio de siempre)
+echo     - Netlify       (el mismo sitio, pero con servidor)
+echo.
+echo   Los dos leen de GitHub, asi que subir una vez actualiza ambos.
 echo.
 
-REM ---------- 1. Comprobar que git existe ----------
 git --version >nul 2>&1
 if errorlevel 1 (
-  echo   [X] No encontre git en esta computadora.
-  echo.
-  echo   Instalalo desde https://git-scm.com/download/win
-  echo   y vuelve a dar doble clic aqui.
+  echo   [X] No encontre git. Instalalo desde https://git-scm.com/download/win
   echo.
   pause
   exit /b 1
 )
 
-REM ---------- 2. En que rama estamos ----------
-for /f "tokens=*" %%r in ('git rev-parse --abbrev-ref HEAD 2^>nul') do set RAMA=%%r
-echo   Rama actual: %RAMA%
-echo.
-
-REM ---------- 3. Que cambio ----------
 echo  ------------------------------------------------------------
-echo   Archivos que se van a subir:
+echo   1. Esto es lo que cambio
 echo  ------------------------------------------------------------
 git status --short
 echo.
 
-REM ---------- 4. Guardar los cambios ----------
+REM  El mensaje del commit es lo unico que se teclea. Si lo dejas vacio
+REM  se pone la fecha y la hora, que para el dia a dia alcanza.
+set "MENSAJE="
+set /p MENSAJE="  Que cambiaste? (Enter para poner la fecha): "
+if "%MENSAJE%"=="" set "MENSAJE=Cambios del %date% %time:~0,5%"
+
+echo.
 echo  ------------------------------------------------------------
-echo   Guardando los cambios...
+echo   2. Guardando
 echo  ------------------------------------------------------------
 git add -A
-git commit -m "Makers Lab dentro del sitio, varias empresas por correo y puerta de dueno"
+git commit -m "%MENSAJE%"
+if errorlevel 1 echo   [i] No habia nada nuevo que guardar. Seguimos.
+echo.
+
+echo  ------------------------------------------------------------
+echo   3. Trayendo lo que hay en GitHub
+echo  ------------------------------------------------------------
+REM  Sin traer primero, el push se rechaza cuando algo se creo desde la
+REM  pagina web de GitHub (como el flujo de publicacion).
+git fetch origin main
+if errorlevel 1 goto fallo
+
+git rebase origin/main
 if errorlevel 1 (
   echo.
-  echo   [i] No habia nada nuevo que guardar. Seguimos: puede que
-  echo       el commit ya se hubiera hecho antes y solo falte subirlo.
+  echo   [!] Hubo un choque al juntar los cambios. Lo deshago para no
+  echo       dejar nada a medias.
+  git rebase --abort
+  echo.
+  echo   Mandale a Claude una captura de esta ventana.
+  echo.
+  pause
+  exit /b 1
 )
 echo.
 
-REM ---------- 5. Subir a main, que es de donde publica Netlify ----------
 echo  ------------------------------------------------------------
-echo   Subiendo a GitHub (rama main)...
+echo   4. Subiendo
 echo  ------------------------------------------------------------
 git push origin HEAD:main
 if errorlevel 1 goto fallo
 
 echo.
 echo  ============================================================
-echo   LISTO. Ya subio.
+echo   LISTO
 echo  ============================================================
 echo.
-echo   Netlify arranca solo en unos segundos. Entra a tu panel de
-echo   Netlify y espera a que el despliegue quede en verde.
+echo   En uno o dos minutos los dos sitios se actualizan solos.
 echo.
-echo   Cuando termine, faltan dos cosas en Supabase:
-echo     1) correr  sql\05-rescate.sql
-echo     2) correr  sql\06-superadmin.sql
+echo   Si abriste el cotizador antes de publicar, no hace falta que
+echo   cierres nada: la pagina se da cuenta sola de que hay version
+echo   nueva y se vuelve a cargar.
 echo.
 pause
 exit /b 0
@@ -74,20 +90,13 @@ exit /b 0
 :fallo
 echo.
 echo  ============================================================
-echo   NO SE PUDO SUBIR
+echo   NO SE PUDO
 echo  ============================================================
 echo.
-echo   Lee el mensaje de arriba. Los dos casos mas comunes:
+echo   Si te pide usuario y contrasena, corre  gh auth login  primero.
+echo   Si dice otra cosa, mandale a Claude una captura de esta ventana.
 echo.
-echo   - Te pide usuario y contrasena:
-echo       cierra esta ventana, abre otra vez este archivo pero
-echo       antes corre  gh auth login  en una terminal.
-echo.
-echo   - Dice "rejected" o "non-fast-forward":
-echo       alguien mas subio algo a main. Mandale a Claude una
-echo       captura de esta ventana y te digo que hacer.
-echo.
-echo   Nada se perdio: tus cambios ya quedaron guardados en git.
+echo   Nada se perdio: tus cambios estan guardados en git.
 echo.
 pause
 exit /b 1

@@ -2,26 +2,62 @@
   publish = "public"
   functions = "netlify/functions"
 
-  # Los archivos de sql/ y las guías no forman parte del sitio: son las
+  # Los archivos de sql/ y las guias no forman parte del sitio: son las
   # instrucciones que corres una vez en Supabase. No se publican en la web,
-  # pero el revisor de secretos de Netlify también los lee, y ahí hay
+  # pero el revisor de secretos de Netlify tambien los lee, y ahi hay
   # nombres y palabras de ejemplo que pueden coincidir con alguna de tus
-  # claves. Se quedan fuera de esa revisión.
+  # claves. Se quedan fuera de esa revision.
   [build.environment]
     SECRETS_SCAN_OMIT_PATHS = "sql/*,*.md"
 
-    # Estas dos llaves son públicas por diseño: viven en config.js porque el
+    # Estas dos llaves son publicas por diseno: viven en config.js porque el
     # navegador las necesita, y no dan acceso a los datos de nadie (la base
-    # está protegida con reglas por fila). El revisor de secretos no tiene
-    # por qué alarmarse de encontrarlas ahí. La llave de servicio y el token
-    # de Mercado Pago NO están en esta lista, y nunca deben estarlo.
+    # esta protegida con reglas por fila). El revisor de secretos no tiene
+    # por que alarmarse de encontrarlas ahi.
+    #
+    # SUPABASE_SERVICE_KEY, MP_ACCESS_TOKEN y WEBHOOK_CLAVE NO estan en esta
+    # lista, y nunca deben estarlo. Si algun dia el despliegue falla diciendo
+    # que encontro una de esas tres en el sitio publicado, el error no es de
+    # Netlify: es que de verdad se coló una llave secreta al navegador.
     SECRETS_SCAN_OMIT_KEYS = "SUPABASE_URL,SUPABASE_ANON_KEY"
 
 [functions]
   node_bundler = "esbuild"
 
-# Makers Lab responde también en /lab, que es más fácil de teclear.
-# Va ANTES del comodín de abajo, porque el primero que coincide gana.
+# ------------------------------------------------------------------
+#  Que nadie se quede con una version vieja
+# ------------------------------------------------------------------
+#  index.html es el unico archivo que no puede desatrasarse solo, porque
+#  el ?v= de los demas lo escribe el. Aqui se le dice al navegador que lo
+#  vuelva a preguntar siempre. La pagina ademas revisa version.json por su
+#  cuenta, asi que hay dos redes: esta, y la del propio programa.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/lab.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/version.json"
+  [headers.values]
+    Cache-Control = "no-store"
+
+# Los archivos que SI llevan ?v= se pueden guardar mucho tiempo sin riesgo:
+# cuando cambian, cambia su direccion.
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# ------------------------------------------------------------------
+#  Direcciones
+# ------------------------------------------------------------------
+# Makers Lab responde tambien en /lab, que es mas facil de teclear.
+# Va ANTES del comodin de abajo, porque el primero que coincide gana.
 [[redirects]]
   from = "/lab"
   to = "/lab.html"
