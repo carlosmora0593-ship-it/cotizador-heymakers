@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20260929-2310"></script>
+<script src="config.js?v=20260929-2328"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -479,6 +479,10 @@ body.rol-produccion .estadoPedido{display:none!important}
   padding:1px 7px;border-radius:5px}
 .clase-oc{background:var(--cyan-soft);color:var(--cyan)}
 .clase-factura{background:var(--good-soft);color:var(--good)}
+.leerCsf{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border:1px dashed var(--line);
+  border-radius:10px;padding:12px 14px;background:var(--surface-2)}
+.leerCsf>div{flex:1;min-width:220px}
+.leerCsf small{display:block;color:var(--ink-3);font-size:12px;margin-top:2px;line-height:1.45}
 .avisoSello{border:1px solid var(--accent);border-radius:10px;padding:12px 14px;
   background:var(--accent-soft);font-size:13px;line-height:1.55;color:var(--ink)}
 .avisoSello b{display:block;margin-bottom:4px}
@@ -1344,7 +1348,13 @@ body.rol-produccion #btnPrint{display:none!important}
     <div class="body">
       <p class="note" id="fiscalCandado" hidden></p>
       <div id="fiscalCampos">
-        <div class="grid g2">
+        <div class="leerCsf">
+          <div><b>¿Tienes tu constancia de situación fiscal?</b>
+          <small>Súbela y lleno todo lo de abajo. El PDF se lee aquí, en tu computadora, y no se guarda.</small></div>
+          <button class="btn sm primary" id="csfEmpresa" type="button">Leer mi constancia (PDF)</button>
+          <input type="file" id="csfEmpresaFile" accept="application/pdf" hidden>
+        </div>
+        <div class="grid g2" style="margin-top:14px">
           <div><label class="f" for="e_razon">Razón social</label><input id="e_razon" placeholder="Como está en tu constancia del SAT"></div>
           <div><label class="f" for="e_rfc">RFC</label><input id="e_rfc" placeholder="XAXX010101000" style="text-transform:uppercase" maxlength="13"></div>
         </div>
@@ -2630,6 +2640,29 @@ $("#tab-set").addEventListener("change", e=>{
   if(t.id==="e_pac"){ empresaFiscal(); P.empresa.pac=t.value; notaPac(); }
   if(t.id==="e_sellosAlta"){ empresaFiscal(); P.empresa.sellosAlta=t.checked; }
   persist(); renderResumen();
+});
+$("#tab-set").addEventListener("click", e=>{
+  if(e.target.closest("#csfEmpresa")) $("#csfEmpresaFile").click();
+});
+$("#tab-set").addEventListener("change", async e=>{
+  if(e.target.id !== "csfEmpresaFile") return;
+  const f = e.target.files[0]; e.target.value = ""; if(!f) return;
+  toast("Leyendo tu constancia…");
+  let d; try{ d = await leeConstancia(f); }catch(err){ avisaConstancia(err); return; }
+  const E = empresaFiscal();
+  E.rfc = d.rfc || E.rfc;
+  if(d.regimen) E.regimen = d.regimen;
+  E.razon = d.razon || E.razon;
+  if(d.cp)        E.cpFiscal  = d.cp;
+  if(d.calle)     E.calle     = d.calle;
+  if(d.numExt)    E.numExt    = d.numExt;
+  if(d.numInt)    E.numInt    = d.numInt;
+  if(d.colonia)   E.colonia   = d.colonia;
+  if(d.municipio) E.municipio = d.municipio;
+  if(d.estado)    E.estado    = d.estado;
+  if(!P.empresa.nombre || P.empresa.nombre === "Hey Makers") P.empresa.nombre = d.comercial || d.razon || P.empresa.nombre;
+  persist(); renderSet(); renderResumen();
+  toast("Listo: quedaron tus datos fiscales");
 });
 $("#btnReset").addEventListener("click", ()=>{ cat=defaults(); P=defaultParams(); persist(); renderCatalogo(); renderSet(); renderCot(); toast("Catálogo de ejemplo restaurado"); });
 $("#btnExport").addEventListener("click", ()=>{
@@ -4209,12 +4242,158 @@ function renderClientes(){
     : '<div class="empty">Sin clientes. Dale a <b>+ Cliente</b> o guarda uno desde una cotización.</div>';
   renderFicha();
 }
+/* ============================================================
+   Leer la constancia de situación fiscal
+   ============================================================
+   La constancia del SAT trae, en texto, todo lo que hace falta para
+   facturarle a alguien. Capturarlo a mano son doce campos y un RFC de
+   trece caracteres que si se teclea mal tumba la factura completa. Esto
+   lo lee y lo llena.
+
+   Se lee AQUÍ, en la computadora de quien la sube: el PDF no viaja a
+   ningún servidor para esto. Y lo que se saca son datos fiscales, que
+   son públicos en el sentido que importa —van impresos en cada factura
+   que esa persona recibe—, no una credencial. */
+
+const PDFJS_BASE = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4/build/";
+let pdfjsCargando = null;
+/* El lector de PDF se baja la primera vez que alguien sube una constancia,
+   no al abrir el programa: son 300 KB que la mayoría de los días nadie
+   necesita, y el cotizador tiene que abrir rápido. */
+function cargaPdfJs(){
+  if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+  if(pdfjsCargando) return pdfjsCargando;
+  pdfjsCargando = import(PDFJS_BASE + "pdf.min.mjs").then(m=>{
+    const lib = (m && m.getDocument) ? m : (m && m.default) ? m.default : null;
+    if(!lib || !lib.getDocument) throw new Error("SIN_LECTOR");
+    try{ lib.GlobalWorkerOptions.workerSrc = PDFJS_BASE + "pdf.worker.min.mjs"; }catch(e){}
+    window.pdfjsLib = lib;
+    return lib;
+  }).catch(()=>{ pdfjsCargando = null; throw new Error("SIN_LECTOR"); });
+  return pdfjsCargando;
+}
+
+async function textoDelPdf(file){
+  const pdfjs = await cargaPdfJs();
+  const buf = await file.arrayBuffer();
+  const doc = await pdfjs.getDocument({data: buf}).promise;
+  let todo = "";
+  for(let i=1; i<=Math.min(doc.numPages, 4); i++){
+    const pag = await doc.getPage(i);
+    const t = await pag.getTextContent();
+    todo += " " + t.items.map(x=> x.str).join(" ");
+  }
+  return todo.replace(/\s+/g, " ").trim();
+}
+
+const sinAcentos = t => String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+
+/* Las etiquetas de la constancia, tal cual vienen. Partir por etiquetas
+   —en vez de una expresión por campo— aguanta que el SAT mueva el orden
+   o meta columnas nuevas, que ya lo ha hecho. */
+const ETIQUETAS_CSF = ["RFC","CURP","Nombre (s)","Primer Apellido","Segundo Apellido",
+  "Denominación/Razón Social","Denominacion/Razon Social","Régimen Capital","Regimen Capital",
+  "Nombre Comercial","Fecha inicio de operaciones","Estatus en el padrón","Estatus en el padron",
+  "Fecha de último cambio de estado","Fecha de ultimo cambio de estado",
+  "Código Postal","Codigo Postal","Tipo de Vialidad","Nombre de Vialidad",
+  "Número Exterior","Numero Exterior","Número Interior","Numero Interior",
+  "Nombre de la Colonia","Nombre de la Localidad",
+  "Nombre del Municipio o Demarcación Territorial","Nombre del Municipio o Demarcacion Territorial",
+  "Nombre de la Entidad Federativa","Entre Calle","Y Calle","Correo electrónico","Correo electronico",
+  "Al reverso","idCIF","Lugar y Fecha de Emisión","Lugar y Fecha de Emision",
+  /* Los encabezados de sección no son campos, pero sirven de tope: sin
+     ellos el "Nombre Comercial" se llevaba pegado el título que venía
+     abajo, y el correo se comía media constancia. */
+  "Datos de identificación del contribuyente","Datos de identificacion del contribuyente",
+  "Datos del domicilio registrado","Características fiscales","Caracteristicas fiscales",
+  "Obligaciones","Régimen","Regimen","Fecha de alta","Fecha Inicio","Fecha Fin"];
+
+function camposCSF(texto){
+  const escapa = x => x.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const corte = ETIQUETAS_CSF.map(escapa).join("|");
+  const out = {};
+  ETIQUETAS_CSF.forEach(et=>{
+    const re = new RegExp(escapa(et) + "\\s*:\\s*([\\s\\S]*?)(?=\\s*(?:" + corte + ")\\s*:|$)", "i");
+    const m = texto.match(re);
+    if(m && m[1]){
+      const v = m[1].trim().replace(/\s{2,}/g," ");
+      if(v && v.length < 120) out[sinAcentos(et)] = v;
+    }
+  });
+  return out;
+}
+
+/* El régimen no viene con dos puntos: viene en una tabla. Así que se
+   busca al revés —cuál de los nombres del catálogo aparece en el texto—
+   y gana el más largo, para que "Régimen Simplificado de Confianza" no
+   pierda contra un pedazo suyo. */
+function regimenDelTexto(texto){
+  const T = sinAcentos(texto);
+  let mejor = null;
+  REGIMENES.forEach(r=>{
+    const n = sinAcentos(r[1]);
+    if(T.indexOf(n) >= 0 && (!mejor || n.length > sinAcentos(mejor[1]).length)) mejor = r;
+  });
+  return mejor ? mejor[0] : "";
+}
+
+function leeConstanciaTexto(texto){
+  const c = camposCSF(texto);
+  const t = k => c[sinAcentos(k)] || "";
+  const rfcSuelto = (texto.match(/\b([A-ZÑ&]{3,4}\d{6}[A-Z\d]{3})\b/) || [])[1] || "";
+  const nombre = [t("Nombre (s)"), t("Primer Apellido"), t("Segundo Apellido")]
+                   .filter(Boolean).join(" ").trim();
+  const razon = t("Denominación/Razón Social") || t("Denominacion/Razon Social") || nombre;
+  return {
+    rfc:       (t("RFC") || rfcSuelto).toUpperCase().replace(/[^A-ZÑ&0-9]/g,""),
+    razon:     razon,
+    comercial: t("Nombre Comercial"),
+    regimen:   regimenDelTexto(texto),
+    cp:        (t("Código Postal") || t("Codigo Postal")).replace(/\D/g,"").slice(0,5),
+    calle:     t("Nombre de Vialidad"),
+    numExt:    t("Número Exterior") || t("Numero Exterior"),
+    numInt:    (t("Número Interior") || t("Numero Interior")).replace(/^-+$/,""),
+    colonia:   t("Nombre de la Colonia"),
+    municipio: t("Nombre del Municipio o Demarcación Territorial") || t("Nombre del Municipio o Demarcacion Territorial"),
+    estado:    t("Nombre de la Entidad Federativa"),
+    mail:      t("Correo electrónico") || t("Correo electronico")
+  };
+}
+
+async function leeConstancia(file){
+  if(!file) throw new Error("SIN_ARCHIVO");
+  if((file.type||"").indexOf("pdf") < 0 && !/\.pdf$/i.test(file.name||""))
+    throw new Error("NO_ES_PDF");
+  const texto = await textoDelPdf(file);
+  if(texto.replace(/\s/g,"").length < 80) throw new Error("ESCANEADA");
+  const d = leeConstanciaTexto(texto);
+  if(!d.rfc) throw new Error("NO_ES_CONSTANCIA");
+  return d;
+}
+
+/* Un solo lugar donde se explica qué salió mal, porque los tres avisos
+   distintos llevan a tres acciones distintas de quien lo está usando. */
+function avisaConstancia(err){
+  const m = String(err && err.message || "");
+  if(m === "SIN_LECTOR")      toast("No se pudo cargar el lector de PDF. Revisa tu conexión o captura los datos a mano.");
+  else if(m === "NO_ES_PDF")  toast("Tiene que ser el PDF de la constancia, no una foto ni una captura.");
+  else if(m === "ESCANEADA")  toast("Esa constancia está escaneada: no trae texto que leer. Bájala otra vez del SAT y sube ese PDF.");
+  else if(m === "NO_ES_CONSTANCIA") toast("No encontré un RFC en ese PDF. ¿Seguro que es la constancia de situación fiscal?");
+  else                        toast("No se pudo leer la constancia. Captura los datos a mano.");
+}
+
 function renderFicha(){
   const c = clientes.find(c=>c.id===clienteSel);
   const w = $("#cliFicha");
   if(!c){ w.innerHTML = '<div class="empty">Elige un cliente de la lista para ver su expediente.</div>'; return; }
   w.innerHTML =
-   '<div class="grid g2"><div><label class="f">Nombre comercial</label><input data-ck="nombre" value="'+esc(c.nombre)+'"></div>'+
+   '<div class="leerCsf">'+
+     '<div><b>¿Tienes su constancia de situación fiscal?</b>'+
+     '<small>Súbela y lleno el RFC, la razón social, el régimen y el domicilio. Se queda en su expediente.</small></div>'+
+     '<button class="btn sm primary" id="csfCliente" type="button">Leer constancia (PDF)</button>'+
+     '<input type="file" id="csfClienteFile" accept="application/pdf" hidden>'+
+   '</div>'+
+   '<div class="grid g2" style="margin-top:14px"><div><label class="f">Nombre comercial</label><input data-ck="nombre" value="'+esc(c.nombre)+'"></div>'+
    '<div><label class="f">Razón social</label><input data-ck="razon" value="'+esc(c.razon)+'"></div></div>'+
    '<div class="grid g3" style="margin-top:12px">'+
    '<div><label class="f">RFC</label><input data-ck="rfc" value="'+esc(c.rfc)+'" style="text-transform:uppercase"></div>'+
@@ -4260,7 +4439,37 @@ $("#cliFicha").addEventListener("input", e=>{
   c[k] = k==="rfc" ? e.target.value.toUpperCase() : e.target.value;
   clearTimeout(c._t); c._t = setTimeout(()=>{ guardaCliente(c); renderListaSolo(); }, 700);
 });
-$("#cliFicha").addEventListener("change", e=>{
+$("#cliFicha").addEventListener("change", async e=>{
+  if(e.target.id === "csfClienteFile"){
+    const f = e.target.files[0]; e.target.value = "";
+    const c = clientes.find(c=>c.id===clienteSel); if(!f || !c) return;
+    toast("Leyendo la constancia…");
+    let d; try{ d = await leeConstancia(f); }catch(err){ avisaConstancia(err); return; }
+
+    /* Lo que ya estaba escrito no se pisa a menos que venga vacío: si
+       alguien corrigió a mano el nombre comercial, la constancia no tiene
+       por qué borrárselo. El RFC y el régimen sí mandan, porque de ahí
+       vienen los rechazos del SAT. */
+    c.rfc = d.rfc || c.rfc;
+    if(d.regimen) c.regimen = d.regimen;
+    c.razon = d.razon || c.razon;
+    if(!c.nombre || c.nombre === "Cliente nuevo") c.nombre = d.comercial || d.razon || c.nombre;
+    const calle = [d.calle, d.numExt, d.numInt ? "int. " + d.numInt : ""].filter(Boolean).join(" ");
+    if(calle) c.calle = calle;
+    if(d.colonia)   c.colonia = d.colonia;
+    if(d.municipio) c.ciudad  = d.municipio;
+    if(d.estado)    c.estado  = d.estado;
+    if(d.cp)        c.cp      = d.cp;
+    if(d.mail && !c.mail) c.mail = d.mail;
+
+    /* Y de paso queda archivada: es el documento que te van a pedir
+       cuando haya una aclaración, y nadie se acuerda de subirlo después. */
+    try{ await archivaConstancia(c, f); }catch(err){ /* los datos ya se llenaron */ }
+
+    guardaCliente(c); renderFicha(); renderListaSolo();
+    toast("Listo: " + (c.razon || c.rfc) + " quedó capturado");
+    return;
+  }
   const k = e.target.dataset.ck; if(!k) return;
   const c = clientes.find(c=>c.id===clienteSel); if(c){ c[k]=e.target.value; guardaCliente(c); }
 });
@@ -4271,6 +4480,7 @@ $("#cliFicha").addEventListener("click", async e=>{
     if(!ASSETS){ toast("La carga de archivos necesita permiso de edición"); return; }
     $("#docFile").click(); return;
   }
+  if(e.target.closest("#csfCliente")){ $("#csfClienteFile").click(); return; }
   const del = e.target.closest("[data-delcli]");
   if(del){ if(!confirm("¿Eliminar a "+(c.nombre||"este cliente")+" y su expediente?")) return;
     clientes = clientes.filter(x=>x.id!==c.id); clienteSel=null;
@@ -4298,6 +4508,20 @@ $("#cliFicha").addEventListener("change", async e=>{
     guardaCliente(c); renderFicha(); toast("Documento guardado en el expediente");
   }catch(err){ toast("No se pudo subir el documento"); }
 });
+/* Guardar la constancia en el expediente es opcional a propósito: si no
+   hay permiso de archivos o falla la subida, los datos YA quedaron
+   capturados, que es lo que se vino a hacer. */
+async function archivaConstancia(c, file){
+  if(!ASSETS) return;
+  if(typeof revisaArchivo === "function" && !revisaArchivo(file, "doc")) return;
+  const res = await ASSETS.upload(file);
+  c.docs = c.docs || [];
+  c.docs = c.docs.filter(d => d.tipo !== "Constancia de situación fiscal");
+  c.docs.push({id:uid(), nombre:file.name, tipo:"Constancia de situación fiscal",
+               tipoMime:file.type||"application/pdf", url:res.url, ref:res.id,
+               kb:Math.round(file.size/1024), fecha:hoyISO()});
+}
+
 async function guardaCliente(c){
   const limpio = JSON.parse(JSON.stringify(c)); delete limpio._t;
   const i = clientes.findIndex(x=>x.id===c.id); if(i>=0) clientes[i]=Object.assign(clientes[i],c);
@@ -6207,10 +6431,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20260929-2310";</script>
+<script>window.BUILD="20260929-2328";</script>
 <script>
 (function(){
-  var mio = "20260929-2310";
+  var mio = "20260929-2328";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -6233,6 +6457,6 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20260929-2310"></script>
+<script src="cuenta.js?v=20260929-2328"></script>
 </body>
 </html>
