@@ -178,6 +178,7 @@ const PUENTE_ASSETS = {
 
 function traduce(error){
   const m = (error && error.message) || "";
+  if(m.indexOf("SIN_PLAN")>=0)           return {code:"sinplan", message:"Tu cuenta todavía no tiene plan"};
   if(m.indexOf("SUSCRIPCION_VENCIDA")>=0) return {code:"vencida", message:"Tu suscripción venció"};
   if(m.indexOf("FUNCION_PRO")>=0)        return {code:"pro",     message:"La caja y el registro de ventas son del plan Pro"};
   if(m.indexOf("FUNCION_MAKER")>=0)      return {code:"pro",     message:"Compras e inventario son del plan Maker en adelante"};
@@ -235,6 +236,18 @@ const SOLO_PRO   = ["caj","ven"];
    qué incluye cada plan en lugar de dos que se desincronizan. */
 const SOLO_MAKER = ["com", "fac"];
 function enElPlan(t){
+  /* Quien nunca contrató no entra a trabajar. Antes esto dejaba pasar todo
+     lo que no fuera Caja, Ventas o Compras, con la idea de que viera cómo
+     funciona; el resultado real era que podía cotizar gratis para siempre
+     y, peor, "confirmar pedidos" que le daban folio y no se guardaban en
+     ningún lado. Prefiero una puerta cerrada y honesta que un recorrido
+     que termina en un documento que no existe.
+
+     Ojo con la diferencia: esto es para el que NUNCA tuvo plan. A quien
+     se le venció no se le cierra nada — sigue viendo lo suyo, y la base
+     es la que no le deja guardar. Quitarle la vista a quien ya pagó
+     sería castigarlo por atrasarse un día. */
+  if(sinPlan()) return false;
   if(SOLO_PRO.indexOf(t) >= 0)   return esPro();
   if(SOLO_MAKER.indexOf(t) >= 0) return esMaker();
   return true;
@@ -738,8 +751,22 @@ function pintaCuenta(){
     q("#avisoPagoTxt").textContent = "Te quedan " + dias + " día(s) de prueba. Elige un plan para no perder tu información.";
   }
 }
+/* El muro: lo único que ve una cuenta sin plan. No es una pantalla de
+   castigo — es la que le dice cómo empezar, con las dos puertas que
+   tiene: pagar, o traer el código de su curso. */
+function muroSinPlan(){
+  const muro = q("#sinPlanMuro");
+  if(!muro) return;
+  const lg = q("#muroLogo");
+  if(lg && !lg.src && window.LOGO_MARCA) lg.src = window.LOGO_MARCA;
+  const cerrado = sinPlan();
+  muro.hidden = !cerrado;
+  document.body.classList.toggle("sin-plan", cerrado);
+}
+
 function aplicaPlan(){
   if(typeof aplicaPermisos === "function") aplicaPermisos();
+  muroSinPlan();
   document.querySelectorAll("[data-solo-pro]").forEach(el=> el.hidden = !esPro());
   document.querySelectorAll("[data-solo-maker]").forEach(el=> el.hidden = !esMaker());
   /* Los datos fiscales no son una pestaña que se pueda esconder con un
@@ -794,6 +821,37 @@ const btnAjustes = q("#btnAjustes");
 if(btnAjustes) btnAjustes.addEventListener("click", ()=> vaA("set"));
 q("#btnPlanes").addEventListener("click", ()=> abrePlanes());
 q("#avisoPagoBtn").addEventListener("click", ()=> abrePlanes());
+
+/* ---------- Los botones del muro ---------- */
+if(q("#muroPlanes")) q("#muroPlanes").addEventListener("click", ()=> abrePlanes());
+
+if(q("#muroCodigo")) q("#muroCodigo").addEventListener("click", ()=>{
+  const caja = q("#muroCanje");
+  caja.hidden = !caja.hidden;
+  if(!caja.hidden) q("#muroCodigoTxt").focus();
+});
+
+async function canjeaDesdeMuro(){
+  const campo = q("#muroCodigoTxt"), msg = q("#muroMsg");
+  const txt = (campo.value || "").trim().toUpperCase();
+  const di = (t, clase)=>{ msg.hidden = false; msg.className = "muroMsg " + clase; msg.textContent = t; };
+  if(txt.length < 4){ di("Escribe el código que te dieron en el curso.", "mal"); return; }
+  di("Revisando…", "");
+  try{
+    const {data, error} = await SB.rpc("canjear_codigo", {p_codigo: txt});
+    if(error) throw error;
+    if(!data || !data.ok){ di((data && data.motivo) || "Ese código no se pudo usar.", "mal"); return; }
+    di("¡Listo! Tu prueba quedó activa.", "bien");
+    /* No recargamos la página: refrescamos la cuenta y el muro se quita
+       solo. Quien acaba de activar su curso no tiene por qué ver cómo se
+       reinicia todo. */
+    setTimeout(async ()=>{ await refrescaCuenta(false); if(typeof toast==="function") toast("Tu prueba quedó activa"); }, 600);
+  }catch(e){
+    di((e && e.message) || "No se pudo activar. Intenta de nuevo.", "mal");
+  }
+}
+if(q("#muroCanjea")) q("#muroCanjea").addEventListener("click", canjeaDesdeMuro);
+if(q("#muroCodigoTxt")) q("#muroCodigoTxt").addEventListener("keydown", e=>{ if(e.key === "Enter") canjeaDesdeMuro(); });
 
 /* ---------- Planes y cobro ---------- */
 const fechaLarga = d => {

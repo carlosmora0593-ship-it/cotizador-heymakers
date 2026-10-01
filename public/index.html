@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20260929-2328"></script>
+<script src="config.js?v=20261001-1729"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -632,6 +632,31 @@ body.sin-acceso .wrap,body.sin-acceso header.top{display:none}
 }
 
 
+/* ---- el muro de quien no tiene plan ----
+   Cubre el trabajo, no la cabecera: desde arriba todavía puede entrar a su
+   perfil, ver su plan y salir. Encerrar a alguien sin salida es peor que
+   no dejarlo pasar. */
+.sinPlanMuro{position:fixed;inset:0;z-index:60;display:grid;place-items:center;
+  padding:24px;background:var(--bg);overflow:auto}
+.sinPlanCard{max-width:460px;width:100%;background:var(--surface);border:1px solid var(--line);
+  border-radius:16px;padding:32px 28px;text-align:center;box-shadow:var(--sombra,0 10px 40px -20px rgba(0,0,0,.3))}
+.muroLogo{height:52px;width:auto;margin-bottom:18px}
+.sinPlanCard h2{margin:0 0 10px;font-size:22px}
+.sinPlanCard p{margin:0 0 18px;color:var(--ink-2);line-height:1.6;font-size:14px}
+.muroBotones{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.muroPie{margin:20px 0 0!important;font-size:12.5px;color:var(--ink-3)}
+.muroCanje{margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.muroCanje input{flex:1;min-width:160px;text-align:center;letter-spacing:.08em;font-weight:600}
+.muroMsg{width:100%;margin:6px 0 0!important;font-size:13px;font-weight:500}
+.muroMsg.mal{color:var(--accent)}
+.muroMsg.bien{color:var(--good)}
+body.sin-plan .avisoPago{display:none}
+/* La cabecera se queda ENCIMA del muro. Si no, alguien sin plan no podría
+   abrir su perfil, ver su plan ni cerrar sesión: quedaría encerrado en una
+   pantalla sin salida, que es la peor forma de pedirle que te pague.
+   Los modales (70) y el botón de ayuda (70) ya estaban por encima. */
+body.sin-plan header.top{z-index:65}
+
 /* ---- el menú de perfil ----
    Todo lo de la cuenta cabe aquí: el plan, la empresa, el equipo, los
    ajustes, Makers Lab y la salida. Antes eran seis cosas sueltas peleando
@@ -871,6 +896,31 @@ body.rol-produccion #btnPrint{display:none!important}
 <div class="avisoPago" id="avisoPago" hidden>
   <span id="avisoPagoTxt"></span>
   <button class="btn sm primary" id="avisoPagoBtn">Ver planes</button>
+</div>
+
+<!-- El muro de quien todavía no contrata. Cubre el área de trabajo y deja
+     a la vista solo las dos puertas de entrada: pagar, o el código del
+     curso. El botón de ayuda sigue flotando encima, a propósito: quien no
+     puede entrar es justo quien más necesita poder preguntar. -->
+<div class="sinPlanMuro" id="sinPlanMuro" hidden>
+  <div class="sinPlanCard">
+    <img id="muroLogo" src="" alt="" class="muroLogo">
+    <h2>Tu cuenta está lista</h2>
+    <p>Falta elegir un plan para empezar a trabajar. En cuanto lo hagas, el
+    cotizador se abre completo y todo lo que captures se guarda.</p>
+    <div class="muroBotones">
+      <button class="btn primary" id="muroPlanes">Ver los planes</button>
+      <button class="btn" id="muroCodigo">Tengo un código de curso</button>
+    </div>
+    <div class="muroCanje" id="muroCanje" hidden>
+      <input id="muroCodigoTxt" placeholder="HM-XXXXXX" autocomplete="off"
+             style="text-transform:uppercase" maxlength="12">
+      <button class="btn primary" id="muroCanjea">Activar</button>
+      <p class="muroMsg" id="muroMsg" hidden></p>
+    </div>
+    <p class="muroPie">¿Tomaste un curso Hey Makers? Tu código abre 15 días
+    del plan Maker, con todo incluido.</p>
+  </div>
 </div>
 <div class="wrap">
 
@@ -6431,10 +6481,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20260929-2328";</script>
+<script>window.BUILD="20261001-1729";</script>
 <script>
 (function(){
-  var mio = "20260929-2328";
+  var mio = "20261001-1729";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -6457,6 +6507,6 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20260929-2328"></script>
+<script src="cuenta.js?v=20261001-1729"></script>
 </body>
 </html>
