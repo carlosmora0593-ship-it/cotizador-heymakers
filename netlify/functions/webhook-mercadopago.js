@@ -18,11 +18,41 @@ exports.handler = async (event) => {
 
     const tipo = cuerpo.type || cuerpo.topic || qs.type || qs.topic || "";
     const id = (cuerpo.data && cuerpo.data.id) || qs["data.id"] || qs.id;
+    if (!id) return ok("aviso sin id: " + tipo);
 
-    // Solo nos interesan los avisos de la suscripción en sí.
-    if (!id || tipo.indexOf("preapproval") < 0) return ok("aviso ignorado: " + tipo);
+    /* Mercado Pago manda DOS avisos distintos y hay que atender los dos:
+     *
+     *   subscription_preapproval          la suscripción se creó, se pausó
+     *                                     o se canceló.
+     *   subscription_authorized_payment   cobró la mensualidad.
+     *
+     * El segundo es el que llega cada mes. Si solo escucháramos el primero,
+     * la cuenta de alguien que paga puntual se vencería igual, porque nadie
+     * le estaría moviendo la fecha. El aviso del cobro no trae la
+     * suscripción: trae el pago, y de ahí se saca a cuál pertenece. */
+    let preapprovalId = null;
 
-    const r = await fetch("https://api.mercadopago.com/preapproval/" + id, {
+    if (tipo.indexOf("authorized_payment") >= 0) {
+      const rp = await fetch("https://api.mercadopago.com/authorized_payments/" + id, {
+        headers: { "Authorization": "Bearer " + process.env.MP_ACCESS_TOKEN }
+      });
+      if (!rp.ok) { console.error("No se pudo leer el cobro", await rp.text()); return ok("sin datos del cobro"); }
+      const pago = await rp.json();
+      preapprovalId = pago.preapproval_id;
+      if (!preapprovalId) return ok("cobro sin suscripción");
+      /* Un cobro rechazado no renueva nada: que siga su curso y que el
+         aviso de la suscripción decida si se pausa. */
+      if (pago.status && pago.status !== "approved" && pago.status !== "accredited") {
+        console.warn("Cobro no aprobado", id, pago.status);
+        return ok("cobro " + pago.status);
+      }
+    } else if (tipo.indexOf("preapproval") >= 0) {
+      preapprovalId = id;
+    } else {
+      return ok("aviso ignorado: " + tipo);
+    }
+
+    const r = await fetch("https://api.mercadopago.com/preapproval/" + preapprovalId, {
       headers: { "Authorization": "Bearer " + process.env.MP_ACCESS_TOKEN }
     });
     if (!r.ok) { console.error("No se pudo leer la suscripción", await r.text()); return ok("sin datos"); }
@@ -41,12 +71,12 @@ exports.handler = async (event) => {
       const siguiente = s.next_payment_date ? new Date(s.next_payment_date) : sumaPeriodo(ciclo);
       // Un día de gracia para que un cobro que tarde no tumbe la cuenta.
       siguiente.setDate(siguiente.getDate() + 1);
-      cambios = { plan, ciclo, estado: "activa", vence: siguiente.toISOString(), mp_preapproval_id: id };
+      cambios = { plan, ciclo, estado: "activa", vence: siguiente.toISOString(), mp_preapproval_id: preapprovalId };
     } else if (s.status === "paused") {
-      cambios = { estado: "vencida", mp_preapproval_id: id };
+      cambios = { estado: "vencida", mp_preapproval_id: preapprovalId };
     } else if (s.status === "cancelled") {
       // Se cancela, pero respetamos el periodo ya pagado.
-      cambios = { estado: "cancelada", mp_preapproval_id: id };
+      cambios = { estado: "cancelada", mp_preapproval_id: preapprovalId };
     } else {
       return ok("estado sin acción: " + s.status);
     }
