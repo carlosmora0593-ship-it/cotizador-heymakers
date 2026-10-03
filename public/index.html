@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261003-0001"></script>
+<script src="config.js?v=20261003-0937"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -930,6 +930,83 @@ input[readonly],textarea[readonly]{background:var(--vidrio-fondo-2)}
 .moSube{color:var(--warn);font-weight:700}
 .moTit{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
 
+/* ---- medidas dentro de un armado ---- */
+.armMedTit{display:flex;align-items:center;gap:10px;margin:14px 0 6px}
+.armMedTit span{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.armMedTit button{margin-left:auto}
+.armMedidas{display:grid;gap:6px}
+.armMedCab,.armMedida{display:grid;grid-template-columns:minmax(96px,1.3fr) 1fr 14px 1fr 1fr 34px;gap:6px;align-items:center}
+.armMedCab span{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);text-align:center}
+.armMedCab span:first-child{text-align:left}
+.armMedida .x{text-align:center;color:var(--ink-3)}
+.armMedida input{text-align:right}
+.armMedQuien{min-width:0;overflow:hidden}
+.armMano{font-size:11px;color:var(--ink-3)}
+.armMedBorra{display:block}
+.armGrupos{display:grid;gap:5px;margin-bottom:4px}
+.armGrupos div{display:grid;grid-template-columns:minmax(80px,1fr) auto;gap:4px 10px;align-items:baseline;
+  font-size:12.5px;padding:6px 9px;background:var(--surface-2);border-radius:8px}
+.armGrupos span{color:var(--ink-2)}
+.armGrupos b{font-family:"IBM Plex Mono",monospace;font-weight:600;text-align:right;white-space:nowrap}
+.armGrupos i{grid-column:1/-1;font-style:normal;font-size:11px;color:var(--ink-3)}
+/* ---- el switch de mayoreo y el de cada aplicación ---- */
+.mayoreoFila{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;
+  border-top:1px solid var(--line-soft);padding-top:13px}
+.escalaChip{font-size:11.5px;color:var(--ink-3);background:var(--surface-2);
+  border-radius:var(--radio-pill,99px);padding:3px 10px}
+.swMini{font-size:11px;color:var(--ink-2);gap:5px}
+.swMini input{width:auto}
+@media (max-width:560px){
+  .armMedCab{display:none}
+  .armMedida{grid-template-columns:1fr 1fr 14px 1fr 1fr 34px}
+  .armMedQuien{grid-column:1/-1}
+}
+/* ---------- menú lateral ---------- */
+@media screen{
+:root{ --barra:224px; }
+#barra{position:fixed;left:0;top:0;bottom:0;width:var(--barra);z-index:52;display:flex;flex-direction:column;
+  background:var(--vidrio-fondo);border-right:1px solid var(--vidrio-linea);overflow:auto;
+  -webkit-backdrop-filter:blur(26px) saturate(185%);backdrop-filter:blur(26px) saturate(185%)}
+.barraCmyk{display:flex;height:3px;flex:none}
+.barraCmyk i{flex:1}
+.barraCmyk i:nth-child(1){background:var(--mk-cyan)}
+.barraCmyk i:nth-child(2){background:var(--mk-magenta)}
+.barraCmyk i:nth-child(3){background:var(--mk-yellow)}
+.barraCmyk i:nth-child(4){background:var(--mk-black)}
+.barraTop{padding:14px 14px 12px;border-bottom:1px solid var(--vidrio-linea);flex:none}
+.barraTop .brand{margin-right:0}
+.barraNav{padding:10px 8px 14px;flex:1}
+.barraPie{padding:10px 14px;border-top:1px solid var(--vidrio-linea);font-size:10.5px;color:var(--ink-3);flex:none}
+
+body.conBarra{padding-left:var(--barra)}
+body.conBarra .menuWrap{display:none}
+body.conBarra header.top .cmyk{display:none}
+body.conBarra header.top{border-bottom:1px solid var(--vidrio-linea)}
+body.conBarra .top-in{padding:8px 18px}
+body.conBarra .wrap{max-width:1180px;padding-inline:18px}
+
+body.conBarra nav.tabs{position:static;display:grid;gap:1px;min-width:0;width:auto;
+  background:transparent;border:0;box-shadow:none;padding:0;animation:none;overflow:visible}
+body.conBarra nav.tabs button{padding:8px 11px;border-radius:9px;gap:0}
+body.conBarra nav.tabs button b{font-size:13px;font-weight:500}
+body.conBarra nav.tabs button small{display:none}
+body.conBarra nav.tabs button[aria-selected="true"]{
+  background-color:var(--accent);
+  background-image:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 58%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 5px 14px -7px var(--accent)}
+body.conBarra nav.tabs button[aria-selected="true"] b{color:var(--accent-ink)}
+.barraGrupo{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);
+  padding:14px 11px 5px}
+.barraGrupo:first-child{padding-top:4px}
+nav.tabs .barraGrupo{padding:12px 11px 4px}
+
+/* ---------- etiquetas de estado con color sólido ---------- */
+.pill{font-weight:700;letter-spacing:.01em}
+.pill.good{background:var(--good);color:#fff}
+.pill.warn,.pill.pend{background:var(--warn);color:#fff}
+.pill.part{background:var(--cyan);color:#fff}
+}
+
 
 /* ---- el diagnóstico ----
    Una pregunta a la vez. Las opciones entran escalonadas: no es adorno,
@@ -1188,6 +1265,12 @@ body.rol-produccion #btnPrint{display:none!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
+<aside id="barra" hidden>
+  <div class="barraCmyk"><i></i><i></i><i></i><i></i></div>
+  <div class="barraTop" id="barraTop"></div>
+  <div class="barraNav" id="barraNav"></div>
+  <div class="barraPie"><span id="barraVer"></span></div>
+</aside>
 </head>
 <body class="sin-sesion">
 <header class="top">
@@ -1338,7 +1421,7 @@ body.rol-produccion #btnPrint{display:none!important}
       <div class="card plegable" data-paso="articulo">
         <header><span class="step">2</span><h2>Artículo o servicio</h2><span class="hint" data-solo="articulo">el costo sale del catálogo</span><span class="hint" data-solo="servicio" hidden>se cobra por medida</span><span class="resumenPaso" data-res="articulo"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body">
         <div class="modoSwitch" id="modoSwitch">
-          <button type="button" data-modo="articulo" aria-selected="true">Artículo físico</button>
+          <button type="button" data-modo="articulo" aria-selected="true">Artículo compuesto o personalizado</button>
           <button type="button" data-modo="servicio" aria-selected="false">Servicio por medida</button>
         </div>
         <p class="note" data-solo="servicio" hidden style="margin:12px 0 0">Para cuando el cliente sólo compra la impresión: la maquila de DTF, una lona, un vinil. No hay prenda, no hay tallas; lo que se cobra es el material que se ocupa.</p>
@@ -1361,10 +1444,19 @@ body.rol-produccion #btnPrint{display:none!important}
             <div data-solo="servicio" hidden style="grid-column:span 2"><label class="f" for="c_svcResumen">Armado</label>
               <div style="display:flex;gap:6px"><input id="c_svcResumen" readonly class="num"><button class="btn sm" data-abrearmado="1">Abrir</button></div></div>
 
-            <div><label class="f" for="c_desc">Descripción para el cliente</label><input id="c_desc" placeholder="Playera algodón color, tallas surtidas"></div>
-            <div><label class="f" for="c_escala">Escala de volumen</label><input id="c_escala" readonly class="num"></div>
+            <div style="grid-column:span 2"><label class="f" for="c_desc">Descripción para el cliente</label><input id="c_desc" placeholder="Playera algodón color, tallas surtidas"></div>
+          </div>
+          <div class="mayoreoFila">
+            <label class="sw"><input type="checkbox" id="c_descOn" checked> Ofrecer descuento por mayoreo</label>
+            <span class="escalaChip num" id="c_escala"></span>
+          </div>
+          <div class="grid g4" style="display:none">
           </div>
         </div>
+      </div></div></div>
+
+      <div class="card plegable" data-paso="apps">
+        <header><span class="step">4</span><h2>Aplicaciones, técnicas y archivos</h2><button class="btn sm ghost" data-abrearmado="1" style="margin-left:auto">Armado del material</button><button class="btn sm ghost" id="addApp">+ Agregar ubicación</button><span class="resumenPaso" data-res="apps"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body"><div id="apps"></div></div>
       </div></div></div>
 
       <div class="card plegable" data-paso="tallas">
@@ -1374,15 +1466,11 @@ body.rol-produccion #btnPrint{display:none!important}
         </div>
       </div></div></div>
 
-      <div class="card plegable" data-paso="apps">
-        <header><span class="step">4</span><h2>Aplicaciones, técnicas y archivos</h2><button class="btn sm ghost" data-abrearmado="1" style="margin-left:auto">Armado del material</button><button class="btn sm ghost" id="addApp">+ Agregar ubicación</button><span class="resumenPaso" data-res="apps"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body"><div id="apps"></div></div>
-      </div></div></div>
-
       <div class="card plegable" data-paso="extras">
         <header><span class="step">5</span><h2>Cargos extra y descuentos</h2><button class="btn sm ghost" id="addExtra" style="margin-left:auto">+ Nuevo cargo</button><span class="resumenPaso" data-res="extras"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body"><div id="extras"></div>
           <div class="descBox">
-            <label class="sw"><input type="checkbox" id="c_descOn" checked> Aplicar el descuento por volumen del catálogo</label>
-            <div class="grid g3" style="margin-top:12px">
+            <p class="note" style="margin:0 0 12px">El descuento por mayoreo se prende en el paso del artículo. Aquí va uno adicional, el que das a mano.</p>
+            <div class="grid g3">
               <div><label class="f" for="c_descTipo">Descuento adicional</label><select id="c_descTipo">
                 <option value="pct">Porcentaje (%)</option><option value="mxn">Pesos ($)</option></select></div>
               <div><label class="f" for="c_descVal">Cuánto</label><input id="c_descVal" type="number" min="0" step="0.5" value="0"></div>
@@ -2592,7 +2680,8 @@ function normalizaCat(){
 }
 function svcDe(id){ return (cat.servicios||[]).find(s=>s.id===id) || null; }
 function abrevUnidad(u){ return u==="m2" ? "m²" : "ml"; }
-function techoA(v, paso){ const p = num(paso)>0 ? num(paso) : 0.01; return Math.ceil((v - 1e-9)/p)*p; }
+function techoA(v, paso){ const p = num(paso)>0 ? num(paso) : 0.01;
+  return Math.round(Math.ceil((v - 1e-9)/p)*p*10000)/10000; }
 function red2(v){ return Math.round(v*100)/100; }
 function red3(v){ return Math.round(v*1000)/1000; }
 function unidadTxt(u, v){ return red3(v).toLocaleString("es-MX",{maximumFractionDigits:3})+" "+abrevUnidad(u); }
@@ -2607,10 +2696,10 @@ function svcPorOmision(tecnicaId){
   return svcParaTecnica(tecnicaId) || normalizaCat()[0] || null;
 }
 
-/* Acomoda n piezas de w×h cm a lo ancho de un rollo.
+/* Acomoda n piezas iguales de w×h cm a lo ancho del rollo.
    giro: "auto" prueba las dos y se queda con la que gasta menos;
          "h" la deja como viene; "v" la gira 90°. */
-function armaUno(s, w, h, n, giro){
+function acomodaGrupo(s, w, h, n, giro){
   n = Math.max(1, Math.round(num(n,1)));
   w = num(w); h = num(h);
   const g = num(s.separacion), orilla = num(s.orilla);
@@ -2621,8 +2710,7 @@ function armaUno(s, w, h, n, giro){
     const porFila = Math.floor((util + g) / (a + g));
     if(porFila < 1) return null;
     const filas = Math.ceil(n / porFila);
-    return {porFila, filas, rot, pieza:{ancho:a, alto:b},
-            largoCm: filas*(b+g) - g + 2*orilla};
+    return {porFila, filas, rot, n, pieza:{ancho:a, alto:b}, largoCm: filas*(b+g) - g};
   };
   const ops = giro==="h" ? [prueba(w,h,false)]
             : giro==="v" ? [prueba(h,w,true)]
@@ -2633,24 +2721,49 @@ function armaUno(s, w, h, n, giro){
   return buenos[0];
 }
 
-/* Todo lo que hay que saber de un renglón de armado. */
+/* Las medidas de un renglón. Los renglones viejos traían una sola suelta. */
+function piezasDe(row){
+  if(Array.isArray(row.piezas) && row.piezas.length) return row.piezas;
+  return [{id:(row.id||"p")+"_1", ancho:num(row.ancho), alto:num(row.alto),
+           cant:Math.max(1,Math.round(num(row.cant,1))), appId:row.appId||"", etiqueta:""}];
+}
+function medidaNueva(row){
+  const ult = piezasDe(row).slice(-1)[0] || {ancho:20, alto:20, cant:1};
+  return {id:uid(), ancho:num(ult.ancho), alto:num(ult.alto),
+          cant:Math.max(1,Math.round(num(ult.cant,1))), appId:"", etiqueta:""};
+}
+
+/* Todo lo que hay que saber de un renglón de armado.
+   Varias medidas caben en el mismo rollo: cada una ocupa sus propias filas y
+   todas se pagan de una sola compra. Por eso el frente chico y la espalda
+   grande ya no piden medio metro cada uno. */
 function armadoDe(row){
   const s = svcDe(row.servicioId);
   if(!s) return {error:"Elige el material o servicio."};
-  const n = Math.max(1, Math.round(num(row.cant,1)));
   const giro = row.giro || "auto";
-  const a = armaUno(s, row.ancho, row.alto, n, giro);
-  if(!a){
-    const util = red2(num(s.ancho)-2*num(s.orilla));
-    return {error: giro==="auto"
-      ? "La pieza de "+num(row.ancho)+"×"+num(row.alto)+" cm no cabe en un ancho útil de "+util+
-        " cm. Usa un material más ancho o parte el diseño."
-      : "Así acomodada no cabe en "+util+" cm de ancho útil. Prueba con Máximo o con la otra orientación.", s};
+  const g = num(s.separacion), orilla = num(s.orilla);
+  const util = red2(num(s.ancho) - 2*orilla);
+  const lista = piezasDe(row).filter(p=>num(p.ancho)>0 && num(p.alto)>0 && num(p.cant)>0);
+  if(!lista.length) return {error:"Captura al menos una medida.", s};
+
+  const grupos = [];
+  for(let k=0; k<lista.length; k++){
+    const p = lista[k];
+    const a = acomodaGrupo(s, num(p.ancho), num(p.alto), p.cant, giro);
+    if(!a) return {error: "La pieza de "+num(p.ancho)+"\u00d7"+num(p.alto)+" cm no cabe en un ancho \u00fatil de "+
+                     util+" cm. Usa un material m\u00e1s ancho, parte el dise\u00f1o o prueba otra orientaci\u00f3n.", s};
+    a.src = p;
+    a.areaM2 = p.cant * (num(p.ancho)*num(p.alto))/10000;
+    grupos.push(a);
   }
+
+  const n = grupos.reduce((t,gr)=>t+gr.n, 0);
+  let largoCm = 2*orilla - g;
+  grupos.forEach(gr=>{ largoCm += gr.filas*(gr.pieza.alto + g); });
 
   const esM2   = s.unidad === "m2";
   const anchoM = num(s.ancho)/100;
-  const largoM = a.largoCm/100;
+  const largoM = largoCm/100;
 
   // lo que de verdad se consume, en la unidad en que vendes
   const reales = esM2 ? largoM*anchoM : largoM;
@@ -2659,8 +2772,7 @@ function armadoDe(row){
   const compradas = Math.max(num(s.minimo), porPaso);
   const topoMinimo = compradas > porPaso + 1e-9;
 
-  // el área que de veras ocupan las piezas, y la que vas a pagar
-  const areaPiezasM2   = n * (num(row.ancho)*num(row.alto))/10000;
+  const areaPiezasM2   = grupos.reduce((t,gr)=>t+gr.areaM2, 0);
   const areaCompradaM2 = esM2 ? compradas : compradas*anchoM;
   const usadas = esM2 ? areaPiezasM2 : areaPiezasM2/(anchoM||1);
 
@@ -2668,22 +2780,31 @@ function armadoDe(row){
   const unidades = cobraMerma ? compradas : usadas;
   const costo  = unidades * num(s.costo);
   const precio = unidades * num(s.precio);
+  // a cada medida le toca su parte, en proporción al área que ocupa
+  grupos.forEach(gr=>{
+    const parte = areaPiezasM2>0 ? gr.areaM2/areaPiezasM2 : 1/grupos.length;
+    gr.parte = parte; gr.costoParte = costo*parte; gr.precioParte = precio*parte;
+  });
 
-  // ¿cuántas piezas caben en el material que vas a pagar?
+  // en el material que vas a pagar, ¿cuánto sobra y cuántas piezas más caben?
   const largoPagadoCm = (esM2 ? (anchoM>0 ? compradas/anchoM : 0) : compradas) * 100;
-  const g = num(s.separacion), orilla = num(s.orilla);
-  const filasCaben = Math.max(0, Math.floor((largoPagadoCm - 2*orilla + g) / (a.pieza.alto + g)));
-  const caben = filasCaben * a.porFila;
-  const llenaFilas = a.filas * a.porFila;
+  const sobraCm = Math.max(0, largoPagadoCm - largoCm);
+  const mayor = grupos.slice().sort((a,b)=>
+    (b.pieza.ancho*b.pieza.alto) - (a.pieza.ancho*a.pieza.alto))[0];
+  const filasExtra = Math.max(0, Math.floor((sobraCm + g) / (mayor.pieza.alto + g)));
+  const caben = n + filasExtra*mayor.porFila;
+  const unaSola = grupos.length === 1;
+  const llenaFilas = unaSola ? grupos[0].filas*grupos[0].porFila : n;
 
   const mermaM2  = Math.max(0, areaCompradaM2 - areaPiezasM2);
   const mermaPct = areaCompradaM2>0 ? mermaM2/areaCompradaM2*100 : 0;
   const usoPct   = Math.max(0, Math.min(100, 100 - mermaPct));
   const peso     = num(s.gramaje)>0 ? areaCompradaM2*num(s.gramaje)/1000 : 0;
 
-  return {s, n, error:null, giro,
-          porFila:a.porFila, filas:a.filas, rot:a.rot, pieza:a.pieza,
-          largoCm:a.largoCm, largoPagadoCm, largoM, anchoM, esM2, unidad:s.unidad,
+  return {s, n, error:null, giro, grupos, unaSola, sobraCm, mayor,
+          porFila:mayor.porFila, filas:grupos.reduce((t,gr)=>t+gr.filas,0),
+          rot:mayor.rot, pieza:mayor.pieza,
+          largoCm, largoPagadoCm, largoM, anchoM, esM2, unidad:s.unidad,
           reales, compradas, usadas, unidades, topoMinimo, cobraMerma,
           areaPiezasM2, areaCompradaM2, mermaM2, mermaPct, usoPct, peso,
           caben, llenaFilas, costo, precio,
@@ -2691,18 +2812,30 @@ function armadoDe(row){
           porPiezaSiLlenas: caben>0 ? (compradas*num(s.precio))/caben : 0};
 }
 
-/* Los renglones que siguen a otra cosa: el principal sigue al paso 2, y los
-   ligados a una aplicación siguen su medida y la cantidad del pedido. */
+/* Los renglones que siguen a otra cosa: el principal sigue al paso 2, y las
+   medidas que vienen de una aplicación siguen su tamaño y la cantidad del pedido. */
+function qtyPedido(){
+  return Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
+}
 function sincronizaArmado(){
-  autoArmado();
-  const q = Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
+  if(typeof autoArmado === "function") autoArmado();
+  const q = qtyPedido();
   (cot.armado||[]).forEach(r=>{
-    if(r.principal){ r.cant = q; r.appId = ""; return; }
-    if(!r.appId) return;
-    const a = cot.apps.find(a=>a.id===r.appId);
-    if(!a){ r.appId = ""; return; }
-    r.cant = q; r.ancho = num(a.ancho); r.alto = num(a.alto);
+    r.piezas = piezasDe(r).slice();
+    delete r.ancho; delete r.alto; delete r.cant;
+    if(r.principal){ r.appId = ""; r.piezas.forEach(p=>{ p.cant = q; p.appId = ""; }); return; }
+    r.piezas = r.piezas.filter(p=>{
+      if(!p.appId) return true;
+      const a = cot.apps.find(a=>a.id===p.appId);
+      if(!a) return false;
+      p.ancho = num(a.ancho); p.alto = num(a.alto); p.cant = q;
+      p.etiqueta = a.ubic || "Aplicaci\u00f3n";
+      return true;
+    });
+    if(!r.piezas.length) r.piezas = [medidaNueva(r)];
+    r.appId = (r.piezas.find(p=>p.appId)||{}).appId || "";
   });
+  cot.armado = (cot.armado||[]).filter(r=> !r.auto || r.piezas.some(p=>p.appId));
 }
 
 /* El renglón que manda cuando el pedido ES el servicio. */
@@ -2714,8 +2847,11 @@ function armadoPrincipal(){
     p.principal = true; p.appId = "";
     cot.armado.unshift(p);
   }
+  if(!Array.isArray(p.piezas) || !p.piezas.length) p.piezas = piezasDe(p).slice();
   return p;
 }
+/* En modo servicio el paso 2 edita la primera medida del renglón principal. */
+function medidaPrincipal(){ return armadoPrincipal().piezas[0]; }
 function esServicio(g){ return (g||cot).modo === "servicio"; }
 
 
@@ -2730,36 +2866,43 @@ function manoDeObraDe(t, cual){
   return num(t.costoMO) || num(P.manoObra);
 }
 
-/* El armado se arma solo: cada aplicación con material tiene su renglón,
-   sin que nadie tenga que acordarse de crearlo. */
+/* El armado se arma solo, y agrupa por material: si el frente y la espalda
+   salen del mismo rollo, van en un solo renglón y se paga una sola compra.
+   Eso es lo que evita que cada aplicación pida su propio mínimo. */
 function autoArmado(){
   cot.armado = cot.armado || [];
   // Mientras no lo apliques en Ajustes, nada cambia: el cotizador sigue
-  // cobrando como hoy y el armado sólo manda donde tú lo ligaste a mano.
+  // cobrando como hoy y el armado sólo manda donde tú lo armaste a mano.
   if(!P.cobroPorArmado){
     cot.armado = cot.armado.filter(r=>!r.auto);   // se van los que puso el sistema
     return;
   }
-  // fuera lo que ya no corresponde
-  cot.armado = cot.armado.filter(r=>{
-    if(r.principal || !r.appId) return true;
-    const a = cot.apps.find(a=>a.id===r.appId);
-    return !!a && tieneMaterial(a.tecnicaId);
-  });
   const q = Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
+  const porServicio = {};
   cot.apps.forEach(a=>{
-    if(!tieneMaterial(a.tecnicaId)) return;
-    if(cot.armado.some(r=>r.appId===a.id)) return;
+    if(a.sinArmado) return;                        // el switch de esa aplicación
     const s = svcParaTecnica(a.tecnicaId);
-    cot.armado.push({id:uid(), servicioId:s.id, appId:a.id, ancho:num(a.ancho), alto:num(a.alto),
-                     cant:q, giro:"auto", cobraMerma:true, nota:"", principal:false, auto:true});
+    if(!s) return;
+    (porServicio[s.id] = porServicio[s.id] || []).push(a);
   });
-  // si cambió la técnica, el material la sigue
-  cot.armado.forEach(r=>{
-    if(!r.appId) return;
-    const a = cot.apps.find(a=>a.id===r.appId); if(!a) return;
-    const s = svcParaTecnica(a.tecnicaId);
-    if(s && (svcDe(r.servicioId)||{}).tecnicaId !== a.tecnicaId) r.servicioId = s.id;
+  // fuera los renglones automáticos de materiales que ya no se usan
+  cot.armado = cot.armado.filter(r=> !r.auto || porServicio[r.servicioId]);
+  Object.keys(porServicio).forEach(sid=>{
+    let r = cot.armado.find(x=>x.auto && x.servicioId===sid);
+    if(!r){
+      r = {id:uid(), servicioId:sid, appId:"", giro:"auto", cobraMerma:true, nota:"",
+           principal:false, auto:true, piezas:[]};
+      cot.armado.push(r);
+    }
+    const previas = {};
+    (r.piezas||[]).forEach(p=>{ if(p.appId) previas[p.appId] = p; });
+    const aMano = (r.piezas||[]).filter(p=>!p.appId);   // las que puso el usuario se quedan
+    r.piezas = porServicio[sid].map(a=>{
+      const vieja = previas[a.id] || {};
+      return {id: vieja.id || uid(), appId:a.id, etiqueta:a.ubic || "Aplicación",
+              ancho:num(a.ancho), alto:num(a.alto), cant:q};
+    }).concat(aMano);
+    r.appId = r.piezas[0].appId;
   });
 }
 
@@ -2773,8 +2916,8 @@ function abreArmado(abrir){
   if(abrir){ renderArmado(); const h = c.querySelector(".cajonHoja"); if(h) h.scrollTop = 0; }
 }
 
-/* Un planito del acomodo, a escala: el rollo acostado, las piezas dentro y
-   en color de aviso lo que se paga y no se usa. */
+/* Un planito del acomodo, a escala: el rollo acostado, cada medida en sus
+   propias filas y en color de aviso lo que se paga y no se usa. */
 function planoArmado(A){
   if(!A || A.error) return "";
   const anchoCm = num(A.s.ancho);
@@ -2783,17 +2926,22 @@ function planoArmado(A){
   const k = Math.min(300/largoCm, 190/anchoCm);
   const W = largoCm*k, H = anchoCm*k;
   const orilla = num(A.s.orilla), g = num(A.s.separacion);
-  const pw = A.pieza.ancho, ph = A.pieza.alto;
-  let piezas = "", puestas = 0;
-  for(let f=0; f<A.filas && puestas<A.n && f<400; f++){
-    for(let c=0; c<A.porFila && puestas<A.n; c++){
-      const x = (orilla + f*(ph+g)) * k;
-      const y = (orilla + c*(pw+g)) * k;
-      piezas += '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+Math.max(1,ph*k).toFixed(1)+
-                '" height="'+Math.max(1,pw*k).toFixed(1)+'" rx="1" fill="var(--cyan)" opacity=".85"/>';
-      puestas++;
+  let piezas = "", x0 = orilla, i = 0;
+  A.grupos.forEach(gr=>{
+    const pw = gr.pieza.ancho, ph = gr.pieza.alto;
+    const op = (i%2) ? ".55" : ".85";
+    let puestas = 0;
+    for(let f=0; f<gr.filas && puestas<gr.n && f<400; f++){
+      for(let c=0; c<gr.porFila && puestas<gr.n; c++){
+        const x = (x0 + f*(ph+g)) * k;
+        const y = (orilla + c*(pw+g)) * k;
+        piezas += '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+Math.max(1,ph*k).toFixed(1)+
+                  '" height="'+Math.max(1,pw*k).toFixed(1)+'" rx="1" fill="var(--cyan)" opacity="'+op+'"/>';
+        puestas++;
+      }
     }
-  }
+    x0 += gr.filas*(ph+g); i++;
+  });
   const usadoX = Math.min(W, A.largoCm*k);
   const Wr = W.toFixed(0), Hr = H.toFixed(1);
   return '<svg viewBox="0 0 '+Wr+' '+Hr+'" width="'+Wr+'" height="'+Hr+'" role="img" '+
@@ -2808,8 +2956,7 @@ function planoArmado(A){
 
 /* Lo que de verdad se cobra por ese material, ya con el descuento por volumen. */
 function descVolActual(){
-  const q = Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
-  return (cot.descOn===false) ? 0 : num(escalaDe(q).desc);
+  return (cot.descOn===false) ? 0 : num(escalaDe(qtyPedido()).desc);
 }
 function netoArmado(A){ return (!A || A.error) ? 0 : A.precio * (1 - descVolActual()/100); }
 
@@ -2818,8 +2965,8 @@ function cuerpoArmado(row, A){
   A = A || armadoDe(row);
   if(A.error) return '<div class="armMal">'+esc(A.error)+'</div>';
   const R = [
-    ["Piezas por fila", A.porFila],
-    ["Filas", A.filas],
+    ["Piezas", A.n],
+    ["Filas en total", A.filas],
     ["Largo que se ocupa", red2(A.largoCm)+" cm"],
     ["Caben en total", A.caben],
     ["Se gastan", unidadTxt(A.unidad, A.reales)],
@@ -2833,15 +2980,25 @@ function cuerpoArmado(row, A){
 
   const sobra = Math.max(0, A.caben - A.n);
   const tip = sobra>0
-    ? 'En los <b>'+unidadTxt(A.unidad,A.compradas)+'</b> que vas a pagar caben <b>'+A.caben+'</b> piezas y vas <b>'+A.n+'</b>. '+
-      (A.porPiezaSiLlenas>0 && A.porPieza>A.porPiezaSiLlenas
-        ? 'Aprovechándolas todas, el material baja de <b>'+mx(A.porPieza)+'</b> a <b>'+mx(A.porPiezaSiLlenas)+'</b> por pieza. ' : "")+
-      '<span class="armAcc"><button class="btn sm" data-armsube="'+row.id+'|'+A.caben+'">Cotizar '+A.caben+'</button>'+
-      (A.llenaFilas>A.n && A.llenaFilas<A.caben
-        ? '<button class="btn sm ghost" data-armsube="'+row.id+'|'+A.llenaFilas+'">Llenar las filas ('+A.llenaFilas+')</button>' : "")+'</span>'
+    ? 'En los <b>'+unidadTxt(A.unidad,A.compradas)+'</b> que vas a pagar sobran <b>'+red2(A.sobraCm)+' cm</b> de largo: '+
+      'caben <b>'+sobra+'</b> piezas más de '+red2(A.mayor.pieza.ancho)+'×'+red2(A.mayor.pieza.alto)+' cm. '+
+      (A.unaSola && A.porPiezaSiLlenas>0 && A.porPieza>A.porPiezaSiLlenas
+        ? 'Aprovechándolo todo, el material baja de <b>'+mx(A.porPieza)+'</b> a <b>'+mx(A.porPiezaSiLlenas)+'</b> por pieza. ' : "")+
+      (A.unaSola
+        ? '<span class="armAcc"><button class="btn sm" data-armsube="'+row.id+'|'+A.caben+'">Cotizar '+A.caben+'</button>'+
+          (A.llenaFilas>A.n && A.llenaFilas<A.caben
+            ? '<button class="btn sm ghost" data-armsube="'+row.id+'|'+A.llenaFilas+'">Llenar las filas ('+A.llenaFilas+')</button>' : "")+'</span>'
+        : "")
     : 'El material va bien aprovechado: cabrían <b>'+A.caben+'</b> piezas y traes <b>'+A.n+'</b>.';
 
-  const app = cot.apps.find(a=>a.id===row.appId);
+  const desglose = A.grupos.length>1
+    ? '<div class="armRepTit">Cómo queda el acomodo</div><div class="armGrupos">'+
+      A.grupos.map(gr=>'<div><span>'+esc(gr.src.etiqueta || (red2(gr.src.ancho)+"×"+red2(gr.src.alto)+" cm"))+'</span>'+
+        '<b>'+gr.porFila+' por fila × '+gr.filas+' fila(s)</b>'+
+        '<i>'+red2(gr.pieza.ancho)+'×'+red2(gr.pieza.alto)+' cm'+(gr.rot? " girada":"")+' · '+mx(gr.precioParte)+'</i></div>').join("")+
+      '</div>'
+    : "";
+
   return '<div class="armCols">'+
       '<div class="armPlano">'+planoArmado(A)+
         '<div class="armPie">'+red2(A.largoPagadoCm)+' × '+red2(num(A.s.ancho))+' cm de material pagado</div></div>'+
@@ -2849,14 +3006,13 @@ function cuerpoArmado(row, A){
         '<span class="chipTira">'+A.mermaPct.toFixed(0)+'% sin utilizar</span>'+
         '<div class="armBarra"><span style="width:'+Math.max(1,A.usoPct).toFixed(1)+'%"></span></div></div>'+
     '</div>'+
+    desglose+
     '<div class="armRepTit">Reporte</div>'+
     '<div class="armRep">'+R.map(f=>'<div><span>'+f[0]+'</span><b>'+f[1]+'</b></div>').join("")+'</div>'+
     '<label class="sw armMerma"><input type="checkbox" data-armck="cobraMerma" data-armid="'+row.id+'"'+
       (row.cobraMerma!==false?" checked":"")+'> Cobrar el espacio desperdiciado ('+unidadTxt(A.unidad,A.compradas)+' completos)</label>'+
     (row.cobraMerma===false ? '<div class="armNota">Se cobra sólo lo aprovechado: <b>'+unidadTxt(A.unidad,A.usadas)+'</b></div>' : "")+
-    '<div class="armTip">'+tip+'</div>'+
-    (app ? '<p class="note" style="margin:10px 0 0">Ligado a <b>'+esc(app.ubic||"la aplicación")+
-      '</b>: esa aplicación ya no cobra por cm² — el material lo cobra este armado y ahí queda sólo la mano de obra.</p>' : "");
+    '<div class="armTip">'+tip+'</div>';
 }
 
 function renderArmado(){
@@ -2867,35 +3023,42 @@ function renderArmado(){
   sincronizaArmado();
   pintaTabArmado();
   if(!cot.armado.length){
-    w.innerHTML = '<div class="empty">Todavía no hay material que calcular. Presiona <b>+ Material</b>, '+
-      'o liga una aplicación del paso de técnicas para saber cuánto rollo se gasta y cuánto se tira.</div>';
+    w.innerHTML = '<div class="empty">Todavía no hay material que calcular. Pon una aplicación con su técnica '+
+      'y el renglón aparece solo, o presiona <b>+ Material</b> para armar uno a mano.</div>';
     return;
   }
   w.innerHTML = cot.armado.map((row,i)=>{
     const A = armadoDe(row);
-    const liga = !!row.appId, fijo = !!row.principal;
+    const fijo = !!row.principal, auto = !!row.auto;
     const opsSvc = svc.map(s=>'<option value="'+s.id+'"'+(s.id===row.servicioId?" selected":"")+'>'+esc(s.nombre)+' · '+mx(s.precio)+'/'+abrevUnidad(s.unidad)+'</option>').join("");
-    const opsApp = '<option value="">— suelto, es maquila —</option>' + cot.apps.map((a,j)=>
-      '<option value="'+a.id+'"'+(a.id===row.appId?" selected":"")+'>'+esc(a.ubic||("Ubicación "+(j+1)))+'</option>').join("");
     const g = row.giro || "auto";
     const bot = (v,t,ayuda)=>'<button class="btn sm'+(g===v?" primary":" ghost")+'" data-armgiro="'+row.id+'|'+v+'" title="'+ayuda+'">'+t+'</button>';
+    const medidas = piezasDe(row).map(pz=>{
+      const liga = !!pz.appId;
+      return '<div class="armMedida" data-med="'+pz.id+'">'+
+        '<span class="armMedQuien">'+(liga? '<span class="pill pend">'+esc(pz.etiqueta||"aplicación")+'</span>' : '<span class="armMano">a mano</span>')+'</span>'+
+        '<input type="number" min="0" step="0.5" data-medk="ancho" value="'+num(pz.ancho)+'"'+(liga?" readonly":"")+' aria-label="Ancho">'+
+        '<span class="x">×</span>'+
+        '<input type="number" min="0" step="0.5" data-medk="alto" value="'+num(pz.alto)+'"'+(liga?" readonly":"")+' aria-label="Largo">'+
+        '<input type="number" min="1" step="1" data-medk="cant" value="'+Math.max(1,Math.round(num(pz.cant,1)))+'"'+((liga||fijo)?" readonly":"")+' aria-label="Piezas">'+
+        ((liga||fijo)? '<span class="armMedBorra"></span>' : '<button class="btn icon sm" data-delmed="'+row.id+'|'+pz.id+'" title="Quitar esta medida">✕</button>')+
+      '</div>';
+    }).join("");
     return '<div class="armFicha" data-arm="'+row.id+'">'+
-      '<div class="armFichaTop"><span class="tag">'+(fijo? "Servicio del pedido" : "Material "+(i+1))+'</span>'+
-        (liga? '<span class="pill pend">'+esc((cot.apps.find(a=>a.id===row.appId)||{}).ubic||"aplicación")+'</span>' : "")+
+      '<div class="armFichaTop"><span class="tag">'+(fijo? "Servicio del pedido" : (auto? "Material del pedido" : "Material "+(i+1)))+'</span>'+
         '<span class="cost">'+(A.error? "" : mx(netoArmado(A)))+'</span>'+
-        (fijo? "" : '<button class="btn icon sm" data-delarm="'+row.id+'" title="Quitar">✕</button>')+'</div>'+
+        ((fijo||auto)? "" : '<button class="btn icon sm" data-delarm="'+row.id+'" title="Quitar">✕</button>')+'</div>'+
       '<div class="armCampos">'+
         '<label class="armCampo armAncho"><span>Material</span><select data-ark="servicioId">'+opsSvc+'</select></label>'+
-        (fijo? "" : '<label class="armCampo armAncho"><span>Toma la medida de</span><select data-ark="appId">'+opsApp+'</select></label>')+
-        '<label class="armCampo"><span>Ancho de la pieza</span><input type="number" min="0" step="0.5" data-ark="ancho" value="'+num(row.ancho)+'"'+(liga?" readonly":"")+'></label>'+
-        '<label class="armCampo"><span>Largo de la pieza</span><input type="number" min="0" step="0.5" data-ark="alto" value="'+num(row.alto)+'"'+(liga?" readonly":"")+'></label>'+
-        '<label class="armCampo"><span>No. de piezas</span><input type="number" min="1" step="1" data-ark="cant" value="'+Math.max(1,Math.round(num(row.cant,1)))+'"'+((liga||fijo)?' readonly title="La toma del pedido"':"")+'></label>'+
         '<label class="armCampo armAncho"><span>Nota para producción</span><input data-ark="nota" value="'+esc(row.nota||"")+'" placeholder="Ej. dejar 1 cm de sangrado"></label>'+
       '</div>'+
+      '<div class="armMedTit"><span>Medidas (cm)</span>'+
+        (fijo? "" : '<button class="btn sm ghost" data-addmed="'+row.id+'">+ Medida</button>')+'</div>'+
+      '<div class="armMedidas"><div class="armMedCab"><span></span><span>Ancho</span><span></span><span>Largo</span><span>Piezas</span><span></span></div>'+medidas+'</div>'+
       '<div class="armBotones">'+
         bot("auto","Máximo","El acomodo que gasta menos material")+
-        bot("h","Horizontal","La pieza como la capturaste")+
-        bot("v","Vertical","La pieza girada 90°")+
+        bot("h","Horizontal","Las piezas como las capturaste")+
+        bot("v","Vertical","Las piezas giradas 90°")+
         '<button class="btn sm ghost" data-armreset="'+row.id+'" title="Volver a empezar este renglón">Reset</button>'+
       '</div>'+
       '<div data-armbody="'+row.id+'">'+cuerpoArmado(row, A)+'</div>'+
@@ -2912,9 +3075,12 @@ function pintaArmado(){
     if(c) c.textContent = A.error ? "" : mx(netoArmado(A));
     const b = el.querySelector("[data-armbody]");
     if(b) b.innerHTML = cuerpoArmado(row, A);
-    [["cant", Math.max(1,Math.round(num(row.cant,1)))],["ancho",num(row.ancho)],["alto",num(row.alto)]].forEach(par=>{
-      const i = el.querySelector('[data-ark="'+par[0]+'"]');
-      if(i && document.activeElement!==i) i.value = par[1];
+    piezasDe(row).forEach(pz=>{
+      const fila = el.querySelector('[data-med="'+pz.id+'"]'); if(!fila) return;
+      [["ancho",num(pz.ancho)],["alto",num(pz.alto)],["cant",Math.max(1,Math.round(num(pz.cant,1)))]].forEach(par=>{
+        const i = fila.querySelector('[data-medk="'+par[0]+'"]');
+        if(i && document.activeElement!==i) i.value = par[1];
+      });
     });
   });
   pintaTabArmado();
@@ -2933,16 +3099,16 @@ function pintaTabArmado(){
 
 function nuevoArmado(){
   const svc = normalizaCat();
+  const q = qtyPedido();
+  // si hay una aplicación por área, proponemos el material de su técnica
   const app = cot.apps.find(a=>{
     const t = cat.tecnicas.find(t=>t.id===a.tecnicaId);
-    return t && t.modo==="area" && !(cot.armado||[]).some(r=>r.appId===a.id);
+    return t && t.modo==="area";
   });
-  const tec = app ? app.tecnicaId : "";
-  const s = svcPorOmision(tec);
-  const q = Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
-  return {id:uid(), servicioId:(s||{}).id||"", appId: app? app.id : "",
-          ancho: app? num(app.ancho) : 20, alto: app? num(app.alto) : 20,
-          cant: q, giro:"auto", cobraMerma:true, nota:"", principal:false};
+  const s = (app && svcParaTecnica(app.tecnicaId)) || svc[0] || {};
+  return {id:uid(), servicioId:s.id||"", appId:"", giro:"auto", cobraMerma:true, nota:"",
+          principal:false, auto:false,
+          piezas:[{id:uid(), ancho:20, alto:20, cant:q, appId:"", etiqueta:""}]};
 }
 
 /* ---------- el paso 2: artículo físico o servicio por medida ---------- */
@@ -2968,9 +3134,10 @@ function renderServicio(){
   $("#c_svc").innerHTML = svc.map(s=>'<option value="'+s.id+'"'+(p && s.id===p.servicioId?" selected":"")+'>'+
     esc(s.nombre)+' · '+mx(s.precio)+'/'+abrevUnidad(s.unidad)+'</option>').join("");
   if(!p) return;
+  const m = medidaPrincipal();
   const foco = document.activeElement;
-  if(foco !== $("#c_svcAncho")) $("#c_svcAncho").value = num(p.ancho);
-  if(foco !== $("#c_svcAlto"))  $("#c_svcAlto").value  = num(p.alto);
+  if(foco !== $("#c_svcAncho")) $("#c_svcAncho").value = num(m.ancho);
+  if(foco !== $("#c_svcAlto"))  $("#c_svcAlto").value  = num(m.alto);
   const A = armadoDe(p);
   $("#c_svcResumen").value = A.error ? "revisa la medida"
     : A.porFila+"/fila · "+unidadTxt(A.unidad,A.compradas)+" · "+A.mermaPct.toFixed(0)+"% merma";
@@ -2989,7 +3156,8 @@ function calc(){
   const porLista = P.origen === "lista";
   // Las aplicaciones ligadas a un armado ya no cobran el material por cm²:
   // ese material se cobra en el armado y aquí queda sólo la mano de obra.
-  const conArmado = new Set((cot.armado||[]).filter(a=>a.appId).map(a=>a.appId));
+  const conArmado = new Set();
+  (cot.armado||[]).forEach(r=> piezasDe(r).forEach(p=>{ if(p.appId) conArmado.add(p.appId); }));
   let costoApps = 0, setupCosto = 0, precioApps = 0, setupPrecio = 0;
   const detalle = [];
   cot.apps.forEach(a=>{
@@ -3048,12 +3216,32 @@ function calc(){
     if(!A || A.error) return;
     const venta = (num(A.s.precio) ? A.precio : aplicaUtil(A.costo)) * (1 - descVolPct/100);
     armadoCosto += A.costo; armadoVenta += venta;
+    const factor = 1 - descVolPct/100;
     armado.push({id:row.id, appId:row.appId||"", principal:!!row.principal, nombre:A.s.nombre, unidad:A.unidad,
+                 grupos:(A.grupos||[]).map(gr=>({appId:gr.src.appId||"", etiqueta:gr.src.etiqueta||"",
+                     ancho:gr.pieza.ancho, alto:gr.pieza.alto, rot:gr.rot, porFila:gr.porFila,
+                     filas:gr.filas, cant:gr.n, costo:gr.costoParte, precio:gr.precioParte*factor})),
                  reales:A.reales, compradas:A.compradas, unidades:A.unidades, giro:A.giro,
                  porFila:A.porFila, filas:A.filas, largoCm:A.largoCm, rot:A.rot, pieza:A.pieza,
                  mermaM2:A.mermaM2, mermaPct:A.mermaPct, usoPct:A.usoPct, peso:A.peso, cobraMerma:A.cobraMerma,
                  piezas:A.n, caben:A.caben, nota:row.nota||"", ancho:num(A.s.ancho),
                  costo:A.costo, precio:venta});
+  });
+  // a cada aplicación le toca su parte del material, para que el renglón
+  // de la aplicación enseñe lo que de verdad cuesta y no sólo la mano de obra
+  const matApp = {}, matAppCosto = {};
+  armado.forEach(a=> (a.grupos||[]).forEach(gr=>{
+    if(!gr.appId) return;
+    matApp[gr.appId]      = (matApp[gr.appId]||0)      + gr.precio;
+    matAppCosto[gr.appId] = (matAppCosto[gr.appId]||0) + gr.costo;
+  }));
+  detalle.forEach(d=>{
+    d.materialTotal = matApp[d.id] || 0;
+    d.materialCosto = matAppCosto[d.id] || 0;
+    d.materialPieza = qty>0 ? d.materialTotal/qty : 0;
+    d.materialCostoPieza = qty>0 ? d.materialCosto/qty : 0;
+    d.costoConMaterial  = d.costo  + d.materialCostoPieza;
+    d.precioConMaterial = d.precio + d.materialPieza;
   });
   let subtotal = subtotalPiezas + setupVenta + extrasUnicos + armadoVenta;
   let descExtra = 0;
@@ -3095,7 +3283,7 @@ function renderCot(){
   $("#c_art").innerHTML = optArticulos(cot.articuloId);
   $("#c_qty").value = cot.cantidad; $("#c_costoArt").value = cot.costoArt;
   $("#c_precioArt").value = cot.precioArt || ""; $("#c_desc").value = cot.desc;
-  $("#c_descOn").checked = cot.descOn !== false;
+  const _d = $("#c_descOn"); if(_d) _d.checked = cot.descOn !== false;
   $("#c_descTipo").value = cot.descTipo || "pct";
   $("#c_descVal").value = num(cot.descVal) || 0;
   $("#c_descNota").value = cot.descNota || "";
@@ -3116,8 +3304,10 @@ function renderApps(){
     const modo = t? t.modo : "area";
     return '<div class="app-row" data-app="'+a.id+'">'+
       '<div class="app-head"><span class="tag">Ubicación '+(i+1)+'</span>'+
-        (d && d.sinMaterial ? '<span class="pill good" title="El material lo calcula el armado; aquí sólo va la mano de obra">material desde el armado</span>' : '')+
-        '<span class="cost">'+(d? "costo "+mx(d.costo)+" · precio "+mx(d.precio)+(d.min?" · mínimo":"") : "")+'</span>'+
+        (tieneMaterial(a.tecnicaId) ? '<label class="sw swMini" title="Calcular el material de esta aplicación en el armado">'+
+            '<input type="checkbox" data-armapp="'+a.id+'"'+(a.sinArmado?"":" checked")+'> Material en el armado</label>' : '')+
+        '<span class="cost">'+(d? "costo "+mx(d.costoConMaterial!=null? d.costoConMaterial : d.costo)+
+            " · precio "+mx(d.precioConMaterial!=null? d.precioConMaterial : d.precio)+(d.min?" · mínimo":"") : "")+'</span>'+
         '<button class="btn icon sm" data-del-app="'+a.id+'" title="Quitar">✕</button></div>'+
       '<div class="grid g4">'+
         '<div><label class="f">Ubicación</label><input data-k="ubic" value="'+esc(a.ubic)+'" placeholder="Frente"></div>'+
@@ -3241,9 +3431,9 @@ function logPrecio(nombre, antes, despues){
 }
 function renderResumen(){
   const r = calc();
-  $("#c_escala").value = (cot.descOn===false) ? "descuento apagado"
+  $("#c_escala").textContent = (cot.descOn===false) ? "sin descuento por mayoreo"
     : r.descVolPct>0 ? (r.esc.desde+"–"+(r.esc.hasta>9999?"+":r.esc.hasta)+" pzas · −"+r.descVolPct+"%")
-    : "sin descuento";
+    : "aún no llega al primer escalón";
   animaNum($("#r_unit"), r.unitario);
   $("#r_unitSub").textContent = r.qty+" pza(s) · costo "+mx(cot.modo==="servicio" && r.qty>0 ? (r.costoDirecto+r.armadoCosto/r.qty) : r.costoDirecto)+
     " · utilidad "+r.margenReal.toFixed(0)+"%";
@@ -3541,6 +3731,8 @@ function renderSaved(){
 /* ---------- ajustes ---------- */
 function renderSet(){
   renderTema(); renderMO();
+  const bv = $("#barraVer");
+  if(bv) bv.textContent = (P.empresa && P.empresa.nombre ? P.empresa.nombre : "Hey Makers");
   $("#p_margen").value=P.margen; $("#p_modo").value=P.modo; $("#p_merma").value=P.merma; $("#p_mo").value=P.manoObra;
   $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia;
   P.compras = P.compras || {tope:2000, siempre:false};
@@ -3658,12 +3850,91 @@ $("#btnLogoDef").addEventListener("click", ()=>{ P.empresa.logo = ""; persist();
 /* ---------- eventos ---------- */
 /* ---------- menú ---------- */
 function abreMenu(v){
+  if(document.body.classList.contains("conBarra")) return;   // con barra siempre está a la vista
   $("#tabs").hidden = !v;
   $("#menuBtn").setAttribute("aria-expanded", String(v));
 }
 $("#menuBtn").addEventListener("click", e=>{ e.stopPropagation(); abreMenu($("#tabs").hidden); });
 document.addEventListener("click", e=>{ if(!e.target.closest(".menuWrap")) abreMenu(false); });
 document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !$("#tabs").hidden) abreMenu(false); });
+
+/* ---------- menú lateral ---------- */
+/* Agrupadas por para qué sirven, no por orden de aparición. */
+const GRUPOS_BARRA = [
+  ["Comercial",  ["cot","sav","cli","arc"]],
+  ["Producción", ["dis","pro","com"]],
+  ["Dinero",     ["caj","ven"]],
+  ["Taller",     ["cat","set"]]
+];
+function agrupaBarra(){
+  const tabs = $("#tabs"); if(!tabs || tabs.dataset.agrupado) return;
+  const botones = {};
+  [...tabs.querySelectorAll("button[data-tab]")].forEach(b=> botones[b.dataset.tab] = b);
+  const sueltos = Object.keys(botones).filter(t=> !GRUPOS_BARRA.some(g=>g[1].indexOf(t)>=0));
+  GRUPOS_BARRA.concat(sueltos.length ? [["Otros", sueltos]] : []).forEach(g=>{
+    const h = document.createElement("div");
+    h.className = "barraGrupo"; h.textContent = g[0]; h.dataset.grupo = g[0];
+    tabs.appendChild(h);
+    g[1].forEach(t=>{ if(botones[t]) tabs.appendChild(botones[t]); });
+  });
+  // en la barra sólo se ve el nombre; la explicación queda como globo de ayuda
+  [...tabs.querySelectorAll("button[data-tab]")].forEach(b=>{
+    const ch = b.querySelector("small");
+    if(ch && !b.title) b.title = ch.textContent;
+  });
+  tabs.dataset.agrupado = "1";
+  limpiaGrupos();
+}
+/* Un encabezado de grupo sin pestañas visibles sobra: el rol de cada quien
+   esconde las que no le tocan. */
+function limpiaGrupos(){
+  const tabs = $("#tabs"); if(!tabs) return;
+  let actual = null, vivos = 0;
+  [...tabs.children].forEach(el=>{
+    if(el.classList.contains("barraGrupo")){
+      if(actual) actual.hidden = vivos === 0;
+      actual = el; vivos = 0;
+    } else if(el.tagName === "BUTTON" && !el.hidden) vivos++;
+  });
+  if(actual) actual.hidden = vivos === 0;
+}
+
+function acomodaBarra(){
+  const barra = $("#barra"), tabs = $("#tabs"); if(!barra || !tabs) return;
+  agrupaBarra();
+  const marca = document.querySelector(".brand");   // puede estar en el header o ya en la barra
+  const wrap  = document.querySelector("header.top .menuWrap");
+  const cabe  = window.innerWidth >= 1100;
+  if(cabe){
+    if(tabs.parentElement !== $("#barraNav")){
+      if(marca) $("#barraTop").appendChild(marca);
+      $("#barraNav").appendChild(tabs);
+    }
+    tabs.hidden = false; barra.hidden = false;
+    document.body.classList.add("conBarra");
+  } else {
+    if(wrap && tabs.parentElement !== wrap){
+      const fila = document.querySelector("header.top .top-in");
+      if(marca && fila) fila.prepend(marca);
+      wrap.appendChild(tabs);
+    }
+    tabs.hidden = true; barra.hidden = true;
+    document.body.classList.remove("conBarra");
+  }
+  limpiaGrupos();
+}
+window.addEventListener("resize", ()=>{ clearTimeout(window.__tBarra);
+  window.__tBarra = setTimeout(acomodaBarra, 120); });
+/* El rol esconde pestañas después de arrancar: hay que volver a limpiar. */
+try{
+  new MutationObserver(ms=>{
+    // los encabezados los escondemos nosotros: si no, nos perseguimos la cola
+    if(ms.every(m=> m.target.classList && m.target.classList.contains("barraGrupo"))) return;
+    limpiaGrupos();
+  }).observe($("#tabs"), {attributes:true, attributeFilter:["hidden"], subtree:true});
+}catch(e){}
+acomodaBarra();
+
 
 /* ---------- pasos plegables ---------- */
 const PASOS_LS = "cotizador_pasos";
@@ -3675,7 +3946,8 @@ function guardaPasos(){
   }catch(e){}
 }
 function arrancaPasos(){
-  const guard = leePasos() || {cliente:false, articulo:false, tallas:true, apps:false, extras:true, prod:true};
+  const guard = leePasos() || {cliente:false, articulo:false, apps:false, tallas:true, extras:true, prod:true};
+  if(guard.tallas === undefined) guard.tallas = true;
   document.querySelectorAll("[data-paso]").forEach(c=> c.classList.toggle("cerrado", !!guard[c.dataset.paso]));
   resumenPasos();
 }
@@ -3730,7 +4002,8 @@ function refrescaCostos(){
   document.querySelectorAll("[data-app]").forEach(row=>{
     const d = r.detalle.find(d=>d.id===row.dataset.app);
     const el = row.querySelector(".cost");
-    if(el) el.textContent = d ? "costo "+mx(d.costo)+" · precio "+mx(d.precio)+(d.min?" · mínimo":"") : "";
+    if(el) el.textContent = d ? "costo "+mx(d.costoConMaterial!=null? d.costoConMaterial : d.costo)+
+        " · precio "+mx(d.precioConMaterial!=null? d.precioConMaterial : d.precio)+(d.min?" · mínimo":"") : "";
   });
   pintaArmado(); renderServicio();
   renderResumen();
@@ -3766,13 +4039,19 @@ $("#tab-cot").addEventListener("input", e=>{
     case "c_qty": cot.cantidad=num(t.value,1); cot.cantManual=true; pintaSumaTallas(); refrescaCostos(); return;
     case "c_descVal": cot.descVal=num(t.value); refrescaCostos(); return;
     case "c_descNota": cot.descNota=t.value; renderResumen(); return;
-    case "c_svcAncho": armadoPrincipal().ancho=num(t.value); refrescaCostos(); return;
-    case "c_svcAlto":  armadoPrincipal().alto =num(t.value); refrescaCostos(); return;
+    case "c_svcAncho": medidaPrincipal().ancho=num(t.value); refrescaCostos(); return;
+    case "c_svcAlto":  medidaPrincipal().alto =num(t.value); refrescaCostos(); return;
     case "c_costoArt": cot.costoArt=num(t.value); refrescaCostos(); return;
     case "c_precioArt": cot.precioArt=num(t.value); refrescaCostos(); return;
   }
 });
 $("#apps").addEventListener("change", e=>{
+  const sw = e.target.closest("[data-armapp]");
+  if(sw){
+    const a = cot.apps.find(a=>a.id===sw.dataset.armapp);
+    if(a){ a.sinArmado = !sw.checked; renderApps(); if(armadoAbierto()) renderArmado(); renderResumen(); }
+    return;
+  }
   const t = e.target; if(t.tagName!=="SELECT") return;
   const row = t.closest("[data-app]"); if(!row) return;
   const a = cot.apps.find(a=>a.id===row.dataset.app); if(!a) return;
@@ -3859,6 +4138,14 @@ $("#armado").addEventListener("input", e=>{
   if(e.target.tagName==="SELECT") return;
   const row = e.target.closest("[data-arm]"); if(!row) return;
   const it = (cot.armado||[]).find(x=>x.id===row.dataset.arm); if(!it) return;
+  const med = e.target.closest("[data-med]");
+  if(med){
+    const pz = piezasDe(it).find(p=>p.id===med.dataset.med); if(!pz) return;
+    const k = e.target.dataset.medk; if(!k) return;
+    pz[k] = num(e.target.value);
+    pintaArmado(); renderServicio(); refrescaCostos();
+    return;
+  }
   const k = e.target.dataset.ark; if(!k) return;
   it[k] = (k==="nota") ? e.target.value : num(e.target.value);
   pintaArmado(); renderServicio(); renderResumen();
@@ -3874,19 +4161,25 @@ $("#armado").addEventListener("change", e=>{
   const it = (cot.armado||[]).find(x=>x.id===row.dataset.arm); if(!it) return;
   const k = e.target.dataset.ark;
   it[k] = e.target.value;
-  if(k==="appId" && e.target.value){
-    const a = cot.apps.find(a=>a.id===e.target.value);
-    if(a){
-      it.ancho = num(a.ancho); it.alto = num(a.alto);
-      const s = svcParaTecnica(a.tecnicaId);     // el material que le toca a esa técnica
-      if(s) it.servicioId = s.id;
-    }
-  }
   renderArmado(); renderApps(); renderServicio(); renderResumen();
 });
 $("#armado").addEventListener("click", e=>{
   const d = e.target.closest("[data-delarm]");
   if(d){ cot.armado = (cot.armado||[]).filter(x=>x.id!==d.dataset.delarm); renderArmado(); renderApps(); renderResumen(); return; }
+  const am = e.target.closest("[data-addmed]");
+  if(am){
+    const it = (cot.armado||[]).find(x=>x.id===am.dataset.addmed); if(!it) return;
+    it.piezas = piezasDe(it).slice(); it.piezas.push(medidaNueva(it));
+    renderArmado(); refrescaCostos(); return;
+  }
+  const dm = e.target.closest("[data-delmed]");
+  if(dm){
+    const parte = String(dm.dataset.delmed).split("|");
+    const it = (cot.armado||[]).find(x=>x.id===parte[0]); if(!it) return;
+    const quedan = piezasDe(it).filter(p=>p.id!==parte[1]);
+    it.piezas = quedan.length ? quedan : [medidaNueva(it)];
+    renderArmado(); refrescaCostos(); return;
+  }
   const gr = e.target.closest("[data-armgiro]");
   if(gr){
     const p = String(gr.dataset.armgiro).split("|");
@@ -3897,10 +4190,8 @@ $("#armado").addEventListener("click", e=>{
   if(rs){
     const it = (cot.armado||[]).find(x=>x.id===rs.dataset.armreset); if(!it) return;
     it.giro = "auto"; it.cobraMerma = true;
-    const a = cot.apps.find(a=>a.id===it.appId);
-    if(a){ it.ancho = num(a.ancho); it.alto = num(a.alto); }
-    it.cant = Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
-    renderArmado(); renderServicio(); renderResumen(); toast("Renglón reiniciado");
+    piezasDe(it).forEach(pz=>{ if(!pz.appId) pz.cant = qtyPedido(); });
+    renderArmado(); renderServicio(); refrescaCostos(); toast("Renglón reiniciado");
     return;
   }
   const s = e.target.closest("[data-armsube]");
@@ -3908,7 +4199,7 @@ $("#armado").addEventListener("click", e=>{
     const parte = String(s.dataset.armsube).split("|");
     const it = (cot.armado||[]).find(x=>x.id===parte[0]); if(!it) return;
     const n = Math.max(1, Math.round(num(parte[1])));
-    it.cant = n;
+    piezasDe(it).forEach(pz=>{ pz.cant = n; });
     if(it.appId || it.principal){ cot.cantidad = n; cot.cantManual = true; $("#c_qty").value = n; pintaSumaTallas(); }
     renderArmado(); refrescaCostos();
     toast((it.appId||it.principal) ? ("Cotización y armado a "+n+" pieza(s)") : ("Armado a "+n+" pieza(s)"));
@@ -7823,10 +8114,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261003-0001";</script>
+<script>window.BUILD="20261003-0937";</script>
 <script>
 (function(){
-  var mio = "20261003-0001";
+  var mio = "20261003-0937";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -7849,7 +8140,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261003-0001"></script>
-<script src="diagnostico.js?v=20261003-0001"></script>
+<script src="cuenta.js?v=20261003-0937"></script>
+<script src="diagnostico.js?v=20261003-0937"></script>
 </body>
 </html>
