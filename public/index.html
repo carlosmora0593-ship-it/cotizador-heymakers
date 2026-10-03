@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261003-1134"></script>
+<script src="config.js?v=20261003-1148"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1078,6 +1078,23 @@ nav.tabs .barraGrupo{padding:12px 11px 4px}
 .tecCampo input{text-align:right}
 #t_tecnicas{min-width:0;display:block}
 
+/* ---- el aviso de que se está vendiendo bajo el costo ---- */
+.alertaPrecio{margin:0 16px 14px;background:var(--warn-soft);border:1px solid var(--warn);
+  border-left-width:4px;border-radius:0 10px 10px 0;padding:12px 14px}
+.alTit{font-weight:800;font-size:13.5px;color:var(--warn);margin-bottom:5px}
+.alTxt{font-size:12.5px;line-height:1.55;margin:0;color:var(--ink-2)}
+.alTxt b{font-family:"IBM Plex Mono",monospace}
+.alLista{list-style:none;margin:9px 0 0;padding:0;display:grid;gap:4px}
+.alLista li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:baseline;
+  font-size:12px;padding:5px 0;border-top:1px solid var(--warn-soft)}
+.alLista li:first-child{border-top:0}
+.alLista span{font-weight:600;color:var(--ink-2)}
+.alLista b{font-family:"IBM Plex Mono",monospace;font-weight:500;color:var(--ink-2);white-space:nowrap}
+@media (max-width:460px){ .alLista li{grid-template-columns:minmax(0,1fr)} }
+.alPie{font-size:11.5px;color:var(--ink-3);margin:9px 0 0;line-height:1.5}
+.alAcc{margin-top:11px}
+.sub.pierde{color:var(--warn);font-weight:700}
+
 
 /* ---- el diagnóstico ----
    Una pregunta a la vez. Las opciones entran escalonadas: no es adorno,
@@ -1574,6 +1591,7 @@ body.rol-produccion #btnPrint{display:none!important}
           <div class="v" id="r_unit">$0.00</div>
           <div class="sub" id="r_unitSub">—</div>
         </div>
+          <div class="alertaPrecio" id="r_alerta" hidden></div>
         <dl class="break" id="r_break"></dl>
         <div class="estadoPedido" id="estadoPedido"></div>
         <div class="body" style="display:flex;gap:8px;flex-wrap:wrap">
@@ -3694,20 +3712,125 @@ function logPrecio(nombre, antes, despues){
   cat.historial.push({fecha:new Date().toISOString().slice(0,16).replace("T"," "),nombre,antes:num(antes),despues:num(despues)});
   if(cat.historial.length>400) cat.historial = cat.historial.slice(-400);
 }
+
+/* ---------- la pieza gana o pierde, y se dice ---------- */
+function costoPieza(r){
+  return (cot.modo==="servicio" && r.qty>0) ? (r.costoDirecto + r.armadoCosto/r.qty) : r.costoDirecto;
+}
+function precioPieza(r){ return num(r.unitario); }
+function margenPieza(r){
+  const p = precioPieza(r), c = costoPieza(r);
+  return p>0 ? (p-c)/p*100 : 0;
+}
+function mermaFactor(){ return 1 + num(P.merma)/100; }
+
+/* Quién está vendiendo bajo su costo. La merma cuenta: si de cada 100 piezas
+   se echan a perder 5, el precio tiene que pagar las 105. */
+function diagPrecio(r){
+  const m = mermaFactor(), filas = [];
+  if(cot.modo!=="servicio" && r.porLista){
+    const c = num(r.costoArt)*m, p = num(r.precioArtLista);
+    if(p < c - 0.005) filas.push({tipo:"articulo", que:"Artículo base", costo:c, precio:p,
+                                  sugerido:Math.round(conUtil(c)*100)/100});
+  }
+  if(r.porLista) r.detalle.forEach(d=>{
+    const c = num(d.costo)*m, p = num(d.precio);
+    if(p < c - 0.005){
+      const a = cot.apps.find(a=>a.id===d.id);
+      filas.push({tipo:"tecnica", tecnicaId:a? a.tecnicaId : "", que:(d.ubic||"Aplicación")+" · "+d.tecnica,
+                  costo:c, precio:p, sugerido:Math.round(conUtil(num(d.costo))*100)/100});
+    }
+  });
+  (r.armado||[]).forEach(a=>{
+    if(num(a.precio) < num(a.costo) - 0.005){
+      const row = (cot.armado||[]).find(x=>x.id===a.id);
+      const s = row ? svcDe(row.servicioId) : null;
+      filas.push({tipo:"servicio", servicioId:s? s.id : "", que:"Material · "+a.nombre,
+                  costo:num(a.costo), precio:num(a.precio),
+                  sugerido: s ? Math.round(conUtil(num(s.costo))*100)/100 : 0});
+    }
+  });
+  const c = costoPieza(r), p = precioPieza(r);
+  return {pierde: p < c - 0.005, costo:c, precio:p, porPieza: p - c, enElPedido: (p-c)*r.qty, filas};
+}
+
+function renderAlertaPrecio(r){
+  const w = $("#r_alerta"); if(!w) return;
+  const d = diagPrecio(r);
+  if(!d.pierde && !d.filas.length){ w.hidden = true; w.innerHTML = ""; return; }
+  w.hidden = false;
+  const detalle = d.filas.map(f=>
+    '<li><span>'+esc(f.que)+'</span><b>cuesta '+mx(f.costo)+' · se vende en '+mx(f.precio)+'</b></li>').join("");
+  const arreglables = d.filas.filter(f=>f.sugerido>0).length;
+  w.innerHTML =
+    (d.pierde
+      ? '<div class="alTit">Esta cotización pierde dinero</div>'+
+        '<p class="alTxt">Cada pieza cuesta <b>'+mx(d.costo)+'</b> y se está vendiendo en <b>'+mx(d.precio)+'</b>: '+
+        'son <b>'+mx(Math.abs(d.porPieza))+'</b> de pérdida por pieza, <b>'+mx(Math.abs(d.enElPedido))+'</b> en todo el pedido.</p>'
+      : '<div class="alTit">Hay renglones que se venden bajo su costo</div>'+
+        '<p class="alTxt">El pedido todavía sale a flote por lo demás, pero estos renglones no se pagan solos:</p>')+
+    (detalle ? '<ul class="alLista">'+detalle+'</ul>' : "")+
+    (num(P.merma)>0 ? '<p class="alPie">El costo ya trae tu <b>'+num(P.merma)+'% de merma</b>: '+
+      'por cada 100 piezas buenas hay que comprar '+Math.round(mermaFactor()*100)+'. '+
+      'Si el precio no la cubre, esas piezas salen de tu bolsa.</p>' : "")+
+    (arreglables
+      ? '<div class="alAcc"><button class="btn sm" id="btnSanea">Subir esos precios con tu utilidad ('+
+        (P.modo==="margen" ? "margen " : "markup ")+num(P.margen)+'%)</button></div>'
+      : '<p class="alPie">Revisa los precios en el Catálogo o sube la mano de obra en Ajustes.</p>');
+}
+
+/* Sube lo que esté bajo su costo, y lo deja escrito en el catálogo para que no
+   vuelva a pasar en la siguiente cotización. */
+function saneaPrecios(){
+  const r = calc(), d = diagPrecio(r);
+  let n = 0;
+  d.filas.forEach(f=>{
+    if(!(f.sugerido>0)) return;
+    if(f.tipo==="articulo"){
+      logPrecio(cot.desc||"Artículo", num(cot.precioArt), f.sugerido);
+      cot.precioArt = f.sugerido;
+      const a = (cat.articulos||[]).find(a=>a.id===cot.articuloId);
+      if(a) a.precio = f.sugerido;
+      n++;
+    } else if(f.tipo==="tecnica"){
+      const t = (cat.tecnicas||[]).find(t=>t.id===f.tecnicaId); if(!t) return;
+      logPrecio(t.nombre+" · mano de obra", num(t.precioMO), f.sugerido);
+      t.precioMO = f.sugerido; n++;
+    } else if(f.tipo==="servicio"){
+      const s = (cat.servicios||[]).find(s=>s.id===f.servicioId); if(!s) return;
+      logPrecio(s.nombre, num(s.precio), f.sugerido);
+      s.precio = f.sugerido; n++;
+    }
+  });
+  if(!n){ toast("No encontré qué subir: revisa los precios en el Catálogo"); return; }
+  persist();
+  renderCot();
+  if(typeof renderCatalogo==="function") renderCatalogo();
+  toast(n+" precio(s) subidos con tu utilidad y guardados en el catálogo");
+}
+
 function renderResumen(){
   const r = calc();
   $("#c_escala").textContent = (cot.descOn===false) ? "sin descuento por mayoreo"
     : r.descVolPct>0 ? (r.esc.desde+"–"+(r.esc.hasta>9999?"+":r.esc.hasta)+" pzas · −"+r.descVolPct+"%")
     : "aún no llega al primer escalón";
   animaNum($("#r_unit"), r.unitario);
-  $("#r_unitSub").textContent = r.qty+" pza(s) · costo "+mx(cot.modo==="servicio" && r.qty>0 ? (r.costoDirecto+r.armadoCosto/r.qty) : r.costoDirecto)+
-    " · utilidad "+r.margenReal.toFixed(0)+"%";
+  // La utilidad que va junto al costo de la pieza es la DE LA PIEZA. La del
+  // pedido completo va abajo, en su propio renglón: mezclarlas escondía que
+  // una playera se estuviera vendiendo por debajo de lo que cuesta.
+  const cPza = costoPieza(r), mPza = margenPieza(r);
+  const sub = $("#r_unitSub");
+  sub.textContent = r.qty+" pza(s) · costo "+mx(cPza)+" · utilidad "+mPza.toFixed(0)+"%";
+  sub.classList.toggle("pierde", mPza < 0);
   const L = [];
   if(cot.modo!=="servicio")
     L.push(["Artículo base", r.porLista ? mx(r.costoArt)+" → "+mx(r.precioArtLista) : mx(r.costoArt)+" c/u", true]);
   r.detalle.forEach(d=> L.push([d.ubic||"Aplicación",
     r.porLista ? d.tecnica+" · "+mx(d.costo)+" → "+mx(d.precio) : d.tecnica+" · "+d.base, true]));
   if(cot.modo!=="servicio"){
+    const montoMerma = r.costoDirecto - (r.costoArt + r.costoApps);
+    if(montoMerma > 0.005)
+      L.push(["Merma "+num(P.merma)+"% · lo que se echa a perder", "+"+mx(montoMerma)+" por pieza", true]);
     L.push(["Costo directo por pieza", mx(r.costoDirecto), true]);
     L.push([r.porLista ? "Precio público por pieza" : "Precio de lista por pieza", mx(r.precioBase), false]);
   }
@@ -3725,8 +3848,10 @@ function renderResumen(){
   if(r.iva>0) L.push(["IVA "+P.iva+"%", mx(r.iva), false]);
   let h = L.map(x=>'<div'+(x[2]?' class="muted"':'')+'><dt>'+esc(x[0])+'</dt><dd>'+x[1]+'</dd></div>').join("");
   h += '<div class="total"><dt>Total</dt><dd>'+mx(r.total)+'</dd></div>';
-  h += '<div class="muted"><dt>Utilidad estimada</dt><dd>'+mx(r.utilidad)+'</dd></div>';
+  h += '<div class="muted"><dt>Utilidad del pedido completo</dt><dd>'+mx(r.utilidad)+
+       ' · '+r.margenReal.toFixed(0)+'%</dd></div>';
   $("#r_break").innerHTML = h;
+  renderAlertaPrecio(r);
   if(typeof resumenPasos==="function") resumenPasos();
 }
 
@@ -4506,6 +4631,11 @@ $("#addApp").addEventListener("click", ()=>{
 $("#addExtra").addEventListener("click", ()=>{
   cat.extras.push({id:uid(),nombre:"Nuevo cargo",tipo:"unico",monto:0}); persist(); renderExtras();
   toast("Cargo agregado — edítalo en la pestaña Catálogo");
+});
+
+
+$("#r_alerta").addEventListener("click", e=>{
+  if(e.target.closest("#btnSanea")) saneaPrecios();
 });
 
 /* ---------- eventos del armado ---------- */
@@ -8673,10 +8803,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261003-1134";</script>
+<script>window.BUILD="20261003-1148";</script>
 <script>
 (function(){
-  var mio = "20261003-1134";
+  var mio = "20261003-1148";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -8699,7 +8829,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261003-1134"></script>
-<script src="diagnostico.js?v=20261003-1134"></script>
+<script src="cuenta.js?v=20261003-1148"></script>
+<script src="diagnostico.js?v=20261003-1148"></script>
 </body>
 </html>
