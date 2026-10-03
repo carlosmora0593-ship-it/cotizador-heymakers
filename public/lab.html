@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0A7FA8">
-<script src="config.js?v=20261001-1729"></script>
+<script src="config.js?v=20261002-1816"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Makers Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -287,6 +287,7 @@ body.sin-sesion .telon{display:none!important}
       <button data-v="soporte">Soporte <span class="cuenta" id="n_soporte">0</span></button>
       <button data-v="cobros">Cobros <span class="cuenta" id="n_cobros">0</span></button>
       <button data-v="codigos">Códigos</button>
+      <button data-v="diagnosticos">Diagnósticos</button>
       <button data-v="equipo">Equipo</button>
       <button data-v="numeros">Números</button>
     </div>
@@ -447,8 +448,8 @@ function desempeno() {
 }
 
 let DB = null;
-let ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [], codigos: [] };
-const COLS = ["cuentas", "tickets", "errores", "equipo", "alianzas", "citas", "cobros", "fallas", "codigos"];
+let ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [], codigos: [], diagnosticos: [] };
+const COLS = ["cuentas", "tickets", "errores", "equipo", "alianzas", "citas", "cobros", "fallas", "codigos", "diagnosticos"];
 let vista = "tablero", abierta = null, esEjemplo = false, listo = false;
 let filtro = { texto: "", estado: "", plan: "" };
 
@@ -2231,7 +2232,7 @@ async function accion(acc) {
 /* ================= pintar ================= */
 function pinta() {
   const titulos = { tablero: "Tablero", cuentas: "Cuentas", agenda: "Agenda", soporte: "Soporte",
-    cobros: "Cobros y facturación", codigos: "Códigos de curso", equipo: "Equipo y alianzas", numeros: "Números" };
+    cobros: "Cobros y facturación", codigos: "Códigos de curso", diagnosticos: "Qué pide quien llega", equipo: "Equipo y alianzas", numeros: "Números" };
   $("#titulo").textContent = titulos[vista];
   $("#n_cuentas").textContent = ficheros.cuentas.length;
   $("#n_agenda").textContent = citasHoy().length;
@@ -2249,6 +2250,7 @@ function pinta() {
   $("#vista").innerHTML = vista === "tablero" ? vTablero() : vista === "cuentas" ? vCuentas()
     : vista === "agenda" ? vAgenda() : vista === "soporte" ? vSoporte()
     : vista === "cobros" ? vCobros() : vista === "codigos" ? vCodigos()
+    : vista === "diagnosticos" ? vDiagnosticos()
     : vista === "equipo" ? vEquipo() : vNumeros();
   ponGlobos();
 }
@@ -2673,12 +2675,101 @@ async function recarga(col) {
   } catch (e) {}
 }
 
+
+/* ================= qué pide quien llega =================
+   Las seis preguntas que contesta la gente antes de elegir plan. Esto no
+   se lee renglón por renglón: se lee de arriba, en los totales. Si de
+   cuarenta respuestas treinta dicen que cotizan en Excel, eso vale más
+   que cualquier corazonada sobre el mercado. */
+function vDiagnosticos() {
+  const ds = ficheros.diagnosticos || [];
+  if (!ds.length) return '<div class="tarjeta"><header><h2>Qué pide quien llega</h2></header>' +
+    '<div class="cuerpo"><div class="vacio">Todavía nadie ha contestado el cuestionario. ' +
+    'Aparece cuando alguien se registra sin código y le da a "Ver los planes".</div></div></div>';
+
+  const contrataron = ds.filter(d => d.eligio);
+  const atinamos = ds.filter(d => d.eligio && d.eligio === d.recomendado);
+
+  /* Cuenta cuántas veces sale cada respuesta. Sirve igual para las de una
+     sola opción que para las de varias, porque las de varias llegan como
+     lista y se cuenta cada elemento. */
+  const cuenta = (campo, mapa) => {
+    const t = {};
+    ds.forEach(d => {
+      const v = d[campo];
+      (Array.isArray(v) ? v : [v]).forEach(x => { if (x) t[x] = (t[x] || 0) + 1; });
+    });
+    return Object.keys(t).sort((a, b) => t[b] - t[a])
+      .map(k => ({ k: (mapa && mapa[k]) || k, n: t[k], pc: Math.round(100 * t[k] / ds.length) }));
+  };
+
+  const barras = (titulo, filas) =>
+    '<div class="tarjeta"><header><h3 style="margin:0;font-size:14px">' + titulo + '</h3></header>' +
+    '<div class="cuerpo">' + filas.map(f =>
+      '<div style="margin-bottom:9px">' +
+      '<div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:3px">' +
+        '<span>' + esc(f.k) + '</span><b>' + f.n + ' · ' + f.pc + '%</b></div>' +
+      '<div style="height:6px;background:var(--surface-3);border-radius:3px;overflow:hidden">' +
+        '<i style="display:block;height:100%;width:' + f.pc + '%;background:var(--acento)"></i></div>' +
+      '</div>').join("") + '</div></div>';
+
+  const NOM_GENTE  = {"1":"Solo él/ella", "2a3":"Dos o tres", "4mas":"Cuatro o más"};
+  const NOM_COTIZA = {pocas:"Menos de 10 al mes", medias:"Entre 10 y 50", muchas:"Más de 50"};
+  const NOM_COMO   = {memoria:"De memoria", papel:"Papel y calculadora", excel:"En Excel", otro:"Otro programa"};
+  const NOM_DONDE  = {curso:"Curso Hey Makers", redes:"Redes sociales", recomendado:"Recomendación", internet:"Buscando"};
+  const NOM_HACE   = {playeras:"Playeras y ropa", gorras:"Gorras", tazas:"Tazas", bordado:"Bordado", otros:"Otras cosas"};
+  const NOM_NEC    = {compras:"Pedir material", inventario:"Inventario", factura:"Facturar",
+                      utilidad:"Saber su utilidad", caja:"Corte de caja"};
+
+  const masSugerido = (function () {
+    const c = cuenta("recomendado", { basico: "Básico", maker: "Maker", pro: "Pro" });
+    return c.length ? c[0].k : "—";
+  })();
+
+  return '<div style="display:flex;flex-direction:column;gap:20px">' +
+    '<div class="tiles">' +
+      tile("Contestaron", ds.length, "el cuestionario completo o parte", true) +
+      tile("Contrataron", contrataron.length,
+           (ds.length ? Math.round(100 * contrataron.length / ds.length) : 0) + "% de los que contestan") +
+      tile("Le atinamos", atinamos.length,
+           (contrataron.length ? Math.round(100 * atinamos.length / contrataron.length) : 0) +
+           "% eligió el que le sugerimos") +
+      tile("Más sugerido", masSugerido, "de los tres planes") +
+    '</div>' +
+
+    '<div class="rejilla2">' +
+      barras("Qué personalizan", cuenta("que_hace", NOM_HACE)) +
+      barras("Qué les hace falta", cuenta("que_necesita", NOM_NEC)) +
+      barras("Cuántos son", cuenta("gente", NOM_GENTE)) +
+      barras("Cuánto cotizan", cuenta("cotizaciones_mes", NOM_COTIZA)) +
+      barras("Cómo cotizan hoy", cuenta("como_cotiza_hoy", NOM_COMO)) +
+      barras("De dónde llegan", cuenta("de_donde_llego", NOM_DONDE)) +
+    '</div>' +
+
+    '<div class="tarjeta"><header><h2>Uno por uno</h2>' +
+      '<span class="pista">los últimos ' + Math.min(ds.length, 40) + '</span></header>' +
+      '<table class="tabla"><thead><tr><th>Cuándo</th><th>Correo</th><th>Son</th>' +
+      '<th>Cotiza</th><th>Necesita</th><th>Le dijimos</th><th>Eligió</th></tr></thead><tbody>' +
+      ds.slice(0, 40).map(d =>
+        '<tr><td>' + fCorta(String(d.creado).slice(0, 10)) + '</td>' +
+        '<td>' + esc(d.correo || "—") + '</td>' +
+        '<td>' + esc(NOM_GENTE[d.gente] || "—") + '</td>' +
+        '<td>' + esc(NOM_COTIZA[d.cotizaciones_mes] || "—") + '</td>' +
+        '<td>' + esc((d.que_necesita || []).map(x => NOM_NEC[x] || x).join(", ") || "nada en especial") + '</td>' +
+        '<td>' + esc((PLANES[d.recomendado] || {}).nombre || "—") + '</td>' +
+        '<td>' + (d.eligio
+            ? '<span class="chip bien">' + esc((PLANES[d.eligio] || {}).nombre || d.eligio) + '</span>'
+            : '<span class="chip gris">todavía no</span>') + '</td></tr>').join("") +
+      '</tbody></table></div>' +
+    '</div>';
+}
+
 </script>
 
-<script>window.BUILD="20261001-1729";</script>
+<script>window.BUILD="20261002-1816";</script>
 <script>
 (function(){
-  var mio = "20261001-1729";
+  var mio = "20261002-1816";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -2701,6 +2792,6 @@ async function recarga(col) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="lab.js?v=20261001-1729"></script>
+<script src="lab.js?v=20261002-1816"></script>
 </body>
 </html>

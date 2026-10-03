@@ -823,7 +823,13 @@ q("#btnPlanes").addEventListener("click", ()=> abrePlanes());
 q("#avisoPagoBtn").addEventListener("click", ()=> abrePlanes());
 
 /* ---------- Los botones del muro ---------- */
-if(q("#muroPlanes")) q("#muroPlanes").addEventListener("click", ()=> abrePlanes());
+/* El muro abre el diagnóstico, no la lista de precios. Quien llega aquí
+   casi nunca sabe cuál plan le toca, y tres columnas de características
+   no se lo van a decir. Si prefiere ver precios y ya, el cuestionario
+   tiene su salida en cada pantalla. */
+if(q("#muroPlanes")) q("#muroPlanes").addEventListener("click", ()=>{
+  if(typeof diagAbre === "function") diagAbre(); else abrePlanes();
+});
 
 if(q("#muroCodigo")) q("#muroCodigo").addEventListener("click", ()=>{
   const caja = q("#muroCanje");
@@ -948,7 +954,7 @@ function abrePlanes(){
   q("#planesGrid").innerHTML = Object.keys(CONFIG.PLANES).map(k=>{
     const p = CONFIG.PLANES[k], precio = ciclo==="anual" ? p.anual : p.mensual;
     const actual = plan()===k && vigente();
-    return '<div class="planCard'+(p.destacado?" destacado":"")+'">'+
+    return '<div class="planCard'+(p.destacado?" destacado":"")+'" data-plan="'+k+'">'+
       '<h3>'+p.nombre+'</h3><p class="para">'+p.para+'</p>'+
       '<div class="precio">$'+precio.toLocaleString("es-MX")+'<span> MXN / '+(ciclo==="anual"?"año":"mes")+'</span></div>'+
       '<ul>'+p.incluye.map(i=>"<li>"+i+"</li>").join("")+'</ul>'+
@@ -981,6 +987,12 @@ q("#planesGrid").addEventListener("click", async e=>{
     });
     const data = await leeJson(r);
     if(!r.ok || !data.init_point) throw new Error(data.error || "No se pudo crear la suscripción");
+    /* Antes de irnos a Mercado Pago, dejamos anotado qué eligió. Comparar
+       eso contra lo que le sugerimos es lo que dice si las preguntas del
+       diagnóstico sirven o hay que cambiarlas. */
+    if(typeof window.__diagEligio === "function"){
+      try{ await window.__diagEligio(b.dataset.contratar); }catch(e){}
+    }
     location.href = data.init_point;
   }catch(err){
     b.disabled = false; b.textContent = "Suscribirme";

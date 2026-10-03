@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261001-1729"></script>
+<script src="config.js?v=20261002-1816"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -632,6 +632,72 @@ body.sin-acceso .wrap,body.sin-acceso header.top{display:none}
 }
 
 
+/* ---- el diagnóstico ----
+   Una pregunta a la vez. Las opciones entran escalonadas: no es adorno,
+   es que el ojo alcance a leerlas en orden en vez de recibir cinco de
+   golpe. Quien prefiera no ver nada de esto tiene prefers-reduced-motion
+   y se respeta. */
+.diagMuro{position:fixed;inset:0;z-index:66;display:grid;place-items:center;
+  padding:20px;background:var(--bg);overflow:auto}
+.diagCard{width:min(560px,100%);background:var(--surface);border:1px solid var(--line);
+  border-radius:18px;padding:28px 26px 18px;box-shadow:0 20px 60px -30px rgba(0,0,0,.45)}
+
+.diagBarra{height:4px;border-radius:3px;background:var(--line-soft);overflow:hidden;margin-bottom:24px}
+.diagBarra i{display:block;height:100%;width:0;border-radius:3px;
+  background:linear-gradient(90deg,#06A1D7,#F51B95,#FFEC30);
+  transition:width .45s cubic-bezier(.4,0,.2,1)}
+
+.diagPaso h3{margin:0 0 6px;font-size:21px;line-height:1.25}
+.diagSub{margin:0 0 18px;font-size:13.5px;color:var(--ink-3);line-height:1.5}
+
+.diagOps{display:grid;gap:9px}
+.diagOp{display:flex;align-items:center;gap:13px;width:100%;text-align:left;
+  padding:13px 15px;border:1.5px solid var(--line);border-radius:12px;
+  background:var(--surface);color:var(--ink);font:inherit;font-size:14.5px;cursor:pointer;
+  transition:border-color .18s,background .18s,transform .12s;
+  animation:diagEntra .34s cubic-bezier(.2,.8,.3,1) both}
+.diagOp:nth-child(1){animation-delay:.02s} .diagOp:nth-child(2){animation-delay:.07s}
+.diagOp:nth-child(3){animation-delay:.12s} .diagOp:nth-child(4){animation-delay:.17s}
+.diagOp:nth-child(5){animation-delay:.22s}
+.diagOp:hover{border-color:var(--accent);transform:translateY(-1px)}
+.diagOp:active{transform:translateY(0)}
+.diagOp.puesta{border-color:var(--accent);background:var(--accent-soft)}
+
+.diagIco{flex:none;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
+  background:var(--surface-2);color:var(--accent);transition:background .18s,color .18s}
+.diagIco svg{width:21px;height:21px}
+.diagOp.puesta .diagIco{background:var(--accent);color:var(--accent-ink)}
+.diagTxt{flex:1;min-width:0}
+
+.diagCheck{flex:none;width:19px;height:19px;border-radius:50%;border:1.5px solid var(--line-soft);
+  position:relative;transition:border-color .18s,background .18s}
+.diagOp.puesta .diagCheck{border-color:var(--accent);background:var(--accent)}
+.diagOp.puesta .diagCheck::after{content:"";position:absolute;left:5.5px;top:2px;
+  width:5px;height:10px;border:solid var(--accent-ink);border-width:0 2px 2px 0;transform:rotate(42deg)}
+
+.diagPie{display:flex;align-items:center;gap:10px;margin-top:20px;
+  padding-top:14px;border-top:1px solid var(--line-soft)}
+.diagCuenta{flex:1;text-align:center;font-size:12px;color:var(--ink-3)}
+
+.diagFinal{text-align:center}
+.diagSello{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:8px;animation:diagEntra .4s both}
+.diagFinal h3{font-size:30px;margin-bottom:10px}
+.diagPorque{font-size:14.5px;color:var(--ink-2);line-height:1.6;margin:0 0 22px}
+.diagBotones{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+
+@keyframes diagEntra{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion:reduce){
+  .diagOp,.diagSello{animation:none}
+  .diagBarra i{transition:none}
+}
+@media (max-width:520px){
+  .diagCard{padding:22px 18px 14px;border-radius:14px}
+  .diagPaso h3{font-size:19px}
+  .diagOp{padding:11px 13px;font-size:14px}
+}
+
 /* ---- el muro de quien no tiene plan ----
    Cubre el trabajo, no la cabecera: desde arriba todavía puede entrar a su
    perfil, ver su plan y salir. Encerrar a alguien sin salida es peor que
@@ -920,6 +986,34 @@ body.rol-produccion #btnPrint{display:none!important}
     </div>
     <p class="muroPie">¿Tomaste un curso Hey Makers? Tu código abre 15 días
     del plan Maker, con todo incluido.</p>
+  </div>
+</div>
+
+<!-- El diagnóstico. Seis preguntas antes de elegir plan: para que el taller
+     no adivine, y para que Hey Makers sepa quién está llegando. Se puede
+     saltar completo — a quien ya decidió, obligarlo a contestar seis
+     pantallas es la forma más rápida de perderlo. -->
+<div class="diagMuro" id="diagMuro" hidden>
+  <div class="diagCard">
+    <div class="diagBarra"><i id="diagAvance"></i></div>
+
+    <div id="diagPasos"><section class="diagPaso" data-paso="0"><h3>¿Qué personalizas?</h3><p class="diagSub">Puedes elegir varias.</p><div class="diagOps multi"><button class="diagOp" type="button" data-op="playeras" data-preg="hace"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4 3 7l2 4 3-1v10h12V10l3 1 2-4-5-3-3 2a3 3 0 0 1-6 0Z"/></svg></span><span class="diagTxt">Playeras y ropa</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="gorras" data-preg="hace"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16h18M4 16a8 8 0 0 1 16 0M12 8V5"/></svg></span><span class="diagTxt">Gorras</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="tazas" data-preg="hace"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h12v9a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3Z"/><path d="M16 11h2a3 3 0 0 1 0 6h-2"/></svg></span><span class="diagTxt">Tazas y promocionales</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="bordado" data-preg="hace"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M7 7l10 10M17 7 7 17"/></svg></span><span class="diagTxt">Bordado</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="otros" data-preg="hace"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span><span class="diagTxt">Otras cosas</span><span class="diagCheck" aria-hidden="true"></span></button></div></section><section class="diagPaso" data-paso="1" hidden><h3>¿Cuántos son en el taller?</h3><p class="diagSub">Contándote a ti.</p><div class="diagOps"><button class="diagOp" type="button" data-op="1" data-preg="gente"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></span><span class="diagTxt">Solo yo</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="2a3" data-preg="gente"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 19a6 6 0 0 1 12 0M15 19a5 5 0 0 1 6-3"/></svg></span><span class="diagTxt">Dos o tres</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="4mas" data-preg="gente"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="7" cy="8" r="2.6"/><circle cx="17" cy="8" r="2.6"/><circle cx="12" cy="14" r="2.6"/><path d="M2 18a5 5 0 0 1 10 0M12 21a5 5 0 0 1 10-3"/></svg></span><span class="diagTxt">Cuatro o más</span><span class="diagCheck" aria-hidden="true"></span></button></div></section><section class="diagPaso" data-paso="2" hidden><h3>¿Cuántas cotizaciones haces al mes?</h3><p class="diagSub">Más o menos, no tiene que ser exacto.</p><div class="diagOps"><button class="diagOp" type="button" data-op="pocas" data-preg="cotiza"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg></span><span class="diagTxt">Menos de 10</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="medias" data-preg="cotiza"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19v-3"/></svg></span><span class="diagTxt">Entre 10 y 50</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="muchas" data-preg="cotiza"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17 9 9l4 5 7-10"/><path d="M20 4h-4M20 4v4"/></svg></span><span class="diagTxt">Más de 50</span><span class="diagCheck" aria-hidden="true"></span></button></div></section><section class="diagPaso" data-paso="3" hidden><h3>¿Qué de esto te hace falta?</h3><p class="diagSub">Elige todo lo que necesites. Si no estás seguro, déjalo en blanco.</p><div class="diagOps multi"><button class="diagOp" type="button" data-op="compras" data-preg="necesita"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.5 11h10L20 7H6"/><circle cx="10" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg></span><span class="diagTxt">Pedir material a proveedores</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="inventario" data-preg="necesita"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h18v11H3Z"/><path d="M3 8l2-4h14l2 4M12 8v11"/></svg></span><span class="diagTxt">Llevar inventario</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="factura" data-preg="necesita"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2Z"/><path d="M9 8h6M9 12h6"/></svg></span><span class="diagTxt">Facturar a mis clientes</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="utilidad" data-preg="necesita"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5a2.5 2.5 0 0 1 5 0c0 2.5-5 2-5 5a2.5 2.5 0 0 0 5 0"/></svg></span><span class="diagTxt">Saber cuánto gané en el mes</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="caja" data-preg="necesita"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10h18v9H3Z"/><path d="M3 10l3-5h12l3 5M8 14h8"/></svg></span><span class="diagTxt">Llevar el corte de caja</span><span class="diagCheck" aria-hidden="true"></span></button></div></section><section class="diagPaso" data-paso="4" hidden><h3>¿Cómo cotizas hoy?</h3><p class="diagSub">Sin pena, aquí casi todos empiezan igual.</p><div class="diagOps"><button class="diagOp" type="button" data-op="memoria" data-preg="como"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a5 5 0 0 0-5 5c0 3 2 4 2 7h6c0-3 2-4 2-7a5 5 0 0 0-5-5Z"/><path d="M10 19h4"/></svg></span><span class="diagTxt">De memoria</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="papel" data-preg="como"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18H6Z"/><path d="M9 7h6M9 11h6M9 15h3"/></svg></span><span class="diagTxt">Papel y calculadora</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="excel" data-preg="como"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v16H4Z"/><path d="M4 9h16M9 4v16"/></svg></span><span class="diagTxt">En Excel</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="otro" data-preg="como"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v12H3Z"/><path d="M8 21h8M12 17v4"/></svg></span><span class="diagTxt">Con otro programa</span><span class="diagCheck" aria-hidden="true"></span></button></div></section><section class="diagPaso" data-paso="5" hidden><h3>¿De dónde nos conoces?</h3><p class="diagSub">Esto nos ayuda a saber dónde seguir.</p><div class="diagOps"><button class="diagOp" type="button" data-op="curso" data-preg="donde"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4 2 9l10 5 10-5Z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/></svg></span><span class="diagTxt">Tomé un curso Hey Makers</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="redes" data-preg="donde"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="6" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8 15.8 7M8.2 13.2l7.6 3.8"/></svg></span><span class="diagTxt">Por redes sociales</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="recomendado" data-preg="donde"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-8-4.5-8-10a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 11c0 5.5-8 10-8 10Z"/></svg></span><span class="diagTxt">Me recomendaron</span><span class="diagCheck" aria-hidden="true"></span></button><button class="diagOp" type="button" data-op="internet" data-preg="donde"><span class="diagIco"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg></span><span class="diagTxt">Buscando en internet</span><span class="diagCheck" aria-hidden="true"></span></button></div></section></div>
+
+    <section class="diagPaso diagFinal" data-paso="fin" hidden>
+      <div class="diagSello" id="diagSello"></div>
+      <h3 id="diagTitulo">Listo</h3>
+      <p class="diagPorque" id="diagPorque"></p>
+      <div class="diagBotones">
+        <button class="btn primary" id="diagVerPlan">Ver ese plan</button>
+        <button class="btn" id="diagTodos">Comparar los tres</button>
+      </div>
+    </section>
+
+    <footer class="diagPie">
+      <button class="btn sm" id="diagAtras" hidden>Atrás</button>
+      <span class="diagCuenta" id="diagCuenta"></span>
+      <button class="btn sm" id="diagSalta">Me lo salto</button>
+    </footer>
   </div>
 </div>
 <div class="wrap">
@@ -6481,10 +6575,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261001-1729";</script>
+<script>window.BUILD="20261002-1816";</script>
 <script>
 (function(){
-  var mio = "20261001-1729";
+  var mio = "20261002-1816";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -6507,6 +6601,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261001-1729"></script>
+<script src="cuenta.js?v=20261002-1816"></script>
+<script src="diagnostico.js?v=20261002-1816"></script>
 </body>
 </html>

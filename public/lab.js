@@ -259,7 +259,7 @@ function ticketDeVista(r, nota){
 /* De solo lectura quiere decir "no se borra desde aquí". Los tickets sí
    se contestan —eso es su razón de ser— pero borrar el reporte de un
    cliente no es algo que Makers Lab deba poder hacer. */
-const SOLO_LECTURA = {cuentas: true, tickets: true, errores: true, codigos: true};
+const SOLO_LECTURA = {cuentas: true, tickets: true, errores: true, codigos: true, diagnosticos: true};
 
 /* La vista de soporte es la última pieza que se instala, y si falta, lo
    que aparece es "no existe la tabla v_soporte": cierto y perfectamente
@@ -327,6 +327,17 @@ async function leeColeccion(col){
       }));
     });
     return fuera;
+  }
+
+  if(col === "diagnosticos"){
+    const {data, error} = await SB.from("v_diagnosticos").select("*").limit(200);
+    if(error){
+      /* Si todavía no se corre el SQL, el Lab no se cae: enseña la
+         sección vacía y sigue. */
+      console.warn("v_diagnosticos no existe todavía:", error.message);
+      return [];
+    }
+    return (data||[]).map(r=> Object.assign({id: String(r.id)}, r));
   }
 
   if(col === "codigos"){
