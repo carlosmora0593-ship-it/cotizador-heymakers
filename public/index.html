@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261002-1924"></script>
+<script src="config.js?v=20261002-2327"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -631,33 +631,280 @@ body.sin-acceso .wrap,body.sin-acceso header.top{display:none}
   .ayudaBtn{right:12px}
 }
 
-#t_servicios{min-width:1320px}
-#t_servicios th:nth-child(1),#t_servicios td:nth-child(1){min-width:240px}
-#t_servicios th:nth-child(2),#t_servicios td:nth-child(2){min-width:130px}
-#t_servicios th:nth-child(3),#t_servicios td:nth-child(3){min-width:180px}
-.descBox{margin-top:16px;border-top:1px solid var(--line-soft);padding-top:14px}
-.armRes{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px;display:grid;gap:7px;font-size:13px}
-.armRes .l{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
-.armRes .l b{font-family:"IBM Plex Mono";font-weight:600}
-.armRes .k{color:var(--ink-3);min-width:150px;font-size:12px}
-.armTip{margin-top:10px;background:var(--cyan-soft);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:10px 12px;font-size:13px;line-height:1.5}
-.armTip b{font-family:"IBM Plex Mono"}
-.armMal{margin-top:10px;background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 8px 8px 0;padding:10px 12px;font-size:13px}
-.armBarra{height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line-soft)}
-.armBarra span{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--accent))}
-.armPlano{margin-top:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:8px;overflow:auto}
+/* ---- interruptor artículo / servicio ---- */
+.modoSwitch{display:inline-flex;gap:2px;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:3px}
+.modoSwitch button{font:inherit;font-weight:600;font-size:13px;border:0;background:transparent;color:var(--ink-2);
+  padding:7px 14px;border-radius:7px;cursor:pointer;white-space:nowrap}
+.modoSwitch button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow)}
+
+/* ---- la pestañita de la orilla ---- */
+.armadoTab{position:fixed;right:0;top:34%;z-index:58;display:flex;align-items:center;gap:7px;
+  writing-mode:vertical-rl;font:inherit;font-weight:700;font-size:12.5px;letter-spacing:.04em;
+  background:var(--surface);color:var(--cyan);border:1px solid var(--line);border-right:0;
+  border-radius:10px 0 0 10px;padding:14px 7px;cursor:pointer;box-shadow:var(--shadow)}
+.armadoTab:hover{color:var(--accent);border-color:var(--accent)}
+.armadoTab b{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:11px;color:var(--ink-3)}
+.armadoTab.alto b{color:var(--warn)}
+
+/* ---- el cajón ---- */
+.cajon{position:fixed;inset:0;z-index:72}
+.cajonFondo{position:absolute;inset:0;background:rgba(8,16,22,.38)}
+.cajonHoja{position:absolute;top:0;right:0;height:100%;width:min(560px,100vw);background:var(--bg);
+  border-left:1px solid var(--line);display:flex;flex-direction:column;animation:cajonEntra .2s ease-out}
+@keyframes cajonEntra{from{transform:translateX(26px);opacity:.3}to{transform:none;opacity:1}}
+.cajonHoja>header{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+.cajonHoja>header h2{margin:0;font-size:16px;flex:1}
+.cajonCuerpo{flex:1;overflow:auto;padding:16px;-webkit-overflow-scrolling:touch}
+
+/* ---- la ficha de cada material ---- */
+.armFicha{border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:14px;margin-bottom:14px}
+.armFichaTop{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.armFichaTop .tag{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--cyan);
+  background:var(--cyan-soft);border-radius:5px;padding:3px 8px}
+.armFichaTop .cost{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:600}
+.armCampos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.armCampo{display:block}
+.armCampo.armAncho{grid-column:1/-1}
+.armCampo span{display:block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.armBotones{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
+.armCols{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:14px;align-items:start;
+  border-top:1px dashed var(--line);padding-top:12px}
+.armPlano{border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:8px;overflow:auto}
 .armPlano svg{display:block;max-width:100%;height:auto}
-.col2{grid-column:span 2}
-@media (max-width:640px){
-  .armRes .l{display:block}
-  .armRes .k{display:block;min-width:0;margin-bottom:1px}
+.armPie{font-size:10.5px;color:var(--ink-3);margin-top:5px}
+.armChips{display:flex;flex-direction:column;gap:6px}
+.chipUso,.chipTira{font-size:11.5px;font-weight:700;padding:5px 9px;border-radius:7px;text-align:center}
+.chipUso{background:var(--good-soft);color:var(--good)}
+.chipTira{background:var(--warn-soft);color:var(--warn)}
+.armBarra{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden;border:1px solid var(--line-soft)}
+.armBarra span{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--accent))}
+.armRepTit{margin-top:14px;border-top:1px dashed var(--line);padding-top:12px;font-size:11px;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.armRep{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 18px;font-size:12.5px}
+.armRep div{display:flex;align-items:baseline;gap:8px;padding:3px 0}
+.armRep span{color:var(--ink-3);flex:1;min-width:0}
+.armRep b{font-family:"IBM Plex Mono",monospace;font-weight:600;white-space:nowrap}
+.armMerma{margin-top:12px}
+.armNota{font-size:12.5px;color:var(--ink-2);margin-top:5px}
+.armTip{margin-top:11px;background:var(--cyan-soft);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;
+  padding:10px 12px;font-size:13px;line-height:1.55}
+.armTip b{font-family:"IBM Plex Mono",monospace}
+.armAcc{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.armMal{margin-top:12px;background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 8px 8px 0;padding:10px 12px;font-size:13px}
+#t_servicios{min-width:1420px}
+#t_servicios th:nth-child(1),#t_servicios td:nth-child(1){min-width:240px}
+#t_servicios th:nth-child(2),#t_servicios td:nth-child(2){min-width:120px}
+#t_servicios th:nth-child(3),#t_servicios td:nth-child(3){min-width:160px}
+#t_servicios th:nth-child(4),#t_servicios td:nth-child(4){min-width:170px}
+@media (max-width:560px){
+  .armCampos{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .armCols{grid-template-columns:minmax(0,1fr)}
+  .armChips{flex-direction:row;flex-wrap:wrap}
+  .armChips .armBarra{flex-basis:100%}
+  .armRep{grid-template-columns:minmax(0,1fr)}
+  .armadoTab{top:auto;bottom:96px;writing-mode:horizontal-tb;border-radius:10px 0 0 10px;padding:8px 12px}
 }
-@media (max-width:420px){ .col2{grid-column:auto} }
-@media (max-width:520px){
-  [data-arm] .app-head{flex-wrap:wrap}
-  [data-arm] .app-head .pill{white-space:nowrap}
-  [data-arm] .app-head .cost{margin-left:0;order:3;flex-basis:100%}
+
+/* ==================== APARIENCIA DE VIDRIO ==================== */
+@media screen{
+:root{
+  --vidrio-fondo:rgba(255,255,255,.60);
+  --vidrio-fondo-2:rgba(255,255,255,.40);
+  --vidrio-borde:rgba(255,255,255,.80);
+  --vidrio-linea:rgba(16,42,56,.07);
+  --campo-fondo:rgba(255,255,255,.74);
+  --campo-borde:rgba(16,42,56,.15);
+  --vidrio-blur:20px;
+  --vidrio-sat:180%;
+  --brillo:inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(255,255,255,.25);
+  --sombra-flota:0 1px 2px rgba(16,42,56,.05), 0 14px 38px -18px rgba(6,96,130,.38);
+  --sombra-alta:0 2px 6px rgba(16,42,56,.07), 0 30px 70px -30px rgba(6,96,130,.5);
+  --radio:20px; --radio-sm:13px; --radio-pill:999px;
+  --amb-1:rgba(6,161,215,.14); --amb-2:rgba(245,27,149,.09); --amb-3:rgba(255,236,48,.11);
 }
+:root[data-theme="dark"],
+:root:not([data-theme="light"]){
+  --sombra-alta:0 2px 6px rgba(16,42,56,.07), 0 30px 70px -30px rgba(6,96,130,.5);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --vidrio-fondo:rgba(26,39,49,.62);
+    --vidrio-fondo-2:rgba(20,30,39,.46);
+    --vidrio-borde:rgba(255,255,255,.10);
+    --vidrio-linea:rgba(255,255,255,.07);
+    --campo-fondo:rgba(255,255,255,.055);
+    --campo-borde:rgba(255,255,255,.15);
+    --brillo:inset 0 1px 0 rgba(255,255,255,.13);
+    --sombra-flota:0 1px 2px rgba(0,0,0,.4), 0 16px 42px -20px rgba(0,0,0,.85);
+    --sombra-alta:0 2px 8px rgba(0,0,0,.5), 0 34px 80px -34px rgba(0,0,0,.95);
+    --amb-1:rgba(6,161,215,.20); --amb-2:rgba(245,27,149,.14); --amb-3:rgba(255,236,48,.07);
+  }
+}
+:root[data-theme="dark"]{
+  --vidrio-fondo:rgba(26,39,49,.62);
+  --vidrio-fondo-2:rgba(20,30,39,.46);
+  --vidrio-borde:rgba(255,255,255,.10);
+  --vidrio-linea:rgba(255,255,255,.07);
+  --campo-fondo:rgba(255,255,255,.055);
+  --campo-borde:rgba(255,255,255,.15);
+  --brillo:inset 0 1px 0 rgba(255,255,255,.13);
+  --sombra-flota:0 1px 2px rgba(0,0,0,.4), 0 16px 42px -20px rgba(0,0,0,.85);
+  --amb-1:rgba(6,161,215,.20); --amb-2:rgba(245,27,149,.14); --amb-3:rgba(255,236,48,.07);
+}
+
+/* el ambiente de color detrás de todo */
+body{
+  background:
+    radial-gradient(1000px 680px at 10% -8%,  var(--amb-1), transparent 62%),
+    radial-gradient(900px 620px at 94% 4%,    var(--amb-2), transparent 64%),
+    radial-gradient(1100px 760px at 48% 112%, var(--amb-3), transparent 62%),
+    var(--bg);
+  background-attachment:fixed;
+}
+
+/* ---- superficies ---- */
+.card,.cajonHoja,.armFicha,.modal>.card{
+  background:var(--vidrio-fondo);
+  -webkit-backdrop-filter:blur(var(--vidrio-blur)) saturate(var(--vidrio-sat));
+  backdrop-filter:blur(var(--vidrio-blur)) saturate(var(--vidrio-sat));
+  border:1px solid var(--vidrio-borde);
+  border-radius:var(--radio);
+  box-shadow:var(--brillo), var(--sombra-flota);
+}
+.card>header{background:var(--vidrio-fondo-2);border-bottom:1px solid var(--vidrio-linea)}
+.card>header h2{font-size:14px;letter-spacing:-.01em}
+.armFicha{margin-bottom:14px}
+.modal>.card{box-shadow:var(--brillo), var(--sombra-alta)}
+.modal{background:rgba(8,18,25,.30);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+
+/* ---- la barra de arriba, flotando ---- */
+header.top{
+  background:var(--vidrio-fondo);
+  -webkit-backdrop-filter:blur(26px) saturate(190%);
+  backdrop-filter:blur(26px) saturate(190%);
+  border-bottom:1px solid var(--vidrio-linea);
+}
+.plaque{background:var(--vidrio-fondo);border:1px solid var(--vidrio-borde);border-radius:var(--radio-sm);
+  box-shadow:var(--brillo),0 2px 6px -3px rgba(16,42,56,.3)}
+.chip-store{border-radius:var(--radio-pill);border-color:var(--vidrio-borde);background:var(--vidrio-fondo-2)}
+
+/* ---- controles segmentados, como los de iOS ---- */
+nav.tabs,.modoSwitch,.planTabs{
+  background:var(--vidrio-fondo-2);
+  -webkit-backdrop-filter:blur(14px) saturate(170%);
+  backdrop-filter:blur(14px) saturate(170%);
+  border:1px solid var(--vidrio-borde);border-radius:var(--radio-pill);padding:4px;
+}
+nav.tabs button,.modoSwitch button{border-radius:var(--radio-pill);transition:background .18s,color .18s,box-shadow .18s}
+nav.tabs button[aria-selected="true"]{
+  background:var(--surface);color:var(--ink);
+  box-shadow:var(--brillo),0 2px 8px -3px rgba(16,42,56,.35)}
+.modoSwitch button[aria-selected="true"]{
+  background-color:var(--accent);
+  background-image:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0) 54%);
+  color:var(--accent-ink);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 4px 12px -5px var(--accent)}
+.planTabs{border-bottom:1px solid var(--vidrio-linea)}
+
+/* ---- botones de pastilla ---- */
+.btn{
+  border-radius:var(--radio-pill);
+  background:var(--vidrio-fondo);
+  border:1px solid var(--campo-borde);
+  -webkit-backdrop-filter:blur(12px) saturate(160%);
+  backdrop-filter:blur(12px) saturate(160%);
+  box-shadow:var(--brillo),0 1px 2px rgba(16,42,56,.06);
+}
+.btn:hover{border-color:var(--vidrio-borde);box-shadow:var(--brillo),0 6px 16px -8px rgba(16,42,56,.45)}
+.btn.primary{
+  background-color:var(--accent);
+  background-image:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,0) 52%);
+  border-color:transparent;color:var(--accent-ink);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.42),0 8px 20px -9px var(--accent);
+}
+.btn.ghost{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none}
+.btn.icon{border-radius:var(--radio-pill)}
+
+/* ---- campos ---- */
+input,select,textarea{
+  background:var(--campo-fondo);
+  border:1px solid var(--campo-borde);
+  border-radius:var(--radio-sm);
+  box-shadow:inset 0 1px 2px rgba(16,42,56,.055);
+}
+input:focus,select:focus,textarea:focus{
+  background:var(--surface);
+  box-shadow:0 0 0 4px var(--accent-soft), inset 0 1px 2px rgba(16,42,56,.05);
+  border-color:var(--accent);
+}
+input[readonly],textarea[readonly]{background:var(--vidrio-fondo-2)}
+
+/* ---- detalles ---- */
+.step{border-radius:var(--radio-pill);
+  background-image:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,0) 55%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 4px 10px -5px var(--accent)}
+.pill,.tag{border-radius:var(--radio-pill)}
+.summary .price .v{letter-spacing:-.03em}
+.armadoTab{background:var(--vidrio-fondo);
+  -webkit-backdrop-filter:blur(18px) saturate(180%);backdrop-filter:blur(18px) saturate(180%);
+  border-color:var(--vidrio-borde);box-shadow:var(--brillo),var(--sombra-flota)}
+.cajonHoja{border-radius:var(--radio) 0 0 var(--radio);border-right:0;
+  -webkit-backdrop-filter:blur(34px) saturate(190%);backdrop-filter:blur(34px) saturate(190%)}
+.cajonHoja>header{background:var(--vidrio-fondo-2);border-bottom:1px solid var(--vidrio-linea)}
+.cajonFondo{-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.armPlano,.descBox,.tbl-wrap{border-radius:var(--radio-sm)}
+.chipUso,.chipTira,.armTip,.armMal{border-radius:var(--radio-sm)}
+.armTip,.armMal{border-left-width:3px}
+
+/* ---- la pantalla de acceso ---- */
+.authWrap{background:transparent}
+.authCard{
+  background:var(--vidrio-fondo);
+  -webkit-backdrop-filter:blur(26px) saturate(185%);
+  backdrop-filter:blur(26px) saturate(185%);
+  border:1px solid var(--vidrio-borde);
+  border-radius:var(--radio);
+  box-shadow:var(--brillo), var(--sombra-alta);
+}
+.planCard{border-radius:var(--radio);border-color:var(--vidrio-borde);background:var(--vidrio-fondo);
+  -webkit-backdrop-filter:blur(16px) saturate(170%);backdrop-filter:blur(16px) saturate(170%);
+  box-shadow:var(--brillo),var(--sombra-flota)}
+.suscResumen,.avisoPago,.authPrueba{border-radius:var(--radio-sm)}
+
+/* ---- el selector de apariencia ---- */
+.temaRejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+.temaCard{position:relative;border:1px solid var(--vidrio-borde);border-radius:var(--radio-sm);padding:10px;
+  background:var(--vidrio-fondo-2);cursor:pointer;text-align:left;font:inherit;color:var(--ink);
+  box-shadow:var(--brillo);transition:transform .14s,box-shadow .14s,border-color .14s}
+.temaCard:hover{transform:translateY(-2px);box-shadow:var(--brillo),var(--sombra-flota)}
+.temaCard[aria-pressed="true"]{border-color:var(--accent);box-shadow:var(--brillo),0 0 0 3px var(--accent-soft)}
+.temaMuestra{display:flex;height:30px;border-radius:9px;overflow:hidden;margin-bottom:8px;box-shadow:inset 0 0 0 1px rgba(16,42,56,.08)}
+.temaMuestra i{flex:1}
+.temaCard b{font-weight:600;font-size:12.5px;display:block}
+.temaFila{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.temaOpc{display:inline-flex;background:var(--vidrio-fondo-2);border:1px solid var(--vidrio-borde);
+  border-radius:var(--radio-pill);padding:3px;gap:2px}
+.temaOpc button{font:inherit;font-weight:600;font-size:12px;border:0;background:transparent;color:var(--ink-2);
+  padding:6px 12px;border-radius:var(--radio-pill);cursor:pointer}
+.temaOpc button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--brillo),0 2px 6px -3px rgba(16,42,56,.35)}
+.temaColor{width:46px;height:34px;padding:2px;border-radius:var(--radio-sm);cursor:pointer}
+
+/* ---- sin vidrio: todo opaco, para quien lo prefiera o no lo soporte ---- */
+:root[data-vidrio="nitido"]{
+  --vidrio-fondo:var(--surface); --vidrio-fondo-2:var(--surface-2);
+  --vidrio-borde:var(--line); --campo-fondo:var(--surface); --campo-borde:var(--line);
+  --brillo:none; --vidrio-blur:0px; --vidrio-sat:100%;
+}
+:root[data-vidrio="nitido"] body{background:var(--bg)}
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+  :root{--vidrio-fondo:var(--surface);--vidrio-fondo-2:var(--surface-2);--vidrio-borde:var(--line);--campo-fondo:var(--surface);--campo-borde:var(--line)}
+}
+@media (prefers-reduced-transparency: reduce){
+  :root{--vidrio-fondo:var(--surface);--vidrio-fondo-2:var(--surface-2);--campo-fondo:var(--surface)}
+  body{background:var(--bg)}
+}
+}
+
 
 /* ---- el diagnóstico ----
    Una pregunta a la vez. Las opciones entran escalonadas: no es adorno,
@@ -1064,20 +1311,31 @@ body.rol-produccion #btnPrint{display:none!important}
       </div></div></div>
 
       <div class="card plegable" data-paso="articulo">
-        <header><span class="step">2</span><h2>Artículo base</h2><span class="hint">el costo sale del catálogo</span><span class="resumenPaso" data-res="articulo"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body">
-          <div class="grid g3">
-            <div style="grid-column:span 2"><label class="f" for="c_art">Artículo</label><select id="c_art"></select></div>
+        <header><span class="step">2</span><h2>Artículo o servicio</h2><span class="hint" data-solo="articulo">el costo sale del catálogo</span><span class="hint" data-solo="servicio" hidden>se cobra por medida</span><span class="resumenPaso" data-res="articulo"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body">
+        <div class="modoSwitch" id="modoSwitch">
+          <button type="button" data-modo="articulo" aria-selected="true">Artículo físico</button>
+          <button type="button" data-modo="servicio" aria-selected="false">Servicio por medida</button>
+        </div>
+        <p class="note" data-solo="servicio" hidden style="margin:12px 0 0">Para cuando el cliente sólo compra la impresión: la maquila de DTF, una lona, un vinil. No hay prenda, no hay tallas; lo que se cobra es el material que se ocupa.</p>
+          <div class="grid g3" style="margin-top:14px">
+            <div style="grid-column:span 2" data-solo="articulo"><label class="f" for="c_art">Artículo</label><select id="c_art"></select></div>
+            <div style="grid-column:span 2" data-solo="servicio" hidden><label class="f" for="c_svc">Servicio por medida</label><select id="c_svc"></select></div>
             <div><label class="f" for="c_qty">Cantidad de piezas</label><input id="c_qty" type="number" min="1" step="1" value="50"></div>
           </div>
           <div class="grid g4" style="margin-top:12px">
-            <div>
+            <div data-solo="articulo">
               <label class="f" for="c_costoArt">Costo de producción ($)</label>
               <input id="c_costoArt" type="number" min="0" step="0.5">
             </div>
-            <div>
+            <div data-solo="articulo">
               <label class="f" for="c_precioArt">Precio público ($)</label>
               <div style="display:flex;gap:6px"><input id="c_precioArt" type="number" min="0" step="0.5"><button class="btn sm" id="btnSavePrice" title="Guardar costo y precio en el catálogo">Guardar</button></div>
             </div>
+            <div data-solo="servicio" hidden><label class="f" for="c_svcAncho">Ancho de la pieza (cm)</label><input id="c_svcAncho" type="number" min="0" step="0.5"></div>
+            <div data-solo="servicio" hidden><label class="f" for="c_svcAlto">Largo de la pieza (cm)</label><input id="c_svcAlto" type="number" min="0" step="0.5"></div>
+            <div data-solo="servicio" hidden style="grid-column:span 2"><label class="f" for="c_svcResumen">Armado</label>
+              <div style="display:flex;gap:6px"><input id="c_svcResumen" readonly class="num"><button class="btn sm" data-abrearmado="1">Abrir</button></div></div>
+
             <div><label class="f" for="c_desc">Descripción para el cliente</label><input id="c_desc" placeholder="Playera algodón color, tallas surtidas"></div>
             <div><label class="f" for="c_escala">Escala de volumen</label><input id="c_escala" readonly class="num"></div>
           </div>
@@ -1092,17 +1350,11 @@ body.rol-produccion #btnPrint{display:none!important}
       </div></div></div>
 
       <div class="card plegable" data-paso="apps">
-        <header><span class="step">4</span><h2>Aplicaciones, técnicas y archivos</h2><button class="btn sm ghost" id="addApp" style="margin-left:auto">+ Agregar ubicación</button><span class="resumenPaso" data-res="apps"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body"><div id="apps"></div></div>
-      </div></div></div>
-
-      <div class="card plegable" data-paso="armado">
-        <header><span class="step">5</span><h2>Armado sugerido</h2><span class="hint">cuánto material se ocupa y cuánto se desperdicia</span><button class="btn sm ghost" id="addArmado" style="margin-left:auto">+ Material</button><span class="resumenPaso" data-res="armado"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body">
-          <div id="armado"></div>
-        </div>
+        <header><span class="step">4</span><h2>Aplicaciones, técnicas y archivos</h2><button class="btn sm ghost" data-abrearmado="1" style="margin-left:auto">Armado del material</button><button class="btn sm ghost" id="addApp">+ Agregar ubicación</button><span class="resumenPaso" data-res="apps"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body"><div id="apps"></div></div>
       </div></div></div>
 
       <div class="card plegable" data-paso="extras">
-        <header><span class="step">6</span><h2>Cargos extra y descuentos</h2><button class="btn sm ghost" id="addExtra" style="margin-left:auto">+ Nuevo cargo</button><span class="resumenPaso" data-res="extras"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body"><div id="extras"></div>
+        <header><span class="step">5</span><h2>Cargos extra y descuentos</h2><button class="btn sm ghost" id="addExtra" style="margin-left:auto">+ Nuevo cargo</button><span class="resumenPaso" data-res="extras"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body"><div id="extras"></div>
           <div class="descBox">
             <label class="sw"><input type="checkbox" id="c_descOn" checked> Aplicar el descuento por volumen del catálogo</label>
             <div class="grid g3" style="margin-top:12px">
@@ -1151,6 +1403,20 @@ body.rol-produccion #btnPrint{display:none!important}
       </div>
     </div>
   </div>
+
+<!-- ====== el armado vive aquí, en un cajón que no empuja la página ====== -->
+<button class="armadoTab" id="armadoTab" hidden><span>Armado</span><b></b></button>
+<div class="cajon" id="armadoCajon" hidden>
+  <div class="cajonFondo" data-cerrarArmado></div>
+  <aside class="cajonHoja" role="dialog" aria-label="Armado del material">
+    <header>
+      <h2>Armado del material</h2>
+      <button class="btn sm ghost" id="addArmado">+ Material</button>
+      <button class="btn icon sm" data-cerrarArmado title="Cerrar">✕</button>
+    </header>
+    <div class="cajonCuerpo"><div id="armado"></div></div>
+  </aside>
+</div>
 </section>
 
 <!-- ============ CATÁLOGO ============ -->
@@ -1188,7 +1454,7 @@ body.rol-produccion #btnPrint{display:none!important}
   <div class="card">
     <header><h2>Servicios y material por medida</h2><button class="btn sm ghost" data-add="servicios" style="margin-left:auto">+ Servicio</button></header>
     <div class="body">
-      <p class="note" style="margin:0 0 12px">Aquí va lo que no se cobra por pieza sino <b>por medida</b>: la maquila de DTF, la lona, el vinil. La <b>unidad</b> es cómo lo vendes — <b>ml</b> es metro lineal (todo el ancho del rollo por un metro de largo) y <b>m²</b> es metro cuadrado. El <b>ancho útil</b> es el del rollo o la hoja. El <b>mínimo</b> es lo menos que puedes cobrar y el <b>incremento</b> es tu escalón de venta: si cobras de diez en diez centímetros, pon 0.1. La <b>separación</b> entre piezas y la <b>orilla</b> que se pierde en los bordes son lo que hace que el armado te dé un número de verdad y no uno de pizarrón.</p>
+      <p class="note" style="margin:0 0 12px">Aquí va lo que no se cobra por pieza sino <b>por medida</b>: la maquila de DTF, la lona, el vinil, el papel. La <b>unidad</b> es cómo lo vendes — <b>ml</b> es metro lineal (todo el ancho del rollo por un metro de largo) y <b>m²</b> es metro cuadrado. La <b>técnica</b> amarra el material con la técnica que lo usa, para que el armado proponga el correcto y no te ofrezca lona cuando estás imprimiendo playeras. El <b>mínimo</b> es lo menos que puedes cobrar y el <b>incremento</b> es tu escalón de venta: si cobras de diez en diez centímetros, pon 0.1. La <b>separación</b> entre piezas y la <b>orilla</b> de los bordes son lo que hace que el armado te dé un número de verdad y no uno de pizarrón. El <b>gramaje</b> es opcional y sólo sirve para calcular el peso.</p>
       <div class="tbl-wrap"><table id="t_servicios"></table></div>
     </div>
   </div>
@@ -1485,6 +1751,32 @@ body.rol-produccion #btnPrint{display:none!important}
       <p class="note" style="margin:0 0 14px"><b>Administrador:</b> todo.&nbsp; <b>Ventas:</b> cotiza, confirma pedidos, clientes y consulta el catálogo sin poder editarlo; no ve caja ni utilidades.&nbsp; <b>Producción:</b> solo el tablero de órdenes, donde mueve el estatus y revisa los diseños; no ve precios.</p>
       <div class="tbl-wrap"><table id="t_equipo"></table></div>
       <p class="note" style="margin-top:14px;border-left-color:var(--warn)">La clave de cada persona sirve para que nadie entre por descuido a lo que no le toca, pero <b>no es una contraseña de verdad</b>: quien tenga el enlace de esta página puede cambiarse de usuario. Para bloquear accesos en serio, con su propio correo y contraseña, se usa la versión instalada en tu dominio.</p>
+    </div>
+  </div>
+  <div class="card">
+    <header><h2>Apariencia</h2><span class="hint">se guarda en este navegador, para ti</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">El color de tu taller, como tú lo quieras ver. Lo que elijas aquí vale para ti — cada quien en el equipo puede tener el suyo sin cambiárselo a los demás.</p>
+      <label class="f">Paleta</label>
+      <div class="temaRejilla" id="temaRejilla"></div>
+      <div class="grid g3" style="margin-top:18px">
+        <div>
+          <label class="f">Transparencia</label>
+          <div class="temaOpc" id="temaVidrio"></div>
+        </div>
+        <div>
+          <label class="f">Esquinas</label>
+          <div class="temaOpc" id="temaEsquinas"></div>
+        </div>
+        <div>
+          <label class="f" for="temaAcento">Color de acento</label>
+          <div class="temaFila" style="margin-top:0">
+            <input type="color" id="temaAcento" class="temaColor" title="El color de los botones y los números importantes">
+            <button class="btn sm ghost" id="temaQuitaAcento" hidden>Volver al de la paleta</button>
+            <span class="hint" id="temaPropio" hidden>color propio</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   
@@ -1915,6 +2207,91 @@ body.rol-produccion #btnPrint{display:none!important}
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
+
+/* ---------- apariencia: temas de color, vidrio y esquinas ---------- */
+/* Vive en el navegador de cada quien, no en la cuenta: así cada persona del
+   taller puede tener la suya sin pelearse con las demás. */
+const LS_TEMA = "cotizador_tema";
+const TEMAS = {
+  heymakers:{nombre:"Hey Makers", acento:"#D6127F", amb:["#06A1D7","#F51B95","#FFEC30"]},
+  guinda:   {nombre:"Guinda",     acento:"#A81B4A", amb:["#7A1231","#C4295C","#E8B9CA"]},
+  oceano:   {nombre:"Océano",     acento:"#0A7EA4", amb:["#06A1D7","#19C3C3","#7FE3F0"]},
+  bosque:   {nombre:"Bosque",     acento:"#0E7C57", amb:["#14A06B","#8FD14F","#0E7C57"]},
+  atardecer:{nombre:"Atardecer",  acento:"#DB4C2C", amb:["#FF8A3D","#F51B95","#FFC43D"]},
+  grafito:  {nombre:"Grafito",    acento:"#3F5160", amb:["#7E8B95","#4E5A63","#B9CEDB"]}
+};
+const VIDRIOS   = [["nitido","Nítido"],["normal","Normal"],["vidrio","Vidrio"]];
+const ESQUINAS  = [["recto","Recto"],["suave","Suave"],["redondo","Redondo"]];
+const BLUR  = {nitido:"0px", normal:"20px", vidrio:"34px"};
+const RADIO = {recto:{g:"10px",s:"7px"}, suave:{g:"15px",s:"10px"}, redondo:{g:"20px",s:"13px"}};
+
+function temaPorOmision(){ return {preset:"heymakers", acento:"", vidrio:"normal", esquinas:"redondo"}; }
+function leeTema(){
+  try{ return Object.assign(temaPorOmision(), JSON.parse(localStorage.getItem(LS_TEMA)||"null")||{}); }
+  catch(e){ return temaPorOmision(); }
+}
+let TEMA = temaPorOmision();
+function guardaTema(){ try{ localStorage.setItem(LS_TEMA, JSON.stringify(TEMA)); }catch(e){} }
+
+function hexARgba(hex, a){
+  const h = String(hex||"").replace("#","");
+  const v = h.length===3 ? h.split("").map(c=>c+c).join("") : h;
+  const n = parseInt(v,16);
+  if(isNaN(n) || v.length!==6) return "rgba(0,0,0,"+a+")";
+  return "rgba("+((n>>16)&255)+","+((n>>8)&255)+","+(n&255)+","+a+")";
+}
+function tintaLegible(hex){
+  const h = String(hex||"").replace("#","");
+  const v = h.length===3 ? h.split("").map(c=>c+c).join("") : h;
+  const n = parseInt(v,16); if(isNaN(n)) return "#FFFFFF";
+  const r=(n>>16)&255, g=(n>>8)&255, b=n&255;
+  // luminancia relativa, la de toda la vida
+  const L = (0.2126*r + 0.7152*g + 0.0722*b)/255;
+  return L > 0.62 ? "#141414" : "#FFFFFF";
+}
+
+function aplicaTema(){
+  const base = TEMAS[TEMA.preset] || TEMAS.heymakers;
+  const raiz = document.documentElement, e = raiz.style;
+  const ac = TEMA.acento || base.acento;
+  e.setProperty("--accent", ac);
+  e.setProperty("--accent-soft", hexARgba(ac, .18));
+  e.setProperty("--accent-ink", tintaLegible(ac));
+  const fuerza = TEMA.vidrio==="vidrio" ? 1.35 : 1;
+  base.amb.forEach((c,i)=> e.setProperty("--amb-"+(i+1), hexARgba(c, (0.14 - i*0.025) * fuerza)));
+  e.setProperty("--vidrio-blur", BLUR[TEMA.vidrio] || BLUR.normal);
+  e.setProperty("--vidrio-sat", TEMA.vidrio==="nitido" ? "100%" : (TEMA.vidrio==="vidrio" ? "200%" : "180%"));
+  const r = RADIO[TEMA.esquinas] || RADIO.redondo;
+  e.setProperty("--radio", r.g); e.setProperty("--radio-sm", r.s);
+  raiz.dataset.vidrio = TEMA.vidrio;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute("content", ac);
+}
+
+function renderTema(){
+  const rej = $("#temaRejilla"); if(!rej) return;
+  rej.innerHTML = Object.keys(TEMAS).map(k=>{
+    const t = TEMAS[k];
+    return '<button type="button" class="temaCard" data-tema="'+k+'" aria-pressed="'+(TEMA.preset===k)+'">'+
+      '<span class="temaMuestra">'+t.amb.map(c=>'<i style="background:'+c+'"></i>').join("")+
+        '<i style="background:'+t.acento+';flex:1.4"></i></span>'+
+      '<b>'+esc(t.nombre)+'</b></button>';
+  }).join("");
+  const pinta = (id, lista, valor, clave) => {
+    const w = $(id); if(!w) return;
+    w.innerHTML = lista.map(o=>'<button type="button" data-'+clave+'="'+o[0]+'" aria-selected="'+(valor===o[0])+'">'+o[1]+'</button>').join("");
+  };
+  pinta("#temaVidrio", VIDRIOS, TEMA.vidrio, "vidrio");
+  pinta("#temaEsquinas", ESQUINAS, TEMA.esquinas, "esquinas");
+  const col = $("#temaAcento");
+  if(col) col.value = TEMA.acento || (TEMAS[TEMA.preset]||TEMAS.heymakers).acento;
+  const prop = $("#temaPropio"), quita = $("#temaQuitaAcento");
+  if(prop)  prop.hidden  = !TEMA.acento;
+  if(quita) quita.hidden = !TEMA.acento;
+}
+
+TEMA = leeTema(); aplicaTema();   // antes de pintar nada, para que no parpadee
+
 const LOGO_MARCA = "data:image/png;base64,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";
 const LOGO_FULL = "data:image/png;base64,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";
 
@@ -1963,13 +2340,14 @@ function defaults(){ return {
   {id:"s8",nombre:"Frente de gorra",ancho:12,alto:6}
  ],
  servicios:[
-  {id:"sv1",nombre:"Impresión DTF textil 60 cm",cat:"Maquila",unidad:"ml",ancho:60,costo:38,precio:62,minimo:0.5,incremento:0.1,separacion:0.5,orilla:1},
-  {id:"sv2",nombre:"Impresión DTF textil 30 cm",cat:"Maquila",unidad:"ml",ancho:30,costo:21,precio:36,minimo:0.5,incremento:0.1,separacion:0.5,orilla:1},
-  {id:"sv3",nombre:"DTF UV para rígidos 30 cm",cat:"Maquila",unidad:"ml",ancho:30,costo:34,precio:58,minimo:0.3,incremento:0.1,separacion:0.3,orilla:0.5},
-  {id:"sv4",nombre:"Lona banner 13 oz 3.20 m",cat:"Gran formato",unidad:"m2",ancho:320,costo:48,precio:95,minimo:1,incremento:0.25,separacion:1,orilla:2},
-  {id:"sv5",nombre:"Vinil de corte 61 cm",cat:"Maquila",unidad:"ml",ancho:61,costo:34,precio:58,minimo:0.5,incremento:0.1,separacion:0.5,orilla:1},
-  {id:"sv6",nombre:"Papel de sublimación 1.10 m",cat:"Maquila",unidad:"ml",ancho:110,costo:26,precio:45,minimo:1,incremento:0.1,separacion:0.5,orilla:1},
-  {id:"sv7",nombre:"Vinil adhesivo impreso 1.37 m",cat:"Gran formato",unidad:"m2",ancho:137,costo:95,precio:175,minimo:0.5,incremento:0.25,separacion:1,orilla:1.5}
+  {id:"sv1",nombre:"Impresión DTF textil 60 cm",cat:"Maquila",tecnicaId:"t1",unidad:"ml",ancho:60,costo:38,precio:62,minimo:0.5,incremento:0.1,separacion:0.5,orilla:1,gramaje:0},
+  {id:"sv2",nombre:"Impresión DTF textil 30 cm",cat:"Maquila",tecnicaId:"t1",unidad:"ml",ancho:30,costo:21,precio:36,minimo:0.5,incremento:0.1,separacion:0.5,orilla:1,gramaje:0},
+  {id:"sv3",nombre:"DTF UV para rígidos 30 cm",cat:"Maquila",tecnicaId:"t2",unidad:"ml",ancho:30,costo:34,precio:58,minimo:0.3,incremento:0.1,separacion:0.3,orilla:0.5,gramaje:0},
+  {id:"sv4",nombre:"Papel de sublimación 1.10 m",cat:"Maquila",tecnicaId:"t3",unidad:"ml",ancho:110,costo:26,precio:45,minimo:1,incremento:0.1,separacion:0.5,orilla:1,gramaje:100},
+  {id:"sv5",nombre:"Vinil de corte 61 cm",cat:"Maquila",tecnicaId:"t4",unidad:"ml",ancho:61,costo:34,precio:58,minimo:0.5,incremento:0.1,separacion:0.5,orilla:1,gramaje:0},
+  {id:"sv6",nombre:"Lona banner 13 oz 3.20 m",cat:"Gran formato",tecnicaId:"",unidad:"m2",ancho:320,costo:48,precio:95,minimo:1,incremento:0.25,separacion:1,orilla:2,gramaje:440},
+  {id:"sv7",nombre:"Vinil adhesivo impreso 1.37 m",cat:"Gran formato",tecnicaId:"",unidad:"m2",ancho:137,costo:95,precio:175,minimo:0.5,incremento:0.25,separacion:1,orilla:1.5,gramaje:150},
+  {id:"sv8",nombre:"Papel couché 90×65 cm",cat:"Impresión",tecnicaId:"",unidad:"m2",ancho:65,costo:7,precio:14,minimo:0.585,incremento:0.585,separacion:0.3,orilla:0.5,gramaje:300}
  ],
  volumen:[
   {id:"v1",desde:1,hasta:11,desc:0},
@@ -2015,7 +2393,7 @@ function nuevaCot(demo){
     folio: folioNuevo(), fecha: new Date().toISOString().slice(0,10),
     cliente: demo? "Cliente de ejemplo":"", contacto:"", clienteId:"", ref: demo? "Uniformes para evento":"",
     articuloId: demo? "a2":"", costoArt: demo? 78:0, precioArt: demo? 125:0, desc: demo? "Playera algodón color, tallas surtidas":"",
-    cantidad: demo? 50:1, cantManual:false,
+    cantidad: demo? 50:1, cantManual:false, modo:"articulo",
     armado: [], descOn:true, descTipo:"pct", descVal:0, descNota:"",
     apps: demo? [{id:uid(),ubic:"Frente",tecnicaId:"t1",tamanoId:"s3",ancho:25,alto:20,tintas:1,puntadas:8000,art:null}] : [],
     extras: demo? [{id:"x2",on:true},{id:"x1",on:false},{id:"x3",on:false},{id:"x4",on:false},{id:"x5",on:false}]
@@ -2168,19 +2546,32 @@ function normalizaCat(){
     if(s.incremento==null) s.incremento = (s.unidad==="m2" ? 0.25 : 0.1);
     if(s.separacion==null) s.separacion = 0.5;
     if(s.orilla==null)     s.orilla = 1;
+    if(s.gramaje==null)    s.gramaje = 0;
+    if(s.tecnicaId==null)  s.tecnicaId = "";
   });
   return cat.servicios;
 }
 function svcDe(id){ return (cat.servicios||[]).find(s=>s.id===id) || null; }
-function nombreUnidad(u, plural){ return u==="m2" ? (plural?"m²":"m²") : (plural?"metros lineales":"metro lineal"); }
 function abrevUnidad(u){ return u==="m2" ? "m²" : "ml"; }
 function techoA(v, paso){ const p = num(paso)>0 ? num(paso) : 0.01; return Math.ceil((v - 1e-9)/p)*p; }
 function red2(v){ return Math.round(v*100)/100; }
 function red3(v){ return Math.round(v*1000)/1000; }
+function unidadTxt(u, v){ return red3(v).toLocaleString("es-MX",{maximumFractionDigits:3})+" "+abrevUnidad(u); }
 
-/* Acomoda n piezas de a×b cm a lo ancho de un rollo. Devuelve el mejor de los
-   dos giros: el que consume menos largo. */
-function armaUno(s, w, h, n, girar){
+/* El material que le toca a una técnica. Así el cotizador no propone lona
+   cuando lo que se está imprimiendo son playeras. */
+function svcParaTecnica(tecnicaId){
+  const svc = normalizaCat();
+  return svc.find(s=>s.tecnicaId && s.tecnicaId===tecnicaId) || null;
+}
+function svcPorOmision(tecnicaId){
+  return svcParaTecnica(tecnicaId) || normalizaCat()[0] || null;
+}
+
+/* Acomoda n piezas de w×h cm a lo ancho de un rollo.
+   giro: "auto" prueba las dos y se queda con la que gasta menos;
+         "h" la deja como viene; "v" la gira 90°. */
+function armaUno(s, w, h, n, giro){
   n = Math.max(1, Math.round(num(n,1)));
   w = num(w); h = num(h);
   const g = num(s.separacion), orilla = num(s.orilla);
@@ -2194,8 +2585,9 @@ function armaUno(s, w, h, n, girar){
     return {porFila, filas, rot, pieza:{ancho:a, alto:b},
             largoCm: filas*(b+g) - g + 2*orilla};
   };
-  const ops = [prueba(w,h,false)];
-  if(girar) ops.push(prueba(h,w,true));
+  const ops = giro==="h" ? [prueba(w,h,false)]
+            : giro==="v" ? [prueba(h,w,true)]
+            : [prueba(w,h,false), prueba(h,w,true)];
   const buenos = ops.filter(Boolean);
   if(!buenos.length) return null;
   buenos.sort((x,y)=> x.largoCm - y.largoCm || y.porFila - x.porFila);
@@ -2207,9 +2599,15 @@ function armadoDe(row){
   const s = svcDe(row.servicioId);
   if(!s) return {error:"Elige el material o servicio."};
   const n = Math.max(1, Math.round(num(row.cant,1)));
-  const a = armaUno(s, row.ancho, row.alto, n, row.girar!==false);
-  if(!a) return {error:"La pieza de "+num(row.ancho)+"×"+num(row.alto)+" cm no cabe en un ancho útil de "+
-                        red2(num(s.ancho)-2*num(s.orilla))+" cm. Usa un material más ancho o parte el diseño.", s};
+  const giro = row.giro || "auto";
+  const a = armaUno(s, row.ancho, row.alto, n, giro);
+  if(!a){
+    const util = red2(num(s.ancho)-2*num(s.orilla));
+    return {error: giro==="auto"
+      ? "La pieza de "+num(row.ancho)+"×"+num(row.alto)+" cm no cabe en un ancho útil de "+util+
+        " cm. Usa un material más ancho o parte el diseño."
+      : "Así acomodada no cabe en "+util+" cm de ancho útil. Prueba con Máximo o con la otra orientación.", s};
+  }
 
   const esM2   = s.unidad === "m2";
   const anchoM = num(s.ancho)/100;
@@ -2235,32 +2633,31 @@ function armadoDe(row){
   // ¿cuántas piezas caben en el material que vas a pagar?
   const largoPagadoCm = (esM2 ? (anchoM>0 ? compradas/anchoM : 0) : compradas) * 100;
   const g = num(s.separacion), orilla = num(s.orilla);
-  const alto = a.pieza.alto;
-  const filasCaben = Math.max(0, Math.floor((largoPagadoCm - 2*orilla + g) / (alto + g)));
+  const filasCaben = Math.max(0, Math.floor((largoPagadoCm - 2*orilla + g) / (a.pieza.alto + g)));
   const caben = filasCaben * a.porFila;
   const llenaFilas = a.filas * a.porFila;
 
   const mermaM2  = Math.max(0, areaCompradaM2 - areaPiezasM2);
   const mermaPct = areaCompradaM2>0 ? mermaM2/areaCompradaM2*100 : 0;
+  const usoPct   = Math.max(0, Math.min(100, 100 - mermaPct));
+  const peso     = num(s.gramaje)>0 ? areaCompradaM2*num(s.gramaje)/1000 : 0;
 
-  return {s, n, error:null,
+  return {s, n, error:null, giro,
           porFila:a.porFila, filas:a.filas, rot:a.rot, pieza:a.pieza,
-          largoCm:a.largoCm, largoM, anchoM, esM2, unidad:s.unidad,
+          largoCm:a.largoCm, largoPagadoCm, largoM, anchoM, esM2, unidad:s.unidad,
           reales, compradas, usadas, unidades, topoMinimo, cobraMerma,
-          areaPiezasM2, areaCompradaM2, mermaM2, mermaPct,
+          areaPiezasM2, areaCompradaM2, mermaM2, mermaPct, usoPct, peso,
           caben, llenaFilas, costo, precio,
           porPieza: n>0 ? precio/n : 0,
           porPiezaSiLlenas: caben>0 ? (compradas*num(s.precio))/caben : 0};
 }
-function armadoFilas(){ return (cot.armado||[]).map(r=>({row:r, A:armadoDe(r)})); }
 
-/* ---------- render del armado ---------- */
-function unidadTxt(u, v){ return red3(v).toLocaleString("es-MX",{maximumFractionDigits:3})+" "+abrevUnidad(u); }
-
-/* Los renglones ligados a una aplicacion siguen su medida y la cantidad del pedido. */
+/* Los renglones que siguen a otra cosa: el principal sigue al paso 2, y los
+   ligados a una aplicación siguen su medida y la cantidad del pedido. */
 function sincronizaArmado(){
   const q = Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
   (cot.armado||[]).forEach(r=>{
+    if(r.principal){ r.cant = q; r.appId = ""; return; }
     if(!r.appId) return;
     const a = cot.apps.find(a=>a.id===r.appId);
     if(!a){ r.appId = ""; return; }
@@ -2268,123 +2665,166 @@ function sincronizaArmado(){
   });
 }
 
-/* Un planito del acomodo: el rollo acostado, las piezas dentro y lo que sobra. */
+/* El renglón que manda cuando el pedido ES el servicio. */
+function armadoPrincipal(){
+  cot.armado = cot.armado || [];
+  let p = cot.armado.find(r=>r.principal);
+  if(!p){
+    p = nuevoArmado();
+    p.principal = true; p.appId = "";
+    cot.armado.unshift(p);
+  }
+  return p;
+}
+function esServicio(g){ return (g||cot).modo === "servicio"; }
+
+/* ---------- el cajón del armado ---------- */
+function armadoAbierto(){ const c = $("#armadoCajon"); return c && !c.hidden; }
+function abreArmado(abrir){
+  const c = $("#armadoCajon"); if(!c) return;
+  if(abrir === undefined) abrir = c.hidden;
+  c.hidden = !abrir;
+  document.body.style.overflow = abrir ? "hidden" : "";
+  if(abrir){ renderArmado(); const h = c.querySelector(".cajonHoja"); if(h) h.scrollTop = 0; }
+}
+
+/* Un planito del acomodo, a escala: el rollo acostado, las piezas dentro y
+   en color de aviso lo que se paga y no se usa. */
 function planoArmado(A){
   if(!A || A.error) return "";
   const anchoCm = num(A.s.ancho);
-  const largoCm = (A.esM2 ? (A.anchoM>0 ? A.compradas/A.anchoM : 0) : A.compradas) * 100;
+  const largoCm = A.largoPagadoCm;
   if(anchoCm<=0 || largoCm<=0) return "";
-  // Una sola escala para los dos ejes: el dibujo tiene que estar a proporcion.
-  const k = Math.min(560/largoCm, 230/anchoCm);
-  const W = largoCm*k, H = anchoCm*k, ky = k;
+  const k = Math.min(300/largoCm, 190/anchoCm);
+  const W = largoCm*k, H = anchoCm*k;
   const orilla = num(A.s.orilla), g = num(A.s.separacion);
   const pw = A.pieza.ancho, ph = A.pieza.alto;
   let piezas = "", puestas = 0;
   for(let f=0; f<A.filas && puestas<A.n && f<400; f++){
     for(let c=0; c<A.porFila && puestas<A.n; c++){
       const x = (orilla + f*(ph+g)) * k;
-      const y = (orilla + c*(pw+g)) * ky;
+      const y = (orilla + c*(pw+g)) * k;
       piezas += '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+Math.max(1,ph*k).toFixed(1)+
-                '" height="'+Math.max(1,pw*ky).toFixed(1)+'" rx="1" fill="var(--cyan)" opacity=".8"/>';
+                '" height="'+Math.max(1,pw*k).toFixed(1)+'" rx="1" fill="var(--cyan)" opacity=".85"/>';
       puestas++;
     }
   }
   const usadoX = Math.min(W, A.largoCm*k);
-  const Wr = W.toFixed(0), Hr = (H+18).toFixed(0);
-  return '<div class="armPlano"><svg viewBox="0 0 '+Wr+' '+Hr+'" width="'+Wr+'" height="'+Hr+'" role="img" '+
+  const Wr = W.toFixed(0), Hr = H.toFixed(1);
+  return '<svg viewBox="0 0 '+Wr+' '+Hr+'" width="'+Wr+'" height="'+Hr+'" role="img" '+
     'aria-label="Acomodo de '+A.n+' piezas en el material">'+
-    '<rect x="0" y="0" width="'+Wr+'" height="'+H.toFixed(1)+'" fill="var(--surface-2)" stroke="var(--line)"/>'+
-    (usadoX < W-1 ? '<rect x="'+usadoX.toFixed(1)+'" y="0" width="'+(W-usadoX).toFixed(1)+'" height="'+H.toFixed(1)+
+    '<rect x="0" y="0" width="'+Wr+'" height="'+Hr+'" fill="var(--surface-2)" stroke="var(--line)"/>'+
+    (usadoX < W-1 ? '<rect x="'+usadoX.toFixed(1)+'" y="0" width="'+(W-usadoX).toFixed(1)+'" height="'+Hr+
        '" fill="var(--warn)" opacity=".18"/>' : "")+
     piezas+
-    '<line x1="'+usadoX.toFixed(1)+'" y1="0" x2="'+usadoX.toFixed(1)+'" y2="'+H.toFixed(1)+'" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4 3"/>'+
-    '<text x="2" y="'+(H+13).toFixed(0)+'" font-size="10" fill="var(--ink-3)">\u2190 '+red2(largoCm)+' cm que pagas \u00b7 '+
-      red2(anchoCm)+' cm de ancho \u2192</text>'+
-    '</svg></div>';
+    '<line x1="'+usadoX.toFixed(1)+'" y1="0" x2="'+usadoX.toFixed(1)+'" y2="'+Hr+'" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4 3"/>'+
+    '</svg>';
 }
 
-/* La parte que cambia sola: resultado, merma, planito y el consejo. */
+/* Lo que de verdad se cobra por ese material, ya con el descuento por volumen. */
+function descVolActual(){
+  const q = Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
+  return (cot.descOn===false) ? 0 : num(escalaDe(q).desc);
+}
+function netoArmado(A){ return (!A || A.error) ? 0 : A.precio * (1 - descVolActual()/100); }
+
+/* El reporte y el consejo: la parte que se repinta sola. */
 function cuerpoArmado(row, A){
   A = A || armadoDe(row);
   if(A.error) return '<div class="armMal">'+esc(A.error)+'</div>';
+  const R = [
+    ["Piezas por fila", A.porFila],
+    ["Filas", A.filas],
+    ["Largo que se ocupa", red2(A.largoCm)+" cm"],
+    ["Caben en total", A.caben],
+    ["Se gastan", unidadTxt(A.unidad, A.reales)],
+    ["Hay que comprar", "<b>"+unidadTxt(A.unidad, A.compradas)+"</b>"+(A.topoMinimo? ' <span class="pill pend">mínimo</span>':'')],
+    ["Merma", red2(A.mermaM2)+" m² · "+A.mermaPct.toFixed(0)+"%"],
+    ["Costo / precio", mx(A.costo)+" / <b>"+mx(A.precio)+"</b>"]
+  ];
+  if(A.peso>0) R.push(["Peso final", red2(A.peso)+" Kg"]);
+  const dv = descVolActual();
+  if(dv>0) R.push(["Con descuento −"+dv+"%", "<b>"+mx(netoArmado(A))+"</b>"]);
+
   const sobra = Math.max(0, A.caben - A.n);
   const tip = sobra>0
     ? 'En los <b>'+unidadTxt(A.unidad,A.compradas)+'</b> que vas a pagar caben <b>'+A.caben+'</b> piezas y vas <b>'+A.n+'</b>. '+
       (A.porPiezaSiLlenas>0 && A.porPieza>A.porPiezaSiLlenas
-        ? 'Si las aprovecharas todas, el material bajaria de <b>'+mx(A.porPieza)+'</b> a <b>'+mx(A.porPiezaSiLlenas)+'</b> por pieza. ' : "")+
+        ? 'Aprovechándolas todas, el material baja de <b>'+mx(A.porPieza)+'</b> a <b>'+mx(A.porPiezaSiLlenas)+'</b> por pieza. ' : "")+
+      '<span class="armAcc"><button class="btn sm" data-armsube="'+row.id+'|'+A.caben+'">Cotizar '+A.caben+'</button>'+
       (A.llenaFilas>A.n && A.llenaFilas<A.caben
-        ? 'Con <b>'+A.llenaFilas+'</b> llenas las filas que ya traes. ' : "")+
-      '<button class="btn sm" data-armsube="'+row.id+'|'+A.caben+'">Cotizar '+A.caben+'</button>'+
-      (A.llenaFilas>A.n && A.llenaFilas<A.caben
-        ? ' <button class="btn sm ghost" data-armsube="'+row.id+'|'+A.llenaFilas+'">Cotizar '+A.llenaFilas+'</button>' : "")
-    : 'El material va bien aprovechado: cabrian <b>'+A.caben+'</b> piezas y traes <b>'+A.n+'</b>.';
+        ? '<button class="btn sm ghost" data-armsube="'+row.id+'|'+A.llenaFilas+'">Llenar las filas ('+A.llenaFilas+')</button>' : "")+'</span>'
+    : 'El material va bien aprovechado: cabrían <b>'+A.caben+'</b> piezas y traes <b>'+A.n+'</b>.';
+
   const app = cot.apps.find(a=>a.id===row.appId);
-  return '<div class="armRes">'+
-      '<div class="l"><span class="k">Acomodo</span><b>'+A.porFila+'</b> por fila \u00d7 <b>'+A.filas+'</b> fila(s)'+
-        (A.rot? ' \u00b7 girada 90\u00b0 porque gasta menos' : "")+
-        ' \u00b7 pieza de '+red2(A.pieza.ancho)+'\u00d7'+red2(A.pieza.alto)+' cm</div>'+
-      '<div class="l"><span class="k">Largo que se ocupa</span><b>'+red2(A.largoCm)+' cm</b> de un rollo de '+red2(num(A.s.ancho))+' cm</div>'+
-      '<div class="l"><span class="k">Material</span>se gastan <b>'+unidadTxt(A.unidad,A.reales)+'</b> \u00b7 hay que comprar <b>'+unidadTxt(A.unidad,A.compradas)+'</b>'+
-        (A.topoMinimo? ' <span class="pill pend">entr\u00f3 el m\u00ednimo</span>' : "")+'</div>'+
-      '<div class="l"><span class="k">Merma</span><b>'+red2(A.mermaM2)+' m\u00b2</b> de '+red2(A.areaCompradaM2)+' m\u00b2 \u00b7 <b>'+A.mermaPct.toFixed(0)+'%</b> del material</div>'+
-      '<div class="armBarra" title="Lo de color es lo que de verdad ocupan las piezas"><span style="width:'+
-        Math.max(1,Math.min(100,100-A.mermaPct)).toFixed(1)+'%"></span></div>'+
-      '<label class="sw" style="margin-top:4px"><input type="checkbox" data-armck="cobraMerma" data-armid="'+row.id+'"'+
-        (row.cobraMerma!==false?" checked":"")+'> Cobrar el espacio desperdiciado ('+unidadTxt(A.unidad,A.compradas)+' completos)</label>'+
-      (row.cobraMerma===false ? '<div class="l"><span class="k">Se cobra</span>s\u00f3lo lo usado: <b>'+unidadTxt(A.unidad,A.usadas)+'</b></div>' : "")+
+  return '<div class="armCols">'+
+      '<div class="armPlano">'+planoArmado(A)+
+        '<div class="armPie">'+red2(A.largoPagadoCm)+' × '+red2(num(A.s.ancho))+' cm de material pagado</div></div>'+
+      '<div class="armChips"><span class="chipUso">'+A.usoPct.toFixed(0)+'% utilizado</span>'+
+        '<span class="chipTira">'+A.mermaPct.toFixed(0)+'% sin utilizar</span>'+
+        '<div class="armBarra"><span style="width:'+Math.max(1,A.usoPct).toFixed(1)+'%"></span></div></div>'+
     '</div>'+
-    planoArmado(A)+
+    '<div class="armRepTit">Reporte</div>'+
+    '<div class="armRep">'+R.map(f=>'<div><span>'+f[0]+'</span><b>'+f[1]+'</b></div>').join("")+'</div>'+
+    '<label class="sw armMerma"><input type="checkbox" data-armck="cobraMerma" data-armid="'+row.id+'"'+
+      (row.cobraMerma!==false?" checked":"")+'> Cobrar el espacio desperdiciado ('+unidadTxt(A.unidad,A.compradas)+' completos)</label>'+
+    (row.cobraMerma===false ? '<div class="armNota">Se cobra sólo lo aprovechado: <b>'+unidadTxt(A.unidad,A.usadas)+'</b></div>' : "")+
     '<div class="armTip">'+tip+'</div>'+
-    (app ? '<p class="note" style="margin:10px 0 0">Ligado a <b>'+esc(app.ubic||"la aplicaci\u00f3n")+
-      '</b>: esa aplicaci\u00f3n ya no cobra por cm\u00b2 \u2014 el material lo cobra este armado y ahi queda s\u00f3lo la mano de obra.</p>' : "");
+    (app ? '<p class="note" style="margin:10px 0 0">Ligado a <b>'+esc(app.ubic||"la aplicación")+
+      '</b>: esa aplicación ya no cobra por cm² — el material lo cobra este armado y ahí queda sólo la mano de obra.</p>' : "");
 }
 
 function renderArmado(){
   const w = $("#armado"); if(!w) return;
   const svc = normalizaCat();
   cot.armado = cot.armado || [];
+  if(esServicio(cot)) armadoPrincipal();
   sincronizaArmado();
+  pintaTabArmado();
   if(!cot.armado.length){
-    w.innerHTML = '<div class="empty">Sin material por medida. Presiona <b>+ Material</b> y el cotizador te dice cu\u00e1ntas piezas caben por fila, '+
-      'cu\u00e1nto rollo se gasta, cu\u00e1nto se desperdicia y qu\u00e9 tanto conviene pedir.</div>';
+    w.innerHTML = '<div class="empty">Todavía no hay material que calcular. Presiona <b>+ Material</b>, '+
+      'o liga una aplicación del paso de técnicas para saber cuánto rollo se gasta y cuánto se tira.</div>';
     return;
   }
   w.innerHTML = cot.armado.map((row,i)=>{
     const A = armadoDe(row);
-    const opsSvc = svc.map(s=>'<option value="'+s.id+'"'+(s.id===row.servicioId?" selected":"")+'>'+esc(s.nombre)+' \u00b7 '+mx(s.precio)+'/'+abrevUnidad(s.unidad)+'</option>').join("");
-    const opsApp = '<option value="">\u2014 suelto, es maquila \u2014</option>' + cot.apps.map((a,j)=>
-      '<option value="'+a.id+'"'+(a.id===row.appId?" selected":"")+'>'+esc(a.ubic||("Ubicaci\u00f3n "+(j+1)))+'</option>').join("");
-    const liga = !!row.appId;
-    return '<div class="app-row" data-arm="'+row.id+'">'+
-      '<div class="app-head"><span class="tag">Material '+(i+1)+'</span>'+
-        (liga? '<span class="pill pend">medida de la aplicaci\u00f3n</span>' : "")+
-        '<span class="cost">'+(A.error? "" : "costo "+mx(A.costo)+" \u00b7 precio "+mx(A.precio))+'</span>'+
-        '<button class="btn icon sm" data-delarm="'+row.id+'" title="Quitar">\u2715</button></div>'+
-      '<div class="grid g4">'+
-        '<div class="col2"><label class="f">Servicio o material</label><select data-ark="servicioId">'+opsSvc+'</select></div>'+
-        '<div><label class="f">Toma la medida de</label><select data-ark="appId">'+opsApp+'</select></div>'+
-        '<div><label class="f">Piezas</label><input type="number" min="1" step="1" data-ark="cant" value="'+Math.max(1,Math.round(num(row.cant,1)))+'"'+(liga?" readonly title=\"La toma del pedido\"":"")+'></div>'+
+    const liga = !!row.appId, fijo = !!row.principal;
+    const opsSvc = svc.map(s=>'<option value="'+s.id+'"'+(s.id===row.servicioId?" selected":"")+'>'+esc(s.nombre)+' · '+mx(s.precio)+'/'+abrevUnidad(s.unidad)+'</option>').join("");
+    const opsApp = '<option value="">— suelto, es maquila —</option>' + cot.apps.map((a,j)=>
+      '<option value="'+a.id+'"'+(a.id===row.appId?" selected":"")+'>'+esc(a.ubic||("Ubicación "+(j+1)))+'</option>').join("");
+    const g = row.giro || "auto";
+    const bot = (v,t,ayuda)=>'<button class="btn sm'+(g===v?" primary":" ghost")+'" data-armgiro="'+row.id+'|'+v+'" title="'+ayuda+'">'+t+'</button>';
+    return '<div class="armFicha" data-arm="'+row.id+'">'+
+      '<div class="armFichaTop"><span class="tag">'+(fijo? "Servicio del pedido" : "Material "+(i+1))+'</span>'+
+        (liga? '<span class="pill pend">'+esc((cot.apps.find(a=>a.id===row.appId)||{}).ubic||"aplicación")+'</span>' : "")+
+        '<span class="cost">'+(A.error? "" : mx(netoArmado(A)))+'</span>'+
+        (fijo? "" : '<button class="btn icon sm" data-delarm="'+row.id+'" title="Quitar">✕</button>')+'</div>'+
+      '<div class="armCampos">'+
+        '<label class="armCampo armAncho"><span>Material</span><select data-ark="servicioId">'+opsSvc+'</select></label>'+
+        (fijo? "" : '<label class="armCampo armAncho"><span>Toma la medida de</span><select data-ark="appId">'+opsApp+'</select></label>')+
+        '<label class="armCampo"><span>Ancho de la pieza</span><input type="number" min="0" step="0.5" data-ark="ancho" value="'+num(row.ancho)+'"'+(liga?" readonly":"")+'></label>'+
+        '<label class="armCampo"><span>Largo de la pieza</span><input type="number" min="0" step="0.5" data-ark="alto" value="'+num(row.alto)+'"'+(liga?" readonly":"")+'></label>'+
+        '<label class="armCampo"><span>No. de piezas</span><input type="number" min="1" step="1" data-ark="cant" value="'+Math.max(1,Math.round(num(row.cant,1)))+'"'+((liga||fijo)?' readonly title="La toma del pedido"':"")+'></label>'+
+        '<label class="armCampo armAncho"><span>Nota para producción</span><input data-ark="nota" value="'+esc(row.nota||"")+'" placeholder="Ej. dejar 1 cm de sangrado"></label>'+
       '</div>'+
-      '<div class="grid g4" style="margin-top:10px">'+
-        '<div><label class="f">Medida de la pieza (cm)</label><div class="dims">'+
-          '<input type="number" min="0" step="0.5" data-ark="ancho" value="'+num(row.ancho)+'"'+(liga?" readonly":"")+'><span>\u00d7</span>'+
-          '<input type="number" min="0" step="0.5" data-ark="alto" value="'+num(row.alto)+'"'+(liga?" readonly":"")+'></div></div>'+
-        '<div><label class="f">\u00bfSe puede girar?</label><label class="sw" style="height:38px"><input type="checkbox" data-armck="girar" data-armid="'+row.id+'"'+
-          (row.girar!==false?" checked":"")+'> Girar 90\u00b0 si gasta menos</label></div>'+
-        '<div class="col2"><label class="f">Nota para producci\u00f3n</label><input data-ark="nota" value="'+esc(row.nota||"")+'" placeholder="Ej. dejar 1 cm de sangrado"></div>'+
+      '<div class="armBotones">'+
+        bot("auto","Máximo","El acomodo que gasta menos material")+
+        bot("h","Horizontal","La pieza como la capturaste")+
+        bot("v","Vertical","La pieza girada 90°")+
+        '<button class="btn sm ghost" data-armreset="'+row.id+'" title="Volver a empezar este renglón">Reset</button>'+
       '</div>'+
       '<div data-armbody="'+row.id+'">'+cuerpoArmado(row, A)+'</div>'+
     '</div>';
   }).join("");
 }
 
-/* Repinta solo lo que cambia, para no robarle el foco a quien esta escribiendo. */
+/* Repinta sólo lo que cambia, para no robarle el foco a quien está escribiendo. */
 function pintaArmado(){
   (cot.armado||[]).forEach(row=>{
     const el = document.querySelector('[data-arm="'+row.id+'"]'); if(!el) return;
     const A = armadoDe(row);
     const c = el.querySelector(".cost");
-    if(c) c.textContent = A.error ? "" : "costo "+mx(A.costo)+" \u00b7 precio "+mx(A.precio);
+    if(c) c.textContent = A.error ? "" : mx(netoArmado(A));
     const b = el.querySelector("[data-armbody]");
     if(b) b.innerHTML = cuerpoArmado(row, A);
     [["cant", Math.max(1,Math.round(num(row.cant,1)))],["ancho",num(row.ancho)],["alto",num(row.alto)]].forEach(par=>{
@@ -2392,6 +2832,18 @@ function pintaArmado(){
       if(i && document.activeElement!==i) i.value = par[1];
     });
   });
+  pintaTabArmado();
+}
+
+/* La pestañita de la orilla derecha: cuánto material y cuánta merma, de un vistazo. */
+function pintaTabArmado(){
+  const t = $("#armadoTab"); if(!t) return;
+  const filas = (cot.armado||[]).map(armadoDe).filter(A=>A && !A.error);
+  const hay = filas.length > 0;
+  t.hidden = false;
+  const m = hay ? Math.round(filas.reduce((s,A)=>s+A.mermaPct,0)/filas.length) : 0;
+  t.querySelector("b").textContent = hay ? m+"% merma" : "";
+  t.classList.toggle("alto", hay && m >= 50);
 }
 
 function nuevoArmado(){
@@ -2400,10 +2852,43 @@ function nuevoArmado(){
     const t = cat.tecnicas.find(t=>t.id===a.tecnicaId);
     return t && t.modo==="area" && !(cot.armado||[]).some(r=>r.appId===a.id);
   });
+  const tec = app ? app.tecnicaId : "";
+  const s = svcPorOmision(tec);
   const q = Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
-  return {id:uid(), servicioId:(svc[0]||{}).id||"", appId: app? app.id : "",
+  return {id:uid(), servicioId:(s||{}).id||"", appId: app? app.id : "",
           ancho: app? num(app.ancho) : 20, alto: app? num(app.alto) : 20,
-          cant: q, girar:true, cobraMerma:true, nota:""};
+          cant: q, giro:"auto", cobraMerma:true, nota:"", principal:false};
+}
+
+/* ---------- el paso 2: artículo físico o servicio por medida ---------- */
+function aplicaModo(){
+  const svc = esServicio(cot);
+  document.querySelectorAll("[data-solo]").forEach(e=>{
+    e.hidden = (e.dataset.solo === "servicio") !== svc;
+  });
+  document.querySelectorAll("#modoSwitch button").forEach(b=>
+    b.setAttribute("aria-selected", (b.dataset.modo==="servicio")===svc));
+  const apps = document.querySelector('[data-paso="apps"]');
+  if(apps){
+    apps.hidden = svc;
+    // Las aplicaciones no se tiran: se guardan por si regresa a artículo físico.
+    if(svc && cot.apps.length){ cot._apps = cot.apps; cot.apps = []; }
+    if(!svc && !cot.apps.length && cot._apps && cot._apps.length){ cot.apps = cot._apps; delete cot._apps; }
+  }
+}
+function renderServicio(){
+  if(!$("#c_svc")) return;
+  const svc = normalizaCat();
+  const p = esServicio(cot) ? armadoPrincipal() : null;
+  $("#c_svc").innerHTML = svc.map(s=>'<option value="'+s.id+'"'+(p && s.id===p.servicioId?" selected":"")+'>'+
+    esc(s.nombre)+' · '+mx(s.precio)+'/'+abrevUnidad(s.unidad)+'</option>').join("");
+  if(!p) return;
+  const foco = document.activeElement;
+  if(foco !== $("#c_svcAncho")) $("#c_svcAncho").value = num(p.ancho);
+  if(foco !== $("#c_svcAlto"))  $("#c_svcAlto").value  = num(p.alto);
+  const A = armadoDe(p);
+  $("#c_svcResumen").value = A.error ? "revisa la medida"
+    : A.porFila+"/fila · "+unidadTxt(A.unidad,A.compradas)+" · "+A.mermaPct.toFixed(0)+"% merma";
 }
 
 /* ---------- cálculo ---------- */
@@ -2461,17 +2946,18 @@ function calc(){
 
   const subtotalPiezas = precioUnit*qty;
   const setupVenta = porLista ? setupPrecio : aplicaUtil(setupCosto);
-  // Material por medida: se gasta por pedido, no por pieza.
+  // Material por medida: se gasta por pedido, no por pieza. El descuento por
+  // volumen también le aplica, para que la regla sea una sola.
   let armadoCosto = 0, armadoVenta = 0; const armado = [];
   (cot.armado||[]).forEach(row=>{
     const A = armadoDe(row);
     if(!A || A.error) return;
-    const venta = num(A.s.precio) ? A.precio : aplicaUtil(A.costo);
+    const venta = (num(A.s.precio) ? A.precio : aplicaUtil(A.costo)) * (1 - descVolPct/100);
     armadoCosto += A.costo; armadoVenta += venta;
-    armado.push({id:row.id, appId:row.appId||"", nombre:A.s.nombre, unidad:A.unidad,
-                 reales:A.reales, compradas:A.compradas, unidades:A.unidades,
+    armado.push({id:row.id, appId:row.appId||"", principal:!!row.principal, nombre:A.s.nombre, unidad:A.unidad,
+                 reales:A.reales, compradas:A.compradas, unidades:A.unidades, giro:A.giro,
                  porFila:A.porFila, filas:A.filas, largoCm:A.largoCm, rot:A.rot, pieza:A.pieza,
-                 mermaM2:A.mermaM2, mermaPct:A.mermaPct, cobraMerma:A.cobraMerma,
+                 mermaM2:A.mermaM2, mermaPct:A.mermaPct, usoPct:A.usoPct, peso:A.peso, cobraMerma:A.cobraMerma,
                  piezas:A.n, caben:A.caben, nota:row.nota||"", ancho:num(A.s.ancho),
                  costo:A.costo, precio:venta});
   });
@@ -2490,7 +2976,9 @@ function calc(){
 
   const costoTotal = costoDirecto*qty + setupCosto + armadoCosto;
   const utilidad = base - costoTotal;
-  return {qty,costoArt,costoApps,costoDirecto,detalle,esc,descVolPct,descExtra,
+  // Cuando el pedido ES el servicio, lo que vale una pieza es su material.
+  const unitario = (cot.modo==="servicio" && qty>0) ? (subtotalPiezas + armadoVenta)/qty : precioUnit;
+  return {qty,costoArt,costoApps,costoDirecto,detalle,esc,descVolPct,descExtra,unitario,
           armado,armadoCosto,armadoVenta,precioBase,precioUnit,subtotalPiezas,setupCosto,setupVenta,
           porLista,precioArtLista,precioApps,
           extrasPieza,extrasUnicos,pctExtra,urgencia,subtotal,iva,total,costoTotal,utilidad,
@@ -2517,7 +3005,8 @@ function renderCot(){
   $("#c_descTipo").value = cot.descTipo || "pct";
   $("#c_descVal").value = num(cot.descVal) || 0;
   $("#c_descNota").value = cot.descNota || "";
-  renderApps(); renderArmado(); renderExtras(); renderTallas(); renderProd(); aplicaPasoTallas(); renderResumen();
+  renderApps(); renderExtras(); renderTallas(); renderProd(); aplicaPasoTallas();
+  renderServicio(); renderArmado(); renderResumen();
   if(typeof pintaSelectClientes==="function") pintaSelectClientes();
   if(typeof renderEstado==="function") renderEstado();
   if(typeof resumenPasos==="function") resumenPasos();
@@ -2611,7 +3100,7 @@ function pintaSumaTallas(){
   const s = sumaTallas(cot);
   const q = Math.max(1, Math.round(num(cot.cantidad,1)));
   const qi = $("#c_qty");
-  if(qi){ qi.readOnly = false; if(usaTallas(cot)) qi.value = s; }
+  if(qi){ qi.readOnly = false; if(usaTallas(cot) && document.activeElement!==qi) qi.value = s; }
   if(!cot.tallas || !cot.tallas.length){
     el.innerHTML = 'Cantidad capturada a mano: <b class="num">'+q+'</b> pieza(s).';
   } else if(s<=0){
@@ -2660,20 +3149,25 @@ function renderResumen(){
   $("#c_escala").value = (cot.descOn===false) ? "descuento apagado"
     : r.descVolPct>0 ? (r.esc.desde+"–"+(r.esc.hasta>9999?"+":r.esc.hasta)+" pzas · −"+r.descVolPct+"%")
     : "sin descuento";
-  animaNum($("#r_unit"), r.precioUnit);
-  $("#r_unitSub").textContent = r.qty+" pza(s) · costo "+mx(r.costoDirecto)+" · utilidad "+r.margenReal.toFixed(0)+"%";
+  animaNum($("#r_unit"), r.unitario);
+  $("#r_unitSub").textContent = r.qty+" pza(s) · costo "+mx(cot.modo==="servicio" && r.qty>0 ? (r.costoDirecto+r.armadoCosto/r.qty) : r.costoDirecto)+
+    " · utilidad "+r.margenReal.toFixed(0)+"%";
   const L = [];
-  L.push(["Artículo base", r.porLista ? mx(r.costoArt)+" → "+mx(r.precioArtLista) : mx(r.costoArt)+" c/u", true]);
+  if(cot.modo!=="servicio")
+    L.push(["Artículo base", r.porLista ? mx(r.costoArt)+" → "+mx(r.precioArtLista) : mx(r.costoArt)+" c/u", true]);
   r.detalle.forEach(d=> L.push([d.ubic||"Aplicación",
     r.porLista ? d.tecnica+" · "+mx(d.costo)+" → "+mx(d.precio) : d.tecnica+" · "+d.base, true]));
-  L.push(["Costo directo por pieza", mx(r.costoDirecto), true]);
-  L.push([r.porLista ? "Precio público por pieza" : "Precio de lista por pieza", mx(r.precioBase), false]);
-  if(r.descVolPct>0) L.push(["Descuento volumen −"+r.descVolPct+"%", "−"+mx(r.precioBase-r.precioUnit), false]);
-  L.push(["Piezas ("+r.qty+" × "+mx(r.precioUnit)+")", mx(r.subtotalPiezas), false]);
+  if(cot.modo!=="servicio"){
+    L.push(["Costo directo por pieza", mx(r.costoDirecto), true]);
+    L.push([r.porLista ? "Precio público por pieza" : "Precio de lista por pieza", mx(r.precioBase), false]);
+  }
+  if(r.descVolPct>0) L.push(["Descuento volumen −"+r.descVolPct+"%", "aplicado a piezas y material", true]);
+  if(cot.modo!=="servicio" || r.subtotalPiezas>0)
+    L.push(["Piezas ("+r.qty+" × "+mx(r.precioUnit)+")", mx(r.subtotalPiezas), false]);
   if(r.setupVenta>0) L.push(["Preparación / setup", mx(r.setupVenta), false]);
   if(r.extrasUnicos>0) L.push(["Cargos por pedido", mx(r.extrasUnicos), false]);
   if(r.urgencia>0) L.push(["Recargo "+r.pctExtra+"%", mx(r.urgencia), false]);
-  (r.armado||[]).forEach(a=> L.push(["Material · "+a.nombre,
+  (r.armado||[]).forEach(a=> L.push([(a.principal? "" : "Material · ")+a.nombre,
     unidadTxt(a.unidad, a.unidades)+" → "+mx(a.precio), false]));
   if(r.descExtra>0) L.push(["Descuento"+(cot.descTipo==="mxn" ? "" : " "+num(cot.descVal)+"%")+
     (cot.descNota ? " · "+cot.descNota : ""), "−"+mx(r.descExtra), false]);
@@ -2694,9 +3188,10 @@ const COLS = {
     ["costoCm2","Costo / cm²","num"],["costoTinta","Costo / tinta","num"],["costoPuntada","Costo / puntada","num"],["minimo","Costo mínimo","num"],["setup","Costo setup","num"],
     ["precioCm2","Precio / cm²","num"],["precioTinta","Precio / tinta","num"],["precioPuntada","Precio / puntada","num"],["precioMin","Precio mínimo","num"],["precioSetup","Precio setup","num"]],
   servicios:[["nombre","Servicio / material","text"],["cat","Categoría","text"],["unidad","Unidad","unidad"],
+    ["tecnicaId","Técnica que lo usa","tecnica"],
     ["ancho","Ancho útil cm","num"],["costo","Costo / unidad $","num"],["precio","Precio / unidad $","num"],
     ["minimo","Mínimo a cobrar","num"],["incremento","Incremento de venta","num"],
-    ["separacion","Separación cm","num"],["orilla","Orilla cm","num"]],
+    ["separacion","Separación cm","num"],["orilla","Orilla cm","num"],["gramaje","Gramaje g/m²","num"]],
   tamanos:[["nombre","Tamaño","text"],["ancho","Ancho cm","num"],["alto","Alto cm","num"]],
   volumen:[["desde","Desde pzas","num"],["hasta","Hasta pzas","num"],["desc","Descuento %","num"]],
   extras:[["nombre","Concepto","text"],["tipo","Tipo","tipo"],["monto","Monto","num"]]
@@ -2708,6 +3203,7 @@ function renderTabla(key){
     const v = r[c[0]];
     if(c[2]==="modo") return '<td><select data-f="modo"><option value="area"'+(v==="area"?" selected":"")+'>Por área</option><option value="tintas"'+(v==="tintas"?" selected":"")+'>Por tinta</option><option value="puntadas"'+(v==="puntadas"?" selected":"")+'>Por puntada</option></select></td>';
     if(c[2]==="unidad") return '<td><select data-f="unidad"><option value="ml"'+(v==="ml"?" selected":"")+'>Metro lineal (ml)</option><option value="m2"'+(v==="m2"?" selected":"")+'>Metro cuadrado (m²)</option></select></td>';
+    if(c[2]==="tecnica") return '<td><select data-f="tecnicaId"><option value="">— ninguna —</option>'+cat.tecnicas.map(t=>'<option value="'+t.id+'"'+(v===t.id?" selected":"")+'>'+esc(t.nombre)+'</option>').join("")+'</select></td>';
     if(c[2]==="ro") return '<td class="n"><input readonly title="Se mueve solo con requisición, desde Inventario" value="'+(v==null?0:v)+'" style="background:var(--surface-2);color:var(--ink-2);text-align:right"></td>';
     if(c[2]==="si") return '<td style="text-align:center"><input type="checkbox" data-f="'+c[0]+'" style="width:auto"'+(v?" checked":"")+'></td>';
     if(c[2]==="tipo") return '<td><select data-f="tipo"><option value="unico"'+(v==="unico"?" selected":"")+'>Único</option><option value="pieza"'+(v==="pieza"?" selected":"")+'>Por pieza</option><option value="porcentaje"'+(v==="porcentaje"?" selected":"")+'>Porcentaje</option></select></td>';
@@ -2766,6 +3262,21 @@ $("#catActualizar").addEventListener("click", async ()=>{
   }catch(e){ $("#catEstado").textContent = "No se pudo actualizar"; toast("No se pudo actualizar el catálogo"); }
   finally{ b.disabled = false; b.textContent = "Actualizar"; }
 });
+
+/* ---------- eventos de la apariencia ---------- */
+$("#tab-set").addEventListener("click", e=>{
+  const t = e.target.closest("[data-tema]");
+  if(t){ TEMA.preset = t.dataset.tema; TEMA.acento = ""; guardaTema(); aplicaTema(); renderTema(); return; }
+  const v = e.target.closest("[data-vidrio]");
+  if(v && v.tagName==="BUTTON"){ TEMA.vidrio = v.dataset.vidrio; guardaTema(); aplicaTema(); renderTema(); return; }
+  const q = e.target.closest("[data-esquinas]");
+  if(q && q.tagName==="BUTTON"){ TEMA.esquinas = q.dataset.esquinas; guardaTema(); aplicaTema(); renderTema(); return; }
+  if(e.target.closest("#temaQuitaAcento")){ TEMA.acento = ""; guardaTema(); aplicaTema(); renderTema(); return; }
+});
+$("#tab-set").addEventListener("input", e=>{
+  if(e.target.id==="temaAcento"){ TEMA.acento = e.target.value; guardaTema(); aplicaTema(); renderTema(); }
+});
+
 $("#clearHist").addEventListener("click", ()=>{ cat.historial=[]; persist(); renderHist(); toast("Historial vaciado"); });
 $("#btnLlenarPrecios").addEventListener("click", ()=>{
   const mk = num(P.margen)/100;
@@ -2804,6 +3315,7 @@ function renderSaved(){
 
 /* ---------- ajustes ---------- */
 function renderSet(){
+  renderTema();
   $("#p_margen").value=P.margen; $("#p_modo").value=P.modo; $("#p_merma").value=P.merma; $("#p_mo").value=P.manoObra;
   $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia;
   P.compras = P.compras || {tope:2000, siempre:false};
@@ -2938,7 +3450,7 @@ function guardaPasos(){
   }catch(e){}
 }
 function arrancaPasos(){
-  const guard = leePasos() || {cliente:false, articulo:false, tallas:true, apps:false, armado:false, extras:true, prod:true};
+  const guard = leePasos() || {cliente:false, articulo:false, tallas:true, apps:false, extras:true, prod:true};
   document.querySelectorAll("[data-paso]").forEach(c=> c.classList.toggle("cerrado", !!guard[c.dataset.paso]));
   resumenPasos();
 }
@@ -2957,9 +3469,8 @@ function resumenPasos(){
   pon("articulo", (cot.desc||"Sin artículo") + " · " + r.qty + " pza(s)");
   pon("tallas", cot.tallas && cot.tallas.length ? sumaTallas(cot)+" pza(s) en "+cot.tallas.length+" renglón(es)" : "sin desglose");
   pon("apps", cot.apps.length ? cot.apps.length+" ubicación(es) · "+mx(r.costoApps)+" de costo" : "sin aplicaciones");
-  pon("armado", (r.armado||[]).length
-    ? r.armado.length+" material(es) · "+mx(r.armadoVenta)+" · "+Math.round(r.armado.reduce((s,a)=>s+a.mermaPct,0)/r.armado.length)+"% de merma"
-    : "sin material por medida");
+  pon("articulo", (cot.desc||"Sin artículo") + " · " + r.qty + " pza(s)" +
+    ((r.armado||[]).length ? " · " + (r.armado.length===1 ? unidadTxt(r.armado[0].unidad, r.armado[0].compradas) : r.armado.length+" materiales") : ""));
   const ex = cot.extras.filter(e=>e.on).length;
   const dsc = [];
   if(cot.descOn===false) dsc.push("volumen apagado");
@@ -2996,7 +3507,7 @@ function refrescaCostos(){
     const el = row.querySelector(".cost");
     if(el) el.textContent = d ? "costo "+mx(d.costo)+" · precio "+mx(d.precio)+(d.min?" · mínimo":"") : "";
   });
-  pintaArmado();
+  pintaArmado(); renderServicio();
   renderResumen();
 }
 $("#tab-cot").addEventListener("input", e=>{
@@ -3030,6 +3541,8 @@ $("#tab-cot").addEventListener("input", e=>{
     case "c_qty": cot.cantidad=num(t.value,1); cot.cantManual=true; pintaSumaTallas(); refrescaCostos(); return;
     case "c_descVal": cot.descVal=num(t.value); refrescaCostos(); return;
     case "c_descNota": cot.descNota=t.value; renderResumen(); return;
+    case "c_svcAncho": armadoPrincipal().ancho=num(t.value); refrescaCostos(); return;
+    case "c_svcAlto":  armadoPrincipal().alto =num(t.value); refrescaCostos(); return;
     case "c_costoArt": cot.costoArt=num(t.value); refrescaCostos(); return;
     case "c_precioArt": cot.precioArt=num(t.value); refrescaCostos(); return;
   }
@@ -3104,9 +3617,17 @@ $("#addExtra").addEventListener("click", ()=>{
 });
 
 /* ---------- eventos del armado ---------- */
+$("#armadoTab").addEventListener("click", ()=>abreArmado(true));
+$("#armadoCajon").addEventListener("click", e=>{
+  if(e.target.closest("[data-cerrarArmado]")) abreArmado(false);
+});
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && armadoAbierto()) abreArmado(false); });
+$("#tab-cot").addEventListener("click", e=>{
+  if(e.target.closest("[data-abrearmado]")){ abreArmado(true); }
+});
 $("#addArmado").addEventListener("click", ()=>{
   cot.armado = cot.armado || [];
-  if(!normalizaCat().length){ toast("Primero da de alta un servicio por medida en el Catalogo"); return; }
+  if(!normalizaCat().length){ toast("Primero da de alta un servicio por medida en el Catálogo"); return; }
   cot.armado.push(nuevoArmado()); renderArmado(); renderApps(); renderResumen();
 });
 $("#armado").addEventListener("input", e=>{
@@ -3115,7 +3636,7 @@ $("#armado").addEventListener("input", e=>{
   const it = (cot.armado||[]).find(x=>x.id===row.dataset.arm); if(!it) return;
   const k = e.target.dataset.ark; if(!k) return;
   it[k] = (k==="nota") ? e.target.value : num(e.target.value);
-  pintaArmado(); renderResumen();
+  pintaArmado(); renderServicio(); renderResumen();
 });
 $("#armado").addEventListener("change", e=>{
   const ck = e.target.closest("[data-armck]");
@@ -3126,22 +3647,76 @@ $("#armado").addEventListener("change", e=>{
   if(e.target.tagName!=="SELECT") return;
   const row = e.target.closest("[data-arm]"); if(!row) return;
   const it = (cot.armado||[]).find(x=>x.id===row.dataset.arm); if(!it) return;
-  it[e.target.dataset.ark] = e.target.value;
-  renderArmado(); renderApps(); renderResumen();
+  const k = e.target.dataset.ark;
+  it[k] = e.target.value;
+  if(k==="appId" && e.target.value){
+    const a = cot.apps.find(a=>a.id===e.target.value);
+    if(a){
+      it.ancho = num(a.ancho); it.alto = num(a.alto);
+      const s = svcParaTecnica(a.tecnicaId);     // el material que le toca a esa técnica
+      if(s) it.servicioId = s.id;
+    }
+  }
+  renderArmado(); renderApps(); renderServicio(); renderResumen();
 });
 $("#armado").addEventListener("click", e=>{
   const d = e.target.closest("[data-delarm]");
   if(d){ cot.armado = (cot.armado||[]).filter(x=>x.id!==d.dataset.delarm); renderArmado(); renderApps(); renderResumen(); return; }
+  const gr = e.target.closest("[data-armgiro]");
+  if(gr){
+    const p = String(gr.dataset.armgiro).split("|");
+    const it = (cot.armado||[]).find(x=>x.id===p[0]); if(!it) return;
+    it.giro = p[1]; renderArmado(); renderServicio(); renderResumen(); return;
+  }
+  const rs = e.target.closest("[data-armreset]");
+  if(rs){
+    const it = (cot.armado||[]).find(x=>x.id===rs.dataset.armreset); if(!it) return;
+    it.giro = "auto"; it.cobraMerma = true;
+    const a = cot.apps.find(a=>a.id===it.appId);
+    if(a){ it.ancho = num(a.ancho); it.alto = num(a.alto); }
+    it.cant = Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
+    renderArmado(); renderServicio(); renderResumen(); toast("Renglón reiniciado");
+    return;
+  }
   const s = e.target.closest("[data-armsube]");
   if(s){
     const parte = String(s.dataset.armsube).split("|");
     const it = (cot.armado||[]).find(x=>x.id===parte[0]); if(!it) return;
     const n = Math.max(1, Math.round(num(parte[1])));
     it.cant = n;
-    if(it.appId){ cot.cantidad = n; cot.cantManual = true; $("#c_qty").value = n; pintaSumaTallas(); }
+    if(it.appId || it.principal){ cot.cantidad = n; cot.cantManual = true; $("#c_qty").value = n; pintaSumaTallas(); }
     renderArmado(); refrescaCostos();
-    toast(it.appId ? ("Cotizacion y armado a "+n+" pieza(s)") : ("Armado a "+n+" pieza(s)"));
+    toast((it.appId||it.principal) ? ("Cotización y armado a "+n+" pieza(s)") : ("Armado a "+n+" pieza(s)"));
     return;
+  }
+});
+
+/* ---------- el interruptor del paso 2 ---------- */
+$("#modoSwitch").addEventListener("click", e=>{
+  const b = e.target.closest("button[data-modo]"); if(!b) return;
+  const quiere = b.dataset.modo;
+  if((cot.modo||"articulo") === quiere) return;
+  cot.modo = quiere;
+  if(quiere==="servicio"){
+    const delCatalogo = !cot.desc || (cat.articulos||[]).some(a=>a.nombre===cot.desc) ||
+                        (cat.servicios||[]).some(x=>x.nombre===cot.desc);
+    cot.articuloId = ""; cot.costoArt = 0; cot.precioArt = 0; cot.tallas = [];
+    const p = armadoPrincipal();
+    if(delCatalogo) cot.desc = (svcDe(p.servicioId)||{}).nombre || cot.desc;
+  } else {
+    cot.armado = (cot.armado||[]).filter(r=>!r.principal);
+  }
+  renderCot();
+  if(quiere==="servicio") abreArmado(true);
+});
+$("#tab-cot").addEventListener("change", e=>{
+  if(e.target.id==="c_svc"){
+    const p = armadoPrincipal(); p.servicioId = e.target.value;
+    const s = svcDe(p.servicioId);
+    if(s && (!cot.desc || (cat.servicios||[]).some(x=>x.nombre===cot.desc))) cot.desc = s.nombre;
+    $("#c_desc").value = cot.desc || "";
+    renderServicio(); if(armadoAbierto()) renderArmado();
+    renderResumen();
   }
 });
 
@@ -3175,7 +3750,7 @@ $("#tab-cat").addEventListener("click", e=>{
   if(add){ const k=add.dataset.add;
     const blank = {articulos:{nombre:"Nuevo artículo",cat:"Otros",costo:0},
       tecnicas:{nombre:"Nueva técnica",modo:"area",costoCm2:0,costoTinta:0,costoPuntada:0,minimo:0,setup:0},
-      servicios:{nombre:"Nuevo servicio por medida",cat:"Maquila",unidad:"ml",ancho:60,costo:0,precio:0,minimo:0.5,incremento:0.1,separacion:0.5,orilla:1},
+      servicios:{nombre:"Nuevo servicio por medida",cat:"Maquila",tecnicaId:"",unidad:"ml",ancho:60,costo:0,precio:0,minimo:0.5,incremento:0.1,separacion:0.5,orilla:1,gramaje:0},
       tamanos:{nombre:"Nuevo tamaño",ancho:10,alto:10},
       volumen:{desde:1,hasta:10,desc:0},
       extras:{nombre:"Nuevo cargo",tipo:"unico",monto:0}}[k];
@@ -4431,6 +5006,7 @@ function llevaTallas(g){
   return (g.tallas||[]).length > 0;
 }
 function aplicaPasoTallas(){
+  aplicaModo();
   const card = document.querySelector('[data-paso="tallas"]');
   if(!card) return;
   const aplica = llevaTallas(cot);
@@ -5840,7 +6416,7 @@ function hoja(g){
   const r = calcDe(g);
   const v = new Date(g.fecha); v.setDate(v.getDate()+num(P.vigencia,15));
   const filas = [];
-  filas.push(["1",(g.desc||"Artículo")+"<br><small>"+r.detalle.map(d=>esc(d.ubic)+": "+esc(d.tecnica)+(d.sinMaterial ? "" : " ("+d.base+")")).join(" · ")+"</small>",r.qty,mx(r.precioUnit),mx(r.subtotalPiezas)]);
+  filas.push(["1",(g.desc||"Artículo")+"<br><small>"+r.detalle.map(d=>esc(d.ubic)+": "+esc(d.tecnica)+" ("+d.base+")").join(" · ")+"</small>",r.qty,mx(r.precioUnit),mx(r.subtotalPiezas)]);
   if(r.setupVenta>0) filas.push(["2","Preparación / setup de producción",1,mx(r.setupVenta),mx(r.setupVenta)]);
   g.extras.filter(e=>e.on).forEach((e,i)=>{ const x=cat.extras.find(x=>x.id===e.id); if(!x||x.tipo==="porcentaje") return;
     const c = x.tipo==="pieza"? 0 : 1; if(c===0) return;
@@ -7022,10 +7598,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261002-1924";</script>
+<script>window.BUILD="20261002-2327";</script>
 <script>
 (function(){
-  var mio = "20261002-1924";
+  var mio = "20261002-2327";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -7048,7 +7624,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261002-1924"></script>
-<script src="diagnostico.js?v=20261002-1924"></script>
+<script src="cuenta.js?v=20261002-2327"></script>
+<script src="diagnostico.js?v=20261002-2327"></script>
 </body>
 </html>
