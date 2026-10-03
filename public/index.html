@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261003-1105"></script>
+<script src="config.js?v=20261003-1134"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -691,6 +691,23 @@ body.sin-acceso .wrap,body.sin-acceso header.top{display:none}
 .armTip b{font-family:"IBM Plex Mono",monospace}
 .armAcc{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .armMal{margin-top:12px;background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 8px 8px 0;padding:10px 12px;font-size:13px}
+/* ---- la vista grande del acomodo ---- */
+.armLupa{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in;position:relative;text-align:left}
+.armLupa .armVer{position:absolute;right:4px;bottom:4px;font-size:10px;font-weight:700;letter-spacing:.03em;
+  text-transform:uppercase;background:var(--ink);color:var(--surface);border-radius:5px;padding:2px 6px;opacity:0;transition:opacity .14s}
+.armLupa:hover .armVer,.armLupa:focus-visible .armVer{opacity:.92}
+/* por encima del cajón: el acomodo se inspecciona con el cajón abierto */
+#modalPlano{z-index:88}
+.modal .card.planoCard{width:min(1180px,96vw);max-width:none}
+.planoCard>header{display:flex;align-items:center;gap:10px}
+.planoZoomBar{display:flex;align-items:center;gap:6px;margin-left:auto}
+.planoZoomBar span{font-family:"IBM Plex Mono",monospace;font-size:12px;min-width:34px;text-align:center;color:var(--ink-2)}
+.planoMarco{border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:12px;overflow:auto;max-height:52vh}
+#planoLienzo svg{display:block}
+.planoLeyendas{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.planoLeg{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2);
+  background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:5px 9px}
+.planoLeg i{width:11px;height:11px;border-radius:3px;flex:none}
 #t_servicios{min-width:1420px}
 #t_servicios th:nth-child(1),#t_servicios td:nth-child(1){min-width:240px}
 #t_servicios th:nth-child(2),#t_servicios td:nth-child(2){min-width:120px}
@@ -1584,6 +1601,29 @@ body.rol-produccion #btnPrint{display:none!important}
     <div class="cajonCuerpo"><div id="armado"></div></div>
   </aside>
 </div>
+<div class="modal" id="modalPlano" hidden>
+  <div class="card planoCard">
+    <header><h2 id="planoTitulo">Acomodo</h2>
+      <div class="seg" id="planoModo">
+        <button type="button" data-planomodo="todo" aria-pressed="true">Todo el rollo</button>
+        <button type="button" data-planomodo="cerca" aria-pressed="false">De cerca</button>
+      </div>
+      <div class="planoZoomBar">
+        <button class="btn icon sm" data-planozoom="-1" title="Alejar">−</button>
+        <span id="planoZoom">1.0×</span>
+        <button class="btn icon sm" data-planozoom="1" title="Acercar">+</button>
+      </div>
+      <button class="btn icon sm" data-cerrarplano title="Cerrar">✕</button>
+    </header>
+    <div class="body">
+      <p class="note" id="planoDatos" style="margin:0 0 12px"></p>
+      <div class="planoMarco"><div id="planoLienzo"></div></div>
+      <p class="note" id="planoCorte" style="margin:8px 0 0"></p>
+      <div class="planoLeyendas" id="planoLeyenda"></div>
+      <p class="note" id="planoAyuda" style="margin:12px 0 0"></p>
+    </div>
+  </div>
+</div>
 </section>
 
 <!-- ============ CATÁLOGO ============ -->
@@ -1947,7 +1987,6 @@ body.rol-produccion #btnPrint{display:none!important}
       <div id="moComparativo" style="margin-top:20px"></div>
       <div class="temaFila" style="margin-top:18px">
         <button class="btn primary" id="moAplicar">Aplicar a mi catálogo</button>
-        <button class="btn ghost" id="moQuitar" hidden>Volver al cobro por cm²</button>
         <span class="hint">Puedes volver aquí y ajustar los montos cuando quieras.</span>
       </div>
     </div>
@@ -2588,7 +2627,7 @@ function defaults(){ return {
  ], compras:[]
 };}
 const CHECKS = ["Diseño aprobado por el cliente","Material en almacén","Archivo impreso","Prensado / aplicado","Revisión de calidad","Empacado","Entregado"];
-function defaultParams(){ return {cobroPorArmado:false,plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
+function defaultParams(){ return {plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
   compras:{tope:2000, siempre:false},
   empresa:{nombre:"Hey Makers",eslogan:"Cursos y Talleres",tel:"",mail:"",logo:"",
   /* Lo fiscal va aparte de lo comercial a propósito: el nombre comercial es
@@ -2958,17 +2997,12 @@ function manoDeObraDe(t, cual){
   return num(t.costoMO) || num(P.manoObra);
 }
 
-/* El armado se arma solo, y agrupa por material: si el frente y la espalda
-   salen del mismo rollo, van en un solo renglón y se paga una sola compra.
-   Eso es lo que evita que cada aplicación pida su propio mínimo. */
+/* El armado se arma solo, SIEMPRE, y agrupa por material.
+   Una técnica con rollo amarrado deja de cobrar por cm² sin que nadie tenga
+   que prender nada: si no, el material termina cobrándose dos veces —
+   una por centímetro cuadrado en la aplicación y otra en el armado. */
 function autoArmado(){
   cot.armado = cot.armado || [];
-  // Mientras no lo apliques en Ajustes, nada cambia: el cotizador sigue
-  // cobrando como hoy y el armado sólo manda donde tú lo armaste a mano.
-  if(!P.cobroPorArmado){
-    cot.armado = cot.armado.filter(r=>!r.auto);   // se van los que puso el sistema
-    return;
-  }
   const q = Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
   const porServicio = {};
   cot.apps.forEach(a=>{
@@ -2977,25 +3011,34 @@ function autoArmado(){
     if(!s) return;
     (porServicio[s.id] = porServicio[s.id] || []).push(a);
   });
-  // fuera los renglones automáticos de materiales que ya no se usan
-  cot.armado = cot.armado.filter(r=> !r.auto || porServicio[r.servicioId]);
   Object.keys(porServicio).forEach(sid=>{
-    let r = cot.armado.find(x=>x.auto && x.servicioId===sid);
+    // Un solo renglón por material: dos rollos iguales en el mismo pedido es
+    // una sola compra. Si ya había uno a mano, se adopta en vez de duplicar.
+    let r = cot.armado.find(x=>!x.principal && x.servicioId===sid);
     if(!r){
       r = {id:uid(), servicioId:sid, appId:"", giro:"auto", cobraMerma:true, nota:"",
            principal:false, auto:true, piezas:[]};
       cot.armado.push(r);
     }
+    r.auto = true;
     const previas = {};
     (r.piezas||[]).forEach(p=>{ if(p.appId) previas[p.appId] = p; });
-    const aMano = (r.piezas||[]).filter(p=>!p.appId);   // las que puso el usuario se quedan
-    r.piezas = porServicio[sid].map(a=>{
+    const aMano = (r.piezas||[]).filter(p=>!p.appId);
+    const deApps = porServicio[sid].map(a=>{
       const vieja = previas[a.id] || {};
       return {id: vieja.id || uid(), appId:a.id, etiqueta:a.ubic || "Aplicación",
               ancho:num(a.ancho), alto:num(a.alto), cant:q};
-    }).concat(aMano);
-    r.appId = r.piezas[0].appId;
+    });
+    // Las medidas sueltas que repiten exactamente una aplicación sobran:
+    // son el rastro de haber armado a mano lo que ahora se arma solo.
+    const limpias = aMano.filter(p=> !deApps.some(d=>
+      Math.abs(num(d.ancho)-num(p.ancho))<0.01 && Math.abs(num(d.alto)-num(p.alto))<0.01));
+    r.piezas = deApps.concat(limpias);
+    r.appId = r.piezas[0].appId || "";
   });
+  // fuera los renglones automáticos de materiales que ya no se usan
+  cot.armado = cot.armado.filter(r=>
+    r.principal || porServicio[r.servicioId] || !r.auto || (r.piezas||[]).some(p=>!p.appId));
 }
 
 /* ---------- el cajón del armado ---------- */
@@ -3009,48 +3052,174 @@ function abreArmado(abrir){
 }
 
 /* Un planito del acomodo, a escala: el rollo acostado, cada medida en sus
-   propias filas y en color de aviso lo que se paga y no se usa. */
-function planoArmado(A){
+   propias filas y en color de aviso lo que se paga y no se usa.
+   opc: {ancho, alto, etiquetas, zoom} para la vista grande y para el papel. */
+function planoArmado(A, opc){
+  opc = opc || {};
   if(!A || A.error) return "";
   const anchoCm = num(A.s.ancho);
   const largoCm = A.largoPagadoCm;
   if(anchoCm<=0 || largoCm<=0) return "";
-  const k = Math.min(300/largoCm, 190/anchoCm);
-  const W = largoCm*k, H = anchoCm*k;
+  const maxW = opc.ancho || 300, maxH = opc.alto || 190;
+  const zoom = Math.max(1, num(opc.zoom, 1));
+  /* «De cerca» no encoge el rollo entero: pone el ancho del material a lo alto
+     del recuadro y enseña nada más el primer tramo, que es donde se ve el
+     acomodo de verdad. Lo que sigue se repite igual. */
+  const vista = opc.recorte ? Math.min(largoCm, num(opc.recorte)) : largoCm;
+  const k = (opc.recorte ? (maxH/anchoCm) : Math.min(maxW/vista, maxH/anchoCm)) * zoom;
+  const W = vista*k, H = anchoCm*k;
   const orilla = num(A.s.orilla), g = num(A.s.separacion);
-  let piezas = "", x0 = orilla, i = 0;
+  const COLORES = opc.paleta || ["var(--cyan)","var(--accent)","var(--good)","var(--warn)"];
+  const fondo = opc.fondo || "var(--surface-2)";
+  const linea = opc.linea || "var(--line)";
+  const guia  = opc.guia  || "var(--accent)";
+  let piezas = "", marcas = "", x0 = orilla, i = 0;
   A.grupos.forEach(gr=>{
-    const pw = gr.pieza.ancho, ph = gr.pieza.alto;
-    const op = (i%2) ? ".55" : ".85";
-    let puestas = 0;
-    for(let f=0; f<gr.filas && puestas<gr.n && f<400; f++){
+    const pw = gr.pieza.ancho, ph = gr.pieza.alto, col = COLORES[i % COLORES.length];
+    let puestas = 0, prim = null;
+    for(let f=0; f<gr.filas && puestas<gr.n && f<600; f++){
       for(let c=0; c<gr.porFila && puestas<gr.n; c++){
         const x = (x0 + f*(ph+g)) * k;
         const y = (orilla + c*(pw+g)) * k;
-        piezas += '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+Math.max(1,ph*k).toFixed(1)+
-                  '" height="'+Math.max(1,pw*k).toFixed(1)+'" rx="1" fill="var(--cyan)" opacity="'+op+'"/>';
+        const an = Math.max(0.6, ph*k), al = Math.max(0.6, pw*k);
         puestas++;
+        if(x > W) continue;           // fuera del tramo que se está viendo
+        if(!prim) prim = {x, y, an, al};
+        piezas += '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+an.toFixed(1)+
+                  '" height="'+al.toFixed(1)+'" rx="'+(an>6?1.5:0)+'" fill="'+col+'" opacity=".82"'+
+                  (an>26 && al>14 ? ' stroke="rgba(255,255,255,.6)" stroke-width=".7"' : "")+'/>';
       }
+    }
+    if(opc.etiquetas && prim && prim.an>30 && prim.al>16){
+      marcas += '<text x="'+(prim.x+prim.an/2).toFixed(1)+'" y="'+(prim.y+prim.al/2+3.5).toFixed(1)+
+        '" font-size="'+Math.min(11, prim.al*0.45).toFixed(0)+'" text-anchor="middle" fill="#fff" font-weight="600">'+
+        esc((gr.src.etiqueta||"").slice(0,12))+'</text>';
     }
     x0 += gr.filas*(ph+g); i++;
   });
   const usadoX = Math.min(W, A.largoCm*k);
+  const cortado = vista < largoCm - 0.01;
   const Wr = W.toFixed(0), Hr = H.toFixed(1);
   return '<svg viewBox="0 0 '+Wr+' '+Hr+'" width="'+Wr+'" height="'+Hr+'" role="img" '+
     'aria-label="Acomodo de '+A.n+' piezas en el material">'+
-    '<rect x="0" y="0" width="'+Wr+'" height="'+Hr+'" fill="var(--surface-2)" stroke="var(--line)"/>'+
+    '<rect x="0" y="0" width="'+Wr+'" height="'+Hr+'" fill="'+fondo+'" stroke="'+linea+'"/>'+
     (usadoX < W-1 ? '<rect x="'+usadoX.toFixed(1)+'" y="0" width="'+(W-usadoX).toFixed(1)+'" height="'+Hr+
        '" fill="var(--warn)" opacity=".18"/>' : "")+
-    piezas+
-    '<line x1="'+usadoX.toFixed(1)+'" y1="0" x2="'+usadoX.toFixed(1)+'" y2="'+Hr+'" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="4 3"/>'+
+    piezas + marcas +
+    (cortado ? "" :
+      '<line x1="'+usadoX.toFixed(1)+'" y1="0" x2="'+usadoX.toFixed(1)+'" y2="'+Hr+'" stroke="'+guia+'" stroke-width="1.5" stroke-dasharray="4 3"/>')+
     '</svg>';
 }
 
-/* Lo que de verdad se cobra por ese material, ya con el descuento por volumen. */
-function descVolActual(){
-  return (cot.descOn===false) ? 0 : num(escalaDe(qtyPedido()).desc);
+/* El mismo dibujo, para la orden de trabajo: en tinta, no en pantalla.
+   Hay que prestarle «cot» al armado un instante porque de ahí saca la
+   cantidad del pedido; se devuelve siempre, pase lo que pase. */
+const PALETA_PAPEL = ["#0a7fa8","#b01660","#0e7a53","#8a5a00"];
+function planoDeFila(g, id){
+  const row = ((g||{}).armado||[]).find(x=>x.id===id); if(!row) return "";
+  const prev = cot;
+  try{
+    cot = g;
+    const A = armadoDe(row);
+    if(A.error) return "";
+    /* En el papel no sirve el rollo entero encogido a una tira: se enseña el
+       primer tramo al tamaño en que sí se distinguen las piezas, que es el
+       acomodo que el taller tiene que repetir. */
+    const ANCHO = 640, ALTO = 170;
+    const anchoCm = num(A.s.ancho) || 1;
+    const tramo = Math.min(A.largoPagadoCm, ANCHO * anchoCm / ALTO);
+    return planoArmado(A, {ancho:ANCHO, alto:ALTO, etiquetas:true, recorte:tramo,
+      paleta:PALETA_PAPEL, fondo:"#fff", linea:"#999", guia:"#000"});
+  }catch(e){ return ""; }
+  finally{ cot = prev; }
 }
-function netoArmado(A){ return (!A || A.error) ? 0 : A.precio * (1 - descVolActual()/100); }
+function tramoDeFila(g, id){
+  const row = ((g||{}).armado||[]).find(x=>x.id===id); if(!row) return "";
+  const prev = cot;
+  try{
+    cot = g;
+    const A = armadoDe(row);
+    if(A.error) return "";
+    const tramo = Math.min(A.largoPagadoCm, 640 * (num(A.s.ancho)||1) / 170);
+    if(tramo >= A.largoPagadoCm - 0.01) return "Todo el material cabe en el dibujo.";
+    return "Se dibujan los primeros "+red2(tramo/100)+" m de los "+red2(A.largoPagadoCm/100)+
+           " m que hay que preparar. De ahí en adelante el acomodo se repite igual.";
+  }catch(e){ return ""; }
+  finally{ cot = prev; }
+}
+function leyendaDeFila(g, id){
+  const row = ((g||{}).armado||[]).find(x=>x.id===id); if(!row) return "";
+  const prev = cot;
+  try{
+    cot = g;
+    const A = armadoDe(row);
+    if(A.error) return "";
+    return A.grupos.map((gr,i)=>'<span style="display:inline-block;margin-right:12px;font-size:10px">'+
+      '<span style="display:inline-block;width:9px;height:9px;background:'+PALETA_PAPEL[i%PALETA_PAPEL.length]+
+      ';margin-right:4px"></span>'+esc(gr.src.etiqueta||"a mano")+' '+red2(gr.pieza.ancho)+'×'+red2(gr.pieza.alto)+' cm'+
+      (gr.rot? " girada":"")+' · '+gr.porFila+'/fila × '+gr.filas+' filas</span>').join("");
+  }catch(e){ return ""; }
+  finally{ cot = prev; }
+}
+
+/* La vista grande, para inspeccionar el acomodo de cerca. */
+let planoViendo = null, planoZoom = 1, planoCerca = false;
+function abrePlano(folioFila){
+  const row = (cot.armado||[]).find(r=>r.id===folioFila); if(!row) return;
+  planoViendo = folioFila; planoZoom = 1; planoCerca = false;
+  pintaPlanoGrande();
+  $("#modalPlano").hidden = false;
+}
+function pintaPlanoGrande(){
+  const row = (cot.armado||[]).find(r=>r.id===planoViendo); if(!row) return;
+  const A = armadoDe(row);
+  if(A.error){ $("#planoLienzo").innerHTML = '<div class="armMal">'+esc(A.error)+'</div>'; return; }
+  const COLORES = ["var(--cyan)","var(--accent)","var(--good)","var(--warn)"];
+  $("#planoTitulo").textContent = A.s.nombre;
+  $("#planoDatos").innerHTML =
+    '<b>'+red2(A.largoPagadoCm)+' × '+red2(num(A.s.ancho))+' cm</b> de material pagado · '+
+    A.n+' piezas · '+A.usoPct.toFixed(0)+'% aprovechado';
+  const TRAMO = 320;   // cm de rollo que se enseñan de cerca
+  $("#planoLienzo").innerHTML = planoArmado(A, planoCerca
+    ? {ancho:1120, alto:300, etiquetas:true, zoom:planoZoom, recorte:TRAMO}
+    : {ancho:1120, alto:300, etiquetas:true, zoom:planoZoom});
+  const corte = $("#planoCorte");
+  if(corte) corte.textContent = planoCerca
+    ? ("Primeros "+red2(Math.min(A.largoPagadoCm, TRAMO)/100)+" m de "+red2(A.largoPagadoCm/100)+" m. De aquí en adelante se repite igual.")
+    : "";
+  const ayuda = $("#planoAyuda");
+  if(ayuda) ayuda.innerHTML = 'El rollo va acostado: a lo ancho del dibujo se desenrolla el <b>largo</b> y a lo alto va el <b>ancho</b> del material. '+
+    (planoCerca
+      ? 'Así es como hay que acomodar las piezas al imprimir. La franja que queda libre abajo es el ancho que no alcanza para otra pieza.'
+      : 'La raya punteada marca dónde termina lo que de verdad se ocupa; lo sombreado a su derecha es lo que se paga y queda libre.')+
+    ' Este mismo dibujo sale en la orden de trabajo.';
+  const sw = $("#planoModo");
+  if(sw) sw.querySelectorAll("button").forEach(b=> b.setAttribute("aria-pressed", String((b.dataset.planomodo==="cerca")===planoCerca)));
+  $("#planoLeyenda").innerHTML = A.grupos.map((gr,i)=>
+    '<span class="planoLeg"><i style="background:'+COLORES[i%COLORES.length]+'"></i>'+
+    esc(gr.src.etiqueta || "a mano")+' · '+red2(gr.pieza.ancho)+'×'+red2(gr.pieza.alto)+' cm'+
+    (gr.rot? " girada":"")+' · '+gr.porFila+'/fila × '+gr.filas+' filas</span>').join("");
+  $("#planoZoom").textContent = planoZoom.toFixed(1)+"×";
+}
+
+/* El descuento por mayoreo que está corriendo ahora mismo. El armado lo
+   enseña ya aplicado porque es lo que el cliente va a pagar; si el switch de
+   mayoreo está apagado, no hay descuento que enseñar. */
+function descVolActual(){
+  if(cot && cot.descOn===false) return 0;
+  return num(escalaDe(qtyPedido()).desc);
+}
+function conUtil(c){
+  const mk = num(P.margen)/100;
+  return P.modo==="margen" ? (mk>=0.95 ? c*20 : c/(1-mk)) : c*(1+mk);
+}
+/* Lo que de verdad se cobra por este material: su precio de lista si lo tiene,
+   o el costo con tu utilidad, y encima el descuento por volumen. */
+function netoArmado(A){
+  if(!A || A.error) return 0;
+  const bruto = num(A.s.precio) ? num(A.precio) : conUtil(num(A.costo));
+  return Math.round(bruto * (1 - descVolActual()/100) * 100)/100;
+}
 
 /* El reporte y el consejo: la parte que se repinta sola. */
 function cuerpoArmado(row, A){
@@ -3093,7 +3262,8 @@ function cuerpoArmado(row, A){
     : "";
 
   return '<div class="armCols">'+
-      '<div class="armPlano">'+planoArmado(A)+
+      '<div class="armPlano"><button type="button" class="armLupa" data-verplano="'+row.id+'" '+
+          'title="Ver el acomodo de cerca">'+planoArmado(A)+'<span class="armVer">Ver de cerca</span></button>'+
         '<div class="armPie">'+red2(A.largoPagadoCm)+' × '+red2(num(A.s.ancho))+' cm de material pagado</div></div>'+
       '<div class="armChips"><span class="chipUso">'+A.usoPct.toFixed(0)+'% utilizado</span>'+
         '<span class="chipTira">'+A.mermaPct.toFixed(0)+'% sin utilizar</span>'+
@@ -3399,7 +3569,7 @@ function renderApps(){
     return '<div class="app-row" data-app="'+a.id+'">'+
       '<div class="app-head"><span class="tag">Ubicación '+(i+1)+'</span>'+
         (d && d.pierde ? '<span class="pill warn" title="Esta ubicación se está vendiendo por debajo de lo que cuesta. Sube la mano de obra en Ajustes → Cómo se cobra la impresión.">precio bajo el costo</span>' : '')+
-        ((P.cobroPorArmado && tieneMaterial(a.tecnicaId)) ? '<label class="sw swMini" title="Calcular el material de esta aplicación en el armado">'+
+        (tieneMaterial(a.tecnicaId) ? '<label class="sw swMini" title="Calcular el material de esta aplicación en el armado">'+
             '<input type="checkbox" data-armapp="'+a.id+'"'+(a.sinArmado?"":" checked")+'> Material en el armado</label>' : '')+
         '<span class="cost">'+(d? "costo "+mx(d.costoConMaterial!=null? d.costoConMaterial : d.costo)+
             " · precio "+mx(d.precioConMaterial!=null? d.precioConMaterial : d.precio)+(d.min?" · mínimo":"") : "")+'</span>'+
@@ -3608,7 +3778,7 @@ function renderTecnicas(){
   w.innerHTML = lista.map(t=>{
     const mat = svcParaTecnica(t.id);
     const porRollo = t.modo==="area" && !!mat;
-    const faltaMO  = P.cobroPorArmado && porRollo && !num(t.costoMO);
+    const faltaMO  = porRollo && !num(t.costoMO);
     const campo = (clave, etiqueta, paso) =>
       '<label class="tecCampo"><span>'+etiqueta+'</span>'+
       '<input type="number" step="'+(paso||"0.5")+'" data-f="'+clave+'" value="'+(t[clave]==null?"":t[clave])+'"></label>';
@@ -3756,16 +3926,10 @@ function comparaMO(t, caso, mo){
   const obra = num(mo.precio) || util(num(mo.costo));
   return {hoy, nuevo: obra + material, material, obra};
 }
-function modeloNuevoPrendido(){ return !!P.cobroPorArmado; }
 function renderMO(){
   const est = $("#moEstado");
-  if(est){
-    est.innerHTML = modeloNuevoPrendido()
-      ? '<span class="pill good">aplicado</span> El material sale del armado y la t\u00e9cnica cobra la mano de obra.'
-      : '<span class="pill pend">todav\u00eda no aplicado</span> Hoy sigue cobrando por cent\u00edmetro cuadrado. Nada cambia hasta que lo apliques.';
-  }
-  const quitar = $("#moQuitar"); if(quitar) quitar.hidden = !modeloNuevoPrendido();
-  const bt0 = $("#moAplicar"); if(bt0) bt0.textContent = modeloNuevoPrendido() ? "Guardar los montos" : "Aplicar a mi cat\u00e1logo";
+  if(est) est.innerHTML = '<span class="pill good">activo</span> En las t\u00e9cnicas con rollo amarrado el material sale del armado y aqu\u00ed s\u00f3lo va tu mano de obra. El cobro por cent\u00edmetro cuadrado ya no se usa ah\u00ed.';
+  const bt0 = $("#moAplicar"); if(bt0) bt0.textContent = "Guardar los montos";
   const w = $("#moTabla"); if(!w) return;
   const lista = tecnicasConMaterial();
   if(!lista.length){
@@ -3853,16 +4017,8 @@ $("#moAplicar").addEventListener("click", ()=>{
     t.precioMO = num(cap[id].precio);
     n++;
   });
-  const estreno = !P.cobroPorArmado;
-  P.cobroPorArmado = true;
   persist(); renderMO(); renderTabla("tecnicas"); renderCot();
-  toast(estreno ? (n+" técnica(s) ahora cobran material y mano de obra por separado")
-                : "Montos de mano de obra guardados");
-});
-$("#moQuitar").addEventListener("click", ()=>{
-  P.cobroPorArmado = false;
-  persist(); renderMO(); renderCot();
-  toast("Volvimos al cobro por centímetro cuadrado");
+  toast("Mano de obra guardada en "+n+" técnica(s)");
 });
 
 
@@ -4437,6 +4593,29 @@ $("#armado").addEventListener("click", e=>{
     toast((it.appId||it.principal) ? ("Cotización y armado a "+n+" pieza(s)") : ("Armado a "+n+" pieza(s)"));
     return;
   }
+});
+
+/* ---------- la vista grande del acomodo ---------- */
+$("#armado").addEventListener("click", e=>{
+  const v = e.target.closest("[data-verplano]");
+  if(v){ abrePlano(v.dataset.verplano); }
+});
+$("#modalPlano").addEventListener("click", e=>{
+  if(e.target.closest("[data-cerrarplano]") || e.target.id==="modalPlano"){
+    $("#modalPlano").hidden = true; planoViendo = null; return;
+  }
+  const m = e.target.closest("[data-planomodo]");
+  if(m){ planoCerca = m.dataset.planomodo==="cerca"; planoZoom = 1; pintaPlanoGrande();
+         const mc = $(".planoMarco"); if(mc) mc.scrollLeft = 0; return; }
+  const z = e.target.closest("[data-planozoom]");
+  if(z){
+    const paso = num(z.dataset.planozoom) > 0 ? 0.5 : -0.5;
+    planoZoom = Math.min(6, Math.max(1, Math.round((planoZoom + paso)*10)/10));
+    pintaPlanoGrande();
+  }
+});
+document.addEventListener("keydown", e=>{
+  if(e.key==="Escape" && !$("#modalPlano").hidden){ $("#modalPlano").hidden = true; planoViendo = null; }
 });
 
 /* ---------- el interruptor del paso 2 ---------- */
@@ -7288,7 +7467,14 @@ function ordenHoja(g){
        '<td>'+a.porFila+' por fila × '+a.filas+' fila(s)<br><small>'+a.piezas+' pieza(s)</small></td>'+
        '<td>'+red2(a.largoCm)+' cm</td>'+
        '<td><b>'+red3(a.compradas)+' '+abrevUnidad(a.unidad)+'</b><br><small>rollo de '+red2(a.ancho)+' cm</small></td>'+
-       '<td>'+red2(a.mermaM2)+' m² · '+a.mermaPct.toFixed(0)+'%</td></tr>').join("")+
+       '<td>'+red2(a.mermaM2)+' m² · '+a.mermaPct.toFixed(0)+'%</td></tr>'+
+       (planoDeFila(g, a.id)
+         ? '<tr><td colspan="6" style="background:#fff"><div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px">Armado sugerido</div>'+
+           planoDeFila(g, a.id)+
+           '<div style="margin-top:5px">'+leyendaDeFila(g, a.id)+'</div>'+
+           '<div style="font-size:9.5px;color:#555;margin-top:4px">El rollo va acostado: a lo ancho del dibujo se desenrolla el largo y a lo alto va el ancho del material. '+
+           'La franja libre de abajo es el ancho que ya no alcanza para otra pieza. '+esc(tramoDeFila(g, a.id))+'</div></td></tr>'
+         : '')).join("")+
      '</tbody></table>' : '')+
    (adm(g).alerta ? '<div style="border:2px solid #000;padding:8px;margin:10px 0"><b>REQUIERE ATENCIÓN:</b> '+esc(adm(g).alerta)+'</div>' : '')+
    (g.notas ? '<h2>Notas de producción</h2><p style="white-space:pre-line">'+esc(g.notas)+'</p>' : '')+
@@ -8487,10 +8673,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261003-1105";</script>
+<script>window.BUILD="20261003-1134";</script>
 <script>
 (function(){
-  var mio = "20261003-1105";
+  var mio = "20261003-1134";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -8513,7 +8699,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261003-1105"></script>
-<script src="diagnostico.js?v=20261003-1105"></script>
+<script src="cuenta.js?v=20261003-1134"></script>
+<script src="diagnostico.js?v=20261003-1134"></script>
 </body>
 </html>
