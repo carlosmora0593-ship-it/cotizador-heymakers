@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261003-1028"></script>
+<script src="config.js?v=20261003-1105"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1042,6 +1042,25 @@ nav.tabs .barraGrupo{padding:12px 11px 4px}
   .cxcAcc{grid-column:1/-1;justify-content:flex-start}
 }
 
+.tecCard{border:1px solid var(--vidrio-borde);border-radius:var(--radio-sm,12px);background:var(--vidrio-fondo-2);
+  padding:14px;margin-bottom:12px}
+.tecTop{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.tecNombre{flex:1;font-weight:600}
+.tecTop select{width:auto;min-width:130px;flex:none}
+.tecMat{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);
+  background:var(--surface-2);border-radius:var(--radio-sm,10px);padding:9px 11px;margin-bottom:12px}
+.tecMat small{flex-basis:100%;color:var(--ink-3);font-size:11.5px}
+.tecAviso{font-size:12.5px;background:var(--warn-soft);color:var(--warn);border-left:3px solid var(--warn);
+  border-radius:0 8px 8px 0;padding:8px 11px;margin-bottom:12px;font-weight:600}
+.tecBloque+.tecBloque{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px}
+.tecTit{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin-bottom:7px}
+.tecTit .hint{font-weight:500;letter-spacing:0;text-transform:none;font-size:11px}
+.tecRejilla{display:flex;flex-wrap:wrap;gap:10px}
+.tecCampo{display:flex;flex-direction:column;flex:0 1 184px;min-width:140px}
+.tecCampo span{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.tecCampo input{text-align:right}
+#t_tecnicas{min-width:0;display:block}
+
 
 /* ---- el diagnóstico ----
    Una pregunta a la vez. Las opciones entran escalonadas: no es adorno,
@@ -1591,12 +1610,12 @@ body.rol-produccion #btnPrint{display:none!important}
   <div class="card">
     <header><h2>Técnicas de decorado</h2><button class="btn sm ghost" data-add="tecnicas" style="margin-left:auto">+ Técnica</button></header>
     <div class="body">
-      <p class="note" style="margin:0 0 12px"><b>Mano de obra</b> es lo que te cuesta prensar, acomodar y revisar <i>una</i> aplicación. Cuando la técnica tiene un material amarrado en la tabla de arriba, es lo único que cobra aquí: el material lo calcula el armado con lo que de verdad se gasta del rollo. Las columnas de <b>cm²</b> quedan de respaldo y sólo se usan si la técnica no tiene material. Cada técnica cobra de una de tres formas: <b>por área</b> (cm², típico de DTF y sublimación), <b>por tinta</b> (serigrafía) o <b>por puntada</b> (bordado). Las columnas de <b>costo</b> son lo que te cuesta producir; las de <b>precio</b> son lo que le cobras al cliente. El <b>mínimo</b> es el piso por aplicación y el <b>setup</b> se cobra una sola vez por pedido.</p>
+      <p class="note" style="margin:0 0 12px">Cada técnica enseña nada más lo suyo. La <b>mano de obra</b> es lo que te cuesta prensar, acomodar y revisar <i>una</i> aplicación, y aplica siempre. Si la técnica tiene un <b>material amarrado</b> arriba, el material lo calcula el armado con lo que de verdad se gasta del rollo y aquí ya no aparece el cobro por cm². Si no lo tiene, el cm² sigue de respaldo. Serigrafía cobra por tinta y bordado por puntada, que es como de verdad se miden. El <b>setup</b> se cobra una sola vez por pedido.</p>
       <div class="pricebar">
         <button class="btn" id="btnLlenarPrecios">Llenar precios públicos con mi utilidad</button>
         <span style="font-size:12px;color:var(--ink-3);align-self:center">Toma cada costo, le aplica tu utilidad y lo escribe en la columna de precio.</span>
       </div>
-      <div class="tbl-wrap"><table id="t_tecnicas"></table></div>
+      <div id="t_tecnicas"></div>
     </div>
   </div>
   <div class="card">
@@ -3559,6 +3578,7 @@ const COLS = {
   extras:[["nombre","Concepto","text"],["tipo","Tipo","tipo"],["monto","Monto","num"]]
 };
 function renderTabla(key){
+  if(key==="tecnicas") return renderTecnicas();
   const cols = COLS[key], rows = cat[key];
   let h = "<thead><tr>"+cols.map(c=>'<th>'+c[1]+'</th>').join("")+"<th></th></tr></thead><tbody>";
   h += rows.map(r=>'<tr data-key="'+key+'" data-id="'+r.id+'">'+cols.map(c=>{
@@ -3575,6 +3595,76 @@ function renderTabla(key){
   h += "</tbody>";
   $("#t_"+key).innerHTML = h;
 }
+
+/* ---------- las técnicas, una ficha cada una ---------- */
+function renderTecnicas(){
+  const w = $("#t_tecnicas"); if(!w) return;
+  normalizaCat();
+  const lista = cat.tecnicas || [];
+  if(!lista.length){
+    w.innerHTML = '<div class="empty">Sin técnicas. Presiona <b>+ Técnica</b>.</div>';
+    return;
+  }
+  w.innerHTML = lista.map(t=>{
+    const mat = svcParaTecnica(t.id);
+    const porRollo = t.modo==="area" && !!mat;
+    const faltaMO  = P.cobroPorArmado && porRollo && !num(t.costoMO);
+    const campo = (clave, etiqueta, paso) =>
+      '<label class="tecCampo"><span>'+etiqueta+'</span>'+
+      '<input type="number" step="'+(paso||"0.5")+'" data-f="'+clave+'" value="'+(t[clave]==null?"":t[clave])+'"></label>';
+
+    let propios = "";
+    if(t.modo==="area" && !porRollo){
+      propios = '<div class="tecBloque"><div class="tecTit">Se cobra por centímetro cuadrado'+
+        '<span class="hint"> — esta técnica no tiene material amarrado</span></div>'+
+        '<div class="tecRejilla">'+
+          campo("costoCm2","Costo / cm²","0.001")+campo("precioCm2","Precio / cm²","0.001")+
+          campo("minimo","Costo mínimo")+campo("precioMin","Precio mínimo")+
+        '</div></div>';
+    } else if(t.modo==="tintas"){
+      propios = '<div class="tecBloque"><div class="tecTit">Se cobra por tinta</div>'+
+        '<div class="tecRejilla">'+
+          campo("costoTinta","Costo / tinta")+campo("precioTinta","Precio / tinta")+
+          campo("minimo","Costo mínimo")+campo("precioMin","Precio mínimo")+
+        '</div></div>';
+    } else if(t.modo==="puntadas"){
+      propios = '<div class="tecBloque"><div class="tecTit">Se cobra por puntada</div>'+
+        '<div class="tecRejilla">'+
+          campo("costoPuntada","Costo / puntada","0.0001")+campo("precioPuntada","Precio / puntada","0.0001")+
+          campo("minimo","Costo mínimo")+campo("precioMin","Precio mínimo")+
+        '</div></div>';
+    }
+
+    return '<div class="tecCard" data-key="tecnicas" data-id="'+t.id+'">'+
+      '<div class="tecTop">'+
+        '<input class="tecNombre" data-f="nombre" value="'+esc(t.nombre||"")+'" aria-label="Nombre de la técnica">'+
+        '<select data-f="modo" aria-label="Cómo se cobra">'+
+          '<option value="area"'+(t.modo==="area"?" selected":"")+'>Por área</option>'+
+          '<option value="tintas"'+(t.modo==="tintas"?" selected":"")+'>Por tinta</option>'+
+          '<option value="puntadas"'+(t.modo==="puntadas"?" selected":"")+'>Por puntada</option>'+
+        '</select>'+
+        '<button class="btn icon sm" data-delrow="1" title="Quitar">✕</button>'+
+      '</div>'+
+      (porRollo
+        ? '<div class="tecMat"><span class="pill good">material desde el armado</span>'+
+          '<span>'+esc(mat.nombre)+' · '+mx(num(mat.precio))+'/'+abrevUnidad(mat.unidad)+
+          '</span><small>El material lo calcula el armado con lo que de verdad se gasta del rollo. Aquí sólo va tu tiempo.</small></div>'
+        : (t.modo==="area"
+            ? '<div class="tecMat"><span class="pill pend">sin material</span>'+
+              '<small>Amárrale un rollo en <b>Servicios y material por medida</b> y deja de cobrar por cm².</small></div>'
+            : ''))+
+      (faltaMO ? '<div class="tecAviso">Falta capturar la mano de obra. Mientras tanto se usa la general de Ajustes ('+mx(num(P.manoObra))+').</div>' : '')+
+      '<div class="tecBloque"><div class="tecTit">Mano de obra'+
+        '<span class="hint"> — por cada aplicación, en cada pieza</span></div>'+
+        '<div class="tecRejilla">'+campo("costoMO","Costo")+campo("precioMO","Precio")+'</div></div>'+
+      propios+
+      '<div class="tecBloque"><div class="tecTit">Preparación'+
+        '<span class="hint"> — una sola vez por pedido</span></div>'+
+        '<div class="tecRejilla">'+campo("setup","Costo de setup")+campo("precioSetup","Precio de setup")+'</div></div>'+
+    '</div>';
+  }).join("");
+}
+
 function renderCatalogo(){
   normalizaCat();
   // La primera vez que una cuenta vieja ve los servicios, se le guardan.
@@ -3841,6 +3931,7 @@ $("#btnLlenarPrecios").addEventListener("click", ()=>{
     t.precioCm2     = sube(num(t.costoCm2));
     t.precioTinta   = sube(num(t.costoTinta));
     t.precioPuntada = sube(num(t.costoPuntada));
+    t.precioMO      = Math.round(sube(num(t.costoMO) || num(P.manoObra))*100)/100;
     t.precioMin     = Math.round(sube(num(t.minimo) + num(P.manoObra))*100)/100;
     t.precioSetup   = Math.round(sube(num(t.setup))*100)/100;
   });
@@ -4380,7 +4471,7 @@ $("#tab-cot").addEventListener("change", e=>{
 
 /* catálogo */
 $("#tab-cat").addEventListener("input", e=>{
-  const tr = e.target.closest("tr[data-id]"); if(!tr) return;
+  const tr = e.target.closest("[data-id]"); if(!tr) return;
   const arr = cat[tr.dataset.key], obj = arr.find(o=>o.id===tr.dataset.id); if(!obj) return;
   const f = e.target.dataset.f; if(!f) return;
   obj[f] = e.target.type==="checkbox" ? e.target.checked : (e.target.type==="number") ? num(e.target.value) : e.target.value;
@@ -4388,17 +4479,17 @@ $("#tab-cat").addEventListener("input", e=>{
 });
 let _prevCosto = null;
 $("#tab-cat").addEventListener("focusin", e=>{
-  const tr = e.target.closest("tr[data-id]");
+  const tr = e.target.closest("[data-id]");
   if(tr && tr.dataset.key==="articulos" && e.target.dataset.f==="costo") _prevCosto = num(e.target.value);
 });
 $("#tab-cat").addEventListener("change", e=>{
-  const tr0 = e.target.closest("tr[data-id]");
+  const tr0 = e.target.closest("[data-id]");
   if(tr0 && tr0.dataset.key==="articulos" && e.target.dataset.f==="costo" && _prevCosto!==null){
     const a = cat.articulos.find(a=>a.id===tr0.dataset.id);
     if(a) logPrecio(a.nombre, _prevCosto, num(e.target.value));
     _prevCosto = null; persist();
   }
-  const tr = e.target.closest("tr[data-id]");
+  const tr = e.target.closest("[data-id]");
   if(tr && e.target.type==="checkbox"){ const o = cat[tr.dataset.key].find(o=>o.id===tr.dataset.id); if(o){ o[e.target.dataset.f]=e.target.checked; persist(); renderResumen(); } }
   if(tr && e.target.tagName==="SELECT"){ const obj = cat[tr.dataset.key].find(o=>o.id===tr.dataset.id); if(obj){ obj[e.target.dataset.f]=e.target.value; persist(); renderTabla(tr.dataset.key); } }
 });
@@ -4413,7 +4504,7 @@ $("#tab-cat").addEventListener("click", e=>{
       extras:{nombre:"Nuevo cargo",tipo:"unico",monto:0}}[k];
     cat[k].push(Object.assign({id:uid()},blank)); persist(); renderTabla(k); return; }
   const del = e.target.closest("[data-delrow]");
-  if(del){ const tr = del.closest("tr"); cat[tr.dataset.key] = cat[tr.dataset.key].filter(o=>o.id!==tr.dataset.id); persist(); renderTabla(tr.dataset.key); renderResumen(); }
+  if(del){ const tr = del.closest("[data-id]"); cat[tr.dataset.key] = cat[tr.dataset.key].filter(o=>o.id!==tr.dataset.id); persist(); renderTabla(tr.dataset.key); renderResumen(); }
 });
 
 /* ajustes */
@@ -8396,10 +8487,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261003-1028";</script>
+<script>window.BUILD="20261003-1105";</script>
 <script>
 (function(){
-  var mio = "20261003-1028";
+  var mio = "20261003-1105";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -8422,7 +8513,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261003-1028"></script>
-<script src="diagnostico.js?v=20261003-1028"></script>
+<script src="cuenta.js?v=20261003-1105"></script>
+<script src="diagnostico.js?v=20261003-1105"></script>
 </body>
 </html>
