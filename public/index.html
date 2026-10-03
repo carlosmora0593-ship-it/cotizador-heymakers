@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261003-0937"></script>
+<script src="config.js?v=20261003-1028"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1007,6 +1007,41 @@ nav.tabs .barraGrupo{padding:12px 11px 4px}
 .pill.part{background:var(--cyan);color:#fff}
 }
 
+/* ---- los campos de un renglón se alinean aunque la etiqueta ocupe dos líneas ---- */
+@media screen{
+  .grid > div{display:flex;flex-direction:column;min-width:0}
+  .grid > div > *:last-child{margin-top:auto}
+  .grid > div > label.f{margin-top:0}
+  label.f{min-height:14px}
+  /* un select y un input deben medir lo mismo, o el renglón se ve chueco */
+  input:not([type=checkbox]):not([type=color]):not([type=file]),select{height:38px}
+  textarea{min-height:0}
+}
+.cxcTotales{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.cxcBarra{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.cxcFila{display:grid;grid-template-columns:minmax(0,1.6fr) auto minmax(120px,auto) auto;gap:14px;align-items:center;
+  border:1px solid var(--vidrio-borde);border-radius:var(--radio-sm,12px);background:var(--vidrio-fondo-2);
+  padding:12px 14px}
+.cxcFila+.cxcFila{margin-top:8px}
+.cxcQuien{min-width:0}
+.cxcQuien b{display:block;font-size:14px}
+.cxcQuien small{display:block;color:var(--ink-3);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cxcEdad{text-align:center;display:grid;gap:3px;justify-items:center}
+.cxcEdad small{color:var(--ink-3);font-size:10.5px}
+.cxcPlata{text-align:right;min-width:120px}
+.cxcSaldo{font-size:17px;font-weight:700}
+.cxcDe{font-size:11px;color:var(--ink-3)}
+.cxcAvance{height:5px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:5px;
+  border:1px solid var(--line-soft)}
+.cxcAvance span{display:block;height:100%;background:var(--good)}
+.cxcAcc{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.cxcAtajos{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+@media (max-width:820px){
+  .cxcFila{grid-template-columns:minmax(0,1fr) auto}
+  .cxcPlata{grid-column:1/-1;text-align:left}
+  .cxcAcc{grid-column:1/-1;justify-content:flex-start}
+}
+
 
 /* ---- el diagnóstico ----
    Una pregunta a la vez. Las opciones entran escalonadas: no es adorno,
@@ -1432,11 +1467,11 @@ body.rol-produccion #btnPrint{display:none!important}
           </div>
           <div class="grid g4" style="margin-top:12px">
             <div data-solo="articulo">
-              <label class="f" for="c_costoArt">Costo de producción ($)</label>
+              <label class="f" for="c_costoArt">Costo de producción</label>
               <input id="c_costoArt" type="number" min="0" step="0.5">
             </div>
             <div data-solo="articulo">
-              <label class="f" for="c_precioArt">Precio público ($)</label>
+              <label class="f" for="c_precioArt">Precio público</label>
               <div style="display:flex;gap:6px"><input id="c_precioArt" type="number" min="0" step="0.5"><button class="btn sm" id="btnSavePrice" title="Guardar costo y precio en el catálogo">Guardar</button></div>
             </div>
             <div data-solo="servicio" hidden><label class="f" for="c_svcAncho">Ancho de la pieza (cm)</label><input id="c_svcAncho" type="number" min="0" step="0.5"></div>
@@ -1788,6 +1823,23 @@ body.rol-produccion #btnPrint{display:none!important}
       </div>
     </div>
   </div>
+  <div class="card" id="cardCxc">
+    <header><h2>Cuentas por cobrar</h2>
+      <span class="hint" id="cxcResumen" style="margin-left:auto"></span>
+    </header>
+    <div class="body">
+      <div class="cxcTotales" id="cxcTotales"></div>
+      <div class="cxcBarra">
+        <input id="cxcBusca" placeholder="Buscar por cliente, folio o referencia" style="flex:1;min-width:180px">
+        <div class="seg" id="cxcSeg">
+          <button data-edad="" aria-pressed="true">Todo</button>
+          <button data-edad="corriente" aria-pressed="false">Al corriente</button>
+          <button data-edad="vencido" aria-pressed="false">Vencido</button>
+        </div>
+      </div>
+      <div id="cxcLista"></div>
+    </div>
+  </div>
   <div class="card">
     <header><h2>Análisis</h2><span class="hint">sobre todo lo registrado, no solo el periodo</span></header>
     <div class="body">
@@ -1849,6 +1901,7 @@ body.rol-produccion #btnPrint{display:none!important}
         <div><label class="f" for="p_iva">IVA (%)</label><input id="p_iva" type="number" min="0" step="1"></div>
         <div><label class="f">&nbsp;</label><label class="sw"><input type="checkbox" id="p_ivaOn"> Cotizar con IVA</label></div>
         <div><label class="f" for="p_redondeo">Redondear precio unitario a</label><select id="p_redondeo"><option value="0">Sin redondeo</option><option value="0.5">$0.50</option><option value="1">$1</option><option value="5">$5</option></select></div>
+        <div><label class="f" for="p_plazoCobro">Plazo de cobro (días)</label><input id="p_plazoCobro" type="number" min="0" step="1"></div>
         <div><label class="f" for="p_vigencia">Vigencia (días)</label><input id="p_vigencia" type="number" min="1" step="1"></div>
       </div>
       <div class="grid g4" style="margin-top:12px">
@@ -2293,6 +2346,26 @@ body.rol-produccion #btnPrint{display:none!important}
   </div>
 </div>
 
+<div class="modal" id="modalAbono" hidden>
+  <div class="card">
+    <header><h2>Registrar un abono</h2></header>
+    <div class="body">
+      <div id="abonoQuien" class="note" style="margin-bottom:14px"></div>
+      <div class="grid g3">
+        <div><label class="f" for="ab_monto">Cuánto recibes</label><input id="ab_monto" type="number" min="0" step="0.5"></div>
+        <div><label class="f" for="ab_fecha">Fecha</label><input id="ab_fecha" type="date"></div>
+        <div><label class="f" for="ab_pago">Forma de pago</label><select id="ab_pago">
+          <option>Efectivo</option><option>Transferencia</option><option>Tarjeta</option><option>Depósito</option><option>Otro</option></select></div>
+      </div>
+      <div class="cxcAtajos" id="abonoAtajos"></div>
+      <p class="note" id="abonoQueda" style="margin:14px 0 0"></p>
+      <div class="row-actions" style="margin-top:16px">
+        <button class="btn primary" id="ab_ok">Registrar abono</button>
+        <button class="btn ghost" id="ab_cancel">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal" id="modalCobro" hidden>
   <div class="card">
     <header><h2>Registrar venta</h2></header>
@@ -2496,7 +2569,7 @@ function defaults(){ return {
  ], compras:[]
 };}
 const CHECKS = ["Diseño aprobado por el cliente","Material en almacén","Archivo impreso","Prensado / aplicado","Revisión de calidad","Empacado","Entregado"];
-function defaultParams(){ return {cobroPorArmado:false,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
+function defaultParams(){ return {cobroPorArmado:false,plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
   compras:{tope:2000, siempre:false},
   empresa:{nombre:"Hey Makers",eslogan:"Cursos y Talleres",tel:"",mail:"",logo:"",
   /* Lo fiscal va aparte de lo comercial a propósito: el nombre comercial es
@@ -2977,6 +3050,7 @@ function cuerpoArmado(row, A){
   if(A.peso>0) R.push(["Peso final", red2(A.peso)+" Kg"]);
   const dv = descVolActual();
   if(dv>0) R.push(["Con descuento −"+dv+"%", "<b>"+mx(netoArmado(A))+"</b>"]);
+  if(A.precio < A.costo - 0.005) R.push(["Ojo", '<span class="pill warn">se vende bajo el costo</span>']);
 
   const sobra = Math.max(0, A.caben - A.n);
   const tip = sobra>0
@@ -3242,6 +3316,7 @@ function calc(){
     d.materialCostoPieza = qty>0 ? d.materialCosto/qty : 0;
     d.costoConMaterial  = d.costo  + d.materialCostoPieza;
     d.precioConMaterial = d.precio + d.materialPieza;
+    d.pierde = d.precioConMaterial < d.costoConMaterial - 0.005;
   });
   let subtotal = subtotalPiezas + setupVenta + extrasUnicos + armadoVenta;
   let descExtra = 0;
@@ -3304,7 +3379,8 @@ function renderApps(){
     const modo = t? t.modo : "area";
     return '<div class="app-row" data-app="'+a.id+'">'+
       '<div class="app-head"><span class="tag">Ubicación '+(i+1)+'</span>'+
-        (tieneMaterial(a.tecnicaId) ? '<label class="sw swMini" title="Calcular el material de esta aplicación en el armado">'+
+        (d && d.pierde ? '<span class="pill warn" title="Esta ubicación se está vendiendo por debajo de lo que cuesta. Sube la mano de obra en Ajustes → Cómo se cobra la impresión.">precio bajo el costo</span>' : '')+
+        ((P.cobroPorArmado && tieneMaterial(a.tecnicaId)) ? '<label class="sw swMini" title="Calcular el material de esta aplicación en el armado">'+
             '<input type="checkbox" data-armapp="'+a.id+'"'+(a.sinArmado?"":" checked")+'> Material en el armado</label>' : '')+
         '<span class="cost">'+(d? "costo "+mx(d.costoConMaterial!=null? d.costoConMaterial : d.costo)+
             " · precio "+mx(d.precioConMaterial!=null? d.precioConMaterial : d.precio)+(d.min?" · mínimo":"") : "")+'</span>'+
@@ -3560,8 +3636,12 @@ function tecnicasConMaterial(){
   return (cat.tecnicas||[]).filter(t=>t.modo==="area" && tieneMaterial(t.id));
 }
 function sugiereMO(t){
-  const costo  = num(t.costoMO)  || num(t.minimo)   || num(P.manoObra);
-  const precio = num(t.precioMO) || num(t.precioMin) || 0;
+  const costo = num(t.costoMO) || num(t.minimo) || num(P.manoObra);
+  const mk = num(P.margen)/100;
+  const conUtilidad = P.modo==="margen" ? (mk>=0.95 ? costo*20 : costo/(1-mk)) : costo*(1+mk);
+  // El precio nunca puede quedar por debajo del costo: si tu precio mínimo
+  // venía más bajo, se usa el costo con tu utilidad.
+  const precio = Math.max(num(t.precioMO) || num(t.precioMin) || 0, conUtilidad);
   return {costo:Math.round(costo*100)/100, precio:Math.round(precio*100)/100};
 }
 const MO_CASOS = [
@@ -3644,10 +3724,13 @@ function renderMOComparativo(){
       const r = comparaMO(t, c, cap[t.id] || sugiereMO(t));
       const dif = r.hoy>0 ? (r.nuevo-r.hoy)/r.hoy*100 : 0;
       const col = Math.abs(dif)<10 ? "" : (dif<0 ? "moBaja" : "moSube");
+      const mkk = num(P.margen)/100;
+      const costoAprox = (P.modo==="margen" ? r.obra*(1-mkk) : r.obra/(1+mkk)) + r.material;
+      const mal = r.nuevo < costoAprox - 0.005;
       return '<tr>'+(i===0? '<td rowspan="'+MO_CASOS.length+'"><b>'+esc(t.nombre)+'</b></td>' : '')+
         '<td>'+esc(c.nom)+'</td><td class="n">'+mx(r.hoy)+'</td>'+
         '<td class="n">'+mx(r.obra)+'</td><td class="n">'+mx(r.material)+'</td>'+
-        '<td class="n"><b>'+mx(r.nuevo)+'</b></td>'+
+        '<td class="n"><b>'+mx(r.nuevo)+'</b>'+(mal? ' <span class="pill warn">bajo el costo</span>' : '')+'</td>'+
         '<td class="n '+col+'">'+(dif>0?"+":"")+dif.toFixed(0)+'%</td></tr>';
     }).join("")).join("")+'</tbody></table></div>';
 }
@@ -3692,6 +3775,64 @@ $("#moQuitar").addEventListener("click", ()=>{
   toast("Volvimos al cobro por centímetro cuadrado");
 });
 
+
+/* ---------- eventos de cobranza ---------- */
+$("#tab-ven").addEventListener("input", e=>{
+  if(e.target.id==="cxcBusca"){ cxcFiltro = e.target.value; renderCobranza(); }
+});
+$("#tab-ven").addEventListener("click", e=>{
+  const f = e.target.closest("#cxcSeg button");
+  if(f){ cxcEdad = f.dataset.edad || ""; renderCobranza(); return; }
+  const ab = e.target.closest("[data-abono]");
+  if(ab){ abreAbono(ab.dataset.abono); return; }
+  const rc = e.target.closest("[data-recordar]");
+  if(rc){ recuerdaCobro(rc.dataset.recordar); return; }
+  const vc = e.target.closest("[data-vercot]");
+  if(vc){
+    const g = guardadas.find(g=>g.folio===vc.dataset.vercot);
+    if(g){ cot = JSON.parse(JSON.stringify(g)); renderCot();
+           const b = document.querySelector('#tabs [data-tab="cot"]'); if(b) b.click(); }
+    return;
+  }
+});
+$("#modalAbono").addEventListener("input", e=>{ if(e.target.id==="ab_monto") pintaAbonoQueda(); });
+$("#modalAbono").addEventListener("click", e=>{
+  const p = e.target.closest("[data-abparte]");
+  if(p){
+    const v = ventas.find(v=>v.folio===abonando); if(!v) return;
+    $("#ab_monto").value = Math.round(saldoDe(v)*num(p.dataset.abparte)*100)/100;
+    pintaAbonoQueda();
+  }
+});
+$("#ab_cancel").addEventListener("click", ()=>{ $("#modalAbono").hidden = true; abonando = null; });
+$("#ab_ok").addEventListener("click", async ()=>{
+  const v = ventas.find(v=>v.folio===abonando); if(!v) return;
+  const monto = Math.min(num($("#ab_monto").value), saldoDe(v));
+  if(monto <= 0){ toast("Escribe cuánto recibes"); return; }
+  const fecha = $("#ab_fecha").value || hoyISO();
+  const forma = $("#ab_pago").value;
+  v.recibido = Math.round((num(v.recibido) + monto)*100)/100;
+  v.estado = saldoDe(v) <= 0 ? "pagado" : "anticipo";
+  v.abonos = (v.abonos||[]).concat([{fecha, monto, pago:forma}]);
+  if(DB){ try{ await DB.collection("ventas").doc(v.folio).set({venta:v, fecha:v.fecha, total:v.total}); }
+          catch(e){ toast("No se pudo guardar el abono en la nube"); } }
+  else lsSet("ventas", ventas);
+  // si entró en efectivo y la caja de ese día está abierta, se registra sola
+  if(forma === "Efectivo"){
+    const c = cajaDe(fecha);
+    if(c.abierta){
+      c.movs.push({id:uid(), hora:horaAhora(), tipo:"venta",
+                   concepto:"Abono de "+(v.cliente||"cliente"), folio:v.folio, monto:monto});
+      await guardaCaja(c);
+      if(!$("#tab-caj").hidden) renderCaja();
+    }
+  }
+  $("#modalAbono").hidden = true; abonando = null;
+  renderCobranza(); renderVentas();
+  toast(saldoDe(v) <= 0 ? "Saldada: "+(v.cliente||"el cliente")+" ya no debe nada"
+                        : "Abono de "+mx(monto)+" · quedan "+mx(saldoDe(v)));
+});
+
 $("#clearHist").addEventListener("click", ()=>{ cat.historial=[]; persist(); renderHist(); toast("Historial vaciado"); });
 $("#btnLlenarPrecios").addEventListener("click", ()=>{
   const mk = num(P.margen)/100;
@@ -3734,7 +3875,7 @@ function renderSet(){
   const bv = $("#barraVer");
   if(bv) bv.textContent = (P.empresa && P.empresa.nombre ? P.empresa.nombre : "Hey Makers");
   $("#p_margen").value=P.margen; $("#p_modo").value=P.modo; $("#p_merma").value=P.merma; $("#p_mo").value=P.manoObra;
-  $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia;
+  $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia; $("#p_plazoCobro").value=num(P.plazoCobro,15);
   P.compras = P.compras || {tope:2000, siempre:false};
   $("#p_compraTope").value = num(P.compras.tope); $("#p_compraSiempre").checked = !!P.compras.siempre;
   $("#p_origen").value = P.origen==="lista" ? "lista" : "utilidad";
@@ -3992,7 +4133,7 @@ $("#tabs").addEventListener("click", e=>{
   if(b.dataset.tab==="dis") renderDiseno();
   if(b.dataset.tab==="caj"){ renderCaja(); renderCortes(); }
   if(b.dataset.tab==="sav") renderSaved();
-  if(b.dataset.tab==="ven") renderVentas();
+  if(b.dataset.tab==="ven"){ renderVentas(); renderCobranza(); }
   if(b.dataset.tab==="set") renderSet();
 });
 
@@ -4278,7 +4419,7 @@ $("#tab-cat").addEventListener("click", e=>{
 /* ajustes */
 $("#tab-set").addEventListener("input", e=>{
   const t=e.target;
-  const map={p_margen:"margen",p_merma:"merma",p_mo:"manoObra",p_iva:"iva",p_vigencia:"vigencia"};
+  const map={p_margen:"margen",p_merma:"merma",p_mo:"manoObra",p_iva:"iva",p_vigencia:"vigencia",p_plazoCobro:"plazoCobro"};
   if(map[t.id]) P[map[t.id]] = num(t.value);
   if(t.id==="e_nombre"){ P.empresa.nombre=t.value; }
   if(t.id==="e_slogan"){ P.empresa.eslogan=t.value; const s=$("#brandSlogan"); if(s) s.textContent=t.value; }
@@ -6446,10 +6587,151 @@ $("#cb_ok").addEventListener("click", async ()=>{
     }
   }
   $("#modalCobro").hidden = true; cobrando = null;
+  if(typeof renderCobranza === "function") renderCobranza();
   toast("Venta registrada: "+mx(venta.total) + (venta.factura && venta.factura.requiere ? " · queda por facturar" : ""));
   renderVentas();
 });
 $("#btnCobrar").addEventListener("click", ()=> abrirCobro(cot));
+
+
+/* ---------- cuentas por cobrar ---------- */
+let cxcFiltro = "", cxcEdad = "", abonando = null;
+
+function saldoDe(v){ return Math.max(0, Math.round((num(v.total) - num(v.recibido))*100)/100); }
+function diasDe(fecha){
+  const d = dmy(fecha); if(isNaN(d)) return 0;
+  return Math.max(0, Math.round((Date.now() - d.getTime())/86400000));
+}
+/* El plazo del taller: lo que pasa de ahí ya es cobranza, no espera. */
+function plazoCxc(){ return Math.max(0, num(P.plazoCobro, 15)); }
+function edadDe(v){
+  const d = diasDe(v.fecha), p = plazoCxc();
+  if(d <= p)      return {clave:"corriente", texto:"al corriente", pill:"part"};
+  if(d <= p + 15) return {clave:"vencido",   texto:"vencido",      pill:"pend"};
+  if(d <= p + 45) return {clave:"vencido",   texto:"vencido +15",  pill:"pend"};
+  return {clave:"vencido", texto:"vencido +45", pill:"warn"};
+}
+function porCobrar(){
+  return ventas.filter(v=>saldoDe(v) > 0)
+    .slice().sort((a,b)=> (a.fecha<b.fecha?-1:a.fecha>b.fecha?1:0));
+}
+function cxcVisibles(){
+  const t = (cxcFiltro||"").toLowerCase().trim();
+  return porCobrar().filter(v=>{
+    if(cxcEdad && edadDe(v).clave !== cxcEdad) return false;
+    if(!t) return true;
+    return ((v.cliente||"")+" "+(v.folio||"")+" "+(v.ref||"")+" "+(v.articulo||"")).toLowerCase().indexOf(t) >= 0;
+  });
+}
+
+function renderCobranza(){
+  const caja = $("#cxcLista"); if(!caja) return;
+  const todo = porCobrar();
+  const total = todo.reduce((s,v)=>s+saldoDe(v), 0);
+  const clientes_ = new Set(todo.map(v=>(v.cliente||"sin cliente").toLowerCase())).size;
+  const vencido = todo.filter(v=>edadDe(v).clave==="vencido");
+  const sumaVenc = vencido.reduce((s,v)=>s+saldoDe(v), 0);
+  const viejo = todo.length ? Math.max.apply(null, todo.map(v=>diasDe(v.fecha))) : 0;
+
+  const chip = $("#cxcResumen");
+  if(chip) chip.textContent = todo.length
+    ? todo.length+" saldo(s) · "+mx(total)
+    : "nadie te debe nada";
+
+  $("#cxcTotales").innerHTML =
+    kpi("Por cobrar", mx(total), true) +
+    kpi("Vencido", mx(sumaVenc)) +
+    kpi("Clientes con saldo", String(clientes_)) +
+    kpi("El más viejo", viejo+" día(s)");
+
+  [...$("#cxcSeg").children].forEach(b=> b.setAttribute("aria-pressed", (b.dataset.edad||"")===cxcEdad));
+
+  const lista = cxcVisibles();
+  if(!lista.length){
+    caja.innerHTML = '<div class="empty">'+(todo.length
+      ? 'Ningún saldo coincide con lo que buscas.'
+      : 'No hay saldos pendientes. Cuando registres una venta como <b>anticipo</b> o <b>pendiente</b>, aparece aquí.')+'</div>';
+    return;
+  }
+  caja.innerHTML = lista.map(v=>{
+    const s = saldoDe(v), d = diasDe(v.fecha), e = edadDe(v);
+    const pagado = num(v.total)>0 ? Math.min(100, num(v.recibido)/num(v.total)*100) : 0;
+    const hayCot = guardadas.some(g=>g.folio===v.folio);
+    return '<div class="cxcFila" data-cxc="'+esc(v.folio)+'">'+
+      '<div class="cxcQuien"><b>'+esc(v.cliente||"Sin cliente")+'</b>'+
+        '<small>'+esc(v.folio)+' · '+esc(v.fecha)+' · '+esc(v.ref||v.articulo||"")+'</small></div>'+
+      '<div class="cxcEdad"><span class="pill '+e.pill+'">'+e.texto+'</span><small>'+d+' día(s)</small></div>'+
+      '<div class="cxcPlata">'+
+        '<div class="cxcSaldo num">'+mx(s)+'</div>'+
+        '<div class="cxcDe num">de '+mx(num(v.total))+'</div>'+
+        '<div class="cxcAvance"><span style="width:'+pagado.toFixed(0)+'%"></span></div>'+
+      '</div>'+
+      '<div class="cxcAcc">'+
+        '<button class="btn sm primary" data-abono="'+esc(v.folio)+'">Registrar abono</button>'+
+        '<button class="btn sm" data-recordar="'+esc(v.folio)+'">Recordar</button>'+
+        (hayCot? '<button class="btn sm ghost" data-vercot="'+esc(v.folio)+'">Abrir</button>' : '')+
+      '</div>'+
+    '</div>';
+  }).join("");
+}
+
+/* ---------- el abono ---------- */
+function abreAbono(folio){
+  const v = ventas.find(v=>v.folio===folio); if(!v) return;
+  abonando = folio;
+  const s = saldoDe(v);
+  $("#abonoQuien").innerHTML = '<b>'+esc(v.cliente||"Sin cliente")+'</b> · '+esc(v.folio)+
+    '<br>Total '+mx(num(v.total))+' · ya pagó '+mx(num(v.recibido))+' · <b>debe '+mx(s)+'</b>';
+  $("#ab_monto").value = s;
+  $("#ab_fecha").value = hoyISO();
+  $("#ab_pago").value = v.pago || "Efectivo";
+  $("#abonoAtajos").innerHTML =
+    '<button class="btn sm ghost" data-abparte="1">Todo ('+mx(s)+')</button>'+
+    '<button class="btn sm ghost" data-abparte="0.5">La mitad ('+mx(Math.round(s*50)/100)+')</button>';
+  pintaAbonoQueda();
+  $("#modalAbono").hidden = false;
+}
+function pintaAbonoQueda(){
+  const v = ventas.find(v=>v.folio===abonando); if(!v) return;
+  const m = num($("#ab_monto").value);
+  const queda = Math.max(0, Math.round((saldoDe(v) - m)*100)/100);
+  $("#abonoQueda").innerHTML = queda > 0
+    ? 'Después de este abono le quedan debiendo <b>'+mx(queda)+'</b>.'
+    : '<b>Queda saldada.</b> La venta pasa a pagada.';
+}
+
+/* El texto del recordatorio: cortés y con el dato que importa. */
+function textoCobro(v){
+  const s = saldoDe(v), d = diasDe(v.fecha);
+  return "Hola"+(v.cliente? " "+v.cliente : "")+", le escribo de "+(P.empresa.nombre||"el taller")+".\n\n"+
+    "Le recuerdo el saldo de su pedido "+v.folio+" del "+v.fecha+
+    (v.ref? " ("+v.ref+")" : "")+":\n"+
+    "· Total: "+mx(num(v.total))+"\n"+
+    "· Pagado: "+mx(num(v.recibido))+"\n"+
+    "· Pendiente: "+mx(s)+"\n\n"+
+    (d > plazoCxc() ? "Ya pasaron "+d+" días desde la entrega. " : "")+
+    "¿Nos ayuda con el pago? Quedo al pendiente. Gracias.";
+}
+function recuerdaCobro(folio){
+  const v = ventas.find(v=>v.folio===folio); if(!v) return;
+  const cli = clientes.find(c=>c.id===v.clienteId);
+  const g   = guardadas.find(g=>g.folio===folio) || {};
+  const texto = textoCobro(v);
+  const tel  = telWhats(cli ? cli.tel : (g.contacto||""));
+  const mail = (cli && cli.mail) || ((g.contacto||"").indexOf("@")>=0 ? g.contacto : "");
+  $("#avisoTexto").value = texto;
+  $("#avisoDatos").innerHTML =
+    '<b>'+esc(v.folio)+'</b> · '+esc(v.cliente||"sin cliente")+' · debe <b>'+mx(saldoDe(v))+'</b><br>'+
+    (tel ? 'WhatsApp: '+esc(cli? cli.tel : g.contacto) : '<span style="color:var(--warn)">Sin teléfono en la ficha del cliente</span>')+' · '+
+    (mail ? 'Correo: '+esc(mail) : '<span style="color:var(--warn)">sin correo</span>');
+  const wa = tel ? "https://wa.me/"+tel+"?text="+encodeURIComponent(texto) : "";
+  const mt = mail ? "mailto:"+encodeURIComponent(mail)+"?subject="+
+    encodeURIComponent("Saldo de su pedido "+v.folio)+"&body="+encodeURIComponent(texto) : "";
+  $("#avisoWA").disabled = !wa; $("#avisoMail").disabled = !mt;
+  $("#avisoWA").dataset.url = wa; $("#avisoMail").dataset.url = mt;
+  $("#avisoFolio").value = folio;
+  $("#modalAviso").hidden = false;
+}
 
 /* ---------- registro de ventas ---------- */
 let venPer = "dia", venRef = hoyISO();
@@ -8114,10 +8396,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261003-0937";</script>
+<script>window.BUILD="20261003-1028";</script>
 <script>
 (function(){
-  var mio = "20261003-0937";
+  var mio = "20261003-1028";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -8140,7 +8422,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261003-0937"></script>
-<script src="diagnostico.js?v=20261003-0937"></script>
+<script src="cuenta.js?v=20261003-1028"></script>
+<script src="diagnostico.js?v=20261003-1028"></script>
 </body>
 </html>

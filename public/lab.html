@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0A7FA8">
-<script src="config.js?v=20261003-0001"></script>
+<script src="config.js?v=20261003-1028"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Makers Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -231,6 +231,141 @@ td.der,th.der{text-align:right;font-variant-numeric:tabular-nums}
   .busca{max-width:none;flex:1}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ==================== APARIENCIA DE VIDRIO ==================== */
+@media screen{
+:root{
+  --vidrio-fondo:rgba(255,255,255,.62);
+  --vidrio-fondo-2:rgba(255,255,255,.42);
+  --vidrio-borde:rgba(255,255,255,.80);
+  --vidrio-linea:rgba(18,28,38,.07);
+  --campo-fondo:rgba(255,255,255,.74);
+  --campo-borde:rgba(18,28,38,.15);
+  --vidrio-blur:20px;
+  --brillo:inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(255,255,255,.25);
+  --sombra-flota:0 1px 2px rgba(18,28,38,.05), 0 14px 38px -18px rgba(10,127,168,.34);
+  --sombra-alta:0 2px 6px rgba(18,28,38,.07), 0 30px 70px -30px rgba(10,127,168,.45);
+  --radio:18px; --radio-sm:12px; --radio-pill:999px;
+  --amb-1:rgba(43,163,203,.14); --amb-2:rgba(176,22,96,.08); --amb-3:rgba(14,122,83,.09);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --vidrio-fondo:rgba(28,36,44,.62);
+    --vidrio-fondo-2:rgba(22,28,35,.46);
+    --vidrio-borde:rgba(255,255,255,.10);
+    --vidrio-linea:rgba(255,255,255,.07);
+    --campo-fondo:rgba(255,255,255,.055);
+    --campo-borde:rgba(255,255,255,.15);
+    --brillo:inset 0 1px 0 rgba(255,255,255,.12);
+    --sombra-flota:0 1px 2px rgba(0,0,0,.4), 0 16px 42px -20px rgba(0,0,0,.85);
+    --sombra-alta:0 2px 8px rgba(0,0,0,.5), 0 34px 80px -34px rgba(0,0,0,.95);
+    --amb-1:rgba(43,163,203,.18); --amb-2:rgba(176,22,96,.10); --amb-3:rgba(14,122,83,.08);
+  }
+}
+:root[data-theme="dark"]{
+  --vidrio-fondo:rgba(28,36,44,.62);
+  --vidrio-fondo-2:rgba(22,28,35,.46);
+  --vidrio-borde:rgba(255,255,255,.10);
+  --vidrio-linea:rgba(255,255,255,.07);
+  --campo-fondo:rgba(255,255,255,.055);
+  --campo-borde:rgba(255,255,255,.15);
+  --brillo:inset 0 1px 0 rgba(255,255,255,.12);
+  --amb-1:rgba(43,163,203,.18); --amb-2:rgba(176,22,96,.10); --amb-3:rgba(14,122,83,.08);
+}
+
+body{
+  background:
+    radial-gradient(1000px 680px at 8% -8%,   var(--amb-1), transparent 62%),
+    radial-gradient(900px 620px at 96% 4%,    var(--amb-2), transparent 64%),
+    radial-gradient(1100px 760px at 50% 112%, var(--amb-3), transparent 62%),
+    var(--ground);
+  background-attachment:fixed;
+}
+
+/* ---- superficies ---- */
+.tarjeta,.tile,.bloque,.ficha{
+  background:var(--vidrio-fondo);
+  -webkit-backdrop-filter:blur(var(--vidrio-blur)) saturate(180%);
+  backdrop-filter:blur(var(--vidrio-blur)) saturate(180%);
+  border:1px solid var(--vidrio-borde);
+  border-radius:var(--radio);
+  box-shadow:var(--brillo), var(--sombra-flota);
+}
+.tarjeta>header{background:var(--vidrio-fondo-2);border-bottom:1px solid var(--vidrio-linea)}
+.bloque{box-shadow:none}
+.ficha{border-radius:var(--radio) 0 0 var(--radio);border-right:0;
+  -webkit-backdrop-filter:blur(32px) saturate(185%);backdrop-filter:blur(32px) saturate(185%);
+  box-shadow:var(--brillo), var(--sombra-alta)}
+.telon{-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.pend{border-bottom-color:var(--vidrio-linea)}
+
+/* ---- el menú lateral y la barra ---- */
+.side{
+  background:var(--vidrio-fondo);
+  -webkit-backdrop-filter:blur(26px) saturate(185%);
+  backdrop-filter:blur(26px) saturate(185%);
+  border-right:1px solid var(--vidrio-linea);
+}
+.sidepie{border-top:1px solid var(--vidrio-linea)}
+.barra{
+  background:var(--vidrio-fondo);
+  -webkit-backdrop-filter:blur(24px) saturate(185%);
+  backdrop-filter:blur(24px) saturate(185%);
+  border-bottom:1px solid var(--vidrio-linea);
+}
+.logo{border-radius:var(--radio-sm)}
+
+/* ---- botones de pastilla ---- */
+.btn{
+  border-radius:var(--radio-pill);
+  background:var(--vidrio-fondo);
+  border:1px solid var(--campo-borde);
+  -webkit-backdrop-filter:blur(12px) saturate(160%);
+  backdrop-filter:blur(12px) saturate(160%);
+  box-shadow:var(--brillo),0 1px 2px rgba(18,28,38,.06);
+}
+.btn:hover{box-shadow:var(--brillo),0 6px 16px -8px rgba(18,28,38,.45)}
+.btn.p{
+  background-color:var(--acento);
+  background-image:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,0) 54%);
+  border-color:transparent;color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 8px 20px -9px var(--acento);
+}
+
+/* ---- campos ---- */
+input,select,textarea{
+  background:var(--campo-fondo);
+  border:1px solid var(--campo-borde);
+  border-radius:var(--radio-sm);
+  box-shadow:inset 0 1px 2px rgba(18,28,38,.055);
+}
+input:focus,select:focus,textarea:focus{background:var(--surface);border-color:var(--acento)}
+
+/* ---- navegación ---- */
+.nav a,.nav button{border-radius:var(--radio-sm)}
+
+/* ---- etiquetas de estado con color sólido ---- */
+.chip{border-radius:var(--radio-pill);font-weight:700}
+.chip::before{display:none}
+.chip.bien{background:var(--bien);color:#fff}
+.chip.aviso{background:var(--aviso);color:#fff}
+.chip.mal{background:var(--critico);color:#fff}
+.chip.info{background:var(--acento);color:#fff}
+.chip.gris{background:var(--ink-3);color:#fff}
+.plan{border-radius:var(--radio-pill)}
+.marco,.aviso-demo{border-radius:var(--radio-sm)}
+
+/* ---- sin vidrio, para quien lo prefiera o no lo soporte ---- */
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+  :root{--vidrio-fondo:var(--surface);--vidrio-fondo-2:var(--surface-2);
+        --vidrio-borde:var(--line);--campo-fondo:var(--surface);--campo-borde:var(--line-2)}
+}
+@media (prefers-reduced-transparency: reduce){
+  :root{--vidrio-fondo:var(--surface);--vidrio-fondo-2:var(--surface-2);--campo-fondo:var(--surface)}
+  body{background:var(--ground)}
+}
+}
+
 
 /* ---- la puerta de Makers Lab ---- */
 body.sin-sesion .app,
@@ -2766,10 +2901,10 @@ function vDiagnosticos() {
 
 </script>
 
-<script>window.BUILD="20261003-0001";</script>
+<script>window.BUILD="20261003-1028";</script>
 <script>
 (function(){
-  var mio = "20261003-0001";
+  var mio = "20261003-1028";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -2792,6 +2927,6 @@ function vDiagnosticos() {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="lab.js?v=20261003-0001"></script>
+<script src="lab.js?v=20261003-1028"></script>
 </body>
 </html>
