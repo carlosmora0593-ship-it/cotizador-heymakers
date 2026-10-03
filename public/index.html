@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261002-2327"></script>
+<script src="config.js?v=20261003-0001"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -788,17 +788,31 @@ header.top{
   box-shadow:var(--brillo),0 2px 6px -3px rgba(16,42,56,.3)}
 .chip-store{border-radius:var(--radio-pill);border-color:var(--vidrio-borde);background:var(--vidrio-fondo-2)}
 
+/* ---- el menú desplegable va sólido: se lee encima del contenido ---- */
+nav.tabs{
+  background:var(--surface);
+  -webkit-backdrop-filter:none;backdrop-filter:none;
+  border:1px solid var(--line);
+  border-radius:var(--radio-sm);
+  padding:6px;
+  box-shadow:var(--sombra-alta);
+}
+nav.tabs button{border-radius:calc(var(--radio-sm) - 3px)}
+nav.tabs button[aria-selected="true"]{background:var(--accent-soft);box-shadow:none}
+.menuBtn{border-radius:var(--radio-pill);background:var(--vidrio-fondo);border-color:var(--campo-borde);
+  -webkit-backdrop-filter:blur(12px) saturate(160%);backdrop-filter:blur(12px) saturate(160%);
+  box-shadow:var(--brillo),0 1px 2px rgba(16,42,56,.06)}
+.perfilMenu{background:var(--surface);border-radius:var(--radio-sm);box-shadow:var(--sombra-alta);
+  -webkit-backdrop-filter:none;backdrop-filter:none}
+
 /* ---- controles segmentados, como los de iOS ---- */
-nav.tabs,.modoSwitch,.planTabs{
+.modoSwitch,.planTabs{
   background:var(--vidrio-fondo-2);
   -webkit-backdrop-filter:blur(14px) saturate(170%);
   backdrop-filter:blur(14px) saturate(170%);
   border:1px solid var(--vidrio-borde);border-radius:var(--radio-pill);padding:4px;
 }
-nav.tabs button,.modoSwitch button{border-radius:var(--radio-pill);transition:background .18s,color .18s,box-shadow .18s}
-nav.tabs button[aria-selected="true"]{
-  background:var(--surface);color:var(--ink);
-  box-shadow:var(--brillo),0 2px 8px -3px rgba(16,42,56,.35)}
+.modoSwitch button{border-radius:var(--radio-pill);transition:background .18s,color .18s,box-shadow .18s}
 .modoSwitch button[aria-selected="true"]{
   background-color:var(--accent);
   background-image:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0) 54%);
@@ -904,6 +918,17 @@ input[readonly],textarea[readonly]{background:var(--vidrio-fondo-2)}
   body{background:var(--bg)}
 }
 }
+
+.moTabla{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
+.moTabla th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);
+  font-weight:700;padding:8px 10px;border-bottom:1px solid var(--line)}
+.moTabla td{padding:8px 10px;border-bottom:1px solid var(--line-soft);vertical-align:middle}
+.moTabla td.n{text-align:right;font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.moTabla td.n input{text-align:right}
+.moTabla tr:last-child td{border-bottom:0}
+.moBaja{color:var(--good);font-weight:700}
+.moSube{color:var(--warn);font-weight:700}
+.moTit{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px}
 
 
 /* ---- el diagnóstico ----
@@ -1443,7 +1468,7 @@ body.rol-produccion #btnPrint{display:none!important}
   <div class="card">
     <header><h2>Técnicas de decorado</h2><button class="btn sm ghost" data-add="tecnicas" style="margin-left:auto">+ Técnica</button></header>
     <div class="body">
-      <p class="note" style="margin:0 0 12px">Cada técnica cobra de una de tres formas: <b>por área</b> (cm², típico de DTF y sublimación), <b>por tinta</b> (serigrafía) o <b>por puntada</b> (bordado). Las columnas de <b>costo</b> son lo que te cuesta producir; las de <b>precio</b> son lo que le cobras al cliente. El <b>mínimo</b> es el piso por aplicación y el <b>setup</b> se cobra una sola vez por pedido.</p>
+      <p class="note" style="margin:0 0 12px"><b>Mano de obra</b> es lo que te cuesta prensar, acomodar y revisar <i>una</i> aplicación. Cuando la técnica tiene un material amarrado en la tabla de arriba, es lo único que cobra aquí: el material lo calcula el armado con lo que de verdad se gasta del rollo. Las columnas de <b>cm²</b> quedan de respaldo y sólo se usan si la técnica no tiene material. Cada técnica cobra de una de tres formas: <b>por área</b> (cm², típico de DTF y sublimación), <b>por tinta</b> (serigrafía) o <b>por puntada</b> (bordado). Las columnas de <b>costo</b> son lo que te cuesta producir; las de <b>precio</b> son lo que le cobras al cliente. El <b>mínimo</b> es el piso por aplicación y el <b>setup</b> se cobra una sola vez por pedido.</p>
       <div class="pricebar">
         <button class="btn" id="btnLlenarPrecios">Llenar precios públicos con mi utilidad</button>
         <span style="font-size:12px;color:var(--ink-3);align-self:center">Toma cada costo, le aplica tu utilidad y lo escribe en la columna de precio.</span>
@@ -1751,6 +1776,20 @@ body.rol-produccion #btnPrint{display:none!important}
       <p class="note" style="margin:0 0 14px"><b>Administrador:</b> todo.&nbsp; <b>Ventas:</b> cotiza, confirma pedidos, clientes y consulta el catálogo sin poder editarlo; no ve caja ni utilidades.&nbsp; <b>Producción:</b> solo el tablero de órdenes, donde mueve el estatus y revisa los diseños; no ve precios.</p>
       <div class="tbl-wrap"><table id="t_equipo"></table></div>
       <p class="note" style="margin-top:14px;border-left-color:var(--warn)">La clave de cada persona sirve para que nadie entre por descuido a lo que no le toca, pero <b>no es una contraseña de verdad</b>: quien tenga el enlace de esta página puede cambiarse de usuario. Para bloquear accesos en serio, con su propio correo y contraseña, se usa la versión instalada en tu dominio.</p>
+    </div>
+  </div>
+  <div class="card">
+    <header><h2>Cómo se cobra la impresión</h2><span class="hint">el material por un lado y la mano de obra por otro</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Las técnicas que se miden por rollo — DTF, vinil, sublimación — ya no cobran por centímetro cuadrado. El <b>material</b> lo calcula el armado con lo que de verdad se gasta del rollo, y aquí capturas la <b>mano de obra</b>: lo que te cuesta prensar, acomodar y revisar una pieza. Serigrafía y bordado no aparecen aquí porque su cobro por tinta y por puntada ya mide lo correcto.</p>
+      <p class="note" id="moEstado" style="margin:0 0 14px"></p>
+      <div id="moTabla"></div>
+      <div id="moComparativo" style="margin-top:20px"></div>
+      <div class="temaFila" style="margin-top:18px">
+        <button class="btn primary" id="moAplicar">Aplicar a mi catálogo</button>
+        <button class="btn ghost" id="moQuitar" hidden>Volver al cobro por cm²</button>
+        <span class="hint">Puedes volver aquí y ajustar los montos cuando quieras.</span>
+      </div>
     </div>
   </div>
   <div class="card">
@@ -2320,14 +2359,14 @@ function defaults(){ return {
   {id:"a16",nombre:"Funda de celular sublimable",cat:"Promocional",costo:55,precio:88,tallas:false,existencia:0,minimo_inv:0}
  ],
  tecnicas:[
-  {id:"t1",nombre:"DTF Textil",modo:"area",costoCm2:0.12,minimo:12,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.19,precioTinta:0,precioPuntada:0,precioMin:20,precioSetup:0},
-  {id:"t2",nombre:"DTF UV (rígidos)",modo:"area",costoCm2:0.18,minimo:15,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.29,precioTinta:0,precioPuntada:0,precioMin:24,precioSetup:0},
-  {id:"t3",nombre:"Sublimación",modo:"area",costoCm2:0.06,minimo:8,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.1,precioTinta:0,precioPuntada:0,precioMin:13,precioSetup:0},
-  {id:"t4",nombre:"Vinil textil (corte)",modo:"area",costoCm2:0.22,minimo:20,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.35,precioTinta:0,precioPuntada:0,precioMin:32,precioSetup:0},
+  {id:"t1",nombre:"DTF Textil",modo:"area",costoCm2:0.12,costoMO:0,precioMO:0,minimo:12,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.19,precioTinta:0,precioPuntada:0,precioMin:20,precioSetup:0},
+  {id:"t2",nombre:"DTF UV (rígidos)",modo:"area",costoCm2:0.18,costoMO:0,precioMO:0,minimo:15,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.29,precioTinta:0,precioPuntada:0,precioMin:24,precioSetup:0},
+  {id:"t3",nombre:"Sublimación",modo:"area",costoCm2:0.06,costoMO:0,precioMO:0,minimo:8,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.1,precioTinta:0,precioPuntada:0,precioMin:13,precioSetup:0},
+  {id:"t4",nombre:"Vinil textil (corte)",modo:"area",costoCm2:0.22,costoMO:0,precioMO:0,minimo:20,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.35,precioTinta:0,precioPuntada:0,precioMin:32,precioSetup:0},
   {id:"t5",nombre:"Serigrafía",modo:"tintas",costoCm2:0,minimo:0,setup:180,costoTinta:3.5,costoPuntada:0,precioCm2:0,precioTinta:5.6,precioPuntada:0,precioMin:0,precioSetup:288},
   {id:"t6",nombre:"Bordado",modo:"puntadas",costoCm2:0,minimo:25,setup:350,costoTinta:0,costoPuntada:0.0022,precioCm2:0,precioTinta:0,precioPuntada:0.0035,precioMin:40,precioSetup:560},
-  {id:"t7",nombre:"Grabado láser",modo:"area",costoCm2:0.10,minimo:20,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.16,precioTinta:0,precioPuntada:0,precioMin:32,precioSetup:0},
-  {id:"t8",nombre:"DTG (directo a prenda)",modo:"area",costoCm2:0.20,minimo:35,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.32,precioTinta:0,precioPuntada:0,precioMin:56,precioSetup:0}
+  {id:"t7",nombre:"Grabado láser",modo:"area",costoCm2:0.10,costoMO:0,precioMO:0,minimo:20,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.16,precioTinta:0,precioPuntada:0,precioMin:32,precioSetup:0},
+  {id:"t8",nombre:"DTG (directo a prenda)",modo:"area",costoCm2:0.20,costoMO:0,precioMO:0,minimo:35,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.32,precioTinta:0,precioPuntada:0,precioMin:56,precioSetup:0}
  ],
  tamanos:[
   {id:"s1",nombre:"Pecho izquierdo / bolsillo",ancho:10,alto:10},
@@ -2369,7 +2408,7 @@ function defaults(){ return {
  ], compras:[]
 };}
 const CHECKS = ["Diseño aprobado por el cliente","Material en almacén","Archivo impreso","Prensado / aplicado","Revisión de calidad","Empacado","Entregado"];
-function defaultParams(){ return {origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
+function defaultParams(){ return {cobroPorArmado:false,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
   compras:{tope:2000, siempre:false},
   empresa:{nombre:"Hey Makers",eslogan:"Cursos y Talleres",tel:"",mail:"",logo:"",
   /* Lo fiscal va aparte de lo comercial a propósito: el nombre comercial es
@@ -2655,6 +2694,7 @@ function armadoDe(row){
 /* Los renglones que siguen a otra cosa: el principal sigue al paso 2, y los
    ligados a una aplicación siguen su medida y la cantidad del pedido. */
 function sincronizaArmado(){
+  autoArmado();
   const q = Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
   (cot.armado||[]).forEach(r=>{
     if(r.principal){ r.cant = q; r.appId = ""; return; }
@@ -2677,6 +2717,51 @@ function armadoPrincipal(){
   return p;
 }
 function esServicio(g){ return (g||cot).modo === "servicio"; }
+
+
+/* ---------- material y mano de obra ---------- */
+/* Una técnica "lleva material" cuando hay un servicio del catálogo amarrado
+   a ella. En ese caso el armado cobra el material y la técnica, sólo la
+   mano de obra: así ningún peso se cobra dos veces. */
+function tieneMaterial(tecnicaId){ return !!svcParaTecnica(tecnicaId); }
+function manoDeObraDe(t, cual){
+  if(!t) return 0;
+  if(cual==="precio") return num(t.precioMO);
+  return num(t.costoMO) || num(P.manoObra);
+}
+
+/* El armado se arma solo: cada aplicación con material tiene su renglón,
+   sin que nadie tenga que acordarse de crearlo. */
+function autoArmado(){
+  cot.armado = cot.armado || [];
+  // Mientras no lo apliques en Ajustes, nada cambia: el cotizador sigue
+  // cobrando como hoy y el armado sólo manda donde tú lo ligaste a mano.
+  if(!P.cobroPorArmado){
+    cot.armado = cot.armado.filter(r=>!r.auto);   // se van los que puso el sistema
+    return;
+  }
+  // fuera lo que ya no corresponde
+  cot.armado = cot.armado.filter(r=>{
+    if(r.principal || !r.appId) return true;
+    const a = cot.apps.find(a=>a.id===r.appId);
+    return !!a && tieneMaterial(a.tecnicaId);
+  });
+  const q = Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
+  cot.apps.forEach(a=>{
+    if(!tieneMaterial(a.tecnicaId)) return;
+    if(cot.armado.some(r=>r.appId===a.id)) return;
+    const s = svcParaTecnica(a.tecnicaId);
+    cot.armado.push({id:uid(), servicioId:s.id, appId:a.id, ancho:num(a.ancho), alto:num(a.alto),
+                     cant:q, giro:"auto", cobraMerma:true, nota:"", principal:false, auto:true});
+  });
+  // si cambió la técnica, el material la sigue
+  cot.armado.forEach(r=>{
+    if(!r.appId) return;
+    const a = cot.apps.find(a=>a.id===r.appId); if(!a) return;
+    const s = svcParaTecnica(a.tecnicaId);
+    if(s && (svcDe(r.servicioId)||{}).tecnicaId !== a.tecnicaId) r.servicioId = s.id;
+  });
+}
 
 /* ---------- el cajón del armado ---------- */
 function armadoAbierto(){ const c = $("#armadoCajon"); return c && !c.hidden; }
@@ -2914,15 +2999,24 @@ function calc(){
     if(t.modo==="area"){ const area = num(a.ancho)*num(a.alto); c = area*num(t.costoCm2); pv = area*num(t.precioCm2); base = area.toFixed(0)+" cm²"; }
     else if(t.modo==="tintas"){ c = ti*num(t.costoTinta); pv = ti*num(t.precioTinta); base = ti+" tinta(s)"; }
     else { const pu = num(a.puntadas); c = pu*num(t.costoPuntada); pv = pu*num(t.precioPuntada); base = pu.toLocaleString("es-MX")+" puntadas"; }
+    // Con material amarrado, la aplicación cobra sólo la mano de obra:
+    // el material entra por el armado y así nada se cobra dos veces.
     const sinMaterial = conArmado.has(a.id);
-    if(sinMaterial){ c = 0; pv = 0; base = "material en el armado"; }
-    const min = sinMaterial ? 0 : num(t.minimo);
-    const aplicoMin = c < min; if(aplicoMin) c = min;
-    c += num(P.manoObra);
-    if(!sinMaterial && pv < num(t.precioMin)) pv = num(t.precioMin);
+    let aplicoMin = false;
+    if(sinMaterial){
+      c = manoDeObraDe(t, "costo");
+      pv = manoDeObraDe(t, "precio");
+      base = "mano de obra";
+    } else {
+      const min = num(t.minimo);
+      aplicoMin = c < min; if(aplicoMin) c = min;
+      c += num(P.manoObra);
+      if(pv < num(t.precioMin)) pv = num(t.precioMin);
+    }
     // Si la técnica no tiene precio público capturado, se calcula con la utilidad.
-    const tienePrecio = !!(num(t.precioCm2)||num(t.precioTinta)||num(t.precioPuntada)||num(t.precioMin));
-    const precio = sinMaterial ? aplicaUtil(c) : (tienePrecio ? pv : aplicaUtil(c));
+    const tienePrecio = sinMaterial ? !!num(t.precioMO)
+      : !!(num(t.precioCm2)||num(t.precioTinta)||num(t.precioPuntada)||num(t.precioMin));
+    const precio = tienePrecio ? pv : aplicaUtil(c);
     let s = num(t.setup); if(t.modo==="tintas") s = num(t.setup)*ti;
     let sp = num(t.precioSetup); if(t.modo==="tintas") sp = num(t.precioSetup)*ti;
     if(!num(t.precioSetup)) sp = aplicaUtil(s);
@@ -3012,6 +3106,7 @@ function renderCot(){
   if(typeof resumenPasos==="function") resumenPasos();
 }
 function renderApps(){
+  sincronizaArmado();
   const w = $("#apps");
   if(!cot.apps.length){ w.innerHTML = '<div class="empty">Sin aplicaciones. Agrega al menos una ubicación (frente, espalda, manga, taza…) con su técnica.</div>'; return; }
   const r = calc();
@@ -3021,7 +3116,7 @@ function renderApps(){
     const modo = t? t.modo : "area";
     return '<div class="app-row" data-app="'+a.id+'">'+
       '<div class="app-head"><span class="tag">Ubicación '+(i+1)+'</span>'+
-        (d && d.sinMaterial ? '<span class="pill pend">material en el armado</span>' : '')+
+        (d && d.sinMaterial ? '<span class="pill good" title="El material lo calcula el armado; aquí sólo va la mano de obra">material desde el armado</span>' : '')+
         '<span class="cost">'+(d? "costo "+mx(d.costo)+" · precio "+mx(d.precio)+(d.min?" · mínimo":"") : "")+'</span>'+
         '<button class="btn icon sm" data-del-app="'+a.id+'" title="Quitar">✕</button></div>'+
       '<div class="grid g4">'+
@@ -3185,6 +3280,7 @@ const COLS = {
   articulos:[["nombre","Artículo","text"],["cat","Categoría","text"],["costo","Costo producción $","num"],["precio","Precio público $","num"],
     ["tallas","¿Lleva tallas?","si"],["existencia","Existencia","ro"],["minimo_inv","Mínimo","num"]],
   tecnicas:[["nombre","Técnica","text"],["modo","Cobro","modo"],
+    ["costoMO","Mano de obra · costo","num"],["precioMO","Mano de obra · precio","num"],
     ["costoCm2","Costo / cm²","num"],["costoTinta","Costo / tinta","num"],["costoPuntada","Costo / puntada","num"],["minimo","Costo mínimo","num"],["setup","Costo setup","num"],
     ["precioCm2","Precio / cm²","num"],["precioTinta","Precio / tinta","num"],["precioPuntada","Precio / puntada","num"],["precioMin","Precio mínimo","num"],["precioSetup","Precio setup","num"]],
   servicios:[["nombre","Servicio / material","text"],["cat","Categoría","text"],["unidad","Unidad","unidad"],
@@ -3263,6 +3359,109 @@ $("#catActualizar").addEventListener("click", async ()=>{
   finally{ b.disabled = false; b.textContent = "Actualizar"; }
 });
 
+
+/* ---------- asistente: pasar el catálogo al modelo nuevo ---------- */
+/* Lo que hoy tienes como "costo mínimo" es, en los hechos, lo que cobras por
+   prensar una pieza: el piso que pusiste para que una calcomanía chiquita no
+   saliera regalada. Eso es exactamente la mano de obra. De ahí sale la
+   sugerencia, y de ahí para arriba el material se suma aparte. */
+function tecnicasConMaterial(){
+  normalizaCat();
+  return (cat.tecnicas||[]).filter(t=>t.modo==="area" && tieneMaterial(t.id));
+}
+function sugiereMO(t){
+  const costo  = num(t.costoMO)  || num(t.minimo)   || num(P.manoObra);
+  const precio = num(t.precioMO) || num(t.precioMin) || 0;
+  return {costo:Math.round(costo*100)/100, precio:Math.round(precio*100)/100};
+}
+const MO_CASOS = [
+  {nom:"6 piezas · logo 10×10",      w:10, h:10, n:6},
+  {nom:"50 piezas · frente 25×20",   w:25, h:20, n:50},
+  {nom:"200 piezas · 12×6",          w:12, h:6,  n:200}
+];
+/* Lo que una aplicación le cuesta al cliente hoy y lo que le costaría después. */
+function comparaMO(t, caso, mo){
+  const area = caso.w*caso.h;
+  const mk = num(P.margen)/100;
+  const util = c => P.modo==="margen" ? (mk>=0.95 ? c*20 : c/(1-mk)) : c*(1+mk);
+  let hoy = area*num(t.precioCm2);
+  if(hoy < num(t.precioMin)) hoy = num(t.precioMin);
+  if(!hoy){ let c = Math.max(num(t.minimo), area*num(t.costoCm2)) + num(P.manoObra); hoy = util(c); }
+  const s = svcParaTecnica(t.id);
+  let material = 0;
+  if(s){
+    const A = armadoDe({id:"x", servicioId:s.id, ancho:caso.w, alto:caso.h, cant:caso.n, giro:"auto", cobraMerma:true});
+    if(!A.error) material = A.precio / caso.n;
+  }
+  const obra = num(mo.precio) || util(num(mo.costo));
+  return {hoy, nuevo: obra + material, material, obra};
+}
+function modeloNuevoPrendido(){ return !!P.cobroPorArmado; }
+function renderMO(){
+  const est = $("#moEstado");
+  if(est){
+    est.innerHTML = modeloNuevoPrendido()
+      ? '<span class="pill good">aplicado</span> El material sale del armado y la t\u00e9cnica cobra la mano de obra.'
+      : '<span class="pill pend">todav\u00eda no aplicado</span> Hoy sigue cobrando por cent\u00edmetro cuadrado. Nada cambia hasta que lo apliques.';
+  }
+  const quitar = $("#moQuitar"); if(quitar) quitar.hidden = !modeloNuevoPrendido();
+  const bt0 = $("#moAplicar"); if(bt0) bt0.textContent = modeloNuevoPrendido() ? "Guardar los montos" : "Aplicar a mi cat\u00e1logo";
+  const w = $("#moTabla"); if(!w) return;
+  const lista = tecnicasConMaterial();
+  if(!lista.length){
+    w.innerHTML = '<div class="empty">Ninguna de tus técnicas tiene material amarrado todavía. '+
+      'Ve a <b>Catálogo → Servicios y material por medida</b> y en la columna <b>Técnica que lo usa</b> '+
+      'dile a cada rollo a qué técnica pertenece.</div>';
+    const cmp = $("#moComparativo"); if(cmp) cmp.innerHTML = "";
+    const bt = $("#moAplicar"); if(bt) bt.disabled = true;
+    return;
+  }
+  const bt = $("#moAplicar"); if(bt) bt.disabled = false;
+  w.innerHTML = '<div class="tbl-wrap"><table class="moTabla"><thead><tr>'+
+    '<th>Técnica</th><th>Material amarrado</th><th>Mano de obra · costo</th><th>Mano de obra · precio</th><th></th>'+
+    '</tr></thead><tbody>'+
+    lista.map(t=>{
+      const s = sugiereMO(t), mat = svcParaTecnica(t.id);
+      const puesta = num(t.costoMO)>0;
+      return '<tr data-mo="'+t.id+'"><td><b>'+esc(t.nombre)+'</b></td>'+
+        '<td>'+esc(mat? mat.nombre : "—")+'</td>'+
+        '<td class="n"><input type="number" min="0" step="0.5" data-mok="costo" value="'+s.costo+'"></td>'+
+        '<td class="n"><input type="number" min="0" step="0.5" data-mok="precio" value="'+s.precio+'"></td>'+
+        '<td>'+(puesta? '<span class="pill good">ya aplicada</span>' : '<span class="pill pend">sugerida</span>')+'</td></tr>';
+    }).join("")+'</tbody></table></div>';
+  renderMOComparativo();
+}
+function moCapturada(){
+  const o = {};
+  document.querySelectorAll("[data-mo]").forEach(tr=>{
+    o[tr.dataset.mo] = {
+      costo:  num(tr.querySelector('[data-mok="costo"]').value),
+      precio: num(tr.querySelector('[data-mok="precio"]').value)
+    };
+  });
+  return o;
+}
+function renderMOComparativo(){
+  const w = $("#moComparativo"); if(!w) return;
+  const cap = moCapturada();
+  const lista = tecnicasConMaterial();
+  w.innerHTML = '<div class="moTit">Qué le pasa a tus precios</div>'+
+    '<p class="note" style="margin:0 0 10px">Precio de la aplicación <b>por pieza</b>, sin el artículo. '+
+    'Lo que baja es porque el cm² lo estaba cobrando como si el material subiera parejo con el tamaño, y no sube así.</p>'+
+    '<div class="tbl-wrap"><table class="moTabla"><thead><tr><th>Técnica</th><th>Trabajo</th>'+
+    '<th>Hoy</th><th>Mano de obra</th><th>Material</th><th>Después</th><th>Cambio</th></tr></thead><tbody>'+
+    lista.map(t=> MO_CASOS.map((c,i)=>{
+      const r = comparaMO(t, c, cap[t.id] || sugiereMO(t));
+      const dif = r.hoy>0 ? (r.nuevo-r.hoy)/r.hoy*100 : 0;
+      const col = Math.abs(dif)<10 ? "" : (dif<0 ? "moBaja" : "moSube");
+      return '<tr>'+(i===0? '<td rowspan="'+MO_CASOS.length+'"><b>'+esc(t.nombre)+'</b></td>' : '')+
+        '<td>'+esc(c.nom)+'</td><td class="n">'+mx(r.hoy)+'</td>'+
+        '<td class="n">'+mx(r.obra)+'</td><td class="n">'+mx(r.material)+'</td>'+
+        '<td class="n"><b>'+mx(r.nuevo)+'</b></td>'+
+        '<td class="n '+col+'">'+(dif>0?"+":"")+dif.toFixed(0)+'%</td></tr>';
+    }).join("")).join("")+'</tbody></table></div>';
+}
+
 /* ---------- eventos de la apariencia ---------- */
 $("#tab-set").addEventListener("click", e=>{
   const t = e.target.closest("[data-tema]");
@@ -3275,6 +3474,32 @@ $("#tab-set").addEventListener("click", e=>{
 });
 $("#tab-set").addEventListener("input", e=>{
   if(e.target.id==="temaAcento"){ TEMA.acento = e.target.value; guardaTema(); aplicaTema(); renderTema(); }
+});
+
+
+/* ---------- eventos del asistente ---------- */
+$("#tab-set").addEventListener("input", e=>{
+  if(e.target.dataset && e.target.dataset.mok) renderMOComparativo();
+});
+$("#moAplicar").addEventListener("click", ()=>{
+  const cap = moCapturada();
+  let n = 0;
+  Object.keys(cap).forEach(id=>{
+    const t = cat.tecnicas.find(t=>t.id===id); if(!t) return;
+    t.costoMO  = num(cap[id].costo);
+    t.precioMO = num(cap[id].precio);
+    n++;
+  });
+  const estreno = !P.cobroPorArmado;
+  P.cobroPorArmado = true;
+  persist(); renderMO(); renderTabla("tecnicas"); renderCot();
+  toast(estreno ? (n+" técnica(s) ahora cobran material y mano de obra por separado")
+                : "Montos de mano de obra guardados");
+});
+$("#moQuitar").addEventListener("click", ()=>{
+  P.cobroPorArmado = false;
+  persist(); renderMO(); renderCot();
+  toast("Volvimos al cobro por centímetro cuadrado");
 });
 
 $("#clearHist").addEventListener("click", ()=>{ cat.historial=[]; persist(); renderHist(); toast("Historial vaciado"); });
@@ -3315,7 +3540,7 @@ function renderSaved(){
 
 /* ---------- ajustes ---------- */
 function renderSet(){
-  renderTema();
+  renderTema(); renderMO();
   $("#p_margen").value=P.margen; $("#p_modo").value=P.modo; $("#p_merma").value=P.merma; $("#p_mo").value=P.manoObra;
   $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia;
   P.compras = P.compras || {tope:2000, siempre:false};
@@ -6416,7 +6641,7 @@ function hoja(g){
   const r = calcDe(g);
   const v = new Date(g.fecha); v.setDate(v.getDate()+num(P.vigencia,15));
   const filas = [];
-  filas.push(["1",(g.desc||"Artículo")+"<br><small>"+r.detalle.map(d=>esc(d.ubic)+": "+esc(d.tecnica)+" ("+d.base+")").join(" · ")+"</small>",r.qty,mx(r.precioUnit),mx(r.subtotalPiezas)]);
+  filas.push(["1",(g.desc||"Artículo")+"<br><small>"+r.detalle.map(d=>esc(d.ubic)+": "+esc(d.tecnica)+(d.sinMaterial ? "" : " ("+d.base+")")).join(" · ")+"</small>",r.qty,mx(r.precioUnit),mx(r.subtotalPiezas)]);
   if(r.setupVenta>0) filas.push(["2","Preparación / setup de producción",1,mx(r.setupVenta),mx(r.setupVenta)]);
   g.extras.filter(e=>e.on).forEach((e,i)=>{ const x=cat.extras.find(x=>x.id===e.id); if(!x||x.tipo==="porcentaje") return;
     const c = x.tipo==="pieza"? 0 : 1; if(c===0) return;
@@ -7598,10 +7823,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261002-2327";</script>
+<script>window.BUILD="20261003-0001";</script>
 <script>
 (function(){
-  var mio = "20261002-2327";
+  var mio = "20261003-0001";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -7624,7 +7849,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261002-2327"></script>
-<script src="diagnostico.js?v=20261002-2327"></script>
+<script src="cuenta.js?v=20261003-0001"></script>
+<script src="diagnostico.js?v=20261003-0001"></script>
 </body>
 </html>
