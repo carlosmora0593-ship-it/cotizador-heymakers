@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261005-1510"></script>
+<script src="config.js?v=20261005-1536"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -9355,10 +9355,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261005-1510";</script>
+<script>window.BUILD="20261005-1536";</script>
 <script>
 (function(){
-  var mio = "20261005-1510";
+  var mio = "20261005-1536";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -9369,6 +9369,11 @@ async function accionAyuda(e) {
       .then(function(d){
         var suyo = d["cotizador"] || d.build;
         if(!suyo || suyo === mio) return;
+        /* Solo hacia ADELANTE. Si version.json se queda atras (un
+           despliegue a medias, por ejemplo), la pagina no tiene por que
+           recargarse para "actualizarse" a una version mas vieja que la
+           que ya trae. La fecha-hora del build se ordena sola. */
+        if(suyo <= mio) return;
         if(yaLoIntente(suyo)) return;
         anota(suyo);
         var base = location.pathname.split("?")[0];
@@ -9381,7 +9386,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261005-1510"></script>
-<script src="diagnostico.js?v=20261005-1510"></script>
+<script src="cuenta.js?v=20261005-1536"></script>
+<script src="diagnostico.js?v=20261005-1536"></script>
 </body>
 </html>
