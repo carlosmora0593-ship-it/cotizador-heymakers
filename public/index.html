@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261005-1536"></script>
+<script src="config.js?v=20261006-1005"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1045,8 +1045,29 @@ input[readonly],textarea[readonly]{background:var(--vidrio-fondo-2)}
 .barraCmyk i:nth-child(4){background:var(--mk-black)}
 .barraTop{padding:14px 14px 12px;border-bottom:1px solid var(--vidrio-linea);flex:none}
 .barraTop .brand{margin-right:0}
-.barraNav{padding:10px 8px 14px;flex:1}
+.barraNav{padding:10px 8px 14px;flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
 .barraPie{padding:10px 14px;border-top:1px solid var(--vidrio-linea);font-size:10.5px;color:var(--ink-3);flex:none}
+
+/* ---------- el desplegable, cuando no cabe la barra ----------
+   Son once secciones. En una ventana baja —el panel de Claude, un teléfono
+   acostado, una laptop chica— la lista se salía por abajo y las últimas
+   (Catálogo, Ajustes) quedaban fuera de alcance. Ahora el menú se queda
+   dentro de la pantalla y se recorre solo. */
+nav.tabs{
+  max-height:calc(100vh - 92px);
+  max-height:calc(100dvh - 92px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  scrollbar-color:var(--line-2,var(--line)) transparent;
+}
+nav.tabs::-webkit-scrollbar{width:9px}
+nav.tabs::-webkit-scrollbar-thumb{background:var(--line-2,var(--line));border-radius:99px;
+  border:3px solid var(--surface);background-clip:padding-box}
+nav.tabs::-webkit-scrollbar-track{background:transparent}
+/* el encabezado del grupo no se pierde al recorrer */
+nav.tabs .barraGrupo{position:sticky;top:0;background:var(--surface);z-index:1}
 
 body.conBarra{padding-left:var(--barra)}
 body.conBarra .menuWrap{display:none}
@@ -9355,10 +9376,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261005-1536";</script>
+<script>window.BUILD="20261006-1005";</script>
 <script>
 (function(){
-  var mio = "20261005-1536";
+  var mio = "20261006-1005";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -9386,7 +9407,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261005-1536"></script>
-<script src="diagnostico.js?v=20261005-1536"></script>
+<script src="cuenta.js?v=20261006-1005"></script>
+<script src="diagnostico.js?v=20261006-1005"></script>
 </body>
 </html>
