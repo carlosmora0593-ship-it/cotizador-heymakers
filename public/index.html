@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261006-1248"></script>
+<script src="config.js?v=20261006-1742"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -785,6 +785,9 @@ body.sin-acceso .wrap,body.sin-acceso header.top{display:none}
 #t_servicios th:nth-child(3),#t_servicios td:nth-child(3){min-width:160px}
 #t_servicios th:nth-child(4),#t_servicios td:nth-child(4){min-width:170px}
 @media (max-width:560px){
+  /* el nombre largo del modo no cabe en un teléfono: que se parta en dos */
+  .modoSwitch{display:flex;flex-wrap:wrap;width:100%}
+  .modoSwitch button{flex:1 1 150px;text-align:center}
   .armCampos{grid-template-columns:repeat(2,minmax(0,1fr))}
   .armCols{grid-template-columns:minmax(0,1fr)}
   .armChips{flex-direction:row;flex-wrap:wrap}
@@ -1084,6 +1087,14 @@ nav.tabs::-webkit-scrollbar{width:9px}
 nav.tabs::-webkit-scrollbar-thumb{background:var(--line-2,var(--line));border-radius:99px;
   border:3px solid var(--surface);background-clip:padding-box}
 nav.tabs::-webkit-scrollbar-track{background:transparent}
+/* En teléfono el desplegable se cuelga de la pantalla, no del botón: así no
+   se sale por ningún lado, mida lo que mida el aparato. */
+@media (max-width:560px){
+  nav.tabs{position:fixed;top:var(--menuTop,62px);left:12px;right:12px;
+    width:auto;min-width:0;max-width:none;
+    max-height:calc(100vh - var(--menuTop,62px) - 16px);
+    max-height:calc(100dvh - var(--menuTop,62px) - 16px)}
+}
 /* el encabezado del grupo no se pierde al recorrer */
 nav.tabs .barraGrupo{position:sticky;top:0;background:var(--surface);z-index:1}
 
@@ -1186,6 +1197,34 @@ nav.tabs .barraGrupo{padding:12px 11px 4px}
 .alPie{font-size:11.5px;color:var(--ink-3);margin:9px 0 0;line-height:1.5}
 .alAcc{margin-top:11px}
 .sub.pierde{color:var(--warn);font-weight:700}
+
+/* ---- el icono de cada sección ---- */
+@media screen{
+nav.tabs button{
+  display:grid;
+  grid-template-columns:22px minmax(0,1fr);
+  column-gap:11px;row-gap:1px;
+  align-items:center;
+}
+nav.tabs button .ico{
+  grid-column:1;grid-row:1 / span 2;
+  width:19px;height:19px;color:var(--ink-3);
+  transition:color .15s;
+}
+nav.tabs button b,
+nav.tabs button small{grid-column:2}
+nav.tabs button:hover .ico{color:var(--ink-2)}
+nav.tabs button[aria-selected="true"] .ico{color:var(--accent)}
+
+/* en la barra lateral la explicación se esconde, así que el icono va en la
+   única línea que queda */
+body.conBarra nav.tabs button{
+  grid-template-columns:20px minmax(0,1fr);
+  column-gap:10px;row-gap:0;
+}
+body.conBarra nav.tabs button .ico{grid-row:1;width:17px;height:17px}
+body.conBarra nav.tabs button[aria-selected="true"] .ico{color:var(--accent-ink)}
+}
 
 
 /* ---- el diagnóstico ----
@@ -1476,6 +1515,7 @@ body.rol-produccion #btnPrint{display:none!important}
         <button role="menuitem" data-tab="caj" aria-selected="false"><b>Caja</b><small>Apertura, movimientos y corte</small></button>
         <button role="menuitem" data-tab="ven" aria-selected="false"><b>Ventas</b><small>Cortes, análisis y proyección</small></button>
         <button role="menuitem" data-tab="cat" aria-selected="false"><b>Catálogo / Artículos</b><small>Artículos, técnicas, precios e inventario</small></button>
+        <button role="menuitem" data-tab="calc" aria-selected="false"><b>Calculadora de costos</b><small>Qué te cuesta producir, paso a paso</small></button>
         <button role="menuitem" data-tab="com" aria-selected="false"><b>Compras <span class="mbadge" hidden>0</span></b><small>Requisiciones, proveedores y facturas</small></button>
         <button role="menuitem" data-tab="set" aria-selected="false" hidden><b>Ajustes</b><small>Utilidad, IVA y datos de tu empresa</small></button>
       </nav>
@@ -1768,38 +1808,6 @@ body.rol-produccion #btnPrint{display:none!important}
       <div id="t_tecnicas"></div>
     </div>
   </div>
-  <div class="card" id="cardCalc">
-    <header><h2>Calculadora de costo de producción</h2>
-      <span class="hint" style="margin-left:auto">para saber qué te cuesta imprimir</span>
-    </header>
-    <div class="body">
-      <p class="note" style="margin:0 0 16px">Tú pon <b>lo que pagaste</b>; el rendimiento lo pone el programa.
-        Los promedios que trae son del oficio y sirven para arrancar, pero <b>el tuyo siempre va a ser más exacto</b>:
-        en cada paso puedes calibrarlo con lo que de verdad gastaste. El resultado es un costo <b>teórico</b> de
-        producción, para que sepas de dónde partir antes de ponerle precio.</p>
-      <div id="calcPasos"></div>
-      <div id="calcResultado"></div>
-    </div>
-  </div>
-<div class="modal" id="modalCal" hidden>
-  <div class="card">
-    <header><h2 id="calTitulo">Tu consumo real</h2></header>
-    <div class="body">
-      <p class="note" id="calTexto" style="margin:0 0 14px"></p>
-      <div class="grid g2">
-        <div><label class="f" for="cal_gasto" id="calGastoEt">Lo que gastaste</label>
-          <input id="cal_gasto" type="number" min="0" step="1"></div>
-        <div><label class="f" for="cal_m2">Metros cuadrados que imprimiste</label>
-          <input id="cal_m2" type="number" min="0" step="0.1"></div>
-      </div>
-      <p class="note" id="calResul" style="margin:14px 0 0"></p>
-      <div class="row-actions" style="margin-top:16px">
-        <button class="btn primary" id="cal_ok">Usar mi consumo</button>
-        <button class="btn ghost" id="cal_cancel">Cancelar</button>
-      </div>
-    </div>
-  </div>
-</div>
   <div class="card">
     <header><h2>Servicios y material por medida</h2><button class="btn sm ghost" data-add="servicios" style="margin-left:auto">+ Servicio</button></header>
     <div class="body">
@@ -1857,6 +1865,42 @@ body.rol-produccion #btnPrint{display:none!important}
     <div class="body"><div class="tbl-wrap"><table id="t_hist"></table></div></div>
   </div>
 </section>
+
+<!-- ============ CALCULADORA ============ -->
+<section id="tab-calc" hidden>
+  <div class="card" id="cardCalc">
+    <header><h2>Calculadora de costo de producción</h2>
+      <span class="hint" style="margin-left:auto">para saber qué te cuesta imprimir</span>
+    </header>
+    <div class="body">
+      <p class="note" style="margin:0 0 16px">Tú pon <b>lo que pagaste</b>; el rendimiento lo pone el programa.
+        Los promedios que trae son del oficio y sirven para arrancar, pero <b>el tuyo siempre va a ser más exacto</b>:
+        en cada paso puedes calibrarlo con lo que de verdad gastaste. El resultado es un costo <b>teórico</b> de
+        producción, para que sepas de dónde partir antes de ponerle precio.</p>
+      <div id="calcPasos"></div>
+      <div id="calcResultado"></div>
+    </div>
+  </div>
+</section>
+<div class="modal" id="modalCal" hidden>
+  <div class="card">
+    <header><h2 id="calTitulo">Tu consumo real</h2></header>
+    <div class="body">
+      <p class="note" id="calTexto" style="margin:0 0 14px"></p>
+      <div class="grid g2">
+        <div><label class="f" for="cal_gasto" id="calGastoEt">Lo que gastaste</label>
+          <input id="cal_gasto" type="number" min="0" step="1"></div>
+        <div><label class="f" for="cal_m2">Metros cuadrados que imprimiste</label>
+          <input id="cal_m2" type="number" min="0" step="0.1"></div>
+      </div>
+      <p class="note" id="calResul" style="margin:14px 0 0"></p>
+      <div class="row-actions" style="margin-top:16px">
+        <button class="btn primary" id="cal_ok">Usar mi consumo</button>
+        <button class="btn ghost" id="cal_cancel">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ============ GUARDADAS ============ -->
 <section id="tab-sav" hidden>
@@ -4530,7 +4574,6 @@ function renderTecnicas(){
 function renderCatalogo(){
   normalizaCat();
   normalizaCalc();
-  renderCalc();
   // La primera vez que una cuenta vieja ve los servicios, se le guardan.
   if(_catSembrado){ _catSembrado = false; persist(); }
   Object.keys(COLS).forEach(renderTabla);
@@ -4947,7 +4990,7 @@ const GRUPOS_BARRA = [
   ["Comercial",  ["cot","sav","cli","arc"]],
   ["Producción", ["dis","pro","com"]],
   ["Dinero",     ["caj","ven"]],
-  ["Taller",     ["cat","set"]]
+  ["Taller",     ["cat","calc","set"]]
 ];
 function agrupaBarra(){
   const tabs = $("#tabs"); if(!tabs || tabs.dataset.agrupado) return;
@@ -4966,6 +5009,7 @@ function agrupaBarra(){
     if(ch && !b.title) b.title = ch.textContent;
   });
   tabs.dataset.agrupado = "1";
+  if(typeof ponIconos==="function") ponIconos();
   limpiaGrupos();
 }
 /* Un encabezado de grupo sin pestañas visibles sobra: el rol de cada quien
@@ -5004,6 +5048,11 @@ function acomodaBarra(){
     tabs.hidden = true; barra.hidden = true;
     document.body.classList.remove("conBarra");
   }
+  // El desplegable se cuelga de la pantalla, no del botón: en un teléfono
+  // angosto colgarlo del botón lo mandaba medio fuera de la vista.
+  const enc = document.querySelector("header.top");
+  if(enc) document.documentElement.style.setProperty("--menuTop",
+    Math.round(enc.getBoundingClientRect().bottom + 6) + "px");
   limpiaGrupos();
 }
 window.addEventListener("resize", ()=>{ clearTimeout(window.__tBarra);
@@ -5066,8 +5115,9 @@ $("#tabs").addEventListener("click", e=>{
   const bd = rot.querySelector(".mbadge"); if(bd) bd.remove();
   $("#menuActual").textContent = rot.textContent.trim();
   abreMenu(false);
-  ["cot","cat","com","cli","arc","caj","pro","dis","sav","ven","set"].forEach(t=> $("#tab-"+t).hidden = (t!==b.dataset.tab));
+  ["cot","cat","calc","com","cli","arc","caj","pro","dis","sav","ven","set"].forEach(t=> $("#tab-"+t).hidden = (t!==b.dataset.tab));
   if(b.dataset.tab==="cat") renderCatalogo();
+  if(b.dataset.tab==="calc") renderCalc();
   if(b.dataset.tab==="com"){ renderCompras(); renderProveedores(); }
   if(b.dataset.tab==="cli") renderClientes();
   if(b.dataset.tab==="arc") renderArchivo();
@@ -5265,6 +5315,62 @@ $("#modalCal").addEventListener("input", pintaCalibrar);
 $("#cal_ok").addEventListener("click", aplicaCalibrar);
 $("#cal_cancel").addEventListener("click", ()=>{ $("#modalCal").hidden = true; ccCalibrando = null; });
 $("#modalCal").addEventListener("click", e=>{ if(e.target.id==="modalCal"){ $("#modalCal").hidden = true; ccCalibrando = null; } });
+
+
+/* ---------- un icono por sección ----------
+   El mapa vive dentro de la función a propósito: la barra lateral llama a
+   ponIconos() antes de llegar aquí, y un const de arriba todavía no existiría. */
+function ponIconos(){
+  const ICONOS = {
+  /* cotizar: una hoja nueva */
+  cot:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'+
+      '<path d="M14 3v5h5"/><path d="M12 11.5v6M9 14.5h6"/>',
+  /* cotizaciones y pedidos: una hoja con renglones */
+  sav:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'+
+      '<path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>',
+  /* clientes: dos personas */
+  cli:'<path d="M15 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-4A3.5 3.5 0 0 0 4 18.5V20"/>'+
+      '<circle cx="9.5" cy="8" r="3.5"/>'+
+      '<path d="M20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4"/><path d="M15.5 4.6a3.5 3.5 0 0 1 0 6.8"/>',
+  /* archivo: una caja de expedientes */
+  arc:'<rect x="3" y="3" width="18" height="5" rx="1"/>'+
+      '<path d="M5 8v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
+  /* diseño: una imagen */
+  dis:'<rect x="3" y="3" width="18" height="18" rx="2"/>'+
+      '<circle cx="8.5" cy="8.5" r="1.4"/><path d="M21 15.5l-4.5-4.5L5.5 21"/>',
+  /* producción: la tabla con su palomita */
+  pro:'<path d="M9 3h6v2.5H9z"/>'+
+      '<path d="M15 4.2h2.5A1.5 1.5 0 0 1 19 5.7v13.8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19.5V5.7a1.5 1.5 0 0 1 1.5-1.5H9"/>'+
+      '<path d="M9 13.5l2 2 4-4"/>',
+  /* compras: el carrito */
+  com:'<circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17.5" cy="19.5" r="1.4"/>'+
+      '<path d="M2.5 3.5H5l2.5 10.2a1.8 1.8 0 0 0 1.8 1.4h7.4a1.8 1.8 0 0 0 1.8-1.4L20.5 7H6"/>',
+  /* caja: un billete */
+  caj:'<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/>'+
+      '<path d="M6 12h.01M18 12h.01"/>',
+  /* ventas: la línea que sube */
+  ven:'<path d="M3.5 3.5v17h17"/><path d="M7 15.5l4-4 3 3 5.5-6"/><path d="M15 8.5h4.5V13"/>',
+  /* catálogo: la etiqueta de precio */
+  cat:'<path d="M20.4 13.1l-7.5-7.5A2 2 0 0 0 11.5 5H5.6A1.6 1.6 0 0 0 4 6.6v5.9a2 2 0 0 0 .6 1.4l7.5 7.5a2 2 0 0 0 2.8 0l5.5-5.5a2 2 0 0 0 0-2.8z"/>'+
+      '<circle cx="8.3" cy="9.3" r="1.3"/>',
+  /* calculadora */
+  calc:'<rect x="4.5" y="2.5" width="15" height="19" rx="2"/>'+
+       '<rect x="7.5" y="5.5" width="9" height="3.5" rx="1"/>'+
+       '<path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 17h.01M12 17h.01M15.5 17h.01"/>',
+  /* ajustes: las correderas */
+  set:'<path d="M4 7h16M4 12h16M4 17h16"/>'+
+      '<circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="17" r="2"/>'
+  };
+  const tabs = $("#tabs"); if(!tabs) return;
+  tabs.querySelectorAll("button[data-tab]").forEach(b=>{
+    if(b.querySelector(".ico")) return;
+    const d = ICONOS[b.dataset.tab]; if(!d) return;
+    const svg = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
+      'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
+    b.insertAdjacentHTML("afterbegin", svg);
+  });
+}
+ponIconos();
 
 /* ---------- eventos del armado ---------- */
 $("#armadoTab").addEventListener("click", ()=>abreArmado(true));
@@ -5952,7 +6058,7 @@ async function bajaCarpeta(cliente, mes, boton){
 
 /* ============ EQUIPO Y ROLES ============ */
 const ROLES = {
-  admin:      {nombre:"Administrador", ve:["cot","sav","pro","dis","cli","arc","caj","ven","cat","com","set"]},
+  admin:      {nombre:"Administrador", ve:["cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","com","set"]},
   ventas:     {nombre:"Ventas",        ve:["cot","sav","pro","dis","cli","arc","cat","com"]},
   diseno:     {nombre:"Diseño",        ve:["dis","pro"]},
   produccion: {nombre:"Producción",    ve:["pro","com"]}
@@ -9426,10 +9532,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261006-1248";</script>
+<script>window.BUILD="20261006-1742";</script>
 <script>
 (function(){
-  var mio = "20261006-1248";
+  var mio = "20261006-1742";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -9457,7 +9563,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261006-1248"></script>
-<script src="diagnostico.js?v=20261006-1248"></script>
+<script src="cuenta.js?v=20261006-1742"></script>
+<script src="diagnostico.js?v=20261006-1742"></script>
 </body>
 </html>
