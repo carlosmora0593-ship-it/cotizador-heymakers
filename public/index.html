@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261006-1005"></script>
+<script src="config.js?v=20261006-1248"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -631,49 +631,67 @@ body.sin-acceso .wrap,body.sin-acceso header.top{display:none}
   .ayudaBtn{right:12px}
 }
 
-/* ---- calculadora de costos ---- */
-.calcTit{display:flex;align-items:center;gap:10px;font-size:11px;font-weight:700;letter-spacing:.06em;
-  text-transform:uppercase;color:var(--ink-3);margin-bottom:10px}
-.calcTit span{flex:1}
-.calcFicha{border:1px solid var(--vidrio-borde,var(--line));border-radius:var(--radio-sm,12px);
-  background:var(--vidrio-fondo-2,var(--surface-2));padding:14px;margin-bottom:12px}
-.calcTop{display:flex;gap:10px;align-items:center;margin-bottom:12px}
-.calcNom{flex:1;font-weight:600}
-.calcRes{font-family:"IBM Plex Mono",monospace;font-weight:700;font-size:15px;color:var(--good);white-space:nowrap}
-.calcRes i{font-style:normal;font-size:11px;color:var(--ink-3);font-weight:500}
-.calcRejilla{display:flex;flex-wrap:wrap;gap:10px}
-.calcCampo{display:flex;flex-direction:column;flex:1 1 150px;min-width:130px}
-.calcCampo span{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
-.calcCampo input{text-align:right}
-.calcIva{margin-top:11px}
-.calcCuenta{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin-top:12px;padding-top:11px;
-  border-top:1px dashed var(--line);font-size:12px;color:var(--ink-3)}
-.calcCuenta b{font-family:"IBM Plex Mono",monospace;font-size:13.5px;color:var(--ink)}
-.calcSug{margin-left:auto;font-weight:600;color:var(--good)}
-.calcAcc{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-top:12px}
-.calcTec{width:auto;min-width:160px;flex:0 1 220px}
-.calcRinde{flex:0 0 130px;margin-left:auto}
-.calcLineaCab,.calcLinea{display:grid;grid-template-columns:150px minmax(0,1fr) 84px 40px 110px 92px 34px;
-  gap:8px;align-items:center}
-.calcLineaCab{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);
-  padding:0 0 5px;border-bottom:1px solid var(--line)}
-.calcLinea{padding:6px 0;border-bottom:1px solid var(--line-soft,var(--line))}
-.calcLinea input[type=number],.calcLinea .calcUnit,.calcLinea b{text-align:right}
-.calcLinea b,.calcLinea .calcUnit{font-family:"IBM Plex Mono",monospace;font-size:12.5px}
-.calcLinea .calcUnit{color:var(--ink-3);font-weight:500}
-.calcUni{font-size:11px;color:var(--ink-3)}
-.calcLnom{font-size:12.5px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.calcArm{font-style:normal;font-family:inherit;font-size:9.5px;font-weight:700;letter-spacing:.04em;
-  text-transform:uppercase;color:var(--cyan);background:var(--cyan-soft);border-radius:5px;padding:1px 4px;margin-left:4px}
-.calcNota{font-size:12px;line-height:1.55;color:var(--ink-2);background:var(--cyan-soft);
-  border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:9px 11px;margin:11px 0 0}
-.calcNota b{font-family:"IBM Plex Mono",monospace}
-@media (max-width:760px){
-  .calcLineaCab{display:none}
-  .calcLinea{grid-template-columns:minmax(0,1fr) 72px 34px;grid-auto-flow:row dense}
-  .calcLinea select{grid-column:1/-1}
-  .calcLinea .calcUnit,.calcLinea b{grid-column:span 1}
-  .calcRinde{margin-left:0}
+/* ---- calculadora de costo de producción ---- */
+#cardCalc .body{padding-bottom:18px}
+.ccPaso{display:flex;gap:14px;align-items:flex-start;padding:16px 0;border-top:1px solid var(--line)}
+.ccPaso:first-child{border-top:0;padding-top:4px}
+.ccNum{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;
+  background:var(--accent);color:#fff;font-weight:700;font-size:13px;margin-top:2px}
+.ccCuerpo{flex:1;min-width:0}
+.ccTit{font-weight:600;font-size:15px;margin-bottom:10px}
+.ccTit small{display:block;font-weight:400;font-size:12px;color:var(--ink-3);margin-top:1px}
+.ccRejilla{display:flex;flex-wrap:wrap;gap:10px}
+.ccCampo{display:flex;flex-direction:column;flex:1 1 170px;min-width:140px}
+.ccCampo span{font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.ccCampo input{text-align:right}
+.ccIva{margin-top:10px}
+.ccPrende{margin-bottom:11px}
+.ccApagado{font-size:12.5px;color:var(--ink-3);margin:0}
+.ccSalida{margin-top:11px;background:var(--good-soft);border-left:3px solid var(--good);border-radius:0 8px 8px 0;
+  padding:9px 12px;font-size:13px;line-height:1.55;color:var(--ink-2)}
+.ccSalida b{font-family:"IBM Plex Mono",monospace;color:var(--good)}
+.ccFalta{color:var(--warn);font-weight:600}
+.ccTip{margin-top:9px;font-size:12px;line-height:1.55;color:var(--ink-3)}
+.ccTip b{font-family:"IBM Plex Mono",monospace;color:var(--ink-2)}
+.ccTip .btn{margin-left:4px;vertical-align:baseline}
+
+.ccRes{margin-top:18px;border-top:2px solid var(--line);padding-top:18px}
+.ccResTop{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.ccResBig{flex:1 1 220px;background:var(--accent-soft);border-radius:var(--radio-sm,12px);padding:13px 15px}
+.ccResBig.alt{background:var(--cyan-soft)}
+.ccResBig span{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.ccResBig b{display:block;font-family:"IBM Plex Mono",monospace;font-size:27px;font-weight:700;color:var(--accent);margin:3px 0 1px}
+.ccResBig.alt b{color:var(--cyan)}
+.ccResBig i{font-style:normal;font-size:11.5px;color:var(--ink-3)}
+.ccMedida{display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--ink-2);
+  background:var(--surface-2);border-radius:var(--radio-sm,10px);padding:10px 12px;margin-bottom:12px}
+.ccMedida input{width:82px;text-align:right;flex:none}
+.ccMedida .x{color:var(--ink-3)}
+.ccMedida b{font-family:"IBM Plex Mono",monospace;color:var(--cyan);margin-left:4px}
+.ccTablaWrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ccTabla{width:100%;border-collapse:collapse;font-size:13px;min-width:320px}
+.ccTabla th{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);
+  text-align:left;padding:0 0 6px;border-bottom:1px solid var(--line)}
+.ccTabla th.n,.ccTabla td.n{text-align:right}
+.ccTabla td{padding:7px 0;border-bottom:1px solid var(--line-soft,var(--line))}
+.ccTabla td.n{font-family:"IBM Plex Mono",monospace}
+.ccTabla td i{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+  color:var(--cyan);background:var(--cyan-soft);border-radius:5px;padding:1px 5px;margin-left:5px}
+.ccTabla .ccMo td i{color:var(--ink-3);background:var(--surface-2)}
+.ccTabla tfoot td{border-bottom:0;border-top:2px solid var(--line);padding-top:9px;font-size:14px}
+.ccTabla tfoot .ccSinFilm td{border-top:0;padding-top:2px;font-size:12.5px;color:var(--ink-3)}
+.ccNota{margin:12px 0 0;font-size:12.5px;line-height:1.55;color:var(--ink-2);
+  background:var(--cyan-soft);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;padding:10px 12px}
+.ccAcc{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.ccTecWrap{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.ccTec{width:auto;min-width:150px;flex:0 1 200px}
+.ccPie{margin:12px 0 0;font-size:11.5px;color:var(--ink-3);line-height:1.5}
+@media (max-width:560px){
+  .ccPaso{gap:10px}
+  .ccResBig b{font-size:23px}
+  .ccTabla{font-size:12px;min-width:300px}
+  .ccTabla td i{display:block;margin:2px 0 0}
+  .ccResTop{gap:9px}
 }
 
 /* ---- interruptor artículo / servicio ---- */
@@ -1751,24 +1769,37 @@ body.rol-produccion #btnPrint{display:none!important}
     </div>
   </div>
   <div class="card" id="cardCalc">
-    <header><h2>Calculadora de costos</h2>
-      <span class="hint" style="margin-left:auto">de lo que pagaste a lo que cuesta producir</span>
+    <header><h2>Calculadora de costo de producción</h2>
+      <span class="hint" style="margin-left:auto">para saber qué te cuesta imprimir</span>
     </header>
     <div class="body">
-      <p class="note" style="margin:0 0 14px">Aquí no se captura un costo por metro cuadrado: se captura <b>lo que pagaste</b>
-        — el rollo, el litro de tinta, la caja de playeras — y la calculadora saca el costo por unidad. Luego, con una
-        <b>receta</b>, se suma lo que se lleva una sola pieza y sale el costo real de producirla. Todo se puede guardar
-        al catálogo con un botón.</p>
-
-      <div class="calcTit"><span>1 · Lo que compraste</span>
-        <button class="btn sm ghost" id="addInsumo">+ Compra</button></div>
-      <div id="calcInsumos"></div>
-
-      <div class="calcTit" style="margin-top:22px"><span>2 · Lo que se lleva una pieza</span>
-        <button class="btn sm ghost" id="addReceta">+ Receta</button></div>
-      <div id="calcRecetas"></div>
+      <p class="note" style="margin:0 0 16px">Tú pon <b>lo que pagaste</b>; el rendimiento lo pone el programa.
+        Los promedios que trae son del oficio y sirven para arrancar, pero <b>el tuyo siempre va a ser más exacto</b>:
+        en cada paso puedes calibrarlo con lo que de verdad gastaste. El resultado es un costo <b>teórico</b> de
+        producción, para que sepas de dónde partir antes de ponerle precio.</p>
+      <div id="calcPasos"></div>
+      <div id="calcResultado"></div>
     </div>
   </div>
+<div class="modal" id="modalCal" hidden>
+  <div class="card">
+    <header><h2 id="calTitulo">Tu consumo real</h2></header>
+    <div class="body">
+      <p class="note" id="calTexto" style="margin:0 0 14px"></p>
+      <div class="grid g2">
+        <div><label class="f" for="cal_gasto" id="calGastoEt">Lo que gastaste</label>
+          <input id="cal_gasto" type="number" min="0" step="1"></div>
+        <div><label class="f" for="cal_m2">Metros cuadrados que imprimiste</label>
+          <input id="cal_m2" type="number" min="0" step="0.1"></div>
+      </div>
+      <p class="note" id="calResul" style="margin:14px 0 0"></p>
+      <div class="row-actions" style="margin-top:16px">
+        <button class="btn primary" id="cal_ok">Usar mi consumo</button>
+        <button class="btn ghost" id="cal_cancel">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
   <div class="card">
     <header><h2>Servicios y material por medida</h2><button class="btn sm ghost" data-add="servicios" style="margin-left:auto">+ Servicio</button></header>
     <div class="body">
@@ -4081,190 +4112,315 @@ function renderResumen(){
 }
 
 
-const UNIDADES = [
-  {id:"ml",   nom:"metro lineal",   ab:"ml"},
-  {id:"m2",   nom:"metro cuadrado", ab:"m²"},
-  {id:"pieza",nom:"pieza",          ab:"pza"},
-  {id:"litro",nom:"litro",          ab:"L"},
-  {id:"ml_l", nom:"mililitro",      ab:"mL"},
-  {id:"kilo", nom:"kilogramo",      ab:"kg"},
-  {id:"gramo",nom:"gramo",          ab:"g"},
-  {id:"hora", nom:"hora",           ab:"h"},
-  {id:"metro",nom:"metro",          ab:"m"}
-];
-function uniAb(id){ const u = UNIDADES.find(u=>u.id===id); return u? u.ab : id; }
-function uniNom(id){ const u = UNIDADES.find(u=>u.id===id); return u? u.nom : id; }
-
-/* ---------- calculadora de costos ---------- */
+/* ---------- calculadora de costo de producción ---------- */
+/* Promedios del oficio para DTF textil. No hay un número oficial: el consumo
+   depende de la cobertura del diseño, de la impresora y del polvo. Sirven para
+   arrancar y se cambian con dos clics. */
+const CALC_DEF = {
+  filmPagado:8700, filmIva:true, filmLargo:50, filmAncho:60,
+  tintaPagado:2900, tintaIva:true, tintaLitros:1, tintaMl:50,
+  polvoOn:true, polvoPagado:1450, polvoIva:true, polvoKilos:5, polvoGr:100,
+  moMin:2, moHora:60,
+  gfOn:true, gfMes:0, gfM2:0,
+  ancho:25, alto:20
+};
 function normalizaCalc(){
-  if(!Array.isArray(cat.insumos)) cat.insumos = [];
-  if(!Array.isArray(cat.recetas)) cat.recetas = [];
-  cat.insumos.forEach(i=>{
-    if(i.conIva==null)  i.conIva = true;
-    if(i.modo==null)    i.modo = "directo";
-    if(i.unidad==null)  i.unidad = "ml";
-    if(i.extra==null)   i.extra = 0;
-  });
-  cat.recetas.forEach(r=>{
-    if(!Array.isArray(r.lineas)) r.lineas = [];
-    if(!num(r.piezas)) r.piezas = 1;
-  });
+  if(!cat.costeo || typeof cat.costeo !== "object") cat.costeo = {};
+  Object.keys(CALC_DEF).forEach(k=>{ if(cat.costeo[k]===undefined) cat.costeo[k] = CALC_DEF[k]; });
+  return cat.costeo;
 }
+/* Lo que pagaste casi siempre trae IVA; el costo real no. */
+function sinIva(v, trae){ return trae ? num(v)/(1 + num(P.iva)/100) : num(v); }
 
-/* Un rollo se compra por metros y ancho; el usuario no tiene por qué sacar
-   los metros cuadrados a mano. */
-function cantInsumo(i){
-  if(i.modo==="rollo"){
-    const largo = num(i.largoM), ancho = num(i.ancho)/100;
-    return i.unidad==="m2" ? largo*ancho : largo;
-  }
-  return num(i.cant);
-}
-function netoInsumo(i){
-  const bruto = num(i.pagado) + num(i.extra);
-  return i.conIva ? bruto / (1 + num(P.iva)/100) : bruto;
-}
-function costoUnidad(i){
-  const c = cantInsumo(i);
-  return c > 0 ? netoInsumo(i)/c : 0;
-}
-function insumoDe(id){ return (cat.insumos||[]).find(i=>i.id===id) || null; }
+function calcCostos(){
+  const c = normalizaCalc();
+  const r = {};
 
-function costoLinea(l){
-  const i = insumoDe(l.insumoId);
-  const cu = i ? costoUnidad(i) : num(l.costoUnit);
-  return num(l.cant) * cu;
-}
-function unidadLinea(l){
-  const i = insumoDe(l.insumoId);
-  return i ? i.unidad : (l.unidad || "pieza");
-}
-function costoReceta(r){
-  const piezas = Math.max(1, num(r.piezas,1));
-  return (r.lineas||[]).reduce((s,l)=>s+costoLinea(l), 0) / piezas;
-}
-/* Un renglón que apunta a un material que ya está dado de alta como servicio
-   por medida y amarrado a una técnica, el ARMADO ya lo cobra en la cotización.
-   Si ese renglón se fuera también a la mano de obra, el material se cobraría
-   dos veces. Aquí se detecta para poder dejarlo fuera. */
-function lineaDelArmado(l){
-  const i = insumoDe(l.insumoId); if(!i) return null;
-  normalizaCat();
-  return (cat.servicios||[]).find(s=>s.tecnicaId && s.nombre === i.nombre) || null;
-}
-function costoManoObra(r){
-  const piezas = Math.max(1, num(r.piezas,1));
-  return (r.lineas||[]).reduce((s,l)=> s + (lineaDelArmado(l) ? 0 : costoLinea(l)), 0) / piezas;
+  // 1 · el film
+  const filmNeto = sinIva(c.filmPagado, c.filmIva);
+  r.filmPorMl = num(c.filmLargo)>0 ? filmNeto/num(c.filmLargo) : 0;
+  r.filmAnchoM = num(c.filmAncho)/100;
+  r.filmPorM2 = r.filmAnchoM>0 ? r.filmPorMl/r.filmAnchoM : 0;
+
+  // 2 · la tinta
+  const tintaNeto = sinIva(c.tintaPagado, c.tintaIva);
+  r.tintaPorLitro = num(c.tintaLitros)>0 ? tintaNeto/num(c.tintaLitros) : 0;
+  r.tintaRindeM2  = num(c.tintaMl)>0 ? 1000/num(c.tintaMl) : 0;
+  r.tintaPorM2    = r.tintaRindeM2>0 ? r.tintaPorLitro/r.tintaRindeM2 : 0;
+  r.tintaRindeMl  = r.filmAnchoM>0 ? r.tintaRindeM2/r.filmAnchoM : 0;   // metros lineales del rollo
+
+  // 3 · el polvo
+  const polvoNeto = sinIva(c.polvoPagado, c.polvoIva);
+  r.polvoPorKilo = num(c.polvoKilos)>0 ? polvoNeto/num(c.polvoKilos) : 0;
+  r.polvoRindeM2 = num(c.polvoGr)>0 ? 1000/num(c.polvoGr) : 0;
+  r.polvoPorM2   = c.polvoOn && r.polvoRindeM2>0 ? r.polvoPorKilo/r.polvoRindeM2 : 0;
+  r.polvoRindeMl = r.filmAnchoM>0 ? r.polvoRindeM2/r.filmAnchoM : 0;
+
+  // 4 · la mano de obra: se paga por pieza, no por metro
+  r.moPorPieza = num(c.moMin)/60 * num(c.moHora);
+
+  // 5 · los gastos fijos, repartidos entre lo que produces
+  r.gfPorM2 = (c.gfOn && num(c.gfM2)>0) ? num(c.gfMes)/num(c.gfM2) : 0;
+
+  // el total
+  r.porM2      = r.filmPorM2 + r.tintaPorM2 + r.polvoPorM2 + r.gfPorM2;
+  r.porM2SinFilm = r.tintaPorM2 + r.polvoPorM2 + r.gfPorM2;
+  r.porMl      = r.porM2 * r.filmAnchoM;
+
+  // la impresión de muestra
+  r.areaM2 = (num(c.ancho)/100) * (num(c.alto)/100);
+  r.pzaFilm  = r.areaM2 * r.filmPorM2;
+  r.pzaTinta = r.areaM2 * r.tintaPorM2;
+  r.pzaPolvo = r.areaM2 * r.polvoPorM2;
+  r.pzaGf    = r.areaM2 * r.gfPorM2;
+  r.pzaSinFilm = r.pzaTinta + r.pzaPolvo + r.pzaGf + r.moPorPieza;
+  r.pzaTotal   = r.pzaFilm + r.pzaSinFilm;
+  return r;
 }
 
 /* ---------- render ---------- */
-function renderInsumos(){
-  const w = $("#calcInsumos"); if(!w) return;
-  normalizaCalc();
-  if(!cat.insumos.length){
-    w.innerHTML = '<div class="empty">Todavía no hay compras. Presiona <b>+ Compra</b> y captura lo que pagaste por un rollo, '+
-      'un litro de tinta o una caja de blancos.</div>';
-    return;
-  }
-  const ops = UNIDADES.map(u=>'<option value="'+u.id+'">'+u.nom+'</option>').join("");
-  w.innerHTML = cat.insumos.map(i=>{
-    const cu = costoUnidad(i), c = cantInsumo(i);
-    const sel = v => ops.replace('value="'+v+'"', 'value="'+v+'" selected');
-    const campo = (k, et, paso, ancho) =>
-      '<label class="calcCampo'+(ancho? " "+ancho : "")+'"><span>'+et+'</span>'+
-      '<input type="number" min="0" step="'+(paso||"0.01")+'" data-ik="'+k+'" value="'+(i[k]==null?"":i[k])+'"></label>';
-    return '<div class="calcFicha" data-insumo="'+i.id+'">'+
-      '<div class="calcTop">'+
-        '<input class="calcNom" data-ik="nombre" value="'+esc(i.nombre||"")+'" placeholder="Ej. Rollo DTF textil 60 cm" aria-label="Qué compraste">'+
-        '<span class="calcRes">'+mx(cu)+' <i>/ '+uniAb(i.unidad)+'</i></span>'+
-        '<button class="btn icon sm" data-delinsumo="'+i.id+'" title="Quitar">✕</button>'+
-      '</div>'+
-      '<div class="calcRejilla">'+
-        campo("pagado","Lo que pagaste","0.01")+
-        campo("extra","Flete / otros","0.01")+
-        '<label class="calcCampo"><span>Unidad</span><select data-ik="unidad">'+sel(i.unidad)+'</select></label>'+
-        '<label class="calcCampo"><span>Cómo viene</span><select data-ik="modo">'+
-          '<option value="directo"'+(i.modo==="directo"?" selected":"")+'>Cantidad directa</option>'+
-          '<option value="rollo"'+(i.modo==="rollo"?" selected":"")+'>Rollo (largo × ancho)</option></select></label>'+
-        (i.modo==="rollo"
-          ? campo("largoM","Largo del rollo (m)","0.5")+campo("ancho","Ancho del rollo (cm)","0.5")
-          : campo("cant","Cuánto te dio","0.01"))+
-      '</div>'+
-      '<label class="sw calcIva"><input type="checkbox" data-ik="conIva"'+(i.conIva?" checked":"")+'> '+
-        'Lo que pagaste ya trae IVA ('+num(P.iva)+'%)</label>'+
-      '<div class="calcCuenta">'+
-        '<span>'+mx(num(i.pagado)+num(i.extra))+(i.conIva? ' con IVA → '+mx(netoInsumo(i))+' sin IVA' : ' sin IVA')+'</span>'+
-        '<span>entre '+red3(c).toLocaleString("es-MX",{maximumFractionDigits:3})+' '+uniAb(i.unidad)+'</span>'+
-        '<b>= '+mx(cu)+' por '+uniAb(i.unidad)+'</b>'+
-        '<span class="calcSug">precio sugerido '+mx(conUtil(cu))+'</span>'+
-      '</div>'+
-      '<div class="calcAcc">'+
-        ((i.unidad==="ml"||i.unidad==="m2")
-          ? '<button class="btn sm" data-aservicio="'+i.id+'">Guardar como material por medida</button>' : "")+
-        (i.unidad==="pieza" ? '<button class="btn sm" data-aarticulo="'+i.id+'">Guardar como artículo</button>' : "")+
-      '</div>'+
-    '</div>';
-  }).join("");
+function calcCampo(k, etiqueta, paso, ancho){
+  const c = normalizaCalc();
+  return '<label class="ccCampo'+(ancho? " "+ancho : "")+'"><span>'+etiqueta+'</span>'+
+    '<input type="number" min="0" step="'+(paso||"0.01")+'" data-cc="'+k+'" value="'+
+    (c[k]==null?"":c[k])+'"></label>';
+}
+function calcIva(k, etiqueta){
+  const c = normalizaCalc();
+  return '<label class="sw ccIva"><input type="checkbox" data-cc="'+k+'"'+(c[k]?" checked":"")+'> '+
+    (etiqueta || 'Ese precio ya trae IVA ('+num(P.iva)+'%)')+'</label>';
+}
+function ccPaso(n, titulo, sub, cuerpo, salida, extra){
+  return '<div class="ccPaso">'+
+    '<div class="ccNum">'+n+'</div>'+
+    '<div class="ccCuerpo">'+
+      '<div class="ccTit">'+titulo+(sub? '<small>'+sub+'</small>' : '')+'</div>'+
+      cuerpo +
+      '<div class="ccSalida" id="ccSal'+n+'"'+(salida? '' : ' hidden')+'>'+(salida||'')+'</div>'+
+      '<div class="ccTipWrap" id="ccTip'+n+'">'+(extra || '')+'</div>'+
+    '</div>'+
+  '</div>';
 }
 
-function renderRecetas(){
-  const w = $("#calcRecetas"); if(!w) return;
-  normalizaCalc();
-  if(!cat.recetas.length){
-    w.innerHTML = '<div class="empty">Una receta suma lo que se lleva <b>una pieza</b>: la película, el polvo, la tinta y tu tiempo. '+
-      'Presiona <b>+ Receta</b>.</div>';
-    return;
-  }
-  const opIns = '<option value="">— a mano —</option>' +
-    (cat.insumos||[]).map(i=>'<option value="'+i.id+'">'+esc(i.nombre||"Sin nombre")+' · '+mx(costoUnidad(i))+'/'+uniAb(i.unidad)+'</option>').join("");
-  const opTec = (cat.tecnicas||[]).map(t=>'<option value="'+t.id+'">'+esc(t.nombre)+'</option>').join("");
-  w.innerHTML = cat.recetas.map(r=>{
-    const cp = costoReceta(r), mo = costoManoObra(r);
-    const deArmado = (r.lineas||[]).filter(lineaDelArmado).length;
-    const lineas = (r.lineas||[]).map(l=>{
-      const liga = !!l.insumoId;
-      const sel = opIns.replace('value="'+l.insumoId+'"', 'value="'+l.insumoId+'" selected');
-      return '<div class="calcLinea" data-linea="'+l.id+'">'+
-        '<select data-lk="insumoId">'+sel+'</select>'+
-        (liga ? '<span class="calcLnom">'+esc((insumoDe(l.insumoId)||{}).nombre||"")+'</span>'
-              : '<input data-lk="nombre" value="'+esc(l.nombre||"")+'" placeholder="Concepto">')+
-        '<input type="number" min="0" step="0.0001" data-lk="cant" value="'+(l.cant==null?"":l.cant)+'" aria-label="Cuánto se lleva">'+
-        '<span class="calcUni">'+uniAb(unidadLinea(l))+'</span>'+
-        (liga ? '<span class="calcUnit">'+mx(costoUnidad(insumoDe(l.insumoId)))+'</span>'
-              : '<input type="number" min="0" step="0.01" data-lk="costoUnit" value="'+(l.costoUnit==null?"":l.costoUnit)+'" aria-label="Costo por unidad">')+
-        '<b>'+mx(costoLinea(l))+(lineaDelArmado(l)? ' <i class="calcArm" title="Este material lo calcula el armado en cada cotización">armado</i>' : '')+'</b>'+
-        '<button class="btn icon sm" data-dellin="'+r.id+'|'+l.id+'" title="Quitar">✕</button>'+
-      '</div>';
-    }).join("");
-    return '<div class="calcFicha" data-receta="'+r.id+'">'+
-      '<div class="calcTop">'+
-        '<input class="calcNom" data-rk="nombre" value="'+esc(r.nombre||"")+'" placeholder="Ej. Playera con frente DTF 25×20" aria-label="Nombre de la receta">'+
-        '<span class="calcRes">'+mx(cp)+' <i>/ pieza</i></span>'+
-        '<button class="btn icon sm" data-delreceta="'+r.id+'" title="Quitar">✕</button>'+
-      '</div>'+
-      '<div class="calcLineaCab"><span>De dónde sale</span><span>Concepto</span><span>Cuánto</span><span></span><span>Costo unitario</span><span>Importe</span><span></span></div>'+
-      (lineas || '<div class="empty" style="margin:8px 0">Sin renglones todavía.</div>')+
-      '<div class="calcAcc">'+
-        '<button class="btn sm ghost" data-addlinea="'+r.id+'">+ Renglón</button>'+
-        '<label class="calcCampo calcRinde"><span>La receta rinde</span>'+
-          '<input type="number" min="1" step="1" data-rk="piezas" value="'+Math.max(1,num(r.piezas,1))+'"></label>'+
-      '</div>'+
-      '<div class="calcCuenta">'+
-        '<b>'+mx(cp)+' por pieza</b>'+
-        '<span class="calcSug">precio sugerido '+mx(conUtil(cp))+' · utilidad '+
-          (conUtil(cp)>0 ? Math.round((conUtil(cp)-cp)/conUtil(cp)*100) : 0)+'%</span>'+
-      '</div>'+
-      (deArmado>0
-        ? '<p class="calcNota">De esos '+mx(cp)+', <b>'+mx(cp - mo)+'</b> es material que el armado ya calcula solo en cada '+
-          'cotización (los renglones marcados <i class="calcArm">armado</i>). A la mano de obra de la técnica le toca '+
-          '<b>'+mx(mo)+'</b>: si mandaras el total, el material se cobraría dos veces.</p>'
-        : "")+
-      (opTec ? '<div class="calcAcc"><select class="calcTec" data-rtec="'+r.id+'">'+opTec+'</select>'+
-        '<button class="btn sm" data-atecnica="'+r.id+'">Guardar '+mx(mo)+' como mano de obra de esa técnica</button></div>' : "")+
-    '</div>';
-  }).join("");
+/* El texto de cada paso, aparte del armazón: así se puede repintar sin tocar
+   los campos y sin quitarle el cursor a quien está escribiendo. */
+function ccSalidaTexto(n){
+  const c = normalizaCalc(), r = calcCostos();
+  const ab = v => '<b>'+mx(v)+'</b>';
+  if(n===1) return 'Te sale en '+ab(r.filmPorMl)+' el <b>metro lineal</b> · '+ab(r.filmPorM2)+' el <b>metro cuadrado</b>';
+  if(n===2) return 'Un litro alcanza para <b>'+red2(r.tintaRindeM2)+' m\u00b2</b> (unos <b>'+red2(r.tintaRindeMl)+
+    ' metros lineales</b> de tu rollo) \u00b7 la tinta te cuesta '+ab(r.tintaPorM2)+' el m\u00b2';
+  if(n===3) return c.polvoOn ? 'Un kilo alcanza para <b>'+red2(r.polvoRindeM2)+' m\u00b2</b> \u00b7 el polvo te cuesta '+
+    ab(r.polvoPorM2)+' el m\u00b2' : "";
+  if(n===4) return 'Cada pieza se lleva '+ab(r.moPorPieza)+' de mano de obra';
+  if(n===5) return c.gfOn
+    ? (num(c.gfM2)>0 ? 'A cada metro cuadrado le tocan '+ab(r.gfPorM2)
+       : '<span class="ccFalta">Falta cu\u00e1ntos m\u00b2 imprimes al mes: sin eso no hay entre qu\u00e9 repartir.</span>')
+    : "";
+  return "";
 }
-function renderCalc(){ renderInsumos(); renderRecetas(); }
+function ccTipTexto(n){
+  const c = normalizaCalc();
+  if(n===2) return '<div class="ccTip">Los <b>'+num(c.tintaMl)+' ml por m\u00b2</b> son un promedio del oficio: el blanco se lleva dos o '+
+    'tres veces lo de cada color, y entre todos rondan esa cifra en un dise\u00f1o bien cubierto. '+
+    '<b>Tu n\u00famero le gana a cualquier promedio:</b> '+
+    '<button class="btn sm ghost" data-ccal="tinta">Calcularlo con lo que gastaste</button></div>';
+  if(n===3) return c.polvoOn
+    ? '<div class="ccTip">Los <b>'+num(c.polvoGr)+' g por m\u00b2</b> tambi\u00e9n son promedio. El polvo s\u00f3lo se pega donde '+
+      'hay tinta, as\u00ed que un dise\u00f1o calado gasta menos. '+
+      '<button class="btn sm ghost" data-ccal="polvo">Calcularlo con lo que gastaste</button></div>'
+    : "";
+  if(n===4) return '<div class="ccTip">Cuenta el tiempo completo: acomodar, imprimir, sacudir el polvo, curar, prensar y revisar. '+
+    'Si lo haces t\u00fa, ponle lo que vale tu hora aunque no te lo pagues: el d\u00eda que contrates a alguien, ese costo aparece.</div>';
+  if(n===5) return c.gfOn
+    ? '<div class="ccTip">Si no sabes cu\u00e1ntos metros cuadrados haces al mes, cuenta los rollos: un rollo de '+
+      num(c.filmAncho)+' cm por '+num(c.filmLargo)+' m son <b>'+red2(num(c.filmLargo)*num(c.filmAncho)/100)+' m\u00b2</b>.</div>'
+    : "";
+  return "";
+}
+
+function renderPasos(){
+  const w = $("#calcPasos"); if(!w) return;
+  const c = normalizaCalc();
+
+  // ---- 1. el film
+  const film = ccPaso(1, "El film", "el rollo que imprimes",
+    '<div class="ccRejilla">'+
+      calcCampo("filmPagado","Lo que te costó el rollo","1")+
+      calcCampo("filmLargo","Metros que trae","0.5")+
+      calcCampo("filmAncho","Ancho del rollo (cm)","0.5")+
+    '</div>'+ calcIva("filmIva"),
+    ccSalidaTexto(1), ccTipTexto(1));
+
+  // ---- 2. la tinta
+  const tinta = ccPaso(2, "La tinta", "blanco y color, juntos",
+    '<div class="ccRejilla">'+
+      calcCampo("tintaPagado","Lo que te costó","1")+
+      calcCampo("tintaLitros","Litros que trae","0.1")+
+      calcCampo("tintaMl","Se gastan ___ ml por m²","1")+
+    '</div>'+ calcIva("tintaIva"),
+    ccSalidaTexto(2), ccTipTexto(2));
+
+  // ---- 3. el polvo
+  const polvo = ccPaso(3, "El polvo termoadhesivo", "sólo en DTF textil",
+    '<label class="sw ccPrende"><input type="checkbox" data-cc="polvoOn"'+(c.polvoOn?" checked":"")+'> '+
+      'Mi proceso lleva polvo</label>'+
+    (c.polvoOn
+      ? '<div class="ccRejilla">'+
+          calcCampo("polvoPagado","Lo que te costó","1")+
+          calcCampo("polvoKilos","Kilos que trae","0.1")+
+          calcCampo("polvoGr","Se usan ___ g por m²","1")+
+        '</div>'+ calcIva("polvoIva")
+      : '<p class="ccApagado">Sin polvo: vinil, sublimación o lona.</p>'),
+    ccSalidaTexto(3), ccTipTexto(3));
+
+  // ---- 4. la mano de obra
+  const mo = ccPaso(4, "Tu mano de obra", "lo que cuesta el tiempo de quien lo hace",
+    '<div class="ccRejilla">'+
+      calcCampo("moMin","Minutos por pieza","0.5")+
+      calcCampo("moHora","Cuánto vale la hora","1")+
+    '</div>',
+    ccSalidaTexto(4), ccTipTexto(4));
+
+  // ---- 5. los gastos fijos
+  const gf = ccPaso(5, "Gastos fijos", "renta, luz, internet, lo que se paga haya o no trabajo",
+    '<label class="sw ccPrende"><input type="checkbox" data-cc="gfOn"'+(c.gfOn?" checked":"")+'> '+
+      'Repartir mis gastos fijos en la producción</label>'+
+    (c.gfOn
+      ? '<div class="ccRejilla">'+
+          calcCampo("gfMes","Lo que pagas al mes","1")+
+          calcCampo("gfM2","Metros cuadrados que imprimes al mes","1")+
+        '</div>'
+      : '<p class="ccApagado">Sin repartir: el costo sale sólo de los materiales y el tiempo.</p>'),
+    ccSalidaTexto(5), ccTipTexto(5));
+
+  w.innerHTML = film + tinta + polvo + mo + gf;
+}
+
+function ccFilas(){
+  const c = normalizaCalc(), r = calcCostos();
+  const fila = (que, m2, pza, nota) =>
+    '<tr><td>'+que+(nota? ' <i>'+nota+'</i>' : '')+'</td>'+
+    '<td class="n">'+mx(m2)+'</td><td class="n">'+mx(pza)+'</td></tr>';
+  return fila("Film", r.filmPorM2, r.pzaFilm, "lo cobra el armado")+
+    fila("Tinta", r.tintaPorM2, r.pzaTinta)+
+    (c.polvoOn ? fila("Polvo", r.polvoPorM2, r.pzaPolvo) : "")+
+    (c.gfOn && r.gfPorM2>0 ? fila("Gastos fijos", r.gfPorM2, r.pzaGf) : "")+
+    '<tr class="ccMo"><td>Mano de obra <i>se paga por pieza</i></td><td class="n">\u2014</td>'+
+      '<td class="n">'+mx(r.moPorPieza)+'</td></tr>';
+}
+function ccPie(){
+  const r = calcCostos();
+  return '<tr><td><b>Todo junto</b></td><td class="n"><b>'+mx(r.porM2)+'</b></td>'+
+      '<td class="n"><b>'+mx(r.pzaTotal)+'</b></td></tr>'+
+    '<tr class="ccSinFilm"><td>Sin el film</td><td class="n">'+mx(r.porM2SinFilm)+'</td>'+
+      '<td class="n">'+mx(r.pzaSinFilm)+'</td></tr>';
+}
+function renderResultado(){
+  const w = $("#calcResultado"); if(!w) return;
+  const c = normalizaCalc(), r = calcCostos();
+  const opTec = (cat.tecnicas||[]).map(t=>'<option value="'+t.id+'">'+esc(t.nombre)+'</option>').join("");
+
+  w.innerHTML =
+    '<div class="ccRes">'+
+      '<div class="ccResTop">'+
+        '<div class="ccResBig"><span>Tu costo de producción</span><b id="ccResM2">'+mx(r.porM2)+'</b><i>por metro cuadrado impreso</i></div>'+
+        '<div class="ccResBig alt"><span>O por metro lineal</span><b id="ccResMl">'+mx(r.porMl)+'</b><i id="ccResMlPie">de tu rollo de '+num(c.filmAncho)+' cm</i></div>'+
+      '</div>'+
+
+      '<div class="ccMedida"><span>Y una impresión de</span>'+
+        '<input type="number" min="0" step="0.5" data-cc="ancho" value="'+num(c.ancho)+'" aria-label="Ancho">'+
+        '<span class="x">×</span>'+
+        '<input type="number" min="0" step="0.5" data-cc="alto" value="'+num(c.alto)+'" aria-label="Alto">'+
+        '<span>cm</span><b id="ccArea">'+red3(r.areaM2)+' m²</b></div>'+
+
+      '<div class="ccTablaWrap"><table class="ccTabla"><thead><tr><th>De qué</th><th class="n">Por m²</th><th class="n">Por pieza</th></tr></thead>'+
+        '<tbody id="ccCuerpoTabla">'+ccFilas()+'</tbody>'+
+        '<tfoot id="ccPieTabla">'+ccPie()+'</tfoot></table></div>'+
+
+      '<p class="ccNota">El <b>film se cobra aparte</b>: el cotizador lo calcula solo en cada cotización, con el acomodo '+
+        'real de las piezas en el rollo. Por eso el renglón que le toca a la técnica es el de <b>sin el film</b> — '+
+        'si mandaras el total, el material se cobraría dos veces.</p>'+
+
+      '<div class="ccAcc">'+
+        '<button class="btn" data-ccguardar="film">Guardar el film como material por medida</button>'+
+        (opTec
+          ? '<span class="ccTecWrap"><select class="ccTec" id="ccTec">'+opTec+'</select>'+
+            '<button class="btn" data-ccguardar="tecnica">Guardar <span id="ccBtnMO">'+mx(r.pzaSinFilm)+'</span> como mano de obra</button></span>'
+          : '')+
+      '</div>'+
+      '<p class="ccPie">Es un costo <b>teórico</b>: sirve para saber de dónde partes, no para cerrar el trato. '+
+        'Tu precio de venta sale de ahí más tu utilidad, que se configura en Ajustes.</p>'+
+    '</div>';
+}
+function renderCalc(){ renderPasos(); renderResultado(); }
+
+/* ---------- calibrar con lo que de verdad gastaste ---------- */
+let ccCalibrando = null;
+function abreCalibrar(que){
+  ccCalibrando = que;
+  const c = normalizaCalc();
+  const esTinta = que === "tinta";
+  $("#calTitulo").textContent = esTinta ? "¿Cuánta tinta gastaste de verdad?" : "¿Cuánto polvo gastaste de verdad?";
+  $("#calTexto").innerHTML = esTinta
+    ? 'Pon lo que gastaste en un periodo que recuerdes bien y cuánto imprimiste en ese mismo periodo. '+
+      'De ahí sale <b>tu</b> consumo por metro cuadrado, que le gana a cualquier promedio.'
+    : 'Lo mismo con el polvo: lo que se acabó y lo que imprimiste mientras tanto.';
+  $("#calGastoEt").textContent = esTinta ? "Mililitros de tinta que gastaste" : "Gramos de polvo que gastaste";
+  $("#cal_gasto").value = "";
+  $("#cal_m2").value = "";
+  $("#calResul").textContent = "";
+  $("#modalCal").hidden = false;
+}
+function pintaCalibrar(){
+  const g = num($("#cal_gasto").value), m2 = num($("#cal_m2").value);
+  const el = $("#calResul");
+  if(!(g>0 && m2>0)){ el.textContent = ""; return; }
+  const porM2 = g/m2;
+  el.innerHTML = 'Tu consumo real: <b>'+red2(porM2)+(ccCalibrando==="tinta" ? ' ml' : ' g')+' por m²</b>'+
+    ' · un '+(ccCalibrando==="tinta" ? 'litro' : 'kilo')+' te rinde <b>'+red2(1000/porM2)+' m²</b>';
+}
+function aplicaCalibrar(){
+  const g = num($("#cal_gasto").value), m2 = num($("#cal_m2").value);
+  if(!(g>0 && m2>0)){ toast("Faltan los dos datos"); return; }
+  const porM2 = Math.round(g/m2*100)/100;
+  const c = normalizaCalc();
+  if(ccCalibrando==="tinta") c.tintaMl = porM2; else c.polvoGr = porM2;
+  persist(); renderCalc();
+  $("#modalCal").hidden = true;
+  toast("Listo: ahora usa tu consumo real, "+red2(porM2)+(ccCalibrando==="tinta" ? " ml" : " g")+" por m²");
+  ccCalibrando = null;
+}
+
+/* ---------- llevarse el resultado al catálogo ---------- */
+function ccGuardaFilm(){
+  const c = normalizaCalc(), r = calcCostos();
+  const costo = red2(r.filmPorMl), precio = red2(conUtil(costo));
+  const nombre = "Film DTF "+num(c.filmAncho)+" cm";
+  normalizaCat();
+  let s = (cat.servicios||[]).find(s=>s.nombre === nombre);
+  if(s){ logPrecio(s.nombre, s.costo, costo); s.costo = costo; s.precio = precio; s.ancho = num(c.filmAncho); s.unidad = "ml"; }
+  else {
+    cat.servicios.push({id:uid(), nombre, unidad:"ml", ancho:num(c.filmAncho), costo, precio,
+      minimo:0, incremento:0.1, separacion:0.5, orilla:1, gramaje:0, tecnicaId:""});
+  }
+  persist();
+  if(typeof renderCatalogo==="function") renderCatalogo();
+  toast('“'+nombre+'” guardado: '+mx(costo)+' de costo y '+mx(precio)+' de precio por metro lineal. '+
+        'Amárralo a su técnica abajo, en Servicios y material por medida.');
+}
+function ccGuardaTecnica(){
+  const r = calcCostos();
+  const sel = $("#ccTec"); if(!sel) return;
+  const t = (cat.tecnicas||[]).find(t=>t.id===sel.value); if(!t) return;
+  const costo = red2(r.pzaSinFilm), precio = red2(conUtil(costo));
+  logPrecio(t.nombre+" · mano de obra", num(t.precioMO), precio);
+  t.costoMO = costo; t.precioMO = precio;
+  persist();
+  if(typeof renderCatalogo==="function") renderCatalogo();
+  toast('“'+t.nombre+'”: '+mx(costo)+' de costo y '+mx(precio)+' de precio por aplicación. '+
+        'El film no va ahí: lo cobra el armado.');
+}
 
 /* ---------- render catálogo ---------- */
 const COLS = {
@@ -5061,160 +5217,54 @@ $("#r_alerta").addEventListener("click", e=>{
 });
 
 
-/* ---------- eventos de la calculadora ---------- */
-$("#addInsumo").addEventListener("click", ()=>{
-  normalizaCalc();
-  cat.insumos.push({id:uid(), nombre:"", pagado:0, extra:0, conIva:true, modo:"directo",
-                    unidad:"ml", cant:0, largoM:50, ancho:60});
-  persist(); renderCalc();
-});
-$("#addReceta").addEventListener("click", ()=>{
-  normalizaCalc();
-  cat.recetas.push({id:uid(), nombre:"", piezas:1, lineas:[]});
-  persist(); renderCalc();
-});
+/* ---------- eventos de la calculadora de costos ---------- */
 $("#cardCalc").addEventListener("input", e=>{
-  const fi = e.target.closest("[data-insumo]");
-  if(fi && e.target.dataset.ik){
-    const i = insumoDe(fi.dataset.insumo); if(!i) return;
-    const k = e.target.dataset.ik;
-    i[k] = (k==="nombre") ? e.target.value : num(e.target.value);
-    persist(); pintaInsumo(i);
-    return;
-  }
-  const fr = e.target.closest("[data-receta]");
-  if(fr){
-    const r = (cat.recetas||[]).find(x=>x.id===fr.dataset.receta); if(!r) return;
-    const ln = e.target.closest("[data-linea]");
-    if(ln && e.target.dataset.lk){
-      const l = (r.lineas||[]).find(x=>x.id===ln.dataset.linea); if(!l) return;
-      const k = e.target.dataset.lk;
-      l[k] = (k==="nombre") ? e.target.value : num(e.target.value);
-      persist(); pintaReceta(r);
-      return;
-    }
-    if(e.target.dataset.rk){
-      const k = e.target.dataset.rk;
-      r[k] = (k==="nombre") ? e.target.value : num(e.target.value);
-      persist(); pintaReceta(r);
-    }
-  }
+  const k = e.target.dataset.cc; if(!k) return;
+  if(e.target.type === "checkbox") return;
+  normalizaCalc()[k] = num(e.target.value);
+  persist();
+  // los pasos no se repintan al escribir, para no robarle el foco a nadie:
+  // sólo las salidas y el resultado
+  pintaSalidas();
 });
 $("#cardCalc").addEventListener("change", e=>{
-  const fi = e.target.closest("[data-insumo]");
-  if(fi && e.target.dataset.ik){
-    const i = insumoDe(fi.dataset.insumo); if(!i) return;
-    const k = e.target.dataset.ik;
-    i[k] = (k==="conIva") ? e.target.checked : e.target.value;
-    persist(); renderCalc();
-    return;
-  }
-  const ln = e.target.closest("[data-linea]");
-  if(ln && e.target.dataset.lk==="insumoId"){
-    const fr = e.target.closest("[data-receta]");
-    const r = (cat.recetas||[]).find(x=>x.id===fr.dataset.receta); if(!r) return;
-    const l = (r.lineas||[]).find(x=>x.id===ln.dataset.linea); if(!l) return;
-    l.insumoId = e.target.value;
-    const i = insumoDe(l.insumoId);
-    if(i && !l.nombre) l.nombre = i.nombre;
-    persist(); renderRecetas();
-  }
+  const k = e.target.dataset.cc; if(!k) return;
+  if(e.target.type !== "checkbox") return;
+  normalizaCalc()[k] = e.target.checked;
+  persist(); renderCalc();
 });
 $("#cardCalc").addEventListener("click", e=>{
-  const d = e.target.closest("[data-delinsumo]");
-  if(d){ cat.insumos = (cat.insumos||[]).filter(i=>i.id!==d.dataset.delinsumo); persist(); renderCalc(); return; }
-  const dr = e.target.closest("[data-delreceta]");
-  if(dr){ cat.recetas = (cat.recetas||[]).filter(r=>r.id!==dr.dataset.delreceta); persist(); renderRecetas(); return; }
-  const al = e.target.closest("[data-addlinea]");
-  if(al){
-    const r = (cat.recetas||[]).find(x=>x.id===al.dataset.addlinea); if(!r) return;
-    r.lineas = (r.lineas||[]).concat([{id:uid(), insumoId:"", nombre:"", cant:1, costoUnit:0, unidad:"pieza"}]);
-    persist(); renderRecetas(); return;
+  const cal = e.target.closest("[data-ccal]");
+  if(cal){ abreCalibrar(cal.dataset.ccal); return; }
+  const g = e.target.closest("[data-ccguardar]");
+  if(g){
+    if(g.dataset.ccguardar === "film") ccGuardaFilm(); else ccGuardaTecnica();
+    return;
   }
-  const dl = e.target.closest("[data-dellin]");
-  if(dl){
-    const p = String(dl.dataset.dellin).split("|");
-    const r = (cat.recetas||[]).find(x=>x.id===p[0]); if(!r) return;
-    r.lineas = (r.lineas||[]).filter(l=>l.id!==p[1]);
-    persist(); renderRecetas(); return;
-  }
-  const sv = e.target.closest("[data-aservicio]");
-  if(sv){ aServicio(sv.dataset.aservicio); return; }
-  const ar = e.target.closest("[data-aarticulo]");
-  if(ar){ aArticulo(ar.dataset.aarticulo); return; }
-  const at = e.target.closest("[data-atecnica]");
-  if(at){ aTecnica(at.dataset.atecnica); return; }
 });
-
-/* ---------- repintar sin robarle el foco a quien escribe ---------- */
-function pintaInsumo(i){
-  const el = document.querySelector('[data-insumo="'+i.id+'"]'); if(!el) return;
-  const cu = costoUnidad(i), c = cantInsumo(i);
-  el.querySelector(".calcRes").innerHTML = mx(cu)+' <i>/ '+uniAb(i.unidad)+'</i>';
-  el.querySelector(".calcCuenta").innerHTML =
-    '<span>'+mx(num(i.pagado)+num(i.extra))+(i.conIva? ' con IVA → '+mx(netoInsumo(i))+' sin IVA' : ' sin IVA')+'</span>'+
-    '<span>entre '+red3(c).toLocaleString("es-MX",{maximumFractionDigits:3})+' '+uniAb(i.unidad)+'</span>'+
-    '<b>= '+mx(cu)+' por '+uniAb(i.unidad)+'</b>'+
-    '<span class="calcSug">precio sugerido '+mx(conUtil(cu))+'</span>';
-}
-function pintaReceta(r){
-  const el = document.querySelector('[data-receta="'+r.id+'"]'); if(!el) return;
-  const cp = costoReceta(r);
-  el.querySelector(".calcRes").innerHTML = mx(cp)+' <i>/ pieza</i>';
-  (r.lineas||[]).forEach(l=>{
-    const ln = el.querySelector('[data-linea="'+l.id+'"]'); if(!ln) return;
-    const b = ln.querySelector("b"); if(b) b.textContent = mx(costoLinea(l));
-  });
-  el.querySelector(".calcCuenta").innerHTML =
-    '<b>'+mx(cp)+' por pieza</b>'+
-    '<span class="calcSug">precio sugerido '+mx(conUtil(cp))+' · utilidad '+
-      (conUtil(cp)>0 ? Math.round((conUtil(cp)-cp)/conUtil(cp)*100) : 0)+'%</span>';
-}
-
-/* ---------- mandar el resultado al catálogo ---------- */
-function aServicio(id){
-  const i = insumoDe(id); if(!i) return;
-  const costo = red2(costoUnidad(i)), precio = red2(conUtil(costo));
-  const nombre = i.nombre || "Material sin nombre";
-  normalizaCat();
-  let s = cat.servicios.find(s=>s.nombre === nombre);
-  if(s){
-    logPrecio(s.nombre, s.costo, costo);
-    s.costo = costo; s.precio = precio; s.unidad = i.unidad;
-    if(i.modo==="rollo") s.ancho = num(i.ancho);
-  } else {
-    cat.servicios.push({id:uid(), nombre, unidad:i.unidad, ancho: i.modo==="rollo" ? num(i.ancho) : 60,
-      costo, precio, minimo:0, incremento: i.unidad==="m2" ? 0.25 : 0.1,
-      separacion:0.5, orilla:1, gramaje:0, tecnicaId:""});
+/* Repinta SÓLO los números. No se vuelve a dibujar ni un campo, así que a
+   quien está escribiendo no se le mueve el cursor ni se le borra lo que lleva. */
+function pintaSalidas(){
+  const c = normalizaCalc(), r = calcCostos();
+  for(let n=1; n<=5; n++){
+    const sal = $("#ccSal"+n);
+    if(sal){ const t = ccSalidaTexto(n); sal.innerHTML = t; sal.hidden = !t; }
+    const tip = $("#ccTip"+n);
+    if(tip) tip.innerHTML = ccTipTexto(n);
   }
-  persist();
-  if(typeof renderCatalogo==="function") renderCatalogo();
-  toast('“'+nombre+'” guardado: '+mx(costo)+' de costo y '+mx(precio)+' de precio por '+uniAb(i.unidad)+
-        '. Amárralo a su técnica en Servicios y material por medida.');
+  const pon = (id, html) => { const el = $(id); if(el) el.innerHTML = html; };
+  pon("#ccResM2", mx(r.porM2));
+  pon("#ccResMl", mx(r.porMl));
+  pon("#ccResMlPie", "de tu rollo de "+num(c.filmAncho)+" cm");
+  pon("#ccArea", red3(r.areaM2)+" m²");
+  pon("#ccCuerpoTabla", ccFilas());
+  pon("#ccPieTabla", ccPie());
+  pon("#ccBtnMO", mx(r.pzaSinFilm));
 }
-function aArticulo(id){
-  const i = insumoDe(id); if(!i) return;
-  const costo = red2(costoUnidad(i)), precio = red2(conUtil(costo));
-  const nombre = i.nombre || "Artículo sin nombre";
-  let a = (cat.articulos||[]).find(a=>a.nombre === nombre);
-  if(a){ logPrecio(a.nombre, a.costo, costo); a.costo = costo; a.precio = precio; }
-  else { cat.articulos.push({id:uid(), nombre, cat:"General", costo, precio, tallas:true, existencia:0, minimo_inv:0}); }
-  persist();
-  if(typeof renderCatalogo==="function") renderCatalogo();
-  toast('“'+nombre+'” guardado en artículos: '+mx(costo)+' de costo y '+mx(precio)+' de precio.');
-}
-function aTecnica(rid){
-  const r = (cat.recetas||[]).find(x=>x.id===rid); if(!r) return;
-  const sel = document.querySelector('[data-rtec="'+rid+'"]'); if(!sel) return;
-  const t = (cat.tecnicas||[]).find(t=>t.id===sel.value); if(!t) return;
-  // sin el material que el armado ya calcula: ese se cobra allá, no aquí
-  const costo = red2(costoManoObra(r)), precio = red2(conUtil(costo));
-  logPrecio(t.nombre+" · mano de obra", num(t.precioMO), precio);
-  t.costoMO = costo; t.precioMO = precio;
-  persist();
-  if(typeof renderCatalogo==="function") renderCatalogo();
-  toast('“'+t.nombre+'”: mano de obra en '+mx(costo)+' de costo y '+mx(precio)+' de precio por aplicación.');
-}
+$("#modalCal").addEventListener("input", pintaCalibrar);
+$("#cal_ok").addEventListener("click", aplicaCalibrar);
+$("#cal_cancel").addEventListener("click", ()=>{ $("#modalCal").hidden = true; ccCalibrando = null; });
+$("#modalCal").addEventListener("click", e=>{ if(e.target.id==="modalCal"){ $("#modalCal").hidden = true; ccCalibrando = null; } });
 
 /* ---------- eventos del armado ---------- */
 $("#armadoTab").addEventListener("click", ()=>abreArmado(true));
@@ -9376,10 +9426,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261006-1005";</script>
+<script>window.BUILD="20261006-1248";</script>
 <script>
 (function(){
-  var mio = "20261006-1005";
+  var mio = "20261006-1248";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -9407,7 +9457,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261006-1005"></script>
-<script src="diagnostico.js?v=20261006-1005"></script>
+<script src="cuenta.js?v=20261006-1248"></script>
+<script src="diagnostico.js?v=20261006-1248"></script>
 </body>
 </html>
