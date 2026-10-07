@@ -223,10 +223,10 @@ function rol(){
   return ROLES_NOMBRE[r] ? r : "admin";     // rol desconocido o sin perfil: no le escondemos nada
 }
 const PERMISOS = {
-  admin:      ["cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","com","set"],
-  ventas:     ["cot","sav","pro","dis","cli","arc","cat","com"],
-  diseno:     ["dis","pro"],
-  produccion: ["pro","com"]
+  admin:      ["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","com","set"],
+  ventas:     ["inicio","cot","sav","pro","dis","cli","arc","cat","com"],
+  diseno:     ["inicio","dis","pro"],
+  produccion: ["inicio","pro","com"]
 };
 /* Secciones que no vienen en el plan Básico */
 const SOLO_PRO   = ["caj","ven"];

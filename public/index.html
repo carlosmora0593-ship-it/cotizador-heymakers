@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261006-2231"></script>
+<script src="config.js?v=20261006-2248"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1198,34 +1198,6 @@ nav.tabs .barraGrupo{padding:12px 11px 4px}
 .alAcc{margin-top:11px}
 .sub.pierde{color:var(--warn);font-weight:700}
 
-/* ---- el icono de cada sección ---- */
-@media screen{
-nav.tabs button{
-  display:grid;
-  grid-template-columns:22px minmax(0,1fr);
-  column-gap:11px;row-gap:1px;
-  align-items:center;
-}
-nav.tabs button .ico{
-  grid-column:1;grid-row:1 / span 2;
-  width:19px;height:19px;color:var(--ink-3);
-  transition:color .15s;
-}
-nav.tabs button b,
-nav.tabs button small{grid-column:2}
-nav.tabs button:hover .ico{color:var(--ink-2)}
-nav.tabs button[aria-selected="true"] .ico{color:var(--accent)}
-
-/* en la barra lateral la explicación se esconde, así que el icono va en la
-   única línea que queda */
-body.conBarra nav.tabs button{
-  grid-template-columns:20px minmax(0,1fr);
-  column-gap:10px;row-gap:0;
-}
-body.conBarra nav.tabs button .ico{grid-row:1;width:17px;height:17px}
-body.conBarra nav.tabs button[aria-selected="true"] .ico{color:var(--accent-ink)}
-}
-
 /* ---- el carrusel de anuncios ---- */
 @media screen{
 .anuncios{position:relative;margin:22px 0 4px;border-radius:var(--radio,16px);overflow:hidden;
@@ -1256,6 +1228,71 @@ a.anunPieza:hover img{opacity:.94}
   .anunPieza img{aspect-ratio:900/260}
   .anunFlecha{opacity:.9;width:27px;height:27px}
 }
+}
+
+/* ---- tablero de turno ---- */
+.tbSaludo{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;margin:22px 0 18px}
+.tbSaludo h1{margin:0;font-size:25px;font-weight:600}
+.tbSaludo p{margin:4px 0 0;font-size:13px;color:var(--ink-3)}
+.tbSaludo .btn{margin-left:auto;flex:none}
+.tbTiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:20px}
+.tbTile{background:var(--vidrio-fondo,var(--surface));border:1px solid var(--vidrio-borde,var(--line));
+  border-radius:var(--radio,16px);padding:14px 16px;box-shadow:var(--brillo),var(--sombra-flota)}
+.tbTile .et{display:block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.tbTile .v{display:block;font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:700;margin:4px 0 2px}
+.tbTile .sub{display:block;font-size:11.5px;color:var(--ink-3)}
+.tbTile.mal .v{color:var(--warn)}
+.tbCols{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;align-items:start}
+.tbMov,.tbUrge{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line-soft,var(--line))}
+.tbMov:first-child,.tbUrge:first-child{border-top:0;padding-top:2px}
+.tbIco{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
+  background:var(--surface-2);color:var(--ink-3);font-size:12px;font-weight:700;margin-top:1px}
+.tbMov.bien .tbIco{background:var(--good-soft);color:var(--good)}
+.tbMov.info .tbIco{background:var(--cyan-soft);color:var(--cyan)}
+.tbMov.mal .tbIco{background:var(--warn-soft);color:var(--warn)}
+.tbTxt{flex:1;min-width:0;font-size:13px;line-height:1.5}
+.tbTxt b{font-family:"IBM Plex Mono",monospace;font-size:12px}
+.tbTxt small{display:block;font-size:11px;color:var(--ink-3);margin-top:2px}
+.tbCli{font-size:12px;color:var(--ink-3)}
+.tbQue{flex:none;font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+  border-radius:5px;padding:3px 7px;margin-top:2px;white-space:nowrap}
+.tbUrge.mal .tbQue{background:var(--warn-soft);color:var(--warn)}
+.tbUrge.aviso .tbQue{background:var(--cyan-soft);color:var(--cyan)}
+[data-tbir]{cursor:pointer;border-radius:8px}
+[data-tbir]:hover{background:var(--surface-2)}
+@media (max-width:900px){ .tbCols{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:560px){
+  .tbSaludo h1{font-size:21px}
+  .tbSaludo .btn{margin-left:0}
+  .tbTile .v{font-size:22px}
+}
+
+/* ---- el icono de cada sección ---- */
+@media screen{
+nav.tabs button{
+  display:grid;
+  grid-template-columns:22px minmax(0,1fr);
+  column-gap:11px;row-gap:1px;
+  align-items:center;
+}
+nav.tabs button .ico{
+  grid-column:1;grid-row:1 / span 2;
+  width:19px;height:19px;color:var(--ink-3);
+  transition:color .15s;
+}
+nav.tabs button b,
+nav.tabs button small{grid-column:2}
+nav.tabs button:hover .ico{color:var(--ink-2)}
+nav.tabs button[aria-selected="true"] .ico{color:var(--accent)}
+
+/* en la barra lateral la explicación se esconde, así que el icono va en la
+   única línea que queda */
+body.conBarra nav.tabs button{
+  grid-template-columns:20px minmax(0,1fr);
+  column-gap:10px;row-gap:0;
+}
+body.conBarra nav.tabs button .ico{grid-row:1;width:17px;height:17px}
+body.conBarra nav.tabs button[aria-selected="true"] .ico{color:var(--accent-ink)}
 }
 
 
@@ -1534,11 +1571,12 @@ body.rol-produccion #btnPrint{display:none!important}
     <div class="menuWrap">
       <button class="menuBtn" id="menuBtn" aria-expanded="false" aria-haspopup="true">
         <span class="lineas"><i></i><i></i><i></i></span>
-        <span id="menuActual">Cotizar</span>
+        <span id="menuActual">Inicio</span>
         <span class="chev">▾</span>
       </button>
       <nav class="tabs" id="tabs" role="menu" hidden>
-        <button role="menuitem" data-tab="cot" aria-selected="true"><b>Cotizar</b><small>Armar una cotización nueva</small></button>
+        <button role="menuitem" data-tab="inicio" aria-selected="true"><b>Inicio</b><small>Qué pasó y qué urge</small></button>
+        <button role="menuitem" data-tab="cot" aria-selected="false"><b>Cotizar</b><small>Armar una cotización nueva</small></button>
         <button role="menuitem" data-tab="sav" aria-selected="false"><b>Cotizaciones / Pedidos</b><small>Guardadas, confirmadas y por facturar</small></button>
         <button role="menuitem" data-tab="dis" aria-selected="false"><b>Diseño</b><small>Archivos de impresión de cada orden</small></button>
         <button role="menuitem" data-tab="pro" aria-selected="false"><b>Producción</b><small>Tablero de órdenes y su estatus</small></button>
@@ -1653,7 +1691,35 @@ body.rol-produccion #btnPrint{display:none!important}
 <div class="wrap">
 
 <!-- ============ COTIZAR ============ -->
-<section id="tab-cot">
+<section id="tab-inicio">
+  <div class="tbSaludo">
+    <div>
+      <h1 id="tbHola">Hola</h1>
+      <p id="tbCuando">—</p>
+    </div>
+    <button class="btn" id="tbVisto" hidden>Ya lo vi</button>
+  </div>
+  <div class="anuncios" id="anuncios" hidden aria-label="Anuncios">
+    <div class="anunViewport"><div class="anunPista" id="anunPista"></div></div>
+    <button class="anunFlecha izq" id="anunAnt" type="button" aria-label="Anterior">‹</button>
+    <button class="anunFlecha der" id="anunSig" type="button" aria-label="Siguiente">›</button>
+    <div class="anunPuntos" id="anunPuntos"></div>
+    <span class="anunSello">Publicidad</span>
+  </div>
+  <div class="tbTiles" id="tbTiles"></div>
+  <div class="tbCols">
+    <div class="card" id="tbCardPaso">
+      <header><h2>Mientras no estabas</h2><span class="hint" id="tbDesde"></span></header>
+      <div class="body"><div id="tbPaso"></div></div>
+    </div>
+    <div class="card">
+      <header><h2>Lo que urge</h2><span class="hint" id="tbUrgeCuenta"></span></header>
+      <div class="body"><div id="tbUrge"></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="tab-cot" hidden>
   <div class="cols">
     <div>
       <div class="card plegable" data-paso="cliente">
@@ -1806,13 +1872,6 @@ body.rol-produccion #btnPrint{display:none!important}
     </div>
   </div>
 </div>
-  <div class="anuncios" id="anuncios" hidden aria-label="Anuncios">
-    <div class="anunViewport"><div class="anunPista" id="anunPista"></div></div>
-    <button class="anunFlecha izq" id="anunAnt" type="button" aria-label="Anterior">‹</button>
-    <button class="anunFlecha der" id="anunSig" type="button" aria-label="Siguiente">›</button>
-    <div class="anunPuntos" id="anunPuntos"></div>
-    <span class="anunSello">Publicidad</span>
-  </div>
 </section>
 
 <!-- ============ CATÁLOGO ============ -->
@@ -5026,6 +5085,7 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !$("#tabs").hid
 /* ---------- menú lateral ---------- */
 /* Agrupadas por para qué sirven, no por orden de aparición. */
 const GRUPOS_BARRA = [
+  ["",           ["inicio"]],
   ["Comercial",  ["cot","sav","cli","arc"]],
   ["Producción", ["dis","pro","com"]],
   ["Dinero",     ["caj","ven"]],
@@ -5037,9 +5097,11 @@ function agrupaBarra(){
   [...tabs.querySelectorAll("button[data-tab]")].forEach(b=> botones[b.dataset.tab] = b);
   const sueltos = Object.keys(botones).filter(t=> !GRUPOS_BARRA.some(g=>g[1].indexOf(t)>=0));
   GRUPOS_BARRA.concat(sueltos.length ? [["Otros", sueltos]] : []).forEach(g=>{
-    const h = document.createElement("div");
-    h.className = "barraGrupo"; h.textContent = g[0]; h.dataset.grupo = g[0];
-    tabs.appendChild(h);
+    if(g[0]){
+      const h = document.createElement("div");
+      h.className = "barraGrupo"; h.textContent = g[0]; h.dataset.grupo = g[0];
+      tabs.appendChild(h);
+    }
     g[1].forEach(t=>{ if(botones[t]) tabs.appendChild(botones[t]); });
   });
   // en la barra sólo se ve el nombre; la explicación queda como globo de ayuda
@@ -5154,7 +5216,8 @@ $("#tabs").addEventListener("click", e=>{
   const bd = rot.querySelector(".mbadge"); if(bd) bd.remove();
   $("#menuActual").textContent = rot.textContent.trim();
   abreMenu(false);
-  ["cot","cat","calc","com","cli","arc","caj","pro","dis","sav","ven","set"].forEach(t=> $("#tab-"+t).hidden = (t!==b.dataset.tab));
+  ["inicio","cot","cat","calc","com","cli","arc","caj","pro","dis","sav","ven","set"].forEach(t=> $("#tab-"+t).hidden = (t!==b.dataset.tab));
+  if(b.dataset.tab==="inicio") renderTablero();
   if(b.dataset.tab==="cat") renderCatalogo();
   if(b.dataset.tab==="calc") renderCalc();
   if(b.dataset.tab==="com"){ renderCompras(); renderProveedores(); }
@@ -5356,62 +5419,6 @@ $("#cal_cancel").addEventListener("click", ()=>{ $("#modalCal").hidden = true; c
 $("#modalCal").addEventListener("click", e=>{ if(e.target.id==="modalCal"){ $("#modalCal").hidden = true; ccCalibrando = null; } });
 
 
-/* ---------- un icono por sección ----------
-   El mapa vive dentro de la función a propósito: la barra lateral llama a
-   ponIconos() antes de llegar aquí, y un const de arriba todavía no existiría. */
-function ponIconos(){
-  const ICONOS = {
-  /* cotizar: una hoja nueva */
-  cot:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'+
-      '<path d="M14 3v5h5"/><path d="M12 11.5v6M9 14.5h6"/>',
-  /* cotizaciones y pedidos: una hoja con renglones */
-  sav:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'+
-      '<path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>',
-  /* clientes: dos personas */
-  cli:'<path d="M15 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-4A3.5 3.5 0 0 0 4 18.5V20"/>'+
-      '<circle cx="9.5" cy="8" r="3.5"/>'+
-      '<path d="M20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4"/><path d="M15.5 4.6a3.5 3.5 0 0 1 0 6.8"/>',
-  /* archivo: una caja de expedientes */
-  arc:'<rect x="3" y="3" width="18" height="5" rx="1"/>'+
-      '<path d="M5 8v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
-  /* diseño: una imagen */
-  dis:'<rect x="3" y="3" width="18" height="18" rx="2"/>'+
-      '<circle cx="8.5" cy="8.5" r="1.4"/><path d="M21 15.5l-4.5-4.5L5.5 21"/>',
-  /* producción: la tabla con su palomita */
-  pro:'<path d="M9 3h6v2.5H9z"/>'+
-      '<path d="M15 4.2h2.5A1.5 1.5 0 0 1 19 5.7v13.8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19.5V5.7a1.5 1.5 0 0 1 1.5-1.5H9"/>'+
-      '<path d="M9 13.5l2 2 4-4"/>',
-  /* compras: el carrito */
-  com:'<circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17.5" cy="19.5" r="1.4"/>'+
-      '<path d="M2.5 3.5H5l2.5 10.2a1.8 1.8 0 0 0 1.8 1.4h7.4a1.8 1.8 0 0 0 1.8-1.4L20.5 7H6"/>',
-  /* caja: un billete */
-  caj:'<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/>'+
-      '<path d="M6 12h.01M18 12h.01"/>',
-  /* ventas: la línea que sube */
-  ven:'<path d="M3.5 3.5v17h17"/><path d="M7 15.5l4-4 3 3 5.5-6"/><path d="M15 8.5h4.5V13"/>',
-  /* catálogo: la etiqueta de precio */
-  cat:'<path d="M20.4 13.1l-7.5-7.5A2 2 0 0 0 11.5 5H5.6A1.6 1.6 0 0 0 4 6.6v5.9a2 2 0 0 0 .6 1.4l7.5 7.5a2 2 0 0 0 2.8 0l5.5-5.5a2 2 0 0 0 0-2.8z"/>'+
-      '<circle cx="8.3" cy="9.3" r="1.3"/>',
-  /* calculadora */
-  calc:'<rect x="4.5" y="2.5" width="15" height="19" rx="2"/>'+
-       '<rect x="7.5" y="5.5" width="9" height="3.5" rx="1"/>'+
-       '<path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 17h.01M12 17h.01M15.5 17h.01"/>',
-  /* ajustes: las correderas */
-  set:'<path d="M4 7h16M4 12h16M4 17h16"/>'+
-      '<circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="17" r="2"/>'
-  };
-  const tabs = $("#tabs"); if(!tabs) return;
-  tabs.querySelectorAll("button[data-tab]").forEach(b=>{
-    if(b.querySelector(".ico")) return;
-    const d = ICONOS[b.dataset.tab]; if(!d) return;
-    const svg = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
-      'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
-    b.insertAdjacentHTML("afterbegin", svg);
-  });
-}
-ponIconos();
-
-
 /* ---------- el carrusel de anuncios ---------- */
 let ANUNCIOS = [], anunIdx = 0, anunReloj = null, anunVistos = {};
 
@@ -5502,6 +5509,282 @@ function anunPara(){ if(anunReloj){ clearInterval(anunReloj); anunReloj = null; 
   document.addEventListener("visibilitychange", ()=>{ if(document.hidden) anunPara(); else anunArranca(); });
   setTimeout(cargaAnuncios, 1200);
 })();
+
+
+/* ---------- el tablero de turno ---------- */
+function turnoGuardado(){
+  const t = P.turno;
+  return (t && typeof t === "object") ? t : null;
+}
+/* La foto del estado: con esto se sabe qué cambió desde la última vez. */
+function fotoDelTurno(){
+  const estados = {};
+  guardadas.forEach(g=>{ if(g.op) estados[g.folio] = g.op.estatus || "Pendiente"; });
+  return {
+    quien: usuarioActual().id || "",
+    cuando: hoyISO() + " " + horaAhora(),
+    estados,
+    folios: guardadas.map(g=>g.folio),
+    cobrado: ventas.reduce((s,v)=>s+num(v.recibido), 0)
+  };
+}
+function marcaTurnoVisto(){
+  P.turno = fotoDelTurno();
+  persist();
+  renderTablero();
+  toast("Listo, desde aquí cuenta de nuevo");
+}
+
+/* Cuánto hace de una fecha+hora "2026-10-06 13:04" */
+function haceCuanto(sello){
+  if(!sello) return "";
+  const p = String(sello).split(" ");
+  const d = dmy(p[0]); if(isNaN(d)) return "";
+  if(p[1]){ const hm = p[1].split(":"); d.setHours(num(hm[0]), num(hm[1]||0)); }
+  const ms = Date.now() - d.getTime();
+  if(ms < 0) return "hace un momento";
+  const min = Math.floor(ms/60000);
+  if(min < 2) return "hace un momento";
+  if(min < 60) return "hace "+min+" minutos";
+  const h = Math.floor(min/60);
+  if(h < 24) return "hace "+h+(h===1?" hora":" horas");
+  const dd = Math.floor(h/24);
+  return "hace "+dd+(dd===1?" día":" días");
+}
+function selloMayor(a, b){ return String(a||"") > String(b||"") ? a : b; }
+
+/* ---------- qué se movió ---------- */
+function movimientosDelTurno(){
+  const foto = turnoGuardado();
+  const movs = [];
+  if(!foto) return movs;
+
+  /* 1. órdenes que cambiaron de estatus */
+  guardadas.forEach(g=>{
+    if(!g.op) return;
+    const antes = foto.estados ? foto.estados[g.folio] : undefined;
+    const ahora = g.op.estatus || "Pendiente";
+    if(antes !== undefined && antes !== ahora)
+      movs.push({tipo:"estatus", folio:g.folio, op:g.op.folio, cliente:g.cliente||"",
+                 texto:"pasó de <b>"+esc(antes)+"</b> a <b>"+esc(ahora)+"</b>",
+                 sello:"", icono:"→", clase: ahora==="Entregada" ? "bien" : ahora==="Detenida" ? "mal" : "info"});
+  });
+
+  /* 2. órdenes y cotizaciones nuevas */
+  const vistos = {}; (foto.folios||[]).forEach(f=> vistos[f] = true);
+  guardadas.forEach(g=>{
+    if(vistos[g.folio]) return;
+    movs.push({tipo:"nueva", folio:g.folio, op:g.op? g.op.folio : "", cliente:g.cliente||"",
+               texto: g.op ? "entró como pedido nuevo" : "se guardó como cotización",
+               sello:"", icono:"＋", clase:"info"});
+  });
+
+  /* 3. las notas de producción: aquí sí hay fecha, hora y quién */
+  const desde = foto.cuando || "";
+  guardadas.forEach(g=>{
+    ((g.op && g.op.bitacora) || []).forEach(n=>{
+      const sello = (n.fecha||"") + " " + (n.hora||"");
+      if(desde && sello <= desde) return;
+      movs.push({tipo:"nota", folio:g.folio, op:g.op.folio, cliente:g.cliente||"",
+                 texto: esc(n.texto||""), quien: n.autor||"", sello, icono:"✎", clase:""});
+    });
+  });
+
+  /* 4. lo que se cobró */
+  const cobradoAhora = ventas.reduce((s,v)=>s+num(v.recibido), 0);
+  const dif = cobradoAhora - num(foto.cobrado);
+  if(dif > 0.005)
+    movs.push({tipo:"cobro", texto:"Entró dinero: <b>"+mx(dif)+"</b> desde tu último vistazo",
+               sello:"", icono:"$", clase:"bien"});
+
+  /* los que traen hora, primero los más recientes; los demás, al principio */
+  return movs.sort((a,b)=> String(b.sello||"zzz").localeCompare(String(a.sello||"zzz")));
+}
+
+/* ---------- qué urge ---------- */
+function urgenciasDeHoy(){
+  const u = [];
+  const vivas = guardadas.filter(g=>g.op && (g.op.estatus||"Pendiente") !== "Entregada");
+
+  vivas.forEach(g=>{
+    const f = faltaPara(g);
+    if(f.vencida) u.push({clase:"mal", que:"Entrega vencida", folio:g.folio, op:g.op.folio,
+                          cliente:g.cliente||"", detalle:f.texto, peso:0});
+    else if(!f.sin && f.ms < 24*3600000)
+      u.push({clase:"aviso", que:"Entrega hoy", folio:g.folio, op:g.op.folio,
+              cliente:g.cliente||"", detalle:f.texto, peso:1});
+  });
+  vivas.forEach(g=>{
+    if((g.op.estatus||"") === "Detenida")
+      u.push({clase:"mal", que:"Orden detenida", folio:g.folio, op:g.op.folio,
+              cliente:g.cliente||"", detalle:"nadie puede avanzarla", peso:0});
+    const a = adm(g);
+    if(a.alerta) u.push({clase:"aviso", que:"Requiere atención", folio:g.folio, op:g.op.folio,
+                         cliente:g.cliente||"", detalle:a.alerta, peso:1});
+  });
+
+  /* el dinero sólo se le enseña a quien le toca verlo */
+  if(puedeVer("ven")){
+    const plazo = typeof plazoCxc === "function" ? plazoCxc() : 15;
+    ventas.filter(v=>saldoDe(v) > 0).forEach(v=>{
+      const d = typeof diasDe === "function" ? diasDe(v.fecha) : 0;
+      if(d > plazo) u.push({clase:"mal", que:"Cuenta vencida", folio:v.folio, op:"",
+                            cliente:v.cliente||"", detalle:"debe "+mx(saldoDe(v))+" desde hace "+d+" días", peso:0});
+    });
+  }
+  if(puedeVer("caj")){
+    Object.keys(cajas||{}).forEach(f=>{
+      const c = cajas[f];
+      if(c && c.abierta && !c.cierre && f < hoyISO())
+        u.push({clase:"aviso", que:"Caja sin cerrar", folio:f, op:"", cliente:"",
+                detalle:"quedó abierta el "+f, peso:1});
+    });
+  }
+  return u.sort((a,b)=> a.peso - b.peso);
+}
+
+/* ---------- el pulso ---------- */
+function pulsoDeHoy(){
+  const hoy = hoyISO();
+  const vivas = guardadas.filter(g=>g.op && (g.op.estatus||"Pendiente") !== "Entregada");
+  const hoyEntrega = vivas.filter(g=>{ const f = faltaPara(g); return !f.sin && !f.vencida && f.ms < 24*3600000; }).length;
+  const vencidas = vivas.filter(g=>faltaPara(g).vencida).length;
+  const t = [];
+  t.push({et:"Órdenes en proceso", v:vivas.length,
+          sub: vencidas ? vencidas+" con la entrega vencida" : "ninguna vencida",
+          mal: vencidas>0});
+  t.push({et:"Entregas hoy", v:hoyEntrega, sub: hoyEntrega ? "para las próximas 24 horas" : "nada compromete hoy"});
+  if(puedeVer("ven")){
+    const porCobrar = ventas.reduce((s,v)=>s+saldoDe(v), 0);
+    const nCob = ventas.filter(v=>saldoDe(v)>0).length;
+    t.push({et:"Por cobrar", v:mx(porCobrar), sub: nCob ? nCob+" cuenta(s) con saldo" : "nadie debe nada"});
+    const hoyVta = ventas.filter(v=>v.fecha===hoy).reduce((s,v)=>s+num(v.recibido), 0);
+    t.push({et:"Cobrado hoy", v:mx(hoyVta), sub: ventas.filter(v=>v.fecha===hoy).length+" venta(s)"});
+  } else {
+    const listas = guardadas.filter(g=>g.op && (g.op.estatus||"")==="Empacada").length;
+    t.push({et:"Listas para entregar", v:listas, sub: listas ? "esperando a que las recojan" : "ninguna esperando"});
+  }
+  return t;
+}
+
+/* ---------- pintar ---------- */
+function renderTablero(){
+  if(!$("#tab-inicio")) return;
+  const u = usuarioActual();
+  const h = new Date().getHours();
+  const saludo = h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches";
+  const nombre = (u.nombre||"").split(" ")[0] || "";
+  $("#tbHola").textContent = saludo + (nombre ? ", "+nombre : "");
+
+  const foto = turnoGuardado();
+  const hace = foto ? haceCuanto(foto.cuando) : "";
+  $("#tbCuando").textContent = foto
+    ? "Tu último vistazo fue " + (hace || "hace un momento") + " · " + foto.cuando
+    : "Es la primera vez que abres el tablero: desde aquí empiezo a contar.";
+
+  /* tiles */
+  $("#tbTiles").innerHTML = pulsoDeHoy().map(t=>
+    '<div class="tbTile'+(t.mal?" mal":"")+'"><span class="et">'+esc(t.et)+'</span>'+
+    '<span class="v">'+esc(String(t.v))+'</span><span class="sub">'+esc(t.sub)+'</span></div>').join("");
+
+  /* lo que pasó */
+  const movs = movimientosDelTurno();
+  $("#tbVisto").hidden = !movs.length;
+  $("#tbDesde").textContent = foto ? ("desde el "+foto.cuando) : "";
+  $("#tbPaso").innerHTML = !foto
+    ? '<div class="empty">Vuelve después de un rato y aquí va a estar lo que se movió mientras no estabas: '+
+      'las órdenes que avanzaron, lo que anotó producción y lo que entró de dinero.</div>'
+    : (movs.length
+      ? movs.map(m=>
+          '<div class="tbMov'+(m.clase? " "+m.clase : "")+'"'+(m.folio? ' data-tbir="'+esc(m.folio)+'"':'')+'>'+
+          '<span class="tbIco">'+m.icono+'</span>'+
+          '<div class="tbTxt">'+((m.op||m.folio) ? '<b>'+esc(m.op || m.folio)+'</b>' : '')+
+            (m.cliente ? ' <span class="tbCli">'+esc(m.cliente)+'</span>' : '')+
+            '<div>'+m.texto+'</div>'+
+            (m.quien || m.sello ? '<small>'+esc(m.quien||"")+(m.sello? " · "+esc(m.sello) : "")+'</small>' : '')+
+          '</div></div>').join("")
+      : '<div class="empty">Nada se movió desde entonces.</div>');
+
+  /* lo que urge */
+  const urge = urgenciasDeHoy();
+  $("#tbUrgeCuenta").textContent = urge.length ? urge.length+" cosa(s)" : "todo al corriente";
+  $("#tbUrge").innerHTML = urge.length
+    ? urge.map(x=>
+        '<div class="tbUrge '+x.clase+'"'+(x.op? ' data-tbir="'+esc(x.folio)+'"':'')+'>'+
+        '<span class="tbQue">'+esc(x.que)+'</span>'+
+        '<div class="tbTxt"><b>'+esc(x.op || x.folio)+'</b>'+
+          (x.cliente ? ' <span class="tbCli">'+esc(x.cliente)+'</span>' : '')+
+          '<div>'+esc(x.detalle)+'</div></div></div>').join("")
+    : '<div class="empty">Nada vencido, nada detenido, nada por cobrar fuera de plazo. Buen momento para adelantar.</div>';
+}
+
+/* ---------- eventos del tablero ---------- */
+$("#tbVisto").addEventListener("click", marcaTurnoVisto);
+$("#tab-inicio").addEventListener("click", e=>{
+  const ir = e.target.closest("[data-tbir]"); if(!ir) return;
+  const g = guardadas.find(g=>g.folio === ir.dataset.tbir);
+  const b = document.querySelector('#tabs [data-tab="'+(g && g.op ? "pro" : "sav")+'"]');
+  if(b && !b.hidden) b.click();
+});
+
+
+/* ---------- un icono por sección ----------
+   El mapa vive dentro de la función a propósito: la barra lateral llama a
+   ponIconos() antes de llegar aquí, y un const de arriba todavía no existiría. */
+function ponIconos(){
+  const ICONOS = {
+  /* inicio: una casa */
+  inicio:'<path d="M3.5 10.2L12 3.5l8.5 6.7"/><path d="M5.5 9v10a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5V9"/>'+
+         '<path d="M9.5 20.5v-6h5v6"/>',
+  /* cotizar: una hoja nueva */
+  cot:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'+
+      '<path d="M14 3v5h5"/><path d="M12 11.5v6M9 14.5h6"/>',
+  /* cotizaciones y pedidos: una hoja con renglones */
+  sav:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'+
+      '<path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>',
+  /* clientes: dos personas */
+  cli:'<path d="M15 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-4A3.5 3.5 0 0 0 4 18.5V20"/>'+
+      '<circle cx="9.5" cy="8" r="3.5"/>'+
+      '<path d="M20 20v-1.5a3.5 3.5 0 0 0-2.6-3.4"/><path d="M15.5 4.6a3.5 3.5 0 0 1 0 6.8"/>',
+  /* archivo: una caja de expedientes */
+  arc:'<rect x="3" y="3" width="18" height="5" rx="1"/>'+
+      '<path d="M5 8v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
+  /* diseño: una imagen */
+  dis:'<rect x="3" y="3" width="18" height="18" rx="2"/>'+
+      '<circle cx="8.5" cy="8.5" r="1.4"/><path d="M21 15.5l-4.5-4.5L5.5 21"/>',
+  /* producción: la tabla con su palomita */
+  pro:'<path d="M9 3h6v2.5H9z"/>'+
+      '<path d="M15 4.2h2.5A1.5 1.5 0 0 1 19 5.7v13.8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19.5V5.7a1.5 1.5 0 0 1 1.5-1.5H9"/>'+
+      '<path d="M9 13.5l2 2 4-4"/>',
+  /* compras: el carrito */
+  com:'<circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17.5" cy="19.5" r="1.4"/>'+
+      '<path d="M2.5 3.5H5l2.5 10.2a1.8 1.8 0 0 0 1.8 1.4h7.4a1.8 1.8 0 0 0 1.8-1.4L20.5 7H6"/>',
+  /* caja: un billete */
+  caj:'<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/>'+
+      '<path d="M6 12h.01M18 12h.01"/>',
+  /* ventas: la línea que sube */
+  ven:'<path d="M3.5 3.5v17h17"/><path d="M7 15.5l4-4 3 3 5.5-6"/><path d="M15 8.5h4.5V13"/>',
+  /* catálogo: la etiqueta de precio */
+  cat:'<path d="M20.4 13.1l-7.5-7.5A2 2 0 0 0 11.5 5H5.6A1.6 1.6 0 0 0 4 6.6v5.9a2 2 0 0 0 .6 1.4l7.5 7.5a2 2 0 0 0 2.8 0l5.5-5.5a2 2 0 0 0 0-2.8z"/>'+
+      '<circle cx="8.3" cy="9.3" r="1.3"/>',
+  /* calculadora */
+  calc:'<rect x="4.5" y="2.5" width="15" height="19" rx="2"/>'+
+       '<rect x="7.5" y="5.5" width="9" height="3.5" rx="1"/>'+
+       '<path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 17h.01M12 17h.01M15.5 17h.01"/>',
+  /* ajustes: las correderas */
+  set:'<path d="M4 7h16M4 12h16M4 17h16"/>'+
+      '<circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="17" r="2"/>'
+  };
+  const tabs = $("#tabs"); if(!tabs) return;
+  tabs.querySelectorAll("button[data-tab]").forEach(b=>{
+    if(b.querySelector(".ico")) return;
+    const d = ICONOS[b.dataset.tab]; if(!d) return;
+    const svg = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
+      'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
+    b.insertAdjacentHTML("afterbegin", svg);
+  });
+}
+ponIconos();
 
 /* ---------- eventos del armado ---------- */
 $("#armadoTab").addEventListener("click", ()=>abreArmado(true));
@@ -6189,10 +6472,10 @@ async function bajaCarpeta(cliente, mes, boton){
 
 /* ============ EQUIPO Y ROLES ============ */
 const ROLES = {
-  admin:      {nombre:"Administrador", ve:["cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","com","set"]},
-  ventas:     {nombre:"Ventas",        ve:["cot","sav","pro","dis","cli","arc","cat","com"]},
-  diseno:     {nombre:"Diseño",        ve:["dis","pro"]},
-  produccion: {nombre:"Producción",    ve:["pro","com"]}
+  admin:      {nombre:"Administrador", ve:["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","com","set"]},
+  ventas:     {nombre:"Ventas",        ve:["inicio","cot","sav","pro","dis","cli","arc","cat","com"]},
+  diseno:     {nombre:"Diseño",        ve:["inicio","dis","pro"]},
+  produccion: {nombre:"Producción",    ve:["inicio","pro","com"]}
 };
 let equipo = [], usuarioId = null, pinPendiente = null;
 
@@ -9663,10 +9946,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261006-2231";</script>
+<script>window.BUILD="20261006-2248";</script>
 <script>
 (function(){
-  var mio = "20261006-2231";
+  var mio = "20261006-2248";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -9694,7 +9977,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261006-2231"></script>
-<script src="diagnostico.js?v=20261006-2231"></script>
+<script src="cuenta.js?v=20261006-2248"></script>
+<script src="diagnostico.js?v=20261006-2248"></script>
 </body>
 </html>
