@@ -223,10 +223,13 @@ function rol(){
   return ROLES_NOMBRE[r] ? r : "admin";     // rol desconocido o sin perfil: no le escondemos nada
 }
 const PERMISOS = {
-  admin:      ["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","com","set"],
-  ventas:     ["inicio","cot","sav","pro","dis","cli","arc","cat","com"],
+  admin:      ["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","set"],
+  /* Ventas no entra al catálogo: ahí viven los costos y las existencias, y
+     tocarlos sin querer le cambia el precio a todas las cotizaciones. */
+  ventas:     ["inicio","cot","sav","pro","dis","cli","arc","com"],
   diseno:     ["inicio","dis","pro"],
-  produccion: ["inicio","pro","com"]
+  /* El taller sí ve el inventario, pero el suyo: existencias sin un peso. */
+  produccion: ["inicio","pro","inv","com"]
 };
 /* Secciones que no vienen en el plan Básico */
 const SOLO_PRO   = ["caj","ven"];
@@ -234,7 +237,7 @@ const SOLO_PRO   = ["caj","ven"];
    que vive dentro de Ajustes. Se cuela en la misma lista porque el
    cotizador pregunta por el mismo lugar, y así hay UNA sola tabla de
    qué incluye cada plan en lugar de dos que se desincronizan. */
-const SOLO_MAKER = ["com", "fac"];
+const SOLO_MAKER = ["com", "inv", "fac"];
 function enElPlan(t){
   /* Quien nunca contrató no entra a trabajar. Antes esto dejaba pasar todo
      lo que no fuera Caja, Ventas o Compras, con la idea de que viera cómo

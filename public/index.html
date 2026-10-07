@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261006-2248"></script>
+<script src="config.js?v=20261006-2315"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1231,22 +1231,77 @@ a.anunPieza:hover img{opacity:.94}
 }
 
 /* ---- tablero de turno ---- */
-.tbSaludo{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;margin:22px 0 18px}
-.tbSaludo h1{margin:0;font-size:25px;font-weight:600}
-.tbSaludo p{margin:4px 0 0;font-size:13px;color:var(--ink-3)}
-.tbSaludo .btn{margin-left:auto;flex:none}
-.tbTiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:20px}
-.tbTile{background:var(--vidrio-fondo,var(--surface));border:1px solid var(--vidrio-borde,var(--line));
-  border-radius:var(--radio,16px);padding:14px 16px;box-shadow:var(--brillo),var(--sombra-flota)}
-.tbTile .et{display:block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
-.tbTile .v{display:block;font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:700;margin:4px 0 2px}
-.tbTile .sub{display:block;font-size:11.5px;color:var(--ink-3)}
+#tab-inicio{padding-bottom:10px}
+
+/* ---- la banda de bienvenida ---- */
+.tbHero{position:relative;overflow:hidden;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  margin:18px 0 18px;padding:22px 24px;border-radius:var(--radio,18px);
+  background:var(--vidrio-fondo,var(--surface));border:1px solid var(--vidrio-borde,var(--line));
+  box-shadow:var(--brillo),var(--sombra-flota)}
+.tbHero::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(120% 160% at 100% 0%, color-mix(in oklab, var(--cyan) 16%, transparent), transparent 62%),
+    radial-gradient(110% 150% at 0% 110%, color-mix(in oklab, var(--guinda,var(--accent)) 12%, transparent), transparent 58%)}
+.tbHero::after{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,var(--cyan),var(--guinda,var(--accent)))}
+.tbHeroTxt{position:relative;flex:1;min-width:0}
+.tbFecha{margin:0;font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink-3)}
+.tbHero h1{margin:5px 0 0;font-size:27px;line-height:1.18;font-weight:650;letter-spacing:-.015em}
+.tbHero .tbSub{margin:6px 0 0;font-size:13px;line-height:1.45;color:var(--ink-2)}
+.tbBtnVisto{position:relative;flex:none;gap:7px;align-items:center;display:inline-flex}
+.tbCheck{display:grid;place-items:center;width:17px;height:17px;border-radius:50%;
+  background:color-mix(in oklab, currentColor 18%, transparent);font-size:10px;line-height:1}
+
+/* ---- las fichas de pulso ---- */
+.tbTiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:12px;margin-bottom:18px}
+.tbTile{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:2px;
+  padding:15px 16px 14px;border-radius:var(--radio,16px);
+  background:var(--vidrio-fondo,var(--surface));border:1px solid var(--vidrio-borde,var(--line));
+  box-shadow:var(--brillo),var(--sombra-flota);transition:transform .16s ease, box-shadow .16s ease}
+.tbTile:hover{transform:translateY(-2px);box-shadow:var(--brillo),var(--sombra-alta,var(--sombra-flota))}
+.tbTile::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ink-3);opacity:.5}
+.tbTileIco{position:absolute;top:13px;right:13px;width:30px;height:30px;border-radius:9px;
+  display:grid;place-items:center;background:var(--surface-2);color:var(--ink-3)}
+.tbTileIco svg{width:17px;height:17px}
+.tbTile .et{display:block;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink-3);padding-right:38px}
+.tbTile .v{display:block;font-family:"IBM Plex Mono",monospace;font-size:27px;font-weight:700;
+  letter-spacing:-.02em;margin:5px 0 1px;font-variant-numeric:tabular-nums}
+.tbTile .sub{display:block;font-size:11.5px;line-height:1.4;color:var(--ink-3)}
+.tbTile.mal::before{background:var(--warn);opacity:1}
 .tbTile.mal .v{color:var(--warn)}
-.tbCols{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;align-items:start}
-.tbMov,.tbUrge{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line-soft,var(--line))}
-.tbMov:first-child,.tbUrge:first-child{border-top:0;padding-top:2px}
-.tbIco{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
-  background:var(--surface-2);color:var(--ink-3);font-size:12px;font-weight:700;margin-top:1px}
+.tbTile.mal .tbTileIco{background:var(--warn-soft);color:var(--warn)}
+.tbTile.cyan::before{background:var(--cyan);opacity:1}
+.tbTile.cyan .tbTileIco{background:var(--cyan-soft);color:var(--cyan)}
+.tbTile.aviso::before{background:var(--yellow,var(--warn));opacity:1}
+.tbTile.aviso .tbTileIco{background:color-mix(in oklab, var(--yellow,var(--warn)) 20%, transparent);
+  color:var(--yellow-ink,var(--warn))}
+.tbTile.bien::before{background:var(--good);opacity:1}
+.tbTile.bien .tbTileIco{background:var(--good-soft);color:var(--good)}
+
+/* ---- las dos columnas ---- */
+.tbCols{display:grid;grid-template-columns:minmax(0,1.32fr) minmax(0,1fr);gap:14px;align-items:start}
+.tbLado{display:flex;flex-direction:column;gap:14px;min-width:0}
+.tbPanel{min-width:0;border-radius:var(--radio,16px);
+  background:var(--vidrio-fondo,var(--surface));border:1px solid var(--vidrio-borde,var(--line));
+  box-shadow:var(--brillo),var(--sombra-flota)}
+.tbPanel>header{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+  padding:14px 16px 11px;border-bottom:1px solid var(--vidrio-linea,var(--line-soft,var(--line)))}
+.tbPanel>header h2{margin:0;font-size:14px;font-weight:650;letter-spacing:-.005em}
+.tbPanel>header .tbDesde,.tbPanel>header .tbCuenta{margin-left:auto;font-size:11px;color:var(--ink-3)}
+.tbPanelBody{padding:6px 16px 14px}
+.tbPanelBody>div>p{font-size:12.5px;color:var(--ink-3);margin:10px 0}
+
+/* ---- la línea de tiempo ---- */
+#tbPaso{position:relative}
+#tbPaso::before{content:"";position:absolute;left:11px;top:14px;bottom:14px;width:1px;
+  background:var(--line-soft,var(--line))}
+.tbMov,.tbUrge{position:relative;display:flex;gap:11px;align-items:flex-start;padding:10px 0}
+.tbUrge+.tbUrge{border-top:1px solid var(--line-soft,var(--line))}
+.tbIco{flex:none;width:23px;height:23px;border-radius:50%;display:grid;place-items:center;
+  background:var(--surface-2);color:var(--ink-3);font-size:11.5px;font-weight:700;margin-top:1px;
+  box-shadow:0 0 0 3px var(--vidrio-fondo,var(--surface))}
 .tbMov.bien .tbIco{background:var(--good-soft);color:var(--good)}
 .tbMov.info .tbIco{background:var(--cyan-soft);color:var(--cyan)}
 .tbMov.mal .tbIco{background:var(--warn-soft);color:var(--warn)}
@@ -1254,18 +1309,42 @@ a.anunPieza:hover img{opacity:.94}
 .tbTxt b{font-family:"IBM Plex Mono",monospace;font-size:12px}
 .tbTxt small{display:block;font-size:11px;color:var(--ink-3);margin-top:2px}
 .tbCli{font-size:12px;color:var(--ink-3)}
-.tbQue{flex:none;font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
-  border-radius:5px;padding:3px 7px;margin-top:2px;white-space:nowrap}
+.tbQue{flex:none;font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  border-radius:5px;padding:4px 7px;margin-top:3px;white-space:nowrap}
 .tbUrge.mal .tbQue{background:var(--warn-soft);color:var(--warn)}
 .tbUrge.aviso .tbQue{background:var(--cyan-soft);color:var(--cyan)}
-[data-tbir]{cursor:pointer;border-radius:8px}
+[data-tbir]{cursor:pointer;border-radius:10px}
 [data-tbir]:hover{background:var(--surface-2)}
+
+/* ---- la gráfica de la semana (una sola serie: el título la nombra) ---- */
+.tbGraf{display:flex;align-items:flex-end;gap:2px;height:118px;margin:14px 0 0}
+.tbDia{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;
+  height:100%;justify-content:flex-end;border-radius:7px;outline:none}
+.tbDia:hover,.tbDia:focus-visible{background:var(--surface-2)}
+.tbCol{position:relative;flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;
+  padding:0 2px;border-bottom:1px solid var(--line-soft,var(--line))}
+.tbBarra{display:block;width:100%;max-width:26px;min-height:3px;
+  border-radius:4px 4px 0 0;background:var(--cyan)}
+.tbBarra.cero{min-height:2px;border-radius:2px;background:var(--line);opacity:.8}
+.tbPico{position:absolute;top:-2px;left:50%;transform:translate(-50%,-100%);
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:700;color:var(--ink-2);
+  font-variant-numeric:tabular-nums}
+.tbDiaEt{font-size:10.5px;font-weight:600;color:var(--ink-3);line-height:1}
+.tbGrafPie{margin:11px 0 0;font-size:12px;color:var(--ink-3)}
+.tbGrafPie b{font-family:"IBM Plex Mono",monospace;color:var(--ink)}
+
 @media (max-width:900px){ .tbCols{grid-template-columns:minmax(0,1fr)} }
 @media (max-width:560px){
-  .tbSaludo h1{font-size:21px}
-  .tbSaludo .btn{margin-left:0}
-  .tbTile .v{font-size:22px}
+  .tbHero{padding:18px 18px 18px 20px;gap:12px}
+  .tbHero h1{font-size:22px}
+  .tbBtnVisto{width:100%;justify-content:center}
+  .tbTiles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .tbTile .v{font-size:23px}
+  .tbTileIco{width:26px;height:26px;border-radius:8px}
+  .tbTileIco svg{width:15px;height:15px}
+  .tbGraf{height:100px}
 }
+@media (prefers-reduced-motion:reduce){ .tbTile{transition:none} .tbTile:hover{transform:none} }
 
 /* ---- el icono de cada sección ---- */
 @media screen{
@@ -1294,6 +1373,69 @@ body.conBarra nav.tabs button{
 body.conBarra nav.tabs button .ico{grid-row:1;width:17px;height:17px}
 body.conBarra nav.tabs button[aria-selected="true"] .ico{color:var(--accent-ink)}
 }
+
+/* ---- inventario del taller ---- */
+.ivEdo{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.03em;
+  border-radius:5px;padding:3px 8px;white-space:nowrap}
+.ivEdo.ok{background:var(--good-soft);color:var(--good)}
+.ivEdo.bajo{background:var(--warn-soft);color:var(--warn)}
+.ivEdo.agotado{background:var(--accent-soft,var(--warn-soft));color:var(--accent);
+  box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent)}
+.ivChk{width:17px;height:17px;accent-color:var(--accent)}
+.ivSol{border:1px solid var(--line);border-radius:var(--radio-sm,12px);padding:11px 13px;margin-bottom:9px;
+  background:var(--surface)}
+.ivSol.atendida{opacity:.72}
+.ivSol.cancelada{opacity:.6}
+.ivSolTop{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px}
+.ivSolTop b{font-family:"IBM Plex Mono",monospace;font-size:12.5px}
+.ivSolEdo{font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+  border-radius:5px;padding:3px 7px;background:var(--cyan-soft);color:var(--cyan)}
+.ivSolEdo.atendida{background:var(--good-soft);color:var(--good)}
+.ivSolEdo.cancelada{background:var(--surface-2);color:var(--ink-3)}
+.ivSolUrge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;
+  border-radius:5px;padding:3px 7px;background:var(--warn-soft);color:var(--warn)}
+.ivSolF{margin-left:auto;font-size:11.5px;color:var(--ink-3)}
+.ivSolQue{font-size:13px;line-height:1.5}
+.ivSolQue b{font-family:"IBM Plex Mono",monospace}
+.ivSolNota{font-size:12px;color:var(--ink-3);margin-top:3px}
+.ivSolBtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.pedFila{display:grid;grid-template-columns:1fr 92px 36px;gap:9px;align-items:center;
+  padding:9px 0;border-top:1px solid var(--line-soft,var(--line))}
+.pedFila:first-child{border-top:0}
+.pedNom{min-width:0}
+.pedNom b{display:block;font-size:13px;line-height:1.35}
+.pedNom small{font-size:11.5px;color:var(--ink-3)}
+.avisoStock{margin:0 16px 12px;border-radius:var(--radio-sm,12px);padding:10px 12px;
+  font-size:12.5px;line-height:1.5}
+.avisoStock.ok{background:var(--good-soft);color:var(--good)}
+.avisoStock.poco{background:color-mix(in oklab, var(--yellow,var(--warn)) 20%, transparent);color:var(--yellow-ink,var(--warn))}
+.avisoStock.nada{background:var(--warn-soft);color:var(--warn)}
+.avisoStockQue{display:block;margin-top:3px;opacity:.85}
+@media (max-width:560px){
+  .ivSolF{margin-left:0;width:100%}
+  .pedFila{grid-template-columns:1fr 78px 32px}
+}
+
+/* ---- cierre del pedido y evidencia de entrega ---- */
+.apResumen{background:var(--surface-2);border-radius:var(--radio-sm,12px);padding:11px 13px;
+  font-size:13px;line-height:1.55;margin-bottom:14px}
+.apResumen b{font-family:"IBM Plex Mono",monospace}
+.enFotos{display:flex;gap:9px;flex-wrap:wrap}
+.enFoto{position:relative;width:104px;border:1px solid var(--line);border-radius:10px;overflow:hidden;
+  background:var(--surface-2);display:flex;flex-direction:column}
+.enFoto img{width:100%;height:78px;object-fit:cover;display:block}
+.enFoto .sin{height:78px;display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--ink-3)}
+.enFoto span:last-of-type{font-size:10.5px;color:var(--ink-3);padding:5px 6px;line-height:1.3;word-break:break-all}
+.enFoto .btn{position:absolute;top:4px;right:4px;background:var(--surface);opacity:.92}
+.enVacio{font-size:12.5px;color:var(--ink-3);margin:0;padding:12px;border:1px dashed var(--line);
+  border-radius:10px;text-align:center}
+.btnEntregar{background:var(--good);border-color:var(--good);color:#fff}
+.opEntregada{font-size:11.5px;color:var(--ink-3);margin-top:7px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.opEntregada b{color:var(--ink-2)}
+.opEvi{display:flex;gap:5px}
+.opEvi button{width:34px;height:34px;border-radius:7px;border:1px solid var(--line);overflow:hidden;
+  background:var(--surface-2);padding:0;cursor:pointer}
+.opEvi img{width:100%;height:100%;object-fit:cover;display:block}
 
 
 /* ---- el diagnóstico ----
@@ -1586,6 +1728,7 @@ body.rol-produccion #btnPrint{display:none!important}
         <button role="menuitem" data-tab="ven" aria-selected="false"><b>Ventas</b><small>Cortes, análisis y proyección</small></button>
         <button role="menuitem" data-tab="cat" aria-selected="false"><b>Catálogo / Artículos</b><small>Artículos, técnicas, precios e inventario</small></button>
         <button role="menuitem" data-tab="calc" aria-selected="false"><b>Calculadora de costos</b><small>Qué te cuesta producir, paso a paso</small></button>
+        <button role="menuitem" data-tab="inv" aria-selected="false"><b>Inventario <span class="mbadge" id="invBadge" hidden>0</span></b><small>Qué hay en el taller y qué hay que pedir</small></button>
         <button role="menuitem" data-tab="com" aria-selected="false"><b>Compras <span class="mbadge" hidden>0</span></b><small>Requisiciones, proveedores y facturas</small></button>
         <button role="menuitem" data-tab="set" aria-selected="false" hidden><b>Ajustes</b><small>Utilidad, IVA y datos de tu empresa</small></button>
       </nav>
@@ -1692,12 +1835,15 @@ body.rol-produccion #btnPrint{display:none!important}
 
 <!-- ============ COTIZAR ============ -->
 <section id="tab-inicio">
-  <div class="tbSaludo">
-    <div>
+  <div class="tbHero">
+    <div class="tbHeroTxt">
+      <p class="tbFecha" id="tbFecha">—</p>
       <h1 id="tbHola">Hola</h1>
-      <p id="tbCuando">—</p>
+      <p class="tbSub" id="tbCuando">—</p>
     </div>
-    <button class="btn" id="tbVisto" hidden>Ya lo vi</button>
+    <button class="btn tbBtnVisto" id="tbVisto" hidden>
+      <span class="tbCheck">✓</span> Ya lo vi
+    </button>
   </div>
   <div class="anuncios" id="anuncios" hidden aria-label="Anuncios">
     <div class="anunViewport"><div class="anunPista" id="anunPista"></div></div>
@@ -1708,13 +1854,19 @@ body.rol-produccion #btnPrint{display:none!important}
   </div>
   <div class="tbTiles" id="tbTiles"></div>
   <div class="tbCols">
-    <div class="card" id="tbCardPaso">
-      <header><h2>Mientras no estabas</h2><span class="hint" id="tbDesde"></span></header>
-      <div class="body"><div id="tbPaso"></div></div>
+    <div class="tbPanel" id="tbCardPaso">
+      <header><h2>Mientras no estabas</h2><span class="tbDesde" id="tbDesde"></span></header>
+      <div class="tbPanelBody"><div id="tbPaso"></div></div>
     </div>
-    <div class="card">
-      <header><h2>Lo que urge</h2><span class="hint" id="tbUrgeCuenta"></span></header>
-      <div class="body"><div id="tbUrge"></div></div>
+    <div class="tbLado">
+      <div class="tbPanel">
+        <header><h2>Lo que urge</h2><span class="tbCuenta" id="tbUrgeCuenta"></span></header>
+        <div class="tbPanelBody"><div id="tbUrge"></div></div>
+      </div>
+      <div class="tbPanel" id="tbPanelSemana">
+        <header><h2>Entregado por día</h2><span class="tbDesde">últimos 7 días</span></header>
+        <div class="tbPanelBody"><div id="tbSemana"></div></div>
+      </div>
     </div>
   </div>
 </section>
@@ -1822,6 +1974,7 @@ body.rol-produccion #btnPrint{display:none!important}
           <div class="sub" id="r_unitSub">—</div>
         </div>
           <div class="alertaPrecio" id="r_alerta" hidden></div>
+          <div class="avisoStock" id="r_stock" hidden></div>
         <dl class="break" id="r_break"></dl>
         <div class="estadoPedido" id="estadoPedido"></div>
         <div class="body" style="display:flex;gap:8px;flex-wrap:wrap">
@@ -2060,6 +2213,32 @@ body.rol-produccion #btnPrint{display:none!important}
 
 
 <!-- ============ COMPRAS ============ -->
+<section id="tab-inv" hidden>
+  <div class="card" style="margin-top:20px">
+    <header><h2>Inventario del taller</h2>
+      <span class="hint" id="ivResumen" style="margin-left:auto"></span>
+      <button class="btn sm primary" id="ivPedir">Pedir material</button>
+    </header>
+    <div class="body">
+      <p class="note" style="margin:0 0 12px">Aquí se ve <b>cuánto hay y cuánto falta</b>, nada de precios: eso es de Compras. Marca lo que se está acabando y manda la solicitud; llega a Compras con tu nombre y la hora.</p>
+      <div class="periodbar">
+        <div class="seg" id="ivFiltro">
+          <button data-ivf="faltan" aria-pressed="true">Hay que pedir</button>
+          <button data-ivf="todo" aria-pressed="false">Todo el inventario</button>
+        </div>
+        <input id="ivBuscar" placeholder="Buscar artículo" style="width:auto;max-width:240px">
+        <span class="hintbar">El <b>mínimo</b> lo pone el administrador en el catálogo. Cuando la existencia baja de ahí, el artículo se marca solo.</span>
+      </div>
+      <div id="ivAviso"></div>
+      <div class="tbl-wrap"><table id="t_inv"></table></div>
+    </div>
+  </div>
+  <div class="card">
+    <header><h2>Lo que ya pediste</h2><span class="hint" id="ivSolResumen" style="margin-left:auto"></span></header>
+    <div class="body"><div id="ivSolicitudes"></div></div>
+  </div>
+</section>
+
 <section id="tab-com" hidden>
   <div class="card" style="margin-top:20px">
     <header><h2>Requisiciones de compra</h2>
@@ -2071,6 +2250,15 @@ body.rol-produccion #btnPrint{display:none!important}
       <p class="note" style="margin:0 0 12px">Una requisición se autoriza, se manda al proveedor y, cuando llega la mercancía, <b>entra sola al inventario</b> con su folio. Al pagarla se registra la salida en la caja del día.</p>
       <div id="compAviso"></div>
       <div class="tbl-wrap"><table id="t_compras"></table></div>
+    </div>
+  </div>
+  <div class="card" id="cardSolicitudes" hidden>
+    <header><h2>Solicitudes de material del taller</h2>
+      <span class="hint" id="comSolResumen" style="margin-left:auto"></span>
+    </header>
+    <div class="body">
+      <p class="note" style="margin:0 0 12px">Producción pide, Compras cotiza. Al convertirla, la solicitud se abre como requisición nueva con los renglones ya puestos: nada más le falta el proveedor y el costo.</p>
+      <div id="comSolicitudes"></div>
     </div>
   </div>
   <div class="card">
@@ -2644,6 +2832,26 @@ body.rol-produccion #btnPrint{display:none!important}
   <div class="paper" id="docPaper"></div>
 </div>
 
+<div class="modal" id="modalPedir" hidden>
+  <div class="card" style="width:min(620px,100%);max-height:88vh;overflow:auto">
+    <header><h2>Pedir material</h2>
+      <button class="btn sm" id="pedCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 12px">Pon cuántas piezas necesitas de cada uno. Se manda a Compras tal cual: sin costos, porque el costo lo averigua Compras.</p>
+      <div id="pedPartidas"></div>
+      <div class="grid g2" style="margin-top:14px">
+        <div><label class="f" for="pedNota">Para qué es</label><input id="pedNota" placeholder="Se acabaron las blancas, pedido de Uniformes del Valle…"></div>
+        <div><label class="f" for="pedUrge">Qué tan urgente</label><select id="pedUrge">
+          <option value="normal">Normal</option><option value="pronto">Pronto</option><option value="urge">Urge: para el pedido de un cliente</option></select></div>
+      </div>
+      <div class="row-actions" style="margin-top:16px">
+        <button class="btn primary" id="pedGuardar">Mandar a Compras</button>
+        <button class="btn ghost" id="pedCancelar">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="modalReq" hidden>
   <div class="card" style="width:min(760px,100%);max-height:88vh;overflow:auto">
     <header><h2 id="reqTitulo">Nueva requisición de compra</h2>
@@ -2711,6 +2919,47 @@ body.rol-produccion #btnPrint{display:none!important}
     </div>
   </div>
 </div>
+<div class="modal" id="modalAProd" hidden>
+  <div class="card" style="width:min(520px,100%)">
+    <header><h2>Pedido cobrado</h2>
+      <button class="btn sm" id="apCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <div id="apResumen" class="apResumen"></div>
+      <p class="note" style="margin:0 0 4px">Falta un paso: mandarlo al taller. Al enviarlo se genera la <b>orden de producción</b>, se descuenta la existencia y la orden aparece en el tablero de Producción.</p>
+      <div class="row-actions" style="margin-top:16px">
+        <button class="btn primary" id="apEnviar">Enviar a producción</button>
+        <button class="btn ghost" id="apDespues">Ahora no</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalEntrega" hidden>
+  <div class="card" style="width:min(560px,100%);max-height:88vh;overflow:auto">
+    <header><h2>Confirmar la entrega</h2>
+      <button class="btn sm" id="enCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <div id="enResumen" class="apResumen"></div>
+      <div class="grid g2">
+        <div><label class="f" for="enQuien">Quién recibió</label><input id="enQuien" placeholder="Nombre de quien firmó o recibió"></div>
+        <div><label class="f" for="enFecha">Cuándo</label><input id="enFecha" type="date"></div>
+      </div>
+      <div style="margin-top:14px">
+        <label class="f">Evidencia de la entrega</label>
+        <p class="note" style="margin:0 0 10px">La cotización o la factura <b>firmada</b>, o la foto de quien recibió el pedido. Al menos una.</p>
+        <div id="enFotos" class="enFotos"></div>
+        <button class="btn sm" id="enSubir" style="margin-top:9px">+ Agregar foto</button>
+        <input type="file" id="enFile" accept="image/png,image/jpeg,image/webp,application/pdf" hidden>
+      </div>
+      <div style="margin-top:14px"><label class="f" for="enNota">Nota (opcional)</label><input id="enNota" placeholder="Se entregó en la escuela, lo recibió el intendente…"></div>
+      <div class="row-actions" style="margin-top:16px">
+        <button class="btn primary" id="enOk">Confirmar la entrega</button>
+        <button class="btn ghost" id="enCancelar">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="modalCobro" hidden>
   <div class="card">
     <header><h2>Registrar venta</h2></header>
@@ -4250,6 +4499,7 @@ function renderResumen(){
        ' · '+r.margenReal.toFixed(0)+'%</dd></div>';
   $("#r_break").innerHTML = h;
   renderAlertaPrecio(r);
+  if(typeof renderAvisoStock==="function") renderAvisoStock();
   if(typeof resumenPasos==="function") resumenPasos();
 }
 
@@ -5087,7 +5337,7 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !$("#tabs").hid
 const GRUPOS_BARRA = [
   ["",           ["inicio"]],
   ["Comercial",  ["cot","sav","cli","arc"]],
-  ["Producción", ["dis","pro","com"]],
+  ["Producción", ["dis","pro","inv","com"]],
   ["Dinero",     ["caj","ven"]],
   ["Taller",     ["cat","calc","set"]]
 ];
@@ -5216,8 +5466,10 @@ $("#tabs").addEventListener("click", e=>{
   const bd = rot.querySelector(".mbadge"); if(bd) bd.remove();
   $("#menuActual").textContent = rot.textContent.trim();
   abreMenu(false);
-  ["inicio","cot","cat","calc","com","cli","arc","caj","pro","dis","sav","ven","set"].forEach(t=> $("#tab-"+t).hidden = (t!==b.dataset.tab));
+  ["inicio","cot","cat","calc","inv","com","cli","arc","caj","pro","dis","sav","ven","set"].forEach(t=> $("#tab-"+t).hidden = (t!==b.dataset.tab));
   if(b.dataset.tab==="inicio") renderTablero();
+  if(b.dataset.tab==="inv") renderInvTaller();
+  if(b.dataset.tab==="com") renderSolicitudesCompras();
   if(b.dataset.tab==="cat") renderCatalogo();
   if(b.dataset.tab==="calc") renderCalc();
   if(b.dataset.tab==="com"){ renderCompras(); renderProveedores(); }
@@ -5650,42 +5902,118 @@ function pulsoDeHoy(){
   const hoyEntrega = vivas.filter(g=>{ const f = faltaPara(g); return !f.sin && !f.vencida && f.ms < 24*3600000; }).length;
   const vencidas = vivas.filter(g=>faltaPara(g).vencida).length;
   const t = [];
-  t.push({et:"Órdenes en proceso", v:vivas.length,
+  t.push({et:"Órdenes en proceso", v:vivas.length, ico:"caja",
           sub: vencidas ? vencidas+" con la entrega vencida" : "ninguna vencida",
-          mal: vencidas>0});
-  t.push({et:"Entregas hoy", v:hoyEntrega, sub: hoyEntrega ? "para las próximas 24 horas" : "nada compromete hoy"});
+          tono: vencidas>0 ? "mal" : ""});
+  t.push({et:"Entregas hoy", v:hoyEntrega, ico:"reloj",
+          sub: hoyEntrega ? "para las próximas 24 horas" : "nada compromete hoy",
+          tono: hoyEntrega>0 ? "cyan" : ""});
   if(puedeVer("ven")){
     const porCobrar = ventas.reduce((s,v)=>s+saldoDe(v), 0);
     const nCob = ventas.filter(v=>saldoDe(v)>0).length;
-    t.push({et:"Por cobrar", v:mx(porCobrar), sub: nCob ? nCob+" cuenta(s) con saldo" : "nadie debe nada"});
+    t.push({et:"Por cobrar", v:mx(porCobrar), ico:"cartera",
+            sub: nCob ? nCob+" cuenta(s) con saldo" : "nadie debe nada",
+            tono: porCobrar>0 ? "aviso" : ""});
     const hoyVta = ventas.filter(v=>v.fecha===hoy).reduce((s,v)=>s+num(v.recibido), 0);
-    t.push({et:"Cobrado hoy", v:mx(hoyVta), sub: ventas.filter(v=>v.fecha===hoy).length+" venta(s)"});
+    t.push({et:"Cobrado hoy", v:mx(hoyVta), ico:"alza",
+            sub: ventas.filter(v=>v.fecha===hoy).length+" venta(s)",
+            tono: hoyVta>0 ? "bien" : ""});
   } else {
-    const listas = guardadas.filter(g=>g.op && (g.op.estatus||"")==="Empacada").length;
-    t.push({et:"Listas para entregar", v:listas, sub: listas ? "esperando a que las recojan" : "ninguna esperando"});
+    const listas = guardadas.filter(g=>g.op && ["Empacada","Lista para entregar"].indexOf(g.op.estatus||"")>=0).length;
+    t.push({et:"Listas para entregar", v:listas, ico:"bien",
+            sub: listas ? "esperando a que las recojan" : "ninguna esperando",
+            tono: listas>0 ? "bien" : ""});
   }
   return t;
 }
 
+/* ---------- lo entregado por día ----------
+   Una sola serie, así que no lleva leyenda: el título la nombra. Barras
+   delgadas con la punta redondeada y 2 px de aire entre ellas, el número
+   sólo encima del día más alto —poner uno en cada barra es ruido— y el
+   detalle completo al pasar el cursor. */
+function entregasPorDia(){
+  const dias = [], hoy = new Date();
+  for(let i=6; i>=0; i--){
+    const d = new Date(hoy.getTime() - i*86400000);
+    const f = iso(d);
+    dias.push({f, et:["D","L","M","M","J","V","S"][d.getDay()], n:0, dinero:0,
+               largo: d.getDate()+"/"+(d.getMonth()+1)});
+  }
+  const porF = {}; dias.forEach(d=> porF[d.f] = d);
+  guardadas.forEach(g=>{
+    if(!g.op || (g.op.estatus||"") !== "Entregada") return;
+    const sello = (g.entregaReal && g.entregaReal.fecha) || g.entrega || g.op.fecha;
+    if(porF[sello]) porF[sello].n++;
+  });
+  if(puedeVer("ven")) ventas.forEach(v=>{ if(porF[v.fecha]) porF[v.fecha].dinero += num(v.recibido); });
+  return dias;
+}
+function pintaSemana(){
+  const w = $("#tbSemana"); if(!w) return;
+  const dias = entregasPorDia();
+  const tope = Math.max(1, ...dias.map(d=>d.n));
+  const total = dias.reduce((s,d)=>s+d.n, 0);
+  const pico = dias.reduce((a,b)=> b.n > a.n ? b : a, dias[0]);
+  w.innerHTML =
+    '<div class="tbGraf" role="img" aria-label="Órdenes entregadas por día en los últimos 7 días">'+
+      dias.map(d=>{
+        const alto = d.n ? Math.max(6, Math.round(d.n/tope*100)) : 0;
+        const tip = d.largo+" · "+(d.n===1 ? "1 orden entregada" : d.n+" órdenes entregadas")+
+                    (d.dinero ? " · "+mx(d.dinero) : "");
+        return '<div class="tbDia" tabindex="0" title="'+esc(tip)+'">'+
+          '<div class="tbCol">'+
+            (d.n && d===pico ? '<span class="tbPico">'+d.n+'</span>' : '')+
+            '<span class="tbBarra'+(d.n? '' : ' cero')+'" style="height:'+alto+'%"></span>'+
+          '</div>'+
+          '<span class="tbDiaEt">'+d.et+'</span></div>';
+      }).join("")+
+    '</div>'+
+    '<p class="tbGrafPie">'+(total
+      ? '<b>'+total+'</b> '+(total===1?"orden entregada":"órdenes entregadas")+' en la semana'
+      : 'Sin entregas registradas esta semana.')+'</p>';
+}
+
 /* ---------- pintar ---------- */
+const TB_ICO = {
+  caja:'<path d="M3.5 7.5L12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5L12 12l8.5-4.5M12 12v9"/>',
+  reloj:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  cartera:'<rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><circle cx="17" cy="14.5" r="1.3"/>',
+  alza:'<path d="M3.5 17l5-5 3 3 6-6.5"/><path d="M14 8.5h4V12"/>',
+  bien:'<circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.3l2.4 2.4 4.6-5"/>'
+};
+function tbSvg(k){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" '+
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(TB_ICO[k]||TB_ICO.caja)+'</svg>';
+}
+const TB_MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto",
+                  "septiembre","octubre","noviembre","diciembre"];
+const TB_DIAS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+
 function renderTablero(){
   if(!$("#tab-inicio")) return;
   const u = usuarioActual();
-  const h = new Date().getHours();
+  const d = new Date(), h = d.getHours();
   const saludo = h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches";
   const nombre = (u.nombre||"").split(" ")[0] || "";
   $("#tbHola").textContent = saludo + (nombre ? ", "+nombre : "");
+  $("#tbFecha").textContent = TB_DIAS[d.getDay()] + " " + d.getDate() + " de " + TB_MESES[d.getMonth()] +
+    " · " + horaAhora();
 
   const foto = turnoGuardado();
   const hace = foto ? haceCuanto(foto.cuando) : "";
   $("#tbCuando").textContent = foto
-    ? "Tu último vistazo fue " + (hace || "hace un momento") + " · " + foto.cuando
+    ? "Tu último vistazo fue " + (hace || "hace un momento")
     : "Es la primera vez que abres el tablero: desde aquí empiezo a contar.";
 
   /* tiles */
   $("#tbTiles").innerHTML = pulsoDeHoy().map(t=>
-    '<div class="tbTile'+(t.mal?" mal":"")+'"><span class="et">'+esc(t.et)+'</span>'+
-    '<span class="v">'+esc(String(t.v))+'</span><span class="sub">'+esc(t.sub)+'</span></div>').join("");
+    '<div class="tbTile'+(t.tono? " "+t.tono : "")+'">'+
+      '<span class="tbTileIco">'+tbSvg(t.ico)+'</span>'+
+      '<span class="et">'+esc(t.et)+'</span>'+
+      '<span class="v">'+esc(String(t.v))+'</span>'+
+      '<span class="sub">'+esc(t.sub)+'</span></div>').join("");
+  pintaSemana();
 
   /* lo que pasó */
   const movs = movimientosDelTurno();
@@ -5771,6 +6099,9 @@ function ponIconos(){
   calc:'<rect x="4.5" y="2.5" width="15" height="19" rx="2"/>'+
        '<rect x="7.5" y="5.5" width="9" height="3.5" rx="1"/>'+
        '<path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 17h.01M12 17h.01M15.5 17h.01"/>',
+  /* inventario: las cajas apiladas */
+  inv:'<rect x="3" y="12.5" width="8" height="8" rx="1.2"/><rect x="13" y="12.5" width="8" height="8" rx="1.2"/>'+
+      '<rect x="8" y="3.5" width="8" height="8" rx="1.2"/>',
   /* ajustes: las correderas */
   set:'<path d="M4 7h16M4 12h16M4 17h16"/>'+
       '<circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="17" r="2"/>'
@@ -5785,6 +6116,346 @@ function ponIconos(){
   });
 }
 ponIconos();
+
+
+/* ---------- inventario del taller ---------- */
+function solicitudes(){ cat.solicitudes = cat.solicitudes || []; return cat.solicitudes; }
+function folioSol(){
+  const base = "SOL-" + hoyISO().replace(/-/g,"");
+  const n = solicitudes().filter(s=>s.folio && s.folio.startsWith(base)).length + 1;
+  return base + "-" + String(n).padStart(2,"0");
+}
+/* Un artículo cuenta para el inventario cuando alguien se tomó la molestia de
+   ponerle mínimo o de registrarle existencia. Los demás no se vigilan. */
+function seVigila(a){ return num(a.minimo_inv) > 0 || num(a.existencia) > 0; }
+function estadoStock(a){
+  const hay = num(a.existencia), min = num(a.minimo_inv);
+  if(hay <= 0)        return {clase:"agotado", et:"Agotado",    falta: Math.max(1, min)};
+  if(min && hay<=min) return {clase:"bajo",    et:"Por acabarse", falta: Math.max(1, min*2 - hay)};
+  return {clase:"ok", et:"Suficiente", falta:0};
+}
+function articulosVigilados(){ return (cat.articulos||[]).filter(seVigila); }
+function faltantesInv(){ return articulosVigilados().filter(a=> estadoStock(a).clase !== "ok"); }
+
+let ivFil = "faltan", ivMarcados = {};
+
+function renderInvTaller(){
+  const t = $("#t_inv"); if(!t) return;
+  const q = (($("#ivBuscar")||{}).value||"").trim().toLowerCase();
+  const todos = articulosVigilados();
+  const faltan = faltantesInv();
+  let lista = ivFil === "faltan" ? faltan : todos;
+  if(q) lista = lista.filter(a=> (a.nombre||"").toLowerCase().indexOf(q) >= 0);
+
+  const r = $("#ivResumen");
+  if(r) r.innerHTML = todos.length
+    ? todos.length + " artículo(s) vigilados · " +
+      (faltan.length ? '<b style="color:var(--warn)">'+faltan.length+' por pedir</b>' : "todo con existencia")
+    : "Todavía no hay artículos con existencia ni mínimo";
+
+  const av = $("#ivAviso");
+  if(av) av.innerHTML = faltan.length
+    ? '<div class="alerta" style="margin:0 0 12px">⚠<span><b>'+faltan.length+'</b> artículo(s) necesitan resurtirse: '+
+      faltan.slice(0,4).map(a=>esc(a.nombre)).join(" · ") + (faltan.length>4 ? " y "+(faltan.length-4)+" más" : "") +
+      '</span></div>'
+    : '';
+
+  t.innerHTML = lista.length
+    ? '<thead><tr><th style="width:34px"></th><th>Artículo</th><th class="num">Hay</th><th class="num">Mínimo</th><th>Cómo está</th><th class="num">Sugerido pedir</th></tr></thead><tbody>'+
+      lista.map(a=>{ const e = estadoStock(a);
+        return '<tr data-ivart="'+esc(a.id)+'">'+
+          '<td><input type="checkbox" class="ivChk" data-ivc="'+esc(a.id)+'"'+(ivMarcados[a.id]?" checked":"")+'></td>'+
+          '<td>'+esc(a.nombre)+'<br><small style="color:var(--ink-3)">'+esc(a.cat||"")+'</small></td>'+
+          '<td class="num">'+num(a.existencia)+'</td>'+
+          '<td class="num">'+(num(a.minimo_inv)||"—")+'</td>'+
+          '<td><span class="ivEdo '+e.clase+'">'+e.et+'</span></td>'+
+          '<td class="num">'+(e.falta||"—")+'</td></tr>';
+      }).join("")+'</tbody>'
+    : '<tbody><tr><td style="color:var(--ink-3);padding:14px">'+
+      (q ? "Nada con ese nombre." : ivFil==="faltan"
+        ? "Nada por pedir: todo está por arriba del mínimo."
+        : "Todavía no hay artículos con existencia ni mínimo. El administrador los pone en el catálogo.")+
+      '</td></tr></tbody>';
+
+  renderMisSolicitudes(); badgeInv();
+}
+
+function renderMisSolicitudes(){
+  const w = $("#ivSolicitudes"); if(!w) return;
+  const mias = solicitudes().slice().reverse().slice(0,20);
+  $("#ivSolResumen").textContent = mias.length
+    ? solicitudes().filter(s=>s.estado==="pendiente").length + " sin atender"
+    : "ninguna todavía";
+  w.innerHTML = mias.length
+    ? mias.map(s=>'<div class="ivSol '+esc(s.estado)+'">'+
+        '<div class="ivSolTop"><b>'+esc(s.folio)+'</b>'+
+          '<span class="ivSolEdo '+esc(s.estado)+'">'+(s.estado==="atendida"?"Ya la tomó Compras":s.estado==="cancelada"?"Cancelada":"Esperando a Compras")+'</span>'+
+          '<span class="ivSolF">'+esc(s.fecha)+' '+esc(s.hora||"")+'</span></div>'+
+        '<div class="ivSolQue">'+ (s.partidas||[]).map(p=>esc(p.desc)+' <b>×'+num(p.cant)+'</b>').join(" · ") +'</div>'+
+        (s.nota ? '<div class="ivSolNota">'+esc(s.nota)+'</div>' : '')+
+        (s.req ? '<div class="ivSolNota">Pasó a la requisición <b>'+esc(s.req)+'</b></div>' : '')+
+      '</div>').join("")
+    : '<p style="color:var(--ink-3);font-size:13px;margin:6px 0">Todavía no has pedido nada. Marca lo que falte arriba y dale a «Pedir material».</p>';
+}
+
+function abrePedido(){
+  const marcados = articulosVigilados().filter(a=> ivMarcados[a.id]);
+  const lista = marcados.length ? marcados : faltantesInv();
+  if(!lista.length){ toast("Marca primero lo que necesitas"); return; }
+  $("#pedPartidas").innerHTML = lista.map(a=>{ const e = estadoStock(a);
+    return '<div class="pedFila" data-ped="'+esc(a.id)+'">'+
+      '<div class="pedNom"><b>'+esc(a.nombre)+'</b><small>hay '+num(a.existencia)+
+        (num(a.minimo_inv)? ' · mínimo '+num(a.minimo_inv) : '')+'</small></div>'+
+      '<input class="pedCant" type="number" min="1" step="1" value="'+(e.falta||1)+'" aria-label="Cuántas piezas de '+esc(a.nombre)+'">'+
+      '<button class="btn sm icon pedQuita" title="Quitar de la solicitud">✕</button>'+
+    '</div>';
+  }).join("");
+  $("#pedNota").value = ""; $("#pedUrge").value = "normal";
+  $("#modalPedir").hidden = false;
+}
+
+function guardaPedido(){
+  const partidas = [...$("#pedPartidas").children].map(f=>{
+    const a = (cat.articulos||[]).find(x=>x.id===f.dataset.ped);
+    return {id:uid(), artId:f.dataset.ped, desc: a ? a.nombre : "",
+            cant: Math.max(1, num(f.querySelector(".pedCant").value,1))};
+  }).filter(p=>p.desc);
+  if(!partidas.length){ toast("No quedó ningún renglón"); return; }
+  const s = {folio:folioSol(), fecha:hoyISO(), hora:horaAhora(),
+             quien: usuarioActual().nombre || "", rol: rolActual(),
+             nota:($("#pedNota").value||"").trim(), urge:$("#pedUrge").value,
+             partidas, estado:"pendiente", req:""};
+  solicitudes().push(s);
+  ivMarcados = {};
+  persist();
+  $("#modalPedir").hidden = true;
+  renderInvTaller(); renderCompras();
+  toast("Solicitud " + s.folio + " mandada a Compras");
+}
+
+/* ---------- del otro lado: Compras ---------- */
+function renderSolicitudesCompras(){
+  const w = $("#comSolicitudes"), card = $("#cardSolicitudes");
+  if(!w || !card) return;
+  const pend = solicitudes().filter(s=>s.estado==="pendiente");
+  card.hidden = !solicitudes().length;
+  const res = $("#comSolResumen");
+  if(res) res.textContent = pend.length ? pend.length+" sin atender" : "ninguna pendiente";
+  const vista = solicitudes().slice().reverse().slice(0,20);
+  w.innerHTML = vista.length
+    ? vista.map(s=>'<div class="ivSol '+esc(s.estado)+'">'+
+        '<div class="ivSolTop"><b>'+esc(s.folio)+'</b>'+
+          '<span class="ivSolEdo '+esc(s.estado)+'">'+(s.estado==="atendida"?"Ya es requisición":s.estado==="cancelada"?"Cancelada":"Pendiente")+'</span>'+
+          (s.urge && s.urge!=="normal" ? '<span class="ivSolUrge">'+(s.urge==="urge"?"Urge":"Pronto")+'</span>' : '')+
+          '<span class="ivSolF">'+esc(s.quien||"alguien")+' · '+esc(s.fecha)+' '+esc(s.hora||"")+'</span></div>'+
+        '<div class="ivSolQue">'+ (s.partidas||[]).map(p=>esc(p.desc)+' <b>×'+num(p.cant)+'</b>').join(" · ") +'</div>'+
+        (s.nota ? '<div class="ivSolNota">'+esc(s.nota)+'</div>' : '')+
+        (s.req ? '<div class="ivSolNota">Requisición <b>'+esc(s.req)+'</b></div>' : '')+
+        (s.estado==="pendiente"
+          ? '<div class="ivSolBtns"><button class="btn sm primary" data-solreq="'+esc(s.folio)+'">Convertir en requisición</button>'+
+            '<button class="btn sm ghost" data-solno="'+esc(s.folio)+'">No se va a pedir</button></div>'
+          : '')+
+      '</div>').join("")
+    : '';
+}
+function solAReq(folio){
+  const s = solicitudes().find(x=>x.folio===folio); if(!s) return;
+  if(!proveedores().length){ toast("Primero da de alta un proveedor"); abreProv(); return; }
+  reqPrefill = {
+    parts: (s.partidas||[]).map(p=>({id:uid(), artId:p.artId||"", desc:p.desc, cant:num(p.cant), costo:0})),
+    nota: (s.nota ? s.nota+" · " : "") + "Solicitud "+s.folio+" de "+(s.quien||"producción"),
+    urge: s.urge || "normal"
+  };
+  solLigada = folio;
+  abreReq();
+}
+/* El número rojo del menú: cuántos artículos hay que pedir. Se pinta aunque la
+   pestaña esté cerrada, que para eso sirve. */
+function badgeInv(){
+  const b = $("#invBadge"); if(!b) return;
+  const n = faltantesInv().length;
+  b.textContent = n; b.hidden = !n;
+  b.className = "mbadge" + (faltantesInv().some(a=>num(a.existencia)<=0) ? " malo" : "");
+}
+
+/* ---------- el aviso de existencia al cotizar ----------
+   Informativo a propósito: el vendedor puede vender sin existencia, nada más
+   que lo sepa antes de prometer la fecha, no cuando ya la prometió. */
+function renderAvisoStock(){
+  const w = $("#r_stock"); if(!w) return;
+  const a = (cat.articulos||[]).find(x=>x.id===cot.articuloId);
+  if(!a || !seVigila(a)){ w.hidden = true; w.innerHTML = ""; return; }
+  const piden = qtyPedido(), hay = num(a.existencia);
+  if(hay >= piden){
+    w.hidden = false; w.className = "avisoStock ok";
+    w.innerHTML = '<b>Sí hay.</b> Quedan ' + hay + ' pza(s) de «' + esc(a.nombre) + '»; este pedido lleva ' + piden + '.';
+    return;
+  }
+  const faltan = piden - hay;
+  w.hidden = false; w.className = "avisoStock " + (hay <= 0 ? "nada" : "poco");
+  w.innerHTML = '<b>Faltan ' + faltan + ' pza(s).</b> De «' + esc(a.nombre) + '» ' +
+    (hay <= 0 ? 'no hay nada en inventario' : 'hay ' + hay) + ' y el pedido pide ' + piden + '. ' +
+    '<span class="avisoStockQue">Puedes cotizar igual; nada más avísale al cliente de la fecha o pídele a producción que lo resurta.</span>';
+}
+
+/* ---------- eventos del inventario del taller ---------- */
+document.addEventListener("click", e=>{
+  const f = e.target.closest("#ivFiltro [data-ivf]");
+  if(f){ ivFil = f.dataset.ivf;
+    $("#ivFiltro").querySelectorAll("button").forEach(b=> b.setAttribute("aria-pressed", String(b===f)));
+    renderInvTaller(); return; }
+  if(e.target.closest("#ivPedir")){ abrePedido(); return; }
+  const quita = e.target.closest(".pedQuita");
+  if(quita){ const fila = quita.closest(".pedFila"); if(fila){ delete ivMarcados[fila.dataset.ped]; fila.remove(); } return; }
+  if(e.target.closest("#pedGuardar")){ guardaPedido(); return; }
+  if(e.target.closest("#pedCerrar") || e.target.closest("#pedCancelar")){ $("#modalPedir").hidden = true; return; }
+  if(e.target.id === "modalPedir"){ $("#modalPedir").hidden = true; return; }
+  const sr = e.target.closest("[data-solreq]"); if(sr){ solAReq(sr.dataset.solreq); return; }
+  const sn = e.target.closest("[data-solno]");
+  if(sn){
+    const s = solicitudes().find(x=>x.folio===sn.dataset.solno); if(!s) return;
+    const porque = prompt("¿Por qué no se va a pedir? Producción lo va a ver.", "");
+    if(porque === null) return;
+    s.estado = "cancelada"; s.nota = (s.nota ? s.nota+" · " : "") + "No se pide: " + (porque||"sin motivo");
+    persist(); renderSolicitudesCompras(); renderInvTaller();
+    toast("Solicitud cancelada");
+    return;
+  }
+});
+document.addEventListener("change", e=>{
+  const c = e.target.closest("[data-ivc]");
+  if(c){ if(c.checked) ivMarcados[c.dataset.ivc] = true; else delete ivMarcados[c.dataset.ivc]; }
+});
+document.addEventListener("input", e=>{ if(e.target.id === "ivBuscar") renderInvTaller(); });
+
+
+/* ---------- del cobro a producción ---------- */
+let aProd = null;
+function ofreceProduccion(q){
+  const g = guardadas.find(x=>x.folio===q.folio) || q;
+  if(g.estado === "confirmada" && g.op) return;          // ya está en el taller
+  aProd = g.folio;
+  const r = calcDe(g);
+  $("#apResumen").innerHTML = '<b>'+esc(g.folio)+'</b> · '+esc(g.cliente||"sin cliente")+
+    '<br>'+esc(g.desc||"Artículo")+' · '+r.qty+' pieza(s) · '+mx(r.total);
+  $("#modalAProd").hidden = false;
+}
+async function mandaAProduccion(folio){
+  const g = guardadas.find(x=>x.folio===folio); if(!g) return;
+  if(!(g.apps||[]).length){ toast("Agrega al menos una ubicación antes de mandarlo al taller"); return; }
+  if(!(g.cliente||"").trim()){ toast("Escribe el nombre del cliente antes de mandarlo al taller"); return; }
+  g.estado = "confirmada";
+  g.op = {folio: folioOP(), fecha: hoyISO(), cotizacion: g.folio, estatus:"Pendiente",
+          historial:[{estatus:"Pendiente", fecha:hoyISO(), hora:horaAhora()}]};
+  const art = (cat.articulos||[]).find(a=>a.id===g.articuloId);
+  if(art && num(art.existencia) > 0){
+    const r = calcDe(g);
+    await moverInventario(art.id, "salida", r.qty, "Salida por pedido cobrado", true,
+                          {folio: g.op.folio, archivo: null});
+  }
+  if(cot && cot.folio === folio){ cot.estado = g.estado; cot.op = g.op; renderEstado(); }
+  await guardaOrden(folio);
+  renderSaved(); renderProduccion();
+  $("#modalAProd").hidden = true; aProd = null;
+  toast("Orden " + g.op.folio + " enviada a producción");
+}
+
+/* ---------- la entrega, con evidencia ---------- */
+let entregando = null, entFotos = [];
+function puedeEntregar(){ return ["ventas","admin"].indexOf(rolActual()) >= 0; }
+function listaParaEntregar(g){ return g && g.op && (g.op.estatus||"") === "Lista para entregar"; }
+
+function abreEntrega(folio){
+  const g = guardadas.find(x=>x.folio===folio); if(!g || !g.op) return;
+  if(!puedeEntregar()){ toast("La entrega la confirma Ventas"); return; }
+  entregando = folio; entFotos = [];
+  const r = calcDe(g);
+  $("#enResumen").innerHTML = '<b>'+esc(g.op.folio)+'</b> · '+esc(g.cliente||"sin cliente")+
+    '<br>'+esc(g.desc||"Artículo")+' · '+r.qty+' pieza(s)';
+  $("#enQuien").value = ""; $("#enNota").value = "";
+  $("#enFecha").value = hoyISO();
+  pintaFotosEntrega();
+  $("#modalEntrega").hidden = false;
+}
+function pintaFotosEntrega(){
+  const w = $("#enFotos"); if(!w) return;
+  w.innerHTML = entFotos.length
+    ? entFotos.map(f=>'<div class="enFoto">'+
+        ((f.tipoMime||"").indexOf("image")===0
+          ? '<img src="'+esc(f.url)+'" alt="'+esc(f.nombre)+'">'
+          : '<span class="sin">PDF</span>')+
+        '<span>'+esc(f.nombre.slice(0,22))+'</span>'+
+        '<button class="btn sm icon" data-enquita="'+esc(f.id)+'" title="Quitar">✕</button></div>').join("")
+    : '<p class="enVacio">Todavía no hay evidencia. Sin al menos una foto o PDF no se puede cerrar la entrega.</p>';
+  const ok = $("#enOk");
+  if(ok){ ok.disabled = !entFotos.length; ok.style.opacity = entFotos.length ? "" : ".55"; }
+}
+async function subeFotoEntrega(file){
+  if(!ASSETS){ toast("La carga de archivos necesita permiso de edición"); return; }
+  if(!revisaArchivo(file, "doc")) return;
+  toast("Subiendo " + file.name + "…");
+  file = await aligera(file);
+  try{
+    const res = await ASSETS.upload(file);
+    entFotos.push({id:uid(), nombre:file.name, url:res.url, ref:res.id,
+                   tipoMime:file.type||"", kb:Math.round(file.size/1024)});
+    pintaFotosEntrega();
+  }catch(e){ toast("No se pudo subir la foto"); }
+}
+async function cierraEntrega(){
+  const g = guardadas.find(x=>x.folio===entregando); if(!g || !g.op) return;
+  if(!entFotos.length){ toast("Falta la evidencia: una foto o el PDF firmado"); return; }
+  const quien = ($("#enQuien").value||"").trim();
+  if(!quien){ toast("Escribe quién recibió el pedido"); return; }
+  const f = $("#enFecha").value || hoyISO();
+  g.op.estatus = "Entregada";
+  g.op.historial = g.op.historial || [];
+  g.op.historial.push({estatus:"Entregada", fecha:f, hora:horaAhora()});
+  g.entregaReal = {fecha:f, hora:horaAhora(), recibe:quien,
+                   por: usuarioActual().nombre || "", nota:($("#enNota").value||"").trim(),
+                   fotos: entFotos.slice()};
+  g.op.bitacora = g.op.bitacora || [];
+  g.op.bitacora.push({id:uid(), rol: rolActual(), autor: usuarioActual().nombre || "Ventas",
+                      fecha: f, hora: horaAhora(),
+                      texto:"Entregado a "+quien+" · "+entFotos.length+" evidencia(s) de la entrega"});
+  await guardaOrden(g.folio);
+  $("#modalEntrega").hidden = true; entregando = null; entFotos = [];
+  renderProduccion(); renderSaved();
+  if(typeof renderTablero === "function" && !$("#tab-inicio").hidden) renderTablero();
+  toast("Entrega confirmada · " + g.op.folio);
+}
+
+/* ---------- eventos del cierre del pedido ---------- */
+document.addEventListener("click", async e=>{
+  if(e.target.closest("#apEnviar")){ if(aProd) await mandaAProduccion(aProd); return; }
+  if(e.target.closest("#apDespues") || e.target.closest("#apCerrar") || e.target.id==="modalAProd"){
+    $("#modalAProd").hidden = true; aProd = null; return; }
+
+  const ent = e.target.closest("[data-entregar]");
+  if(ent){ abreEntrega(ent.dataset.entregar); return; }
+  const ve = e.target.closest("[data-verevi]");
+  if(ve){
+    const [folio, id] = ve.dataset.verevi.split("|");
+    const g = guardadas.find(x=>x.folio===folio); if(!g || !g.entregaReal) return;
+    const fotos = (g.entregaReal.fotos||[]).map(f=>Object.assign({}, f,
+      {ubic:"Evidencia de entrega", folio:(g.op||{}).folio||g.folio}));
+    abreVisor(fotos, fotos.findIndex(f=>f.id===id));
+    return;
+  }
+  if(e.target.closest("#enSubir")){ const i = $("#enFile"); if(i) i.click(); return; }
+  const q = e.target.closest("[data-enquita]");
+  if(q){ entFotos = entFotos.filter(f=>f.id !== q.dataset.enquita); pintaFotosEntrega(); return; }
+  if(e.target.closest("#enOk")){ await cierraEntrega(); return; }
+  if(e.target.closest("#enCancelar") || e.target.closest("#enCerrar") || e.target.id==="modalEntrega"){
+    $("#modalEntrega").hidden = true; entregando = null; entFotos = []; return; }
+});
+document.addEventListener("change", async e=>{
+  if(e.target.id === "enFile"){
+    const f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if(f) await subeFotoEntrega(f);
+  }
+});
 
 /* ---------- eventos del armado ---------- */
 $("#armadoTab").addEventListener("click", ()=>abreArmado(true));
@@ -6472,10 +7143,10 @@ async function bajaCarpeta(cliente, mes, boton){
 
 /* ============ EQUIPO Y ROLES ============ */
 const ROLES = {
-  admin:      {nombre:"Administrador", ve:["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","com","set"]},
-  ventas:     {nombre:"Ventas",        ve:["inicio","cot","sav","pro","dis","cli","arc","cat","com"]},
+  admin:      {nombre:"Administrador", ve:["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","set"]},
+  ventas:     {nombre:"Ventas",        ve:["inicio","cot","sav","pro","dis","cli","arc","com"]},
   diseno:     {nombre:"Diseño",        ve:["inicio","dis","pro"]},
-  produccion: {nombre:"Producción",    ve:["inicio","pro","com"]}
+  produccion: {nombre:"Producción",    ve:["inicio","pro","inv","com"]}
 };
 let equipo = [], usuarioId = null, pinPendiente = null;
 
@@ -7105,9 +7776,15 @@ async function reemplazaDiseno(folio, appId, file){
 }
 
 /* ============ TABLERO DE PRODUCCIÓN ============ */
-const ESTATUS = ["Pendiente","En diseño","En impresión","En aplicación","Control de calidad","Empacada","Entregada","Detenida"];
+const ESTATUS = ["Pendiente","En diseño","En impresión","En aplicación","Control de calidad","Empacada","Lista para entregar","Entregada","Detenida"];
+/* En el menú de producción no está «Entregada»: esa la pone ventas al
+   confirmar la entrega, con evidencia. Si la orden ya está entregada se
+   muestra, para no borrarla del renglón. */
+function estatusQueOfrecer(est){
+  return ESTATUS.filter(x=> x !== "Entregada" || est === "Entregada");
+}
 function claseEstatus(e){
-  if(e==="Entregada"||e==="Empacada") return "e-listo";
+  if(e==="Entregada"||e==="Empacada"||e==="Lista para entregar") return "e-listo";
   if(e==="Detenida") return "e-alto";
   if(e==="Pendiente"||!e) return "e-pendiente";
   return "e-proceso";
@@ -7175,7 +7852,19 @@ function renderProduccion(){
         '<button class="btn sm" data-verdoc-op="'+esc(o.folio)+'">Ver orden</button></span>'+
         (soloMira
           ? '<span class="soloVista">Solo consulta</span>'
-          : '<select data-est="'+esc(o.folio)+'" style="margin-left:0">'+ESTATUS.map(x=>'<option'+(x===est?" selected":"")+'>'+x+'</option>').join("")+'</select>')+
+          : '<select data-est="'+esc(o.folio)+'" style="margin-left:0">'+estatusQueOfrecer(est).map(x=>'<option'+(x===est?" selected":"")+'>'+x+'</option>').join("")+'</select>')+
+      (est==="Lista para entregar" && puedeEntregar()
+        ? '<button class="btn sm btnEntregar" data-entregar="'+esc(o.folio)+'">Confirmar entrega</button>' : '')+
+      (o.entregaReal
+        ? '<div class="opEntregada">Entregado a <b>'+esc(o.entregaReal.recibe||"—")+'</b> el '+
+          esc(o.entregaReal.fecha)+' '+esc(o.entregaReal.hora||"")+
+          ' · lo confirmó '+esc(o.entregaReal.por||"ventas")+
+          '<span class="opEvi">'+ (o.entregaReal.fotos||[]).map(f=>
+            '<button data-verevi="'+esc(o.folio)+'|'+esc(f.id)+'" title="Ver la evidencia">'+
+            ((f.tipoMime||"").indexOf("image")===0 ? '<img src="'+esc(f.url)+'" alt="">' : 'PDF')+
+            '</button>').join("") +'</span>'+
+          (o.entregaReal.nota ? '<span>'+esc(o.entregaReal.nota)+'</span>' : '')+
+          '</div>' : '')+
       '</div>'+
       '<div class="opCuerpo"><div>'+
         '<div class="opSpec"><div><b>'+esc(o.desc||"Artículo")+'</b> · '+piezas+' pieza(s)</div>'+
@@ -8138,6 +8827,7 @@ $("#cb_ok").addEventListener("click", async ()=>{
   if(typeof renderCobranza === "function") renderCobranza();
   toast("Venta registrada: "+mx(venta.total) + (venta.factura && venta.factura.requiere ? " · queda por facturar" : ""));
   renderVentas();
+  if(typeof ofreceProduccion === "function") ofreceProduccion(q);
 });
 $("#btnCobrar").addEventListener("click", ()=> abrirCobro(cot));
 
@@ -8933,8 +9623,10 @@ function renderCompras(){
         (porAut.length===1 ? ' requisición espera' : ' requisiciones esperan') + ' autorización.</b> ' +
         (puedeAutorizar() ? 'Ábrela y decide.' : 'Solo el administrador puede autorizarlas.') + '</p>'
       : '');
+  renderSolicitudesCompras(); badgeInv();
+  const solPend = solicitudes().filter(s=>s.estado==="pendiente").length;
   const badge = document.querySelector('#tabs [data-tab="com"] .mbadge');
-  const n = alertas.length + porAut.length;
+  const n = alertas.length + porAut.length + solPend;
   if(badge){ badge.textContent = n; badge.hidden = !n; badge.className = "mbadge" + (alertas.length ? " malo" : ""); }
 
   const t = $("#t_compras"); if(!t) return;
@@ -8991,8 +9683,10 @@ function abreProv(id){
   $("#pvBorrar").hidden = !id;
   $("#modalProv").hidden = false;
 }
+let reqPrefill = null, solLigada = null;
 function abreReq(folio){
   ponFormReq();
+  if(folio) { reqPrefill = null; solLigada = null; }
   reqEdit = folio || null;
   const r = folio ? compras().find(x=>x.folio===folio) : null;
   $("#reqTitulo").textContent = r ? "Requisición " + r.folio : "Nueva requisición de compra";
@@ -9002,7 +9696,14 @@ function abreReq(folio){
   $("#reqFecha").value = r ? r.para : iso(new Date(Date.now()+7*86400000));
   $("#reqUrge").value = r ? (r.urge||"normal") : "normal";
   $("#reqNota").value = r ? (r.nota||"") : "";
-  const parts = r && r.partidas && r.partidas.length ? r.partidas : [{id:uid(), artId:"", desc:"", cant:1, costo:0}];
+  const parts = r && r.partidas && r.partidas.length ? r.partidas
+    : (reqPrefill && reqPrefill.parts && reqPrefill.parts.length
+        ? reqPrefill.parts : [{id:uid(), artId:"", desc:"", cant:1, costo:0}]);
+  if(!r && reqPrefill){
+    $("#reqNota").value = reqPrefill.nota || "";
+    if(reqPrefill.urge === "urge") $("#reqUrge").value = "urge";
+  }
+  reqPrefill = null;
   pintaPartidas(parts);
   $("#reqGuardar").textContent = r ? "Guardar cambios" : "Crear la requisición";
   $("#reqGuardar").hidden = !!(r && !puedeEditarReq(r));
@@ -9297,6 +9998,12 @@ document.addEventListener("click", async e=>{
         autoriza:{necesita:nec, estado:nec?"pendiente":"nolapide", quien:"", fecha:"", motivo:""},
         recibida:null, pagada:null, bitacora:[{f:hoyISO()+" "+horaAhora(), t:"La creó "+(usuarioActual().nombre||"alguien")+"."}]};
       compras().push(r);
+      if(solLigada){
+        const s = solicitudes().find(x=>x.folio===solLigada);
+        if(s){ s.estado = "atendida"; s.req = r.folio; }
+        solLigada = null;
+        renderSolicitudesCompras(); renderInvTaller();
+      }
       persist(); renderCompras(); $("#modalReq").hidden = true;
       toast(nec ? "Creada. Falta que la autorice el administrador." : "Requisición " + r.folio + " lista para mandarse");
       abreDetalleReq(r.folio);
@@ -9946,10 +10653,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261006-2248";</script>
+<script>window.BUILD="20261006-2315";</script>
 <script>
 (function(){
-  var mio = "20261006-2248";
+  var mio = "20261006-2315";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -9977,7 +10684,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261006-2248"></script>
-<script src="diagnostico.js?v=20261006-2248"></script>
+<script src="cuenta.js?v=20261006-2315"></script>
+<script src="diagnostico.js?v=20261006-2315"></script>
 </body>
 </html>
