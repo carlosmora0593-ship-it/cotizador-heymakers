@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261006-2315"></script>
+<script src="config.js?v=20261006-2339"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -100,7 +100,8 @@ nav.tabs button:hover{color:var(--ink)}
 
 /* layout */
 .cols{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:20px;align-items:start;margin-top:20px}
-@media (max-width:980px){.cols{grid-template-columns:1fr}}
+.cols>*{min-width:0}
+@media (max-width:980px){.cols{grid-template-columns:minmax(0,1fr)}}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
 .card+.card{margin-top:16px}
 .card>header{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--line-soft);background:var(--surface-2)}
@@ -1437,6 +1438,66 @@ body.conBarra nav.tabs button[aria-selected="true"] .ico{color:var(--accent-ink)
   background:var(--surface-2);padding:0;cursor:pointer}
 .opEvi img{width:100%;height:100%;object-fit:cover;display:block}
 
+/* ---- varios artículos en una cotización ---- */
+.tiraArts{margin-top:14px;padding:13px 15px 14px}
+.tiraTop{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.tiraTop h2{margin:0;font-size:14px;font-weight:650}
+.tiraCuenta{margin-left:auto;font-size:11.5px;color:var(--ink-3)}
+.tiraFila{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch}
+.tiraArt{position:relative;display:flex;align-items:center;gap:9px;text-align:left;
+  padding:9px 30px 9px 10px;border-radius:var(--radio-sm,12px);cursor:pointer;
+  border:1px solid var(--line);background:var(--surface);min-width:0;max-width:260px;
+  transition:border-color .15s ease, box-shadow .15s ease}
+.tiraArt:hover{border-color:var(--ink-3)}
+.tiraArt.act{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in oklab, var(--accent) 22%, transparent)}
+.tiraNum{flex:none;width:21px;height:21px;border-radius:50%;display:grid;place-items:center;
+  background:var(--surface-2);color:var(--ink-3);font-size:11px;font-weight:700}
+.tiraArt.act .tiraNum{background:var(--accent);color:#fff}
+.tiraTxt{min-width:0;display:block}
+.tiraTxt b{display:block;font-size:12.5px;font-weight:600;line-height:1.3;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tiraTxt small{display:block;font-size:11px;color:var(--ink-3);margin-top:1px}
+.tiraX{position:absolute;top:50%;right:7px;transform:translateY(-50%);width:19px;height:19px;
+  border-radius:50%;display:grid;place-items:center;font-size:10px;color:var(--ink-3);
+  background:transparent;cursor:pointer}
+.tiraX:hover{background:var(--warn-soft);color:var(--warn)}
+.tiraMas{padding:9px 14px;border-radius:var(--radio-sm,12px);cursor:pointer;font-size:12.5px;
+  font-weight:600;border:1px dashed var(--line);background:transparent;color:var(--ink-2)}
+.tiraMas:hover{border-color:var(--accent);color:var(--accent)}
+.opArtN{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-3);margin-top:8px;padding-top:7px;border-top:1px solid var(--line-soft,var(--line))}
+.opSpec>.opArtN:first-child{margin-top:0;padding-top:0;border-top:0}
+.tiraPie{margin:11px 0 0;font-size:12px;color:var(--ink-3);line-height:1.5}
+.tiraPie b{color:var(--ink-2)}
+.pasoArt{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;
+  padding-top:13px;border-top:1px solid var(--line-soft,var(--line))}
+#pasoArtQue{font-size:12px;color:var(--ink-3)}
+.pasoArt .btn{margin-left:auto}
+.rVarios{margin:0 16px 14px;border:1px solid var(--line);border-radius:var(--radio-sm,12px);
+  padding:11px 13px;background:var(--surface-2)}
+.rvTit{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:8px}
+.rvFila{display:flex;align-items:center;gap:9px;padding:6px 0;cursor:pointer;border-radius:8px}
+.rvFila:hover{background:var(--surface)}
+.rvFila.act .rvNom{font-weight:600}
+.rvN{flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;
+  background:var(--surface);color:var(--ink-3);font-size:10px;font-weight:700}
+.rvFila.act .rvN{background:var(--accent);color:#fff}
+.rvNom{flex:1;min-width:0;font-size:12.5px;line-height:1.35;overflow:hidden}
+.rvNom small{display:block;font-size:11px;color:var(--ink-3);font-weight:400}
+.rvMx{font-family:"IBM Plex Mono",monospace;font-size:12.5px;white-space:nowrap}
+.rvTotal{display:flex;justify-content:space-between;gap:10px;align-items:baseline;
+  margin-top:8px;padding-top:8px;border-top:1px solid var(--line);
+  font-size:13px;font-weight:650}
+.rvTotal span:last-child{font-family:"IBM Plex Mono",monospace;font-size:16px}
+.rvNota{font-size:11px;color:var(--ink-3);margin-top:6px}
+@media (max-width:560px){
+  .tiraArt{max-width:none;width:100%}
+  .tiraMas{width:100%}
+  .pasoArt .btn{margin-left:0;width:100%}
+}
+@media print{ .tiraArts,.pasoArt{display:none!important} }
+
 
 /* ---- el diagnóstico ----
    Una pregunta a la vez. Las opciones entran escalonadas: no es adorno,
@@ -1691,6 +1752,8 @@ body.rol-produccion #btnPrint{display:none!important}
 #hoja .op-grid,.paper .op-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 #hoja .op-card,.paper .op-card{border:1px solid #999;padding:8px}
 #hoja .op-chk span,.paper .op-chk span{display:inline-block;border:1px solid #000;width:11px;height:11px;margin-right:6px;vertical-align:-1px}
+#hoja .op-art,.paper .op-art{border-left:3px solid #000;padding-left:12px;margin:14px 0 18px;break-inside:avoid}
+#hoja h3,.paper h3{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;margin:12px 0 6px}
 #hoja h2,.paper h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #000;padding-bottom:3px;margin:16px 0 8px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -1888,6 +1951,15 @@ body.rol-produccion #btnPrint{display:none!important}
         </div>
       </div></div></div>
 
+      <div class="card tiraArts" id="tiraArts" hidden>
+        <div class="tiraTop">
+          <h2>Artículos de la cotización</h2>
+          <span class="tiraCuenta" id="tiraCuenta"></span>
+        </div>
+        <div class="tiraFila" id="tiraFila"></div>
+        <p class="tiraPie" id="tiraPie"></p>
+      </div>
+
       <div class="card plegable" data-paso="articulo">
         <header><span class="step">2</span><h2>Artículo o servicio</h2><span class="hint" data-solo="articulo">el costo sale del catálogo</span><span class="hint" data-solo="servicio" hidden>se cobra por medida</span><span class="resumenPaso" data-res="articulo"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body">
         <div class="modoSwitch" id="modoSwitch">
@@ -1958,6 +2030,11 @@ body.rol-produccion #btnPrint{display:none!important}
             <div><label class="f" for="c_resp">Responsable de producción</label><input id="c_resp" placeholder="Nombre"></div>
           </div>
           <div style="margin-top:12px"><label class="f" for="c_notas">Notas de producción</label><textarea id="c_notas" rows="3" placeholder="Posición exacta, temperatura de prensa, cuidados especiales…"></textarea></div>
+          <div class="pasoArt" id="pasoArt">
+            <span id="pasoArtQue">Este artículo</span>
+            <button class="btn sm" id="btnAddArt">+ Agregar otro artículo</button>
+          </div>
+
           <label class="f" style="margin-top:14px">Checklist de proceso</label>
           <div class="check" id="checklist"></div>
           <div id="bitaCot"></div>
@@ -1975,6 +2052,8 @@ body.rol-produccion #btnPrint{display:none!important}
         </div>
           <div class="alertaPrecio" id="r_alerta" hidden></div>
           <div class="avisoStock" id="r_stock" hidden></div>
+          <div class="rVarios" id="rVarios" hidden></div>
+
         <dl class="break" id="r_break"></dl>
         <div class="estadoPedido" id="estadoPedido"></div>
         <div class="body" style="display:flex;gap:8px;flex-wrap:wrap">
@@ -3179,7 +3258,7 @@ let P = defaultParams();
 let cot = null;
 let guardadas = [];
 let ventas = [];
-function calcDe(q){ const prev = cot; cot = q; try{ return calc(); } finally { cot = prev; } }
+/* calcDe vive abajo, con la lista de artículos: calcula cada uno y suma. */
 const hoyISO = () => new Date(Date.now() - new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
 
 function nuevaCot(demo){
@@ -3194,7 +3273,7 @@ function nuevaCot(demo){
                 : cat.extras.map(e=>({id:e.id,on:false})),
     tallas: demo? [{id:uid(),talla:"M",color:"Negro",cant:20},{id:uid(),talla:"G",color:"Negro",cant:30}] : [],
     notas:"", entrega:"", entregaHora:"18:00", resp:"", checklist:{},
-    estado:"borrador", op:null
+    estado:"borrador", op:null, items:null, iAct:0
   };
 }
 function sumaTallas(c){ return (c.tallas||[]).reduce((s,t)=>s+Math.max(0,Math.round(num(t.cant))),0); }
@@ -4211,6 +4290,7 @@ function renderCot(){
   $("#c_descNota").value = cot.descNota || "";
   renderApps(); renderExtras(); renderTallas(); renderProd(); aplicaPasoTallas();
   renderServicio(); renderArmado(); renderResumen();
+  if(typeof renderTiraItems==="function") renderTiraItems();
   if(typeof pintaSelectClientes==="function") pintaSelectClientes();
   if(typeof renderEstado==="function") renderEstado();
   if(typeof resumenPasos==="function") resumenPasos();
@@ -4499,6 +4579,8 @@ function renderResumen(){
        ' · '+r.margenReal.toFixed(0)+'%</dd></div>';
   $("#r_break").innerHTML = h;
   renderAlertaPrecio(r);
+  if(typeof renderTotalVarios==="function") renderTotalVarios();
+  if(typeof renderTiraItems==="function") renderTiraItems();
   if(typeof renderAvisoStock==="function") renderAvisoStock();
   if(typeof resumenPasos==="function") resumenPasos();
 }
@@ -5121,7 +5203,7 @@ $("#tab-ven").addEventListener("click", e=>{
   const vc = e.target.closest("[data-vercot]");
   if(vc){
     const g = guardadas.find(g=>g.folio===vc.dataset.vercot);
-    if(g){ cot = JSON.parse(JSON.stringify(g)); renderCot();
+    if(g){ cot = JSON.parse(JSON.stringify(g)); normalizaItems(cot); renderCot();
            const b = document.querySelector('#tabs [data-tab="cot"]'); if(b) b.click(); }
     return;
   }
@@ -5186,7 +5268,8 @@ function renderSaved(){
   $("#savCount").textContent = guardadas.length + " cotización(es)";
   if(!guardadas.length){ $("#savedList").innerHTML = '<div class="empty">Aún no guardas cotizaciones. Arma una y presiona <b>Guardar</b>.</div>'; return; }
   $("#savedList").innerHTML = guardadas.slice().reverse().map(g=>
-    '<div class="saved-item"><div class="meta"><b>'+esc(g.cliente||"Sin cliente")+'</b><small>'+esc(g.folio)+' · '+esc(g.fecha)+' · '+esc(g.ref||"")+' · '+g.cantidad+' pzas</small></div>'+
+    '<div class="saved-item"><div class="meta"><b>'+esc(g.cliente||"Sin cliente")+'</b><small>'+esc(g.folio)+' · '+esc(g.fecha)+' · '+esc(g.ref||"")+' · '+
+      (()=>{ const r = calcDe(g); return r.qty+" pzas"+(r.varios ? " · "+r.partes.length+" artículos" : ""); })()+'</small></div>'+
     (g.estado==="confirmada" && g.op ? '<span class="pill part">Pedido '+esc(g.op.folio)+'</span>' : '')+
     (ventas.some(v=>v.folio===g.folio) ? '<span class="pill good">Vendida</span>' : '')+
     (facturaDe(g) ? (facturaDe(g).estado==="facturada"
@@ -6347,11 +6430,11 @@ async function mandaAProduccion(folio){
   g.estado = "confirmada";
   g.op = {folio: folioOP(), fecha: hoyISO(), cotizacion: g.folio, estatus:"Pendiente",
           historial:[{estatus:"Pendiente", fecha:hoyISO(), hora:horaAhora()}]};
-  const art = (cat.articulos||[]).find(a=>a.id===g.articuloId);
-  if(art && num(art.existencia) > 0){
-    const r = calcDe(g);
-    await moverInventario(art.id, "salida", r.qty, "Salida por pedido cobrado", true,
-                          {folio: g.op.folio, archivo: null});
+  for(const p of calcDe(g).partes){
+    const a = (cat.articulos||[]).find(a=>a.id===p.q.articuloId);
+    if(a && num(a.existencia) > 0)
+      await moverInventario(a.id, "salida", p.r.qty, "Salida por pedido cobrado", true,
+                            {folio: g.op.folio, archivo: null});
   }
   if(cot && cot.folio === folio){ cot.estado = g.estado; cot.op = g.op; renderEstado(); }
   await guardaOrden(folio);
@@ -6454,6 +6537,277 @@ document.addEventListener("change", async e=>{
     const f = e.target.files && e.target.files[0];
     e.target.value = "";
     if(f) await subeFotoEntrega(f);
+  }
+});
+
+
+/* ---------- varios artículos en una cotización ----------
+   Lo que es del artículo y no del pedido. Todo lo demás —cliente, folio,
+   entrega, responsable, la orden de producción— es de la cotización entera. */
+const CAMPOS_ITEM = ["articuloId","costoArt","precioArt","desc","cantidad","cantManual","modo",
+                     "apps","_apps","armado","extras","tallas",
+                     "descOn","descTipo","descVal","descNota","notas"];
+
+function itemEnBlanco(){
+  const o = {id:uid()};
+  CAMPOS_ITEM.forEach(k=>{ o[k] = undefined; });
+  o.articuloId=""; o.costoArt=0; o.precioArt=0; o.desc=""; o.cantidad=1; o.cantManual=false;
+  o.modo="articulo"; o.apps=[]; o.armado=[]; o.tallas=[];
+  o.extras=(cat.extras||[]).map(e=>({id:e.id,on:false}));
+  o.descOn=true; o.descTipo="pct"; o.descVal=0; o.descNota=""; o.notas="";
+  return o;
+}
+/* Saca de una cotización los campos del artículo, sin tocar la cabecera. */
+function itemDeCot(q){
+  const o = {id: q.itemId || uid()};
+  CAMPOS_ITEM.forEach(k=>{ o[k] = q[k]; });
+  return o;
+}
+/* Al revés: cabecera + artículo = un objeto que calc() entiende sin saber nada. */
+function cotDeItem(q, it){
+  const o = {};
+  Object.keys(q).forEach(k=>{ if(k!=="items" && k!=="iAct") o[k] = q[k]; });
+  CAMPOS_ITEM.forEach(k=>{ o[k] = it[k]; });
+  o.itemId = it.id;
+  if(!o.apps) o.apps = [];
+  if(!o.extras) o.extras = [];
+  if(!o.tallas) o.tallas = [];
+  if(!o.armado) o.armado = [];
+  return o;
+}
+/* Una cotización guardada antes de esto no tiene lista: ella es su artículo. */
+function itemsDe(q){
+  if(q && q.items && q.items.length) return q.items;
+  return [itemDeCot(q||cot)];
+}
+/* Lo que se está editando se escribe en su renglón antes de contar o de
+   cambiarse de artículo. Sin esto, lo recién tecleado no entraría a la suma. */
+function guardaItemActivo(q){
+  q = q || cot;
+  if(!q.items || !q.items.length){ q.items = [itemDeCot(q)]; q.iAct = 0; return q.items[0]; }
+  let i = Math.min(Math.max(0, Math.round(num(q.iAct))), q.items.length - 1);
+  /* El seguro: sólo se escribe encima del renglón que de verdad se estaba
+     editando. Si la lista cambió de tamaño y el índice ya apunta a otro lado,
+     se busca por id y, si tampoco está, no se escribe nada — más vale perder
+     lo último tecleado que machacar un artículo ajeno. */
+  if(q.itemId && q.items[i] && q.items[i].id !== q.itemId){
+    const j = q.items.findIndex(x=>x.id === q.itemId);
+    if(j < 0){ q.iAct = i; return q.items[i]; }
+    i = j;
+  }
+  const id = q.items[i].id;
+  q.items[i] = itemDeCot(q); q.items[i].id = id;
+  q.iAct = i; q.itemId = id;
+  return q.items[i];
+}
+/* Carga un artículo de la lista al editor. Se asignan las MISMAS listas, no
+   copias: así lo que se edite en apps o en el armado cae solo en su renglón. */
+/* Al abrir una cotización guardada: se le pone lista si no la traía y se
+   amarran los campos de arriba a los del artículo activo, para que editar en
+   la pantalla sea editar su renglón y no una copia suelta. */
+function normalizaItems(q){
+  q = q || cot;
+  if(!q.items || !q.items.length) q.items = [itemDeCot(q)];
+  q.iAct = Math.min(Math.max(0, Math.round(num(q.iAct))), q.items.length - 1);
+  const it = q.items[q.iAct];
+  if(!it.id) it.id = uid();
+  const base = itemEnBlanco();
+  CAMPOS_ITEM.forEach(k=>{ q[k] = (it[k] !== undefined ? it[k] : base[k]); });
+  q.itemId = it.id;
+  return q;
+}
+/* `sinGuardar` es para después de quitar un renglón: ahí lo que está en el
+   editor es el artículo que acaba de desaparecer, y guardarlo lo escribiría
+   encima del que sobrevivió. */
+function cargaItem(i, sinGuardar){
+  if(!sinGuardar) guardaItemActivo(cot);
+  if(!cot.items[i]) return;
+  cot.iAct = i;
+  normalizaItems(cot);
+  renderCot();
+  const t = $("#tiraFila"); if(t){ const b = t.children[i]; if(b) b.focus(); }
+}
+function agregaItem(){
+  guardaItemActivo(cot);
+  cot.items.push(itemEnBlanco());
+  cargaItem(cot.items.length - 1);
+  const c = document.querySelector('[data-paso="articulo"]');
+  if(c){ if(c.classList.contains("cerrado")) c.classList.remove("cerrado");
+         c.scrollIntoView({behavior:"smooth", block:"start"}); }
+  toast("Artículo " + cot.items.length + " · ponle su artículo y sus aplicaciones");
+}
+function quitaItem(i){
+  guardaItemActivo(cot);
+  if(cot.items.length <= 1){ toast("La cotización necesita por lo menos un artículo"); return; }
+  const it = cot.items[i];
+  if(!confirm("¿Quitar «" + (it.desc || "este artículo") + "» de la cotización?")) return;
+  const veia = cot.iAct;
+  cot.items.splice(i, 1);
+  /* Si quitó otro, se queda viendo el mismo; si se quitó a sí mismo, cae en
+     el que ocupó su lugar. */
+  cot.iAct = Math.min(veia > i ? veia - 1 : veia, cot.items.length - 1);
+  cargaItem(cot.iAct, true);
+  toast("Artículo quitado");
+}
+
+/* ---------- la cuenta ----------
+   calc() sigue siendo «este artículo». calcDe() pasó a ser «toda la
+   cotización»: calcula cada artículo y suma. Con un solo artículo devuelve
+   exactamente el mismo objeto de antes, para que nada guardado cambie. */
+function calcUno(q){ const prev = cot; cot = q; try{ return calc(); } finally { cot = prev; } }
+function calcDe(q){
+  if(!q) return calcUno(cot);
+  if(q === cot) guardaItemActivo(q);
+  const its = itemsDe(q);
+  const partes = its.map(it=>{ const qi = cotDeItem(q, it); return {it, q:qi, r:calcUno(qi)}; });
+  if(partes.length === 1) return Object.assign({}, partes[0].r, {partes, varios:false});
+  const sum = k => partes.reduce((s,p)=> s + num(p.r[k]), 0);
+  const qty = sum("qty"), subtotalPiezas = sum("subtotalPiezas");
+  const subtotal = sum("subtotal"), costoTotal = sum("costoTotal");
+  return Object.assign({}, partes[0].r, {
+    partes, varios:true,
+    qty, subtotalPiezas,
+    setupCosto:sum("setupCosto"), setupVenta:sum("setupVenta"),
+    armadoCosto:sum("armadoCosto"), armadoVenta:sum("armadoVenta"), armadoBruto:sum("armadoBruto"),
+    extrasUnicos:sum("extrasUnicos"), descExtra:sum("descExtra"), urgencia:sum("urgencia"),
+    subtotal, iva:sum("iva"), total:sum("total"),
+    costoTotal, utilidad: subtotal - costoTotal,
+    precioUnit: qty ? Math.round(subtotalPiezas/qty*100)/100 : 0,
+    unitario:   qty ? Math.round(subtotalPiezas/qty*100)/100 : 0,
+    detalle: partes.reduce((a,p)=> a.concat(p.r.detalle||[]), []),
+    armado:  partes.reduce((a,p)=> a.concat(p.r.armado||[]), []),
+    margenReal: subtotal>0 ? (subtotal-costoTotal)/subtotal*100 : 0
+  });
+}
+/* El nombre corto de un artículo, para la tira y para los documentos. */
+function nombreItem(it, n){
+  const a = (cat.articulos||[]).find(a=>a.id===it.articuloId);
+  return (it.desc||"").trim() || (a ? a.nombre : "") || ("Artículo " + n);
+}
+function descripcionCot(q){
+  const its = itemsDe(q);
+  if(its.length === 1) return q.desc || nombreItem(its[0], 1);
+  return its.map((it,i)=> nombreItem(it, i+1)).join(" · ");
+}
+
+/* ---------- la tira de artículos ---------- */
+function renderTiraItems(){
+  const w = $("#tiraFila"); if(!w) return;
+  guardaItemActivo(cot);
+  const its = cot.items, varios = its.length > 1;
+  const tarjeta = $("#tiraArts"); if(tarjeta) tarjeta.hidden = !varios;
+  const paso = $("#pasoArtQue");
+  if(paso) paso.textContent = varios
+    ? "Artículo " + (cot.iAct+1) + " de " + its.length
+    : "Un solo artículo en esta cotización";
+  if(!varios){ w.innerHTML = ""; const p=$("#tiraPie"); if(p) p.textContent=""; return; }
+
+  let totalPedido = 0, piezasPedido = 0;
+  const cuentas = its.map(it=>{ const r = calcUno(cotDeItem(cot, it));
+    totalPedido += num(r.total); piezasPedido += num(r.qty); return r; });
+
+  w.innerHTML = its.map((it,i)=>{
+    const r = cuentas[i], act = i === cot.iAct;
+    return '<button type="button" class="tiraArt'+(act?" act":"")+'" data-itm="'+i+'"'+
+      (act?' aria-current="true"':'')+'>'+
+      '<span class="tiraNum">'+(i+1)+'</span>'+
+      '<span class="tiraTxt"><b>'+esc(nombreItem(it, i+1))+'</b>'+
+        '<small>'+r.qty+' pza(s) · '+mx(r.total)+'</small></span>'+
+      '<span class="tiraX" data-itmX="'+i+'" role="button" tabindex="0" title="Quitar este artículo">✕</span>'+
+    '</button>';
+  }).join("") +
+  '<button type="button" class="tiraMas" id="tiraMas">+ Agregar artículo</button>';
+
+  const p = $("#tiraPie");
+  if(p) p.innerHTML = '<b>'+its.length+' artículos</b> · '+piezasPedido+' pieza(s) en total · '+
+    '<b>'+mx(totalPedido)+'</b> la cotización completa. El descuento por volumen de cada artículo ' +
+    'se calcula con sus propias piezas.';
+}
+
+/* El bloque del resumen: qué cuesta todo, cuando hay más de un artículo. */
+function renderTotalVarios(){
+  const w = $("#rVarios"); if(!w) return;
+  guardaItemActivo(cot);
+  if(cot.items.length <= 1){ w.hidden = true; w.innerHTML = ""; return; }
+  const r = calcDe(cot);
+  w.hidden = false;
+  w.innerHTML = '<div class="rvTit">Total de la cotización</div>'+
+    r.partes.map((p,i)=>'<div class="rvFila'+(i===cot.iAct?" act":"")+'" data-itm="'+i+'">'+
+      '<span class="rvN">'+(i+1)+'</span>'+
+      '<span class="rvNom">'+esc(nombreItem(p.it, i+1))+'<small>'+p.r.qty+' × '+mx(p.r.precioUnit)+'</small></span>'+
+      '<span class="rvMx">'+mx(p.r.total)+'</span></div>').join("")+
+    '<div class="rvTotal"><span>'+r.qty+' pieza(s) · '+r.partes.length+' artículos</span><span>'+mx(r.total)+'</span></div>'+
+    '<div class="rvNota">Abajo está el detalle del artículo que tienes abierto.</div>';
+}
+
+/* Un artículo de la orden de producción: lo que hay que hacer, con qué
+   medidas y con cuánto material. Se repite tal cual por cada artículo. */
+function bloqueArticuloOrden(p, n, varios, cuantos){
+  const q = p.q, r = p.r;
+  const art = (cat.articulos||[]).find(a=>a.id===q.articuloId);
+  const tal = (q.tallas||[]).filter(t=>num(t.cant)>0);
+  return (varios ? '<div class="op-art">' : '')+
+   '<h2>'+(varios ? 'Artículo '+(n+1)+' de '+cuantos : 'Artículo')+'</h2>'+
+   '<p><b>'+esc(nombreItem(p.it, n+1) || (art?art.nombre:"—"))+'</b> · <b>'+r.qty+' pieza(s)</b></p>'+
+   (tal.length ? '<h3>Tallas y colores</h3><table><thead><tr><th>Talla</th><th>Color</th><th>Cantidad</th></tr></thead><tbody>'+
+     tal.map(t=>'<tr><td>'+esc(t.talla||"—")+'</td><td>'+esc(t.color||"—")+'</td><td>'+Math.round(num(t.cant))+'</td></tr>').join("")+
+     '<tr><td colspan="2"><b>Total</b></td><td><b>'+sumaTallas(q)+'</b></td></tr></tbody></table>' : '')+
+   '<h3>Aplicaciones</h3><table><thead><tr><th>Ubicación</th><th>Técnica</th><th>Medidas</th><th>Detalle</th><th>Archivo a imprimir</th></tr></thead><tbody>'+
+   ((q.apps||[]).length
+     ? (q.apps||[]).map(a=>{ const d = (r.detalle||[]).find(d=>d.id===a.id); const t = cat.tecnicas.find(t=>t.id===a.tecnicaId);
+         const med = t && t.modo==="area" ? num(a.ancho)+" × "+num(a.alto)+" cm" : "—";
+         return '<tr><td><b>'+esc(a.ubic||"—")+'</b></td><td>'+esc(t?t.nombre:"—")+'</td><td>'+med+'</td><td>'+esc(d?d.base:"—")+'</td><td>'+miniatura(a.art)+'</td></tr>';
+       }).join("")
+     : '<tr><td colspan="5">Sin aplicaciones.</td></tr>')+'</tbody></table>'+
+   ((r.armado||[]).length ? '<h3>Material a ocupar</h3><table><thead><tr><th>Material</th><th>Pieza</th><th>Acomodo</th><th>Largo</th><th>Hay que preparar</th><th>Merma</th></tr></thead><tbody>'+
+     r.armado.map(a=>'<tr><td><b>'+esc(a.nombre)+'</b>'+(a.nota? '<br><small>'+esc(a.nota)+'</small>':'')+'</td>'+
+       '<td>'+red2(a.pieza.ancho)+' × '+red2(a.pieza.alto)+' cm'+(a.rot? '<br><small>girada 90°</small>':'')+'</td>'+
+       '<td>'+a.porFila+' por fila × '+a.filas+' fila(s)<br><small>'+a.piezas+' pieza(s)</small></td>'+
+       '<td>'+red2(a.largoCm)+' cm</td>'+
+       '<td><b>'+red3(a.compradas)+' '+abrevUnidad(a.unidad)+'</b><br><small>rollo de '+red2(a.ancho)+' cm</small></td>'+
+       '<td>'+red2(a.mermaM2)+' m² · '+a.mermaPct.toFixed(0)+'%</td></tr>'+
+       (planoDeFila(q, a.id)
+         ? '<tr><td colspan="6" style="background:#fff"><div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px">Armado sugerido</div>'+
+           planoDeFila(q, a.id)+
+           '<div style="margin-top:5px">'+leyendaDeFila(q, a.id)+'</div>'+
+           '<div style="font-size:9.5px;color:#555;margin-top:4px">El rollo va acostado: a lo ancho del dibujo se desenrolla el largo y a lo alto va el ancho del material. '+
+           'La franja libre de abajo es el ancho que ya no alcanza para otra pieza. '+esc(tramoDeFila(q, a.id))+'</div></td></tr>'
+         : '')).join("")+
+     '</tbody></table>' : '')+
+   ((q.notas||"").trim() ? '<h3>Notas de este artículo</h3><p style="white-space:pre-line">'+esc(q.notas)+'</p>' : '')+
+   (varios ? '</div>' : '');
+}
+
+/* Lo que ve producción de cada artículo del pedido: nombre, piezas, tallas y
+   sus aplicaciones. Con un solo artículo se ve igual que siempre. */
+function specPorArticulo(o){
+  const r = calcDe(o);
+  return r.partes.map((p, i)=>{
+    const q = p.q;
+    const tallas = (q.tallas||[]).filter(t=>num(t.cant)>0)
+      .map(t=>esc(t.talla||"—")+"/"+esc(t.color||"—")+": "+Math.round(num(t.cant))).join(" · ");
+    const apps = (q.apps||[]).map(a=>{
+      const t = cat.tecnicas.find(t=>t.id===a.tecnicaId);
+      const med = t && t.modo==="area" ? num(a.ancho)+"×"+num(a.alto)+" cm"
+                : t && t.modo==="tintas" ? (a.tintas||1)+" tinta(s)" : (a.puntadas||0)+" puntadas";
+      return '<div><span class="tag">'+esc(a.ubic||"Ubicación")+'</span> <b>'+esc(t?t.nombre:"—")+'</b> · '+med+'</div>';
+    }).join("");
+    return (r.varios ? '<div class="opArtN">Artículo '+(i+1)+' de '+r.partes.length+'</div>' : '')+
+      '<div><b>'+esc(nombreItem(p.it, i+1))+'</b> · '+p.r.qty+' pieza(s)</div>'+
+      (tallas ? '<div style="color:var(--ink-2)">'+tallas+'</div>' : '')+ apps;
+  }).join("");
+}
+
+/* ---------- eventos de la tira de artículos ---------- */
+document.addEventListener("click", e=>{
+  const x = e.target.closest("[data-itmX]");
+  if(x){ e.preventDefault(); e.stopPropagation(); quitaItem(Number(x.dataset.itmX)); return; }
+  if(e.target.closest("#tiraMas") || e.target.closest("#btnAddArt")){ agregaItem(); return; }
+  const b = e.target.closest("[data-itm]");
+  if(b && (b.closest("#tiraFila") || b.closest("#rVarios"))){
+    const i = Number(b.dataset.itm);
+    if(i !== cot.iAct) cargaItem(i);
+    return;
   }
 });
 
@@ -6738,17 +7092,20 @@ $("#btnConfirmar").addEventListener("click", async ()=>{
   cot.estado = "confirmada";
   cot.op = {folio: folioOP(), fecha: hoyISO(), cotizacion: cot.folio, estatus:"Pendiente",
             historial:[{estatus:"Pendiente", fecha:hoyISO(), hora:horaAhora()}]};
-  const art = cat.articulos.find(a=>a.id===cot.articuloId);
-  if(art && num(art.existencia) > 0){
-    const r = calc();
-    await moverInventario(art.id, "salida", r.qty, "Salida por pedido confirmado", true,
-                          {folio: cot.op.folio, archivo: null});
+  guardaItemActivo(cot);
+  for(const p of calcDe(cot).partes){
+    const art = cat.articulos.find(a=>a.id===p.q.articuloId);
+    if(art && num(art.existencia) > 0)
+      await moverInventario(art.id, "salida", p.r.qty, "Salida por pedido confirmado", true,
+                            {folio: cot.op.folio, archivo: null});
   }
+  const art = cat.articulos.find(a=>a.id===cot.articuloId);
   renderEstado(); await guardaCot(); renderSaved();
   toast("Pedido confirmado · orden "+cot.op.folio+(art && num(art.existencia)<0 ? " · ojo: existencia en negativo" : ""));
 });
 async function guardaCot(){
-  const r = calc();
+  if(typeof guardaItemActivo==="function") guardaItemActivo(cot);
+  const r = calcDe(cot);
   const rec = JSON.parse(JSON.stringify(cot)); rec._total = r.total; rec._unit = r.precioUnit;
   const i = guardadas.findIndex(g=>g.folio===rec.folio);
   if(i>=0) guardadas[i]=rec; else guardadas.push(rec);
@@ -6784,7 +7141,7 @@ $("#tab-sav").addEventListener("click", async e=>{
   const vd = e.target.closest("[data-verdoc-op]");
   if(vd){ verOrdenDe(vd.dataset.verdocOp); return; }
   const l = e.target.closest("[data-load]");
-  if(l){ const g = guardadas.find(g=>g.folio===l.dataset.load); if(g){ cot = JSON.parse(JSON.stringify(g)); renderCot(); $("#tabs").querySelector('[data-tab="cot"]').click(); } return; }
+  if(l){ const g = guardadas.find(g=>g.folio===l.dataset.load); if(g){ cot = JSON.parse(JSON.stringify(g)); normalizaItems(cot); renderCot(); $("#tabs").querySelector('[data-tab="cot"]').click(); } return; }
   const av2 = e.target.closest("[data-avisar]");
   if(av2){ const [folio, tipo] = av2.dataset.avisar.split("|"); avisaCliente(folio, tipo); return; }
   const fa = e.target.closest("[data-facturar]");
@@ -7867,8 +8224,7 @@ function renderProduccion(){
           '</div>' : '')+
       '</div>'+
       '<div class="opCuerpo"><div>'+
-        '<div class="opSpec"><div><b>'+esc(o.desc||"Artículo")+'</b> · '+piezas+' pieza(s)</div>'+
-        (tallas? '<div style="color:var(--ink-2)">'+tallas+'</div>':'')+ apps +
+        '<div class="opSpec">'+ specPorArticulo(o) +
         (o.notas? '<div style="margin-top:6px;color:var(--ink-2)"><b>Notas:</b> '+esc(o.notas)+'</div>':'')+
         (o.resp? '<div style="color:var(--ink-3)">Responsable: '+esc(o.resp)+'</div>':'')+
         '</div>'+
@@ -8794,7 +9150,7 @@ $("#cb_ok").addEventListener("click", async ()=>{
   const q = cobrando, r = calcDe(q);
   const venta = {
     folio: q.folio, fecha: $("#cb_fecha").value || hoyISO(),
-    cliente: q.cliente||"", ref: q.ref||"", articulo: q.desc||"",
+    cliente: q.cliente||"", ref: q.ref||"", articulo: descripcionCot(q),
     piezas: r.qty, total: Math.round(r.total*100)/100,
     costo: Math.round(r.costoTotal*100)/100, utilidad: Math.round(r.utilidad*100)/100,
     pago: $("#cb_pago").value, estado: $("#cb_estado").value, recibido: num($("#cb_monto").value),
@@ -9420,32 +9776,9 @@ function ordenHoja(g){
    (g.entrega? '<br><span style="font-size:11px">'+esc(faltaPara(g).texto)+' al imprimir</span>' : '')+'</div></div>'+
    '<div class="op-grid"><div class="op-card"><b>Cliente</b><br>'+esc(g.cliente||"—")+(g.contacto?"<br>"+esc(g.contacto):"")+'</div>'+
    '<div class="op-card"><b>Trabajo</b><br>'+esc(g.ref||"—")+'<br>Responsable: '+esc(g.resp||"—")+'</div></div>'+
-   '<h2>Artículo</h2><p>'+esc(g.desc || (art?art.nombre:"—"))+' · <b>'+r.qty+' pieza(s)</b></p>'+
-   (tal.length ? '<h2>Desglose de tallas y colores</h2><table><thead><tr><th>Talla</th><th>Color</th><th>Cantidad</th></tr></thead><tbody>'+
-     tal.map(t=>'<tr><td>'+esc(t.talla||"—")+'</td><td>'+esc(t.color||"—")+'</td><td>'+Math.round(num(t.cant))+'</td></tr>').join("")+
-     '<tr><td colspan="2"><b>Total</b></td><td><b>'+sumaTallas(g)+'</b></td></tr></tbody></table>' : '')+
-   '<h2>Aplicaciones</h2><table><thead><tr><th>Ubicación</th><th>Técnica</th><th>Medidas</th><th>Detalle</th><th>Archivo a imprimir</th></tr></thead><tbody>'+
-   g.apps.map(a=>{ const d = r.detalle.find(d=>d.id===a.id); const t = cat.tecnicas.find(t=>t.id===a.tecnicaId);
-     const med = t && t.modo==="area" ? num(a.ancho)+" × "+num(a.alto)+" cm" : "—";
-     return '<tr><td><b>'+esc(a.ubic||"—")+'</b></td><td>'+esc(t?t.nombre:"—")+'</td><td>'+med+'</td><td>'+esc(d?d.base:"—")+'</td><td>'+miniatura(a.art)+'</td></tr>';
-   }).join("")+'</tbody></table>'+
-   ((r.armado||[]).length ? '<h2>Material a ocupar</h2><table><thead><tr><th>Material</th><th>Pieza</th><th>Acomodo</th><th>Largo</th><th>Hay que preparar</th><th>Merma</th></tr></thead><tbody>'+
-     r.armado.map(a=>'<tr><td><b>'+esc(a.nombre)+'</b>'+(a.nota? '<br><small>'+esc(a.nota)+'</small>':'')+'</td>'+
-       '<td>'+red2(a.pieza.ancho)+' × '+red2(a.pieza.alto)+' cm'+(a.rot? '<br><small>girada 90°</small>':'')+'</td>'+
-       '<td>'+a.porFila+' por fila × '+a.filas+' fila(s)<br><small>'+a.piezas+' pieza(s)</small></td>'+
-       '<td>'+red2(a.largoCm)+' cm</td>'+
-       '<td><b>'+red3(a.compradas)+' '+abrevUnidad(a.unidad)+'</b><br><small>rollo de '+red2(a.ancho)+' cm</small></td>'+
-       '<td>'+red2(a.mermaM2)+' m² · '+a.mermaPct.toFixed(0)+'%</td></tr>'+
-       (planoDeFila(g, a.id)
-         ? '<tr><td colspan="6" style="background:#fff"><div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px">Armado sugerido</div>'+
-           planoDeFila(g, a.id)+
-           '<div style="margin-top:5px">'+leyendaDeFila(g, a.id)+'</div>'+
-           '<div style="font-size:9.5px;color:#555;margin-top:4px">El rollo va acostado: a lo ancho del dibujo se desenrolla el largo y a lo alto va el ancho del material. '+
-           'La franja libre de abajo es el ancho que ya no alcanza para otra pieza. '+esc(tramoDeFila(g, a.id))+'</div></td></tr>'
-         : '')).join("")+
-     '</tbody></table>' : '')+
+   r.partes.map((p, n)=> bloqueArticuloOrden(p, n, r.varios, r.partes.length)).join("")+
    (adm(g).alerta ? '<div style="border:2px solid #000;padding:8px;margin:10px 0"><b>REQUIERE ATENCIÓN:</b> '+esc(adm(g).alerta)+'</div>' : '')+
-   (g.notas ? '<h2>Notas de producción</h2><p style="white-space:pre-line">'+esc(g.notas)+'</p>' : '')+
+   (g.notas && !r.varios ? '<h2>Notas de producción</h2><p style="white-space:pre-line">'+esc(g.notas)+'</p>' : '')+
    ((g.op && g.op.bitacora && g.op.bitacora.length)
      ? '<h2>Bitácora</h2><table><thead><tr><th>Fecha</th><th>Quién</th><th>Nota</th></tr></thead><tbody>'+
        g.op.bitacora.slice(-12).map(n=>'<tr><td>'+esc(n.fecha)+' '+esc(n.hora)+'</td><td>'+esc(n.autor||"")+'</td><td>'+esc(n.texto)+'</td></tr>').join("")+
@@ -9459,12 +9792,17 @@ function hoja(g){
   const r = calcDe(g);
   const v = new Date(g.fecha); v.setDate(v.getDate()+num(P.vigencia,15));
   const filas = [];
-  filas.push(["1",(g.desc||"Artículo")+"<br><small>"+r.detalle.map(d=>esc(d.ubic)+": "+esc(d.tecnica)+(d.sinMaterial ? "" : " ("+d.base+")")).join(" · ")+
-     ((r.armado||[]).length ? "<br>Incluye el material: "+r.armado.map(a=>esc(a.nombre)+" "+red3(a.unidades)+" "+abrevUnidad(a.unidad)).join(", ") : "")+"</small>",r.qty,mx(r.precioUnit),mx(r.subtotalPiezas)]);
-  if(r.setupVenta>0) filas.push(["2","Preparación / setup de producción",1,mx(r.setupVenta),mx(r.setupVenta)]);
-  g.extras.filter(e=>e.on).forEach((e,i)=>{ const x=cat.extras.find(x=>x.id===e.id); if(!x||x.tipo==="porcentaje") return;
-    const c = x.tipo==="pieza"? 0 : 1; if(c===0) return;
-    filas.push([String(filas.length+1),esc(x.nombre),1,mx(x.monto),mx(x.monto)]); });
+  r.partes.forEach((p, n)=>{
+    const pr = p.r, it = p.it;
+    filas.push([String(filas.length+1),
+      esc(nombreItem(it, n+1))+"<br><small>"+pr.detalle.map(d=>esc(d.ubic)+": "+esc(d.tecnica)+(d.sinMaterial ? "" : " ("+d.base+")")).join(" · ")+
+      ((pr.armado||[]).length ? "<br>Incluye el material: "+pr.armado.map(a=>esc(a.nombre)+" "+red3(a.unidades)+" "+abrevUnidad(a.unidad)).join(", ") : "")+"</small>",
+      pr.qty, mx(pr.precioUnit), mx(pr.subtotalPiezas)]);
+    if(pr.setupVenta>0) filas.push([String(filas.length+1),
+      "Preparación / setup"+(r.varios ? " · "+esc(nombreItem(it, n+1)) : " de producción"),1,mx(pr.setupVenta),mx(pr.setupVenta)]);
+    (p.q.extras||[]).filter(e=>e.on).forEach(e=>{ const x=cat.extras.find(x=>x.id===e.id); if(!x||x.tipo==="porcentaje"||x.tipo==="pieza") return;
+      filas.push([String(filas.length+1),esc(x.nombre),1,mx(x.monto),mx(x.monto)]); });
+  });
   $("#hoja").innerHTML =
    membrete()+
    '<div class="hoja-head"><div><h1>'+esc(P.empresa.nombre)+'</h1><div>'+esc(P.empresa.eslogan||"")+(P.empresa.tel?" · "+esc(P.empresa.tel):"")+(P.empresa.mail?" · "+esc(P.empresa.mail):"")+'</div></div>'+
@@ -9473,14 +9811,17 @@ function hoja(g){
    '<table><thead><tr><th>#</th><th>Concepto</th><th>Cant.</th><th>P. unitario</th><th>Importe</th></tr></thead><tbody>'+
    filas.map(f=>'<tr><td>'+f[0]+'</td><td>'+f[1]+'</td><td>'+f[2]+'</td><td>'+f[3]+'</td><td>'+f[4]+'</td></tr>').join("")+'</tbody></table>'+
    '<div class="tot">'+
-   (r.descExtra>0 ? '<div><span>Descuento'+(g.descTipo==="mxn" ? "" : " "+num(g.descVal)+"%")+
-      (g.descNota ? " · "+esc(g.descNota) : "")+'</span><span>−'+mx(r.descExtra)+'</span></div>' : '')+
+   (r.descExtra>0 ? '<div><span>Descuento'+(r.varios ? "" : (g.descTipo==="mxn" ? "" : " "+num(g.descVal)+"%")+
+      (g.descNota ? " · "+esc(g.descNota) : ""))+'</span><span>−'+mx(r.descExtra)+'</span></div>' : '')+
    '<div><span>Subtotal</span><span>'+mx(r.subtotal)+'</span></div>'+
    (r.urgencia>0?'<div><span>Recargo '+r.pctExtra+'%</span><span>'+mx(r.urgencia)+'</span></div>':'')+
    (r.iva>0?'<div><span>IVA '+P.iva+'%</span><span>'+mx(r.iva)+'</span></div>':'')+
    '<div class="t"><span>Total</span><span>'+mx(r.total)+'</span></div></div>'+
-   (g.apps.some(a=>a.art) ? '<h2>Diseños incluidos</h2><div class="op-grid">'+
-      g.apps.filter(a=>a.art).map(a=>'<div class="op-card"><b>'+esc(a.ubic||"Aplicación")+'</b><br>'+miniatura(a.art)+'</div>').join("")+'</div>' : '')+
+   (r.partes.some(p=>(p.q.apps||[]).some(a=>a.art)) ? '<h2>Diseños incluidos</h2><div class="op-grid">'+
+      r.partes.reduce((h,p,n)=> h + (p.q.apps||[]).filter(a=>a.art).map(a=>
+        '<div class="op-card"><b>'+esc(a.ubic||"Aplicación")+'</b>'+
+        (r.varios ? '<br><small>'+esc(nombreItem(p.it, n+1))+'</small>' : '')+
+        '<br>'+miniatura(a.art)+'</div>').join(""), "")+'</div>' : '')+
    '<p style="margin-top:18px;font-size:11px;white-space:pre-line">'+esc(P.empresa.cond)+'</p>';
 }
 
@@ -10653,10 +10994,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261006-2315";</script>
+<script>window.BUILD="20261006-2339";</script>
 <script>
 (function(){
-  var mio = "20261006-2315";
+  var mio = "20261006-2339";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -10684,7 +11025,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261006-2315"></script>
-<script src="diagnostico.js?v=20261006-2315"></script>
+<script src="cuenta.js?v=20261006-2339"></script>
+<script src="diagnostico.js?v=20261006-2339"></script>
 </body>
 </html>
