@@ -223,7 +223,7 @@ function rol(){
   return ROLES_NOMBRE[r] ? r : "admin";     // rol desconocido o sin perfil: no le escondemos nada
 }
 const PERMISOS = {
-  admin:      ["cot","sav","pro","dis","cli","arc","caj","ven","cat","com","set"],
+  admin:      ["cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","com","set"],
   ventas:     ["cot","sav","pro","dis","cli","arc","cat","com"],
   diseno:     ["dis","pro"],
   produccion: ["pro","com"]
@@ -255,6 +255,31 @@ function enElPlan(t){
 function puede(seccion){
   return (PERMISOS[rol()] || PERMISOS.admin).indexOf(seccion) >= 0 && enElPlan(seccion);
 }
+
+/* ---------- el carrusel de anuncios ----------
+   Los anuncios no son de ningún taller: son del Lab y los ve todo el mundo.
+   La base ya filtra por vigencia y por "activo", así que aquí no hace falta
+   repetir esa lógica: lo que llegue es lo que está al aire.
+
+   Si algo falla —sin red, tabla todavía sin crear— se devuelve una lista
+   vacía a propósito. Un anuncio que no carga no tiene por qué romperle el
+   día a quien está cotizando. */
+window.__anuncios = async function(){
+  if(!SB) return [];
+  try{
+    const {data, error} = await SB.from("anuncios")
+      .select("id,titulo,imagen,enlace,alt")
+      .order("orden", {ascending:true}).order("id", {ascending:true});
+    if(error) return [];
+    return data || [];
+  }catch(e){ return []; }
+};
+/* Contar es lo ÚNICO que el navegador puede hacerle a un anuncio: del otro
+   lado hay una función que sólo sabe sumar de uno en uno. */
+window.__anuncioMarca = function(id, tipo){
+  if(!SB || !id) return;
+  try{ SB.rpc("anuncio_marca", {p_id: id, p_tipo: tipo}); }catch(e){}
+};
 
 /* El cotizador reparte sus pestañas por rol y no sabe de planes. Le
    dejamos esta puerta para que pregunte antes de mostrar una sección que

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261006-1742"></script>
+<script src="config.js?v=20261006-2231"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1226,6 +1226,38 @@ body.conBarra nav.tabs button .ico{grid-row:1;width:17px;height:17px}
 body.conBarra nav.tabs button[aria-selected="true"] .ico{color:var(--accent-ink)}
 }
 
+/* ---- el carrusel de anuncios ---- */
+@media screen{
+.anuncios{position:relative;margin:22px 0 4px;border-radius:var(--radio,16px);overflow:hidden;
+  background:var(--surface-2);border:1px solid var(--vidrio-borde,var(--line))}
+.anunViewport{overflow:hidden}
+.anunPista{display:flex;transition:transform .45s cubic-bezier(.22,.61,.36,1)}
+.anunPieza{flex:0 0 100%;display:block;line-height:0;background:var(--surface-2)}
+.anunPieza img{width:100%;height:auto;display:block;aspect-ratio:1200/200;object-fit:cover}
+a.anunPieza{cursor:pointer}
+a.anunPieza:hover img{opacity:.94}
+.anunFlecha{position:absolute;top:50%;transform:translateY(-50%);z-index:2;
+  width:30px;height:30px;border-radius:50%;border:1px solid var(--vidrio-borde,var(--line));
+  background:var(--surface);color:var(--ink-2);font:inherit;font-size:17px;line-height:1;
+  cursor:pointer;opacity:0;transition:opacity .15s;display:grid;place-items:center;padding:0}
+.anunFlecha.izq{left:9px} .anunFlecha.der{right:9px}
+.anuncios:hover .anunFlecha,.anunFlecha:focus-visible{opacity:.92}
+.anunFlecha:hover{color:var(--accent);border-color:var(--accent)}
+.anunPuntos{position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;gap:5px;z-index:2}
+.anunPuntos button{width:6px;height:6px;padding:0;border:0;border-radius:50%;cursor:pointer;
+  background:rgba(255,255,255,.55);box-shadow:0 0 0 1px rgba(0,0,0,.18);transition:width .2s,background .2s}
+.anunPuntos button[aria-current="true"]{width:16px;border-radius:99px;background:#fff}
+.anunSello{position:absolute;top:8px;right:10px;z-index:2;font-size:9px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:#fff;background:rgba(10,16,22,.42);
+  border-radius:5px;padding:2px 6px;pointer-events:none}
+@media (prefers-reduced-motion: reduce){ .anunPista{transition:none} }
+@media (max-width:560px){
+  .anuncios{margin:16px 0 2px}
+  .anunPieza img{aspect-ratio:900/260}
+  .anunFlecha{opacity:.9;width:27px;height:27px}
+}
+}
+
 
 /* ---- el diagnóstico ----
    Una pregunta a la vez. Las opciones entran escalonadas: no es adorno,
@@ -1465,7 +1497,7 @@ body.rol-produccion #btnPrint{display:none!important}
 /* hoja imprimible */
 #hoja{display:none}
 @media print{
-  header.top,.wrap,.toast,.docview,.modal{display:none!important}
+  header.top,.wrap,.toast,.docview,.modal,.anuncios{display:none!important}
   #hoja{display:block;padding:0;color:#000;background:#fff;font-size:12px}
   #hoja h1{font-size:20px}
   #hoja table{min-width:0}
@@ -1774,6 +1806,13 @@ body.rol-produccion #btnPrint{display:none!important}
     </div>
   </div>
 </div>
+  <div class="anuncios" id="anuncios" hidden aria-label="Anuncios">
+    <div class="anunViewport"><div class="anunPista" id="anunPista"></div></div>
+    <button class="anunFlecha izq" id="anunAnt" type="button" aria-label="Anterior">‹</button>
+    <button class="anunFlecha der" id="anunSig" type="button" aria-label="Siguiente">›</button>
+    <div class="anunPuntos" id="anunPuntos"></div>
+    <span class="anunSello">Publicidad</span>
+  </div>
 </section>
 
 <!-- ============ CATÁLOGO ============ -->
@@ -5371,6 +5410,98 @@ function ponIconos(){
   });
 }
 ponIconos();
+
+
+/* ---------- el carrusel de anuncios ---------- */
+let ANUNCIOS = [], anunIdx = 0, anunReloj = null, anunVistos = {};
+
+/* Quien no ve la imagen igual tiene que saber qué le están enseñando. */
+function anunAlt(a){ return a.alt || a.titulo || "Anuncio"; }
+
+async function cargaAnuncios(){
+  const caja = $("#anuncios"); if(!caja) return;
+  let lista = [];
+  try{
+    if(typeof window.__anuncios === "function") lista = await window.__anuncios();
+  }catch(e){ lista = []; }
+  ANUNCIOS = (lista||[]).filter(a=>a && a.imagen);
+  if(!ANUNCIOS.length){ caja.hidden = true; caja.innerHTML_vacio = true; return; }
+  caja.hidden = false;
+  anunIdx = 0;
+  pintaAnuncios();
+  anunArranca();
+}
+
+function pintaAnuncios(){
+  const pista = $("#anunPista"), puntos = $("#anunPuntos"); if(!pista) return;
+  pista.innerHTML = ANUNCIOS.map((a,i)=>{
+    const cuerpo = '<img src="'+esc(a.imagen)+'" alt="'+esc(anunAlt(a))+'" loading="lazy">';
+    return a.enlace
+      ? '<a class="anunPieza" href="'+esc(a.enlace)+'" target="_blank" rel="noopener noreferrer nofollow sponsored" '+
+        'data-anun="'+a.id+'" aria-hidden="'+(i===anunIdx?"false":"true")+'">'+cuerpo+'</a>'
+      : '<div class="anunPieza" aria-hidden="'+(i===anunIdx?"false":"true")+'">'+cuerpo+'</div>';
+  }).join("");
+  puntos.innerHTML = ANUNCIOS.length > 1
+    ? ANUNCIOS.map((a,i)=>'<button type="button" data-anunir="'+i+'" aria-label="Anuncio '+(i+1)+
+        '"'+(i===anunIdx?' aria-current="true"':'')+'></button>').join("")
+    : "";
+  const solo = ANUNCIOS.length < 2;
+  $("#anunAnt").hidden = solo; $("#anunSig").hidden = solo;
+  vaAnuncio(anunIdx, true);
+}
+
+function vaAnuncio(i, quieto){
+  if(!ANUNCIOS.length) return;
+  anunIdx = (i + ANUNCIOS.length) % ANUNCIOS.length;
+  const pista = $("#anunPista"); if(!pista) return;
+  pista.style.transition = quieto ? "none" : "";
+  pista.style.transform = "translateX(" + (-anunIdx * 100) + "%)";
+  pista.querySelectorAll(".anunPieza").forEach((e,k)=> e.setAttribute("aria-hidden", k===anunIdx ? "false" : "true"));
+  const puntos = $("#anunPuntos");
+  if(puntos) puntos.querySelectorAll("button").forEach((b,k)=>{
+    if(k===anunIdx) b.setAttribute("aria-current","true"); else b.removeAttribute("aria-current");
+  });
+  marcaAnuncio(ANUNCIOS[anunIdx], "vista");
+}
+
+/* Una vista por anuncio y por sesión: si contáramos cada vuelta del carrusel,
+   el número diría cuánto tiempo estuvo abierta la pestaña, no cuánta gente lo vio. */
+function marcaAnuncio(a, tipo){
+  if(!a || !a.id) return;
+  if(tipo === "vista"){
+    if(anunVistos[a.id]) return;
+    anunVistos[a.id] = true;
+  }
+  try{ if(typeof window.__anuncioMarca === "function") window.__anuncioMarca(a.id, tipo); }catch(e){}
+}
+
+function anunArranca(){
+  anunPara();
+  if(ANUNCIOS.length < 2) return;
+  if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  anunReloj = setInterval(()=>vaAnuncio(anunIdx + 1), 7000);
+}
+function anunPara(){ if(anunReloj){ clearInterval(anunReloj); anunReloj = null; } }
+
+/* ---------- eventos del carrusel ---------- */
+(function(){
+  const caja = $("#anuncios"); if(!caja) return;
+  caja.addEventListener("click", e=>{
+    const p = e.target.closest("[data-anunir]");
+    if(p){ vaAnuncio(num(p.dataset.anunir)); anunArranca(); return; }
+    if(e.target.closest("#anunAnt")){ vaAnuncio(anunIdx - 1); anunArranca(); return; }
+    if(e.target.closest("#anunSig")){ vaAnuncio(anunIdx + 1); anunArranca(); return; }
+    const liga = e.target.closest("[data-anun]");
+    if(liga) marcaAnuncio(ANUNCIOS.find(a=>String(a.id)===liga.dataset.anun), "clic");
+  });
+  /* Mientras lo estás viendo o lo estás recorriendo con el teclado, se queda quieto. */
+  caja.addEventListener("mouseenter", anunPara);
+  caja.addEventListener("mouseleave", anunArranca);
+  caja.addEventListener("focusin", anunPara);
+  caja.addEventListener("focusout", anunArranca);
+  document.addEventListener("visibilitychange", ()=>{ if(document.hidden) anunPara(); else anunArranca(); });
+  setTimeout(cargaAnuncios, 1200);
+})();
 
 /* ---------- eventos del armado ---------- */
 $("#armadoTab").addEventListener("click", ()=>abreArmado(true));
@@ -9532,10 +9663,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261006-1742";</script>
+<script>window.BUILD="20261006-2231";</script>
 <script>
 (function(){
-  var mio = "20261006-1742";
+  var mio = "20261006-2231";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -9563,7 +9694,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261006-1742"></script>
-<script src="diagnostico.js?v=20261006-1742"></script>
+<script src="cuenta.js?v=20261006-2231"></script>
+<script src="diagnostico.js?v=20261006-2231"></script>
 </body>
 </html>

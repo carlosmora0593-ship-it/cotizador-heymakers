@@ -498,6 +498,62 @@ const PUENTE_DOWNLOADS = {
   }
 };
 
+/* ---------- el carrusel de publicidad ----------
+   No pasa por el puente de documentos a propósito: esa tabla está amarrada a
+   una cuenta, y un anuncio no es de ningún taller — es de Hey Makers y lo ven
+   todos. Tiene su tabla propia, y del otro lado las políticas sólo dejan
+   escribir al staff del Lab, así que esto no abre ninguna puerta nueva. */
+window.__labAnuncios = {
+  async lista(){
+    if(!SB) return [];
+    const {data, error} = await SB.from("v_anuncios").select("*");
+    if(error) throw error;
+    return (data||[]).map(a=>Object.assign({}, a, {
+      desde: a.desde || "", hasta: a.hasta || "",
+      enlace: a.enlace || "", alt: a.alt || "", nota: a.nota || "",
+      anunciante: a.anunciante || "", titulo: a.titulo || ""
+    }));
+  },
+  async guarda(a){
+    if(!SB) return null;
+    const fila = {
+      titulo: a.titulo || "", anunciante: a.anunciante || "",
+      imagen: a.imagen, enlace: a.enlace || null, alt: a.alt || null,
+      nota: a.nota || null, activo: a.activo !== false,
+      orden: Number(a.orden) || 0,
+      desde: a.desde || null, hasta: a.hasta || null
+    };
+    /* Un id que empieza con "nuevo-" lo inventó la pantalla para poder
+       dibujar la ficha antes de que exista la fila. Ese no se manda: lo
+       pone la base. */
+    const esNuevo = String(a.id).indexOf("nuevo-") === 0;
+    const q = esNuevo
+      ? SB.from("anuncios").insert(fila).select("id").single()
+      : SB.from("anuncios").update(fila).eq("id", a.id).select("id").single();
+    const {data, error} = await q;
+    if(error) throw error;
+    return data;
+  },
+  async borra(id){
+    if(!SB || String(id).indexOf("nuevo-") === 0) return;
+    const {error} = await SB.from("anuncios").delete().eq("id", id);
+    if(error) throw error;
+  },
+  /* Sube la foto al almacén público de anuncios y devuelve su dirección.
+     El bucket es público porque un anuncio se le enseña a todo el que entra:
+     firmar la dirección no protegería nada y la dejaría caducar. */
+  async sube(file){
+    if(!SB) throw new Error("Sin conexión");
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const ruta = Date.now() + "-" + Math.random().toString(36).slice(2,8) + "." + ext;
+    const {error} = await SB.storage.from("anuncios")
+      .upload(ruta, file, {contentType: file.type || undefined, upsert: false});
+    if(error) throw error;
+    const {data} = SB.storage.from("anuncios").getPublicUrl(ruta);
+    return (data && data.publicUrl) || "";
+  }
+};
+
 window.claude = { use: async nombre =>
   nombre === "db" ? {doc: refDoc, collection: refCol} :
   nombre === "downloads" ? PUENTE_DOWNLOADS :

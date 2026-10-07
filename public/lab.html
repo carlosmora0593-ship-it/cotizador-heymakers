@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0A7FA8">
-<script src="config.js?v=20261006-1248"></script>
+<script src="config.js?v=20261006-2231"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Makers Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -366,6 +366,30 @@ input:focus,select:focus,textarea:focus{background:var(--surface);border-color:v
 }
 }
 
+/* ---- publicidad ---- */
+.anMini{display:inline-block;width:62px;height:16px;vertical-align:middle;margin-right:8px;
+  border-radius:3px;overflow:hidden;background:var(--surface-2);border:1px solid var(--line)}
+.anMini img{width:100%;height:100%;object-fit:cover;display:block}
+.anMini i{font-size:8px;color:var(--ink-3);font-style:normal;line-height:16px;display:block;text-align:center}
+.ficha .cuerpo{flex:1;min-height:0;overflow:auto}
+.anPrevio{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface-2);margin-bottom:16px}
+.anPrevio img{width:100%;height:auto;display:block;max-height:180px;object-fit:cover}
+.anVacio{padding:28px 16px;text-align:center;font-size:12px;color:var(--ink-3)}
+.anRejilla{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.anRejilla label{display:flex;flex-direction:column}
+.anRejilla label.ancho{grid-column:1/-1}
+.anRejilla label span{font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:4px}
+.anRejilla label.anSw{flex-direction:row;align-items:center;gap:7px;align-self:end;padding-bottom:7px}
+.anRejilla label.anSw span{margin:0;text-transform:none;letter-spacing:0;font-size:13px;color:var(--ink)}
+.anRejilla label.anSw input{width:auto;flex:none}
+.anFoto{display:flex;gap:7px;align-items:center}
+.anFoto input{flex:1;min-width:0}
+.anFoto .btn{flex:none}
+.anAcc{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+.anAcc .mal{margin-left:auto}
+@media (max-width:560px){ .anRejilla{grid-template-columns:1fr} .anAcc .mal{margin-left:0} }
+
 
 /* ---- la puerta de Makers Lab ---- */
 body.sin-sesion .app,
@@ -424,6 +448,7 @@ body.sin-sesion .telon{display:none!important}
       <button data-v="codigos">Códigos</button>
       <button data-v="diagnosticos">Diagnósticos</button>
       <button data-v="equipo">Equipo</button>
+      <button data-v="anuncios">Publicidad <span class="cuenta" id="n_anuncios">0</span></button>
       <button data-v="numeros">Números</button>
     </div>
     <div class="sidepie">
@@ -583,7 +608,7 @@ function desempeno() {
 }
 
 let DB = null;
-let ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [], codigos: [], diagnosticos: [] };
+let ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [], anuncios: [] };
 const COLS = ["cuentas", "tickets", "errores", "equipo", "alianzas", "citas", "cobros", "fallas", "codigos", "diagnosticos"];
 let vista = "tablero", abierta = null, esEjemplo = false, listo = false;
 let filtro = { texto: "", estado: "", plan: "" };
@@ -720,6 +745,10 @@ function senales(c) {
 /* ================= almacén ================= */
 async function arranca() {
   try { DB = await (window.claude && window.claude.use ? window.claude.use("db") : null); } catch (e) { DB = null; }
+  /* Los anuncios no pasan por DB: tienen tabla propia y puente propio, porque
+     no son de ninguna cuenta. Se piden aparte, sin detener el arranque, y la
+     pantalla se repinta cuando lleguen. */
+  cargaAnuncios().then(pinta, () => {});
   if (!DB) { generaEjemplo(true); listo = true; pinta(); return; }
   const cfg = await DB.doc("meta/config").get().catch(() => ({ exists: false }));
   if (cfg.exists) CFG = Object.assign(CFG, cfg.data());
@@ -1120,6 +1149,170 @@ function grafPlanes() {
 }
 const tile = (et, v, sub, dest) => '<div class="tile' + (dest ? " destacada" : "") + '"><span class="et">' + esc(et) +
   '</span><span class="v">' + esc(v) + '</span><span class="sub">' + esc(sub) + '</span></div>';
+
+
+/* ---------- el carrusel de publicidad ---------- */
+const anNum = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
+const PUENTE_AN = () => (typeof window.__labAnuncios === "object" && window.__labAnuncios) || null;
+
+async function cargaAnuncios(){
+  const p = PUENTE_AN();
+  if(!p){ return; }                     // sin servidor: lo que haya en memoria
+  /* Ojo con la trampa: en «ficheros.anuncios = await p.lista()» JavaScript
+     fija el objeto ANTES de esperar, y mientras tanto el arranque reemplaza
+     «ficheros» entero. El resultado caía en el objeto viejo y se perdía.
+     Primero se trae el dato, después se guarda. */
+  let lista = [];
+  try{ lista = await p.lista(); }catch(e){ lista = []; }
+  ficheros.anuncios = lista;
+}
+async function guardaAnuncio(a){
+  const i = ficheros.anuncios.findIndex(x => String(x.id) === String(a.id));
+  if(i >= 0) ficheros.anuncios[i] = a; else ficheros.anuncios.unshift(a);
+  pinta();
+  const p = PUENTE_AN(); if(!p) return;
+  try{
+    const guardado = await p.guarda(a);
+    if(guardado){ await cargaAnuncios(); pinta(); }
+  }catch(e){ aviso("No se pudo guardar el anuncio. Vuelve a intentar."); }
+}
+async function borraAnuncio(id){
+  ficheros.anuncios = ficheros.anuncios.filter(x => String(x.id) !== String(id));
+  pinta();
+  const p = PUENTE_AN(); if(!p) return;
+  try{ await p.borra(id); }catch(e){ aviso("No se pudo quitar el anuncio."); }
+}
+function anuncioNuevo(){
+  return {id:"nuevo-"+Date.now(), titulo:"", anunciante:"", imagen:"", enlace:"", alt:"",
+          nota:"", activo:true, orden:(ficheros.anuncios.length+1)*10,
+          desde:"", hasta:"", vistas:0, clics:0, estado:"apagado"};
+}
+function estadoAnuncio(a){
+  if(a.estado) return a.estado;
+  const hoy = iso(HOY);
+  if(!a.activo) return "apagado";
+  if(a.desde && a.desde > hoy) return "programado";
+  if(a.hasta && a.hasta < hoy) return "vencido";
+  return "al aire";
+}
+const CHIP_AN = {"al aire":"bien", "programado":"info", "vencido":"aviso", "apagado":"gris"};
+
+function vAnuncios(){
+  const lista = (ficheros.anuncios||[]).slice()
+    .sort((a,b)=> (b.activo?1:0)-(a.activo?1:0) || anNum(a.orden)-anNum(b.orden));
+  const alAire = lista.filter(a=>estadoAnuncio(a)==="al aire").length;
+  const vistas = lista.reduce((s,a)=>s+anNum(a.vistas), 0);
+  const clics  = lista.reduce((s,a)=>s+anNum(a.clics), 0);
+  const pct = vistas ? (clics/vistas*100) : 0;
+
+  return '<div style="display:flex;flex-direction:column;gap:20px">' +
+    '<div class="tiles">' +
+      tile("Al aire", alAire, alAire ? "los ven todos los talleres" : "nadie está viendo publicidad", true) +
+      tile("Anuncios en total", lista.length, lista.length ? "incluye apagados y programados" : "todavía no hay ninguno") +
+      tile("Vistas", vistas.toLocaleString("es-MX"), "una por taller y por sesión") +
+      tile("Clics", clics.toLocaleString("es-MX"), vistas ? pct.toFixed(1)+"% de las vistas" : "sin vistas todavía") +
+    '</div>' +
+
+    '<div class="aviso-demo">Esto lo ven <b>todos los talleres</b> al pie de su pantalla de cotizar. ' +
+      'Si no hay ninguno al aire, el espacio desaparece: nadie ve un hueco vacío.</div>' +
+
+    '<div class="tarjeta"><header><h2>El carrusel</h2>' +
+      '<span class="pista">da clic en un anuncio para editarlo</span>' +
+      '<button class="btn p sm" id="anNuevo" style="margin-left:auto">Nuevo anuncio</button></header>' +
+      (lista.length
+        ? '<div class="marco"><table style="min-width:960px"><thead><tr>' +
+          '<th>Anuncio</th><th>Anunciante</th><th>Estado</th><th>Vigencia</th>' +
+          '<th class="der">Orden</th><th class="der">Vistas</th><th class="der">Clics</th><th class="der">% clic</th>' +
+          '</tr></thead><tbody>' + lista.map(a=>{
+            const e = estadoAnuncio(a), v = anNum(a.vistas), c = anNum(a.clics);
+            return '<tr class="clic" data-anuncio="'+esc(String(a.id))+'" tabindex="0">' +
+              '<td><span class="anMini">'+(a.imagen ? '<img src="'+esc(a.imagen)+'" alt="">' : '<i>sin foto</i>')+'</span>' +
+                '<span class="taller">'+esc(a.titulo||"Sin título")+'</span>' +
+                (a.enlace ? '<br><span class="sitio">'+esc(a.enlace).slice(0,52)+'</span>' : '<br><span class="sitio">sin enlace</span>')+'</td>' +
+              '<td>'+esc(a.anunciante||"—")+'</td>' +
+              '<td><span class="chip '+(CHIP_AN[e]||"gris")+'">'+e+'</span></td>' +
+              '<td class="mono">'+((a.desde||a.hasta) ? esc(a.desde||"—")+" → "+esc(a.hasta||"—") : "sin fecha")+'</td>' +
+              '<td class="der mono">'+anNum(a.orden)+'</td>' +
+              '<td class="der mono">'+v.toLocaleString("es-MX")+'</td>' +
+              '<td class="der mono">'+c.toLocaleString("es-MX")+'</td>' +
+              '<td class="der mono">'+(v ? (c/v*100).toFixed(1)+"%" : "—")+'</td></tr>';
+          }).join("") + '</tbody></table></div>'
+        : '<div class="vacio">Todavía no hay anuncios. Presiona <b>Nuevo anuncio</b> para poner el primero.</div>') +
+    '</div></div>';
+}
+
+/* ---------- la ficha de un anuncio ----------
+   Usa el mismo panel lateral que el resto del Lab (#ficha + muestraPanel),
+   no uno propio: así se abre, se cierra y se recorre igual que todo lo demás. */
+let anEditando = null;
+function abreAnuncio(id){
+  anEditando = id === "nuevo"
+    ? anuncioNuevo()
+    : Object.assign({}, (ficheros.anuncios||[]).find(a=>String(a.id)===String(id)));
+  if(!anEditando) return;
+  const a = anEditando, nuevo = String(a.id).indexOf("nuevo-") === 0;
+  const campo = (k, et, tipo, ph) =>
+    '<label class="'+(["titulo","anunciante","desde","hasta","orden"].indexOf(k)<0 ? "ancho" : "")+'">'+
+    '<span>'+et+'</span><input id="an_'+k+'" type="'+(tipo||"text")+'" value="'+esc(a[k]==null?"":a[k])+'"'+
+    (ph? ' placeholder="'+esc(ph)+'"' : '')+'></label>';
+
+  $("#ficha").innerHTML =
+    '<header><div style="flex:1;min-width:0"><h2>'+(nuevo ? "Nuevo anuncio" : "Editar anuncio")+'</h2>'+
+      '<p class="sitio" style="margin-top:3px">'+(nuevo
+        ? "Lo van a ver todos los talleres al pie de su pantalla de cotizar."
+        : esc(a.titulo||"Sin título")+" · "+anNum(a.vistas).toLocaleString("es-MX")+" vistas · "+
+          anNum(a.clics).toLocaleString("es-MX")+" clics")+'</p></div>'+
+      '<button class="btn sm" id="cerrarFicha">Cerrar</button></header>'+
+    '<div class="cuerpo">'+
+      '<div class="anPrevio" id="anPrevio"></div>'+
+      '<div class="anRejilla">'+
+        campo("titulo","Título (interno)","text","Ej. Proveedor de blancos")+
+        campo("anunciante","Anunciante","text","Quién paga")+
+        '<label class="ancho"><span>La foto</span>'+
+          '<span class="anFoto"><input id="an_imagen" value="'+esc(a.imagen||"")+'" '+
+          'placeholder="Pega una dirección o sube un archivo">'+
+          '<button class="btn sm" id="anSubir" type="button">Subir foto</button>'+
+          '<input id="an_archivo" type="file" accept="image/*" hidden></span></label>'+
+        campo("enlace","A dónde lleva el clic","text","https://…")+
+        campo("alt","Texto para quien no ve la foto","text","Playeras al mayoreo en Morelia")+
+        campo("desde","Desde","date")+
+        campo("hasta","Hasta","date")+
+        campo("orden","Orden","number")+
+        '<label class="anSw"><input id="an_activo" type="checkbox"'+(a.activo!==false?" checked":"")+'> '+
+          '<span>Al aire</span></label>'+
+        campo("nota","Nota interna","text","Pagó hasta marzo, renovar antes")+
+      '</div>'+
+      '<p class="pista" style="margin-top:12px">Vacías las dos fechas, el anuncio corre hasta que lo apagues. '+
+        'El <b>orden</b> decide quién va primero en el carrusel: del más chico al más grande.</p>'+
+      '<div class="anAcc">'+
+        '<button class="btn p" id="anGuarda">Guardar</button>'+
+        (nuevo ? '' : '<button class="btn mal" id="anBorra">Quitar anuncio</button>')+
+      '</div>'+
+    '</div>';
+  pintaAnPrevio();
+  muestraPanel();
+}
+function pintaAnPrevio(){
+  const el = $("#anPrevio"); if(!el) return;
+  const url = ($("#an_imagen").value||"").trim();
+  el.innerHTML = url
+    ? '<img src="'+esc(url)+'" alt="Vista previa">'
+    : '<div class="anVacio">Aquí se va a ver la foto. Lo que mejor queda es una tira ancha, como de 1200 × 200.</div>';
+}
+function guardaFicha(){
+  if(!anEditando) return;
+  const a = anEditando;
+  ["titulo","anunciante","imagen","enlace","alt","nota","desde","hasta"].forEach(k=>{
+    const el = $("#an_"+k); if(el) a[k] = el.value.trim();
+  });
+  a.orden = anNum($("#an_orden").value);
+  a.activo = $("#an_activo").checked;
+  if(!a.imagen){ aviso("Falta la foto del anuncio."); return; }
+  cierraPanel();
+  guardaAnuncio(a);
+  anEditando = null;
+}
+
 
 /* ================= vistas ================= */
 function vTablero() {
@@ -2367,7 +2560,8 @@ async function accion(acc) {
 /* ================= pintar ================= */
 function pinta() {
   const titulos = { tablero: "Tablero", cuentas: "Cuentas", agenda: "Agenda", soporte: "Soporte",
-    cobros: "Cobros y facturación", codigos: "Códigos de curso", diagnosticos: "Qué pide quien llega", equipo: "Equipo y alianzas", numeros: "Números" };
+    cobros: "Cobros y facturación", equipo: "Equipo y alianzas", numeros: "Números",
+    anuncios: "Publicidad" };
   $("#titulo").textContent = titulos[vista];
   $("#n_cuentas").textContent = ficheros.cuentas.length;
   $("#n_agenda").textContent = citasHoy().length;
@@ -2378,15 +2572,16 @@ function pinta() {
   const rech = ficheros.cobros.filter(p => p.estado === "rechazado").length;
   $("#n_cobros").textContent = rech;
   $("#n_cobros").className = "cuenta" + (rech ? " urge" : "");
+  const alAire = (ficheros.anuncios||[]).filter(a=>estadoAnuncio(a)==="al aire").length;
+  $("#n_anuncios").textContent = alAire;
   $("#avisoDemo").hidden = !esEjemplo;
   ["busca", "filtroEstado", "filtroPlan", "btnNueva"].forEach(i => { $("#" + i).hidden = vista !== "cuentas"; });
   document.querySelectorAll("#nav button").forEach(b => b.setAttribute("aria-current", String(b.dataset.v === vista)));
   if (!listo) { $("#vista").innerHTML = '<div class="tarjeta"><div class="vacio">Cargando tus cuentas…</div></div>'; return; }
   $("#vista").innerHTML = vista === "tablero" ? vTablero() : vista === "cuentas" ? vCuentas()
     : vista === "agenda" ? vAgenda() : vista === "soporte" ? vSoporte()
-    : vista === "cobros" ? vCobros() : vista === "codigos" ? vCodigos()
-    : vista === "diagnosticos" ? vDiagnosticos()
-    : vista === "equipo" ? vEquipo() : vNumeros();
+    : vista === "cobros" ? vCobros() : vista === "equipo" ? vEquipo()
+    : vista === "anuncios" ? vAnuncios() : vNumeros();
   ponGlobos();
 }
 
@@ -2696,11 +2891,44 @@ async function borraEjemplo() {
     bajas.push(DB.doc("meta/estado").set({ ejemplo: false, creado: iso(HOY) }));
     try { await Promise.all(bajas); } catch (e) {}
   }
-  ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [] };
+  ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [], anuncios: [] };
   esEjemplo = false; pinta(); aviso("Listo, quedó vacío");
 }
 
 window.__arranca = arranca;
+
+/* ---------- eventos de publicidad ---------- */
+document.addEventListener("click", e=>{
+  if(e.target.closest("#anNuevo")){ abreAnuncio("nuevo"); return; }
+  const fila = e.target.closest("[data-anuncio]");
+  if(fila){ abreAnuncio(fila.dataset.anuncio); return; }
+  if(anEditando && e.target.closest("#cerrarFicha")){ cierraPanel(); anEditando = null; return; }
+  if(e.target.closest("#anGuarda")){ guardaFicha(); return; }
+  if(e.target.closest("#anBorra")){
+    if(anEditando){ const id = anEditando.id; cierraPanel(); anEditando = null; borraAnuncio(id); }
+    return;
+  }
+});
+document.addEventListener("input", e=>{ if(e.target.id === "an_imagen") pintaAnPrevio(); });
+document.addEventListener("click", e=>{
+  if(e.target.closest("#anSubir")){
+    const p = PUENTE_AN();
+    if(!p || !p.sube){ aviso("Sin servidor no se puede subir: pega la dirección de la foto."); return; }
+    $("#an_archivo").click();
+  }
+});
+document.addEventListener("change", async e=>{
+  if(e.target.id !== "an_archivo") return;
+  const f = e.target.files && e.target.files[0]; if(!f) return;
+  const b = $("#anSubir"); const antes = b.textContent;
+  b.textContent = "Subiendo…"; b.disabled = true;
+  try{
+    const url = await PUENTE_AN().sube(f);
+    $("#an_imagen").value = url; pintaAnPrevio();
+  }catch(err){ aviso("No se pudo subir la foto. Intenta con otra o pega la dirección."); }
+  b.textContent = antes; b.disabled = false; e.target.value = "";
+});
+
 
 /* ================= códigos de curso =================
    Un código por curso. Lo dictas en clase y con él tus alumnos entran a
@@ -2901,10 +3129,10 @@ function vDiagnosticos() {
 
 </script>
 
-<script>window.BUILD="20261006-1248";</script>
+<script>window.BUILD="20261006-2231";</script>
 <script>
 (function(){
-  var mio = "20261006-1248";
+  var mio = "20261006-2231";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -2932,6 +3160,6 @@ function vDiagnosticos() {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="lab.js?v=20261006-1248"></script>
+<script src="lab.js?v=20261006-2231"></script>
 </body>
 </html>
