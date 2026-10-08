@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261007-1938"></script>
+<script src="config.js?v=20261007-2005"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1504,7 +1504,6 @@ body.conBarra nav.tabs button[aria-selected="true"] .ico{color:var(--accent-ink)
   .tiraArt{max-width:none;width:100%}
   .tiraMas{width:100%}
 }
-@media print{ .tiraArts,.pasoArt{display:none!important} }
 
 /* ---- foto del artículo ---- */
 .artMini{flex:none;width:44px;height:44px;border-radius:10px;object-fit:cover;display:block;
@@ -1836,12 +1835,28 @@ body.rol-produccion #btnPrint{display:none!important}
 /* hoja imprimible */
 #hoja{display:none}
 @media print{
-  header.top,.wrap,.toast,.docview,.modal,.anuncios{display:none!important}
-  #hoja{display:block;padding:0;color:#000;background:#fff;font-size:12px}
-  #hoja h1{font-size:20px}
-  #hoja table{min-width:0}
+  /* Se esconde TODO y se enseña sólo la hoja. Lo que se agregue después nace
+     escondido al imprimir, que es lo que un documento del cliente necesita. */
+  body > *{display:none!important}
+  body > #hoja{display:block!important}
+  html,body{background:#fff!important;margin:0!important;padding:0!important}
+  #hoja{padding:0;color:#000;background:#fff;font-size:11.5px}
+  #hoja h1{font-size:19px}
+  #hoja h2{margin:12px 0 6px}
+  #hoja table{min-width:0;width:100%}
   #hoja th,#hoja td{border-bottom:1px solid #ccc}
-  @page{margin:16mm}
+  /* Nada se parte a la mitad de un salto de página. */
+  #hoja tr,#hoja .op-card,#hoja .op-art,#hoja .tot{break-inside:avoid;page-break-inside:avoid}
+  #hoja thead{display:table-header-group}
+  #hoja h2{break-after:avoid;page-break-after:avoid}
+  /* Los diseños, más chicos y de tres en tres: un pedido normal cabe en una
+     hoja. Va con `body` adelante a propósito: las reglas de pantalla para
+     `#hoja .op-grid` están más abajo en la hoja de estilos y, con el mismo
+     peso, ganarían por venir después. Estar dentro de @media no da peso. */
+  body #hoja .op-grid{grid-template-columns:repeat(3,1fr);gap:8px}
+  body #hoja img.pv{max-width:80px;max-height:80px}
+  body #hoja .op-card{padding:6px;font-size:10px}
+  @page{margin:12mm}
 }
 #hoja .hoja-head,.paper .hoja-head{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:14px}
 #hoja .tot,.paper .tot{margin-left:auto;width:min(320px,100%)}
@@ -11502,10 +11517,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261007-1938";</script>
+<script>window.BUILD="20261007-2005";</script>
 <script>
 (function(){
-  var mio = "20261007-1938";
+  var mio = "20261007-2005";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -11533,7 +11548,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261007-1938"></script>
-<script src="diagnostico.js?v=20261007-1938"></script>
+<script src="cuenta.js?v=20261007-2005"></script>
+<script src="diagnostico.js?v=20261007-2005"></script>
 </body>
 </html>
