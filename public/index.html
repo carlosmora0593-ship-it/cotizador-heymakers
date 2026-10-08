@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261007-1928"></script>
+<script src="config.js?v=20261007-1938"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1587,6 +1587,12 @@ span.ivImg{display:grid;place-items:center;font-size:26px;font-weight:700;color:
   .ivImg{height:86px}
 }
 
+/* ---- enviar la cotización ---- */
+.envAcc{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+#envDatos b{font-family:"IBM Plex Mono",monospace}
+#envTexto{font-size:13px;line-height:1.55}
+@media (max-width:560px){ .envAcc .btn{flex:1 1 calc(50% - 4px)} }
+
 
 /* ---- el diagnóstico ----
    Una pregunta a la vez. Las opciones entran escalonadas: no es adorno,
@@ -2162,6 +2168,8 @@ body.rol-produccion #btnPrint{display:none!important}
           <button class="btn" id="btnCobrar">Cobrar</button>
           <button class="btn" id="btnOrden">Orden de producción</button>
           <button class="btn" id="btnPrint">Cotización</button>
+          <button class="btn" id="btnEnviar">Enviar</button>
+
           <button class="btn" id="btnNew">Nueva</button>
         </div>
       </div>
@@ -2818,6 +2826,27 @@ body.rol-produccion #btnPrint{display:none!important}
   </div>
 </div>
 
+
+<div class="modal" id="modalEnviar" hidden>
+  <div class="card" style="width:min(560px,100%);max-height:88vh;overflow:auto">
+    <header><h2>Enviar la cotización</h2>
+      <button class="btn sm" id="envCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <div id="envDatos" class="note" style="margin-bottom:12px"></div>
+      <input type="hidden" id="envFolio">
+      <label class="f" for="envTexto">Mensaje</label>
+      <textarea id="envTexto" rows="8"></textarea>
+      <p class="note" style="margin-top:10px">WhatsApp y el correo se abren con el mensaje escrito y tú le das enviar.
+        <b>El archivo no se puede adjuntar solo</b>: baja primero el PDF y adjúntalo tú.</p>
+      <div class="envAcc">
+        <button class="btn primary" id="envPdf">Descargar PDF</button>
+        <button class="btn" id="envWA">Abrir WhatsApp</button>
+        <button class="btn" id="envMail">Abrir correo</button>
+        <button class="btn ghost" id="envCopiar">Copiar mensaje</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="modal" id="modalAviso" hidden>
   <div class="card" style="width:min(520px,100%)">
@@ -5401,6 +5430,7 @@ function renderSaved(){
     '<button class="btn sm" data-load="'+esc(g.folio)+'">Abrir</button>'+
     (g.estado==="confirmada" && g.op ? '<button class="btn sm" data-verdoc-op="'+esc(g.folio)+'">Ver orden</button>' : '')+
     (g.estado==="confirmada" && g.op ? '<button class="btn sm primary" data-avisar="'+esc(g.folio)+'|entrega" title="Avisarle que su pedido está listo">Avisar</button>' : '')+
+    '<button class="btn sm" data-enviar="'+esc(g.folio)+'">Enviar</button>'+
     '<button class="btn sm" data-facturar="'+esc(g.folio)+'">Facturar</button>'+
     '<button class="btn sm" data-cobrar="'+esc(g.folio)+'">Cobrar</button>'+
     '<button class="btn sm icon" data-delcot="'+esc(g.folio)+'">✕</button></div>').join("");
@@ -7186,6 +7216,107 @@ document.addEventListener("change", async e=>{
 });
 document.addEventListener("keydown", e=>{
   if(e.key === "Escape" && !$("#modalArt").hidden){ $("#modalArt").hidden = true; }
+});
+
+
+/* ---------- enviar la cotización ---------- */
+/* Windows, macOS y Linux no aceptan los mismos caracteres en un nombre de
+   archivo. Se quitan los que ninguno acepta y se recortan los espacios. */
+function nombreArchivo(t){
+  return String(t||"documento").replace(/[\\/:*?"<>|]+/g, "-").replace(/\s+/g, " ").trim().slice(0, 90);
+}
+function cotDeFolio(folio){
+  if(cot && cot.folio === folio) return cot;
+  return guardadas.find(g=>g.folio === folio) || null;
+}
+function vigenciaDe(g){
+  const v = new Date(g.fecha); v.setDate(v.getDate() + num(P.vigencia, 15));
+  return iso(v);
+}
+function mensajeCotizacion(g){
+  const r = calcDe(g);
+  const emp = P.empresa.nombre || "tu proveedor";
+  const cli = (g.cliente||"").split(" ")[0] || "";
+  const renglones = r.partes.map((p,i)=>
+    "· " + nombreItem(p.it, i+1) + " — " + p.r.qty + " pza" + (p.r.qty>1?"s":"") +
+    " — " + mx(p.r.total)).join("\n");
+  return "Hola" + (cli ? " " + cli : "") + ", le escribimos de " + emp + ".\n" +
+    "Le mandamos la cotización " + g.folio + (g.ref ? " · " + g.ref : "") + ":\n\n" +
+    renglones + "\n\n" +
+    "Total: " + mx(r.total) + (r.iva > 0 ? " (IVA incluido)" : " (más IVA si lo requiere)") + "\n" +
+    "Vigencia: hasta el " + vigenciaDe(g) + ".\n\n" +
+    "Le adjuntamos el documento completo. Cualquier duda quedamos atentos. ¡Gracias!";
+}
+function abreEnviar(folio){
+  const g = cotDeFolio(folio); if(!g){ toast("No encuentro esa cotización"); return; }
+  if(!(g.cliente||"").trim() && !g.clienteId) toast("Ojo: la cotización no tiene cliente");
+  const c = clientes.find(c=>c.id===g.clienteId);
+  const tel  = telWhats(c ? c.tel : g.contacto);
+  const mail = (c && c.mail) || ((g.contacto||"").indexOf("@") >= 0 ? g.contacto : "");
+  const r = calcDe(g);
+  $("#envTexto").value = mensajeCotizacion(g);
+  $("#envDatos").innerHTML =
+    '<b>'+esc(g.folio)+'</b> · '+esc(g.cliente||"sin cliente")+' · '+r.qty+' pza(s) · <b>'+mx(r.total)+'</b><br>'+
+    (tel ? 'WhatsApp: '+esc(c ? c.tel : g.contacto)
+         : '<span style="color:var(--warn)">Sin teléfono — ponlo en la ficha del cliente o en Contacto</span>')+' · '+
+    (mail ? 'Correo: '+esc(mail)
+          : '<span style="color:var(--warn)">sin correo</span>');
+  $("#envWA").disabled = !tel;     $("#envWA").dataset.tel = tel || "";
+  $("#envMail").disabled = !mail;  $("#envMail").dataset.mail = mail || "";
+  $("#envFolio").value = g.folio;
+  $("#modalEnviar").hidden = false;
+}
+/* El PDF: el navegador nombra el archivo con el título de la página, así que
+   se le presta el folio el tiempo que dura el diálogo de impresión. */
+function descargaCotizacion(folio){
+  const g = cotDeFolio(folio); if(!g) return;
+  try{
+    hoja(g);
+    const titulo = document.title;
+    document.title = nombreArchivo(g.folio + (g.cliente ? " · " + g.cliente : ""));
+    const vuelve = ()=>{ document.title = titulo; window.removeEventListener("afterprint", vuelve); };
+    window.addEventListener("afterprint", vuelve);
+    setTimeout(vuelve, 60000);          // por si el navegador nunca avisa
+    window.print();
+    toast("Elige «Guardar como PDF» · se llamará " + g.folio);
+  }catch(e){
+    document.title = document.title;
+    toast("No se pudo armar el documento: revisa que tenga artículo y cantidad");
+  }
+}
+
+/* ---------- eventos de enviar ---------- */
+document.addEventListener("click", e=>{
+  if(e.target.closest("#btnEnviar")){ abreEnviar(cot.folio); return; }
+  const env = e.target.closest("[data-enviar]");
+  if(env){ abreEnviar(env.dataset.enviar); return; }
+  if(e.target.closest("#envCerrar") || e.target.id === "modalEnviar"){ $("#modalEnviar").hidden = true; return; }
+  if(e.target.closest("#envPdf")){ descargaCotizacion($("#envFolio").value); return; }
+  if(e.target.closest("#envWA")){
+    const tel = $("#envWA").dataset.tel; if(!tel) return;
+    const texto = $("#envTexto").value;
+    if(!abreLink("https://wa.me/"+tel+"?text="+encodeURIComponent(texto))){
+      if(navigator.clipboard) navigator.clipboard.writeText(texto);
+      toast("El navegador bloqueó la ventana. El mensaje quedó copiado.");
+    }
+    return;
+  }
+  if(e.target.closest("#envMail")){
+    const mail = $("#envMail").dataset.mail; if(!mail) return;
+    const g = cotDeFolio($("#envFolio").value);
+    const asunto = "Cotización " + (g ? g.folio : "") + " · " + (P.empresa.nombre || "");
+    const texto = $("#envTexto").value;
+    if(!abreLink("mailto:"+encodeURIComponent(mail)+"?subject="+encodeURIComponent(asunto)+
+                 "&body="+encodeURIComponent(texto))){
+      if(navigator.clipboard) navigator.clipboard.writeText(texto);
+      toast("No se pudo abrir el correo. El mensaje quedó copiado.");
+    }
+    return;
+  }
+  if(e.target.closest("#envCopiar")){
+    if(navigator.clipboard) navigator.clipboard.writeText($("#envTexto").value).then(()=>toast("Mensaje copiado"));
+    return;
+  }
 });
 
 /* ---------- eventos del armado ---------- */
@@ -11371,10 +11502,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261007-1928";</script>
+<script>window.BUILD="20261007-1938";</script>
 <script>
 (function(){
-  var mio = "20261007-1928";
+  var mio = "20261007-1938";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -11402,7 +11533,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261007-1928"></script>
-<script src="diagnostico.js?v=20261007-1928"></script>
+<script src="cuenta.js?v=20261007-1938"></script>
+<script src="diagnostico.js?v=20261007-1938"></script>
 </body>
 </html>
