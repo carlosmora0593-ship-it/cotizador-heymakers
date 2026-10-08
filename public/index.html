@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261007-1905"></script>
+<script src="config.js?v=20261007-1928"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1683,7 +1683,11 @@ body.sin-plan header.top{z-index:65}
    Todo lo de la cuenta cabe aquí: el plan, la empresa, el equipo, los
    ajustes, Makers Lab y la salida. Antes eran seis cosas sueltas peleando
    por el ancho del encabezado. */
-.perfilBox{position:relative}
+/* Hasta la derecha, siempre. Con la barra lateral puesta, la marca y el menú
+   se salen del encabezado y el perfil se quedaba pegado a la izquierda: su
+   desplegable se abría hacia la izquierda —porque cuelga de `right:0`— y se
+   metía debajo de la barra, donde no se podía ni ver ni usar. */
+.perfilBox{position:relative;margin-left:auto}
 .perfilBtn{display:flex;align-items:center;gap:9px;font:inherit;cursor:pointer;
   background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:4px 12px 4px 5px;
   color:var(--ink);transition:border-color .15s,box-shadow .15s}
@@ -11367,10 +11371,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261007-1905";</script>
+<script>window.BUILD="20261007-1928";</script>
 <script>
 (function(){
-  var mio = "20261007-1905";
+  var mio = "20261007-1928";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -11398,7 +11402,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261007-1905"></script>
-<script src="diagnostico.js?v=20261007-1905"></script>
+<script src="cuenta.js?v=20261007-1928"></script>
+<script src="diagnostico.js?v=20261007-1928"></script>
 </body>
 </html>
