@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261006-2339"></script>
+<script src="config.js?v=20261007-1836"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1199,35 +1199,45 @@ nav.tabs .barraGrupo{padding:12px 11px 4px}
 .alAcc{margin-top:11px}
 .sub.pierde{color:var(--warn);font-weight:700}
 
-/* ---- el carrusel de anuncios ---- */
+/* ---- el carrusel de anuncios: tres a la vez, abajo, discreto ---- */
 @media screen{
-.anuncios{position:relative;margin:22px 0 4px;border-radius:var(--radio,16px);overflow:hidden;
-  background:var(--surface-2);border:1px solid var(--vidrio-borde,var(--line))}
-.anunViewport{overflow:hidden}
-.anunPista{display:flex;transition:transform .45s cubic-bezier(.22,.61,.36,1)}
-.anunPieza{flex:0 0 100%;display:block;line-height:0;background:var(--surface-2)}
-.anunPieza img{width:100%;height:auto;display:block;aspect-ratio:1200/200;object-fit:cover}
-a.anunPieza{cursor:pointer}
-a.anunPieza:hover img{opacity:.94}
-.anunFlecha{position:absolute;top:50%;transform:translateY(-50%);z-index:2;
-  width:30px;height:30px;border-radius:50%;border:1px solid var(--vidrio-borde,var(--line));
-  background:var(--surface);color:var(--ink-2);font:inherit;font-size:17px;line-height:1;
-  cursor:pointer;opacity:0;transition:opacity .15s;display:grid;place-items:center;padding:0}
-.anunFlecha.izq{left:9px} .anunFlecha.der{right:9px}
-.anuncios:hover .anunFlecha,.anunFlecha:focus-visible{opacity:.92}
+.anuncios{--anunVis:3;--anunGap:10px;
+  position:relative;margin:22px 0 2px;padding-top:13px;
+  border-top:1px solid var(--line-soft,var(--line))}
+.anunTop{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.anunSello{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink-3)}
+.anunNav{margin-left:auto;display:flex;gap:5px}
+.anunFlecha{width:25px;height:25px;border-radius:50%;padding:0;cursor:pointer;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink-3);
+  font:inherit;font-size:15px;line-height:1;display:grid;place-items:center;
+  transition:color .15s,border-color .15s}
 .anunFlecha:hover{color:var(--accent);border-color:var(--accent)}
-.anunPuntos{position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:center;gap:5px;z-index:2}
+/* El que rueda es el marco; adentro la pista es una fila de ancho normal, y
+   los recuadros se salen de ella: así `calc(100% …)` mide contra la pantalla
+   y no contra sí mismo. */
+.anunViewport{overflow-x:auto;overscroll-behavior-x:contain;
+  scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none}
+.anunViewport::-webkit-scrollbar{display:none}
+.anunPista{display:flex;gap:var(--anunGap)}
+.anunPieza{flex:0 0 calc((100% - (var(--anunGap) * (var(--anunVis) - 1))) / var(--anunVis));
+  scroll-snap-align:start;display:block;line-height:0;border-radius:var(--radio-sm,12px);
+  overflow:hidden;background:var(--surface-2);border:1px solid var(--line);
+  opacity:.9;transition:opacity .15s}
+/* Formato de banner, no de tarjeta: a dos por uno la tira se lleva ~170 px de
+   alto en vez de 210, y se lee como publicidad y no como contenido. */
+.anunPieza img{width:100%;height:auto;display:block;aspect-ratio:2/1;object-fit:cover;
+  max-height:170px}
+a.anunPieza{cursor:pointer}
+a.anunPieza:hover{opacity:1;border-color:var(--ink-3)}
+.anunPuntos{display:flex;justify-content:center;gap:5px;margin-top:9px}
 .anunPuntos button{width:6px;height:6px;padding:0;border:0;border-radius:50%;cursor:pointer;
-  background:rgba(255,255,255,.55);box-shadow:0 0 0 1px rgba(0,0,0,.18);transition:width .2s,background .2s}
-.anunPuntos button[aria-current="true"]{width:16px;border-radius:99px;background:#fff}
-.anunSello{position:absolute;top:8px;right:10px;z-index:2;font-size:9px;font-weight:700;
-  letter-spacing:.08em;text-transform:uppercase;color:#fff;background:rgba(10,16,22,.42);
-  border-radius:5px;padding:2px 6px;pointer-events:none}
-@media (prefers-reduced-motion: reduce){ .anunPista{transition:none} }
+  background:var(--line);transition:width .2s,background .2s}
+.anunPuntos button[aria-current="true"]{width:15px;border-radius:99px;background:var(--ink-3)}
+@media (max-width:860px){ .anuncios{--anunVis:2} }
 @media (max-width:560px){
-  .anuncios{margin:16px 0 2px}
-  .anunPieza img{aspect-ratio:900/260}
-  .anunFlecha{opacity:.9;width:27px;height:27px}
+  .anuncios{--anunVis:1;margin:20px 0 2px;padding-top:12px}
+  .anunFlecha{width:29px;height:29px}
 }
 }
 
@@ -1497,6 +1507,87 @@ body.conBarra nav.tabs button[aria-selected="true"] .ico{color:var(--accent-ink)
   .pasoArt .btn{margin-left:0;width:100%}
 }
 @media print{ .tiraArts,.pasoArt{display:none!important} }
+
+/* ---- foto del artículo ---- */
+.artMini{flex:none;width:44px;height:44px;border-radius:10px;object-fit:cover;display:block;
+  background:var(--surface-2);border:1px solid var(--line)}
+.artSinFoto{display:grid;place-items:center;font-size:16px;font-weight:700;color:var(--ink-3)}
+.artBoton{display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;
+  padding:7px 10px;border-radius:var(--radio-sm,12px);
+  border:1px solid var(--campo-borde,var(--line));background:var(--campo-fondo,var(--surface));
+  font:inherit;color:inherit}
+.artBoton:hover{border-color:var(--accent)}
+.artChev{margin-left:auto;color:var(--ink-3);font-size:12px}
+.artTxt{min-width:0;display:block}
+.artTxt b{display:block;font-size:13px;font-weight:600;line-height:1.3;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.artTxt small{display:block;font-size:11.5px;color:var(--ink-3);margin-top:1px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.artCats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.artCats button{font:inherit;font-size:12px;font-weight:600;cursor:pointer;padding:5px 11px;
+  border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2)}
+.artCats button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.artLista{display:grid;gap:9px}
+.artRejilla{grid-template-columns:repeat(auto-fill,minmax(228px,1fr))}
+.artFila{grid-template-columns:minmax(0,1fr)}
+.artIt{position:relative;display:flex;align-items:center;gap:10px;text-align:left;cursor:pointer;
+  padding:9px 10px;border-radius:var(--radio-sm,12px);border:1px solid var(--line);
+  background:var(--surface);font:inherit;color:inherit;min-width:0}
+.artIt:hover{border-color:var(--ink-3)}
+.artIt.act{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in oklab, var(--accent) 22%, transparent)}
+.artRejilla .artIt{flex-direction:column;align-items:stretch;padding:10px;gap:8px}
+.artRejilla .artMini{width:100%;height:112px;border-radius:9px}
+.artRejilla .artTxt b{white-space:normal;line-height:1.3}
+.artRejilla .artTxt small{white-space:normal}
+.artPropio{border-style:dashed}
+.artAviso,.artTallas{font-size:9.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+  border-radius:5px;padding:3px 6px;white-space:nowrap}
+.artAviso{background:var(--warn-soft);color:var(--warn)}
+.artTallas{background:var(--surface-2);color:var(--ink-3)}
+.artSellos{display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.artRejilla .artSellos{position:absolute;top:17px;right:17px;max-width:calc(100% - 34px)}
+.artVacio{grid-column:1/-1;font-size:13px;color:var(--ink-3);padding:14px;text-align:center}
+#t_articulos th:first-child,#t_articulos td:first-child{width:106px}
+.catFoto{display:flex;align-items:center;gap:6px}
+.catFoto .artMini{width:36px;height:36px;border-radius:8px;cursor:pointer}
+.catFotoBtns{display:flex;flex-direction:column;gap:3px}
+.catFotoBtns button{font:inherit;font-size:10px;cursor:pointer;border:0;background:transparent;
+  color:var(--ink-3);padding:1px 3px;border-radius:4px;text-align:left}
+.catFotoBtns button:hover{color:var(--accent)}
+
+/* ---- inventario en tarjetas ---- */
+.ivTarjetas{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:4px}
+.ivCard{position:relative;display:block;cursor:pointer;padding:11px;border-radius:var(--radio,16px);
+  border:1px solid var(--line);background:var(--surface);transition:border-color .15s ease}
+.ivCard:hover{border-color:var(--ink-3)}
+.ivCard.bajo{border-color:color-mix(in oklab, var(--warn) 50%, var(--line))}
+.ivCard.agotado{border-color:color-mix(in oklab, var(--accent) 45%, var(--line))}
+.ivCard>.ivChk{position:absolute;top:16px;left:16px;z-index:2;width:18px;height:18px;accent-color:var(--accent);
+  box-shadow:0 0 0 3px var(--surface);border-radius:4px}
+.ivFoto{position:relative}
+.ivImg{width:100%;height:104px;border-radius:11px;object-fit:cover;display:block;
+  background:var(--surface-2);border:1px solid var(--line)}
+span.ivImg{display:grid;place-items:center;font-size:26px;font-weight:700;color:var(--ink-3)}
+.ivAlerta{position:absolute;right:7px;bottom:7px;width:24px;height:24px;border-radius:50%;
+  display:grid;place-items:center;font-size:12px;background:var(--warn);color:#fff}
+.ivCard.agotado .ivAlerta{background:var(--accent)}
+.ivNom{font-size:12.5px;font-weight:600;line-height:1.3;margin-top:9px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ivNum{margin-top:4px;display:flex;align-items:baseline;gap:5px}
+.ivNum b{font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:700;letter-spacing:-.02em}
+.ivNum span{font-size:11px;color:var(--ink-3)}
+.ivBarra{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:7px}
+.ivBarra i{display:block;height:100%;border-radius:99px;background:var(--good)}
+.ivCard.bajo .ivBarra i{background:var(--warn)}
+.ivCard.agotado .ivBarra i{background:var(--accent);min-width:3px}
+.ivPie{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:8px}
+.ivFalta{font-size:11px;color:var(--ink-3)}
+@media (max-width:560px){
+  .artRejilla{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .artRejilla .artMini{height:92px}
+  .ivTarjetas{grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:10px}
+  .ivImg{height:86px}
+}
 
 
 /* ---- el diagnóstico ----
@@ -1908,13 +1999,6 @@ body.rol-produccion #btnPrint{display:none!important}
       <span class="tbCheck">✓</span> Ya lo vi
     </button>
   </div>
-  <div class="anuncios" id="anuncios" hidden aria-label="Anuncios">
-    <div class="anunViewport"><div class="anunPista" id="anunPista"></div></div>
-    <button class="anunFlecha izq" id="anunAnt" type="button" aria-label="Anterior">‹</button>
-    <button class="anunFlecha der" id="anunSig" type="button" aria-label="Siguiente">›</button>
-    <div class="anunPuntos" id="anunPuntos"></div>
-    <span class="anunSello">Publicidad</span>
-  </div>
   <div class="tbTiles" id="tbTiles"></div>
   <div class="tbCols">
     <div class="tbPanel" id="tbCardPaso">
@@ -1931,6 +2015,17 @@ body.rol-produccion #btnPrint{display:none!important}
         <div class="tbPanelBody"><div id="tbSemana"></div></div>
       </div>
     </div>
+  </div>
+  <div class="anuncios" id="anuncios" hidden aria-label="Anuncios">
+    <div class="anunTop">
+      <span class="anunSello">Publicidad</span>
+      <span class="anunNav">
+        <button class="anunFlecha" id="anunAnt" type="button" aria-label="Anuncios anteriores">‹</button>
+        <button class="anunFlecha" id="anunSig" type="button" aria-label="Anuncios siguientes">›</button>
+      </span>
+    </div>
+    <div class="anunViewport" id="anunVista"><div class="anunPista" id="anunPista"></div></div>
+    <div class="anunPuntos" id="anunPuntos"></div>
   </div>
 </section>
 
@@ -1968,7 +2063,11 @@ body.rol-produccion #btnPrint{display:none!important}
         </div>
         <p class="note" data-solo="servicio" hidden style="margin:12px 0 0">Para cuando el cliente sólo compra la impresión: la maquila de DTF, una lona, un vinil. No hay prenda, no hay tallas; lo que se cobra es el material que se ocupa.</p>
           <div class="grid g3" style="margin-top:14px">
-            <div style="grid-column:span 2" data-solo="articulo"><label class="f" for="c_art">Artículo</label><select id="c_art"></select></div>
+            <div style="grid-column:span 2" data-solo="articulo"><label class="f" for="c_artBtn">Artículo</label>
+              <button type="button" class="artBoton" id="c_artBtn"></button>
+              <select id="c_art" hidden aria-hidden="true" tabindex="-1"></select>
+              <input type="file" id="fotoArtFile" accept="image/png,image/jpeg,image/webp" hidden></div>
+
             <div style="grid-column:span 2" data-solo="servicio" hidden><label class="f" for="c_svc">Servicio por medida</label><select id="c_svc"></select></div>
             <div><label class="f" for="c_qty">Cantidad de piezas</label><input id="c_qty" type="number" min="1" step="1" value="50"></div>
           </div>
@@ -2296,6 +2395,7 @@ body.rol-produccion #btnPrint{display:none!important}
   <div class="card" style="margin-top:20px">
     <header><h2>Inventario del taller</h2>
       <span class="hint" id="ivResumen" style="margin-left:auto"></span>
+      <button class="btn sm ghost" id="ivVista">Ver como tabla</button>
       <button class="btn sm primary" id="ivPedir">Pedir material</button>
     </header>
     <div class="body">
@@ -2309,7 +2409,8 @@ body.rol-produccion #btnPrint{display:none!important}
         <span class="hintbar">El <b>mínimo</b> lo pone el administrador en el catálogo. Cuando la existencia baja de ahí, el artículo se marca solo.</span>
       </div>
       <div id="ivAviso"></div>
-      <div class="tbl-wrap"><table id="t_inv"></table></div>
+      <div id="ivCuerpo"></div>
+      <div class="tbl-wrap" id="ivTabla"><table id="t_inv"></table></div>
     </div>
   </div>
   <div class="card">
@@ -3035,6 +3136,19 @@ body.rol-produccion #btnPrint{display:none!important}
         <button class="btn primary" id="enOk">Confirmar la entrega</button>
         <button class="btn ghost" id="enCancelar">Cancelar</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalArt" hidden>
+  <div class="card" style="width:min(880px,100%);max-height:88vh;display:flex;flex-direction:column">
+    <header><h2>Elegir artículo</h2>
+      <button class="btn sm" id="artVista" style="margin-left:auto">Ver como lista</button>
+      <button class="btn sm" id="artCerrar">Cerrar</button></header>
+    <div class="body" style="overflow:auto">
+      <input id="artBusca" placeholder="Buscar por nombre o categoría" style="margin-bottom:10px">
+      <div class="artCats" id="artCats"></div>
+      <div class="artLista artRejilla" id="artLista"></div>
     </div>
   </div>
 </div>
@@ -4282,6 +4396,7 @@ function renderCot(){
   $("#folioHint").textContent = cot.folio + " · " + cot.fecha;
   $("#c_cliente").value = cot.cliente; $("#c_contacto").value = cot.contacto; $("#c_ref").value = cot.ref;
   $("#c_art").innerHTML = optArticulos(cot.articuloId);
+  if(typeof pintaBotonArt==="function") pintaBotonArt();
   $("#c_qty").value = cot.cantidad; $("#c_costoArt").value = cot.costoArt;
   $("#c_precioArt").value = cot.precioArt || ""; $("#c_desc").value = cot.desc;
   const _d = $("#c_descOn"); if(_d) _d.checked = cot.descOn !== false;
@@ -4898,7 +5013,7 @@ function ccGuardaTecnica(){
 
 /* ---------- render catálogo ---------- */
 const COLS = {
-  articulos:[["nombre","Artículo","text"],["cat","Categoría","text"],["costo","Costo producción $","num"],["precio","Precio público $","num"],
+  articulos:[["foto","Foto","foto"],["nombre","Artículo","text"],["cat","Categoría","text"],["costo","Costo producción $","num"],["precio","Precio público $","num"],
     ["tallas","¿Lleva tallas?","si"],["existencia","Existencia","ro"],["minimo_inv","Mínimo","num"]],
   tecnicas:[["nombre","Técnica","text"],["modo","Cobro","modo"],
     ["costoMO","Mano de obra · costo","num"],["precioMO","Mano de obra · precio","num"],
@@ -4922,6 +5037,11 @@ function renderTabla(key){
     if(c[2]==="modo") return '<td><select data-f="modo"><option value="area"'+(v==="area"?" selected":"")+'>Por área</option><option value="tintas"'+(v==="tintas"?" selected":"")+'>Por tinta</option><option value="puntadas"'+(v==="puntadas"?" selected":"")+'>Por puntada</option></select></td>';
     if(c[2]==="unidad") return '<td><select data-f="unidad"><option value="ml"'+(v==="ml"?" selected":"")+'>Metro lineal (ml)</option><option value="m2"'+(v==="m2"?" selected":"")+'>Metro cuadrado (m²)</option></select></td>';
     if(c[2]==="tecnica") return '<td><select data-f="tecnicaId"><option value="">— ninguna —</option>'+cat.tecnicas.map(t=>'<option value="'+t.id+'"'+(v===t.id?" selected":"")+'>'+esc(t.nombre)+'</option>').join("")+'</select></td>';
+    if(c[2]==="foto") return '<td><div class="catFoto">'+
+      '<span data-fotoart="'+esc(r.id)+'" title="Subir o cambiar la foto">'+miniArt(r)+'</span>'+
+      '<span class="catFotoBtns"><button type="button" data-fotoart="'+esc(r.id)+'">'+(fotoDe(r)?"Cambiar":"Subir")+'</button>'+
+      (fotoDe(r)? '<button type="button" data-fotoquita="'+esc(r.id)+'">Quitar</button>' : '')+
+      '</span></div></td>';
     if(c[2]==="ro") return '<td class="n"><input readonly title="Se mueve solo con requisición, desde Inventario" value="'+(v==null?0:v)+'" style="background:var(--surface-2);color:var(--ink-2);text-align:right"></td>';
     if(c[2]==="si") return '<td style="text-align:center"><input type="checkbox" data-f="'+c[0]+'" style="width:auto"'+(v?" checked":"")+'></td>';
     if(c[2]==="tipo") return '<td><select data-f="tipo"><option value="unico"'+(v==="unico"?" selected":"")+'>Único</option><option value="pieza"'+(v==="pieza"?" selected":"")+'>Por pieza</option><option value="porcentaje"'+(v==="porcentaje"?" selected":"")+'>Porcentaje</option></select></td>';
@@ -5021,6 +5141,7 @@ $("#btnSavePrice").addEventListener("click", ()=>{
     const nuevo = {id:uid(),nombre,cat:"Otros",costo,precio};
     cat.articulos.push(nuevo); cot.articuloId = nuevo.id; logPrecio(nombre, 0, costo); persist();
     $("#c_art").innerHTML = optArticulos(cot.articuloId);
+  if(typeof pintaBotonArt==="function") pintaBotonArt();
     toast("“"+nombre+"” agregado al catálogo");
   }
 });
@@ -5755,7 +5876,7 @@ $("#modalCal").addEventListener("click", e=>{ if(e.target.id==="modalCal"){ $("#
 
 
 /* ---------- el carrusel de anuncios ---------- */
-let ANUNCIOS = [], anunIdx = 0, anunReloj = null, anunVistos = {};
+let ANUNCIOS = [], anunIdx = 0, anunReloj = null, anunVistos = {}, anunQuieto = null;
 
 /* Quien no ve la imagen igual tiene que saber qué le están enseñando. */
 function anunAlt(a){ return a.alt || a.titulo || "Anuncio"; }
@@ -5767,43 +5888,71 @@ async function cargaAnuncios(){
     if(typeof window.__anuncios === "function") lista = await window.__anuncios();
   }catch(e){ lista = []; }
   ANUNCIOS = (lista||[]).filter(a=>a && a.imagen);
-  if(!ANUNCIOS.length){ caja.hidden = true; caja.innerHTML_vacio = true; return; }
+  if(!ANUNCIOS.length){ caja.hidden = true; return; }
   caja.hidden = false;
   anunIdx = 0;
   pintaAnuncios();
   anunArranca();
 }
 
+/* El paso de la tira: el ancho de un recuadro más su separación. De aquí sale
+   todo lo demás —cuántos caben, cuántas paradas hay— sin repetir en JS los
+   números que ya dice el CSS. */
+function anunPaso(){
+  const t = $("#anunPista"); if(!t || !t.firstElementChild) return 1;
+  const a = t.children[0], b = t.children[1];
+  if(b) return Math.max(1, b.offsetLeft - a.offsetLeft);
+  return Math.max(1, a.offsetWidth);
+}
+function anunCaben(){
+  const v = $("#anunVista"); if(!v) return 1;
+  return Math.max(1, Math.round(v.clientWidth / anunPaso()));
+}
+function anunParadas(){ return Math.max(1, ANUNCIOS.length - anunCaben() + 1); }
+
 function pintaAnuncios(){
-  const pista = $("#anunPista"), puntos = $("#anunPuntos"); if(!pista) return;
-  pista.innerHTML = ANUNCIOS.map((a,i)=>{
+  const pista = $("#anunPista"); if(!pista) return;
+  pista.innerHTML = ANUNCIOS.map(a=>{
     const cuerpo = '<img src="'+esc(a.imagen)+'" alt="'+esc(anunAlt(a))+'" loading="lazy">';
     return a.enlace
       ? '<a class="anunPieza" href="'+esc(a.enlace)+'" target="_blank" rel="noopener noreferrer nofollow sponsored" '+
-        'data-anun="'+a.id+'" aria-hidden="'+(i===anunIdx?"false":"true")+'">'+cuerpo+'</a>'
-      : '<div class="anunPieza" aria-hidden="'+(i===anunIdx?"false":"true")+'">'+cuerpo+'</div>';
+        'data-anun="'+a.id+'">'+cuerpo+'</a>'
+      : '<div class="anunPieza">'+cuerpo+'</div>';
   }).join("");
-  puntos.innerHTML = ANUNCIOS.length > 1
-    ? ANUNCIOS.map((a,i)=>'<button type="button" data-anunir="'+i+'" aria-label="Anuncio '+(i+1)+
-        '"'+(i===anunIdx?' aria-current="true"':'')+'></button>').join("")
+  requestAnimationFrame(()=>{ pintaPuntosAnun(); vaAnuncio(0, true); anunCuenta(); });
+}
+
+function pintaPuntosAnun(){
+  const puntos = $("#anunPuntos"); if(!puntos) return;
+  const paradas = anunParadas(), hayMas = paradas > 1;
+  puntos.innerHTML = hayMas
+    ? Array.from({length:paradas}, (_,i)=>'<button type="button" data-anunir="'+i+'" '+
+        'aria-label="Anuncios '+(i+1)+' de '+paradas+'"'+(i===anunIdx?' aria-current="true"':'')+'></button>').join("")
     : "";
-  const solo = ANUNCIOS.length < 2;
-  $("#anunAnt").hidden = solo; $("#anunSig").hidden = solo;
-  vaAnuncio(anunIdx, true);
+  const a = $("#anunAnt"), s = $("#anunSig");
+  if(a) a.hidden = !hayMas;
+  if(s) s.hidden = !hayMas;
 }
 
 function vaAnuncio(i, quieto){
-  if(!ANUNCIOS.length) return;
-  anunIdx = (i + ANUNCIOS.length) % ANUNCIOS.length;
-  const pista = $("#anunPista"); if(!pista) return;
-  pista.style.transition = quieto ? "none" : "";
-  pista.style.transform = "translateX(" + (-anunIdx * 100) + "%)";
-  pista.querySelectorAll(".anunPieza").forEach((e,k)=> e.setAttribute("aria-hidden", k===anunIdx ? "false" : "true"));
+  const v = $("#anunVista"); if(!v || !ANUNCIOS.length) return;
+  const paradas = anunParadas();
+  anunIdx = ((i % paradas) + paradas) % paradas;
+  const sinMovimiento = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  v.scrollTo({left: anunIdx * anunPaso(), behavior: (quieto || sinMovimiento) ? "auto" : "smooth"});
   const puntos = $("#anunPuntos");
   if(puntos) puntos.querySelectorAll("button").forEach((b,k)=>{
     if(k===anunIdx) b.setAttribute("aria-current","true"); else b.removeAttribute("aria-current");
   });
-  marcaAnuncio(ANUNCIOS[anunIdx], "vista");
+}
+
+/* Cuenta como vista todo lo que de verdad está en pantalla, no nada más el
+   primero: si se ven tres, se vieron tres. */
+function anunCuenta(){
+  const v = $("#anunVista"); if(!v) return;
+  const desde = Math.round(v.scrollLeft / anunPaso());
+  for(let k = desde; k < desde + anunCaben() && k < ANUNCIOS.length; k++)
+    marcaAnuncio(ANUNCIOS[k], "vista");
 }
 
 /* Una vista por anuncio y por sesión: si contáramos cada vuelta del carrusel,
@@ -5819,11 +5968,19 @@ function marcaAnuncio(a, tipo){
 
 function anunArranca(){
   anunPara();
-  if(ANUNCIOS.length < 2) return;
+  if(anunParadas() < 2) return;
   if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   anunReloj = setInterval(()=>vaAnuncio(anunIdx + 1), 7000);
 }
 function anunPara(){ if(anunReloj){ clearInterval(anunReloj); anunReloj = null; } }
+
+/* Al cambiar el ancho cambian cuántos caben, así que cambian las paradas. */
+function anunAcomoda(){
+  if(!ANUNCIOS.length) return;
+  pintaPuntosAnun();
+  vaAnuncio(Math.min(anunIdx, anunParadas() - 1), true);
+  anunCuenta();
+}
 
 /* ---------- eventos del carrusel ---------- */
 (function(){
@@ -5836,12 +5993,30 @@ function anunPara(){ if(anunReloj){ clearInterval(anunReloj); anunReloj = null; 
     const liga = e.target.closest("[data-anun]");
     if(liga) marcaAnuncio(ANUNCIOS.find(a=>String(a.id)===liga.dataset.anun), "clic");
   });
-  /* Mientras lo estás viendo o lo estás recorriendo con el teclado, se queda quieto. */
+  /* Mientras lo estás viendo, arrastrando o recorriendo con el teclado, se queda quieto. */
   caja.addEventListener("mouseenter", anunPara);
   caja.addEventListener("mouseleave", anunArranca);
   caja.addEventListener("focusin", anunPara);
   caja.addEventListener("focusout", anunArranca);
+  caja.addEventListener("pointerdown", anunPara);
+  const vista = $("#anunVista");
+  if(vista) vista.addEventListener("scroll", ()=>{
+    clearTimeout(anunQuieto);
+    anunQuieto = setTimeout(()=>{
+      const i = Math.round(vista.scrollLeft / anunPaso());
+      if(i !== anunIdx){
+        anunIdx = Math.max(0, Math.min(i, anunParadas() - 1));
+        const puntos = $("#anunPuntos");
+        if(puntos) puntos.querySelectorAll("button").forEach((b,k)=>{
+          if(k===anunIdx) b.setAttribute("aria-current","true"); else b.removeAttribute("aria-current");
+        });
+      }
+      anunCuenta();
+    }, 160);
+  }, {passive:true});
   document.addEventListener("visibilitychange", ()=>{ if(document.hidden) anunPara(); else anunArranca(); });
+  let anunResize = null;
+  window.addEventListener("resize", ()=>{ clearTimeout(anunResize); anunResize = setTimeout(anunAcomoda, 180); });
   setTimeout(cargaAnuncios, 1200);
 })();
 
@@ -6243,11 +6418,27 @@ function renderInvTaller(){
       '</span></div>'
     : '';
 
+  const bv = $("#ivVista");
+  if(bv) bv.textContent = vistaInv()==="tarjetas" ? "Ver como tabla" : "Ver con fotos";
+  const cuerpo = $("#ivCuerpo"), tabla = $("#ivTabla");
+  if(cuerpo && tabla){
+    const enTarjetas = vistaInv()==="tarjetas";
+    tabla.hidden = enTarjetas;
+    cuerpo.hidden = !enTarjetas;
+    cuerpo.innerHTML = enTarjetas
+      ? (lista.length ? tarjetasInv(lista)
+         : '<p style="color:var(--ink-3);font-size:13px;padding:10px 0">'+
+           (q ? "Nada con ese nombre." : ivFil==="faltan"
+             ? "Nada por pedir: todo está por arriba del mínimo."
+             : "Todavía no hay artículos con existencia ni mínimo. El administrador los pone en el catálogo.")+'</p>')
+      : "";
+  }
   t.innerHTML = lista.length
-    ? '<thead><tr><th style="width:34px"></th><th>Artículo</th><th class="num">Hay</th><th class="num">Mínimo</th><th>Cómo está</th><th class="num">Sugerido pedir</th></tr></thead><tbody>'+
+    ? '<thead><tr><th style="width:34px"></th><th>Foto</th><th>Artículo</th><th class="num">Hay</th><th class="num">Mínimo</th><th>Cómo está</th><th class="num">Sugerido pedir</th></tr></thead><tbody>'+
       lista.map(a=>{ const e = estadoStock(a);
         return '<tr data-ivart="'+esc(a.id)+'">'+
           '<td><input type="checkbox" class="ivChk" data-ivc="'+esc(a.id)+'"'+(ivMarcados[a.id]?" checked":"")+'></td>'+
+          '<td>'+miniArt(a)+'</td>'+
           '<td>'+esc(a.nombre)+'<br><small style="color:var(--ink-3)">'+esc(a.cat||"")+'</small></td>'+
           '<td class="num">'+num(a.existencia)+'</td>'+
           '<td class="num">'+(num(a.minimo_inv)||"—")+'</td>'+
@@ -6387,6 +6578,10 @@ document.addEventListener("click", e=>{
   if(f){ ivFil = f.dataset.ivf;
     $("#ivFiltro").querySelectorAll("button").forEach(b=> b.setAttribute("aria-pressed", String(b===f)));
     renderInvTaller(); return; }
+  if(e.target.closest("#ivVista")){
+    P.vistaInv = vistaInv()==="tarjetas" ? "tabla" : "tarjetas";
+    persist(); renderInvTaller(); return;
+  }
   if(e.target.closest("#ivPedir")){ abrePedido(); return; }
   const quita = e.target.closest(".pedQuita");
   if(quita){ const fila = quita.closest(".pedFila"); if(fila){ delete ivMarcados[fila.dataset.ped]; fila.remove(); } return; }
@@ -6809,6 +7004,174 @@ document.addEventListener("click", e=>{
     if(i !== cot.iAct) cargaItem(i);
     return;
   }
+});
+
+
+/* ---------- la foto del artículo ---------- */
+function fotoDe(a){ return (a && a.foto) ? String(a.foto) : ""; }
+function miniArt(a, clase){
+  const f = fotoDe(a);
+  return f
+    ? '<img class="'+(clase||"artMini")+'" src="'+esc(f)+'" alt="'+esc(a.nombre||"")+'" loading="lazy">'
+    : '<span class="'+(clase||"artMini")+' artSinFoto" aria-hidden="true">'+
+      esc(((a&&a.nombre)||"?").trim().charAt(0).toUpperCase())+'</span>';
+}
+let fotoDe_id = null;
+async function subeFotoArticulo(id, file){
+  const a = (cat.articulos||[]).find(a=>a.id===id); if(!a) return;
+  if(!ASSETS){ toast("Subir fotos necesita permiso de edición en esta página"); return; }
+  if(!revisaArchivo(file, "diseno")) return;
+  toast("Subiendo la foto de " + (a.nombre||"el artículo") + "…");
+  file = await aligera(file);
+  try{
+    const res = await ASSETS.upload(file);
+    a.foto = res.url; a.fotoRef = res.id || "";
+    persist();
+    renderTabla("articulos");
+    if(typeof renderInvTaller==="function") renderInvTaller();
+    if(typeof pintaSelectorArt==="function") pintaSelectorArt();
+    toast("Foto guardada");
+  }catch(e){ toast("No se pudo subir la foto"); }
+}
+function quitaFotoArticulo(id){
+  const a = (cat.articulos||[]).find(a=>a.id===id); if(!a) return;
+  a.foto = ""; a.fotoRef = "";
+  persist(); renderTabla("articulos");
+  if(typeof renderInvTaller==="function") renderInvTaller();
+  if(typeof pintaSelectorArt==="function") pintaSelectorArt();
+}
+
+/* ---------- el selector de artículo, con foto ---------- */
+let artBusca = "", artCat = "";
+function vistaArt(){ return P.vistaArt === "lista" ? "lista" : "tarjetas"; }
+function categoriasArt(){
+  const vistas = [];
+  (cat.articulos||[]).forEach(a=>{ const c = (a.cat||"Otros"); if(vistas.indexOf(c)<0) vistas.push(c); });
+  return vistas.sort((x,y)=> x.localeCompare(y,"es"));
+}
+function abreSelectorArt(){
+  artBusca = ""; artCat = "";
+  const i = $("#artBusca"); if(i) i.value = "";
+  pintaSelectorArt();
+  $("#modalArt").hidden = false;
+  setTimeout(()=>{ const b = $("#artBusca"); if(b) b.focus(); }, 60);
+}
+function pintaSelectorArt(){
+  const w = $("#artLista"); if(!w) return;
+  const q = artBusca.trim().toLowerCase();
+  let lista = (cat.articulos||[]).slice();
+  if(artCat) lista = lista.filter(a=>(a.cat||"Otros") === artCat);
+  if(q) lista = lista.filter(a=> ((a.nombre||"")+" "+(a.cat||"")).toLowerCase().indexOf(q) >= 0);
+
+  const tabs = $("#artCats");
+  if(tabs) tabs.innerHTML = '<button type="button" data-artcat=""'+(artCat?"":' aria-pressed="true"')+'>Todos</button>'+
+    categoriasArt().map(c=>'<button type="button" data-artcat="'+esc(c)+'"'+
+      (artCat===c?' aria-pressed="true"':'')+'>'+esc(c)+'</button>').join("");
+
+  const b = $("#artVista");
+  if(b){ b.textContent = vistaArt()==="tarjetas" ? "Ver como lista" : "Ver como tarjetas";
+         b.title = "Cambiar cómo se ven los artículos"; }
+
+  w.className = vistaArt()==="tarjetas" ? "artLista artRejilla" : "artLista artFila";
+  const propio = '<button type="button" class="artIt artPropio" data-artpick="">'+
+      '<span class="artMini artSinFoto" aria-hidden="true">+</span>'+
+      '<span class="artTxt"><b>Artículo personalizado</b><small>escribe tú el nombre y el costo</small></span></button>';
+  w.innerHTML = propio + (lista.length
+    ? lista.map(a=>{
+        const sel = a.id === cot.articuloId;
+        const ex = num(a.existencia), min = num(a.minimo_inv);
+        const bajo = (min>0 && ex<=min) || (ex<=0 && (min>0 || ex<0));
+        return '<button type="button" class="artIt'+(sel?" act":"")+'" data-artpick="'+esc(a.id)+'">'+
+          miniArt(a)+
+          '<span class="artTxt"><b>'+esc(a.nombre)+'</b>'+
+            '<small>'+esc(a.cat||"Sin categoría")+' · '+mx(num(a.costo))+' costo'+
+            (num(a.precio) ? ' · '+mx(num(a.precio))+' público' : '')+'</small></span>'+
+          ((bajo || a.tallas)
+            ? '<span class="artSellos">'+
+              (bajo ? '<span class="artAviso">Poca existencia</span>' : '')+
+              (a.tallas ? '<span class="artTallas">tallas</span>' : '')+'</span>'
+            : '')+
+        '</button>';
+      }).join("")
+    : '<p class="artVacio">Nada con ese nombre. Puedes capturarlo como artículo personalizado.</p>');
+}
+function eligeArticulo(id){
+  const s = $("#c_art"); if(!s) return;
+  s.value = id;
+  s.dispatchEvent(new Event("change", {bubbles:true}));
+  $("#modalArt").hidden = true;
+  pintaBotonArt();
+}
+/* El botón que sustituye al desplegable: enseña lo elegido con su foto. */
+function pintaBotonArt(){
+  const b = $("#c_artBtn"); if(!b) return;
+  const a = (cat.articulos||[]).find(a=>a.id===cot.articuloId);
+  b.innerHTML = a
+    ? miniArt(a)+'<span class="artTxt"><b>'+esc(a.nombre)+'</b><small>'+
+      esc(a.cat||"Sin categoría")+' · '+mx(num(a.costo))+' costo</small></span><span class="artChev">▾</span>'
+    : '<span class="artMini artSinFoto" aria-hidden="true">+</span>'+
+      '<span class="artTxt"><b>Elegir artículo</b><small>o captúralo a mano</small></span><span class="artChev">▾</span>';
+}
+
+/* ---------- el inventario en tarjetas ---------- */
+function vistaInv(){ return P.vistaInv === "tabla" ? "tabla" : "tarjetas"; }
+/* Qué tan surtido está, de 0 a 100. Sin mínimo no hay con qué comparar, así
+   que la barra se llena y el estado lo dice la etiqueta, no el color. */
+function surtidoPct(a){
+  const ex = num(a.existencia), min = num(a.minimo_inv);
+  if(ex <= 0) return 0;
+  if(min <= 0) return 100;
+  return Math.max(4, Math.min(100, Math.round(ex / (min*3) * 100)));
+}
+function tarjetasInv(lista){
+  return '<div class="ivTarjetas">'+ lista.map(a=>{
+    const e = estadoStock(a), pct = surtidoPct(a);
+    return '<label class="ivCard '+e.clase+'" data-ivart="'+esc(a.id)+'">'+
+      '<input type="checkbox" class="ivChk" data-ivc="'+esc(a.id)+'"'+(ivMarcados[a.id]?" checked":"")+
+        ' aria-label="Pedir '+esc(a.nombre)+'">'+
+      '<div class="ivFoto">'+miniArt(a, "ivImg")+
+        (e.clase!=="ok" ? '<span class="ivAlerta" aria-hidden="true">⚠</span>' : '')+'</div>'+
+      '<div class="ivNom">'+esc(a.nombre)+'</div>'+
+      '<div class="ivNum"><b>'+num(a.existencia)+'</b> <span>en existencia</span></div>'+
+      '<div class="ivBarra"><i style="width:'+pct+'%"></i></div>'+
+      '<div class="ivPie"><span class="ivEdo '+e.clase+'">'+e.et+'</span>'+
+        (e.falta ? '<span class="ivFalta">pedir '+e.falta+'</span>'
+                 : (num(a.minimo_inv) ? '<span class="ivFalta">mín. '+num(a.minimo_inv)+'</span>' : ''))+
+      '</div></label>';
+  }).join("") +'</div>';
+}
+
+/* ---------- eventos de las fotos y del selector ---------- */
+document.addEventListener("click", e=>{
+  const sf = e.target.closest("[data-fotoart]");
+  if(sf){ fotoDe_id = sf.dataset.fotoart; const i = $("#fotoArtFile"); if(i) i.click(); return; }
+  const qf = e.target.closest("[data-fotoquita]");
+  if(qf){ quitaFotoArticulo(qf.dataset.fotoquita); return; }
+
+  if(e.target.closest("#c_artBtn")){ abreSelectorArt(); return; }
+  if(e.target.closest("#artCerrar") || e.target.id === "modalArt"){ $("#modalArt").hidden = true; return; }
+  if(e.target.closest("#artVista")){
+    P.vistaArt = vistaArt()==="tarjetas" ? "lista" : "tarjetas";
+    persist(); pintaSelectorArt(); return;
+  }
+  const ct = e.target.closest("[data-artcat]");
+  if(ct){ artCat = ct.dataset.artcat; pintaSelectorArt(); return; }
+  const pk = e.target.closest("[data-artpick]");
+  if(pk){ eligeArticulo(pk.dataset.artpick); return; }
+});
+document.addEventListener("input", e=>{
+  if(e.target.id === "artBusca"){ artBusca = e.target.value || ""; pintaSelectorArt(); }
+});
+document.addEventListener("change", async e=>{
+  if(e.target.id === "fotoArtFile"){
+    const f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if(f && fotoDe_id) await subeFotoArticulo(fotoDe_id, f);
+    fotoDe_id = null;
+  }
+});
+document.addEventListener("keydown", e=>{
+  if(e.key === "Escape" && !$("#modalArt").hidden){ $("#modalArt").hidden = true; }
 });
 
 /* ---------- eventos del armado ---------- */
@@ -10994,10 +11357,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261006-2339";</script>
+<script>window.BUILD="20261007-1836";</script>
 <script>
 (function(){
-  var mio = "20261006-2339";
+  var mio = "20261007-1836";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -11025,7 +11388,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261006-2339"></script>
-<script src="diagnostico.js?v=20261006-2339"></script>
+<script src="cuenta.js?v=20261007-1836"></script>
+<script src="diagnostico.js?v=20261007-1836"></script>
 </body>
 </html>
