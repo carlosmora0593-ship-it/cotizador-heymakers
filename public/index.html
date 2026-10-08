@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261007-1836"></script>
+<script src="config.js?v=20261007-1905"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1482,7 +1482,6 @@ body.conBarra nav.tabs button[aria-selected="true"] .ico{color:var(--accent-ink)
 .pasoArt{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;
   padding-top:13px;border-top:1px solid var(--line-soft,var(--line))}
 #pasoArtQue{font-size:12px;color:var(--ink-3)}
-.pasoArt .btn{margin-left:auto}
 .rVarios{margin:0 16px 14px;border:1px solid var(--line);border-radius:var(--radio-sm,12px);
   padding:11px 13px;background:var(--surface-2)}
 .rvTit{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
@@ -1504,7 +1503,6 @@ body.conBarra nav.tabs button[aria-selected="true"] .ico{color:var(--accent-ink)
 @media (max-width:560px){
   .tiraArt{max-width:none;width:100%}
   .tiraMas{width:100%}
-  .pasoArt .btn{margin-left:0;width:100%}
 }
 @media print{ .tiraArts,.pasoArt{display:none!important} }
 
@@ -2046,7 +2044,7 @@ body.rol-produccion #btnPrint{display:none!important}
         </div>
       </div></div></div>
 
-      <div class="card tiraArts" id="tiraArts" hidden>
+      <div class="card tiraArts" id="tiraArts">
         <div class="tiraTop">
           <h2>Artículos de la cotización</h2>
           <span class="tiraCuenta" id="tiraCuenta"></span>
@@ -2056,7 +2054,7 @@ body.rol-produccion #btnPrint{display:none!important}
       </div>
 
       <div class="card plegable" data-paso="articulo">
-        <header><span class="step">2</span><h2>Artículo o servicio</h2><span class="hint" data-solo="articulo">el costo sale del catálogo</span><span class="hint" data-solo="servicio" hidden>se cobra por medida</span><span class="resumenPaso" data-res="articulo"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body">
+        <header><span class="step">2</span><h2>Artículo o servicio</h2><span class="hint" data-solo="articulo">el costo sale del catálogo</span><span class="hint" data-solo="servicio" hidden>se cobra por medida</span><button class="btn sm ghost" id="btnAddArt" style="margin-left:auto">+ Otro artículo</button><span class="resumenPaso" data-res="articulo"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body">
         <div class="modoSwitch" id="modoSwitch">
           <button type="button" data-modo="articulo" aria-selected="true">Artículo compuesto o personalizado</button>
           <button type="button" data-modo="servicio" aria-selected="false">Servicio por medida</button>
@@ -2091,6 +2089,10 @@ body.rol-produccion #btnPrint{display:none!important}
             <label class="sw"><input type="checkbox" id="c_descOn" checked> Ofrecer descuento por mayoreo</label>
             <span class="escalaChip num" id="c_escala"></span>
           </div>
+          <div class="pasoArt" id="pasoArt">
+            <span id="pasoArtQue">Este artículo</span>
+          </div>
+
           <div class="grid g4" style="display:none">
           </div>
         </div>
@@ -2129,11 +2131,6 @@ body.rol-produccion #btnPrint{display:none!important}
             <div><label class="f" for="c_resp">Responsable de producción</label><input id="c_resp" placeholder="Nombre"></div>
           </div>
           <div style="margin-top:12px"><label class="f" for="c_notas">Notas de producción</label><textarea id="c_notas" rows="3" placeholder="Posición exacta, temperatura de prensa, cuidados especiales…"></textarea></div>
-          <div class="pasoArt" id="pasoArt">
-            <span id="pasoArtQue">Este artículo</span>
-            <button class="btn sm" id="btnAddArt">+ Agregar otro artículo</button>
-          </div>
-
           <label class="f" style="margin-top:14px">Checklist de proceso</label>
           <div class="check" id="checklist"></div>
           <div id="bitaCot"></div>
@@ -6890,12 +6887,25 @@ function renderTiraItems(){
   const w = $("#tiraFila"); if(!w) return;
   guardaItemActivo(cot);
   const its = cot.items, varios = its.length > 1;
-  const tarjeta = $("#tiraArts"); if(tarjeta) tarjeta.hidden = !varios;
+  const cuenta = $("#tiraCuenta");
+  if(cuenta) cuenta.textContent = varios ? its.length + " artículos" : "";
   const paso = $("#pasoArtQue");
   if(paso) paso.textContent = varios
-    ? "Artículo " + (cot.iAct+1) + " de " + its.length
+    ? "Estás editando el artículo " + (cot.iAct+1) + " de " + its.length
     : "Un solo artículo en esta cotización";
-  if(!varios){ w.innerHTML = ""; const p=$("#tiraPie"); if(p) p.textContent=""; return; }
+
+  if(!varios){
+    const it = its[0], r = calcUno(cotDeItem(cot, it));
+    w.innerHTML = '<button type="button" class="tiraArt act" data-itm="0" aria-current="true">'+
+      '<span class="tiraNum">1</span>'+
+      '<span class="tiraTxt"><b>'+esc(nombreItem(it, 1))+'</b>'+
+        '<small>'+r.qty+' pza(s) · '+mx(r.total)+'</small></span></button>'+
+      '<button type="button" class="tiraMas" id="tiraMas">+ Agregar artículo</button>';
+    const p1 = $("#tiraPie");
+    if(p1) p1.innerHTML = 'Puedes meter <b>varios artículos en la misma cotización</b> — playeras, '+
+      'gorras y tazas en un solo folio. Cada uno lleva su cantidad, sus aplicaciones y su armado.';
+    return;
+  }
 
   let totalPedido = 0, piezasPedido = 0;
   const cuentas = its.map(it=>{ const r = calcUno(cotDeItem(cot, it));
@@ -11357,10 +11367,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261007-1836";</script>
+<script>window.BUILD="20261007-1905";</script>
 <script>
 (function(){
-  var mio = "20261007-1836";
+  var mio = "20261007-1905";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -11388,7 +11398,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261007-1836"></script>
-<script src="diagnostico.js?v=20261007-1836"></script>
+<script src="cuenta.js?v=20261007-1905"></script>
+<script src="diagnostico.js?v=20261007-1905"></script>
 </body>
 </html>
