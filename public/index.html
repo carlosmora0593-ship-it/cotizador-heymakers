@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261009-2325"></script>
+<script src="config.js?v=20261009-2337"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2221,6 +2221,7 @@ body.rol-produccion #btnPrint{display:none!important}
           <button class="btn" id="btnPrint">Cotización</button>
           <button class="btn" id="btnEnviar">Enviar</button>
 
+          <button class="btn" id="btnTerminar">Terminar</button>
           <button class="btn" id="btnNew">Nueva</button>
         </div>
       </div>
@@ -2668,7 +2669,11 @@ body.rol-produccion #btnPrint{display:none!important}
         <div><label class="f" for="p_merma">Merma / reposición (%)</label><input id="p_merma" type="number" min="0" step="0.5"></div>
         <div style="grid-column:span 2"><label class="f">Acomodo del material</label>
           <label class="sw"><input type="checkbox" id="p_nesting" checked> Meter las piezas chicas en el ancho que les sobra a las grandes</label>
-          <p class="note" style="margin:6px 0 0">Apágalo sólo si tu equipo imprime cada medida en su propia tira.</p></div>
+          <p class="note" style="margin:6px 0 0">Apágalo sólo si tu equipo imprime cada medida en su propia tira.</p>
+          <label class="sw"><input type="checkbox" id="p_nuevaGuardar"> Al <b>guardar</b>, empezar una cotización nueva</label>
+          <label class="sw"><input type="checkbox" id="p_nuevaCobrar"> Al <b>cerrar el cobro</b>, empezar una cotización nueva</label>
+          <p class="note" style="margin:8px 0 0">Lo que estás capturando se guarda solo en este navegador, así que si se recarga la página no se pierde. Eso es un <b>borrador</b>: para que la cotización exista de verdad hay que darle Guardar.</p>
+          </div>
         <div><label class="f" for="p_mo">Mano de obra por aplicación ($)</label><input id="p_mo" type="number" min="0" step="0.5"></div>
       </div>
       <div class="grid g4" style="margin-top:12px">
@@ -4805,6 +4810,7 @@ function renderResumen(){
   else { const al = $("#r_alerta"); if(al){ al.hidden = true; al.innerHTML = ""; } }
   if(typeof renderTotalVarios==="function") renderTotalVarios();
   if(typeof renderPedido==="function") renderPedido();
+  if(typeof apuntaBorrador==="function") apuntaBorrador();
   if(typeof renderTiraItems==="function") renderTiraItems();
   if(typeof renderAvisoStock==="function") renderAvisoStock();
   if(typeof resumenPasos==="function") resumenPasos();
@@ -5523,6 +5529,8 @@ function renderSet(){
   if(bv) bv.textContent = (P.empresa && P.empresa.nombre ? P.empresa.nombre : "Hey Makers");
   $("#p_margen").value=P.margen; $("#p_modo").value=P.modo; $("#p_merma").value=P.merma; $("#p_mo").value=P.manoObra;
   $("#p_nesting").checked = P.nesting !== false;
+  const pg = $("#p_nuevaGuardar"); if(pg) pg.checked = P.nuevaAlGuardar !== false;
+  const pc = $("#p_nuevaCobrar");  if(pc) pc.checked = P.nuevaAlCobrar  !== false;
   $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia; $("#p_plazoCobro").value=num(P.plazoCobro,15);
   P.compras = P.compras || {tope:2000, siempre:false};
   $("#p_compraTope").value = num(P.compras.tope); $("#p_compraSiempre").checked = !!P.compras.siempre;
@@ -5923,6 +5931,10 @@ $("#addExtra").addEventListener("click", ()=>{
 });
 
 /* ---------- el acomodo aprovechado se prende y se apaga ---------- */
+document.addEventListener("change", e=>{
+  if(e.target.id === "p_nuevaGuardar"){ P.nuevaAlGuardar = e.target.checked; persist(); }
+  if(e.target.id === "p_nuevaCobrar"){  P.nuevaAlCobrar  = e.target.checked; persist(); }
+});
 $("#p_nesting").addEventListener("change", e=>{
   P.nesting = e.target.checked; persist();
   renderCot();
@@ -6722,7 +6734,12 @@ document.addEventListener("input", e=>{ if(e.target.id === "ivBuscar") renderInv
 let aProd = null;
 function ofreceProduccion(q){
   const g = guardadas.find(x=>x.folio===q.folio) || q;
-  if(g.estado === "confirmada" && g.op) return;          // ya está en el taller
+  if(g.estado === "confirmada" && g.op){
+    /* Ya estaba en el taller: no hay paso que ofrecer, pero sí terminó. */
+    if(cot && cot.folio === g.folio && typeof nuevaAlCobrar === "function" && nuevaAlCobrar())
+      terminaYEmpieza("Cobrada");
+    return;
+  }
   aProd = g.folio;
   const r = calcDe(g);
   $("#apResumen").innerHTML = '<b>'+esc(g.folio)+'</b> · '+esc(g.cliente||"sin cliente")+
@@ -6747,6 +6764,7 @@ async function mandaAProduccion(folio){
   renderSaved(); renderProduccion();
   $("#modalAProd").hidden = true; aProd = null;
   toast("Orden " + g.op.folio + " enviada a producción");
+  if(typeof nuevaAlCobrar === "function" && nuevaAlCobrar()) cotizacionNueva(false);
 }
 
 /* ---------- la entrega, con evidencia ---------- */
@@ -6818,7 +6836,9 @@ async function cierraEntrega(){
 document.addEventListener("click", async e=>{
   if(e.target.closest("#apEnviar")){ if(aProd) await mandaAProduccion(aProd); return; }
   if(e.target.closest("#apDespues") || e.target.closest("#apCerrar") || e.target.id==="modalAProd"){
-    $("#modalAProd").hidden = true; aProd = null; return; }
+    $("#modalAProd").hidden = true; aProd = null;
+    if(typeof nuevaAlCobrar === "function" && nuevaAlCobrar()) terminaYEmpieza("Cobrada");
+    return; }
 
   const ent = e.target.closest("[data-entregar]");
   if(ent){ abreEntrega(ent.dataset.entregar); return; }
@@ -7498,6 +7518,62 @@ function celdaVeCostos(u){
     (u.veCostos?" checked":"")+'></td>';
 }
 
+
+/* ---------- el borrador que no se pierde ---------- */
+/* Lo que está en pantalla se escribe en ESTE navegador. No es una cotización
+   guardada: no sale en la lista ni viaja a la nube. Es el seguro contra el F5
+   y contra la pestaña que el teléfono descarga por falta de memoria. */
+let borradorReloj = null;
+function guardaBorrador(){
+  try{
+    if(typeof guardaItemActivo === "function") guardaItemActivo(cot);
+    lsSet("borrador", {cot, cuando: Date.now()});
+  }catch(e){}
+}
+function apuntaBorrador(){
+  clearTimeout(borradorReloj);
+  borradorReloj = setTimeout(guardaBorrador, 500);
+}
+function tiraBorrador(){ clearTimeout(borradorReloj); try{ lsSet("borrador", null); }catch(e){} }
+/* Vale la pena recuperarlo sólo si tiene algo escrito: un borrador en blanco
+   es lo mismo que empezar de cero, y preguntar por él sería ruido. */
+function borradorConAlgo(b){
+  if(!b || !b.cot) return false;
+  const c = b.cot;
+  return !!((c.cliente||"").trim() || (c.ref||"").trim() || (c.desc||"").trim() ||
+            (c.apps||[]).length || (c.items||[]).length > 1 ||
+            (c.tallas||[]).length || num(c.costoArt) > 0);
+}
+function recuperaBorrador(){
+  const b = lsGet("borrador", null);
+  if(!borradorConAlgo(b)) return false;
+  /* Si ya se guardó de verdad y no se ha tocado desde entonces, no hay nada
+     que recuperar: la de la lista manda. */
+  cot = b.cot;
+  if(typeof normalizaItems === "function") normalizaItems(cot);
+  return true;
+}
+
+/* ---------- empezar una nueva ---------- */
+/* El ejemplo sólo la primera vez: a quien ya tiene su catálogo y sus clientes,
+   una cotización de playeras que él no capturó le estorba — y si se distrae,
+   la cobra. */
+function esPrimeraVez(){ return !(guardadas||[]).length; }
+function cotizacionNueva(conEjemplo){
+  cot = nuevaCot(conEjemplo === true);
+  if(typeof normalizaItems === "function") normalizaItems(cot);
+  tiraBorrador();
+  renderCot();
+}
+/* Al terminar: se limpia la pantalla y se arranca una nueva, en blanco. */
+function terminaYEmpieza(queFue){
+  const folio = cot.folio;
+  cotizacionNueva(false);
+  toast((queFue || "Listo") + " · " + folio + ". Empezamos una nueva.");
+}
+const nuevaAlGuardar = () => P.nuevaAlGuardar !== false;
+const nuevaAlCobrar  = () => P.nuevaAlCobrar  !== false;
+
 /* ---------- eventos del armado ---------- */
 $("#armadoTab").addEventListener("click", ()=>abreArmado(true));
 $("#armadoCajon").addEventListener("click", e=>{
@@ -7744,9 +7820,16 @@ $("#fileIn").addEventListener("change", e=>{
 
 /* guardar / cargar */
 $("#btnSave").addEventListener("click", async ()=>{
-  await guardaCot(); renderSaved(); toast("Cotización "+cot.folio+" guardada");
+  await guardaCot(); renderSaved();
+  if(nuevaAlGuardar()) terminaYEmpieza("Guardada");
+  else toast("Cotización "+cot.folio+" guardada");
 });
-$("#btnNew").addEventListener("click", ()=>{ cot = nuevaCot(false); renderCot(); toast("Cotización nueva"); });
+/* Terminar: la guarda y limpia la pantalla. Es el final explícito, para
+   quien prefiere cerrar a mano. */
+$("#btnTerminar").addEventListener("click", async ()=>{
+  await guardaCot(); renderSaved(); terminaYEmpieza("Terminada");
+});
+$("#btnNew").addEventListener("click", ()=>{ cotizacionNueva(false); toast("Cotización nueva"); });
 
 /* ---------- confirmar pedido ---------- */
 function renderEstado(){
@@ -10533,7 +10616,7 @@ function start(){
   const al = $("#authLogo"); if(al) al.src = LOGO_MARCA;
   const ad = $("#authDias"); if(ad && window.CONFIG) ad.textContent = CONFIG.DIAS_DE_PRUEBA;
   const at = $("#authTitulo"); if(at && window.CONFIG) at.textContent = "Cotizador " + CONFIG.MARCA;
-  cot = nuevaCot(true);
+  cot = nuevaCot(false);
   aplicaMarca();
   arrancaEquipo();
   renderCot(); renderSet(); arrancaPasos();
@@ -10541,10 +10624,16 @@ function start(){
 }
 start();
 window.__arranca = () => initStore().then(()=>{
-  cot.folio = folioNuevo();
+  /* El orden importa: primero lo que se estaba capturando, luego —si no había
+     nada— el ejemplo, y sólo la primerísima vez. */
+  const habia = recuperaBorrador();
+  if(!habia && esPrimeraVez()) cot = nuevaCot(true);
+  if(!habia) cot.folio = folioNuevo();
+  if(typeof normalizaItems === "function") normalizaItems(cot);
   const a = cat.articulos.find(a=>a.id===cot.articuloId);
-  if(a) cot.costoArt = a.costo;
+  if(a && !habia) cot.costoArt = a.costo;
   if(cot.apps.length && !cat.tecnicas.find(t=>t.id===cot.apps[0].tecnicaId)) cot.apps[0].tecnicaId = cat.tecnicas[0].id;
+  if(habia) setTimeout(()=>toast("Recuperé lo que estabas capturando"), 900);
   arrancaEquipo();
   renderCot(); renderSet(); renderSaved(); pintaSelectClientes();
   $("#catEstado").textContent = "Catálogo al día";
@@ -11685,10 +11774,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261009-2325";</script>
+<script>window.BUILD="20261009-2337";</script>
 <script>
 (function(){
-  var mio = "20261009-2325";
+  var mio = "20261009-2337";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -11716,7 +11805,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261009-2325"></script>
-<script src="diagnostico.js?v=20261009-2325"></script>
+<script src="cuenta.js?v=20261009-2337"></script>
+<script src="diagnostico.js?v=20261009-2337"></script>
 </body>
 </html>
