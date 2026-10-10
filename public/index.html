@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261009-2309"></script>
+<script src="config.js?v=20261009-2325"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -6946,7 +6946,9 @@ function quitaItem(i){
   guardaItemActivo(cot);
   if(cot.items.length <= 1){ toast("La cotización necesita por lo menos un artículo"); return; }
   const it = cot.items[i];
-  if(!confirm("¿Quitar «" + (it.desc || "este artículo") + "» de la cotización?")) return;
+  /* Un índice que no existe no debe tirar la pantalla: se avisa y ya. */
+  if(!it){ toast("No encuentro ese artículo"); return; }
+  if(!confirm("¿Quitar «" + (nombreItem(it, i+1)) + "» de la cotización?")) return;
   const veia = cot.iAct;
   cot.items.splice(i, 1);
   /* Si quitó otro, se queda viendo el mismo; si se quitó a sí mismo, cae en
@@ -7032,7 +7034,7 @@ function renderTiraItems(){
       '<span class="tiraNum">'+(i+1)+'</span>'+
       '<span class="tiraTxt"><b>'+esc(nombreItem(it, i+1))+'</b>'+
         '<small>'+r.qty+' pza(s) · '+mx(r.total)+'</small></span>'+
-      '<span class="tiraX" data-itmX="'+i+'" role="button" tabindex="0" title="Quitar este artículo">✕</span>'+
+      '<span class="tiraX" data-quitaitm="'+i+'" role="button" tabindex="0" title="Quitar este artículo">✕</span>'+
     '</button>';
   }).join("") +
   '<button type="button" class="tiraMas" id="tiraMas">+ Agregar artículo</button>';
@@ -7118,9 +7120,22 @@ function specPorArticulo(o){
 }
 
 /* ---------- eventos de la tira de artículos ---------- */
+/* La ✕ trae role="button" y tabindex: entonces también obedece al teclado,
+   no nada más al ratón. */
+document.addEventListener("keydown", e=>{
+  if(e.key !== "Enter" && e.key !== " ") return;
+  const x = e.target.closest && e.target.closest("[data-quitaitm]");
+  if(!x) return;
+  e.preventDefault(); quitaItem(Number(x.dataset.quitaitm));
+});
 document.addEventListener("click", e=>{
-  const x = e.target.closest("[data-itmX]");
-  if(x){ e.preventDefault(); e.stopPropagation(); quitaItem(Number(x.dataset.itmX)); return; }
+  /* En minúsculas a propósito: el navegador baja a minúsculas el nombre de
+     todo atributo del HTML, así que `data-itmX` se lee como `dataset.itmx` y
+     `dataset.itmX` devolvía undefined. El selector sí lo encontraba —los
+     selectores de atributo no distinguen mayúsculas— y por eso el clic entraba
+     aquí, llamaba a quitaItem(NaN) y reventaba sin decir nada. */
+  const x = e.target.closest("[data-quitaitm]");
+  if(x){ e.preventDefault(); e.stopPropagation(); quitaItem(Number(x.dataset.quitaitm)); return; }
   if(e.target.closest("#tiraMas") || e.target.closest("#btnAddArt")){ agregaItem(); return; }
   const b = e.target.closest("[data-itm]");
   if(b && (b.closest("#tiraFila") || b.closest("#rVarios"))){
@@ -11670,10 +11685,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261009-2309";</script>
+<script>window.BUILD="20261009-2325";</script>
 <script>
 (function(){
-  var mio = "20261009-2309";
+  var mio = "20261009-2325";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -11701,7 +11716,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261009-2309"></script>
-<script src="diagnostico.js?v=20261009-2309"></script>
+<script src="cuenta.js?v=20261009-2325"></script>
+<script src="diagnostico.js?v=20261009-2325"></script>
 </body>
 </html>
