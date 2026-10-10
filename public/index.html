@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261009-2337"></script>
+<script src="config.js?v=20261010-0101"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -433,6 +433,7 @@ nav.tabs button[aria-selected="true"] b{color:var(--accent)}
 
 /* lo que cada rol no ve */
 body.rol-ventas [data-solo-admin],
+body.rol-diseno [data-solo-admin],
 body.rol-produccion [data-solo-admin]{display:none!important}
 body.rol-ventas #tab-cat .pricebar,
 body.rol-ventas #tab-cat [data-add],
@@ -1626,6 +1627,151 @@ body.sinDetalleCostos .soloAdminCostos{display:none!important}
 .notaCostos{font-size:12px;color:var(--ink-3);line-height:1.5;margin:10px 0 0}
 .notaCostos b{color:var(--ink-2)}
 
+/* ---- comisiones ---- */
+.comNota{font-size:12px;color:var(--ink-3);line-height:1.5;margin:0 0 14px}
+.comNota b{color:var(--ink-2)}
+.comGraf{display:flex;flex-direction:column;gap:9px}
+.comFila{display:grid;grid-template-columns:minmax(110px,22%) minmax(0,1fr) auto;gap:12px;align-items:center}
+.comQuien{font-size:13px;font-weight:600;line-height:1.3;min-width:0}
+.comQuien small{display:block;font-size:11px;font-weight:400;color:var(--ink-3);margin-top:1px}
+.comBarra{height:14px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.comBarra i{display:block;height:100%;border-radius:4px;background:var(--cyan);min-width:3px}
+.comMx{font-family:"IBM Plex Mono",monospace;font-size:13px;white-space:nowrap;text-align:right}
+.comMx.pico{font-weight:700}
+.comTotal{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:14px;
+  padding-top:11px;border-top:1px solid var(--line);font-size:13px}
+.comTotal b{font-family:"IBM Plex Mono",monospace;font-size:17px;color:var(--good)}
+@media (max-width:560px){
+  .comFila{grid-template-columns:1fr auto;gap:5px 10px}
+  .comQuien{grid-column:1;grid-row:1}
+  .comMx{grid-column:2;grid-row:1;align-self:center}
+  .comBarra{grid-column:1/-1;grid-row:2;height:10px}
+}
+
+/* ---- reloj checador ---- */
+.asGente{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.asPersona{display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border:1px solid var(--line);
+  border-radius:12px;background:var(--surface);cursor:pointer;transition:border-color .15s,transform .1s;width:100%}
+.asPersona:hover{border-color:var(--accent);transform:translateY(-1px)}
+.asPersona.dentro{border-left:4px solid var(--good);padding-left:11px}
+.asAv{width:40px;height:40px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;
+  font-weight:700;font-size:16px;flex:0 0 auto}
+.asPersona.dentro .asAv{background:var(--good);color:#fff}
+.asQ{flex:1;min-width:0}
+.asQ b{display:block;font-size:14px;line-height:1.25}
+.asQ small{display:block;font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.asAccion{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);flex:0 0 auto}
+.asPersona.dentro .asAccion{color:var(--good)}
+
+.asDia{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.asDia:last-child{border-bottom:0}
+.asDiaQ{min-width:150px}
+.asDiaQ b{display:block;font-size:13.5px}
+.asDiaQ small{font-size:11.5px;color:var(--ink-3)}
+.asEvs{display:flex;flex-wrap:wrap;gap:8px;flex:1}
+.asEv{display:inline-flex;align-items:center;gap:7px;font-size:12px;padding:5px 9px 5px 5px;border-radius:999px;
+  background:var(--surface-2);border:1px solid var(--line)}
+.asEv.entrada{border-color:color-mix(in srgb,var(--good) 45%,transparent)}
+.asEv.salida{border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.asEv b{font-family:"IBM Plex Mono",monospace}
+.asFoto{width:30px;height:30px;border-radius:50%;object-fit:cover;cursor:zoom-in;background:var(--surface-2)}
+.asFoto.vacia{display:grid;place-items:center;color:var(--ink-3);font-size:11px;cursor:default}
+.asX{border:0;background:none;color:var(--ink-3);cursor:pointer;font-size:12px;padding:0 2px;line-height:1}
+.asX:hover{color:var(--bad,#c0392b)}
+
+.chEstado{font-size:13px;padding:11px 13px;border-radius:9px;background:var(--surface-2);margin-bottom:14px}
+.chCam{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#111;display:grid;place-items:center}
+.chCam video,.chCam img{width:100%;height:100%;object-fit:cover;display:block}
+.chCamAviso{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:22px;
+  color:#fff;font-size:13px;line-height:1.5;background:#111}
+.chBotonera{display:flex;gap:9px;margin-top:11px}
+.chBotonera .btn{flex:1}
+.chPin{display:flex;gap:9px;margin:7px 0 14px;min-height:16px;align-items:center}
+.chPin i{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);display:block}
+.chPin i.lleno{background:var(--accent);border-color:var(--accent)}
+.chTeclado{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chTeclado button{padding:14px 0;font-size:19px;font-weight:600;border:1px solid var(--line);border-radius:10px;
+  background:var(--surface);cursor:pointer;font-family:"IBM Plex Mono",monospace}
+.chTeclado button:hover{border-color:var(--accent)}
+.chTeclado button.chBorra{font-size:12px;font-family:inherit;font-weight:600;color:var(--ink-3)}
+
+body.quiosco > *:not(#tab-asi):not(.modal):not(.toast){display:none!important}
+body.quiosco #tab-asi > .card:not(:first-child){display:none}
+body.quiosco #tab-asi{padding:0 16px}
+
+@media (max-width:560px){
+  .asGente{grid-template-columns:1fr}
+  .asDiaQ{min-width:100%}
+}
+
+/* ---- expedientes del personal ---- */
+.expFila{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--line);
+  border-radius:11px;margin-bottom:9px;cursor:pointer;background:var(--surface);transition:border-color .15s}
+.expFila:hover,.expFila:focus-visible{border-color:var(--accent);outline:none}
+.expQ{flex:1;min-width:0}
+.expQ b{display:block;font-size:13.5px}
+.expQ small{display:block;font-size:11.5px;color:var(--ink-3);margin-top:1px}
+.expDocs{font-size:12px;color:var(--ink-3);white-space:nowrap}
+.expH{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);
+  margin:22px 0 10px;padding-top:16px;border-top:1px solid var(--line)}
+.expCarp{border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-bottom:9px}
+.expCarpTit{display:flex;align-items:center;gap:9px;font-size:13px}
+.expVacia{font-size:12px;color:var(--ink-3);margin-top:7px}
+.expDocsLista{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.expDocsLista .docChip{display:inline-flex;align-items:center;gap:7px}
+.expDocsLista .docNom{border:0;background:none;padding:0;font:inherit;font-size:12px;color:var(--accent);
+  cursor:pointer;text-decoration:underline;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.expFiscal{margin-top:14px;border:1px solid var(--line);border-radius:11px;padding:11px 13px}
+.expFiscal summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.caFila{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.caFila input[data-ck="nombre"]{flex:1}
+.caFila .sw{white-space:nowrap;font-size:12px}
+@media (max-width:560px){
+  .expFila{flex-wrap:wrap}
+  .expQ{flex:1 1 100%;order:-1}
+}
+
+/* ---- nómina ---- */
+.nmFila{display:flex;align-items:center;gap:14px;padding:12px;border:1px solid var(--line);
+  border-radius:11px;margin-bottom:9px;cursor:pointer;background:var(--surface);transition:border-color .15s}
+.nmFila:hover,.nmFila:focus-visible{border-color:var(--accent);outline:none}
+.nmQ{flex:1;min-width:0}
+.nmQ b{display:block;font-size:13.5px}
+.nmQ small{display:block;font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.nmCol{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:13px;white-space:nowrap;min-width:86px}
+.nmCol small{display:block;font-family:inherit;font-size:10px;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--ink-3);font-weight:600;margin-bottom:2px}
+.nmCol.menos{color:var(--ink-3)}
+.nmCol.neto{font-weight:700;font-size:15px}
+.nmTotal{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:16px;
+  padding-top:13px;border-top:1px solid var(--line);font-size:13px}
+.nmTotal b{font-family:"IBM Plex Mono",monospace;font-size:19px;color:var(--good)}
+.nmCerradaBar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:14px}
+.nmResumenP{border:1px solid var(--line);border-radius:11px;padding:12px 14px}
+.nmRen{display:flex;justify-content:space-between;gap:12px;font-size:13px;padding:3px 0}
+.nmRen b{font-family:"IBM Plex Mono",monospace}
+.nmRen.neto{border-top:1px solid var(--line);margin-top:7px;padding-top:9px;font-weight:700;font-size:15px}
+.nmRen.neto b{color:var(--good);font-size:17px}
+.nmRenSub{font-size:11.5px;color:var(--ink-3);margin:1px 0 7px}
+.nmLinea{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.nmLinea input[data-lk="concepto"]{flex:1;min-width:0}
+.nmLinea .sw{white-space:nowrap;font-size:11.5px;color:var(--ink-3)}
+.nmNeto{margin-top:18px;border-top:1px solid var(--line);padding-top:13px}
+#docPaper .nmTabla,#hoja .nmTabla{width:100%;border-collapse:collapse;font-size:13px}
+#docPaper .nmTabla td,#hoja .nmTabla td{border-bottom:1px solid #ddd;padding:5px 2px}
+#docPaper .recibo,#hoja .recibo{page-break-inside:avoid;margin-bottom:26px;padding-bottom:18px;border-bottom:1px dashed #bbb}
+#docPaper .recibo:last-child,#hoja .recibo:last-child{border-bottom:0}
+#docPaper .firma,#hoja .firma{margin-top:30px}
+#docPaper .firma span,#hoja .firma span{display:block;border-top:1px solid #333;width:230px;margin-bottom:4px}
+#docPaper .firma small,#hoja .firma small{font-size:11px;color:#555}
+@media (max-width:620px){
+  .nmFila{flex-wrap:wrap;gap:8px 14px}
+  .nmQ{flex:1 1 100%;order:-1}
+  .nmCol{min-width:0;flex:1}
+  .nmLinea{flex-wrap:wrap}
+  .nmLinea input[data-lk="concepto"]{flex:1 1 100%}
+}
+
 
 /* ---- el diagnóstico ----
    Una pregunta a la vez. Las opciones entran escalonadas: no es adorno,
@@ -1941,6 +2087,8 @@ body.rol-produccion #btnPrint{display:none!important}
         <button role="menuitem" data-tab="calc" aria-selected="false"><b>Calculadora de costos</b><small>Qué te cuesta producir, paso a paso</small></button>
         <button role="menuitem" data-tab="inv" aria-selected="false"><b>Inventario <span class="mbadge" id="invBadge" hidden>0</span></b><small>Qué hay en el taller y qué hay que pedir</small></button>
         <button role="menuitem" data-tab="com" aria-selected="false"><b>Compras <span class="mbadge" hidden>0</span></b><small>Requisiciones, proveedores y facturas</small></button>
+        <button role="menuitem" data-tab="asi" aria-selected="false"><b>Asistencia</b><small>Reloj checador y horas trabajadas</small></button>
+        <button role="menuitem" data-tab="nom" aria-selected="false"><b>Nómina</b><small>Lo que se le paga a cada quien</small></button>
         <button role="menuitem" data-tab="set" aria-selected="false" hidden><b>Ajustes</b><small>Utilidad, IVA y datos de tu empresa</small></button>
       </nav>
     </div>
@@ -2448,6 +2596,16 @@ body.rol-produccion #btnPrint{display:none!important}
       <div id="arcCompras"></div>
     </div>
   </div>
+  <div class="card" id="cardExp" data-solo-admin>
+    <header><h2>Expedientes del personal</h2>
+      <span class="hint" id="expResumen" style="margin-left:auto"></span>
+      <button class="btn sm ghost" id="expCarpetas">Carpetas</button>
+    </header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Los papeles de cada persona: contrato, identificación, altas del IMSS, renuncia. <b>Solo tú los ves</b>, ni ventas ni producción ni diseño, ni en la pantalla ni en la base.</p>
+      <div id="expLista"></div>
+    </div>
+  </div>
 </section>
 
 
@@ -2595,6 +2753,10 @@ body.rol-produccion #btnPrint{display:none!important}
       </div>
     </div>
   </div>
+  <div class="card" id="cardComis" hidden>
+    <header><h2>Comisiones del periodo</h2><span class="hint" style="margin-left:auto">quién vendió y cuánto se le debe</span></header>
+    <div class="body"><div id="venComis"></div></div>
+  </div>
   <div class="card" id="cardCxc">
     <header><h2>Cuentas por cobrar</h2>
       <span class="hint" id="cxcResumen" style="margin-left:auto"></span>
@@ -2649,6 +2811,83 @@ body.rol-produccion #btnPrint{display:none!important}
 </section>
 
 <!-- ============ AJUSTES ============ -->
+<section id="tab-asi" hidden>
+  <div class="card" style="margin-top:20px">
+    <header><h2>Reloj checador</h2>
+      <span class="hint" id="asHoy" style="margin-left:auto"></span>
+      <button class="btn sm ghost" id="asPantalla">Modo quiosco</button>
+    </header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Toca tu nombre, teclea tu clave y tómate la foto. La misma clave con la que entras al sistema. <b>Sin foto no se registra</b>.</p>
+      <div id="asGente" class="asGente"></div>
+      <div id="asSinClave"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <header><h2>Lo de hoy</h2><span class="hint" id="asResumenHoy" style="margin-left:auto"></span></header>
+    <div class="body"><div id="asLista"></div></div>
+  </div>
+
+  <div class="card">
+    <header><h2>Horas del periodo</h2>
+      <span class="hint" id="asRango" style="margin-left:auto"></span>
+      <button class="btn sm" data-reporte="asistencia">Reporte Excel</button>
+    </header>
+    <div class="body">
+      <div class="periodbar">
+        <div class="seg" id="asSeg">
+          <button data-per="dia" aria-pressed="false">Día</button>
+          <button data-per="semana" aria-pressed="true">Semana</button>
+          <button data-per="mes" aria-pressed="false">Mes</button>
+        </div>
+        <button class="btn sm" id="asPrev">‹ Anterior</button>
+        <input type="date" id="asFecha" style="width:auto">
+        <button class="btn sm" id="asNext">Siguiente ›</button>
+        <button class="btn sm ghost" id="asHoyBtn">Hoy</button>
+      </div>
+      <div class="kpis" id="asKpis"></div>
+      <div id="asHoras" style="margin-top:18px"></div>
+      <div class="tbl-wrap" style="margin-top:18px"><table id="t_asis"></table></div>
+    </div>
+  </div>
+</section>
+
+<section id="tab-nom" hidden>
+  <div class="card" style="margin-top:20px" data-solo-admin>
+    <header><h2>Nómina</h2>
+      <span class="hint" id="nmRango" style="margin-left:auto"></span>
+      <button class="btn sm" data-reporte="nomina">Reporte Excel</button>
+    </header>
+    <div class="body">
+      <div class="periodbar">
+        <div class="seg" id="nmSeg">
+          <button data-per="semana" aria-pressed="true">Semanal</button>
+          <button data-per="quincena" aria-pressed="false">Quincenal</button>
+          <button data-per="mes" aria-pressed="false">Mensual</button>
+        </div>
+        <button class="btn sm" id="nmPrev">‹ Anterior</button>
+        <input type="date" id="nmFecha" style="width:auto">
+        <button class="btn sm" id="nmNext">Siguiente ›</button>
+        <button class="btn sm ghost" id="nmHoy">Hoy</button>
+        <span class="hintbar">Los días y las horas salen del <b>reloj checador</b>. El sueldo y la forma de pago, del expediente de cada quien.</span>
+      </div>
+      <div class="kpis" id="nmKpis"></div>
+      <div id="nmAviso"></div>
+      <div id="nmLista" style="margin-top:16px"></div>
+      <div class="nmPie" id="nmPie"></div>
+    </div>
+  </div>
+
+  <div class="card" data-solo-admin>
+    <header><h2>Nóminas cerradas</h2><span class="hint" id="nmCerradasResumen" style="margin-left:auto"></span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 12px">Una vez cerrada, la nómina se congela: los renglones quedan como estaban ese día aunque después cambien los sueldos.</p>
+      <div id="nmCerradas"></div>
+    </div>
+  </div>
+</section>
+
 <section id="tab-set" hidden>
   <div class="card" style="margin-top:20px">
     <header><h2>Parámetros de precio</h2></header>
@@ -2684,6 +2923,13 @@ body.rol-produccion #btnPrint{display:none!important}
         <div><label class="f" for="p_vigencia">Vigencia (días)</label><input id="p_vigencia" type="number" min="1" step="1"></div>
       </div>
       <div class="grid g4" style="margin-top:12px">
+        <div><label class="f" for="p_comisionBase">La comisión se calcula sobre</label><select id="p_comisionBase">
+          <option value="cobrado">Lo cobrado — el dinero que ya entró</option>
+          <option value="venta">Lo vendido, sin IVA</option>
+          <option value="utilidad">La utilidad del pedido</option></select>
+          <p class="note" style="margin:6px 0 0">Sobre <b>lo cobrado</b> es lo más sano: no pagas comisión de dinero que todavía no te pagan. El porcentaje de cada quien se pone en Equipo.</p></div>
+      </div>
+      <div class="grid g4" style="margin-top:12px">
         <div><label class="f" for="p_compraTope">Autorizar compras desde ($)</label><input id="p_compraTope" type="number" min="0" step="100"></div>
         <div><label class="f">&nbsp;</label><label class="sw"><input type="checkbox" id="p_compraSiempre"> Autorizar todas, sin importar el monto</label></div>
         <div style="grid-column:span 2"><p class="note" style="margin:0">Cuando hay <b>más de una persona</b> en el equipo, toda requisición pasa por el administrador aunque sea de cien pesos. El tope aplica cuando trabajas solo.</p></div>
@@ -2697,7 +2943,7 @@ body.rol-produccion #btnPrint{display:none!important}
       <div class="tbl-wrap"><table id="t_equipo"></table></div>
         <p class="notaCostos"><b>Quién ve los costos.</b> El administrador siempre. A los demás los autorizas tú con la casilla <b>Ve costos</b>: sin ella ven precios, piezas y totales, pero ni el costo de producción ni la utilidad. El detalle aplicación por aplicación y el aviso de venta bajo costo son sólo del administrador. Ojo: esto <b>esconde</b> los números de la pantalla, no los cifra — quien sepa abrir las herramientas del navegador los puede encontrar.</p>
 
-      <p class="note" style="margin-top:14px;border-left-color:var(--warn)">La clave de cada persona sirve para que nadie entre por descuido a lo que no le toca, pero <b>no es una contraseña de verdad</b>: quien tenga el enlace de esta página puede cambiarse de usuario. Para bloquear accesos en serio, con su propio correo y contraseña, se usa la versión instalada en tu dominio.</p>
+      <p class="note" style="margin-top:14px;border-left-color:var(--warn)">La clave de cada persona sirve para dos cosas: que nadie entre por descuido a lo que no le toca, y <b>checar su entrada y su salida</b> en el reloj. Sin clave no puede checar. Eso sí, <b>no es una contraseña de verdad</b>: quien tenga el enlace de esta página puede cambiarse de usuario. Para bloquear accesos en serio, con su propio correo y contraseña, se usa la versión instalada en tu dominio.</p>
     </div>
   </div>
   <div class="card">
@@ -3237,6 +3483,116 @@ body.rol-produccion #btnPrint{display:none!important}
       <input id="artBusca" placeholder="Buscar por nombre o categoría" style="margin-bottom:10px">
       <div class="artCats" id="artCats"></div>
       <div class="artLista artRejilla" id="artLista"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalCheca" hidden>
+  <div class="card" style="width:min(460px,100%);max-height:94vh;overflow:auto">
+    <header><h2 id="chTitulo">Checar</h2>
+      <button class="btn sm" id="chCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <div class="chEstado" id="chEstado"></div>
+      <div class="chCam">
+        <video id="chVideo" autoplay playsinline muted></video>
+        <img id="chShot" alt="" hidden>
+        <div class="chCamAviso" id="chCamAviso" hidden></div>
+      </div>
+      <div class="chBotonera">
+        <button class="btn" id="chTomar">Tomar la foto</button>
+        <button class="btn ghost" id="chOtra" hidden>Repetir</button>
+      </div>
+      <label class="f" style="margin-top:14px">Tu clave</label>
+      <div class="chPin" id="chPin"></div>
+      <div class="chTeclado" id="chTeclado">
+        <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+        <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+        <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+        <button data-k="x" class="chBorra">Borrar</button><button data-k="0">0</button>
+        <button data-k="c" class="chBorra">Limpiar</button>
+      </div>
+      <button class="btn primary" id="chOk" style="width:100%;margin-top:16px" disabled>Registrar</button>
+      <p class="note" id="chNota" style="margin:12px 0 0"></p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalExp" hidden>
+  <div class="card" style="width:min(720px,100%);max-height:92vh;overflow:auto">
+    <header><h2 id="expTitulo">Expediente</h2>
+      <button class="btn sm" id="expCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <div class="grid g3">
+        <div><label class="f" for="x_puesto">Puesto</label><input id="x_puesto" placeholder="Serigrafista"></div>
+        <div><label class="f" for="x_ingreso">Fecha de ingreso</label><input id="x_ingreso" type="date"></div>
+        <div><label class="f" for="x_baja">Fecha de baja</label><input id="x_baja" type="date"></div>
+      </div>
+      <div class="grid g3" style="margin-top:12px">
+        <div><label class="f" for="x_sueldo">Sueldo ($)</label><input id="x_sueldo" type="number" min="0" step="1"></div>
+        <div><label class="f" for="x_periodo">Se paga</label><select id="x_periodo">
+          <option value="dia">Por día</option><option value="semana">Por semana</option>
+          <option value="quincena">Por quincena</option><option value="mes">Por mes</option></select></div>
+        <div><label class="f" for="x_jornada">Horas por día</label><input id="x_jornada" type="number" min="0" max="24" step="0.5"></div>
+      </div>
+      <div class="grid g3" style="margin-top:12px">
+        <div style="grid-column:span 2"><label class="f" for="x_modo">En la nómina se le paga</label><select id="x_modo">
+          <option value="fijo">Su sueldo completo del periodo</option>
+          <option value="dias">Por los días que checó</option>
+          <option value="horas">Por las horas que checó</option></select></div>
+        <div><label class="f">&nbsp;</label><p class="note" style="margin:0;font-size:11.5px">Con <b>sueldo completo</b> el reloj solo sirve para ver faltas; con los otros dos, es el que calcula.</p></div>
+      </div>
+      <div class="grid g3" style="margin-top:12px">
+        <div><label class="f" for="x_tel">Teléfono</label><input id="x_tel" inputmode="tel"></div>
+        <div><label class="f" for="x_emNombre">Avisar a (emergencia)</label><input id="x_emNombre" placeholder="Nombre y parentesco"></div>
+        <div><label class="f" for="x_emTel">Su teléfono</label><input id="x_emTel" inputmode="tel"></div>
+      </div>
+      <details class="expFiscal" id="expFiscal">
+        <summary>Datos fiscales · solo si vas a timbrar recibos de nómina</summary>
+        <div class="grid g3" style="margin-top:12px">
+          <div><label class="f" for="x_rfc">RFC</label><input id="x_rfc" maxlength="13" style="text-transform:uppercase"></div>
+          <div><label class="f" for="x_curp">CURP</label><input id="x_curp" maxlength="18" style="text-transform:uppercase"></div>
+          <div><label class="f" for="x_nss">NSS (IMSS)</label><input id="x_nss" maxlength="11" inputmode="numeric"></div>
+        </div>
+        <p class="note" style="margin:12px 0 0">Mientras no timbres recibos, déjalos en blanco: el cotizador no los necesita para nada más.</p>
+      </details>
+      <label class="f" for="x_notas" style="margin-top:14px">Notas</label>
+      <textarea id="x_notas" rows="2" placeholder="Lo que quieras recordar de esta persona"></textarea>
+      <h3 class="expH">Documentos</h3>
+      <div id="expCarps"></div>
+      <input type="file" id="expFile" accept="image/png,image/jpeg,image/webp,application/pdf" hidden>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalCarpetas" hidden>
+  <div class="card" style="width:min(520px,100%);max-height:88vh;overflow:auto">
+    <header><h2>Carpetas del expediente</h2>
+      <button class="btn sm" id="caCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Las mismas para todo el personal. Las marcadas con <b>obligatoria</b> salen avisadas en la lista cuando a alguien le faltan.</p>
+      <div id="caLista"></div>
+      <div style="display:flex;gap:8px;margin-top:14px">
+        <input id="caNueva" placeholder="Nombre de la carpeta nueva" style="flex:1">
+        <button class="btn" id="caAgrega">Agregar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalNom" hidden>
+  <div class="card" style="width:min(620px,100%);max-height:92vh;overflow:auto">
+    <header><h2 id="nmTitulo">Renglón de nómina</h2>
+      <button class="btn sm" id="nmCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <div class="nmResumenP" id="nmResumenP"></div>
+      <h3 class="expH" style="margin-top:18px">Percepciones extra</h3>
+      <div id="nmPercep"></div>
+      <button class="btn sm ghost" id="nmAddPercep">+ Agregar percepción</button>
+      <h3 class="expH">Deducciones</h3>
+      <div id="nmDeduc"></div>
+      <button class="btn sm ghost" id="nmAddDeduc">+ Agregar deducción</button>
+      <p class="note" style="margin:16px 0 0">El <b>ISR</b> y el <b>IMSS</b> se capturan aquí con el número que te dé tu contador. Si marcas <b>recordar</b>, se vuelven a poner solos el siguiente periodo.</p>
+      <div class="nmNeto" id="nmNeto"></div>
     </div>
   </div>
 </div>
@@ -5532,6 +5888,7 @@ function renderSet(){
   const pg = $("#p_nuevaGuardar"); if(pg) pg.checked = P.nuevaAlGuardar !== false;
   const pc = $("#p_nuevaCobrar");  if(pc) pc.checked = P.nuevaAlCobrar  !== false;
   $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia; $("#p_plazoCobro").value=num(P.plazoCobro,15);
+  const pcb = $("#p_comisionBase"); if(pcb) pcb.value = baseComision();
   P.compras = P.compras || {tope:2000, siempre:false};
   $("#p_compraTope").value = num(P.compras.tope); $("#p_compraSiempre").checked = !!P.compras.siempre;
   $("#p_origen").value = P.origen==="lista" ? "lista" : "utilidad";
@@ -5660,8 +6017,9 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !$("#tabs").hid
 const GRUPOS_BARRA = [
   ["",           ["inicio"]],
   ["Comercial",  ["cot","sav","cli","arc"]],
-  ["Producción", ["dis","pro","inv","com"]],
-  ["Dinero",     ["caj","ven"]],
+  ["Producción", ["dis","pro","inv"]],
+  ["Administración", ["caj","ven","com"]],
+  ["Personal",    ["asi","nom"]],
   ["Taller",     ["cat","calc","set"]]
 ];
 function agrupaBarra(){
@@ -5789,7 +6147,10 @@ $("#tabs").addEventListener("click", e=>{
   const bd = rot.querySelector(".mbadge"); if(bd) bd.remove();
   $("#menuActual").textContent = rot.textContent.trim();
   abreMenu(false);
-  ["inicio","cot","cat","calc","inv","com","cli","arc","caj","pro","dis","sav","ven","set"].forEach(t=> $("#tab-"+t).hidden = (t!==b.dataset.tab));
+  ["inicio","cot","cat","calc","inv","com","cli","arc","caj","pro","dis","sav","ven","asi","nom","set"].forEach(t=> $("#tab-"+t).hidden = (t!==b.dataset.tab));
+  if(b.dataset.tab==="nom") renderNomina();
+  if(b.dataset.tab==="asi") renderAsistencia();
+  if(b.dataset.tab==="arc" && rolActual()==="admin") renderExpedientes();
   if(b.dataset.tab==="inicio") renderTablero();
   if(b.dataset.tab==="inv") renderInvTaller();
   if(b.dataset.tab==="com") renderSolicitudesCompras();
@@ -6483,6 +6844,10 @@ function ponIconos(){
   /* inventario: las cajas apiladas */
   inv:'<rect x="3" y="12.5" width="8" height="8" rx="1.2"/><rect x="13" y="12.5" width="8" height="8" rx="1.2"/>'+
       '<rect x="8" y="3.5" width="8" height="8" rx="1.2"/>',
+  /* asistencia: el reloj */
+  asi:'<circle cx="12" cy="12" r="8.4"/><path d="M12 7.6V12l3 1.8"/>',
+  /* nómina: el sobre con el billete */
+  nom:'<rect x="2.6" y="5.5" width="18.8" height="13" rx="2"/><path d="M2.6 8.5h18.8"/><path d="M6.5 14h4"/>',
   /* ajustes: las correderas */
   set:'<path d="M4 7h16M4 12h16M4 17h16"/>'+
       '<circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="17" r="2"/>'
@@ -7527,6 +7892,7 @@ let borradorReloj = null;
 function guardaBorrador(){
   try{
     if(typeof guardaItemActivo === "function") guardaItemActivo(cot);
+    if(typeof selloVendedor === "function") selloVendedor(cot);
     lsSet("borrador", {cot, cuando: Date.now()});
   }catch(e){}
 }
@@ -7573,6 +7939,1155 @@ function terminaYEmpieza(queFue){
 }
 const nuevaAlGuardar = () => P.nuevaAlGuardar !== false;
 const nuevaAlCobrar  = () => P.nuevaAlCobrar  !== false;
+
+
+/* ---------- quién la hizo ---------- */
+/* Se pega al nacer la cotización, no al imprimirla: si mañana otro la vuelve
+   a imprimir, el documento sigue diciendo quién la hizo. */
+function selloVendedor(q){
+  q = q || cot;
+  if(!q.vendedor || !q.vendedor.nombre){
+    const u = usuarioActual();
+    q.vendedor = {id: u.id || "", nombre: u.nombre || ""};
+  }
+  return q.vendedor;
+}
+function nombreVendedor(q){ const v = (q && q.vendedor) || null; return (v && v.nombre) || ""; }
+
+/* ---------- quién puede cotizar ---------- */
+const puedeCotizar = u => { u = u || usuarioActual(); return u.cotiza !== false; };
+
+/* ---------- la comisión ---------- */
+const BASES_COMISION = {
+  venta:    {et:"lo vendido (sin IVA)", campo:"subtotal"},
+  cobrado:  {et:"lo cobrado",           campo:"recibido"},
+  utilidad: {et:"la utilidad",          campo:"utilidad"}
+};
+function baseComision(){ return BASES_COMISION[P.comisionBase] ? P.comisionBase : "cobrado"; }
+/* El porcentaje de la persona hoy. Vacío o cero: no comisiona. */
+function pctDe(u){ return Math.max(0, num((u||{}).comision)); }
+/* Sobre cuánto se comisiona esta venta. */
+function baseDeVenta(v){
+  const b = baseComision();
+  if(b === "cobrado")  return num(v.recibido);
+  if(b === "utilidad") return num(v.utilidad);
+  return num(v.total) - num(v.iva || 0) || num(v.total);
+}
+/* El monto se calcula al vuelo: lo cobrado crece con cada abono. El
+   porcentaje sí viene congelado de la venta. */
+function comisionDe(v){
+  const pct = num(v.comisionPct);
+  if(!pct) return 0;
+  return Math.round(baseDeVenta(v) * pct / 100 * 100) / 100;
+}
+function vendedorDe(v){
+  return (v.vendedor && v.vendedor.nombre) ? v.vendedor.nombre : "Sin asignar";
+}
+
+/* ---------- el reporte ---------- */
+function comisionesDe(lista){
+  const bolsa = {};
+  lista.forEach(v=>{
+    if(!num(v.comisionPct)) return;
+    const k = vendedorDe(v);
+    const b = bolsa[k] || (bolsa[k] = {quien:k, ventas:0, piezas:0, genero:0, comision:0, pct:num(v.comisionPct)});
+    b.ventas++; b.piezas += num(v.piezas);
+    b.genero += baseDeVenta(v); b.comision += comisionDe(v);
+  });
+  return Object.keys(bolsa).map(k=>bolsa[k]).sort((a,b)=> b.comision - a.comision);
+}
+function renderComisiones(enRango){
+  const w = $("#venComis"); if(!w) return;
+  const filas = comisionesDe(enRango);
+  const card = $("#cardComis"); if(card) card.hidden = !filas.length;
+  if(!filas.length){ w.innerHTML = ""; return; }
+  const total = filas.reduce((s,f)=>s+f.comision, 0);
+  const tope  = Math.max(1, ...filas.map(f=>f.comision));
+  const pico  = filas[0];
+  /* Una sola serie: el título la nombra y no lleva leyenda. Cada barra trae
+     su nombre y su monto en texto, que el color no puede ser lo único. */
+  w.innerHTML =
+    '<p class="comNota">Sobre <b>'+BASES_COMISION[baseComision()].et+'</b>. El porcentaje queda guardado en cada venta: '+
+      'si lo cambias después, lo vendido antes no se mueve.</p>'+
+    '<div class="comGraf" role="img" aria-label="Comisión ganada por vendedor en el periodo">'+
+      filas.map(f=>'<div class="comFila">'+
+        '<span class="comQuien">'+esc(f.quien)+'<small>'+f.ventas+' venta(s) · '+f.pct+'%</small></span>'+
+        '<span class="comBarra"><i style="width:'+Math.max(3, Math.round(f.comision/tope*100))+'%"></i></span>'+
+        '<span class="comMx'+(f===pico?" pico":"")+'">'+mx(f.comision)+'</span>'+
+      '</div>').join("")+
+    '</div>'+
+    '<div class="comTotal"><span>'+filas.length+' persona(s) comisionan</span><b>'+mx(total)+'</b></div>';
+}
+
+/* Las dos columnas nuevas del equipo. */
+function celdaCotiza(u){
+  return '<td style="text-align:center"><input type="checkbox" data-uk="cotiza" style="width:auto"'+
+    (u.cotiza !== false ? " checked" : "")+'></td>';
+}
+function celdaComision(u){
+  return '<td style="text-align:center"><input type="number" data-uk="comision" min="0" max="100" step="0.5" '+
+    'style="width:68px;text-align:right" placeholder="—" value="'+(num(u.comision) || "")+'"></td>';
+}
+
+
+/* ====================== reloj checador ====================== */
+let asistencias = [];
+let asPer = "semana", asRef = hoyISO();
+let chQuien = null, chStream = null, chBlob = null, chTecleado = "";
+
+/* Las fotos locales pesan; en el navegador solo caben unas cuantas semanas.
+   Con cuenta en línea se van al almacén y esto no aplica. */
+const DIAS_FOTO_LOCAL = 20;
+const LADO_FOTO_CHECA = 320;
+
+function minutosDe(hhmm){
+  const p = String(hhmm||"").split(":");
+  return (num(p[0])*60) + num(p[1]);
+}
+function horasTxt(min){
+  min = Math.max(0, Math.round(min));
+  const h = Math.floor(min/60), m = min%60;
+  if(!h) return m + " min";
+  return h + " h" + (m ? " " + m + " min" : "");
+}
+function horasDec(min){ return Math.round(min/60*100)/100; }
+
+function personasChecador(){ return equipo.filter(u=>u.activo !== false); }
+function eventosDe(id, fecha){
+  return asistencias.filter(a=>a.uid===id && a.fecha===fecha)
+    .slice().sort((a,b)=> a.hora<b.hora ? -1 : a.hora>b.hora ? 1 : 0);
+}
+/* Entrada con su salida. Una jornada partida da varios turnos; el último
+   puede quedar abierto, y así se enseña: abierto, no en cero. */
+function turnosDe(id, fecha){
+  const ev = eventosDe(id, fecha), t = [];
+  let abierto = null;
+  ev.forEach(e=>{
+    if(e.tipo === "entrada"){ if(!abierto) abierto = {entrada:e, salida:null}; }
+    else if(abierto){ abierto.salida = e; t.push(abierto); abierto = null; }
+  });
+  if(abierto) t.push(abierto);
+  return t;
+}
+function minutosTurno(t){ return t.salida ? Math.max(0, minutosDe(t.salida.hora) - minutosDe(t.entrada.hora)) : 0; }
+function minutosDia(id, fecha){ return turnosDe(id, fecha).reduce((s,t)=>s+minutosTurno(t), 0); }
+function estaDentro(id){
+  const t = turnosDe(id, hoyISO());
+  return !!(t.length && !t[t.length-1].salida);
+}
+function desdeHace(id){
+  const t = turnosDe(id, hoyISO());
+  if(!t.length || t[t.length-1].salida) return 0;
+  const ahora = minutosDe(horaAhora());
+  return Math.max(0, ahora - minutosDe(t[t.length-1].entrada.hora));
+}
+function diasDelRango(R){
+  const a = dmy(R.ini), b = dmy(R.fin), d = [];
+  for(let x=new Date(a); x<=b; x.setDate(x.getDate()+1)) d.push(iso(new Date(x)));
+  return d;
+}
+
+/* ---------- guardar ---------- */
+async function guardaChecada(ev){
+  asistencias.push(ev);
+  if(DB){
+    try{ await DB.collection("asistencia").doc(ev.id).set(Object.assign({fecha:ev.fecha}, ev)); return true; }
+    catch(e){ asistencias.pop(); toast("No se pudo guardar la checada: " + ((e&&e.message)||"error")); return false; }
+  }
+  if(!guardaAsistenciasLocal()){
+    asistencias.pop();
+    toast("Ya no cabe en este navegador. Borra checadas viejas o conecta una cuenta en línea.");
+    return false;
+  }
+  return true;
+}
+/* El navegador se llena. Antes de rendirse, tira las fotos más viejas:
+   vale mil veces más la hora que la foto de hace mes y medio. */
+function guardaAsistenciasLocal(){
+  for(let intento=0; intento<6; intento++){
+    try{ localStorage.setItem(LS+"_asistencias", JSON.stringify(asistencias)); return true; }
+    catch(e){
+      const conFoto = asistencias.filter(a=>a.foto && a.foto.data)
+        .sort((a,b)=> a.fecha<b.fecha ? -1 : a.fecha>b.fecha ? 1 : 0);
+      if(!conFoto.length) return false;
+      conFoto.slice(0, Math.max(1, Math.ceil(conFoto.length/4)))
+        .forEach(a=>{ delete a.foto.data; a.foto.vieja = true; });
+    }
+  }
+  return false;
+}
+function podaFotosAsistencia(){
+  if(DB) return;
+  const corte = new Date(Date.now() - DIAS_FOTO_LOCAL*86400000);
+  let tocadas = 0;
+  asistencias.forEach(a=>{
+    if(a.foto && a.foto.data && dmy(a.fecha) < corte){ delete a.foto.data; a.foto.vieja = true; tocadas++; }
+  });
+  if(tocadas) guardaAsistenciasLocal();
+}
+async function cargaAsistencias(){
+  if(DB){
+    try{
+      const s = await DB.collection("asistencia").orderBy("fecha","desc").limit(1200).get();
+      asistencias = s.docs.map(d=>d.data()).filter(Boolean);
+    }catch(e){ asistencias = []; }
+  } else {
+    asistencias = lsGet("asistencias", []) || [];
+    podaFotosAsistencia();
+  }
+}
+async function borraChecada(id){
+  const i = asistencias.findIndex(a=>a.id===id); if(i<0) return;
+  asistencias.splice(i,1);
+  if(DB){ try{ await DB.collection("asistencia").doc(id).delete(); }catch(e){ toast("No se pudo borrar"); } }
+  else guardaAsistenciasLocal();
+  renderAsistencia();
+}
+
+/* ---------- la cámara ---------- */
+async function abreCamara(){
+  const v = $("#chVideo"), aviso = $("#chCamAviso");
+  aviso.hidden = true; v.hidden = false; $("#chShot").hidden = true;
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    return sinCamara("Este navegador no deja usar la cámara. El reloj necesita cámara para la foto.");
+  }
+  try{
+    chStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user", width:{ideal:640}}, audio:false});
+    v.srcObject = chStream;
+    $("#chTomar").disabled = false;
+  }catch(e){
+    sinCamara(e && e.name === "NotAllowedError"
+      ? "No diste permiso de cámara. Dáselo al sitio y vuelve a intentar."
+      : "No encontré una cámara en este aparato. El reloj necesita una para la foto.");
+  }
+}
+function sinCamara(msg){
+  const aviso = $("#chCamAviso");
+  $("#chVideo").hidden = true; aviso.hidden = false; aviso.textContent = msg;
+  $("#chTomar").disabled = true;
+  revisaChOk();
+}
+function cierraCamara(){
+  try{ if(chStream) chStream.getTracks().forEach(t=>t.stop()); }catch(e){}
+  chStream = null;
+  const v = $("#chVideo"); if(v) v.srcObject = null;
+}
+function tomaFoto(){
+  const v = $("#chVideo");
+  if(!v || !v.videoWidth) { toast("La cámara todavía no arranca"); return; }
+  const escala = LADO_FOTO_CHECA / Math.max(v.videoWidth, v.videoHeight);
+  const cv = document.createElement("canvas");
+  cv.width  = Math.round(v.videoWidth * Math.min(1, escala));
+  cv.height = Math.round(v.videoHeight * Math.min(1, escala));
+  cv.getContext("2d").drawImage(v, 0, 0, cv.width, cv.height);
+  const url = cv.toDataURL("image/jpeg", 0.62);
+  $("#chShot").src = url; $("#chShot").hidden = false; $("#chVideo").hidden = true;
+  $("#chTomar").hidden = true; $("#chOtra").hidden = false;
+  chBlob = url;
+  revisaChOk();
+}
+function dataAFile(dataUrl){
+  const [cab, b64] = String(dataUrl).split(",");
+  const bin = atob(b64), arr = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+  return new File([arr], "checada.jpg", {type: (cab.match(/:(.*?);/)||[])[1] || "image/jpeg"});
+}
+async function guardaFotoCheca(dataUrl){
+  if(ASSETS){
+    try{ const r = await ASSETS.upload(dataAFile(dataUrl)); return {url:r.url, ref:r.id}; }
+    catch(e){ /* si el almacén falla, al menos queda la foto local */ }
+  }
+  return {data: dataUrl};
+}
+
+/* ---------- el modal ---------- */
+function abreCheca(id){
+  const u = equipo.find(x=>x.id===id); if(!u) return;
+  if(!String(u.pin||"").trim()){
+    toast("A " + (u.nombre||"esta persona") + " le falta su clave. Se la pone el administrador en Ajustes → Equipo.");
+    return;
+  }
+  chQuien = u; chBlob = null; chTecleado = "";
+  const dentro = estaDentro(id);
+  $("#chTitulo").textContent = (dentro ? "Salida · " : "Entrada · ") + (u.nombre||"");
+  $("#chOk").textContent = dentro ? "Registrar salida" : "Registrar entrada";
+  $("#chEstado").innerHTML = dentro
+    ? '<b>Estás dentro</b> desde las ' + esc(turnosDe(id,hoyISO()).slice(-1)[0].entrada.hora) +
+      ' · llevas ' + horasTxt(desdeHace(id))
+    : (minutosDia(id, hoyISO())
+        ? '<b>Hoy ya trabajaste</b> ' + horasTxt(minutosDia(id, hoyISO())) + ' · vas a volver a entrar'
+        : '<b>Sin registro hoy</b>');
+  $("#chNota").textContent = "Se guardan tu nombre, la hora, la foto y desde qué sesión se registró.";
+  $("#chShot").hidden = true; $("#chShot").removeAttribute("src");
+  $("#chTomar").hidden = false; $("#chOtra").hidden = true;
+  pintaPin(); revisaChOk();
+  $("#modalCheca").hidden = false;
+  abreCamara();
+}
+function cierraCheca(){
+  cierraCamara();
+  $("#modalCheca").hidden = true;
+  chQuien = null; chBlob = null; chTecleado = "";
+}
+function pintaPin(){
+  const largo = Math.max(4, chTecleado.length);
+  $("#chPin").innerHTML = Array.from({length:largo}, (_,i)=>
+    '<i class="' + (i < chTecleado.length ? "lleno" : "") + '"></i>').join("");
+}
+function revisaChOk(){
+  $("#chOk").disabled = !(chBlob && chTecleado.length >= 1);
+}
+async function registraCheca(){
+  const u = chQuien; if(!u) return;
+  if(!chBlob){ toast("Falta la foto"); return; }
+  if(String(chTecleado) !== String(u.pin||"")){
+    toast("Esa no es la clave de " + (u.nombre||""));
+    chTecleado = ""; pintaPin(); revisaChOk(); return;
+  }
+  const btn = $("#chOk"); btn.disabled = true; btn.textContent = "Guardando…";
+  const foto = await guardaFotoCheca(chBlob);
+  const dentro = estaDentro(u.id);
+  const quienRegistra = usuarioActual();
+  const ok = await guardaChecada({
+    id: uid(), uid: u.id, nombre: u.nombre||"", fecha: hoyISO(), hora: horaAhora(),
+    tipo: dentro ? "salida" : "entrada", foto,
+    desde: {id: quienRegistra.id||"", nombre: quienRegistra.nombre||""},
+    ts: Date.now()
+  });
+  if(ok) toast((dentro ? "Salida" : "Entrada") + " de " + (u.nombre||"") + " a las " + horaAhora());
+  cierraCheca();
+  renderAsistencia();
+}
+
+/* ---------- las pantallas ---------- */
+function renderAsistencia(){
+  if(!$("#asGente")) return;
+  pintaChecador();
+  pintaHoyAsistencia();
+  pintaPeriodoAsistencia();
+}
+function pintaChecador(){
+  const gente = personasChecador();
+  $("#asHoy").textContent = gente.filter(u=>estaDentro(u.id)).length + " de " + gente.length + " dentro";
+  $("#asGente").innerHTML = gente.map(u=>{
+    const dentro = estaDentro(u.id), min = minutosDia(u.id, hoyISO());
+    return '<button class="asPersona' + (dentro ? " dentro" : "") + '" data-checa="' + esc(u.id) + '">' +
+      '<span class="asAv">' + esc((u.nombre||"?").trim().charAt(0).toUpperCase()) + '</span>' +
+      '<span class="asQ"><b>' + esc(u.nombre||"Sin nombre") + '</b>' +
+        '<small>' + (dentro ? "Dentro desde " + esc(turnosDe(u.id,hoyISO()).slice(-1)[0].entrada.hora)
+                            : min ? "Fuera · hoy " + horasTxt(min) : "Sin checar hoy") + '</small></span>' +
+      '<span class="asAccion">' + (dentro ? "Salir" : "Entrar") + '</span></button>';
+  }).join("") || '<div class="empty">No hay nadie activo en el equipo. Agrégalos en Ajustes → Equipo.</div>';
+
+  const sin = gente.filter(u=>!String(u.pin||"").trim());
+  $("#asSinClave").innerHTML = sin.length
+    ? '<p class="note" style="margin:14px 0 0;border-left-color:var(--warn)"><b>' +
+      sin.map(u=>esc(u.nombre||"Sin nombre")).join(", ") +
+      '</b> no' + (sin.length>1 ? " tienen" : " tiene") + ' clave todavía, así que no puede' + (sin.length>1?"n":"") +
+      ' checar. Se la pones en <b>Ajustes → Equipo</b>.</p>'
+    : "";
+}
+function miniFoto(e){
+  const src = e.foto && (e.foto.url || e.foto.data);
+  if(src) return '<img class="asFoto" src="'+esc(src)+'" alt="Foto de la checada de '+esc(e.nombre)+
+    '" data-verfoto="'+esc(e.id)+'" onerror="this.className=\'asFoto vacia\';this.removeAttribute(\'src\')">';
+  return '<span class="asFoto vacia" title="' + (e.foto && e.foto.vieja ? "La foto ya se borró por espacio" : "Sin foto") + '">—</span>';
+}
+function pintaHoyAsistencia(){
+  const hoy = hoyISO();
+  const gente = personasChecador().filter(u=>eventosDe(u.id, hoy).length);
+  $("#asResumenHoy").textContent = gente.length
+    ? gente.length + " persona(s) · " + horasTxt(gente.reduce((s,u)=>s+minutosDia(u.id,hoy),0))
+    : "nadie ha checado";
+  $("#asLista").innerHTML = gente.length ? gente.map(u=>{
+    const ev = eventosDe(u.id, hoy);
+    return '<div class="asDia"><div class="asDiaQ"><b>' + esc(u.nombre||"") + '</b>' +
+      '<small>' + (estaDentro(u.id) ? "dentro · " + horasTxt(desdeHace(u.id)) : horasTxt(minutosDia(u.id,hoy))) + '</small></div>' +
+      '<div class="asEvs">' + ev.map(e=>
+        '<span class="asEv ' + e.tipo + '">' + miniFoto(e) +
+          '<span>' + (e.tipo==="entrada" ? "Entró" : "Salió") + ' <b>' + esc(e.hora) + '</b></span>' +
+          (rolActual()==="admin" ? '<button class="asX" data-delcheca="'+esc(e.id)+'" title="Borrar este registro">✕</button>' : '') +
+        '</span>').join("") + '</div></div>';
+  }).join("") : '<div class="empty">Todavía nadie checa hoy.</div>';
+}
+function pintaPeriodoAsistencia(){
+  const R = rango(asPer, asRef);
+  $("#asFecha").value = asRef;
+  $("#asRango").textContent = etiquetaRango(asPer, R);
+  [...$("#asSeg").children].forEach(b=>b.setAttribute("aria-pressed", b.dataset.per===asPer));
+  const dias = diasDelRango(R), gente = personasChecador();
+
+  const filas = gente.map(u=>{
+    const porDia = dias.map(d=>({d, min: minutosDia(u.id, d)}));
+    const min = porDia.reduce((s,x)=>s+x.min, 0);
+    return {u, min, porDia, dias: porDia.filter(x=>x.min>0).length};
+  }).filter(f=>f.min > 0 || f.dias > 0);
+
+  const totalMin = filas.reduce((s,f)=>s+f.min, 0);
+  /* Una entrada sin su salida: se quedaron sin checar al irse. Vale la pena
+     que se vea, porque son las horas que no se van a pagar. */
+  const cerrados = gente.reduce((s,u)=> s + dias.reduce((t,d)=> t + turnosDe(u.id,d).filter(x=>x.salida).length, 0), 0);
+  const enRango  = asistencias.filter(a=>a.fecha>=R.ini && a.fecha<=R.fin).length;
+  const sueltas  = Math.max(0, enRango - cerrados*2);
+  const diasCon  = new Set();
+  filas.forEach(f=> f.porDia.forEach(x=>{ if(x.min>0) diasCon.add(x.d); }));
+  $("#asKpis").innerHTML =
+    kpi("Horas del periodo", horasTxt(totalMin), true) +
+    kpi("Personas que checaron", filas.length) +
+    kpi("Días con asistencia", diasCon.size) +
+    kpi("Checadas sin su pareja", sueltas);
+
+  if(!filas.length){
+    $("#asHoras").innerHTML = '<div class="empty">Nadie checó en este periodo.</div>';
+    $("#t_asis").innerHTML = "";
+    return;
+  }
+  /* Una sola serie: horas por persona. Cada barra trae nombre y horas en
+     texto, que el color no puede ser lo único que distinga. */
+  const tope = Math.max(1, ...filas.map(f=>f.min));
+  const orden = filas.slice().sort((a,b)=> b.min - a.min);
+  $("#asHoras").innerHTML =
+    '<div class="comGraf" role="img" aria-label="Horas trabajadas por persona en el periodo">' +
+    orden.map(f=>'<div class="comFila">' +
+      '<span class="comQuien">' + esc(f.u.nombre||"") + '<small>' + f.dias + ' día(s)</small></span>' +
+      '<span class="comBarra"><i style="width:' + Math.max(3, Math.round(f.min/tope*100)) + '%"></i></span>' +
+      '<span class="comMx">' + horasTxt(f.min) + '</span></div>').join("") +
+    '</div>' +
+    '<div class="comTotal"><span>' + filas.length + ' persona(s)</span><b>' + horasDec(totalMin).toLocaleString("es-MX") + ' h</b></div>';
+
+  const conAlgo = dias.filter(d=>filas.some(f=>f.porDia.find(x=>x.d===d && x.min>0)));
+  $("#t_asis").innerHTML = conAlgo.length
+    ? '<thead><tr><th>Persona</th>' + conAlgo.map(d=>'<th style="text-align:right">'+dmy(d).getDate()+'</th>').join("") +
+      '<th style="text-align:right">Total</th></tr></thead><tbody>' +
+      orden.map(f=>'<tr><td>'+esc(f.u.nombre||"")+'</td>' +
+        conAlgo.map(d=>{ const m = f.porDia.find(x=>x.d===d).min;
+          return '<td style="text-align:right;font-family:\'IBM Plex Mono\',monospace">'+(m? horasDec(m).toFixed(1) : "·")+'</td>'; }).join("") +
+        '<td style="text-align:right;font-weight:700;font-family:\'IBM Plex Mono\',monospace">'+horasDec(f.min).toFixed(1)+'</td></tr>').join("") +
+      '</tbody>'
+    : "";
+}
+
+/* El quiosco: solo el checador, pantalla completa, sin menú ni nada que tocar. */
+function modoQuiosco(){
+  document.body.classList.toggle("quiosco");
+  const on = document.body.classList.contains("quiosco");
+  $("#asPantalla").textContent = on ? "Salir del quiosco" : "Modo quiosco";
+  if(on) toast("Modo quiosco. El botón de arriba lo apaga.");
+}
+
+/* ---------- eventos del checador ---------- */
+$("#tab-asi").addEventListener("click", e=>{
+  const p = e.target.closest("[data-checa]");
+  if(p){ abreCheca(p.dataset.checa); return; }
+  const d = e.target.closest("[data-delcheca]");
+  if(d){
+    if(rolActual() !== "admin"){ toast("Solo el administrador puede borrar una checada"); return; }
+    if(!confirm("¿Borrar este registro? No se corrige, se borra: el hueco se queda a la vista.")) return;
+    borraChecada(d.dataset.delcheca); return;
+  }
+  const f = e.target.closest("[data-verfoto]");
+  if(f && f.src){ abreVisor([{url:f.src, nombre:"Checada", ubic:"Checada"}], 0); return; }
+});
+$("#asPantalla").addEventListener("click", modoQuiosco);
+$("#asSeg").addEventListener("click", e=>{
+  const b = e.target.closest("[data-per]"); if(!b) return;
+  asPer = b.dataset.per; pintaPeriodoAsistencia();
+});
+$("#asFecha").addEventListener("change", e=>{ asRef = e.target.value || hoyISO(); pintaPeriodoAsistencia(); });
+$("#asHoyBtn").addEventListener("click", ()=>{ asRef = hoyISO(); pintaPeriodoAsistencia(); });
+function mueveAsis(dir){
+  const d = dmy(asRef);
+  if(asPer==="dia") d.setDate(d.getDate()+dir);
+  else if(asPer==="semana") d.setDate(d.getDate()+7*dir);
+  else d.setMonth(d.getMonth()+dir);
+  asRef = iso(d); pintaPeriodoAsistencia();
+}
+$("#asPrev").addEventListener("click", ()=>mueveAsis(-1));
+$("#asNext").addEventListener("click", ()=>mueveAsis(1));
+
+$("#chCerrar").addEventListener("click", cierraCheca);
+$("#modalCheca").addEventListener("click", e=>{ if(e.target.id === "modalCheca") cierraCheca(); });
+$("#chTomar").addEventListener("click", tomaFoto);
+$("#chOtra").addEventListener("click", ()=>{
+  chBlob = null; $("#chShot").hidden = true; $("#chOtra").hidden = true; $("#chTomar").hidden = false;
+  $("#chVideo").hidden = false; revisaChOk();
+});
+$("#chTeclado").addEventListener("click", e=>{
+  const b = e.target.closest("[data-k]"); if(!b) return;
+  const k = b.dataset.k;
+  if(k === "x") chTecleado = chTecleado.slice(0,-1);
+  else if(k === "c") chTecleado = "";
+  else if(chTecleado.length < 24) chTecleado += k;
+  pintaPin(); revisaChOk();
+});
+/* Escucha en todo el documento, así que no da por hecho que el modal sigue
+   ahí: con el teclado físico se checa igual de rápido que con el de pantalla. */
+document.addEventListener("keydown", e=>{
+  const m = $("#modalCheca"); if(!m || m.hidden) return;
+  if(e.key === "Escape") return cierraCheca();
+  if(/^[0-9]$/.test(e.key) && chTecleado.length < 24){ chTecleado += e.key; pintaPin(); revisaChOk(); }
+  if(e.key === "Backspace"){ chTecleado = chTecleado.slice(0,-1); pintaPin(); revisaChOk(); }
+  const ok = $("#chOk");
+  if(e.key === "Enter" && ok && !ok.disabled) registraCheca();
+});
+$("#chOk").addEventListener("click", registraCheca);
+
+
+/* Las carpetas del expediente. Se pueden cambiar; estas son las de arranque. */
+const CARPETAS_EXP = [
+  {id:"contrato", nombre:"Contrato",                  pide:true},
+  {id:"ident",    nombre:"Identificación",            pide:true},
+  {id:"domicilio",nombre:"Comprobante de domicilio",  pide:false},
+  {id:"imss",     nombre:"Altas y bajas del IMSS",    pide:false},
+  {id:"otros",    nombre:"Otros documentos",          pide:false}
+];
+const PERIODOS_SUELDO = {dia:"por día", semana:"por semana", quincena:"por quincena", mes:"por mes"};
+
+/* ====================== expedientes del personal ====================== */
+let expedientes = {};        /* id de la persona  ->  su expediente */
+let expAbierto = null, expCarpetaSubiendo = null, expNombre = "", expReloj = null;
+
+function carpetasExp(){
+  const c = P.carpetasExp;
+  return (Array.isArray(c) && c.length) ? c : CARPETAS_EXP;
+}
+/* Leer un expediente NO lo crea. Si creara, cada vez que se pinta la lista
+   nacería un expediente vacío por persona, y al renombrar o dar de baja a
+   alguien quedarían fantasmas en la lista. Se crea al escribir, no al mirar. */
+function expDe(id){
+  const e = expedientes[id];
+  if(!e) return {id, docs:[], sueldo:{}, emergencia:{}, fiscal:{}};
+  e.docs = e.docs || []; e.sueldo = e.sueldo || {}; e.emergencia = e.emergencia || {}; e.fiscal = e.fiscal || {};
+  return e;
+}
+function expCrea(id){
+  if(!expedientes[id]) expedientes[id] = {id, docs:[], sueldo:{}, emergencia:{}, fiscal:{}};
+  return expDe(id);
+}
+function docsCarpeta(e, cid){ return (e.docs||[]).filter(d=>d.carpeta === cid); }
+function faltantesExp(e){
+  return carpetasExp().filter(c=>c.pide && !docsCarpeta(e, c.id).length);
+}
+function conExpediente(){
+  /* El equipo de hoy, más quien ya se fue pero dejó papeles. */
+  const vistos = {}, lista = [];
+  equipo.forEach(u=>{ vistos[u.id]=1; lista.push({id:u.id, nombre:u.nombre||"Sin nombre", activo:u.activo!==false}); });
+  Object.keys(expedientes).forEach(id=>{
+    if(vistos[id]) return;
+    lista.push({id, nombre:(expedientes[id].nombre)||"Persona dada de baja", activo:false});
+  });
+  return lista;
+}
+
+async function cargaExpedientes(){
+  if(DB){
+    try{
+      const s = await DB.collection("expedientes").limit(300).get();
+      expedientes = {};
+      s.docs.map(d=>d.data()).filter(Boolean).forEach(e=>{ if(e.id) expedientes[e.id] = e; });
+    }catch(e){ expedientes = {}; }
+  } else expedientes = lsGet("expedientes", {}) || {};
+}
+async function guardaExpediente(id){
+  const e = expDe(id);
+  if(DB){ try{ await DB.collection("expedientes").doc(id).set(e); }catch(err){ toast("No se pudo guardar el expediente"); } }
+  else lsSet("expedientes", expedientes);
+}
+
+/* ---------- la lista ---------- */
+function renderExpedientes(){
+  const w = $("#expLista"); if(!w) return;
+  const gente = conExpediente();
+  const conFalta = gente.filter(g=>g.activo && faltantesExp(expDe(g.id)).length).length;
+  $("#expResumen").textContent = gente.length + " expediente(s)" +
+    (conFalta ? " · " + conFalta + " con papeles pendientes" : " · completos");
+  w.innerHTML = gente.length ? gente.map(g=>{
+    const e = expDe(g.id), faltan = faltantesExp(e), n = (e.docs||[]).length;
+    return '<div class="expFila" data-exp="'+esc(g.id)+'" role="button" tabindex="0">'+
+      '<span class="asAv">'+esc((g.nombre||"?").trim().charAt(0).toUpperCase())+'</span>'+
+      '<span class="expQ"><b>'+esc(g.nombre)+(g.activo?"":' <span class="pill">baja</span>')+'</b>'+
+        '<small>'+esc(e.puesto||"Sin puesto")+(e.ingreso? " · desde "+esc(e.ingreso):"")+'</small></span>'+
+      '<span class="expDocs">'+n+' documento'+(n===1?"":"s")+'</span>'+
+      (faltan.length
+        ? '<span class="pill pend">falta '+esc(faltan.map(c=>c.nombre.toLowerCase()).join(", "))+'</span>'
+        : '<span class="pill good">completo</span>')+
+      '</div>';
+  }).join("") : '<div class="empty">No hay nadie en el equipo todavía. Se agregan en Ajustes → Equipo.</div>';
+}
+
+/* ---------- el expediente ---------- */
+function abreExpediente(id){
+  const e = expDe(id);
+  const u = equipo.find(x=>x.id===id);
+  expAbierto = id;
+  expNombre = (u && u.nombre) || e.nombre || "Sin nombre";
+  $("#expTitulo").textContent = "Expediente · " + expNombre;
+  $("#x_puesto").value = e.puesto || "";
+  $("#x_ingreso").value = e.ingreso || "";
+  $("#x_baja").value = e.baja || "";
+  $("#x_sueldo").value = e.sueldo.monto != null ? e.sueldo.monto : "";
+  $("#x_periodo").value = e.sueldo.periodo || "semana";
+  $("#x_jornada").value = e.jornada != null ? e.jornada : "";
+  $("#x_modo").value = (e.sueldo && e.sueldo.modo) || "fijo";
+  $("#x_tel").value = e.tel || "";
+  $("#x_emNombre").value = e.emergencia.nombre || "";
+  $("#x_emTel").value = e.emergencia.tel || "";
+  $("#x_rfc").value = e.fiscal.rfc || "";
+  $("#x_curp").value = e.fiscal.curp || "";
+  $("#x_nss").value = e.fiscal.nss || "";
+  $("#x_notas").value = e.notas || "";
+  $("#expFiscal").open = !!(e.fiscal.rfc || e.fiscal.curp || e.fiscal.nss);
+  pintaCarpetasExp();
+  $("#modalExp").hidden = false;
+}
+function pintaCarpetasExp(){
+  const e = expDe(expAbierto);
+  $("#expCarps").innerHTML = carpetasExp().map(c=>{
+    const docs = docsCarpeta(e, c.id);
+    return '<div class="expCarp">'+
+      '<div class="expCarpTit"><b>'+esc(c.nombre)+'</b>'+
+        (c.pide && !docs.length ? '<span class="faltante">falta</span>' : '')+
+        '<button class="btn sm ghost" data-subeexp="'+esc(c.id)+'" style="margin-left:auto">+ Subir</button></div>'+
+      (docs.length
+        ? '<div class="expDocsLista">'+docs.map(d=>
+            '<span class="docChip"><button class="docNom" data-verexp="'+esc(d.id)+'">'+esc(d.nombre)+'</button>'+
+            '<small>'+esc(d.fecha||"")+'</small>'+
+            '<button class="asX" data-delexp="'+esc(d.id)+'" title="Quitar">✕</button></span>').join("")+'</div>'
+        : '<div class="expVacia">Sin documentos</div>')+
+    '</div>';
+  }).join("");
+}
+function guardaCamposExp(yaMismo){
+  if(!expAbierto) return;
+  const e = expCrea(expAbierto);
+  e.puesto = $("#x_puesto").value.trim();
+  e.ingreso = $("#x_ingreso").value;
+  e.baja = $("#x_baja").value;
+  e.sueldo = {monto: num($("#x_sueldo").value), periodo: $("#x_periodo").value,
+              modo: $("#x_modo").value, retenciones: undefined};
+  delete e.sueldo.retenciones;
+  e.jornada = num($("#x_jornada").value);
+  e.tel = $("#x_tel").value.trim();
+  e.emergencia = {nombre: $("#x_emNombre").value.trim(), tel: $("#x_emTel").value.trim()};
+  e.fiscal = {rfc: $("#x_rfc").value.toUpperCase().trim(),
+              curp: $("#x_curp").value.toUpperCase().trim(),
+              nss: $("#x_nss").value.replace(/\D/g,"")};
+  e.notas = $("#x_notas").value.trim();
+  const u = equipo.find(x=>x.id===expAbierto); if(u) e.nombre = u.nombre||"";
+  clearTimeout(expReloj);
+  const quien = expAbierto;
+  if(yaMismo === true){ guardaExpediente(quien); renderExpedientes(); return; }
+  expReloj = setTimeout(()=>{ guardaExpediente(quien); renderExpedientes(); }, 600);
+}
+async function subeDocExp(file){
+  if(!expAbierto || !expCarpetaSubiendo) return;
+  if(!ASSETS){ toast("Para guardar documentos hace falta la cuenta en línea"); return; }
+  if(!revisaArchivo(file, "doc")) return;
+  toast("Subiendo " + file.name + "…");
+  file = await aligera(file);
+  try{
+    const res = await ASSETS.upload(file);
+    const e = expCrea(expAbierto);
+    e.docs.push({id:uid(), carpeta:expCarpetaSubiendo, nombre:file.name, url:res.url, ref:res.id,
+                 tipoMime:file.type||"", kb:Math.round(file.size/1024), fecha:hoyISO(),
+                 subio:(usuarioActual().nombre||"")});
+    await guardaExpediente(expAbierto);
+    pintaCarpetasExp(); renderExpedientes();
+    toast("Documento guardado en " + (carpetasExp().find(c=>c.id===expCarpetaSubiendo)||{}).nombre);
+  }catch(err){ toast("No se pudo subir el documento"); }
+}
+async function quitaDocExp(docId){
+  const e = expDe(expAbierto);
+  const d = e.docs.find(x=>x.id===docId); if(!d) return;
+  if(!confirm("¿Quitar «"+d.nombre+"» del expediente?")) return;
+  e.docs = e.docs.filter(x=>x.id!==docId);
+  if(ASSETS && d.ref){ try{ await ASSETS.delete(d.ref); }catch(err){} }
+  await guardaExpediente(expAbierto);
+  pintaCarpetasExp(); renderExpedientes();
+}
+
+/* ---------- las carpetas ---------- */
+function pintaCarpetasAjuste(){
+  const cs = carpetasExp();
+  $("#caLista").innerHTML = cs.map((c,i)=>
+    '<div class="caFila" data-carp="'+esc(c.id)+'">'+
+      '<input data-ck="nombre" value="'+esc(c.nombre)+'">'+
+      '<label class="sw"><input type="checkbox" data-ck="pide"'+(c.pide?" checked":"")+'> obligatoria</label>'+
+      '<button class="btn sm icon" data-delcarp="'+esc(c.id)+'"'+(cs.length<2?" disabled":"")+'>✕</button>'+
+    '</div>').join("");
+}
+function guardaCarpetas(){ P.carpetasExp = carpetasExp(); persist(); }
+
+/* ---------- eventos de los expedientes ---------- */
+$("#expLista").addEventListener("click", e=>{
+  const f = e.target.closest("[data-exp]"); if(f) abreExpediente(f.dataset.exp);
+});
+$("#expLista").addEventListener("keydown", e=>{
+  if(e.key !== "Enter" && e.key !== " ") return;
+  const f = e.target.closest("[data-exp]"); if(!f) return;
+  e.preventDefault(); abreExpediente(f.dataset.exp);
+});
+$("#expCerrar").addEventListener("click", ()=>{
+  if(expAbierto && expedientes[expAbierto]) guardaCamposExp(true);
+  clearTimeout(expReloj);
+  $("#modalExp").hidden = true; expAbierto = null; renderExpedientes();
+});
+$("#modalExp").addEventListener("click", e=>{ if(e.target.id === "modalExp") $("#expCerrar").click(); });
+$("#modalExp").addEventListener("input", guardaCamposExp);
+$("#modalExp").addEventListener("change", guardaCamposExp);
+$("#expCarps").addEventListener("click", e=>{
+  const s = e.target.closest("[data-subeexp]");
+  if(s){ expCarpetaSubiendo = s.dataset.subeexp; $("#expFile").value = ""; $("#expFile").click(); return; }
+  const v = e.target.closest("[data-verexp]");
+  if(v){
+    const e2 = expDe(expAbierto), d = e2.docs.find(x=>x.id===v.dataset.verexp);
+    if(d) abreVisor([Object.assign({}, d, {ubic:(carpetasExp().find(c=>c.id===d.carpeta)||{}).nombre||"Documento"})], 0);
+    return;
+  }
+  const q = e.target.closest("[data-delexp]");
+  if(q){ quitaDocExp(q.dataset.delexp); return; }
+});
+$("#expFile").addEventListener("change", e=>{
+  const f = e.target.files[0]; if(f) subeDocExp(f);
+});
+
+$("#expCarpetas").addEventListener("click", ()=>{ pintaCarpetasAjuste(); $("#modalCarpetas").hidden = false; });
+$("#caCerrar").addEventListener("click", ()=>{ $("#modalCarpetas").hidden = true; renderExpedientes(); if(expAbierto) pintaCarpetasExp(); });
+$("#modalCarpetas").addEventListener("click", e=>{ if(e.target.id === "modalCarpetas") $("#caCerrar").click(); });
+$("#caAgrega").addEventListener("click", ()=>{
+  const n = ($("#caNueva").value||"").trim();
+  if(!n){ toast("Ponle nombre a la carpeta"); return; }
+  P.carpetasExp = carpetasExp().concat([{id:uid(), nombre:n, pide:false}]);
+  persist(); $("#caNueva").value = ""; pintaCarpetasAjuste();
+});
+$("#caLista").addEventListener("input", e=>{
+  const f = e.target.closest("[data-carp]"); if(!f) return;
+  const c = carpetasExp().find(c=>c.id===f.dataset.carp); if(!c) return;
+  if(e.target.dataset.ck === "nombre") c.nombre = e.target.value;
+  clearTimeout(window._tcarp); window._tcarp = setTimeout(guardaCarpetas, 500);
+});
+$("#caLista").addEventListener("change", e=>{
+  const f = e.target.closest("[data-carp]"); if(!f) return;
+  const c = carpetasExp().find(c=>c.id===f.dataset.carp); if(!c) return;
+  if(e.target.dataset.ck === "pide") c.pide = e.target.checked;
+  guardaCarpetas();
+});
+$("#caLista").addEventListener("click", e=>{
+  const d = e.target.closest("[data-delcarp]"); if(!d) return;
+  const cs = carpetasExp(); if(cs.length < 2) return;
+  const c = cs.find(c=>c.id===d.dataset.delcarp);
+  const cuantos = Object.keys(expedientes).reduce((s,id)=> s + docsCarpeta(expedientes[id], c.id).length, 0);
+  if(cuantos && !confirm("Esa carpeta tiene "+cuantos+" documento(s). Si la quitas, los documentos se quedan guardados pero dejan de verse. ¿Seguir?")) return;
+  P.carpetasExp = cs.filter(x=>x.id!==c.id);
+  persist(); pintaCarpetasAjuste();
+});
+
+
+/* ====================== nómina ====================== */
+let nominas = [];
+let nmPer = "semana", nmRef = hoyISO();
+let nmAbierto = null;
+
+const MODOS_PAGO = {fijo:"Sueldo fijo del periodo", dias:"Por días trabajados", horas:"Por horas trabajadas"};
+
+/* El salario diario a la mexicana: el mes son 30 días y la quincena 15,
+   no los que traiga el calendario. */
+function salarioDiario(e){
+  const m = num(e.sueldo && e.sueldo.monto), p = (e.sueldo && e.sueldo.periodo) || "semana";
+  if(p === "dia") return m;
+  if(p === "semana") return m/7;
+  if(p === "quincena") return m/15;
+  return m/30;
+}
+function salarioHora(e){
+  const j = num(e.jornada, 8) || 8;
+  return salarioDiario(e) / j;
+}
+/* Rango del periodo de nómina. La quincena no la da rango(): va del 1 al 15
+   o del 16 al fin de mes, que es como se paga aquí. */
+function rangoNomina(per, refISO){
+  if(per !== "quincena") return rango(per === "mes" ? "mes" : "semana", refISO);
+  const d = dmy(refISO), y = d.getFullYear(), m = d.getMonth();
+  if(d.getDate() <= 15) return {ini: iso(new Date(y,m,1)), fin: iso(new Date(y,m,15))};
+  return {ini: iso(new Date(y,m,16)), fin: iso(new Date(y,m+1,0))};
+}
+function etiquetaNomina(per, R){
+  if(per !== "quincena") return etiquetaRango(per === "mes" ? "mes" : "semana", R);
+  const a = dmy(R.ini);
+  return (a.getDate() === 1 ? "1ª" : "2ª") + " quincena de " +
+    ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"][a.getMonth()] +
+    " " + a.getFullYear();
+}
+const horasExtraOn = () => P.horasExtra !== false;
+
+/* Lo que trabajó alguien en el periodo, según el reloj. */
+function trabajoDe(id, R){
+  const e = expDe(id), j = num(e.jornada, 8) || 8;
+  const dias = diasDelRango(R);
+  let minTot = 0, diasCon = 0, minOrd = 0, semanas = {};
+  dias.forEach(d=>{
+    const m = minutosDia(id, d);
+    if(!m) return;
+    diasCon++; minTot += m;
+    const ord = Math.min(m, j*60);
+    minOrd += ord;
+    const k = clave()(d);
+    semanas[k] = (semanas[k] || 0) + Math.max(0, m - j*60);
+  });
+  /* Las primeras nueve horas extra de la semana van al doble; de ahí, al
+     triple. Se cuenta semana por semana, no de corrido. */
+  let dobles = 0, triples = 0;
+  Object.keys(semanas).forEach(k=>{
+    const h = semanas[k] / 60;
+    dobles  += Math.min(9, h);
+    triples += Math.max(0, h - 9);
+  });
+  return {dias: diasCon, minutos: minTot, horas: minTot/60, horasOrd: minOrd/60,
+          extraDoble: Math.round(dobles*100)/100, extraTriple: Math.round(triples*100)/100};
+  function clave(){ return d=>{ const x = dmy(d); const dow = (x.getDay()+6)%7;
+    const lun = new Date(x); lun.setDate(x.getDate()-dow); return iso(lun); }; }
+}
+
+/* ---------- el cálculo de un renglón ---------- */
+function renglonNomina(id, R){
+  const u = equipo.find(x=>x.id===id);
+  const e = expDe(id);
+  const t = trabajoDe(id, R);
+  const modo = (e.sueldo && e.sueldo.modo) || "fijo";
+  const diario = salarioDiario(e), porHora = salarioHora(e);
+  const diasRango = diasDelRango(R).length;
+
+  let base = 0, comoSeCalculo = "";
+  if(modo === "dias"){
+    base = diario * t.dias;
+    comoSeCalculo = t.dias + " día(s) × " + mx(diario);
+  } else if(modo === "horas"){
+    base = porHora * t.horasOrd;
+    comoSeCalculo = (Math.round(t.horasOrd*100)/100) + " h × " + mx(porHora);
+  } else {
+    base = diario * diasRango;
+    comoSeCalculo = diasRango + " día(s) de calendario × " + mx(diario);
+  }
+  const extra = horasExtraOn() ? (t.extraDoble * porHora * 2) + (t.extraTriple * porHora * 3) : 0;
+
+  const g = guardadoNomina(id, R);
+  const percep = (g.percep || []).slice();
+  const deduc  = (g.deduc  || (e.retenciones || []).map(r=>Object.assign({}, r, {id: uid()}))).slice();
+
+  const extras = percep.reduce((s,x)=>s+num(x.monto), 0);
+  const menos  = deduc.reduce((s,x)=>s+num(x.monto), 0);
+  const bruto  = Math.round((base + extra + extras)*100)/100;
+  const neto   = Math.round((bruto - menos)*100)/100;
+
+  return {id, nombre: (u && u.nombre) || e.nombre || "Sin nombre",
+          puesto: e.puesto || "", modo, diario, porHora, trabajo: t, comoSeCalculo,
+          base: Math.round(base*100)/100, extra: Math.round(extra*100)/100,
+          percep, deduc, extras, menos, bruto, neto,
+          sinSueldo: !num(e.sueldo && e.sueldo.monto)};
+}
+/* Lo que el administrador ya capturó para este periodo y todavía no se cierra. */
+let nmBorradores = {};
+function llaveNomina(R){ return R.ini + "·" + R.fin; }
+function guardadoNomina(id, R){
+  const k = llaveNomina(R);
+  nmBorradores[k] = nmBorradores[k] || {};
+  return nmBorradores[k][id] || {};
+}
+function apuntaNomina(id, R, datos){
+  const k = llaveNomina(R);
+  nmBorradores[k] = nmBorradores[k] || {};
+  nmBorradores[k][id] = datos;
+  lsSet("nmBorradores", nmBorradores);
+}
+function nominaCerradaDe(R){
+  return nominas.find(n=>n.ini===R.ini && n.fin===R.fin) || null;
+}
+
+/* ---------- la pantalla ---------- */
+function renglonesDelPeriodo(R){
+  const cerrada = nominaCerradaDe(R);
+  if(cerrada) return cerrada.renglones.slice();
+  return equipo.filter(u=>u.activo !== false)
+    .map(u=>renglonNomina(u.id, R))
+    .filter(r=>!r.sinSueldo || r.trabajo.dias > 0);
+}
+function renderNomina(){
+  if(!$("#nmLista")) return;
+  const R = rangoNomina(nmPer, nmRef);
+  $("#nmFecha").value = nmRef;
+  $("#nmRango").textContent = etiquetaNomina(nmPer, R);
+  [...$("#nmSeg").children].forEach(b=>b.setAttribute("aria-pressed", b.dataset.per===nmPer));
+
+  const cerrada = nominaCerradaDe(R);
+  const rs = renglonesDelPeriodo(R);
+  const total = rs.reduce((s,r)=>s+r.neto, 0);
+  const bruto = rs.reduce((s,r)=>s+r.bruto, 0);
+  const extra = rs.reduce((s,r)=>s+r.extra, 0);
+
+  $("#nmKpis").innerHTML =
+    kpi("A pagar", mx(total), true) +
+    kpi("Personas", rs.length) +
+    kpi("Horas extra", mx(extra)) +
+    kpi("Deducciones", mx(bruto - total));
+
+  const sinSueldo = equipo.filter(u=>u.activo !== false && !num((expDe(u.id).sueldo||{}).monto));
+  $("#nmAviso").innerHTML = (!cerrada && sinSueldo.length)
+    ? '<p class="note" style="margin:14px 0 0;border-left-color:var(--warn)"><b>' +
+      sinSueldo.map(u=>esc(u.nombre||"")).join(", ") + '</b> todavía no tiene' + (sinSueldo.length>1?"n":"") +
+      ' sueldo capturado. Se pone en <b>Archivo → Expedientes</b>.</p>'
+    : "";
+
+  $("#nmLista").innerHTML = rs.length ? rs.map(r=>
+    '<div class="nmFila" data-nom="'+esc(r.id)+'" role="button" tabindex="0">'+
+      '<span class="asAv">'+esc((r.nombre||"?").trim().charAt(0).toUpperCase())+'</span>'+
+      '<span class="nmQ"><b>'+esc(r.nombre)+'</b>'+
+        '<small>'+esc(MODOS_PAGO[r.modo]||"")+' · '+esc(r.comoSeCalculo)+
+        (r.trabajo.dias ? ' · '+r.trabajo.dias+' día(s) checado(s)' : ' · sin checadas')+'</small></span>'+
+      '<span class="nmCol"><small>Bruto</small>'+mx(r.bruto)+'</span>'+
+      '<span class="nmCol menos"><small>Deducciones</small>'+(r.menos? "−"+mx(r.menos) : "—")+'</span>'+
+      '<span class="nmCol neto"><small>Neto</small>'+mx(r.neto)+'</span>'+
+    '</div>').join("")
+    : '<div class="empty">No hay a quién pagarle en este periodo. Captura los sueldos en Archivo → Expedientes.</div>';
+
+  $("#nmPie").innerHTML = !rs.length ? "" :
+    '<div class="nmTotal"><span>'+rs.length+' persona(s) · '+etiquetaNomina(nmPer,R)+'</span><b>'+mx(total)+'</b></div>'+
+    (cerrada
+      ? '<div class="nmCerradaBar"><span class="pill good">Cerrada el '+esc(cerrada.cerrada)+'</span>'+
+        (cerrada.pagada ? '<span class="pill good">Pagada el '+esc(cerrada.pagada)+'</span>'
+                        : '<button class="btn sm primary" id="nmPagar">Marcar como pagada</button>')+
+        '<button class="btn sm" id="nmRecibos">Recibos</button>'+
+        '<button class="btn sm ghost" id="nmAbrir">Reabrir</button></div>'
+      : '<div class="nmCerradaBar"><button class="btn primary" id="nmCierra">Cerrar nómina del periodo</button>'+
+        '<span class="hint">Al cerrarla se congelan los renglones.</span></div>');
+
+  $("#nmCerradas").innerHTML = nominas.length
+    ? nominas.slice().sort((a,b)=>b.ini<a.ini?-1:1).map(n=>
+        '<div class="saved-item"><div class="meta"><b>'+esc(n.etiqueta)+'</b>'+
+        '<small>'+esc(n.folio)+' · '+n.renglones.length+' persona(s) · cerrada '+esc(n.cerrada)+'</small></div>'+
+        (n.pagada ? '<span class="pill good">Pagada</span>' : '<span class="pill pend">Sin pagar</span>')+
+        '<span class="amt">'+mx(n.renglones.reduce((s,r)=>s+r.neto,0))+'</span>'+
+        '<button class="btn sm" data-vernom="'+esc(n.folio)+'">Ver</button></div>').join("")
+    : '<div class="empty">Todavía no cierras ninguna nómina.</div>';
+  $("#nmCerradasResumen").textContent = nominas.length
+    ? nominas.length + " cerrada(s) · " + nominas.filter(n=>!n.pagada).length + " sin pagar" : "";
+}
+
+/* ---------- el renglón de una persona ---------- */
+function abreRenglonNom(id){
+  const R = rangoNomina(nmPer, nmRef);
+  if(nominaCerradaDe(R)){ toast("Esta nómina ya está cerrada. Reábrela si necesitas cambiarla."); return; }
+  nmAbierto = id;
+  const r = renglonNomina(id, R);
+  $("#nmTitulo").textContent = "Nómina · " + r.nombre;
+  $("#nmResumenP").innerHTML =
+    '<div class="nmRen"><span>'+esc(MODOS_PAGO[r.modo])+'</span><b>'+mx(r.base)+'</b></div>'+
+    '<div class="nmRenSub">'+esc(r.comoSeCalculo)+'</div>'+
+    (horasExtraOn() && (r.trabajo.extraDoble || r.trabajo.extraTriple)
+      ? '<div class="nmRen"><span>Horas extra · '+r.trabajo.extraDoble+' al doble'+
+        (r.trabajo.extraTriple? ' y '+r.trabajo.extraTriple+' al triple':'')+'</span><b>'+mx(r.extra)+'</b></div>'
+      : '')+
+    '<div class="nmRenSub">'+r.trabajo.dias+' día(s) checado(s) · '+horasTxt(r.trabajo.minutos)+' en el reloj</div>';
+  pintaLineasNom(r);
+  $("#modalNom").hidden = false;
+}
+function lineaNom(l, clase){
+  return '<div class="nmLinea" data-lin="'+esc(l.id)+'" data-clase="'+clase+'">'+
+    '<input data-lk="concepto" value="'+esc(l.concepto||"")+'" placeholder="'+(clase==="deduc"?"ISR, IMSS, préstamo…":"Bono, despensa…")+'">'+
+    '<input data-lk="monto" type="number" min="0" step="1" value="'+(num(l.monto)||"")+'" style="width:110px;text-align:right">'+
+    '<label class="sw" title="Volver a ponerlo solo el siguiente periodo"><input type="checkbox" data-lk="fija"'+(l.fija?" checked":"")+'> recordar</label>'+
+    '<button class="btn sm icon" data-dellin="'+esc(l.id)+'">✕</button></div>';
+}
+function pintaLineasNom(r){
+  $("#nmPercep").innerHTML = r.percep.length ? r.percep.map(l=>lineaNom(l,"percep")).join("")
+    : '<div class="expVacia">Sin percepciones extra</div>';
+  $("#nmDeduc").innerHTML = r.deduc.length ? r.deduc.map(l=>lineaNom(l,"deduc")).join("")
+    : '<div class="expVacia">Sin deducciones</div>';
+  $("#nmNeto").innerHTML =
+    '<div class="nmRen"><span>Bruto</span><b>'+mx(r.bruto)+'</b></div>'+
+    '<div class="nmRen"><span>Deducciones</span><b>'+(r.menos? "−"+mx(r.menos):mx(0))+'</b></div>'+
+    '<div class="nmRen neto"><span>Neto a pagar</span><b>'+mx(r.neto)+'</b></div>';
+}
+function leeLineasNom(){
+  const lee = sel => [...document.querySelectorAll(sel+" .nmLinea")].map(d=>({
+    id: d.dataset.lin,
+    concepto: d.querySelector('[data-lk="concepto"]').value.trim(),
+    monto: num(d.querySelector('[data-lk="monto"]').value),
+    fija: d.querySelector('[data-lk="fija"]').checked
+  }));
+  return {percep: lee("#nmPercep"), deduc: lee("#nmDeduc")};
+}
+function guardaRenglonNom(){
+  if(!nmAbierto) return;
+  const R = rangoNomina(nmPer, nmRef);
+  const l = leeLineasNom();
+  apuntaNomina(nmAbierto, R, l);
+  /* Lo marcado como «recordar» se queda pegado a la persona. */
+  const e = expCrea(nmAbierto);
+  e.retenciones = l.deduc.filter(x=>x.fija).map(x=>({concepto:x.concepto, monto:x.monto, fija:true}));
+  guardaExpediente(nmAbierto);
+  pintaLineasNom(renglonNomina(nmAbierto, R));
+}
+
+/* ---------- cerrar, pagar, reabrir ---------- */
+function folioNomina(){
+  const base = "NOM-" + hoyISO().replace(/-/g,"");
+  return base + "-" + String(nominas.filter(n=>n.folio.indexOf(base)===0).length + 1).padStart(2,"0");
+}
+async function cierraNomina(){
+  const R = rangoNomina(nmPer, nmRef);
+  if(nominaCerradaDe(R)){ toast("Esta nómina ya estaba cerrada"); return; }
+  const rs = renglonesDelPeriodo(R);
+  if(!rs.length){ toast("No hay renglones que cerrar"); return; }
+  const n = {folio: folioNomina(), periodo: nmPer, ini: R.ini, fin: R.fin,
+             etiqueta: etiquetaNomina(nmPer, R), cerrada: hoyISO(), pagada: "",
+             cerroQuien: usuarioActual().nombre || "", renglones: rs};
+  nominas.push(n);
+  await guardaNominas(n);
+  delete nmBorradores[llaveNomina(R)]; lsSet("nmBorradores", nmBorradores);
+  renderNomina();
+  toast("Nómina " + n.folio + " cerrada · " + mx(rs.reduce((s,r)=>s+r.neto,0)));
+}
+async function guardaNominas(n){
+  if(DB){ try{ await DB.collection("nominas").doc(n.folio).set(Object.assign({fecha:n.cerrada}, n)); }
+          catch(e){ toast("No se pudo guardar la nómina"); } }
+  else lsSet("nominas", nominas);
+}
+async function cargaNominas(){
+  if(DB){
+    try{ const s = await DB.collection("nominas").orderBy("fecha","desc").limit(200).get();
+         nominas = s.docs.map(d=>d.data()).filter(Boolean); }
+    catch(e){ nominas = []; }
+  } else nominas = lsGet("nominas", []) || [];
+  nmBorradores = lsGet("nmBorradores", {}) || {};
+}
+async function pagaNomina(folio){
+  const n = nominas.find(x=>x.folio===folio); if(!n || n.pagada) return;
+  const total = n.renglones.reduce((s,r)=>s+r.neto, 0);
+  n.pagada = hoyISO();
+  await guardaNominas(n);
+  /* Si la caja del día está abierta, el pago sale de ahí: la nómina es el
+     gasto más grande del taller y no tiene por qué quedar fuera del corte. */
+  const c = cajaDe(hoyISO());
+  if(c.abierta){
+    c.movs.push({id:uid(), hora:horaAhora(), tipo:"salida",
+                 concepto:"Nómina "+n.folio+" · "+n.etiqueta, folio:n.folio, monto:total});
+    await guardaCaja(c);
+    if(!$("#tab-caj").hidden) renderCaja();
+    toast("Nómina pagada · salió de la caja del día");
+  } else toast("Nómina marcada como pagada. La caja de hoy está cerrada, así que no entró al corte.");
+  renderNomina();
+}
+async function reabreNomina(folio){
+  const n = nominas.find(x=>x.folio===folio); if(!n) return;
+  if(n.pagada && !confirm("Esta nómina ya está marcada como pagada. ¿Reabrirla de todos modos?")) return;
+  nominas = nominas.filter(x=>x.folio!==folio);
+  if(DB){ try{ await DB.collection("nominas").doc(folio).delete(); }catch(e){} }
+  else lsSet("nominas", nominas);
+  renderNomina();
+  toast("Nómina reabierta. Los renglones se vuelven a calcular solos.");
+}
+
+/* ---------- los recibos ---------- */
+function recibosNomina(folio){
+  const n = nominas.find(x=>x.folio===folio) ||
+            {etiqueta: etiquetaNomina(nmPer, rangoNomina(nmPer,nmRef)), folio:"(sin cerrar)",
+             ini: rangoNomina(nmPer,nmRef).ini, fin: rangoNomina(nmPer,nmRef).fin,
+             renglones: renglonesDelPeriodo(rangoNomina(nmPer,nmRef))};
+  const E = (typeof empresaFiscal === "function") ? empresaFiscal() : {};
+  const cuerpo = n.renglones.map(r=>{
+    const e = expDe(r.id);
+    const fila = (a,b,fuerte)=> '<tr'+(fuerte?' style="font-weight:700"':'')+'><td>'+esc(a)+'</td><td style="text-align:right">'+b+'</td></tr>';
+    return '<section class="recibo">'+
+      '<h2 style="margin:0 0 2px">Recibo de nómina</h2>'+
+      '<p style="margin:0 0 10px;color:#555;font-size:12px">'+esc(E.razon || P.empresa.nombre || "")+
+        (E.rfc? " · RFC "+esc(E.rfc):"")+' · '+esc(n.etiqueta)+' ('+esc(n.ini)+' al '+esc(n.fin)+')</p>'+
+      '<p style="margin:0 0 10px"><b>'+esc(r.nombre)+'</b>'+(r.puesto? " · "+esc(r.puesto):"")+
+        (e.fiscal && e.fiscal.rfc ? '<br>RFC '+esc(e.fiscal.rfc):"")+
+        (e.fiscal && e.fiscal.nss ? ' · NSS '+esc(e.fiscal.nss):"")+'</p>'+
+      '<table class="nmTabla"><tbody>'+
+        fila(MODOS_PAGO[r.modo]+" — "+r.comoSeCalculo, mx(r.base))+
+        (r.extra? fila("Horas extra", mx(r.extra)) : "")+
+        r.percep.filter(x=>num(x.monto)).map(x=>fila(x.concepto||"Percepción", mx(x.monto))).join("")+
+        fila("Total de percepciones", mx(r.bruto), true)+
+        r.deduc.filter(x=>num(x.monto)).map(x=>fila(x.concepto||"Deducción", "−"+mx(x.monto))).join("")+
+        (r.menos? fila("Total de deducciones", "−"+mx(r.menos), true) : "")+
+        fila("Neto a pagar", mx(r.neto), true)+
+      '</tbody></table>'+
+      '<div class="firma"><span></span><small>Recibí de conformidad · '+esc(r.nombre)+'</small></div>'+
+    '</section>';
+  }).join("");
+  muestraDoc("Recibos de nómina · "+n.folio, cuerpo);
+}
+
+/* ---------- eventos de la nómina ---------- */
+$("#nmSeg").addEventListener("click", e=>{
+  const b = e.target.closest("[data-per]"); if(!b) return;
+  nmPer = b.dataset.per; P.nominaPeriodo = nmPer; persist(); renderNomina();
+});
+$("#nmFecha").addEventListener("change", e=>{ nmRef = e.target.value || hoyISO(); renderNomina(); });
+$("#nmHoy").addEventListener("click", ()=>{ nmRef = hoyISO(); renderNomina(); });
+function mueveNom(dir){
+  const d = dmy(nmRef);
+  if(nmPer === "semana") d.setDate(d.getDate()+7*dir);
+  else if(nmPer === "mes") d.setMonth(d.getMonth()+dir);
+  else {
+    /* Quincenas: del 1 al 15 y del 16 al fin de mes. */
+    if(d.getDate() <= 15){ if(dir<0){ d.setMonth(d.getMonth()-1); d.setDate(16); } else d.setDate(16); }
+    else { if(dir<0) d.setDate(1); else { d.setMonth(d.getMonth()+1); d.setDate(1); } }
+  }
+  nmRef = iso(d); renderNomina();
+}
+$("#nmPrev").addEventListener("click", ()=>mueveNom(-1));
+$("#nmNext").addEventListener("click", ()=>mueveNom(1));
+
+$("#tab-nom").addEventListener("click", e=>{
+  const f = e.target.closest("[data-nom]"); if(f){ abreRenglonNom(f.dataset.nom); return; }
+  if(e.target.id === "nmCierra"){ cierraNomina(); return; }
+  if(e.target.id === "nmPagar"){ const n = nominaCerradaDe(rangoNomina(nmPer,nmRef)); if(n) pagaNomina(n.folio); return; }
+  if(e.target.id === "nmAbrir"){ const n = nominaCerradaDe(rangoNomina(nmPer,nmRef)); if(n) reabreNomina(n.folio); return; }
+  if(e.target.id === "nmRecibos"){ const n = nominaCerradaDe(rangoNomina(nmPer,nmRef)); if(n) recibosNomina(n.folio); return; }
+  const v = e.target.closest("[data-vernom]");
+  if(v){ recibosNomina(v.dataset.vernom); return; }
+});
+$("#tab-nom").addEventListener("keydown", e=>{
+  if(e.key !== "Enter" && e.key !== " ") return;
+  const f = e.target.closest("[data-nom]"); if(!f) return;
+  e.preventDefault(); abreRenglonNom(f.dataset.nom);
+});
+
+$("#nmCerrar").addEventListener("click", ()=>{
+  guardaRenglonNom(); $("#modalNom").hidden = true; nmAbierto = null; renderNomina();
+});
+$("#modalNom").addEventListener("click", e=>{ if(e.target.id === "modalNom") $("#nmCerrar").click(); });
+$("#nmAddPercep").addEventListener("click", ()=>{
+  const R = rangoNomina(nmPer, nmRef), l = leeLineasNom();
+  l.percep.push({id:uid(), concepto:"", monto:0, fija:false});
+  apuntaNomina(nmAbierto, R, l); pintaLineasNom(renglonNomina(nmAbierto, R));
+});
+$("#nmAddDeduc").addEventListener("click", ()=>{
+  const R = rangoNomina(nmPer, nmRef), l = leeLineasNom();
+  l.deduc.push({id:uid(), concepto:"", monto:0, fija:true});
+  apuntaNomina(nmAbierto, R, l); pintaLineasNom(renglonNomina(nmAbierto, R));
+});
+$("#modalNom").addEventListener("input", e=>{
+  if(!e.target.closest(".nmLinea")) return;
+  clearTimeout(window._tnom); window._tnom = setTimeout(guardaRenglonNom, 500);
+});
+$("#modalNom").addEventListener("change", e=>{
+  if(!e.target.closest(".nmLinea")) return;
+  guardaRenglonNom();
+});
+$("#modalNom").addEventListener("click", e=>{
+  const d = e.target.closest("[data-dellin]"); if(!d) return;
+  const R = rangoNomina(nmPer, nmRef), l = leeLineasNom();
+  l.percep = l.percep.filter(x=>x.id !== d.dataset.dellin);
+  l.deduc  = l.deduc.filter(x=>x.id !== d.dataset.dellin);
+  apuntaNomina(nmAbierto, R, l);
+  const e2 = expCrea(nmAbierto);
+  e2.retenciones = l.deduc.filter(x=>x.fija).map(x=>({concepto:x.concepto, monto:x.monto, fija:true}));
+  guardaExpediente(nmAbierto);
+  pintaLineasNom(renglonNomina(nmAbierto, R));
+});
 
 /* ---------- eventos del armado ---------- */
 $("#armadoTab").addEventListener("click", ()=>abreArmado(true));
@@ -7777,6 +9292,7 @@ $("#tab-set").addEventListener("change", e=>{
   if(t.id==="p_modo") P.modo=t.value;
   if(t.id==="p_origen"){ P.origen=t.value; renderSet(); renderApps(); }
   if(t.id==="p_redondeo") P.redondeo=num(t.value);
+  if(t.id==="p_comisionBase"){ P.comisionBase = t.value; if(!$("#tab-ven").hidden) renderVentas(); }
   if(t.id==="p_ivaOn") P.ivaOn=t.checked;
   if(t.id==="e_regimen"){ empresaFiscal(); P.empresa.regimen=t.value; }
   if(t.id==="e_pac"){ empresaFiscal(); P.empresa.pac=t.value; notaPac(); }
@@ -7875,6 +9391,7 @@ $("#btnConfirmar").addEventListener("click", async ()=>{
 });
 async function guardaCot(){
   if(typeof guardaItemActivo==="function") guardaItemActivo(cot);
+  selloVendedor(cot);
   const r = calcDe(cot);
   const rec = JSON.parse(JSON.stringify(cot)); rec._total = r.total; rec._unit = r.precioUnit;
   const i = guardadas.findIndex(g=>g.folio===rec.folio);
@@ -8270,10 +9787,10 @@ async function bajaCarpeta(cliente, mes, boton){
 
 /* ============ EQUIPO Y ROLES ============ */
 const ROLES = {
-  admin:      {nombre:"Administrador", ve:["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","set"]},
-  ventas:     {nombre:"Ventas",        ve:["inicio","cot","sav","pro","dis","cli","arc","com"]},
-  diseno:     {nombre:"Diseño",        ve:["inicio","dis","pro"]},
-  produccion: {nombre:"Producción",    ve:["inicio","pro","inv","com"]}
+  admin:      {nombre:"Administrador", ve:["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","asi","nom","set"]},
+  ventas:     {nombre:"Ventas",        ve:["inicio","cot","sav","pro","dis","cli","arc","com","asi"]},
+  diseno:     {nombre:"Diseño",        ve:["inicio","dis","pro","asi"]},
+  produccion: {nombre:"Producción",    ve:["inicio","pro","inv","com","asi"]}
 };
 let equipo = [], usuarioId = null, pinPendiente = null;
 
@@ -8290,26 +9807,29 @@ function aplicaRol(){
   $("#userAv").textContent = (u.nombre||"?").trim().charAt(0).toUpperCase();
   document.body.classList.toggle("rol-ventas", r==="ventas");
   document.body.classList.toggle("rol-produccion", r==="produccion");
+  document.body.classList.toggle("rol-diseno", r==="diseno");
   if(typeof aplicaCostos === "function") aplicaCostos();
   document.querySelectorAll('#tabs [data-tab]').forEach(b=> b.hidden = b.dataset.tab === "set" || !puedeVer(b.dataset.tab) || (window.__enElPlan && !window.__enElPlan(b.dataset.tab)));
+  /* Cotizar se puede quitar persona por persona, aunque el rol se la diera. */
+  if(!puedeCotizar(u)){ const bc = document.querySelector('#tabs [data-tab="cot"]'); if(bc) bc.hidden = true; }
   const sel = document.querySelector('#tabs [data-tab][aria-selected="true"]');
   if(!sel || sel.hidden){
     const primera = document.querySelector('#tabs [data-tab]:not([hidden])');
     if(primera) primera.click();
   }
   document.querySelectorAll("[data-reporte]").forEach(b=>{
-    const zona = {ventas:"ven", caja:"caj", produccion:"pro", clientes:"cli", cotizaciones:"sav", archivo:"arc", inventario:"cat", compras:"com"}[b.dataset.reporte];
+    const zona = {ventas:"ven", caja:"caj", produccion:"pro", clientes:"cli", cotizaciones:"sav", archivo:"arc", inventario:"cat", compras:"com", asistencia:"asi", nomina:"nom"}[b.dataset.reporte];
     b.hidden = !puedeVer(zona);
   });
 }
 function renderEquipo(){
   const t = $("#t_equipo"); if(!t) return;
-  t.innerHTML = '<thead><tr><th>Nombre</th><th>Rol</th><th>Contraseña</th><th>Ve costos</th><th>Activo</th><th></th></tr></thead><tbody>'+
+  t.innerHTML = '<thead><tr><th>Nombre</th><th>Rol</th><th>Clave / PIN</th><th>Ve costos</th><th>Cotiza</th><th>Comisión %</th><th>Activo</th><th></th></tr></thead><tbody>'+
     equipo.map(u=>'<tr data-usr="'+u.id+'">'+
       '<td><input data-uk="nombre" value="'+esc(u.nombre)+'"></td>'+
       '<td><select data-uk="rol">'+Object.keys(ROLES).map(r=>'<option value="'+r+'"'+(r===u.rol?" selected":"")+'>'+ROLES[r].nombre+'</option>').join("")+'</select></td>'+
       '<td><input data-uk="pin" inputmode="numeric" maxlength="24" value="'+esc(u.pin||"")+'" placeholder="sin contraseña"></td>'+
-      celdaVeCostos(u)+
+      celdaVeCostos(u)+ celdaCotiza(u)+ celdaComision(u)+
       '<td style="text-align:center"><input type="checkbox" data-uk="activo" style="width:auto"'+(u.activo!==false?" checked":"")+'></td>'+
       '<td><button class="btn icon sm" data-delusr="'+u.id+'"'+(equipo.length<2?" disabled":"")+'>✕</button></td></tr>').join("")+
     '</tbody>';
@@ -8335,6 +9855,7 @@ $("#t_equipo").addEventListener("change", e=>{
   const k = e.target.dataset.uk;
   if(k==="activo") u.activo = e.target.checked;
   if(k==="veCostos") u.veCostos = e.target.checked;
+  if(k==="cotiza")   u.cotiza   = e.target.checked;
   if(k==="rol"){ u.rol = e.target.value; renderEquipo(); }
   guardaEquipo(); aplicaRol(); renderResumen();
 });
@@ -8449,6 +9970,66 @@ function reporte(tipo){
 
     XLSX.writeFile(wb, "compras-"+hoy+".xlsx");
     toast("Reporte de compras listo");
+    return;
+  }
+
+  if(tipo==="nomina"){
+    const R = rangoNomina(nmPer, nmRef), rs = renglonesDelPeriodo(R);
+    const n = nominaCerradaDe(R);
+    hojaXls(wb, "Nómina", encabezado("Nómina", etiquetaNomina(nmPer, R) +
+        (n ? " · " + n.folio + (n.pagada ? " · pagada " + n.pagada : " · sin pagar") : " · sin cerrar")).concat(
+      [["Persona","Puesto","Cómo se paga","Días checados","Horas","Sueldo del periodo","Horas extra",
+        "Percepciones extra","Bruto","Deducciones","Neto"]],
+      rs.map(r=>[r.nombre, r.puesto, MODOS_PAGO[r.modo]||"", r.trabajo.dias,
+                 Math.round(r.trabajo.horas*100)/100, r.base, r.extra, r.extras, r.bruto, r.menos, r.neto]),
+      [[]],
+      [["TOTAL","","","","","","","", rs.reduce((s,r)=>s+r.bruto,0), rs.reduce((s,r)=>s+r.menos,0),
+        rs.reduce((s,r)=>s+r.neto,0)]]),
+      [24,18,22,14,10,16,13,17,12,13,12]);
+
+    const det = [["Persona","Tipo","Concepto","Monto"]];
+    rs.forEach(r=>{
+      r.percep.filter(x=>num(x.monto)).forEach(x=> det.push([r.nombre,"Percepción", x.concepto||"", num(x.monto)]));
+      r.deduc.filter(x=>num(x.monto)).forEach(x=> det.push([r.nombre,"Deducción",  x.concepto||"", num(x.monto)]));
+    });
+    hojaXls(wb, "Renglones", det, [24,13,28,12]);
+
+    hojaXls(wb, "Cerradas", [["Folio","Periodo","Del","Al","Personas","Neto","Cerrada","Pagada","La cerró"]].concat(
+      nominas.slice().sort((a,b)=>a.ini<b.ini?-1:1).map(x=>[x.folio, x.etiqueta, x.ini, x.fin,
+        x.renglones.length, x.renglones.reduce((s,r)=>s+r.neto,0), x.cerrada, x.pagada||"", x.cerroQuien||""])),
+      [18,24,12,12,10,13,12,12,20]);
+
+    bajaLibro(wb, "nomina-"+hoy+".xlsx");
+    return;
+  }
+
+  if(tipo==="asistencia"){
+    const R = rango(asPer, asRef), dias = diasDelRango(R);
+    const evs = asistencias.filter(a=>a.fecha>=R.ini && a.fecha<=R.fin)
+      .slice().sort((a,b)=> (a.fecha+a.hora) < (b.fecha+b.hora) ? -1 : 1);
+    hojaXls(wb, "Checadas", encabezado("Asistencia", etiquetaRango(asPer, R)).concat(
+      [["Fecha","Hora","Persona","Movimiento","Con foto","Registrado desde"]],
+      evs.map(a=>[a.fecha, a.hora, a.nombre||"", a.tipo==="entrada"?"Entrada":"Salida",
+                  (a.foto && (a.foto.url||a.foto.data)) ? "sí" : (a.foto && a.foto.vieja ? "se borró" : "no"),
+                  (a.desde && a.desde.nombre) || ""])), [12,9,24,13,11,24]);
+
+    const gente = personasChecador();
+    const res = [["Persona"].concat(dias.map(d=>d)).concat(["Total horas","Días"])];
+    gente.forEach(u=>{
+      const porDia = dias.map(d=>horasDec(minutosDia(u.id, d)));
+      const tot = porDia.reduce((s,x)=>s+x, 0);
+      if(tot > 0) res.push([u.nombre||""].concat(porDia.map(h=>h||"")).concat([Math.round(tot*100)/100, porDia.filter(h=>h>0).length]));
+    });
+    hojaXls(wb, "Horas por día", encabezado("Horas trabajadas", etiquetaRango(asPer, R)).concat(res),
+            [24].concat(dias.map(()=>9)).concat([13,8]));
+
+    const turnos = [["Fecha","Persona","Entrada","Salida","Horas"]];
+    gente.forEach(u=> dias.forEach(d=> turnosDe(u.id, d).forEach(t=>
+      turnos.push([d, u.nombre||"", t.entrada.hora, t.salida ? t.salida.hora : "sin salida",
+                   t.salida ? horasDec(minutosTurno(t)) : ""]))));
+    hojaXls(wb, "Turnos", turnos, [12,24,11,13,9]);
+
+    bajaLibro(wb, "asistencia-"+hoy+".xlsx");
     return;
   }
 
@@ -9921,6 +11502,10 @@ $("#cb_cancel").addEventListener("click", ()=>{ $("#modalCobro").hidden = true; 
 $("#cb_ok").addEventListener("click", async ()=>{
   if(!cobrando) return;
   const q = cobrando, r = calcDe(q);
+  selloVendedor(q);
+  /* El porcentaje se congela aqui: subirle la comision a alguien en marzo no
+     debe repintar lo que vendio en febrero. */
+  const vdor = equipo.find(u=>u.id === ((q.vendedor||{}).id)) || null;
   const venta = {
     folio: q.folio, fecha: $("#cb_fecha").value || hoyISO(),
     cliente: q.cliente||"", ref: q.ref||"", articulo: descripcionCot(q),
@@ -9928,6 +11513,7 @@ $("#cb_ok").addEventListener("click", async ()=>{
     costo: Math.round(r.costoTotal*100)/100, utilidad: Math.round(r.utilidad*100)/100,
     pago: $("#cb_pago").value, estado: $("#cb_estado").value, recibido: num($("#cb_monto").value),
     clienteId: q.clienteId || "",
+    vendedor: q.vendedor || null, comisionPct: vdor ? pctDe(vdor) : 0,
     factura: $("#cb_factura").checked ? {
       requiere: true, estado: "pendiente",
       rfc: ($("#cb_rfc").value||"").toUpperCase().trim(), razon: ($("#cb_razon").value||"").trim(),
@@ -10165,6 +11751,7 @@ function renderVentas(){
   $("#venAxis").innerHTML = cubos.map((c,i)=>'<span>'+((cubos.length>16 && i%2) ? "" : c.lab)+'</span>').join("");
 
   renderAnalisis();
+  renderComisiones(enRango);
   $("#venCount").textContent = enRango.length + " venta(s) · " + mx(total);
   $("#venList").innerHTML = enRango.length ? enRango.slice().sort((a,b)=>b.fecha<a.fecha?-1:1).map(v=>{
     const falta = num(v.total)-num(v.recibido);
@@ -10548,7 +12135,8 @@ function ordenHoja(g){
    '<br>Entrega: <b>'+esc(g.entrega||"por definir")+(g.entrega? " · "+esc(g.entregaHora||"18:00"):"")+'</b>'+
    (g.entrega? '<br><span style="font-size:11px">'+esc(faltaPara(g).texto)+' al imprimir</span>' : '')+'</div></div>'+
    '<div class="op-grid"><div class="op-card"><b>Cliente</b><br>'+esc(g.cliente||"—")+(g.contacto?"<br>"+esc(g.contacto):"")+'</div>'+
-   '<div class="op-card"><b>Trabajo</b><br>'+esc(g.ref||"—")+'<br>Responsable: '+esc(g.resp||"—")+'</div></div>'+
+   '<div class="op-card"><b>Trabajo</b><br>'+esc(g.ref||"—")+'<br>Responsable: '+esc(g.resp||"—")+
+     (nombreVendedor(g) ? '<br>Elaborada por: '+esc(nombreVendedor(g)) : '')+'</div></div>'+
    r.partes.map((p, n)=> bloqueArticuloOrden(p, n, r.varios, r.partes.length)).join("")+
    (adm(g).alerta ? '<div style="border:2px solid #000;padding:8px;margin:10px 0"><b>REQUIERE ATENCIÓN:</b> '+esc(adm(g).alerta)+'</div>' : '')+
    (g.notas && !r.varios ? '<h2>Notas de producción</h2><p style="white-space:pre-line">'+esc(g.notas)+'</p>' : '')+
@@ -10580,7 +12168,8 @@ function hoja(g){
    membrete()+
    '<div class="hoja-head"><div><h1>'+esc(P.empresa.nombre)+'</h1><div>'+esc(P.empresa.eslogan||"")+(P.empresa.tel?" · "+esc(P.empresa.tel):"")+(P.empresa.mail?" · "+esc(P.empresa.mail):"")+'</div></div>'+
    '<div style="text-align:right"><b>COTIZACIÓN '+esc(g.folio)+'</b><br>Fecha: '+esc(g.fecha)+'<br>Vigencia: '+v.toISOString().slice(0,10)+'</div></div>'+
-   '<p><b>Cliente:</b> '+esc(g.cliente||"—")+(g.contacto?" · "+esc(g.contacto):"")+'<br><b>Trabajo:</b> '+esc(g.ref||"—")+'</p>'+
+   '<p><b>Cliente:</b> '+esc(g.cliente||"—")+(g.contacto?" · "+esc(g.contacto):"")+'<br><b>Trabajo:</b> '+esc(g.ref||"—")+
+     (nombreVendedor(g) ? '<br><b>Elaborada por:</b> '+esc(nombreVendedor(g)) : '')+'</p>'+
    '<table><thead><tr><th>#</th><th>Concepto</th><th>Cant.</th><th>P. unitario</th><th>Importe</th></tr></thead><tbody>'+
    filas.map(f=>'<tr><td>'+f[0]+'</td><td>'+f[1]+'</td><td>'+f[2]+'</td><td>'+f[3]+'</td><td>'+f[4]+'</td></tr>').join("")+'</tbody></table>'+
    '<div class="tot">'+
@@ -10623,7 +12212,7 @@ function start(){
   if(typeof aplicaCostos === "function") aplicaCostos();
 }
 start();
-window.__arranca = () => initStore().then(()=>{
+window.__arranca = () => initStore().then(async ()=>{
   /* El orden importa: primero lo que se estaba capturando, luego —si no había
      nada— el ejemplo, y sólo la primerísima vez. */
   const habia = recuperaBorrador();
@@ -10635,6 +12224,11 @@ window.__arranca = () => initStore().then(()=>{
   if(cot.apps.length && !cat.tecnicas.find(t=>t.id===cot.apps[0].tecnicaId)) cot.apps[0].tecnicaId = cat.tecnicas[0].id;
   if(habia) setTimeout(()=>toast("Recuperé lo que estabas capturando"), 900);
   arrancaEquipo();
+  await cargaAsistencias(); renderAsistencia();
+  if(rolActual()==="admin"){
+    await cargaExpedientes(); renderExpedientes();
+    await cargaNominas(); nmPer = P.nominaPeriodo || "semana"; renderNomina();
+  }
   renderCot(); renderSet(); renderSaved(); pintaSelectClientes();
   $("#catEstado").textContent = "Catálogo al día";
   arrancaAyuda();
@@ -11774,10 +13368,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261009-2337";</script>
+<script>window.BUILD="20261010-0101";</script>
 <script>
 (function(){
-  var mio = "20261009-2337";
+  var mio = "20261010-0101";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -11805,7 +13399,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261009-2337"></script>
-<script src="diagnostico.js?v=20261009-2337"></script>
+<script src="cuenta.js?v=20261010-0101"></script>
+<script src="diagnostico.js?v=20261010-0101"></script>
 </body>
 </html>
