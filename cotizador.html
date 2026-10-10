@@ -1638,6 +1638,62 @@ body.sinDetalleCostos .soloAdminCostos{display:none!important}
   .comBarra{grid-column:1/-1;grid-row:2;height:10px}
 }
 
+/* ---- reloj checador ---- */
+.asGente{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.asPersona{display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border:1px solid var(--line);
+  border-radius:12px;background:var(--surface);cursor:pointer;transition:border-color .15s,transform .1s;width:100%}
+.asPersona:hover{border-color:var(--accent);transform:translateY(-1px)}
+.asPersona.dentro{border-left:4px solid var(--good);padding-left:11px}
+.asAv{width:40px;height:40px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;
+  font-weight:700;font-size:16px;flex:0 0 auto}
+.asPersona.dentro .asAv{background:var(--good);color:#fff}
+.asQ{flex:1;min-width:0}
+.asQ b{display:block;font-size:14px;line-height:1.25}
+.asQ small{display:block;font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.asAccion{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);flex:0 0 auto}
+.asPersona.dentro .asAccion{color:var(--good)}
+
+.asDia{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.asDia:last-child{border-bottom:0}
+.asDiaQ{min-width:150px}
+.asDiaQ b{display:block;font-size:13.5px}
+.asDiaQ small{font-size:11.5px;color:var(--ink-3)}
+.asEvs{display:flex;flex-wrap:wrap;gap:8px;flex:1}
+.asEv{display:inline-flex;align-items:center;gap:7px;font-size:12px;padding:5px 9px 5px 5px;border-radius:999px;
+  background:var(--surface-2);border:1px solid var(--line)}
+.asEv.entrada{border-color:color-mix(in srgb,var(--good) 45%,transparent)}
+.asEv.salida{border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.asEv b{font-family:"IBM Plex Mono",monospace}
+.asFoto{width:30px;height:30px;border-radius:50%;object-fit:cover;cursor:zoom-in;background:var(--surface-2)}
+.asFoto.vacia{display:grid;place-items:center;color:var(--ink-3);font-size:11px;cursor:default}
+.asX{border:0;background:none;color:var(--ink-3);cursor:pointer;font-size:12px;padding:0 2px;line-height:1}
+.asX:hover{color:var(--bad,#c0392b)}
+
+.chEstado{font-size:13px;padding:11px 13px;border-radius:9px;background:var(--surface-2);margin-bottom:14px}
+.chCam{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#111;display:grid;place-items:center}
+.chCam video,.chCam img{width:100%;height:100%;object-fit:cover;display:block}
+.chCamAviso{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:22px;
+  color:#fff;font-size:13px;line-height:1.5;background:#111}
+.chBotonera{display:flex;gap:9px;margin-top:11px}
+.chBotonera .btn{flex:1}
+.chPin{display:flex;gap:9px;margin:7px 0 14px;min-height:16px;align-items:center}
+.chPin i{width:13px;height:13px;border-radius:50%;border:2px solid var(--line);display:block}
+.chPin i.lleno{background:var(--accent);border-color:var(--accent)}
+.chTeclado{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.chTeclado button{padding:14px 0;font-size:19px;font-weight:600;border:1px solid var(--line);border-radius:10px;
+  background:var(--surface);cursor:pointer;font-family:"IBM Plex Mono",monospace}
+.chTeclado button:hover{border-color:var(--accent)}
+.chTeclado button.chBorra{font-size:12px;font-family:inherit;font-weight:600;color:var(--ink-3)}
+
+body.quiosco > *:not(#tab-asi):not(.modal):not(.toast){display:none!important}
+body.quiosco #tab-asi > .card:not(:first-child){display:none}
+body.quiosco #tab-asi{padding:0 16px}
+
+@media (max-width:560px){
+  .asGente{grid-template-columns:1fr}
+  .asDiaQ{min-width:100%}
+}
+
 /* hoja imprimible */
 #hoja{display:none}
 @media print{
@@ -1711,6 +1767,7 @@ body.sinDetalleCostos .soloAdminCostos{display:none!important}
         <button role="menuitem" data-tab="calc" aria-selected="false"><b>Calculadora de costos</b><small>Qué te cuesta producir, paso a paso</small></button>
         <button role="menuitem" data-tab="inv" aria-selected="false"><b>Inventario <span class="mbadge" id="invBadge" hidden>0</span></b><small>Qué hay en el taller y qué hay que pedir</small></button>
         <button role="menuitem" data-tab="com" aria-selected="false"><b>Compras <span class="mbadge" hidden>0</span></b><small>Requisiciones, proveedores y facturas</small></button>
+        <button role="menuitem" data-tab="asi" aria-selected="false"><b>Asistencia</b><small>Reloj checador y horas trabajadas</small></button>
         <button role="menuitem" data-tab="set" aria-selected="false"><b>Ajustes</b><small>Utilidad, IVA y datos de tu empresa</small></button>
       </nav>
     </div>
@@ -2333,6 +2390,48 @@ body.sinDetalleCostos .soloAdminCostos{display:none!important}
 </section>
 
 <!-- ============ AJUSTES ============ -->
+<section id="tab-asi" hidden>
+  <div class="card" style="margin-top:20px">
+    <header><h2>Reloj checador</h2>
+      <span class="hint" id="asHoy" style="margin-left:auto"></span>
+      <button class="btn sm ghost" id="asPantalla">Modo quiosco</button>
+    </header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Toca tu nombre, teclea tu clave y tómate la foto. La misma clave con la que entras al sistema. <b>Sin foto no se registra</b>.</p>
+      <div id="asGente" class="asGente"></div>
+      <div id="asSinClave"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <header><h2>Lo de hoy</h2><span class="hint" id="asResumenHoy" style="margin-left:auto"></span></header>
+    <div class="body"><div id="asLista"></div></div>
+  </div>
+
+  <div class="card">
+    <header><h2>Horas del periodo</h2>
+      <span class="hint" id="asRango" style="margin-left:auto"></span>
+      <button class="btn sm" data-reporte="asistencia">Reporte Excel</button>
+    </header>
+    <div class="body">
+      <div class="periodbar">
+        <div class="seg" id="asSeg">
+          <button data-per="dia" aria-pressed="false">Día</button>
+          <button data-per="semana" aria-pressed="true">Semana</button>
+          <button data-per="mes" aria-pressed="false">Mes</button>
+        </div>
+        <button class="btn sm" id="asPrev">‹ Anterior</button>
+        <input type="date" id="asFecha" style="width:auto">
+        <button class="btn sm" id="asNext">Siguiente ›</button>
+        <button class="btn sm ghost" id="asHoyBtn">Hoy</button>
+      </div>
+      <div class="kpis" id="asKpis"></div>
+      <div id="asHoras" style="margin-top:18px"></div>
+      <div class="tbl-wrap" style="margin-top:18px"><table id="t_asis"></table></div>
+    </div>
+  </div>
+</section>
+
 <section id="tab-set" hidden>
   <div class="card" style="margin-top:20px">
     <header><h2>Parámetros de precio</h2></header>
@@ -2388,7 +2487,7 @@ body.sinDetalleCostos .soloAdminCostos{display:none!important}
       <div class="tbl-wrap"><table id="t_equipo"></table></div>
         <p class="notaCostos"><b>Quién ve los costos.</b> El administrador siempre. A los demás los autorizas tú con la casilla <b>Ve costos</b>: sin ella ven precios, piezas y totales, pero ni el costo de producción ni la utilidad. El detalle aplicación por aplicación y el aviso de venta bajo costo son sólo del administrador. Ojo: esto <b>esconde</b> los números de la pantalla, no los cifra — quien sepa abrir las herramientas del navegador los puede encontrar.</p>
 
-      <p class="note" style="margin-top:14px;border-left-color:var(--warn)">La clave de cada persona sirve para que nadie entre por descuido a lo que no le toca, pero <b>no es una contraseña de verdad</b>: quien tenga el enlace de esta página puede cambiarse de usuario. Para bloquear accesos en serio, con su propio correo y contraseña, se usa la versión instalada en tu dominio.</p>
+      <p class="note" style="margin-top:14px;border-left-color:var(--warn)">La clave de cada persona sirve para dos cosas: que nadie entre por descuido a lo que no le toca, y <b>checar su entrada y su salida</b> en el reloj. Sin clave no puede checar. Eso sí, <b>no es una contraseña de verdad</b>: quien tenga el enlace de esta página puede cambiarse de usuario. Para bloquear accesos en serio, con su propio correo y contraseña, se usa la versión instalada en tu dominio.</p>
     </div>
   </div>
   <div class="card">
@@ -2826,6 +2925,36 @@ body.sinDetalleCostos .soloAdminCostos{display:none!important}
       <input id="artBusca" placeholder="Buscar por nombre o categoría" style="margin-bottom:10px">
       <div class="artCats" id="artCats"></div>
       <div class="artLista artRejilla" id="artLista"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalCheca" hidden>
+  <div class="card" style="width:min(460px,100%);max-height:94vh;overflow:auto">
+    <header><h2 id="chTitulo">Checar</h2>
+      <button class="btn sm" id="chCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <div class="chEstado" id="chEstado"></div>
+      <div class="chCam">
+        <video id="chVideo" autoplay playsinline muted></video>
+        <img id="chShot" alt="" hidden>
+        <div class="chCamAviso" id="chCamAviso" hidden></div>
+      </div>
+      <div class="chBotonera">
+        <button class="btn" id="chTomar">Tomar la foto</button>
+        <button class="btn ghost" id="chOtra" hidden>Repetir</button>
+      </div>
+      <label class="f" style="margin-top:14px">Tu clave</label>
+      <div class="chPin" id="chPin"></div>
+      <div class="chTeclado" id="chTeclado">
+        <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+        <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+        <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+        <button data-k="x" class="chBorra">Borrar</button><button data-k="0">0</button>
+        <button data-k="c" class="chBorra">Limpiar</button>
+      </div>
+      <button class="btn primary" id="chOk" style="width:100%;margin-top:16px" disabled>Registrar</button>
+      <p class="note" id="chNota" style="margin:12px 0 0"></p>
     </div>
   </div>
 </div>
@@ -5251,6 +5380,7 @@ const GRUPOS_BARRA = [
   ["Comercial",  ["cot","sav","cli","arc"]],
   ["Producción", ["dis","pro","inv"]],
   ["Administración", ["caj","ven","com"]],
+  ["Personal",    ["asi"]],
   ["Taller",     ["cat","calc","set"]]
 ];
 function agrupaBarra(){
@@ -5378,7 +5508,8 @@ $("#tabs").addEventListener("click", e=>{
   const bd = rot.querySelector(".mbadge"); if(bd) bd.remove();
   $("#menuActual").textContent = rot.textContent.trim();
   abreMenu(false);
-  ["inicio","cot","cat","calc","inv","com","cli","arc","caj","pro","dis","sav","ven","set"].forEach(t=> $("#tab-"+t).hidden = (t!==b.dataset.tab));
+  ["inicio","cot","cat","calc","inv","com","cli","arc","caj","pro","dis","sav","ven","asi","set"].forEach(t=> $("#tab-"+t).hidden = (t!==b.dataset.tab));
+  if(b.dataset.tab==="asi") renderAsistencia();
   if(b.dataset.tab==="inicio") renderTablero();
   if(b.dataset.tab==="inv") renderInvTaller();
   if(b.dataset.tab==="com") renderSolicitudesCompras();
@@ -6072,6 +6203,8 @@ function ponIconos(){
   /* inventario: las cajas apiladas */
   inv:'<rect x="3" y="12.5" width="8" height="8" rx="1.2"/><rect x="13" y="12.5" width="8" height="8" rx="1.2"/>'+
       '<rect x="8" y="3.5" width="8" height="8" rx="1.2"/>',
+  /* asistencia: el reloj */
+  asi:'<circle cx="12" cy="12" r="8.4"/><path d="M12 7.6V12l3 1.8"/>',
   /* ajustes: las correderas */
   set:'<path d="M4 7h16M4 12h16M4 17h16"/>'+
       '<circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="17" r="2"/>'
@@ -7253,6 +7386,406 @@ function celdaComision(u){
     'style="width:68px;text-align:right" placeholder="—" value="'+(num(u.comision) || "")+'"></td>';
 }
 
+
+/* ====================== reloj checador ====================== */
+let asistencias = [];
+let asPer = "semana", asRef = hoyISO();
+let chQuien = null, chStream = null, chBlob = null, chTecleado = "";
+
+/* Las fotos locales pesan; en el navegador solo caben unas cuantas semanas.
+   Con cuenta en línea se van al almacén y esto no aplica. */
+const DIAS_FOTO_LOCAL = 20;
+const LADO_FOTO_CHECA = 320;
+
+function minutosDe(hhmm){
+  const p = String(hhmm||"").split(":");
+  return (num(p[0])*60) + num(p[1]);
+}
+function horasTxt(min){
+  min = Math.max(0, Math.round(min));
+  const h = Math.floor(min/60), m = min%60;
+  if(!h) return m + " min";
+  return h + " h" + (m ? " " + m + " min" : "");
+}
+function horasDec(min){ return Math.round(min/60*100)/100; }
+
+function personasChecador(){ return equipo.filter(u=>u.activo !== false); }
+function eventosDe(id, fecha){
+  return asistencias.filter(a=>a.uid===id && a.fecha===fecha)
+    .slice().sort((a,b)=> a.hora<b.hora ? -1 : a.hora>b.hora ? 1 : 0);
+}
+/* Entrada con su salida. Una jornada partida da varios turnos; el último
+   puede quedar abierto, y así se enseña: abierto, no en cero. */
+function turnosDe(id, fecha){
+  const ev = eventosDe(id, fecha), t = [];
+  let abierto = null;
+  ev.forEach(e=>{
+    if(e.tipo === "entrada"){ if(!abierto) abierto = {entrada:e, salida:null}; }
+    else if(abierto){ abierto.salida = e; t.push(abierto); abierto = null; }
+  });
+  if(abierto) t.push(abierto);
+  return t;
+}
+function minutosTurno(t){ return t.salida ? Math.max(0, minutosDe(t.salida.hora) - minutosDe(t.entrada.hora)) : 0; }
+function minutosDia(id, fecha){ return turnosDe(id, fecha).reduce((s,t)=>s+minutosTurno(t), 0); }
+function estaDentro(id){
+  const t = turnosDe(id, hoyISO());
+  return !!(t.length && !t[t.length-1].salida);
+}
+function desdeHace(id){
+  const t = turnosDe(id, hoyISO());
+  if(!t.length || t[t.length-1].salida) return 0;
+  const ahora = minutosDe(horaAhora());
+  return Math.max(0, ahora - minutosDe(t[t.length-1].entrada.hora));
+}
+function diasDelRango(R){
+  const a = dmy(R.ini), b = dmy(R.fin), d = [];
+  for(let x=new Date(a); x<=b; x.setDate(x.getDate()+1)) d.push(iso(new Date(x)));
+  return d;
+}
+
+/* ---------- guardar ---------- */
+async function guardaChecada(ev){
+  asistencias.push(ev);
+  if(DB){
+    try{ await DB.collection("asistencia").doc(ev.id).set(Object.assign({fecha:ev.fecha}, ev)); return true; }
+    catch(e){ asistencias.pop(); toast("No se pudo guardar la checada: " + ((e&&e.message)||"error")); return false; }
+  }
+  if(!guardaAsistenciasLocal()){
+    asistencias.pop();
+    toast("Ya no cabe en este navegador. Borra checadas viejas o conecta una cuenta en línea.");
+    return false;
+  }
+  return true;
+}
+/* El navegador se llena. Antes de rendirse, tira las fotos más viejas:
+   vale mil veces más la hora que la foto de hace mes y medio. */
+function guardaAsistenciasLocal(){
+  for(let intento=0; intento<6; intento++){
+    try{ localStorage.setItem(LS+"_asistencias", JSON.stringify(asistencias)); return true; }
+    catch(e){
+      const conFoto = asistencias.filter(a=>a.foto && a.foto.data)
+        .sort((a,b)=> a.fecha<b.fecha ? -1 : a.fecha>b.fecha ? 1 : 0);
+      if(!conFoto.length) return false;
+      conFoto.slice(0, Math.max(1, Math.ceil(conFoto.length/4)))
+        .forEach(a=>{ delete a.foto.data; a.foto.vieja = true; });
+    }
+  }
+  return false;
+}
+function podaFotosAsistencia(){
+  if(DB) return;
+  const corte = new Date(Date.now() - DIAS_FOTO_LOCAL*86400000);
+  let tocadas = 0;
+  asistencias.forEach(a=>{
+    if(a.foto && a.foto.data && dmy(a.fecha) < corte){ delete a.foto.data; a.foto.vieja = true; tocadas++; }
+  });
+  if(tocadas) guardaAsistenciasLocal();
+}
+async function cargaAsistencias(){
+  if(DB){
+    try{
+      const s = await DB.collection("asistencia").orderBy("fecha","desc").limit(1200).get();
+      asistencias = s.docs.map(d=>d.data()).filter(Boolean);
+    }catch(e){ asistencias = []; }
+  } else {
+    asistencias = lsGet("asistencias", []) || [];
+    podaFotosAsistencia();
+  }
+}
+async function borraChecada(id){
+  const i = asistencias.findIndex(a=>a.id===id); if(i<0) return;
+  asistencias.splice(i,1);
+  if(DB){ try{ await DB.collection("asistencia").doc(id).delete(); }catch(e){ toast("No se pudo borrar"); } }
+  else guardaAsistenciasLocal();
+  renderAsistencia();
+}
+
+/* ---------- la cámara ---------- */
+async function abreCamara(){
+  const v = $("#chVideo"), aviso = $("#chCamAviso");
+  aviso.hidden = true; v.hidden = false; $("#chShot").hidden = true;
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    return sinCamara("Este navegador no deja usar la cámara. El reloj necesita cámara para la foto.");
+  }
+  try{
+    chStream = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user", width:{ideal:640}}, audio:false});
+    v.srcObject = chStream;
+    $("#chTomar").disabled = false;
+  }catch(e){
+    sinCamara(e && e.name === "NotAllowedError"
+      ? "No diste permiso de cámara. Dáselo al sitio y vuelve a intentar."
+      : "No encontré una cámara en este aparato. El reloj necesita una para la foto.");
+  }
+}
+function sinCamara(msg){
+  const aviso = $("#chCamAviso");
+  $("#chVideo").hidden = true; aviso.hidden = false; aviso.textContent = msg;
+  $("#chTomar").disabled = true;
+  revisaChOk();
+}
+function cierraCamara(){
+  try{ if(chStream) chStream.getTracks().forEach(t=>t.stop()); }catch(e){}
+  chStream = null;
+  const v = $("#chVideo"); if(v) v.srcObject = null;
+}
+function tomaFoto(){
+  const v = $("#chVideo");
+  if(!v || !v.videoWidth) { toast("La cámara todavía no arranca"); return; }
+  const escala = LADO_FOTO_CHECA / Math.max(v.videoWidth, v.videoHeight);
+  const cv = document.createElement("canvas");
+  cv.width  = Math.round(v.videoWidth * Math.min(1, escala));
+  cv.height = Math.round(v.videoHeight * Math.min(1, escala));
+  cv.getContext("2d").drawImage(v, 0, 0, cv.width, cv.height);
+  const url = cv.toDataURL("image/jpeg", 0.62);
+  $("#chShot").src = url; $("#chShot").hidden = false; $("#chVideo").hidden = true;
+  $("#chTomar").hidden = true; $("#chOtra").hidden = false;
+  chBlob = url;
+  revisaChOk();
+}
+function dataAFile(dataUrl){
+  const [cab, b64] = String(dataUrl).split(",");
+  const bin = atob(b64), arr = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+  return new File([arr], "checada.jpg", {type: (cab.match(/:(.*?);/)||[])[1] || "image/jpeg"});
+}
+async function guardaFotoCheca(dataUrl){
+  if(ASSETS){
+    try{ const r = await ASSETS.upload(dataAFile(dataUrl)); return {url:r.url, ref:r.id}; }
+    catch(e){ /* si el almacén falla, al menos queda la foto local */ }
+  }
+  return {data: dataUrl};
+}
+
+/* ---------- el modal ---------- */
+function abreCheca(id){
+  const u = equipo.find(x=>x.id===id); if(!u) return;
+  if(!String(u.pin||"").trim()){
+    toast("A " + (u.nombre||"esta persona") + " le falta su clave. Se la pone el administrador en Ajustes → Equipo.");
+    return;
+  }
+  chQuien = u; chBlob = null; chTecleado = "";
+  const dentro = estaDentro(id);
+  $("#chTitulo").textContent = (dentro ? "Salida · " : "Entrada · ") + (u.nombre||"");
+  $("#chOk").textContent = dentro ? "Registrar salida" : "Registrar entrada";
+  $("#chEstado").innerHTML = dentro
+    ? '<b>Estás dentro</b> desde las ' + esc(turnosDe(id,hoyISO()).slice(-1)[0].entrada.hora) +
+      ' · llevas ' + horasTxt(desdeHace(id))
+    : (minutosDia(id, hoyISO())
+        ? '<b>Hoy ya trabajaste</b> ' + horasTxt(minutosDia(id, hoyISO())) + ' · vas a volver a entrar'
+        : '<b>Sin registro hoy</b>');
+  $("#chNota").textContent = "Se guardan tu nombre, la hora, la foto y desde qué sesión se registró.";
+  $("#chShot").hidden = true; $("#chShot").removeAttribute("src");
+  $("#chTomar").hidden = false; $("#chOtra").hidden = true;
+  pintaPin(); revisaChOk();
+  $("#modalCheca").hidden = false;
+  abreCamara();
+}
+function cierraCheca(){
+  cierraCamara();
+  $("#modalCheca").hidden = true;
+  chQuien = null; chBlob = null; chTecleado = "";
+}
+function pintaPin(){
+  const largo = Math.max(4, chTecleado.length);
+  $("#chPin").innerHTML = Array.from({length:largo}, (_,i)=>
+    '<i class="' + (i < chTecleado.length ? "lleno" : "") + '"></i>').join("");
+}
+function revisaChOk(){
+  $("#chOk").disabled = !(chBlob && chTecleado.length >= 1);
+}
+async function registraCheca(){
+  const u = chQuien; if(!u) return;
+  if(!chBlob){ toast("Falta la foto"); return; }
+  if(String(chTecleado) !== String(u.pin||"")){
+    toast("Esa no es la clave de " + (u.nombre||""));
+    chTecleado = ""; pintaPin(); revisaChOk(); return;
+  }
+  const btn = $("#chOk"); btn.disabled = true; btn.textContent = "Guardando…";
+  const foto = await guardaFotoCheca(chBlob);
+  const dentro = estaDentro(u.id);
+  const quienRegistra = usuarioActual();
+  const ok = await guardaChecada({
+    id: uid(), uid: u.id, nombre: u.nombre||"", fecha: hoyISO(), hora: horaAhora(),
+    tipo: dentro ? "salida" : "entrada", foto,
+    desde: {id: quienRegistra.id||"", nombre: quienRegistra.nombre||""},
+    ts: Date.now()
+  });
+  if(ok) toast((dentro ? "Salida" : "Entrada") + " de " + (u.nombre||"") + " a las " + horaAhora());
+  cierraCheca();
+  renderAsistencia();
+}
+
+/* ---------- las pantallas ---------- */
+function renderAsistencia(){
+  if(!$("#asGente")) return;
+  pintaChecador();
+  pintaHoyAsistencia();
+  pintaPeriodoAsistencia();
+}
+function pintaChecador(){
+  const gente = personasChecador();
+  $("#asHoy").textContent = gente.filter(u=>estaDentro(u.id)).length + " de " + gente.length + " dentro";
+  $("#asGente").innerHTML = gente.map(u=>{
+    const dentro = estaDentro(u.id), min = minutosDia(u.id, hoyISO());
+    return '<button class="asPersona' + (dentro ? " dentro" : "") + '" data-checa="' + esc(u.id) + '">' +
+      '<span class="asAv">' + esc((u.nombre||"?").trim().charAt(0).toUpperCase()) + '</span>' +
+      '<span class="asQ"><b>' + esc(u.nombre||"Sin nombre") + '</b>' +
+        '<small>' + (dentro ? "Dentro desde " + esc(turnosDe(u.id,hoyISO()).slice(-1)[0].entrada.hora)
+                            : min ? "Fuera · hoy " + horasTxt(min) : "Sin checar hoy") + '</small></span>' +
+      '<span class="asAccion">' + (dentro ? "Salir" : "Entrar") + '</span></button>';
+  }).join("") || '<div class="empty">No hay nadie activo en el equipo. Agrégalos en Ajustes → Equipo.</div>';
+
+  const sin = gente.filter(u=>!String(u.pin||"").trim());
+  $("#asSinClave").innerHTML = sin.length
+    ? '<p class="note" style="margin:14px 0 0;border-left-color:var(--warn)"><b>' +
+      sin.map(u=>esc(u.nombre||"Sin nombre")).join(", ") +
+      '</b> no' + (sin.length>1 ? " tienen" : " tiene") + ' clave todavía, así que no puede' + (sin.length>1?"n":"") +
+      ' checar. Se la pones en <b>Ajustes → Equipo</b>.</p>'
+    : "";
+}
+function miniFoto(e){
+  const src = e.foto && (e.foto.url || e.foto.data);
+  if(src) return '<img class="asFoto" src="'+esc(src)+'" alt="Foto de la checada de '+esc(e.nombre)+
+    '" data-verfoto="'+esc(e.id)+'" onerror="this.className=\'asFoto vacia\';this.removeAttribute(\'src\')">';
+  return '<span class="asFoto vacia" title="' + (e.foto && e.foto.vieja ? "La foto ya se borró por espacio" : "Sin foto") + '">—</span>';
+}
+function pintaHoyAsistencia(){
+  const hoy = hoyISO();
+  const gente = personasChecador().filter(u=>eventosDe(u.id, hoy).length);
+  $("#asResumenHoy").textContent = gente.length
+    ? gente.length + " persona(s) · " + horasTxt(gente.reduce((s,u)=>s+minutosDia(u.id,hoy),0))
+    : "nadie ha checado";
+  $("#asLista").innerHTML = gente.length ? gente.map(u=>{
+    const ev = eventosDe(u.id, hoy);
+    return '<div class="asDia"><div class="asDiaQ"><b>' + esc(u.nombre||"") + '</b>' +
+      '<small>' + (estaDentro(u.id) ? "dentro · " + horasTxt(desdeHace(u.id)) : horasTxt(minutosDia(u.id,hoy))) + '</small></div>' +
+      '<div class="asEvs">' + ev.map(e=>
+        '<span class="asEv ' + e.tipo + '">' + miniFoto(e) +
+          '<span>' + (e.tipo==="entrada" ? "Entró" : "Salió") + ' <b>' + esc(e.hora) + '</b></span>' +
+          (rolActual()==="admin" ? '<button class="asX" data-delcheca="'+esc(e.id)+'" title="Borrar este registro">✕</button>' : '') +
+        '</span>').join("") + '</div></div>';
+  }).join("") : '<div class="empty">Todavía nadie checa hoy.</div>';
+}
+function pintaPeriodoAsistencia(){
+  const R = rango(asPer, asRef);
+  $("#asFecha").value = asRef;
+  $("#asRango").textContent = etiquetaRango(asPer, R);
+  [...$("#asSeg").children].forEach(b=>b.setAttribute("aria-pressed", b.dataset.per===asPer));
+  const dias = diasDelRango(R), gente = personasChecador();
+
+  const filas = gente.map(u=>{
+    const porDia = dias.map(d=>({d, min: minutosDia(u.id, d)}));
+    const min = porDia.reduce((s,x)=>s+x.min, 0);
+    return {u, min, porDia, dias: porDia.filter(x=>x.min>0).length};
+  }).filter(f=>f.min > 0 || f.dias > 0);
+
+  const totalMin = filas.reduce((s,f)=>s+f.min, 0);
+  /* Una entrada sin su salida: se quedaron sin checar al irse. Vale la pena
+     que se vea, porque son las horas que no se van a pagar. */
+  const cerrados = gente.reduce((s,u)=> s + dias.reduce((t,d)=> t + turnosDe(u.id,d).filter(x=>x.salida).length, 0), 0);
+  const enRango  = asistencias.filter(a=>a.fecha>=R.ini && a.fecha<=R.fin).length;
+  const sueltas  = Math.max(0, enRango - cerrados*2);
+  const diasCon  = new Set();
+  filas.forEach(f=> f.porDia.forEach(x=>{ if(x.min>0) diasCon.add(x.d); }));
+  $("#asKpis").innerHTML =
+    kpi("Horas del periodo", horasTxt(totalMin), true) +
+    kpi("Personas que checaron", filas.length) +
+    kpi("Días con asistencia", diasCon.size) +
+    kpi("Checadas sin su pareja", sueltas);
+
+  if(!filas.length){
+    $("#asHoras").innerHTML = '<div class="empty">Nadie checó en este periodo.</div>';
+    $("#t_asis").innerHTML = "";
+    return;
+  }
+  /* Una sola serie: horas por persona. Cada barra trae nombre y horas en
+     texto, que el color no puede ser lo único que distinga. */
+  const tope = Math.max(1, ...filas.map(f=>f.min));
+  const orden = filas.slice().sort((a,b)=> b.min - a.min);
+  $("#asHoras").innerHTML =
+    '<div class="comGraf" role="img" aria-label="Horas trabajadas por persona en el periodo">' +
+    orden.map(f=>'<div class="comFila">' +
+      '<span class="comQuien">' + esc(f.u.nombre||"") + '<small>' + f.dias + ' día(s)</small></span>' +
+      '<span class="comBarra"><i style="width:' + Math.max(3, Math.round(f.min/tope*100)) + '%"></i></span>' +
+      '<span class="comMx">' + horasTxt(f.min) + '</span></div>').join("") +
+    '</div>' +
+    '<div class="comTotal"><span>' + filas.length + ' persona(s)</span><b>' + horasDec(totalMin).toLocaleString("es-MX") + ' h</b></div>';
+
+  const conAlgo = dias.filter(d=>filas.some(f=>f.porDia.find(x=>x.d===d && x.min>0)));
+  $("#t_asis").innerHTML = conAlgo.length
+    ? '<thead><tr><th>Persona</th>' + conAlgo.map(d=>'<th style="text-align:right">'+dmy(d).getDate()+'</th>').join("") +
+      '<th style="text-align:right">Total</th></tr></thead><tbody>' +
+      orden.map(f=>'<tr><td>'+esc(f.u.nombre||"")+'</td>' +
+        conAlgo.map(d=>{ const m = f.porDia.find(x=>x.d===d).min;
+          return '<td style="text-align:right;font-family:\'IBM Plex Mono\',monospace">'+(m? horasDec(m).toFixed(1) : "·")+'</td>'; }).join("") +
+        '<td style="text-align:right;font-weight:700;font-family:\'IBM Plex Mono\',monospace">'+horasDec(f.min).toFixed(1)+'</td></tr>').join("") +
+      '</tbody>'
+    : "";
+}
+
+/* El quiosco: solo el checador, pantalla completa, sin menú ni nada que tocar. */
+function modoQuiosco(){
+  document.body.classList.toggle("quiosco");
+  const on = document.body.classList.contains("quiosco");
+  $("#asPantalla").textContent = on ? "Salir del quiosco" : "Modo quiosco";
+  if(on) toast("Modo quiosco. El botón de arriba lo apaga.");
+}
+
+/* ---------- eventos del checador ---------- */
+$("#tab-asi").addEventListener("click", e=>{
+  const p = e.target.closest("[data-checa]");
+  if(p){ abreCheca(p.dataset.checa); return; }
+  const d = e.target.closest("[data-delcheca]");
+  if(d){
+    if(rolActual() !== "admin"){ toast("Solo el administrador puede borrar una checada"); return; }
+    if(!confirm("¿Borrar este registro? No se corrige, se borra: el hueco se queda a la vista.")) return;
+    borraChecada(d.dataset.delcheca); return;
+  }
+  const f = e.target.closest("[data-verfoto]");
+  if(f && f.src){ abreVisor([{url:f.src, nombre:"Checada", ubic:"Checada"}], 0); return; }
+});
+$("#asPantalla").addEventListener("click", modoQuiosco);
+$("#asSeg").addEventListener("click", e=>{
+  const b = e.target.closest("[data-per]"); if(!b) return;
+  asPer = b.dataset.per; pintaPeriodoAsistencia();
+});
+$("#asFecha").addEventListener("change", e=>{ asRef = e.target.value || hoyISO(); pintaPeriodoAsistencia(); });
+$("#asHoyBtn").addEventListener("click", ()=>{ asRef = hoyISO(); pintaPeriodoAsistencia(); });
+function mueveAsis(dir){
+  const d = dmy(asRef);
+  if(asPer==="dia") d.setDate(d.getDate()+dir);
+  else if(asPer==="semana") d.setDate(d.getDate()+7*dir);
+  else d.setMonth(d.getMonth()+dir);
+  asRef = iso(d); pintaPeriodoAsistencia();
+}
+$("#asPrev").addEventListener("click", ()=>mueveAsis(-1));
+$("#asNext").addEventListener("click", ()=>mueveAsis(1));
+
+$("#chCerrar").addEventListener("click", cierraCheca);
+$("#modalCheca").addEventListener("click", e=>{ if(e.target.id === "modalCheca") cierraCheca(); });
+$("#chTomar").addEventListener("click", tomaFoto);
+$("#chOtra").addEventListener("click", ()=>{
+  chBlob = null; $("#chShot").hidden = true; $("#chOtra").hidden = true; $("#chTomar").hidden = false;
+  $("#chVideo").hidden = false; revisaChOk();
+});
+$("#chTeclado").addEventListener("click", e=>{
+  const b = e.target.closest("[data-k]"); if(!b) return;
+  const k = b.dataset.k;
+  if(k === "x") chTecleado = chTecleado.slice(0,-1);
+  else if(k === "c") chTecleado = "";
+  else if(chTecleado.length < 24) chTecleado += k;
+  pintaPin(); revisaChOk();
+});
+document.addEventListener("keydown", e=>{
+  if($("#modalCheca").hidden) return;
+  if(e.key === "Escape") return cierraCheca();
+  if(/^[0-9]$/.test(e.key) && chTecleado.length < 24){ chTecleado += e.key; pintaPin(); revisaChOk(); }
+  if(e.key === "Backspace"){ chTecleado = chTecleado.slice(0,-1); pintaPin(); revisaChOk(); }
+  if(e.key === "Enter" && !$("#chOk").disabled) registraCheca();
+});
+$("#chOk").addEventListener("click", registraCheca);
+
 /* ---------- eventos del armado ---------- */
 $("#armadoTab").addEventListener("click", ()=>abreArmado(true));
 $("#armadoCajon").addEventListener("click", e=>{
@@ -7951,10 +8484,10 @@ async function bajaCarpeta(cliente, mes, boton){
 
 /* ============ EQUIPO Y ROLES ============ */
 const ROLES = {
-  admin:      {nombre:"Administrador", ve:["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","set"]},
-  ventas:     {nombre:"Ventas",        ve:["inicio","cot","sav","pro","dis","cli","arc","com"]},
-  diseno:     {nombre:"Diseño",        ve:["inicio","dis","pro"]},
-  produccion: {nombre:"Producción",    ve:["inicio","pro","inv","com"]}
+  admin:      {nombre:"Administrador", ve:["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","asi","set"]},
+  ventas:     {nombre:"Ventas",        ve:["inicio","cot","sav","pro","dis","cli","arc","com","asi"]},
+  diseno:     {nombre:"Diseño",        ve:["inicio","dis","pro","asi"]},
+  produccion: {nombre:"Producción",    ve:["inicio","pro","inv","com","asi"]}
 };
 let equipo = [], usuarioId = null, pinPendiente = null;
 
@@ -7981,13 +8514,13 @@ function aplicaRol(){
     if(primera) primera.click();
   }
   document.querySelectorAll("[data-reporte]").forEach(b=>{
-    const zona = {ventas:"ven", caja:"caj", produccion:"pro", clientes:"cli", cotizaciones:"sav", archivo:"arc", inventario:"cat", compras:"com"}[b.dataset.reporte];
+    const zona = {ventas:"ven", caja:"caj", produccion:"pro", clientes:"cli", cotizaciones:"sav", archivo:"arc", inventario:"cat", compras:"com", asistencia:"asi"}[b.dataset.reporte];
     b.hidden = !puedeVer(zona);
   });
 }
 function renderEquipo(){
   const t = $("#t_equipo"); if(!t) return;
-  t.innerHTML = '<thead><tr><th>Nombre</th><th>Rol</th><th>Contraseña</th><th>Ve costos</th><th>Cotiza</th><th>Comisión %</th><th>Activo</th><th></th></tr></thead><tbody>'+
+  t.innerHTML = '<thead><tr><th>Nombre</th><th>Rol</th><th>Clave / PIN</th><th>Ve costos</th><th>Cotiza</th><th>Comisión %</th><th>Activo</th><th></th></tr></thead><tbody>'+
     equipo.map(u=>'<tr data-usr="'+u.id+'">'+
       '<td><input data-uk="nombre" value="'+esc(u.nombre)+'"></td>'+
       '<td><select data-uk="rol">'+Object.keys(ROLES).map(r=>'<option value="'+r+'"'+(r===u.rol?" selected":"")+'>'+ROLES[r].nombre+'</option>').join("")+'</select></td>'+
@@ -8133,6 +8666,36 @@ function reporte(tipo){
 
     XLSX.writeFile(wb, "compras-"+hoy+".xlsx");
     toast("Reporte de compras listo");
+    return;
+  }
+
+  if(tipo==="asistencia"){
+    const R = rango(asPer, asRef), dias = diasDelRango(R);
+    const evs = asistencias.filter(a=>a.fecha>=R.ini && a.fecha<=R.fin)
+      .slice().sort((a,b)=> (a.fecha+a.hora) < (b.fecha+b.hora) ? -1 : 1);
+    hojaXls(wb, "Checadas", encabezado("Asistencia", etiquetaRango(asPer, R)).concat(
+      [["Fecha","Hora","Persona","Movimiento","Con foto","Registrado desde"]],
+      evs.map(a=>[a.fecha, a.hora, a.nombre||"", a.tipo==="entrada"?"Entrada":"Salida",
+                  (a.foto && (a.foto.url||a.foto.data)) ? "sí" : (a.foto && a.foto.vieja ? "se borró" : "no"),
+                  (a.desde && a.desde.nombre) || ""])), [12,9,24,13,11,24]);
+
+    const gente = personasChecador();
+    const res = [["Persona"].concat(dias.map(d=>d)).concat(["Total horas","Días"])];
+    gente.forEach(u=>{
+      const porDia = dias.map(d=>horasDec(minutosDia(u.id, d)));
+      const tot = porDia.reduce((s,x)=>s+x, 0);
+      if(tot > 0) res.push([u.nombre||""].concat(porDia.map(h=>h||"")).concat([Math.round(tot*100)/100, porDia.filter(h=>h>0).length]));
+    });
+    hojaXls(wb, "Horas por día", encabezado("Horas trabajadas", etiquetaRango(asPer, R)).concat(res),
+            [24].concat(dias.map(()=>9)).concat([13,8]));
+
+    const turnos = [["Fecha","Persona","Entrada","Salida","Horas"]];
+    gente.forEach(u=> dias.forEach(d=> turnosDe(u.id, d).forEach(t=>
+      turnos.push([d, u.nombre||"", t.entrada.hora, t.salida ? t.salida.hora : "sin salida",
+                   t.salida ? horasDec(minutosTurno(t)) : ""]))));
+    hojaXls(wb, "Turnos", turnos, [12,24,11,13,9]);
+
+    bajaLibro(wb, "asistencia-"+hoy+".xlsx");
     return;
   }
 
@@ -10312,7 +10875,7 @@ function start(){
   if(typeof aplicaCostos === "function") aplicaCostos();
 }
 start();
-initStore().then(()=>{
+initStore().then(async ()=>{
   /* El orden importa: primero lo que se estaba capturando, luego —si no había
      nada— el ejemplo, y sólo la primerísima vez. */
   const habia = recuperaBorrador();
@@ -10324,6 +10887,7 @@ initStore().then(()=>{
   if(cot.apps.length && !cat.tecnicas.find(t=>t.id===cot.apps[0].tecnicaId)) cot.apps[0].tecnicaId = cat.tecnicas[0].id;
   if(habia) setTimeout(()=>toast("Recuperé lo que estabas capturando"), 900);
   arrancaEquipo();
+  await cargaAsistencias(); renderAsistencia();
   renderCot(); renderSet(); renderSaved(); pintaSelectClientes();
   $("#catEstado").textContent = "Catálogo al día";
   arrancaAyuda();
