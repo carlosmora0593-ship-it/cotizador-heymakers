@@ -232,7 +232,11 @@ const PERMISOS = {
   produccion: ["inicio","pro","inv","com"]
 };
 /* Secciones que no vienen en el plan Básico */
-const SOLO_PRO   = ["caj","ven"];
+/* "costos" tampoco es una pestaña: es el control de quién del equipo ve los
+   costos de producción. En Básico todo el equipo los ve, como siempre; desde
+   Pro el administrador puede esconderlos. Se vende la privacidad, no se
+   quita algo que ya tenían. */
+const SOLO_PRO   = ["caj","ven","costos"];
 /* "fac" no es una pestaña: es el bloque de datos fiscales y facturación
    que vive dentro de Ajustes. Se cuela en la misma lista porque el
    cotizador pregunta por el mismo lugar, y así hay UNA sola tabla de

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261009-2106"></script>
+<script src="config.js?v=20261009-2309"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1616,6 +1616,16 @@ span.ivImg{display:grid;place-items:center;font-size:26px;font-weight:700;color:
   border:1px dashed var(--line);border-radius:9px}
 .rVerDet:hover{color:var(--accent);border-color:var(--accent)}
 
+/* ---- quién ve los costos ---- */
+body.sinCostos .soloCostos{display:none!important}
+body.sinDetalleCostos .soloAdminCostos{display:none!important}
+.costoSiempre,.costoPlan{font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+  border-radius:5px;padding:3px 7px;white-space:nowrap}
+.costoSiempre{background:var(--good-soft);color:var(--good)}
+.costoPlan{background:var(--surface-2);color:var(--ink-3)}
+.notaCostos{font-size:12px;color:var(--ink-3);line-height:1.5;margin:10px 0 0}
+.notaCostos b{color:var(--ink-2)}
+
 
 /* ---- el diagnóstico ----
    Una pregunta a la vez. Las opciones entran escalonadas: no es adorno,
@@ -2680,6 +2690,8 @@ body.rol-produccion #btnPrint{display:none!important}
     <div class="body">
       <p class="note" style="margin:0 0 14px"><b>Administrador:</b> todo.&nbsp; <b>Ventas:</b> cotiza, confirma pedidos, clientes y consulta el catálogo sin poder editarlo; no ve caja ni utilidades.&nbsp; <b>Producción:</b> solo el tablero de órdenes, donde mueve el estatus y revisa los diseños; no ve precios.</p>
       <div class="tbl-wrap"><table id="t_equipo"></table></div>
+        <p class="notaCostos"><b>Quién ve los costos.</b> El administrador siempre. A los demás los autorizas tú con la casilla <b>Ve costos</b>: sin ella ven precios, piezas y totales, pero ni el costo de producción ni la utilidad. El detalle aplicación por aplicación y el aviso de venta bajo costo son sólo del administrador. Ojo: esto <b>esconde</b> los números de la pantalla, no los cifra — quien sepa abrir las herramientas del navegador los puede encontrar.</p>
+
       <p class="note" style="margin-top:14px;border-left-color:var(--warn)">La clave de cada persona sirve para que nadie entre por descuido a lo que no le toca, pero <b>no es una contraseña de verdad</b>: quien tenga el enlace de esta página puede cambiarse de usuario. Para bloquear accesos en serio, con su propio correo y contraseña, se usa la versión instalada en tu dominio.</p>
     </div>
   </div>
@@ -4726,11 +4738,19 @@ function renderResumen(){
   // una playera se estuviera vendiendo por debajo de lo que cuesta.
   const cPza = costoPieza(r), mPza = margenPieza(r);
   const sub = $("#r_unitSub");
-  sub.textContent = r.qty+" pza(s) · costo "+mx(cPza)+" · utilidad "+mPza.toFixed(0)+"%";
-  sub.classList.toggle("pierde", mPza < 0);
+  /* Sin permiso, aquí sólo van las piezas. El margen de la pieza es del
+     administrador; el costo, de quien él autorice. */
+  sub.textContent = r.qty+" pza(s)"+
+    (veCostos()  ? " · costo "+mx(cPza) : "")+
+    (veDetalle() ? " · utilidad "+mPza.toFixed(0)+"%" : "");
+  sub.classList.toggle("pierde", veDetalle() && mPza < 0);
   const L = [];
-  if(cot.modo!=="servicio")
-    L.push(["Artículo base", r.porLista ? mx(r.costoArt)+" → "+mx(r.precioArtLista) : mx(r.costoArt)+" c/u", true]);
+  /* Sin permiso queda el precio de lista; si el precio no sale de una lista
+     sino de la utilidad, el renglón no tiene nada que decir y no se pone. */
+  if(cot.modo!=="servicio" && (veCostos() || r.porLista))
+    L.push(["Artículo base", veCostos()
+      ? (r.porLista ? mx(r.costoArt)+" → "+mx(r.precioArtLista) : mx(r.costoArt)+" c/u")
+      : mx(r.precioArtLista), true]);
   /* Las aplicaciones, en un renglón. Seis líneas para tres estampados eran
      un acta, no un resumen; el detalle vive abajo, plegado. */
   const det = [];
@@ -4746,12 +4766,13 @@ function renderResumen(){
   });
   if(r.detalle.length)
     L.push(["Aplicaciones ("+r.detalle.length+")",
-            mx(apCosto)+" → "+mx(apPrecio)+" por pieza", true]);
+            (veCostos() ? mx(apCosto)+" → " : "")+mx(apPrecio)+" por pieza", true]);
   if(cot.modo!=="servicio"){
     const montoMerma = r.costoDirecto - (r.costoArt + r.costoApps);
-    if(montoMerma > 0.005)
+    if(montoMerma > 0.005 && veCostos())
       L.push(["Merma "+num(P.merma)+"% · lo que se echa a perder", "+"+mx(montoMerma)+" por pieza", true]);
-    L.push(["Costo de la pieza terminada", mx(costoPieza(r)), true]);
+    if(veCostos())
+      L.push(["Costo de la pieza terminada", mx(costoPieza(r)), true]);
     L.push([r.porLista ? "Precio público por pieza" : "Precio de lista por pieza", mx(r.precioBase), false]);
   }
   if(r.descVolPct>0) L.push(["Descuento volumen −"+r.descVolPct+"%", "aplicado a piezas y material", true]);
@@ -4773,12 +4794,15 @@ function renderResumen(){
   h += '<div class="total"><dt>Total</dt><dd>'+mx(r.total)+'</dd></div>';
   /* La utilidad ya no se repite aquí: la de la pieza está arriba junto al
      precio, y la del pedido completo abajo, una sola vez. */
-  if(det.length)
+  if(det.length && veDetalle())
     h += '<div class="rDet" id="rDet" hidden>'+
       det.map(x=>'<div class="muted"><dt>'+esc(x[0])+'</dt><dd>'+x[1]+'</dd></div>').join("")+
       '</div><button type="button" class="rVerDet" id="rVerDet">Ver el detalle de las aplicaciones</button>';
   $("#r_break").innerHTML = h;
-  renderAlertaPrecio(r);
+  /* El aviso de «estás vendiendo bajo tu costo» dice un costo: es del
+     administrador, que es quien puede hacer algo al respecto. */
+  if(veDetalle()) renderAlertaPrecio(r);
+  else { const al = $("#r_alerta"); if(al){ al.hidden = true; al.innerHTML = ""; } }
   if(typeof renderTotalVarios==="function") renderTotalVarios();
   if(typeof renderPedido==="function") renderPedido();
   if(typeof renderTiraItems==="function") renderTiraItems();
@@ -7394,6 +7418,9 @@ function materialDelPedido(q){
 function renderPedido(){
   const w = $("#rPedido"); if(!w) return;
   const r = calcDe(cot);
+  /* Sin permiso no hay nada que enseñar aquí: el material va con su costo y
+     la utilidad es utilidad. */
+  if(!veCostos()){ w.hidden = true; w.innerHTML = ""; return; }
   const mats = materialDelPedido(cot);
   if(!mats.length && !r.total){ w.hidden = true; w.innerHTML = ""; return; }
   w.hidden = false;
@@ -7416,6 +7443,45 @@ document.addEventListener("click", e=>{
   d.hidden = !d.hidden;
   b.textContent = d.hidden ? "Ver el detalle de las aplicaciones" : "Ocultar el detalle";
 });
+
+
+/* ---------- quién ve los costos ---------- */
+/* El control de costos es una función de paga. Mientras el plan no lo
+   incluya, todo el equipo ve los costos como siempre: nadie pierde algo que
+   ya tenía el día que esto se publique. */
+function hayControlDeCostos(){
+  try{ if(typeof window.__enElPlan === "function") return !!window.__enElPlan("costos"); }catch(e){}
+  return false;                       // cotizador suelto: sin plan, sin control
+}
+/* nada · costos · admin */
+function nivelCostos(){
+  if(rolActual() === "admin") return "admin";
+  if(!hayControlDeCostos()) return "costos";
+  return usuarioActual().veCostos ? "costos" : "nada";
+}
+const veCostos  = () => nivelCostos() !== "nada";
+const veDetalle = () => nivelCostos() === "admin";
+
+/* La clase en el cuerpo apaga de un golpe todo lo que se esconde con CSS y
+   deja el JS para lo que de plano no se debe armar. */
+function aplicaCostos(){
+  const n = nivelCostos();
+  document.body.classList.toggle("sinCostos", n === "nada");
+  document.body.classList.toggle("sinDetalleCostos", n !== "admin");
+}
+
+/* El interruptor por persona, en Ajustes → Equipo. */
+function celdaVeCostos(u){
+  const hay = hayControlDeCostos();
+  if(u.rol === "admin")
+    return '<td style="text-align:center" title="El administrador siempre ve los costos">'+
+      '<span class="costoSiempre">siempre</span></td>';
+  if(!hay)
+    return '<td style="text-align:center" title="El control de costos viene desde el plan Pro. Mientras tanto, todo el equipo los ve.">'+
+      '<span class="costoPlan">desde Pro</span></td>';
+  return '<td style="text-align:center"><input type="checkbox" data-uk="veCostos" style="width:auto"'+
+    (u.veCostos?" checked":"")+'></td>';
+}
 
 /* ---------- eventos del armado ---------- */
 $("#armadoTab").addEventListener("click", ()=>abreArmado(true));
@@ -8126,6 +8192,7 @@ function aplicaRol(){
   $("#userAv").textContent = (u.nombre||"?").trim().charAt(0).toUpperCase();
   document.body.classList.toggle("rol-ventas", r==="ventas");
   document.body.classList.toggle("rol-produccion", r==="produccion");
+  if(typeof aplicaCostos === "function") aplicaCostos();
   document.querySelectorAll('#tabs [data-tab]').forEach(b=> b.hidden = b.dataset.tab === "set" || !puedeVer(b.dataset.tab) || (window.__enElPlan && !window.__enElPlan(b.dataset.tab)));
   const sel = document.querySelector('#tabs [data-tab][aria-selected="true"]');
   if(!sel || sel.hidden){
@@ -8139,11 +8206,12 @@ function aplicaRol(){
 }
 function renderEquipo(){
   const t = $("#t_equipo"); if(!t) return;
-  t.innerHTML = '<thead><tr><th>Nombre</th><th>Rol</th><th>Contraseña</th><th>Activo</th><th></th></tr></thead><tbody>'+
+  t.innerHTML = '<thead><tr><th>Nombre</th><th>Rol</th><th>Contraseña</th><th>Ve costos</th><th>Activo</th><th></th></tr></thead><tbody>'+
     equipo.map(u=>'<tr data-usr="'+u.id+'">'+
       '<td><input data-uk="nombre" value="'+esc(u.nombre)+'"></td>'+
       '<td><select data-uk="rol">'+Object.keys(ROLES).map(r=>'<option value="'+r+'"'+(r===u.rol?" selected":"")+'>'+ROLES[r].nombre+'</option>').join("")+'</select></td>'+
       '<td><input data-uk="pin" inputmode="numeric" maxlength="24" value="'+esc(u.pin||"")+'" placeholder="sin contraseña"></td>'+
+      celdaVeCostos(u)+
       '<td style="text-align:center"><input type="checkbox" data-uk="activo" style="width:auto"'+(u.activo!==false?" checked":"")+'></td>'+
       '<td><button class="btn icon sm" data-delusr="'+u.id+'"'+(equipo.length<2?" disabled":"")+'>✕</button></td></tr>').join("")+
     '</tbody>';
@@ -8168,8 +8236,9 @@ $("#t_equipo").addEventListener("change", e=>{
   const u = equipo.find(u=>u.id===tr.dataset.usr); if(!u) return;
   const k = e.target.dataset.uk;
   if(k==="activo") u.activo = e.target.checked;
-  if(k==="rol") u.rol = e.target.value;
-  guardaEquipo(); aplicaRol();
+  if(k==="veCostos") u.veCostos = e.target.checked;
+  if(k==="rol"){ u.rol = e.target.value; renderEquipo(); }
+  guardaEquipo(); aplicaRol(); renderResumen();
 });
 $("#t_equipo").addEventListener("click", e=>{
   const d = e.target.closest("[data-delusr]"); if(!d) return;
@@ -10453,6 +10522,7 @@ function start(){
   aplicaMarca();
   arrancaEquipo();
   renderCot(); renderSet(); arrancaPasos();
+  if(typeof aplicaCostos === "function") aplicaCostos();
 }
 start();
 window.__arranca = () => initStore().then(()=>{
@@ -11600,10 +11670,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261009-2106";</script>
+<script>window.BUILD="20261009-2309";</script>
 <script>
 (function(){
-  var mio = "20261009-2106";
+  var mio = "20261009-2309";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -11631,7 +11701,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261009-2106"></script>
-<script src="diagnostico.js?v=20261009-2106"></script>
+<script src="cuenta.js?v=20261009-2309"></script>
+<script src="diagnostico.js?v=20261009-2309"></script>
 </body>
 </html>
