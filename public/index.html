@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261007-2005"></script>
+<script src="config.js?v=20261009-1804"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1499,6 +1499,9 @@ body.conBarra nav.tabs button[aria-selected="true"] .ico{color:var(--accent-ink)
   margin-top:8px;padding-top:8px;border-top:1px solid var(--line);
   font-size:13px;font-weight:650}
 .rvTotal span:last-child{font-family:"IBM Plex Mono",monospace;font-size:16px}
+.rvUtil{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-top:5px;
+  font-size:12px;color:var(--ink-2)}
+.rvUtil span:last-child{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--good)}
 .rvNota{font-size:11px;color:var(--ink-3);margin-top:6px}
 @media (max-width:560px){
   .tiraArt{max-width:none;width:100%}
@@ -4735,8 +4738,12 @@ function renderResumen(){
   if(r.iva>0) L.push(["IVA "+P.iva+"%", mx(r.iva), false]);
   let h = L.map(x=>'<div'+(x[2]?' class="muted"':'')+'><dt>'+esc(x[0])+'</dt><dd>'+x[1]+'</dd></div>').join("");
   h += '<div class="total"><dt>Total</dt><dd>'+mx(r.total)+'</dd></div>';
-  h += '<div class="muted"><dt>Utilidad del pedido completo</dt><dd>'+mx(r.utilidad)+
-       ' · '+r.margenReal.toFixed(0)+'%</dd></div>';
+  /* Este desglose es SIEMPRE del artículo abierto. Mientras hubo uno solo,
+     «del pedido completo» era cierto; con varios, era mentira. El total de
+     verdad vive en el bloque de arriba. */
+  const variosArts = (cot.items || []).length > 1;
+  h += '<div class="muted"><dt>Utilidad '+(variosArts ? 'de este artículo' : 'del pedido completo')+
+       '</dt><dd>'+mx(r.utilidad)+' · '+r.margenReal.toFixed(0)+'%</dd></div>';
   $("#r_break").innerHTML = h;
   renderAlertaPrecio(r);
   if(typeof renderTotalVarios==="function") renderTotalVarios();
@@ -6991,7 +6998,9 @@ function renderTotalVarios(){
       '<span class="rvNom">'+esc(nombreItem(p.it, i+1))+'<small>'+p.r.qty+' × '+mx(p.r.precioUnit)+'</small></span>'+
       '<span class="rvMx">'+mx(p.r.total)+'</span></div>').join("")+
     '<div class="rvTotal"><span>'+r.qty+' pieza(s) · '+r.partes.length+' artículos</span><span>'+mx(r.total)+'</span></div>'+
-    '<div class="rvNota">Abajo está el detalle del artículo que tienes abierto.</div>';
+    '<div class="rvUtil"><span>Utilidad de todo el pedido</span><span>'+mx(r.utilidad)+
+      ' · '+r.margenReal.toFixed(0)+'%</span></div>'+
+    '<div class="rvNota">Abajo está el detalle del artículo que tienes abierto, no el del pedido.</div>';
 }
 
 /* Un artículo de la orden de producción: lo que hay que hacer, con qué
@@ -11517,10 +11526,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261007-2005";</script>
+<script>window.BUILD="20261009-1804";</script>
 <script>
 (function(){
-  var mio = "20261007-2005";
+  var mio = "20261009-1804";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -11548,7 +11557,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261007-2005"></script>
-<script src="diagnostico.js?v=20261007-2005"></script>
+<script src="cuenta.js?v=20261009-1804"></script>
+<script src="diagnostico.js?v=20261009-1804"></script>
 </body>
 </html>
