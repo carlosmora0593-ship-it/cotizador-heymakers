@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261010-0101"></script>
+<script src="config.js?v=20261015-1252"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Cotizador Hey Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1772,6 +1772,141 @@ body.quiosco #tab-asi{padding:0 16px}
   .nmLinea input[data-lk="concepto"]{flex:1 1 100%}
 }
 
+/* ---- colores de las series de las gráficas ----
+   Los pisa la paleta Tecnología; éstos son los de las paletas claras, que ya
+   venían validados de antes. */
+:root{
+  --serie-1:#0680AB; --serie-2:#D6127F; --serie-3:#96600A; --serie-4:#0E7C57;
+}
+
+/* ---- accesos rápidos del tablero ---- */
+.tbAccesos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px}
+@media (min-width:1180px){ .tbAccesos{grid-template-columns:repeat(3,minmax(0,1fr))} }
+.tbAcceso{display:flex;align-items:center;gap:13px;text-align:left;width:100%;cursor:pointer;
+  padding:15px 16px;border-radius:var(--radio-sm,13px);border:1px solid var(--line);
+  background:var(--vidrio-fondo,var(--surface));color:inherit;font:inherit;position:relative;overflow:hidden;
+  transition:border-color .16s,transform .12s,box-shadow .16s}
+.tbAcceso::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--line);transition:background .16s}
+.tbAcceso:hover,.tbAcceso:focus-visible{border-color:var(--accent);transform:translateY(-2px);
+  box-shadow:0 10px 26px -16px rgba(0,0,0,.6);outline:none}
+.tbAcceso:hover::after,.tbAcceso:focus-visible::after{background:var(--accent)}
+.tbAcceso.cyan::after{background:var(--cyan)}
+.tbAcceso.bien::after{background:var(--good)}
+.tbAcceso.aviso::after{background:var(--warn)}
+.tbAcceso.mal::after{background:var(--guinda-2,var(--accent))}
+.tbAccIco{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:11px;
+  background:var(--surface-2);color:var(--ink-2)}
+.tbAcceso:hover .tbAccIco{color:var(--accent)}
+.tbAccIco svg{width:21px;height:21px}
+.tbAccTxt{flex:1;min-width:0}
+.tbAccTxt b{display:block;font-size:14px;font-family:"Fredoka",system-ui,sans-serif;font-weight:500;line-height:1.2}
+.tbAccTxt small{display:block;font-size:11px;color:var(--ink-3);line-height:1.35;margin-top:2px}
+.tbAccN{flex:none;text-align:right;font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:600;line-height:1}
+.tbAccN i{display:block;font-family:"Nunito Sans",sans-serif;font-style:normal;font-size:10px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);margin-top:4px;white-space:nowrap}
+.tbAccN.vacio{font-size:0}
+.tbAcceso.mal .tbAccN{color:var(--guinda-2,var(--accent))}
+.tbAcceso.aviso .tbAccN{color:var(--warn)}
+.tbAcceso.bien .tbAccN{color:var(--good)}
+
+/* ---- los anillos ---- */
+.tbAnillos{display:grid;grid-template-columns:repeat(auto-fit,minmax(214px,1fr));gap:12px;margin:0 0 16px}
+.tbAnillo{display:flex;align-items:center;gap:14px;padding:15px 17px;border-radius:var(--radio-sm,13px);
+  border:1px solid var(--line);background:var(--vidrio-fondo,var(--surface));position:relative}
+.tbAnSvg{width:62px;height:62px;flex:none;transform:rotate(-90deg)}
+.tbAnPista{fill:none;stroke:var(--surface-2);stroke-width:7}
+.tbAnVal{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dasharray .7s cubic-bezier(.2,.8,.3,1)}
+.tbAnPct{position:absolute;left:17px;width:62px;text-align:center;font-family:"IBM Plex Mono",monospace;
+  font-size:17px;font-weight:600;line-height:1;pointer-events:none}
+.tbAnPct i{font-style:normal;font-size:10px;margin-left:1px;color:var(--ink-3)}
+.tbAnPct small{color:var(--ink-3);font-size:15px}
+.tbAnEt{min-width:0}
+.tbAnEt b{display:block;font-size:13px;font-family:"Fredoka",system-ui,sans-serif;font-weight:500;line-height:1.25}
+.tbAnEt small{display:block;font-size:11px;color:var(--ink-3);line-height:1.4;margin-top:3px}
+
+/* ---- lo tuyo y el tip ---- */
+.tbCols2{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}
+.tbMioFila{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;font:inherit;
+  color:inherit;padding:11px 12px;border:1px solid var(--line);border-radius:11px;margin-bottom:8px;
+  background:transparent;transition:border-color .15s,background .15s}
+.tbMioFila:hover,.tbMioFila:focus-visible{border-color:var(--accent);background:var(--surface-2);outline:none}
+.tbMioIco{flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:9px;
+  background:var(--surface-2);color:var(--ink-3)}
+.tbMioIco svg{width:17px;height:17px}
+.tbMioFila:hover .tbMioIco{color:var(--accent)}
+.tbMioTxt{flex:1;min-width:0}
+.tbMioTxt b{display:block;font-size:13px;line-height:1.25}
+.tbMioTxt small{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.4;margin-top:1px}
+.tbMioIr{flex:none;color:var(--ink-3);font-size:19px;line-height:1}
+.tbPanelTip .tbPanelBody{display:flex}
+.tbTipCaja{display:flex;gap:13px;align-items:flex-start}
+.tbTipIco{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:11px;
+  background:color-mix(in oklab, var(--warn) 18%, transparent);color:var(--warn)}
+.tbTipIco svg{width:21px;height:21px}
+.tbTipCaja b{display:block;font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:14.5px;line-height:1.25}
+.tbTipCaja p{margin:5px 0 0;font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+
+@media (max-width:860px){ .tbCols2{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:620px){
+  .tbAccesos,.tbAnillos{grid-template-columns:minmax(0,1fr)}
+  .tbAccN{font-size:17px}
+}
+/* ---- portadas de grupo ---- */
+#tab-hub{padding-bottom:12px}
+.hubCabeza{display:flex;align-items:center;gap:16px;margin:20px 0 18px;padding:20px 22px;
+  border-radius:var(--radio,18px);background:var(--vidrio-fondo,var(--surface));
+  border:1px solid var(--vidrio-borde,var(--line));position:relative;overflow:hidden}
+.hubCabeza::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 180% at 100% 0%, color-mix(in oklab, var(--cyan) 14%, transparent), transparent 60%)}
+.hubCabIco{position:relative;flex:none;display:grid;place-items:center;width:52px;height:52px;border-radius:15px;
+  background:color-mix(in oklab, var(--accent) 16%, transparent);color:var(--accent)}
+.hubCabIco svg{width:27px;height:27px}
+.hubCabeza h1{margin:0;font-size:23px;font-weight:600;letter-spacing:-.01em;position:relative}
+.hubCabeza p{margin:4px 0 0;font-size:13px;color:var(--ink-2);line-height:1.45;position:relative}
+
+.hubRejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.hubCard{display:flex;align-items:flex-start;gap:13px;text-align:left;width:100%;cursor:pointer;font:inherit;
+  color:inherit;padding:16px 17px;border:1px solid var(--line);border-radius:var(--radio-sm,13px);
+  background:var(--vidrio-fondo,var(--surface));position:relative;overflow:hidden;
+  transition:border-color .16s,transform .12s,box-shadow .16s}
+.hubCard:hover,.hubCard:focus-visible{border-color:var(--accent);transform:translateY(-2px);
+  box-shadow:0 12px 28px -18px rgba(0,0,0,.65);outline:none}
+.hubIco{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:11px;
+  background:var(--surface-2);color:var(--cyan);transition:background .16s}
+.hubIco svg{width:20px;height:20px}
+.hubCard:hover .hubIco{background:color-mix(in oklab, var(--accent) 16%, transparent);color:var(--accent)}
+.hubTxt{flex:1;min-width:0}
+.hubTxt b{display:block;font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:14.5px;line-height:1.25}
+.hubTxt small{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.5;margin-top:4px}
+.hubN{flex:none;font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;color:var(--ink-3)}
+.hubCard.mal .hubN{color:var(--guinda-2,var(--accent))}
+.hubCard.aviso .hubN{color:var(--warn)}
+.hubCard.bien .hubN{color:var(--good)}
+
+/* el grupo del menú, ahora botón */
+nav.tabs .barraGrupo{cursor:pointer;width:100%;text-align:left;font:inherit;background:none;
+  border:0;border-radius:8px;transition:color .15s,background .15s}
+nav.tabs .barraGrupo:hover{color:var(--ink-2);background:var(--surface-2)}
+nav.tabs .barraGrupo[aria-current="true"]{color:var(--accent)}
+nav.tabs .barraGrupo.conPortada::after{content:"›";float:right;opacity:0;transition:opacity .15s;font-size:15px;line-height:1}
+nav.tabs .barraGrupo.conPortada:hover::after,
+nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
+
+/* la tarjeta a la que se llegó se enciende un segundo */
+.hubResalta{animation:hubFlash 1.5s ease-out}
+@keyframes hubFlash{
+  0%,12%{box-shadow:0 0 0 2px var(--accent), 0 0 0 7px color-mix(in oklab, var(--accent) 26%, transparent)}
+  100%{box-shadow:0 0 0 0 transparent, 0 0 0 0 transparent}
+}
+@media (prefers-reduced-motion: reduce){ .hubResalta{animation:none;outline:2px solid var(--accent)} }
+
+@media (max-width:560px){
+  .hubRejilla{grid-template-columns:minmax(0,1fr)}
+  .hubCabeza{padding:16px 17px;gap:13px}
+  .hubCabIco{width:44px;height:44px}
+  .hubCabeza h1{font-size:20px}
+}
+
 
 /* ---- el diagnóstico ----
    Una pregunta a la vez. Las opciones entran escalonadas: no es adorno,
@@ -2193,6 +2328,17 @@ body.rol-produccion #btnPrint{display:none!important}
 <div class="wrap">
 
 <!-- ============ COTIZAR ============ -->
+<section id="tab-hub" hidden>
+  <div class="hubCabeza">
+    <span class="hubCabIco" id="hubIco"></span>
+    <div>
+      <h1 id="hubTitulo">—</h1>
+      <p id="hubSub">—</p>
+    </div>
+  </div>
+  <div class="hubRejilla" id="hubRejilla"></div>
+</section>
+
 <section id="tab-inicio">
   <div class="tbHero">
     <div class="tbHeroTxt">
@@ -2204,7 +2350,20 @@ body.rol-produccion #btnPrint{display:none!important}
       <span class="tbCheck">✓</span> Ya lo vi
     </button>
   </div>
+  <div class="tbAccesos" id="tbAccesos"></div>
   <div class="tbTiles" id="tbTiles"></div>
+  <div class="tbAnillos" id="tbAnillos"></div>
+
+  <div class="tbCols tbCols2">
+    <div class="tbPanel" id="tbPanelMio">
+      <header><h2>Lo tuyo</h2><span class="tbCuenta" id="tbMioCuenta"></span></header>
+      <div class="tbPanelBody"><div id="tbMio"></div></div>
+    </div>
+    <div class="tbPanel tbPanelTip">
+      <header><h2>Tip del día</h2></header>
+      <div class="tbPanelBody"><div id="tbTip"></div></div>
+    </div>
+  </div>
   <div class="tbCols">
     <div class="tbPanel" id="tbCardPaso">
       <header><h2>Mientras no estabas</h2><span class="tbDesde" id="tbDesde"></span></header>
@@ -3643,7 +3802,26 @@ const $ = s => document.querySelector(s);
 /* Vive en el navegador de cada quien, no en la cuenta: así cada persona del
    taller puede tener la suya sin pelearse con las demás. */
 const LS_TEMA = "cotizador_tema";
+/* Los colores de las series de las gráficas: cian, magenta, ámbar y verde.
+   Pasaron el verificador contra el fondo de tarjeta #171C35 —banda de
+   luminosidad, separación para daltonismo y 3:1 de contraste— en ese orden,
+   que es el que separa los pares que se confunden. No se reordenan al azar. */
+const SERIES_TECNO = ["#0F9AB8","#D6127F","#BC8417","#17A179"];
 const TEMAS = {
+  tecno:    {nombre:"Tecnología",  acento:"#22D3EE", amb:["#22D3EE","#D6127F","#6366F1"],
+             modo:"dark", vars:{
+    "--bg":"#0E1226", "--surface":"#171C35", "--surface-2":"#1E2442",
+    "--line":"#2F3660", "--line-soft":"#252B4C",
+    "--ink":"#E8ECFB", "--ink-2":"#A8B0D0", "--ink-3":"#7C85A8",
+    "--cyan":"#22D3EE", "--cyan-soft":"#11283C",
+    "--good":"#34D399", "--good-soft":"#0F2A24",
+    "--warn":"#FBBF24", "--warn-soft":"#2E2512",
+    "--yellow":"#FBBF24", "--yellow-ink":"#141414",
+    "--guinda":"#F472B6", "--guinda-2":"#F9A8D4",
+    "--guinda-tenue":"#2B1430", "--guinda-medio":"#3E1A42",
+    "--serie-1":"#0F9AB8", "--serie-2":"#D6127F", "--serie-3":"#BC8417", "--serie-4":"#17A179",
+    "--shadow":"0 1px 2px rgba(0,0,0,.5), 0 14px 34px -18px rgba(0,0,0,.9)"
+  }},
   heymakers:{nombre:"Hey Makers", acento:"#D6127F", amb:["#06A1D7","#F51B95","#FFEC30"]},
   guinda:   {nombre:"Guinda",     acento:"#A81B4A", amb:["#7A1231","#C4295C","#E8B9CA"]},
   oceano:   {nombre:"Océano",     acento:"#0A7EA4", amb:["#06A1D7","#19C3C3","#7FE3F0"]},
@@ -3656,9 +3834,18 @@ const ESQUINAS  = [["recto","Recto"],["suave","Suave"],["redondo","Redondo"]];
 const BLUR  = {nitido:"0px", normal:"20px", vidrio:"34px"};
 const RADIO = {recto:{g:"10px",s:"7px"}, suave:{g:"15px",s:"10px"}, redondo:{g:"20px",s:"13px"}};
 
-function temaPorOmision(){ return {preset:"heymakers", acento:"", vidrio:"normal", esquinas:"redondo"}; }
+function temaPorOmision(){ return {preset:"tecno", acento:"", vidrio:"normal", esquinas:"redondo", v:2}; }
+/* Quien ya tenía la paleta de fábrica anterior pasa a la nueva una sola vez.
+   Quien escogió la suya —otra paleta o un acento propio— se queda con la
+   suya: cambiarle el color a alguien que ya decidió es una grosería. */
+function migraTema(t){
+  if(t.v === 2) return t;
+  if(t.preset === "heymakers" && !t.acento) t.preset = "tecno";
+  t.v = 2;
+  return t;
+}
 function leeTema(){
-  try{ return Object.assign(temaPorOmision(), JSON.parse(localStorage.getItem(LS_TEMA)||"null")||{}); }
+  try{ return migraTema(Object.assign(temaPorOmision(), JSON.parse(localStorage.getItem(LS_TEMA)||"null")||{})); }
   catch(e){ return temaPorOmision(); }
 }
 let TEMA = temaPorOmision();
@@ -3681,9 +3868,20 @@ function tintaLegible(hex){
   return L > 0.62 ? "#141414" : "#FFFFFF";
 }
 
+/* Las variables que una paleta puede pisar. Se limpian antes de poner las
+   nuevas: si no, al pasar de Tecnología a una paleta clara se quedarían los
+   grises oscuros pegados y el texto desaparecería sobre fondo blanco. */
+const VARS_PALETA = ["--bg","--surface","--surface-2","--line","--line-soft","--ink","--ink-2","--ink-3",
+  "--cyan","--cyan-soft","--good","--good-soft","--warn","--warn-soft","--yellow","--yellow-ink",
+  "--guinda","--guinda-2","--guinda-tenue","--guinda-medio",
+  "--serie-1","--serie-2","--serie-3","--serie-4","--shadow"];
 function aplicaTema(){
-  const base = TEMAS[TEMA.preset] || TEMAS.heymakers;
+  const base = TEMAS[TEMA.preset] || TEMAS.tecno;
   const raiz = document.documentElement, e = raiz.style;
+  VARS_PALETA.forEach(v=> e.removeProperty(v));
+  if(base.modo) raiz.setAttribute("data-theme", base.modo);
+  else raiz.removeAttribute("data-theme");
+  if(base.vars) Object.keys(base.vars).forEach(k=> e.setProperty(k, base.vars[k]));
   const ac = TEMA.acento || base.acento;
   e.setProperty("--accent", ac);
   e.setProperty("--accent-soft", hexARgba(ac, .18));
@@ -6029,8 +6227,12 @@ function agrupaBarra(){
   const sueltos = Object.keys(botones).filter(t=> !GRUPOS_BARRA.some(g=>g[1].indexOf(t)>=0));
   GRUPOS_BARRA.concat(sueltos.length ? [["Otros", sueltos]] : []).forEach(g=>{
     if(g[0]){
-      const h = document.createElement("div");
+      const h = document.createElement("button");
+      h.type = "button";
       h.className = "barraGrupo"; h.textContent = g[0]; h.dataset.grupo = g[0];
+      h.setAttribute("aria-current", "false");
+      if(window.HUBS && window.HUBS[g[0]]){ h.title = "Ver la portada de " + g[0];
+        h.classList.add("conPortada"); }
       tabs.appendChild(h);
     }
     g[1].forEach(t=>{ if(botones[t]) tabs.appendChild(botones[t]); });
@@ -6147,7 +6349,9 @@ $("#tabs").addEventListener("click", e=>{
   const bd = rot.querySelector(".mbadge"); if(bd) bd.remove();
   $("#menuActual").textContent = rot.textContent.trim();
   abreMenu(false);
-  ["inicio","cot","cat","calc","inv","com","cli","arc","caj","pro","dis","sav","ven","asi","nom","set"].forEach(t=> $("#tab-"+t).hidden = (t!==b.dataset.tab));
+  TABS_TODAS.forEach(t=>{ const s = $("#tab-"+t); if(s) s.hidden = (t !== b.dataset.tab); });
+  const hub = $("#tab-hub"); if(hub) hub.hidden = true;
+  document.querySelectorAll('#tabs [data-grupo]').forEach(x=> x.setAttribute("aria-current","false"));
   if(b.dataset.tab==="nom") renderNomina();
   if(b.dataset.tab==="asi") renderAsistencia();
   if(b.dataset.tab==="arc" && rolActual()==="admin") renderExpedientes();
@@ -6748,6 +6952,8 @@ function renderTablero(){
     ? "Tu último vistazo fue " + (hace || "hace un momento")
     : "Es la primera vez que abres el tablero: desde aquí empiezo a contar.";
 
+  pintaAccesos(); pintaAnillos(); pintaMio(); pintaTip();
+
   /* tiles */
   $("#tbTiles").innerHTML = pulsoDeHoy().map(t=>
     '<div class="tbTile'+(t.tono? " "+t.tono : "")+'">'+
@@ -6802,7 +7008,9 @@ $("#tab-inicio").addEventListener("click", e=>{
    El mapa vive dentro de la función a propósito: la barra lateral llama a
    ponIconos() antes de llegar aquí, y un const de arriba todavía no existiría. */
 function ponIconos(){
-  const ICONOS = {
+  /* El mismo mapa lo usan el tablero y las portadas; se publica para no
+     tener dos juegos de dibujos que se puedan desfasar. */
+  const ICONOS = window.ICONOS_SEC = {
   /* inicio: una casa */
   inicio:'<path d="M3.5 10.2L12 3.5l8.5 6.7"/><path d="M5.5 9v10a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5V9"/>'+
          '<path d="M9.5 20.5v-6h5v6"/>',
@@ -9089,6 +9297,477 @@ $("#modalNom").addEventListener("click", e=>{
   pintaLineasNom(renglonNomina(nmAbierto, R));
 });
 
+/* Todas las secciones que existen. Vivir en un solo lado evita el error de
+   crear una pestaña y que se quede visible encima de otra. */
+const TABS_TODAS = ["inicio","cot","cat","calc","inv","com","cli","arc","caj","pro","dis","sav","ven","asi","nom","set"];
+
+/* ====================== tablero: accesos, anillos y lo tuyo ====================== */
+
+/* ---------- los accesos rápidos ---------- */
+/* Por rol, en el orden en que de verdad se usan. Se filtran además por lo que
+   el rol puede ver, así que agregar una sección aquí nunca abre una puerta. */
+const ACCESOS_ROL = {
+  admin:      ["cot","pro","ven","caj","inv","nom"],
+  ventas:     ["cot","sav","cli","pro","arc","asi"],
+  produccion: ["pro","inv","asi","com"],
+  diseno:     ["dis","pro","asi"]
+};
+const ACCESOS_ET = {
+  cot: ["Cotizar",      "Empieza una cotización"],
+  sav: ["Cotizaciones", "Lo guardado y los pedidos"],
+  cli: ["Clientes",     "Directorio y su historial"],
+  arc: ["Archivo",      "Papeles por cliente"],
+  dis: ["Diseño",       "El arte de cada aplicación"],
+  pro: ["Producción",   "El tablero de órdenes"],
+  inv: ["Inventario",   "Qué hay y qué falta"],
+  caj: ["Caja",         "El corte del día"],
+  ven: ["Ventas",       "Cortes y utilidad"],
+  com: ["Compras",      "Requisiciones y proveedores"],
+  asi: ["Asistencia",   "Reloj checador y horas"],
+  nom: ["Nómina",       "Lo que se paga este periodo"],
+  cat: ["Catálogo",     "Artículos, técnicas y precios"],
+  calc:["Calculadora",  "El costo de un trabajo suelto"]
+};
+/* El número vivo de cada acceso. Todo va envuelto: si una sección todavía no
+   existe en esta versión, el acceso se pinta sin número en vez de tronar. */
+function datoAcceso(t){
+  try{
+    const vivas = guardadas.filter(g=>g.op && (g.op.estatus||"Pendiente") !== "Entregada");
+    if(t === "pro"){
+      const v = vivas.filter(g=>faltaPara(g).vencida).length;
+      return {n: vivas.length, et: vivas.length ? (v ? v+" vencida(s)" : "en proceso") : "nada en proceso",
+              tono: v ? "mal" : vivas.length ? "cyan" : ""};
+    }
+    if(t === "sav"){
+      const sin = guardadas.filter(g=>!g.op).length;
+      return {n: sin, et: sin ? "sin confirmar" : "todas confirmadas", tono: sin ? "aviso" : ""};
+    }
+    if(t === "inv"){
+      const f = (typeof faltantesInv === "function") ? faltantesInv() : [];
+      const cero = f.filter(a=>num(a.existencia) <= 0).length;
+      return {n: f.length, et: f.length ? (cero ? cero+" agotado(s)" : "por pedir") : "todo surtido",
+              tono: cero ? "mal" : f.length ? "aviso" : "bien"};
+    }
+    if(t === "ven"){
+      const con = ventas.filter(v=>saldoDe(v) > 0);
+      return {n: mx(con.reduce((s,v)=>s+saldoDe(v), 0)), et: con.length ? con.length+" por cobrar" : "nadie debe",
+              tono: con.length ? "aviso" : "bien"};
+    }
+    if(t === "caj"){
+      const c = cajaDe(hoyISO());
+      return {n: c.abierta ? "Abierta" : "Cerrada", et: c.abierta ? (c.movs||[]).length+" movimiento(s)" : "sin abrir hoy",
+              tono: c.abierta ? "bien" : ""};
+    }
+    if(t === "com"){
+      const a = (typeof conAviso === "function") ? conAviso() : [];
+      const pend = compras().filter(r=>r.estado === "pendiente").length;
+      return {n: pend, et: a.length ? a.length+" con problema" : pend ? "por autorizar" : "nada pendiente",
+              tono: a.length ? "mal" : pend ? "aviso" : ""};
+    }
+    if(t === "asi"){
+      const g = (typeof personasChecador === "function") ? personasChecador() : [];
+      const d = g.filter(u=>estaDentro(u.id)).length;
+      return {n: d + "/" + g.length, et: d ? "dentro ahorita" : "nadie ha checado", tono: d ? "bien" : ""};
+    }
+    if(t === "nom"){
+      const sin = (nominas||[]).filter(n=>!n.pagada).length;
+      return {n: sin, et: sin ? "sin pagar" : "al corriente", tono: sin ? "aviso" : "bien"};
+    }
+    if(t === "cli") return {n: (cat.clientes||[]).length, et: "en el directorio", tono: ""};
+    if(t === "dis"){
+      const sin = vivas.filter(g=>(g.apps||[]).some(a=>!a.art)).length;
+      return {n: sin, et: sin ? "sin archivo" : "todas con archivo", tono: sin ? "aviso" : "bien"};
+    }
+    if(t === "arc") return {n: guardadas.filter(g=>g.op).length, et: "pedidos archivados", tono: ""};
+    if(t === "cot") return {n: "", et: "empieza una nueva", tono: "cyan"};
+  }catch(e){}
+  return {n: "", et: "", tono: ""};
+}
+function pintaAccesos(){
+  const w = $("#tbAccesos"); if(!w) return;
+  const r = rolActual();
+  const lista = (ACCESOS_ROL[r] || ACCESOS_ROL.admin).filter(t=>{
+    if(!puedeVer(t)) return false;
+    if(t === "cot" && typeof puedeCotizar === "function" && !puedeCotizar()) return false;
+    return true;
+  });
+  w.innerHTML = lista.map(t=>{
+    const et = ACCESOS_ET[t] || [t, ""], d = datoAcceso(t);
+    return '<button class="tbAcceso'+(d.tono? " "+d.tono : "")+'" data-tbtab="'+esc(t)+'">'+
+      '<span class="tbAccIco">'+icoSeccion(t)+'</span>'+
+      '<span class="tbAccTxt"><b>'+esc(et[0])+'</b><small>'+esc(et[1])+'</small></span>'+
+      (d.n !== "" ? '<span class="tbAccN">'+esc(String(d.n))+'<i>'+esc(d.et)+'</i></span>'
+                  : '<span class="tbAccN vacio"><i>'+esc(d.et)+'</i></span>')+
+    '</button>';
+  }).join("");
+}
+/* El icono de cada sección sale del mismo mapa que usa la barra lateral, así
+   no hay dos juegos de dibujos que se puedan desfasar. */
+function icoSeccion(t){
+  const m = window.ICONOS_SEC || {};
+  const d = m[t] || m.inicio || "";
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" '+
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
+}
+function vaATab(t){
+  const b = document.querySelector('#tabs [data-tab="'+t+'"]');
+  if(b && !b.hidden){ b.click(); window.scrollTo({top:0, behavior:"smooth"}); return true; }
+  return false;
+}
+
+/* ---------- los anillos ---------- */
+/* Un dato por anillo, con su porcentaje escrito en el centro: el color
+   acompaña, nunca informa solo. */
+function anillosDeHoy(){
+  const a = [];
+  try{
+    const entregadas = guardadas.filter(g=>g.op && (g.op.estatus||"") === "Entregada");
+    const recientes = entregadas.filter(g=>{
+      const f = (g.entregaReal && g.entregaReal.fecha) || g.entrega || "";
+      return f && (Date.now() - dmy(f).getTime()) < 30*86400000;
+    });
+    const aTiempo = recientes.filter(g=>{
+      const real = (g.entregaReal && g.entregaReal.fecha) || "";
+      return real && g.entrega && real <= g.entrega;
+    }).length;
+    a.push({k:"tiempo", et:"Entregas a tiempo", sub: recientes.length ? aTiempo+" de "+recientes.length+" · últimos 30 días" : "sin entregas aún",
+            pct: recientes.length ? Math.round(aTiempo/recientes.length*100) : 0,
+            hay: recientes.length > 0, serie:1});
+
+    const vivas = guardadas.filter(g=>g.op && (g.op.estatus||"Pendiente") !== "Entregada");
+    const arrancadas = vivas.filter(g=>(g.op.estatus||"Pendiente") !== "Pendiente").length;
+    a.push({k:"taller", et:"Producción arrancada", sub: vivas.length ? arrancadas+" de "+vivas.length+" órdenes vivas" : "nada en el taller",
+            pct: vivas.length ? Math.round(arrancadas/vivas.length*100) : 0,
+            hay: vivas.length > 0, serie:4});
+
+    if(puedeVer("ven")){
+      const R = rango("mes", hoyISO());
+      const mes = ventas.filter(v=>v.fecha>=R.ini && v.fecha<=R.fin);
+      const tot = mes.reduce((s,v)=>s+num(v.total), 0);
+      const cob = mes.reduce((s,v)=>s+num(v.recibido), 0);
+      a.push({k:"cobro", et:"Cobrado del mes", sub: tot ? mx(cob)+" de "+mx(tot) : "sin ventas este mes",
+              pct: tot ? Math.round(cob/tot*100) : 0, hay: tot > 0, serie:2});
+    } else {
+      const g2 = (typeof personasChecador === "function") ? personasChecador() : [];
+      const dentro = g2.filter(u=>estaDentro(u.id)).length;
+      a.push({k:"gente", et:"Equipo adentro", sub: g2.length ? dentro+" de "+g2.length+" checaron entrada" : "sin equipo",
+              pct: g2.length ? Math.round(dentro/g2.length*100) : 0, hay: g2.length > 0, serie:3});
+    }
+  }catch(e){}
+  return a;
+}
+function pintaAnillos(){
+  const w = $("#tbAnillos"); if(!w) return;
+  w.innerHTML = anillosDeHoy().map(a=>{
+    const r = 26, circ = 2*Math.PI*r;
+    const largo = a.hay ? circ * Math.min(100, Math.max(0, a.pct)) / 100 : 0;
+    return '<div class="tbAnillo" role="img" aria-label="'+esc(a.et+": "+(a.hay? a.pct+" por ciento" : "sin datos")+". "+a.sub)+'">'+
+      '<svg viewBox="0 0 64 64" class="tbAnSvg" aria-hidden="true">'+
+        '<circle class="tbAnPista" cx="32" cy="32" r="'+r+'"></circle>'+
+        '<circle class="tbAnVal" cx="32" cy="32" r="'+r+'" stroke="var(--serie-'+a.serie+')" '+
+          'stroke-dasharray="'+largo.toFixed(1)+' '+circ.toFixed(1)+'"></circle>'+
+      '</svg>'+
+      '<span class="tbAnPct">'+(a.hay ? a.pct+'<i>%</i>' : '<small>—</small>')+'</span>'+
+      '<span class="tbAnEt"><b>'+esc(a.et)+'</b><small>'+esc(a.sub)+'</small></span>'+
+    '</div>';
+  }).join("");
+}
+
+/* ---------- lo tuyo ---------- */
+/* Lo que esa persona tiene que mover hoy. Cada renglón sabe a dónde lleva. */
+function pendientesMios(){
+  const p = [], r = rolActual();
+  const vivas = guardadas.filter(g=>g.op && (g.op.estatus||"Pendiente") !== "Entregada");
+  try{
+    if(r === "admin"){
+      const porAut = compras().filter(x=>x.estado === "pendiente" && !anulada(x));
+      if(porAut.length) p.push({t:"com", que:"Compras por autorizar", det: porAut.length+" requisición(es) esperando tu visto bueno"});
+      const sinPagar = (nominas||[]).filter(n=>!n.pagada);
+      if(sinPagar.length) p.push({t:"nom", que:"Nómina sin pagar", det: sinPagar.map(n=>n.etiqueta).join(", ")});
+      const porFac = ventas.filter(v=>v.factura && v.factura.requiere && v.factura.estado !== "facturada");
+      if(porFac.length) p.push({t:"ven", que:"Facturas pendientes", det: porFac.length+" venta(s) que pidieron factura"});
+      const f = (typeof faltantesInv === "function") ? faltantesInv() : [];
+      if(f.length) p.push({t:"inv", que:"Material por pedir", det: f.length+" artículo(s) abajo del mínimo"});
+      const sinClave = equipo.filter(u=>u.activo !== false && !String(u.pin||"").trim());
+      if(sinClave.length) p.push({t:"set", que:"Falta clave", det: sinClave.map(u=>u.nombre||"").join(", ")+" no puede checar"});
+    }
+    if(r === "admin" || r === "ventas"){
+      const plazo = (typeof plazoCxc === "function") ? plazoCxc() : 15;
+      const vencidas = ventas.filter(v=>saldoDe(v) > 0 && (typeof diasDe === "function" ? diasDe(v.fecha) : 0) > plazo);
+      if(vencidas.length && puedeVer("ven"))
+        p.push({t:"ven", que:"Cuentas vencidas", det: vencidas.length+" cliente(s) · "+mx(vencidas.reduce((s,v)=>s+saldoDe(v),0))});
+      const sinConfirmar = guardadas.filter(g=>!g.op);
+      if(sinConfirmar.length) p.push({t:"sav", que:"Cotizaciones sin confirmar", det: sinConfirmar.length+" esperando respuesta del cliente"});
+    }
+    if(r === "produccion" || r === "admin"){
+      const detenidas = vivas.filter(g=>(g.op.estatus||"") === "Detenida");
+      if(detenidas.length) p.push({t:"pro", que:"Órdenes detenidas", det: detenidas.map(g=>g.op.folio).join(", ")});
+      const hoy = vivas.filter(g=>{ const f = faltaPara(g); return !f.sin && !f.vencida && f.ms < 24*3600000; });
+      if(hoy.length) p.push({t:"pro", que:"Entregas de hoy", det: hoy.length+" orden(es) comprometidas en 24 horas"});
+    }
+    if(r === "diseno" || r === "admin"){
+      const sinArte = vivas.filter(g=>(g.apps||[]).some(a=>!a.art));
+      if(sinArte.length) p.push({t:"dis", que:"Sin archivo de diseño", det: sinArte.length+" orden(es) con aplicaciones sin arte"});
+    }
+    if(typeof estaDentro === "function" && !estaDentro(usuarioActual().id) && puedeVer("asi"))
+      p.push({t:"asi", que:"No has checado entrada", det:"el reloj no tiene tu entrada de hoy"});
+  }catch(e){}
+  return p;
+}
+function pintaMio(){
+  const w = $("#tbMio"); if(!w) return;
+  const p = pendientesMios();
+  const c = $("#tbMioCuenta");
+  if(c) c.textContent = p.length ? p.length+" cosa(s)" : "nada pendiente";
+  w.innerHTML = p.length
+    ? p.map(x=>'<button class="tbMioFila" data-tbtab="'+esc(x.t)+'">'+
+        '<span class="tbMioIco">'+icoSeccion(x.t)+'</span>'+
+        '<span class="tbMioTxt"><b>'+esc(x.que)+'</b><small>'+esc(x.det)+'</small></span>'+
+        '<span class="tbMioIr">›</span></button>').join("")
+    : '<div class="empty">Nada en tu lista. Buen momento para adelantar lo que venía después.</div>';
+}
+
+/* ---------- el tip ---------- */
+/* Fijos por ahora. El día del año escoge cuál, así que es el mismo en todas
+   las máquinas del taller y cambia solo a la medianoche. Aquí es donde van a
+   entrar después los tips programados por rol y por lo que esté pasando. */
+const TIPS = [
+  ["Cobra antes de producir", "Un anticipo del 50% no es desconfianza: es lo que paga el material. El cotizador deja registrar el anticipo al confirmar el pedido."],
+  ["La merma no es opcional", "Si imprimes 200 y entregas 200, no tienes margen de error. Un 3% de merma en Ajustes te cubre las dos playeras que se van a manchar."],
+  ["El precio del catálogo manda", "Si cambias un costo en Catálogo, las cotizaciones nuevas lo toman solas. Las viejas no: quedaron congeladas a propósito."],
+  ["Revisa lo vencido los lunes", "Cuentas por cobrar ordena por antigüedad. Un cliente que debe hace 45 días rara vez paga solo."],
+  ["Foto de entrega siempre", "La evidencia de quién recibió y a qué hora vale más el día que alguien dice que nunca le llegó."],
+  ["Pide material antes de que se acabe", "El mínimo en Catálogo marca el artículo solo. Pedir con el tanque en reserva es lo que para una producción."],
+  ["Separa costo de precio", "El costo de producción es tuyo; el precio es del cliente. Por eso el cotizador esconde el costo a quien no debe verlo."],
+  ["Cierra la caja todos los días", "Una caja que se quedó abierta de ayer mezcla el dinero de dos días y ya no hay forma de saber cuál faltó."],
+  ["Las horas extra salen del reloj", "Si la gente no checa salida, la nómina no puede pagarlas. Las checadas sin pareja se ven en Asistencia."],
+  ["Guarda el contrato el primer día", "El expediente con contrato e identificación se arma en cinco minutos al contratar, y en cinco horas cuando ya hubo un problema."],
+  ["Una cotización vence", "La vigencia en Ajustes sale impresa en el documento. Sin fecha de vencimiento, el cliente de marzo te pide el precio de enero."],
+  ["Revisa la utilidad, no el total", "Una cotización de cien mil con 8% de utilidad deja menos que una de treinta mil con 40%. El resumen te da las dos cifras."]
+];
+function tipDeHoy(){
+  const d = new Date();
+  const dia = Math.floor((d - new Date(d.getFullYear(),0,0)) / 86400000);
+  return TIPS[dia % TIPS.length];
+}
+function pintaTip(){
+  const w = $("#tbTip"); if(!w) return;
+  const t = tipDeHoy();
+  w.innerHTML = '<div class="tbTipCaja"><span class="tbTipIco">'+
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+
+    '<path d="M9 18h6"/><path d="M10 21.5h4"/>'+
+    '<path d="M12 2.5a6 6 0 0 0-3.5 10.9c.6.5.9 1.2.9 1.9V16h5.2v-.7c0-.7.3-1.4.9-1.9A6 6 0 0 0 12 2.5z"/>'+
+    '</svg></span><div><b>'+esc(t[0])+'</b><p>'+esc(t[1])+'</p></div></div>';
+}
+
+/* ====================== portadas de grupo ====================== */
+/* Cada entrada es: una sección (t), una sección y una tarjeta dentro de ella
+   (foco), o un botón que ya existe en esa sección (accion). */
+/* Se publica en window porque la barra lateral se arma antes de que este
+   const exista: leer `HUBS` ahí tronaría, y `window.HUBS` nada más da
+   undefined hasta que llega. */
+const HUBS = window.HUBS = {
+  "Producción": {
+    ico:"pro", sub:"El taller: qué se está haciendo, con qué, y para cuándo",
+    entradas:[
+      {t:"pro",  ico:"pro",       d:"ordenes",  et:"Tablero de órdenes",     det:"Mueve el estatus, palomea el checklist y deja notas de bitácora"},
+      {t:"dis",  ico:"dis",       d:"arte",     et:"Diseño y archivos",      det:"El arte de cada aplicación, listo para imprimir o bordar"},
+      {t:"inv",  ico:"inv",       d:"stock",    et:"Inventario del taller",  det:"Cuánto hay de cada artículo y qué está por acabarse"},
+      {t:"inv",  ico:"pedir",                   et:"Pedir material",         det:"Manda la solicitud a Compras con tu nombre y la hora", accion:"#ivPedir"},
+      {t:"pro",  ico:"entrega",   d:"hoy",      et:"Entregas comprometidas", det:"Lo que vence en las próximas horas, antes de que venza"},
+      {t:"arc",  ico:"historial", d:"entregadas", et:"Historial de pedidos", det:"Lo ya entregado, con su orden y sus documentos"}
+    ]
+  },
+  "Administración": {
+    ico:"caj", sub:"El dinero: lo que entra, lo que sale y lo que falta por cobrar",
+    entradas:[
+      {t:"caj",  ico:"caj",       d:"caja",     et:"Caja del día",           det:"Abre, registra movimientos y cierra el corte"},
+      {t:"ven",  ico:"ven",       d:"ventames", et:"Corte de ventas",        det:"Lo vendido, la utilidad y las piezas del periodo"},
+      {t:"ven",  ico:"cobrar",    d:"cxc",      et:"Cuentas por cobrar",     det:"Quién debe, desde cuándo y el recordatorio listo", foco:"#cardCxc"},
+      {t:"ven",  ico:"comision",  d:"comis",    et:"Comisiones",             det:"Quién vendió y cuánto se le debe del periodo", foco:"#cardComis"},
+      {t:"com",  ico:"com",       d:"compras",  et:"Compras y requisiciones",det:"Pide, autoriza, recibe y registra la factura del proveedor"},
+      {t:"com",  ico:"proveedor", d:"prov",     et:"Proveedores",            det:"A quién le compras, con qué crédito y qué le pides", foco:"#cardProv"},
+      {t:"ven",  ico:"reporte",                 et:"Reporte de ventas",      det:"El libro de Excel del periodo, para tu contador", accion:'[data-reporte="ventas"]'},
+      {t:"arc",  ico:"mes",       d:"compmes",  et:"Compras por mes",        det:"La relación con el PDF y el XML de cada proveedor", foco:"#arcCompras"}
+    ]
+  },
+  "Personal": {
+    ico:"asi", sub:"La gente: quién entró, cuánto trabajó y qué se le paga",
+    entradas:[
+      {t:"asi",  ico:"asi",       d:"dentro",   et:"Reloj checador",         det:"Entradas y salidas con clave y foto del momento"},
+      {t:"asi",  ico:"horas",     d:"horas",    et:"Horas del periodo",      det:"Cuánto trabajó cada quien, día por día"},
+      {t:"nom",  ico:"nom",       d:"nompend",  et:"Nómina del periodo",     det:"Lo que se le paga a cada quien, con sus horas extra"},
+      {t:"nom",  ico:"historial", d:"nomcerr",  et:"Nóminas cerradas",       det:"Las ya congeladas, pagadas y por pagar", foco:"#nmCerradas"},
+      {t:"arc",  ico:"expediente",d:"exped",    et:"Expedientes",            det:"Contratos, identificaciones y papeles de cada persona", foco:"#cardExp"},
+      {t:"set",  ico:"gente",     d:"equipo",   et:"Equipo y permisos",      det:"Quién entra, qué ve, quién cotiza y quién comisiona"}
+    ]
+  }
+};
+
+/* Iconos propios de la portada: los que no son una sección entera. Sin esto
+   cuatro cuadros de Administración traían el mismo dibujo de Ventas, que es
+   justo lo que una rejilla de iconos no debe hacer. */
+const ICO_HUB = {
+  pedir:'<circle cx="9.5" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/>'+
+        '<path d="M2.5 3.5H5l2.4 9.8a1.7 1.7 0 0 0 1.7 1.3h7a1.7 1.7 0 0 0 1.7-1.3L20 7.5"/>'+
+        '<path d="M13.5 3v5M11 5.5h5"/>',
+  entrega:'<path d="M2.5 7.5h10v9h-10z"/><path d="M12.5 10.5h4l3 3v3h-7z"/>'+
+          '<circle cx="6" cy="18.5" r="1.4"/><circle cx="16.5" cy="18.5" r="1.4"/>',
+  historial:'<path d="M3.3 12a8.7 8.7 0 1 0 2.6-6.2"/><path d="M3 4.5V9h4.5"/><path d="M12 8v4.3l3 1.8"/>',
+  cobrar:'<rect x="2.5" y="5.5" width="14" height="10" rx="2"/><path d="M2.5 9h14"/>'+
+         '<circle cx="17.5" cy="16.5" r="4"/><path d="M17.5 14.6v2l1.3.9"/>',
+  comision:'<path d="M5 19L19 5"/><circle cx="7.5" cy="7.5" r="2.6"/><circle cx="16.5" cy="16.5" r="2.6"/>',
+  reporte:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>'+
+          '<path d="M8.5 17v-3M12 17v-5.5M15.5 17v-2"/>',
+  proveedor:'<path d="M2.5 6.5h11v9h-11z"/><path d="M13.5 9.5h3.6l2.9 3v3h-6.5z"/>'+
+            '<circle cx="6" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/><path d="M5 10h5"/>',
+  mes:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'+
+      '<path d="M7.5 14h3M7.5 17.5h7"/>',
+  horas:'<circle cx="8" cy="8" r="5"/><path d="M8 5.3V8l1.9 1.2"/><path d="M14.5 14h6M14.5 17.5h6M14.5 20.5h4"/>',
+  expediente:'<path d="M3.5 7.5a2 2 0 0 1 2-2h3.2l1.8 2.2h8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>'+
+             '<circle cx="12" cy="12.8" r="1.9"/><path d="M8.8 17.6a3.6 3.6 0 0 1 6.4 0"/>',
+  gente:'<circle cx="8.5" cy="8" r="3.2"/><path d="M3 19.5v-1a4.5 4.5 0 0 1 4.5-4.5h2"/>'+
+        '<circle cx="16.5" cy="15.5" r="2.4"/><path d="M16.5 11.8v1.3M16.5 17.9v1.3M13.3 13.6l1.1.7M18.6 16.7l1.1.7M19.7 13.6l-1.1.7M14.4 16.7l-1.1.7"/>'
+};
+function icoHub(k){
+  const propio = ICO_HUB[k];
+  if(propio) return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" '+
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+propio+'</svg>';
+  return icoSeccion(k);
+}
+
+/* El número de cada cuadro es suyo, no el de su sección: si no, «Corte de
+   ventas», «Cuentas por cobrar» y «Comisiones» enseñaban los tres la misma
+   cifra y ninguna de las tres era la que decía el título. */
+function datoHub(d){
+  if(!d) return {n:"", tono:""};
+  try{
+    const vivas = guardadas.filter(g=>g.op && (g.op.estatus||"Pendiente") !== "Entregada");
+    if(d === "ordenes" || d === "stock" || d === "caja" || d === "compras" || d === "arte" || d === "dentro")
+      return datoAcceso({ordenes:"pro", stock:"inv", caja:"caj", compras:"com", arte:"dis", dentro:"asi"}[d]);
+    if(d === "hoy"){
+      const n = vivas.filter(g=>{ const f = faltaPara(g); return !f.sin && (f.vencida || f.ms < 24*3600000); }).length;
+      return {n, tono: n ? "mal" : "bien"};
+    }
+    if(d === "entregadas") return {n: guardadas.filter(g=>g.op && (g.op.estatus||"")==="Entregada").length, tono:""};
+    if(d === "ventames"){
+      const R = rango("mes", hoyISO());
+      return {n: mx(ventas.filter(v=>v.fecha>=R.ini && v.fecha<=R.fin).reduce((s,v)=>s+num(v.total),0)), tono:""};
+    }
+    if(d === "cxc"){
+      const con = ventas.filter(v=>saldoDe(v) > 0);
+      return {n: mx(con.reduce((s,v)=>s+saldoDe(v),0)), tono: con.length ? "aviso" : "bien"};
+    }
+    if(d === "comis"){
+      if(typeof comisionesDe !== "function") return {n:"", tono:""};
+      const R = rango("mes", hoyISO());
+      const f = comisionesDe(ventas.filter(v=>v.fecha>=R.ini && v.fecha<=R.fin));
+      return {n: mx(f.reduce((s,x)=>s+x.comision,0)), tono:""};
+    }
+    if(d === "prov") return {n: (typeof proveedores === "function" ? proveedores().length : 0), tono:""};
+    if(d === "compmes"){
+      const R = rango("mes", hoyISO());
+      return {n: compras().filter(r=>!anulada(r) && r.fecha>=R.ini && r.fecha<=R.fin).length, tono:""};
+    }
+    if(d === "horas"){
+      const R = rango("semana", hoyISO());
+      const dias = diasDelRango(R);
+      const min = personasChecador().reduce((s,u)=> s + dias.reduce((t,x)=>t+minutosDia(u.id,x), 0), 0);
+      return {n: Math.round(min/60) + " h", tono:""};
+    }
+    if(d === "nompend"){
+      const R = rangoNomina(nmPer, nmRef);
+      return {n: mx(renglonesDelPeriodo(R).reduce((s,r)=>s+r.neto,0)), tono:""};
+    }
+    if(d === "nomcerr"){
+      const sin = (nominas||[]).filter(n=>!n.pagada).length;
+      return {n: (nominas||[]).length, tono: sin ? "aviso" : ""};
+    }
+    if(d === "exped"){
+      const faltan = conExpediente().filter(g=>faltantesExp(expDe(g.id)).length).length;
+      return {n: conExpediente().length, tono: faltan ? "aviso" : "bien"};
+    }
+    if(d === "equipo") return {n: equipo.filter(u=>u.activo !== false).length, tono:""};
+  }catch(e){}
+  return {n:"", tono:""};
+}
+let hubActual = null;
+
+function entradasDelHub(nombre){
+  const h = HUBS[nombre]; if(!h) return [];
+  return h.entradas.filter(x=>{
+    if(!puedeVer(x.t)) return false;
+    /* Lo que sólo es del administrador no se enseña aunque el rol vea la
+       sección donde vive: los expedientes son el caso. */
+    if((x.foco === "#cardExp" || x.t === "set") && rolActual() !== "admin") return false;
+    return true;
+  });
+}
+function abreHub(nombre){
+  const h = HUBS[nombre]; if(!h) return false;
+  const lista = entradasDelHub(nombre);
+  if(!lista.length) return false;
+  hubActual = nombre;
+  TABS_TODAS.forEach(t=>{ const s = $("#tab-"+t); if(s) s.hidden = true; });
+  $("#tab-hub").hidden = false;
+  document.querySelectorAll('#tabs [data-tab]').forEach(b=> b.setAttribute("aria-selected","false"));
+  document.querySelectorAll('#tabs [data-grupo]').forEach(b=> b.setAttribute("aria-current", b.dataset.grupo === nombre ? "true" : "false"));
+  $("#hubTitulo").textContent = nombre;
+  $("#hubSub").textContent = h.sub;
+  $("#hubIco").innerHTML = icoSeccion(h.ico);
+  $("#hubRejilla").innerHTML = lista.map((x,i)=>{
+    const d = datoHub(x.d);
+    return '<button class="hubCard'+(d.tono? " "+d.tono : "")+'" data-hub="'+i+'">'+
+      '<span class="hubIco">'+icoHub(x.ico || x.t)+'</span>'+
+      '<span class="hubTxt"><b>'+esc(x.et)+'</b><small>'+esc(x.det)+'</small></span>'+
+      (d.n !== "" ? '<span class="hubN">'+esc(String(d.n))+'</span>' : '')+
+    '</button>';
+  }).join("");
+  $("#hubRejilla").dataset.grupo = nombre;
+  window.scrollTo({top:0, behavior:"smooth"});
+  return true;
+}
+/* Lleva a la sección y, si hace falta, baja hasta la tarjeta y la enciende un
+   segundo: sin eso, abrir Ventas para enseñar comisiones deja al usuario
+   buscando cuál de las cuatro tarjetas era. */
+function vaAEntrada(x){
+  if(!vaATab(x.t)){ toast("Esa sección no está disponible para tu usuario"); return; }
+  setTimeout(()=>{
+    if(x.accion){
+      const b = document.querySelector(x.accion);
+      if(b) b.click(); else toast("Ese botón no está en esta pantalla");
+      return;
+    }
+    if(x.foco){
+      const el = document.querySelector(x.foco);
+      if(!el){ return; }
+      el.scrollIntoView({behavior:"smooth", block:"start"});
+      el.classList.add("hubResalta");
+      setTimeout(()=>el.classList.remove("hubResalta"), 1600);
+    }
+  }, 120);
+}
+
+/* ---------- eventos de los accesos ---------- */
+$("#tab-inicio").addEventListener("click", e=>{
+  const b = e.target.closest("[data-tbtab]"); if(!b) return;
+  if(!vaATab(b.dataset.tbtab)) toast("Esa sección no está disponible para tu usuario");
+});
+
+/* ---------- eventos de las portadas ---------- */
+$("#tabs").addEventListener("click", e=>{
+  const g = e.target.closest("[data-grupo]"); if(!g) return;
+  e.stopPropagation();
+  if(!abreHub(g.dataset.grupo)) toast("No hay nada en ese grupo para tu usuario");
+  else if(window.innerWidth < 1100 && typeof abreMenu === "function") abreMenu(false);
+});
+$("#hubRejilla").addEventListener("click", e=>{
+  const c = e.target.closest("[data-hub]"); if(!c) return;
+  const lista = entradasDelHub($("#hubRejilla").dataset.grupo || hubActual);
+  const x = lista[num(c.dataset.hub)];
+  if(x) vaAEntrada(x);
+});
+
 /* ---------- eventos del armado ---------- */
 $("#armadoTab").addEventListener("click", ()=>abreArmado(true));
 $("#armadoCajon").addEventListener("click", e=>{
@@ -9810,6 +10489,11 @@ function aplicaRol(){
   document.body.classList.toggle("rol-diseno", r==="diseno");
   if(typeof aplicaCostos === "function") aplicaCostos();
   document.querySelectorAll('#tabs [data-tab]').forEach(b=> b.hidden = b.dataset.tab === "set" || !puedeVer(b.dataset.tab) || (window.__enElPlan && !window.__enElPlan(b.dataset.tab)));
+  /* Un grupo sin una sola sección visible es un encabezado huérfano. */
+  document.querySelectorAll('#tabs [data-grupo]').forEach(h=>{
+    const g = GRUPOS_BARRA.find(x=>x[0] === h.dataset.grupo);
+    h.hidden = !!g && !g[1].some(t=>puedeVer(t));
+  });
   /* Cotizar se puede quitar persona por persona, aunque el rol se la diera. */
   if(!puedeCotizar(u)){ const bc = document.querySelector('#tabs [data-tab="cot"]'); if(bc) bc.hidden = true; }
   const sel = document.querySelector('#tabs [data-tab][aria-selected="true"]');
@@ -13368,10 +14052,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261010-0101";</script>
+<script>window.BUILD="20261015-1252";</script>
 <script>
 (function(){
-  var mio = "20261010-0101";
+  var mio = "20261015-1252";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -13399,7 +14083,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261010-0101"></script>
-<script src="diagnostico.js?v=20261010-0101"></script>
+<script src="cuenta.js?v=20261015-1252"></script>
+<script src="diagnostico.js?v=20261015-1252"></script>
 </body>
 </html>
