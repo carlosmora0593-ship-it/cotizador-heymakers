@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261016-1215"></script>
+<script src="config.js?v=20261016-1242"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Taller Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -427,6 +427,16 @@ nav.tabs button[aria-selected="true"] b{color:var(--accent)}
 .candadoBtn:hover{border-color:var(--accent);color:var(--accent)}
 
 /* ---------- claves del equipo ---------- */
+/* ---------- folios ---------- */
+.folMuestra{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:18px}
+.folEj{border:1px solid var(--line);border-radius:var(--radio-sm,10px);background:var(--surface-2);padding:10px 12px}
+.folEj span{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:5px}
+.folEj b{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;letter-spacing:.02em;word-break:break-all}
+.folCuenta{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.folCuenta i{font-style:normal;font-size:11.5px;color:var(--ink-3);background:var(--surface-2);
+  border:1px solid var(--line-soft);border-radius:99px;padding:3px 10px}
+
 .clvLista{display:flex;flex-direction:column}
 .clvFila{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
   padding:10px 2px;border-bottom:1px solid var(--line-soft)}
@@ -2851,7 +2861,7 @@ body.rol-produccion #btnPrint{display:none!important}
           <div><label class="f" for="inv_tipo">Movimiento</label><select id="inv_tipo">
             <option value="entrada">Entrada (compra)</option><option value="salida">Salida (merma, uso)</option><option value="ajuste">Ajuste de conteo</option></select></div>
           <div style="width:120px"><label class="f" for="inv_cant">Cantidad</label><input id="inv_cant" type="number" min="0" step="1"></div>
-          <div style="width:150px"><label class="f" for="inv_req">N.º requisición</label><input id="inv_req" placeholder="REQ-001"></div>
+          <div style="width:170px"><label class="f" for="inv_req">N.º requisición</label><input id="inv_req" placeholder="REQ-…"></div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:end">
           <div style="min-width:220px;flex:1"><label class="f" for="inv_nota">Concepto / proveedor</label><input id="inv_nota" placeholder="A quién se compró, motivo de la salida…"></div>
@@ -3333,6 +3343,37 @@ body.rol-produccion #btnPrint{display:none!important}
       <div class="tbl-wrap"><table id="t_equipo"></table></div>
         <p class="notaCostos"><b>Quién ve los costos.</b> El administrador siempre. A los demás los autorizas tú con la casilla <b>Ve costos</b>: sin ella ven precios, piezas y totales, pero ni el costo de producción ni la utilidad. El detalle aplicación por aplicación y el aviso de venta bajo costo son sólo del administrador. Ojo: esto <b>esconde</b> los números de la pantalla, no los cifra — quien sepa abrir las herramientas del navegador los puede encontrar.</p>
 
+    </div>
+  </div>
+  <div class="card" data-solo-admin>
+    <header><h2>Folios</h2><span class="hint">las letras de tu taller en cada documento</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Escoge <b>tres letras</b> y todos los documentos nuevos las llevan:
+        cotizaciones, órdenes de producción, requisiciones de compra y la serie de tus facturas. Los folios que ya
+        existen <b>no se tocan</b> — un documento que ya saliste del taller no puede cambiar de nombre.</p>
+      <div class="grid g3">
+        <div>
+          <label class="f" for="f_letras">Tus tres letras</label>
+          <input id="f_letras" maxlength="3" placeholder="COM" autocomplete="off"
+                 style="text-transform:uppercase;letter-spacing:.18em;font-family:'IBM Plex Mono',monospace">
+        </div>
+        <div>
+          <label class="f" for="f_digitos">Cuántos números</label>
+          <select id="f_digitos">
+            <option value="4">4 — hasta 9,999</option>
+            <option value="5">5 — hasta 99,999</option>
+            <option value="6">6 — hasta 999,999</option>
+            <option value="7">7 — hasta 9,999,999</option>
+            <option value="8">8 — hasta 99,999,999</option>
+          </select>
+        </div>
+      </div>
+      <div class="folMuestra" id="folMuestra"></div>
+      <div id="folEstado"></div>
+      <div class="temaFila" style="margin-top:16px">
+        <button class="btn" id="folLetra" type="button">Agregar una letra a la serie</button>
+        <span class="hint">cuando se acaben los números</span>
+      </div>
     </div>
   </div>
   <div class="card" data-solo-admin>
@@ -4342,6 +4383,7 @@ function defaults(){ return {
 const CHECKS = ["Diseño aprobado por el cliente","Material en almacén","Archivo impreso","Prensado / aplicado","Revisión de calidad","Empacado","Entregado"];
 function defaultParams(){ return {plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
   tarifaKwh:4, bloqueoMin:10,
+  folios:{letras:"", extra:"", digitos:6, desde:{cot:1, op:1, req:1}},
   compras:{tope:2000, siempre:false},
   empresa:{nombre:"Hey Makers",eslogan:"Cursos y Talleres",tel:"",mail:"",logo:"",
   /* Lo fiscal va aparte de lo comercial a propósito: el nombre comercial es
@@ -4378,17 +4420,118 @@ function nuevaCot(demo){
 function sumaTallas(c){ return (c.tallas||[]).reduce((s,t)=>s+Math.max(0,Math.round(num(t.cant))),0); }
 function usaTallas(c){ return (c.tallas||[]).length>0 && sumaTallas(c)>0 && !c.cantManual; }
 function esTextil(g){ const a = cat.articulos.find(a=>a.id===(g||cot).articuloId); return a? !!a.tallas : false; }
+/* ============ FOLIOS CON LETRAS PROPIAS ============
+   El administrador escoge tres letras —las de su taller— y todos los folios
+   las llevan: COT-COM000001, OP-COM000001, REQ-COM000001, y la serie de sus
+   facturas F-COM. Mientras no escoja ninguna, los folios siguen como siempre,
+   con la fecha; así nadie se encuentra un formato nuevo sin pedirlo.
+
+   El consecutivo NO se guarda en un contador. Se deduce del documento más
+   alto que ya existe con esas letras. Es a propósito: una cotización que se
+   empieza y no se guarda no debe quemarse un folio, y si alguien restaura un
+   respaldo viejo el número se reacomoda solo en vez de repetirse. */
+const PREFIJO_FOLIO = {cot:"COT", op:"OP", req:"REQ"};
+
+function foliosCfg(){
+  if(!P.folios) P.folios = {letras:"", extra:"", digitos:6, desde:{cot:1, op:1, req:1}};
+  if(!P.folios.desde) P.folios.desde = {cot:1, op:1, req:1};
+  return P.folios;
+}
+const letrasFolio = () => String(foliosCfg().letras||"").toUpperCase().replace(/[^A-Z]/g,"").slice(0,3);
+const extraFolio  = () => String(foliosCfg().extra||"").toUpperCase().replace(/[^A-Z]/g,"").slice(0,3);
+const serieFolio  = () => letrasFolio() + extraFolio();
+const digitosFolio = () => Math.min(9, Math.max(3, num(foliosCfg().digitos, 6)));
+const topeFolio = () => Math.pow(10, digitosFolio()) - 1;
+function armaFolio(tipo, n){
+  return PREFIJO_FOLIO[tipo] + "-" + serieFolio() + String(n).padStart(digitosFolio(), "0");
+}
+
+/* Los folios que ya existen con ESTA serie. Los de la serie anterior —o los
+   viejos con fecha— no estorban: no empiezan igual, así que no se cuentan. */
+function foliosDe(tipo){
+  if(tipo === "cot") return guardadas.map(g=>g.folio);
+  if(tipo === "op")  return guardadas.map(g=> g.op && g.op.folio);
+  if(tipo === "req") return (typeof compras === "function" ? compras() : []).map(r=>r.folio);
+  return [];
+}
+function ultimoFolio(tipo){
+  const pre = PREFIJO_FOLIO[tipo] + "-" + serieFolio();
+  let alto = 0;
+  foliosDe(tipo).forEach(f=>{
+    if(!f || String(f).indexOf(pre) !== 0) return;
+    const n = parseInt(String(f).slice(pre.length).replace(/\D/g,""), 10);
+    if(isFinite(n) && n > alto) alto = n;
+  });
+  return alto;
+}
+
+/* Se acabaron los números: se le agrega una letra a la serie y el
+   consecutivo vuelve a empezar. Los folios viejos siguen siendo válidos —
+   están en la serie anterior, que nadie va a volver a usar. */
+function sumaLetra(s){
+  if(!s) return "A";
+  const i = s.charCodeAt(s.length-1) - 65;
+  if(i < 25) return s.slice(0,-1) + String.fromCharCode(66 + i);
+  return sumaLetra(s.slice(0,-1)) + "A";
+}
+function creceSerie(callado){
+  const c = foliosCfg();
+  c.extra = sumaLetra(extraFolio());
+  c.desde = {cot:1, op:1, req:1};
+  persist();
+  if(!callado) toast("Se agotaron los números: la serie ahora es " + serieFolio() +
+                     " y el consecutivo vuelve a empezar.");
+  if(typeof renderFolios === "function") renderFolios();
+  return serieFolio();
+}
+
+function siguienteFolio(tipo){
+  const c = foliosCfg();
+  let n = Math.max(num((c.desde||{})[tipo], 1), ultimoFolio(tipo) + 1);
+  if(n > topeFolio()){ creceSerie(); n = Math.max(1, num((foliosCfg().desde||{})[tipo], 1)); }
+  return armaFolio(tipo, n);
+}
+
+/* El formato viejo, con la fecha. Sigue vivo para quien no puso letras. */
+function folioPorFecha(prefijo, usados){
+  const d = new Date(), p = n => String(n).padStart(2,"0");
+  const base = prefijo + "-" + d.getFullYear() + p(d.getMonth()+1) + p(d.getDate());
+  const n = usados.filter(f => f && String(f).indexOf(base) === 0).length + 1;
+  return base + "-" + p(n);
+}
+
+/* La factura es harina de otro costal: la serie y el consecutivo son campos
+   fiscales del CFDI y los lleva el SAT, no nosotros. Lo único que hacemos es
+   sugerir la serie —F- más las letras del taller— y enseñar el folio con sus
+   ceros. Quien ya tenga una serie suya escogida, se la respetamos. */
+function serieFacturaSugerida(){ return letrasFolio() ? "F-" + serieFolio() : ""; }
+function folioFacturaTxt(){
+  const E = P.empresa || {};
+  const n = num(E.folioFactura, 0);
+  if(!n) return E.serie || "";
+  return (E.serie || "") + "-" + String(n).padStart(digitosFolio(), "0");
+}
+/* Se adopta la serie sugerida sólo si la que hay es la de fábrica, está
+   vacía, o es una sugerencia nuestra anterior. Cambiarle la serie a quien ya
+   facturó con la suya sería meterse donde no nos llaman. */
+function alineaSerieFactura(){
+  const E = P.empresa || {};
+  const sug = serieFacturaSugerida(); if(!sug) return false;
+  const actual = String(E.serie||"").trim();
+  const nuestra = /^F-[A-Z]{3,6}$/.test(actual);
+  if(actual && actual !== "A" && !nuestra) return false;
+  if(actual === sug) return false;
+  E.serie = sug;
+  return true;
+}
+
 function folioOP(){
-  const d=new Date(), p=n=>String(n).padStart(2,"0");
-  const base="OP-"+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());
-  const usados = guardadas.filter(g=>g.op && g.op.folio && g.op.folio.indexOf(base)===0).length;
-  return base+"-"+p(usados+1);
+  if(letrasFolio()) return siguienteFolio("op");
+  return folioPorFecha("OP", guardadas.map(g=> g.op && g.op.folio));
 }
 function folioNuevo(){
-  const d=new Date(), p=n=>String(n).padStart(2,"0");
-  const base="COT-"+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());
-  const n=guardadas.filter(g=>g.folio&&g.folio.startsWith(base)).length+1;
-  return base+"-"+p(n);
+  if(letrasFolio()) return siguienteFolio("cot");
+  return folioPorFecha("COT", guardadas.map(g=>g.folio));
 }
 
 /* ---------- almacenamiento ---------- */
@@ -6479,7 +6622,7 @@ function renderSet(){
   $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia; $("#p_plazoCobro").value=num(P.plazoCobro,15);
   const pcb = $("#p_comisionBase"); if(pcb) pcb.value = baseComision();
   const pbl = $("#p_bloqueo"); if(pbl) pbl.value = String(num(P.bloqueoMin, MIN_BLOQUEO));
-  pintaNotaBloqueo(); renderClaves();
+  pintaNotaBloqueo(); renderClaves(); renderFolios();
   P.compras = P.compras || {tope:2000, siempre:false};
   $("#p_compraTope").value = num(P.compras.tope); $("#p_compraSiempre").checked = !!P.compras.siempre;
   $("#p_origen").value = P.origen==="lista" ? "lista" : "utilidad";
@@ -12688,6 +12831,84 @@ let clvAbierto = {};
 function clvOn(u){ return tieneClave(u) || !!clvAbierto[u.id]; }
 function clvFila(id, sel){ return $('#clvLista [data-clv="'+id+'"] '+sel); }
 
+function renderFolios(){
+  const m = $("#folMuestra"); if(!m) return;
+  const c = foliosCfg();
+  const li = $("#f_letras"); if(li && document.activeElement !== li) li.value = letrasFolio();
+  const di = $("#f_digitos"); if(di) di.value = String(digitosFolio());
+
+  if(!letrasFolio()){
+    m.innerHTML = '<div class="folEj" style="grid-column:1/-1"><span>Así salen hoy</span>' +
+      '<b>COT-' + new Date().getFullYear() + '…-01</b></div>';
+    $("#folEstado").innerHTML = '<p class="note" style="margin-top:14px">Sin letras, los folios llevan la fecha ' +
+      'como hasta ahora. Escribe tres letras arriba para cambiarlos.</p>';
+    return;
+  }
+
+  const prox = t => { const n = Math.max(num((c.desde||{})[t],1), ultimoFolio(t)+1); return Math.min(n, topeFolio()); };
+  const ej = (et, v) => '<div class="folEj"><span>'+et+'</span><b>'+esc(v)+'</b></div>';
+  m.innerHTML =
+    ej("Cotización", armaFolio("cot", prox("cot"))) +
+    ej("Orden de producción", armaFolio("op", prox("op"))) +
+    ej("Requisición de compra", armaFolio("req", prox("req"))) +
+    ej("Factura", (serieFacturaSugerida() || "—") + "-" +
+        String(Math.max(1, num((P.empresa||{}).folioFactura, 1))).padStart(digitosFolio(),"0"));
+
+  const falta = t => topeFolio() - prox(t) + 1;
+  const apretado = ["cot","op","req"].filter(t => falta(t) <= Math.max(50, topeFolio()*0.02));
+  $("#folEstado").innerHTML =
+    '<div class="folCuenta">' +
+      '<i>Serie actual: <b>' + esc(serieFolio()) + '</b></i>' +
+      ["cot","op","req"].map(t=>'<i>' + PREFIJO_FOLIO[t] + ': quedan ' +
+        falta(t).toLocaleString("es-MX") + '</i>').join("") +
+    '</div>' +
+    (apretado.length
+      ? '<p class="note" style="margin-top:12px;border-left-color:var(--warn)">Ya casi se acaban los números de ' +
+        apretado.map(t=>PREFIJO_FOLIO[t]).join(", ") + '. Agrega una letra a la serie: los folios viejos siguen ' +
+        'valiendo y el consecutivo vuelve a empezar.</p>'
+      : '<p class="note" style="margin-top:12px">El consecutivo sale del documento más alto que ya existe con estas ' +
+        'letras, no de un contador escondido: una cotización que empiezas y no guardas no se quema un folio.</p>');
+}
+
+$("#tab-set").addEventListener("input", e=>{
+  if(e.target.id !== "f_letras") return;
+  const c = foliosCfg();
+  c.letras = String(e.target.value||"").toUpperCase().replace(/[^A-Z]/g,"").slice(0,3);
+  e.target.value = c.letras;
+  if(alineaSerieFactura()) renderFiscal();
+  clearTimeout(window._tFol);
+  window._tFol = setTimeout(()=>{ persist(); renderFolios(); reexpideFolioAbierto(); }, 500);
+});
+
+/* La cotizacion que esta en pantalla y todavia no se guarda no tiene por que
+   quedarse con el folio del formato anterior: no existe en ningun lado mas
+   que aqui. Una ya guardada no se toca nunca. */
+function reexpideFolioAbierto(){
+  if(typeof cot !== "object" || !cot) return;
+  if(guardadas.some(g=>g.folio === cot.folio)) return;
+  const nuevoF = folioNuevo();
+  if(nuevoF === cot.folio) return;
+  cot.folio = nuevoF;
+  const h = $("#folioHint"); if(h) h.textContent = cot.folio + " · " + cot.fecha;
+  if(typeof renderResumen === "function") renderResumen();
+}
+$("#tab-set").addEventListener("change", e=>{
+  if(e.target.id !== "f_digitos") return;
+  foliosCfg().digitos = num(e.target.value, 6);
+  persist(); renderFolios(); reexpideFolioAbierto();
+});
+$("#tab-set").addEventListener("click", e=>{
+  if(!e.target.closest("#folLetra")) return;
+  if(!letrasFolio()){ toast("Primero escribe tus tres letras"); return; }
+  if(!confirm("¿Agregar una letra a la serie?\n\nLa serie pasa de " + serieFolio() + " a " +
+      (letrasFolio() + sumaLetra(extraFolio())) + " y el consecutivo vuelve a empezar en 1.\n\n" +
+      "Los folios que ya existen no se tocan: quedan en la serie anterior y siguen siendo válidos.")) return;
+  creceSerie(true);
+  if(alineaSerieFactura()) renderFiscal();
+  toast("La serie ahora es " + serieFolio());
+  renderFolios(); reexpideFolioAbierto();
+});
+
 function renderClaves(){
   const w = $("#clvLista"); if(!w) return;
   w.innerHTML = equipo.map(u=>{
@@ -14192,7 +14413,7 @@ function abreFactura(v){
     ["Emisor", E.razon || P.empresa.nombre], ["RFC del emisor", E.rfc],
     ["Régimen del emisor", E.regimen ? E.regimen+" — "+regE : ""],
     ["Lugar de expedición (CP)", E.cpFiscal],
-    ["Serie y folio", (E.serie||"") + (E.folioFactura ? "-"+E.folioFactura : "")],
+    ["Serie y folio", folioFacturaTxt()],
     ["Folio interno", v.folio], ["Fecha", v.fecha],
     ["Receptor", f.razon || v.cliente], ["RFC", f.rfc],
     ["Código postal", f.cp], ["Régimen fiscal", f.regimen+" — "+reg],
@@ -14489,9 +14710,8 @@ function proveedores(){ cat.proveedores = cat.proveedores || []; return cat.prov
 function compras(){ cat.compras = cat.compras || []; return cat.compras; }
 const provDe = id => proveedores().find(p=>p.id===id);
 function folioReq(){
-  const base = "REQ-" + hoyISO().replace(/-/g,"");
-  const n = compras().filter(r=>r.folio && r.folio.startsWith(base)).length + 1;
-  return base + "-" + String(n).padStart(2,"0");
+  if(letrasFolio()) return siguienteFolio("req");
+  return folioPorFecha("REQ", compras().map(r=>r.folio));
 }
 const totalReq = r => (r.partidas||[]).reduce((s,x)=> s + num(x.cant)*num(x.costo), 0);
 const faltaDe = x => Math.max(0, num(x.cant) - num(x.recibido));
@@ -15591,10 +15811,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261016-1215";</script>
+<script>window.BUILD="20261016-1242";</script>
 <script>
 (function(){
-  var mio = "20261016-1215";
+  var mio = "20261016-1242";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -15622,7 +15842,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261016-1215"></script>
-<script src="diagnostico.js?v=20261016-1215"></script>
+<script src="cuenta.js?v=20261016-1242"></script>
+<script src="diagnostico.js?v=20261016-1242"></script>
 </body>
 </html>
