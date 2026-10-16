@@ -194,6 +194,115 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
   padding-top:9px;border-top:1px solid var(--line)}
 .sumaLin.total span:last-child{font-family:"IBM Plex Mono",monospace}
 
+/* ---------- comensales ---------- */
+.comenFila{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.comenFila button{cursor:pointer;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:99px;padding:5px 13px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.comenFila button[aria-pressed="true"]{background:var(--good);border-color:var(--good);color:#04201A}
+.comenFila .et{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-right:4px}
+.linGrupo{padding:7px 15px 3px;font-size:10.5px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--good);background:var(--surface-2);border-bottom:1px solid var(--line-soft)}
+.linGrupo span{float:right;font-family:"IBM Plex Mono",monospace;color:var(--ink-2);letter-spacing:0}
+.lin .edo{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  border-radius:99px;padding:1px 7px;margin-top:3px}
+.edo.pedido{background:var(--surface-2);color:var(--ink-3)}
+.edo.preparando{background:var(--warn-soft);color:var(--warn)}
+.edo.listo{background:var(--good-soft);color:var(--good)}
+.edo.entregada{background:var(--cyan-soft);color:var(--cyan)}
+.lin.cancelada{opacity:.5;text-decoration:line-through}
+
+/* ---------- cocina ---------- */
+.kds{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.kdsCard{border:1px solid var(--line);border-radius:var(--radio);background:var(--surface);
+  overflow:hidden;display:flex;flex-direction:column}
+.kdsCard.verde{border-color:var(--good)}
+.kdsCard.ambar{border-color:var(--warn)}
+.kdsCard.rojo{border-color:var(--mal);box-shadow:0 0 0 1px var(--mal)}
+.kdsCard header{display:flex;align-items:baseline;gap:9px;padding:11px 14px;
+  background:var(--surface-2);border-bottom:1px solid var(--line-soft)}
+.kdsCard header b{font-family:"Fredoka";font-size:16px}
+.kdsCard header small{color:var(--ink-3);font-size:11.5px}
+.kdsCard header .reloj{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600}
+.kdsCard.ambar header .reloj{color:var(--warn)}
+.kdsCard.rojo header .reloj{color:var(--mal)}
+.kdsCuerpo{padding:4px 0;flex:1}
+.kdsSeat{padding:6px 14px 2px;font-size:10.5px;font-weight:700;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--cyan)}
+.kdsLin{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:8px;align-items:center;
+  padding:7px 14px;border-bottom:1px solid var(--line-soft)}
+.kdsLin:last-child{border-bottom:0}
+.kdsLin .c{font-family:"IBM Plex Mono",monospace;font-weight:700;color:var(--cyan)}
+.kdsLin b{font-size:13.5px;font-weight:600;display:block;line-height:1.3}
+.kdsLin small{display:block;color:var(--warn);font-size:11.5px;line-height:1.4}
+.kdsLin button{cursor:pointer;border:1px solid var(--line);background:var(--surface-2);
+  border-radius:99px;padding:4px 11px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.kdsLin button.ir{background:var(--warn);border-color:var(--warn);color:#2A1D02}
+.kdsLin button.ok{background:var(--good);border-color:var(--good);color:#04201A}
+.kdsLin.lista{opacity:.55}
+.kdsPie{padding:10px 14px;border-top:1px solid var(--line);background:var(--surface-2)}
+.kdsCancel{background:var(--accent-soft);border-left:3px solid var(--accent);padding:8px 14px;
+  font-size:12px;color:var(--ink-2)}
+.kdsCancel b{color:var(--accent)}
+
+/* ---------- croquis ---------- */
+.croquis{position:relative;border:1px dashed var(--line);border-radius:var(--radio);
+  background:
+    linear-gradient(var(--line-soft) 1px, transparent 1px) 0 0/40px 40px,
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px) 0 0/40px 40px,
+    var(--surface);
+  height:min(66vh,560px);overflow:hidden;touch-action:none;user-select:none}
+.cmesa{position:absolute;transform:translate(-50%,-50%);cursor:grab;display:grid;place-items:center;
+  border:2px solid var(--line);background:var(--surface-2);color:var(--ink);text-align:center;
+  transition:border-color .15s,box-shadow .15s}
+.cmesa.arrastrando{cursor:grabbing;z-index:20;box-shadow:0 10px 26px -10px rgba(0,0,0,.8)}
+.cmesa.blanco{border-color:var(--cyan);box-shadow:0 0 0 4px var(--cyan-soft)}
+.cmesa.redonda{border-radius:50%}
+.cmesa.cuadrada{border-radius:12px}
+.cmesa.ocupada{border-color:var(--good);background:linear-gradient(180deg,var(--good-soft),var(--surface-2))}
+.cmesa.cuenta{border-color:var(--warn);background:linear-gradient(180deg,var(--warn-soft),var(--surface-2))}
+.cmesa b{font-family:"Fredoka";font-size:13px;line-height:1.15;pointer-events:none}
+.cmesa small{font-size:10px;color:var(--ink-3);pointer-events:none}
+.cmesa .mnt{font-family:"IBM Plex Mono",monospace;font-size:11px;pointer-events:none}
+.silla{position:absolute;width:9px;height:9px;border-radius:50%;background:var(--ink-3);opacity:.65}
+.cmesa.ocupada .silla{background:var(--good);opacity:.9}
+.croqBarra{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.croqPista{font-size:11.5px;color:var(--ink-3)}
+.grupoSello{position:absolute;transform:translate(-50%,-50%);background:var(--cyan);color:#06121A;
+  font-size:10px;font-weight:700;border-radius:99px;padding:2px 9px;z-index:15;pointer-events:none}
+
+/* ---------- checador ---------- */
+.chGente{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.chPersona{display:flex;align-items:center;gap:11px;cursor:pointer;text-align:left;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radio-sm);padding:12px 14px}
+.chPersona:hover{border-color:var(--cyan)}
+.chPersona.dentro{border-color:var(--good);background:linear-gradient(180deg,var(--good-soft),var(--surface) 70%)}
+.chPersona .av{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-family:"Fredoka";font-size:14px;flex:none}
+.chPersona b{display:block;font-size:13.5px}
+.chPersona small{display:block;color:var(--ink-3);font-size:11.5px}
+.chPersona .acc{margin-left:auto;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--ink-3)}
+.chPersona.dentro .acc{color:var(--good)}
+.chCam{width:100%;border-radius:var(--radio-sm);background:#000;aspect-ratio:4/3;object-fit:cover}
+.chPin{display:flex;gap:7px;justify-content:center;margin:14px 0}
+.chPin i{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--line)}
+.chPin i.lleno{background:var(--cyan);border-color:var(--cyan)}
+
+/* ---------- calculadoras ---------- */
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:99px;padding:3px;gap:3px}
+.seg button{cursor:pointer;border:0;background:transparent;color:var(--ink-2);
+  border-radius:99px;padding:6px 16px;font-size:13px;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--cyan);color:#06121A}
+.semaforo{display:flex;align-items:center;gap:11px;padding:14px;border-radius:var(--radio-sm);
+  border:1px solid var(--line);background:var(--surface-2)}
+.semaforo .luz{width:14px;height:14px;border-radius:50%;flex:none}
+.semaforo.bien{border-color:var(--good)} .semaforo.bien .luz{background:var(--good)}
+.semaforo.ojo{border-color:var(--warn)} .semaforo.ojo .luz{background:var(--warn)}
+.semaforo.mal{border-color:var(--mal)}  .semaforo.mal .luz{background:var(--mal)}
+.semaforo b{font-size:15px}
+.semaforo small{display:block;color:var(--ink-3);font-size:12px}
+
 /* ---------- modales ---------- */
 .modal{position:fixed;inset:0;z-index:70;background:rgba(5,8,20,.72);display:grid;place-items:center;padding:16px}
 .modal .card{width:min(540px,100%);max-height:88vh;overflow:auto;margin:0}
@@ -337,7 +446,112 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
     <button class="btn sm" id="mesaRapida" style="margin-left:auto">Venta para llevar</button>
   </div>
   <div class="zonas" id="mesaZonas"></div>
-  <div class="mesas" id="mesaRejilla"></div>
+  <div class="croqBarra">
+    <div class="seg" id="mesaVista">
+      <button type="button" data-mv="croquis" aria-pressed="true">Croquis</button>
+      <button type="button" data-mv="lista" aria-pressed="false">Lista</button>
+    </div>
+    <button class="btn sm ghost" id="croqAcomodar" hidden>Acomodar mesas</button>
+    <span class="croqPista" id="croqPista"></span>
+  </div>
+  <div class="croquis" id="mesaCroquis"></div>
+  <div class="mesas" id="mesaRejilla" hidden></div>
+</section>
+
+<!-- ============ COCINA ============ -->
+<section id="tab-cocina" hidden>
+  <div class="fila" style="margin-bottom:14px">
+    <h2 style="font-size:19px">Cocina</h2>
+    <span id="kdsResumen" style="color:var(--ink-3);font-size:12.5px"></span>
+    <div class="seg" id="kdsVista" style="margin-left:auto">
+      <button type="button" data-kv="pendiente" aria-pressed="true">Por hacer</button>
+      <button type="button" data-kv="todo" aria-pressed="false">Todo</button>
+    </div>
+  </div>
+  <div class="kds" id="kdsRejilla"></div>
+</section>
+
+<!-- ============ PERSONAL ============ -->
+<section id="tab-personal" hidden>
+  <div class="card">
+    <header><h2>Reloj checador</h2><span class="hint" id="chHoy"></span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Cada quien checa con <b>su clave</b> y una foto. La foto no es desconfianza:
+        es lo que resuelve el día que alguien dice que sí llegó a las ocho. Sin clave no se puede checar — se pone en
+        <b>Ajustes → Equipo</b>.</p>
+      <div class="chGente" id="chGente"></div>
+    </div>
+  </div>
+  <div class="card">
+    <header><h2>Horas de hoy</h2></header>
+    <div class="body"><div class="tbl-wrap"><table id="t_horas"></table></div></div>
+  </div>
+</section>
+
+<!-- ============ COSTOS ============ -->
+<section id="tab-costos" hidden>
+  <div class="fila" style="margin-bottom:14px">
+    <h2 style="font-size:19px">Calculadora de costos</h2>
+    <div class="seg" id="costVista" style="margin-left:auto">
+      <button type="button" data-cv="simple" aria-pressed="true">Simple</button>
+      <button type="button" data-cv="pro" aria-pressed="false">Profesional</button>
+    </div>
+  </div>
+
+  <div id="costSimple">
+    <div class="card">
+      <header><h2>Compras de hoy</h2>
+        <span class="hint" id="comprasFecha"></span>
+        <button class="btn sm ghost" id="compraNueva" style="margin-left:auto">+ Compra</button></header>
+      <div class="body">
+        <p class="note" style="margin:0 0 14px">Apunta lo que gastaste hoy en materia prima. Con eso sale tu
+          <b>costo de materia prima</b>: cuánto de cada peso que vendes se va en ingredientes. Es el número que
+          decide si un restaurante gana o no.</p>
+        <div class="tbl-wrap"><table id="t_compras"></table></div>
+      </div>
+    </div>
+    <div class="card">
+      <header><h2>Cómo vas hoy</h2></header>
+      <div class="body" id="costResumen"></div>
+    </div>
+    <div class="card">
+      <header><h2>Rendimiento</h2><span class="hint">cuánto te cuesta una porción</span></header>
+      <div class="body">
+        <p class="note" style="margin:0 0 14px">Escribe cuántas porciones salen de cada compra y te digo el costo
+          de cada una. Es la forma más rápida de saber si un platillo está mal precado.</p>
+        <div class="tbl-wrap"><table id="t_rend"></table></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="costPro" hidden>
+    <div class="card">
+      <header><h2>Lo que cuesta tener abierto</h2><span class="hint">al mes</span></header>
+      <div class="body">
+        <p class="note" style="margin:0 0 14px">Estos gastos no cambian si vendes mucho o poco, pero los paga cada
+          platillo que sale. Repartirlos es la diferencia entre creer que ganas y ganar.</p>
+        <div class="grid g3" id="gastosFijos"></div>
+        <div class="grid g3" style="margin-top:14px">
+          <div><label class="f" for="g_dias">Días que abres al mes</label><input id="g_dias" type="number" min="1" max="31"></div>
+          <div><label class="f" for="g_porciones">Platillos que vendes al día</label><input id="g_porciones" type="number" min="1"></div>
+          <div><label class="f" for="g_margen">Utilidad que quieres %</label><input id="g_margen" type="number" min="0" max="95"></div>
+        </div>
+        <div id="proFijos" style="margin-top:14px"></div>
+      </div>
+    </div>
+    <div class="card">
+      <header><h2>Receta por platillo</h2>
+        <select id="recPlat" style="width:auto;min-width:200px;margin-left:auto"></select>
+        <button class="btn sm ghost" id="recIngNuevo">+ Ingrediente</button></header>
+      <div class="body">
+        <p class="note" style="margin:0 0 14px">La <b>merma</b> es lo que se va a la basura al limpiar: si compras
+          un kilo de cebolla y usas 800 g, la merma es 20% y el kilo te costó 25% más de lo que dice el ticket.
+          Casi nadie lo cuenta y por eso casi nadie sabe cuánto gana.</p>
+        <div class="tbl-wrap"><table id="t_receta"></table></div>
+        <div id="recResultado" style="margin-top:16px"></div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ============ COMANDA ============ -->
@@ -350,6 +564,7 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
   </div>
   <div class="comanda">
     <div>
+      <div class="comenFila" id="comComensales"></div>
       <div class="catFila" id="comCats"></div>
       <div class="platillos" id="comPlatillos"></div>
     </div>
@@ -569,6 +784,33 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
   </div>
 </div>
 
+<div class="modal" id="modalCorrige" hidden>
+  <div class="card">
+    <header><h2 id="corrTitulo">Corregir</h2><button class="btn sm" id="corrCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body" id="corrCuerpo"></div>
+  </div>
+</div>
+
+<div class="modal" id="modalCheca" hidden>
+  <div class="card">
+    <header><h2 id="chTitulo">Checar</h2><button class="btn sm" id="chCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <p class="note" id="chEstado" style="margin:0 0 14px"></p>
+      <video id="chVideo" class="chCam" autoplay muted playsinline></video>
+      <img id="chShot" class="chCam" hidden alt="Foto de la checada">
+      <div class="fila" style="margin-top:10px;justify-content:center">
+        <button class="btn" id="chTomar">Tomar la foto</button>
+        <button class="btn ghost" id="chOtra" hidden>Otra foto</button>
+      </div>
+      <label class="f" style="margin-top:16px;text-align:center">Tu clave</label>
+      <div class="chPin" id="chPin"></div>
+      <div class="teclado" id="chTeclado"></div>
+      <button class="btn primary ancho" id="chOk" style="margin-top:14px" disabled>Registrar</button>
+      <p class="note" style="margin-top:12px;font-size:11.5px">Se guardan tu nombre, la hora y la foto.</p>
+    </div>
+  </div>
+</div>
+
 <div id="toast" hidden></div>
 
 <script>
@@ -618,6 +860,8 @@ function persist(){
   guardaT = setTimeout(()=>{
     lsSet("menu", MENU); lsSet("mesas", MESAS); lsSet("comandas", COMANDAS);
     lsSet("turnos", TURNOS); lsSet("P", P); lsSet("equipo", EQUIPO);
+    lsSet("asistencias", ASISTENCIAS); lsSet("compras", COMPRAS); lsSet("recetas", RECETAS);
+    try{ localStorage.setItem(LS+"_latido", String(Date.now())); }catch(e){}
     subeNube();
   }, 500);
 }
@@ -677,15 +921,22 @@ function menuPorDefecto(){
 }
 function mesasPorDefecto(){
   const m = [];
-  for(let i=1; i<=8; i++)  m.push({id:uid(), nombre:"Mesa "+i, zona:"Salón",   lugares:4, activa:true});
-  for(let i=1; i<=4; i++)  m.push({id:uid(), nombre:"Terraza "+i, zona:"Terraza", lugares:2, activa:true});
-  m.push({id:uid(), nombre:"Barra 1", zona:"Barra", lugares:1, activa:true});
-  m.push({id:uid(), nombre:"Barra 2", zona:"Barra", lugares:1, activa:true});
+  for(let i=1; i<=8; i++)
+    m.push({id:uid(), nombre:"Mesa "+i, zona:"Salón", lugares:4, activa:true,
+            x: 16 + ((i-1)%4)*23, y: 26 + Math.floor((i-1)/4)*34, forma:"cuadrada"});
+  for(let i=1; i<=4; i++)
+    m.push({id:uid(), nombre:"Terraza "+i, zona:"Terraza", lugares:2, activa:true,
+            x: 20 + (i-1)*21, y: 40, forma:"redonda"});
+  m.push({id:uid(), nombre:"Barra 1", zona:"Barra", lugares:1, activa:true, x:35, y:45, forma:"redonda"});
+  m.push({id:uid(), nombre:"Barra 2", zona:"Barra", lugares:1, activa:true, x:60, y:45, forma:"redonda"});
   return m;
 }
 function paramsPorDefecto(){
   return {negocio:{nombre:"Mi restaurante", tel:"", dir:""},
-          iva:16, propina:10, servicio:0, bloqueoMin:10,
+          iva:16, propina:10, servicio:0, bloqueoMin:10, fotoCheca:true,
+          cocinaAmbar:10, cocinaRojo:20,
+          gastos:{renta:0, luz:0, gas:0, agua:0, sueldos:0, otros:0},
+          diasMes:26, porcionesDia:120, margenMeta:70,
           folios:{letras:"", extra:"", digitos:5, desde:{cta:1, tur:1}}};
 }
 function equipoPorDefecto(){
@@ -697,15 +948,20 @@ let MESAS    = lsGet("mesas", null)    || mesasPorDefecto();
 let COMANDAS = lsGet("comandas", []);
 let TURNOS   = lsGet("turnos", []);
 let P        = Object.assign(paramsPorDefecto(), lsGet("P", {}));
-let EQUIPO   = lsGet("equipo", null)   || equipoPorDefecto();
+let EQUIPO      = lsGet("equipo", null) || equipoPorDefecto();
+let ASISTENCIAS = lsGet("asistencias", []);
+let COMPRAS     = lsGet("compras", []);
+let RECETAS     = lsGet("recetas", {});   /* platId -> {ings:[], minutos:0} */
 P.negocio = Object.assign({nombre:"Mi restaurante", tel:"", dir:""}, P.negocio||{});
 P.folios  = Object.assign({letras:"", extra:"", digitos:5, desde:{cta:1, tur:1}}, P.folios||{});
+P.gastos  = Object.assign({renta:0, luz:0, gas:0, agua:0, sueldos:0, otros:0}, P.gastos||{});
 
 /* ---------------- roles ---------------- */
 const ROLES = {
-  gerente: {nombre:"Gerente", ve:["inicio","mesas","comanda","menu","caja","ventas","set"]},
-  cajero:  {nombre:"Cajero",  ve:["inicio","mesas","comanda","caja","ventas"]},
-  mesero:  {nombre:"Mesero",  ve:["mesas","comanda"]}
+  gerente: {nombre:"Gerente", ve:["inicio","mesas","comanda","cocina","menu","caja","ventas","personal","costos","set"]},
+  cajero:  {nombre:"Cajero",  ve:["inicio","mesas","comanda","cocina","caja","ventas","personal"]},
+  mesero:  {nombre:"Mesero",  ve:["mesas","comanda","cocina","personal"]},
+  cocina:  {nombre:"Cocina",  ve:["cocina","personal"]}
 };
 let usuarioId = null;
 const usuarioActual = () => EQUIPO.find(u=>u.id===usuarioId) || EQUIPO[0] ||
@@ -721,15 +977,19 @@ const ICO = {
   menu:  '<path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h10"/>',
   caja:  '<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M3 11h18"/><circle cx="12" cy="15" r="1.3"/>',
   ventas:'<path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M21 19H3"/>',
-  set:   '<path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="17" r="2"/>'
+  set:   '<path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="17" r="2"/>',
+  cocina:'<path d="M7 3v7"/><path d="M11 3v7"/><path d="M9 10v11"/><path d="M17 3c-1.5 2-2 4-2 6.5 0 1.5.7 2.5 2 2.5v9"/>',
+  personal:'<circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6"/>',
+  costos:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 11h3"/><path d="M13 11h3"/><path d="M8 15h3"/><path d="M13 15h3"/>'
 };
 const PESTANAS = [
-  {k:"inicio", t:"Inicio"}, {k:"mesas", t:"Mesas"}, {k:"menu", t:"El menú"},
-  {k:"caja", t:"Caja"}, {k:"ventas", t:"Ventas"}, {k:"set", t:"Ajustes"}
+  {k:"inicio", t:"Inicio"}, {k:"mesas", t:"Mesas"}, {k:"cocina", t:"Cocina"},
+  {k:"menu", t:"El menú"}, {k:"caja", t:"Caja"}, {k:"ventas", t:"Ventas"},
+  {k:"personal", t:"Personal"}, {k:"costos", t:"Costos"}, {k:"set", t:"Ajustes"}
 ];
 function pintaTabs(){
   $("#tabs").innerHTML = PESTANAS.filter(p=>puedeVer(p.k)).map(p=>{
-    const n = p.k === "mesas" ? abiertas().length : 0;
+    const n = p.k === "mesas" ? abiertas().length : p.k === "cocina" ? porHacer().length : 0;
     return '<button role="menuitem" data-tab="'+p.k+'" aria-selected="false">'+
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+
       ICO[p.k]+'</svg>'+esc(p.t)+
@@ -738,16 +998,20 @@ function pintaTabs(){
 }
 function vaA(k){
   if(!puedeVer(k) && k !== "comanda") k = PESTANAS.filter(p=>puedeVer(p.k))[0].k;
+  if(k !== "comanda") comandaId = comandaId;   /* la comanda abierta se conserva */
   PESTANAS.concat([{k:"comanda"}]).forEach(p=>{
     const s = $("#tab-"+p.k); if(s) s.hidden = (p.k !== k);
   });
   $$("#tabs button").forEach(b=> b.setAttribute("aria-selected", String(b.dataset.tab === k)));
-  if(k === "inicio") renderInicio();
-  if(k === "mesas")  renderMesas();
-  if(k === "menu")   renderMenu();
-  if(k === "caja")   renderCaja();
-  if(k === "ventas") renderVentas();
-  if(k === "set")    renderSet();
+  if(k === "inicio")   renderInicio();
+  if(k === "mesas")    renderMesas();
+  if(k === "cocina")   renderCocina();
+  if(k === "menu")     renderMenu();
+  if(k === "caja")     renderCaja();
+  if(k === "ventas")   renderVentas();
+  if(k === "personal") renderPersonal();
+  if(k === "costos")   renderCostos();
+  if(k === "set")      renderSet();
   window.scrollTo(0,0);
 }
 $("#tabs").addEventListener("click", e=>{
@@ -803,15 +1067,219 @@ const abiertas  = () => COMANDAS.filter(c=>c.estado !== "cerrada");
 const zonas = () => [...new Set(MESAS.filter(m=>m.activa!==false).map(m=>m.zona||"Salón"))];
 let zonaVista = "";
 
-function totalLineas(c){
-  return (c.lineas||[]).reduce((s,l)=> s + num(l.precio) * num(l.cant,1) +
-    (l.mods||[]).reduce((x,m)=> x + num(m.extra) * num(l.cant,1), 0), 0);
+const vivas = c => (c.lineas||[]).filter(l=>!l.cancelada);
+const importeLinea = l => (num(l.precio) + (l.mods||[]).reduce((x,m)=>x+num(m.extra),0)) * num(l.cant,1);
+function totalLineas(c){ return vivas(c).reduce((s,l)=> s + importeLinea(l), 0); }
+
+/* Lo que una persona consumió. Lo de "compartir" (comensal 0) se reparte
+   entre todos: es lo que de verdad hace la gente con la botana. */
+function porComensal(c){
+  const n = Math.max(1, num(c.personas,1));
+  const por = {}; for(let i=1;i<=n;i++) por[i] = 0;
+  let compartido = 0;
+  vivas(c).forEach(l=>{
+    const k = num(l.comensal,0);
+    if(k >= 1 && k <= n) por[k] += importeLinea(l); else compartido += importeLinea(l);
+  });
+  const extra = compartido / n;
+  const serv = 1 + num(P.servicio)/100;
+  const out = [];
+  for(let i=1;i<=n;i++) out.push({comensal:i, consumo:por[i] + extra, total:(por[i]+extra)*serv});
+  return {lista:out, compartido};
 }
 function sumaComanda(c){
   const sub = totalLineas(c);
   const serv = sub * num(P.servicio)/100;
   return {sub, serv, total: sub + serv};
 }
+
+/* ---------------- el croquis ----------------
+   Las mesas se acomodan arrastrándolas, y se juntan soltando una encima de
+   otra. Las coordenadas se guardan en porcentaje, no en pixeles: así el
+   croquis se ve igual en la tableta del mostrador y en la pantalla grande
+   de la oficina. */
+let mesaVista = lsGet("mesaVista", "croquis");
+let modoAcomodo = false, arrastrando = null;
+
+const grupoDe = m => m && m.grupo ? m.grupo : "";
+const mesasDelGrupo = g => MESAS.filter(m=>m.grupo === g && m.activa !== false);
+/* De un grupo de mesas, la primera manda: ahí vive la comanda. */
+function mesaMadre(m){
+  if(!grupoDe(m)) return m;
+  const hs = mesasDelGrupo(m.grupo);
+  return hs[0] || m;
+}
+function lugaresDe(m){
+  if(!grupoDe(m)) return num(m.lugares, 2);
+  return mesasDelGrupo(m.grupo).reduce((s,x)=>s+num(x.lugares,2), 0);
+}
+function tamMesa(m){
+  const l = num(m.lugares, 2);
+  const lado = Math.min(104, 52 + l * 7);
+  return {w: lado, h: m.forma === "redonda" ? lado : Math.round(lado * 0.82)};
+}
+function sillasHTML(m){
+  const n = Math.min(12, num(m.lugares, 2)), t = tamMesa(m);
+  const r = Math.max(t.w, t.h)/2 + 9;
+  let s = "";
+  for(let i=0;i<n;i++){
+    const a = (i/n) * Math.PI * 2 - Math.PI/2;
+    s += '<i class="silla" style="left:calc(50% + '+Math.round(Math.cos(a)*r)+'px);' +
+         'top:calc(50% + '+Math.round(Math.sin(a)*r)+'px);transform:translate(-50%,-50%)"></i>';
+  }
+  return s;
+}
+
+function renderCroquis(){
+  const caja = $("#mesaCroquis"); if(!caja) return;
+  const mias = MESAS.filter(m=>m.activa !== false && (m.zona||"Salón") === zonaVista);
+  const vistos = {};
+  caja.innerHTML = mias.map(m=>{
+    const g = grupoDe(m);
+    if(g){ if(vistos[g]) return ""; vistos[g] = true; }
+    const madre = mesaMadre(m);
+    const c = comandaDe(madre.id);
+    const cl = !c ? "" : c.estado === "cuenta" ? "cuenta" : "ocupada";
+    const t = tamMesa(m);
+    const nombre = g ? mesasDelGrupo(g).map(x=>x.nombre).join(" + ") : m.nombre;
+    return '<div class="cmesa '+(m.forma||"cuadrada")+' '+cl+'" data-cm="'+esc(m.id)+'"' +
+      ' style="left:'+num(m.x,50)+'%;top:'+num(m.y,50)+'%;width:'+t.w+'px;height:'+t.h+'px">' +
+      sillasHTML(m) +
+      '<b>'+esc(g ? m.nombre : nombre)+'</b>' +
+      '<small>'+lugaresDe(m)+' lug</small>' +
+      (c ? '<span class="mnt">'+mx(sumaComanda(c).total)+'</span>' : '') +
+      '</div>';
+  }).join("") +
+  /* El sello del grupo va aparte para que no estorbe al arrastrar. */
+  Object.keys(vistos).map(g=>{
+    const hs = mesasDelGrupo(g).filter(x=>(x.zona||"Salón") === zonaVista);
+    if(hs.length < 2) return "";
+    const x = hs.reduce((s,h)=>s+num(h.x,50),0)/hs.length;
+    const y = Math.min.apply(null, hs.map(h=>num(h.y,50))) - 9;
+    return '<span class="grupoSello" style="left:'+x+'%;top:'+y+'%">juntas · ' +
+      hs.reduce((s,h)=>s+num(h.lugares,2),0) + ' lugares</span>';
+  }).join("");
+
+  $("#croqPista").textContent = modoAcomodo
+    ? "Arrastra para acomodar. Suelta una mesa encima de otra para juntarlas."
+    : "Toca una mesa para abrirla.";
+  const b = $("#croqAcomodar");
+  b.hidden = !esGerente();
+  b.textContent = modoAcomodo ? "Listo, ya quedó" : "Acomodar mesas";
+  b.className = "btn sm" + (modoAcomodo ? " primary" : " ghost");
+}
+
+/* ---- arrastrar ---- */
+function croqXY(ev){
+  const r = $("#mesaCroquis").getBoundingClientRect();
+  return {x: ((ev.clientX - r.left)/r.width)*100, y: ((ev.clientY - r.top)/r.height)*100};
+}
+$("#mesaCroquis").addEventListener("pointerdown", e=>{
+  const el = e.target.closest("[data-cm]"); if(!el) return;
+  if(!modoAcomodo) return;
+  const m = MESAS.find(x=>x.id === el.dataset.cm); if(!m) return;
+  arrastrando = {id:m.id, el, movio:false};
+  el.classList.add("arrastrando");
+  el.setPointerCapture(e.pointerId);
+  e.preventDefault();
+});
+$("#mesaCroquis").addEventListener("pointermove", e=>{
+  if(!arrastrando) return;
+  const p = croqXY(e);
+  const m = MESAS.find(x=>x.id === arrastrando.id); if(!m) return;
+  const antes = {x:num(m.x,50), y:num(m.y,50)};
+  m.x = Math.max(4, Math.min(96, p.x));
+  m.y = Math.max(7, Math.min(93, p.y));
+  if(Math.abs(m.x - antes.x) > .4 || Math.abs(m.y - antes.y) > .4) arrastrando.movio = true;
+  arrastrando.el.style.left = m.x + "%";
+  arrastrando.el.style.top  = m.y + "%";
+  /* ¿Encima de otra? Se resalta la que recibiría. */
+  const blanco = mesaCerca(m);
+  $$(".cmesa.blanco").forEach(x=>x.classList.remove("blanco"));
+  if(blanco){
+    const el2 = $('.cmesa[data-cm="'+blanco.id+'"]');
+    if(el2) el2.classList.add("blanco");
+  }
+});
+function mesaCerca(m){
+  const mias = MESAS.filter(x=>x.activa !== false && (x.zona||"Salón") === (m.zona||"Salón") && x.id !== m.id);
+  let cerca = null, d = 99;
+  mias.forEach(x=>{
+    const dd = Math.hypot(num(x.x,50) - num(m.x,50), (num(x.y,50) - num(m.y,50)) * 0.6);
+    if(dd < d){ d = dd; cerca = x; }
+  });
+  return d < 9 ? cerca : null;
+}
+$("#mesaCroquis").addEventListener("pointerup", e=>{
+  if(!arrastrando) return;
+  const m = MESAS.find(x=>x.id === arrastrando.id);
+  arrastrando.el.classList.remove("arrastrando");
+  $$(".cmesa.blanco").forEach(x=>x.classList.remove("blanco"));
+  const movio = arrastrando.movio;
+  arrastrando = null;
+  if(!m) return;
+  if(movio){
+    const otra = mesaCerca(m);
+    if(otra) proponJuntar(m, otra);
+    persist(); renderCroquis();
+  }
+});
+$("#mesaCroquis").addEventListener("pointercancel", ()=>{
+  if(arrastrando){ arrastrando.el.classList.remove("arrastrando"); arrastrando = null; }
+});
+
+function proponJuntar(a, b){
+  const ga = grupoDe(a), gb = grupoDe(b);
+  if(ga && ga === gb) return;
+  const ca = comandaDe(mesaMadre(a).id), cb = comandaDe(mesaMadre(b).id);
+  if(ca && cb){ toast("Las dos tienen cuenta abierta: ciérrale a una antes de juntarlas"); return; }
+  if(!confirm("¿Juntar " + a.nombre + " con " + b.nombre + "?\n\n" +
+      "Quedan como una sola mesa de " + (num(a.lugares,2) + lugaresDe(b)) + " lugares y comparten la cuenta.")) return;
+  const g = gb || ga || uid();
+  [a, b].forEach(x=>{
+    if(grupoDe(x) && grupoDe(x) !== g) mesasDelGrupo(grupoDe(x)).forEach(h=>h.grupo = g);
+    x.grupo = g;
+  });
+  /* La cuenta que ya existía se queda, pero ahora se llama por las dos. */
+  const madre = mesaMadre(a);
+  const c = comandaDe(madre.id);
+  if(c) c.mesaNombre = mesasDelGrupo(g).map(x=>x.nombre).join(" + ");
+  persist(); renderMesas();
+  toast("Mesas juntas: " + mesasDelGrupo(g).map(x=>x.nombre).join(" + "));
+}
+function separaGrupo(g){
+  const hs = mesasDelGrupo(g);
+  const madre = hs[0];
+  if(madre && comandaDe(madre.id)){ toast("Tiene cuenta abierta: ciérrala antes de separarlas"); return; }
+  hs.forEach(x=>{ delete x.grupo; });
+  persist(); renderMesas();
+  toast("Mesas separadas");
+}
+$("#mesaCroquis").addEventListener("click", e=>{
+  const el = e.target.closest("[data-cm]"); if(!el) return;
+  if(modoAcomodo) return;
+  const m = MESAS.find(x=>x.id === el.dataset.cm); if(!m) return;
+  const g = grupoDe(m);
+  if(g && mesasDelGrupo(g).length > 1 && !comandaDe(mesaMadre(m).id) && esGerente()){
+    if(confirm("«" + mesasDelGrupo(g).map(x=>x.nombre).join(" + ") + "» están juntas.\n\n" +
+        "Aceptar: abrir la cuenta.\nCancelar: separarlas.")){
+      abreMesa(mesaMadre(m).id);
+    }else separaGrupo(g);
+    return;
+  }
+  abreMesa(mesaMadre(m).id);
+});
+$("#croqAcomodar").addEventListener("click", ()=>{
+  modoAcomodo = !modoAcomodo;
+  renderCroquis();
+  toast(modoAcomodo ? "Arrastra las mesas. Suelta una encima de otra para juntarlas." : "Croquis guardado");
+});
+$("#mesaVista").addEventListener("click", e=>{
+  const b = e.target.closest("[data-mv]"); if(!b) return;
+  mesaVista = b.dataset.mv; lsSet("mesaVista", mesaVista);
+  modoAcomodo = false;
+  renderMesas();
+});
 
 function renderMesas(){
   const zs = zonas();
@@ -824,15 +1292,26 @@ function renderMesas(){
       esc(z) + (n ? " · " + n : "") + '</button>';
   }).join("");
 
-  const mias = MESAS.filter(m=>m.activa!==false && (m.zona||"Salón") === zonaVista);
+  $$("#mesaVista button").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.mv === mesaVista)));
+  $("#mesaCroquis").hidden = mesaVista !== "croquis";
+  $("#mesaRejilla").hidden = mesaVista === "croquis";
+  $("#croqAcomodar").hidden = mesaVista !== "croquis" || !esGerente();
+  if(mesaVista === "croquis") renderCroquis();
+
+  const vistos2 = {};
+  const mias = MESAS.filter(m=>m.activa!==false && (m.zona||"Salón") === zonaVista)
+    .filter(m=>{ const g = grupoDe(m); if(!g) return true; if(vistos2[g]) return false; vistos2[g] = true; return true; });
   $("#mesaRejilla").innerHTML = mias.map(m=>{
-    const c = comandaDe(m.id);
+    const madre = mesaMadre(m);
+    const c = comandaDe(madre.id);
     const cl = !c ? "libre" : c.estado === "cuenta" ? "cuenta" : "ocupada";
     const s = c ? sumaComanda(c) : null;
     const desde = c ? horasTxt(minutosDe(horaAhora()) - minutosDe(c.abre)) : "";
-    return '<button class="mesa '+cl+'" data-mesa="'+esc(m.id)+'">'+
-      '<b>'+esc(m.nombre)+'</b>'+
-      '<span class="pers">'+(c ? (c.personas||m.lugares||2)+" pers" : (m.lugares||2)+" lug")+'</span>'+
+    const g = grupoDe(m);
+    const titulo = g ? mesasDelGrupo(g).map(x=>x.nombre).join(" + ") : m.nombre;
+    return '<button class="mesa '+cl+'" data-mesa="'+esc(madre.id)+'">'+
+      '<b>'+esc(titulo)+'</b>'+
+      '<span class="pers">'+(c ? (c.personas||lugaresDe(m))+" pers" : lugaresDe(m)+" lug")+'</span>'+
       '<small>'+(c ? esc(c.mesero||"") + " · " + desde : "Libre")+'</small>'+
       '<span class="tot">'+(c ? mx(s.total) : "")+'</span>'+
       '<span class="sello">'+(!c ? "toca para abrir" : c.estado === "cuenta" ? "cuenta pedida" : "ocupada")+'</span>'+
@@ -859,7 +1338,7 @@ $("#mesaRapida").addEventListener("click", ()=> abreMesa("llevar"));
 /* ===================================================================
    COMANDA
    =================================================================== */
-let comandaId = null, catVista = "";
+let comandaId = null, catVista = "", comensalVista = 1;
 
 function comandaActual(){ return COMANDAS.find(c=>c.id === comandaId); }
 
@@ -897,6 +1376,16 @@ function renderComanda(){
   $("#comFolio").textContent = c.folio;
   $("#comPersonas").textContent = c.personas + " comensal(es) · abrió " + c.abre + " · " + (c.mesero||"");
 
+  /* A quién se le anota lo que se toque. Es lo que hace que el ticket de
+     cocina salga por persona y que la cuenta se pueda dividir por consumo. */
+  if(comensalVista > num(c.personas,1)) comensalVista = 1;
+  const pc = porComensal(c);
+  $("#comComensales").innerHTML = '<span class="et">Anotar a</span>' +
+    pc.lista.map(x=>'<button type="button" data-comen="'+x.comensal+'" aria-pressed="'+(x.comensal===comensalVista)+'">' +
+      'Comensal ' + x.comensal + (x.consumo ? ' · ' + mx(x.consumo) : '') + '</button>').join("") +
+    '<button type="button" data-comen="0" aria-pressed="'+(comensalVista===0)+'">Para compartir' +
+      (pc.compartido ? ' · ' + mx(pc.compartido) : '') + '</button>';
+
   const cats = (MENU.cats||[]).slice().sort((a,b)=>num(a.orden)-num(b.orden));
   if(!catVista || !cats.some(x=>x.id===catVista)) catVista = (cats[0]||{}).id || "";
   $("#comCats").innerHTML = cats.map(x=>
@@ -912,23 +1401,46 @@ function renderComanda(){
 
   pintaLineas();
 }
+const ET_EDO = {pedido:"en cocina", preparando:"preparando", listo:"listo", entregada:"entregado"};
 function pintaLineas(){
   const c = comandaActual(); if(!c) return;
-  $("#comLineas").innerHTML = (c.lineas||[]).map(l=>{
-    const imp = (num(l.precio) + (l.mods||[]).reduce((x,m)=>x+num(m.extra),0)) * num(l.cant,1);
-    const extras = (l.mods||[]).map(m=>m.nombre + (num(m.extra) ? " +"+mx(m.extra) : "")).join(" · ");
-    return '<div class="lin'+(l.enviada?" enviada":"")+'" data-lin="'+esc(l.id)+'">'+
-      '<span class="cant">'+num(l.cant,1)+'×</span>'+
-      '<span><b>'+esc(l.nombre)+'</b>'+
-        (extras ? '<small>'+esc(extras)+'</small>' : '')+
-        (l.nota ? '<small>✎ '+esc(l.nota)+'</small>' : '')+
-        (l.enviada ? '<small>en cocina desde '+esc(l.enviada)+'</small>'
-                   : '<span class="acc"><button data-menos="'+esc(l.id)+'">−</button>'+
-                     '<button data-mas="'+esc(l.id)+'">+</button>'+
-                     '<button data-quita="'+esc(l.id)+'">✕</button></span>')+
-      '</span>'+
-      '<span class="imp">'+mx(imp)+'</span></div>';
-  }).join("") || '<div class="empty">Nada pedido todavía. Toca un platillo.</div>';
+  const n = Math.max(1, num(c.personas,1));
+  const pc = porComensal(c);
+  const grupos = [];
+  for(let i=1;i<=n;i++) grupos.push({k:i, et:"Comensal "+i});
+  grupos.push({k:0, et:"Para compartir"});
+
+  let html = "";
+  grupos.forEach(g=>{
+    const suyas = (c.lineas||[]).filter(l=>{
+      const k = num(l.comensal,0);
+      return (k >= 1 && k <= n ? k : 0) === g.k;
+    });
+    if(!suyas.length) return;
+    const suma = g.k ? (pc.lista.find(x=>x.comensal===g.k)||{}).consumo
+                     : suyas.filter(l=>!l.cancelada).reduce((s,l)=>s+importeLinea(l),0);
+    html += '<div class="linGrupo">'+esc(g.et)+'<span>'+mx(suma)+'</span></div>';
+    html += suyas.map(l=>{
+      const extras = (l.mods||[]).map(m=>m.nombre + (num(m.extra) ? " +"+mx(m.extra) : "")).join(" · ");
+      const edo = l.estado || (l.enviada ? "pedido" : "");
+      return '<div class="lin'+(l.enviada?" enviada":"")+(l.cancelada?" cancelada":"")+'" data-lin="'+esc(l.id)+'">'+
+        '<span class="cant">'+num(l.cant,1)+'×</span>'+
+        '<span><b>'+esc(l.nombre)+'</b>'+
+          (extras ? '<small>'+esc(extras)+'</small>' : '')+
+          (l.nota ? '<small>✎ '+esc(l.nota)+'</small>' : '')+
+          (l.cancelada ? '<small>cancelado · '+esc(l.motivo||"")+'</small>'
+            : l.enviada
+              ? '<span class="edo '+edo+'">'+(ET_EDO[edo]||edo)+' '+esc(l.enviada)+'</span>'+
+                '<span class="acc"><button data-corrige="'+esc(l.id)+'">Corregir</button></span>'
+              : '<span class="acc"><button data-menos="'+esc(l.id)+'">−</button>'+
+                '<button data-mas="'+esc(l.id)+'">+</button>'+
+                '<button data-quita="'+esc(l.id)+'">✕</button>'+
+                '<button data-mueve="'+esc(l.id)+'">↔</button></span>')+
+        '</span>'+
+        '<span class="imp">'+mx(importeLinea(l))+'</span></div>';
+    }).join("");
+  });
+  $("#comLineas").innerHTML = html || '<div class="empty">Nada pedido todavía. Toca un platillo.</div>';
 
   const s = sumaComanda(c);
   $("#comSuma").innerHTML =
@@ -936,11 +1448,16 @@ function pintaLineas(){
     (num(P.servicio) ? '<div class="sumaLin"><span>Servicio '+num(P.servicio)+'%</span><span class="mono">'+mx(s.serv)+'</span></div>' : '') +
     '<div class="sumaLin total"><span>Total</span><span>'+mx(s.total)+'</span></div>';
 
-  const faltan = (c.lineas||[]).filter(l=>!l.enviada).length;
+  const faltan = (c.lineas||[]).filter(l=>!l.enviada && !l.cancelada).length;
   $("#comEnviar").textContent = faltan ? "Mandar a cocina (" + faltan + ")" : "Todo en cocina";
   $("#comEnviar").disabled = !faltan;
-  $("#comCobrar").disabled = !(c.lineas||[]).length;
+  $("#comCobrar").disabled = !vivas(c).length;
 }
+$("#comComensales").addEventListener("click", e=>{
+  const b = e.target.closest("[data-comen]"); if(!b) return;
+  comensalVista = num(b.dataset.comen);
+  renderComanda();
+});
 $("#comCats").addEventListener("click", e=>{
   const b = e.target.closest("[data-cat]"); if(!b) return;
   catVista = b.dataset.cat; renderComanda();
@@ -951,15 +1468,113 @@ $("#comPlatillos").addEventListener("click", e=>{
 });
 $("#comLineas").addEventListener("click", e=>{
   const c = comandaActual(); if(!c) return;
+  const corr = e.target.closest("[data-corrige]");
+  if(corr){ abreCorrige(corr.dataset.corrige); return; }
+  const mov = e.target.closest("[data-mueve]");
+  if(mov){ mueveComensal(mov.dataset.mueve); return; }
   const mas = e.target.closest("[data-mas]"), menos = e.target.closest("[data-menos]"),
         qui = e.target.closest("[data-quita]");
-  const id = (mas||menos||qui||{}).dataset;
-  if(!id) return;
-  const l = c.lineas.find(x=>x.id === (id.mas || id.menos || id.quita)); if(!l || l.enviada) return;
+  const d = (mas||menos||qui||{}).dataset;
+  if(!d) return;
+  const l = c.lineas.find(x=>x.id === (d.mas || d.menos || d.quita)); if(!l || l.enviada) return;
   if(mas) l.cant = num(l.cant,1) + 1;
   if(menos) l.cant = Math.max(1, num(l.cant,1) - 1);
   if(qui) c.lineas = c.lineas.filter(x=>x.id !== l.id);
-  persist(); pintaLineas();
+  persist(); pintaLineas(); renderComanda();
+});
+
+/* Pasar un platillo de una persona a otra. Pasa todo el tiempo: se pidió,
+   llegó, y resulta que era del de enfrente. */
+function mueveComensal(linId){
+  const c = comandaActual(); if(!c) return;
+  const l = c.lineas.find(x=>x.id === linId); if(!l) return;
+  const n = Math.max(1, num(c.personas,1));
+  const quien = prompt("¿A quién se le anota «" + l.nombre + "»?\n\n" +
+    "Escribe el número de comensal (1 a " + n + ") o 0 para compartir.", num(l.comensal,0));
+  if(quien === null) return;
+  const k = Math.max(0, Math.min(n, num(quien,0)));
+  l.comensal = k;
+  persist(); renderComanda();
+  toast(l.nombre + " → " + (k ? "comensal " + k : "para compartir"));
+}
+
+/* ---------------- corregir lo que ya está en cocina ----------------
+   La primera versión no dejaba tocarlo, y eso no aguanta un servicio real:
+   la gente cambia de opinión. Sí se puede, pero deja rastro — quién, qué y
+   por qué — y la cocina se entera en su pantalla. */
+const MOTIVOS = ["El cliente cambió de opinión", "Se tardó mucho", "Salió mal",
+                 "Error al tomar la orden", "Ya no lo van a querer", "Otro"];
+let corrigiendo = null;
+function abreCorrige(linId){
+  const c = comandaActual(); if(!c) return;
+  const l = c.lineas.find(x=>x.id === linId); if(!l || l.cancelada) return;
+  corrigiendo = linId;
+  const avanzado = l.estado === "preparando" || l.estado === "listo" || l.estado === "entregada";
+  $("#corrTitulo").textContent = "Corregir · " + l.nombre;
+  $("#corrCuerpo").innerHTML =
+    '<p class="note" style="margin:0 0 14px'+(avanzado ? ';border-left-color:var(--warn)' : '')+'">' +
+      (avanzado
+        ? 'Esto ya está <b>' + esc(ET_EDO[l.estado]||l.estado) + '</b>: alguien lo preparó y el material ya se gastó. ' +
+          'Si lo cancelas se registra como <b>merma</b>, no como si nunca hubiera existido.'
+        : 'Todavía no lo empiezan. Cancelarlo o cambiar la cantidad no cuesta material.') + '</p>' +
+    '<div class="grid g2">' +
+      '<div><label class="f" for="corrCant">Cantidad</label>' +
+        '<input id="corrCant" type="number" min="0" step="1" value="'+num(l.cant,1)+'"></div>' +
+      '<div><label class="f" for="corrMotivo">Por qué</label><select id="corrMotivo">' +
+        MOTIVOS.map(m=>'<option>'+esc(m)+'</option>').join("") + '</select></div>' +
+    '</div>' +
+    '<label class="f" style="margin-top:12px" for="corrNota">Detalle (opcional)</label>' +
+    '<input id="corrNota" placeholder="Lo pidió sin chile y llegó con chile…">' +
+    '<div class="fila" style="margin-top:18px">' +
+      '<button class="btn primary" id="corrGuarda">Guardar el cambio</button>' +
+      '<button class="btn mal" id="corrCancela" style="margin-left:auto">Cancelar el platillo</button>' +
+    '</div>';
+  $("#modalCorrige").hidden = false;
+}
+function anotaCancelacion(c, l, cant, motivo, nota, merma){
+  c.cancelaciones = c.cancelaciones || [];
+  c.cancelaciones.push({
+    id: uid(), linId: l.id, nombre: l.nombre, cant: cant,
+    importe: (num(l.precio) + (l.mods||[]).reduce((x,m)=>x+num(m.extra),0)) * cant,
+    motivo: motivo, nota: nota||"", merma: !!merma,
+    quien: usuarioActual().nombre||"", hora: horaAhora(), estadoAlCancelar: l.estado||"pedido"
+  });
+}
+$("#corrCerrar").addEventListener("click", ()=>{ $("#modalCorrige").hidden = true; corrigiendo = null; });
+$("#corrCuerpo").addEventListener("click", e=>{
+  const c = comandaActual(); if(!c || !corrigiendo) return;
+  const l = c.lineas.find(x=>x.id === corrigiendo); if(!l) return;
+  const motivo = ($("#corrMotivo")||{}).value || "";
+  const nota = (($("#corrNota")||{}).value || "").trim();
+  const avanzado = l.estado === "preparando" || l.estado === "listo" || l.estado === "entregada";
+
+  if(e.target.closest("#corrCancela")){
+    if(!confirm("¿Cancelar «" + l.nombre + "» completo?" +
+        (avanzado ? "\n\nYa estaba " + (ET_EDO[l.estado]||l.estado) + ": se registra como merma." : ""))) return;
+    anotaCancelacion(c, l, num(l.cant,1), motivo, nota, avanzado);
+    l.cancelada = true; l.motivo = motivo; l.cancelaHora = horaAhora();
+    persist(); $("#modalCorrige").hidden = true; corrigiendo = null;
+    renderComanda(); pintaTabs();
+    toast("Cancelado. La cocina lo va a ver en su pantalla.");
+    return;
+  }
+  if(e.target.closest("#corrGuarda")){
+    const nueva = Math.max(0, num($("#corrCant").value, 0));
+    const antes = num(l.cant,1);
+    if(nueva === antes){ $("#modalCorrige").hidden = true; corrigiendo = null; return; }
+    if(nueva === 0){
+      anotaCancelacion(c, l, antes, motivo, nota, avanzado);
+      l.cancelada = true; l.motivo = motivo; l.cancelaHora = horaAhora();
+    }else{
+      if(nueva < antes) anotaCancelacion(c, l, antes - nueva, motivo, nota, avanzado);
+      l.cant = nueva;
+      /* Si crece, lo que se suma todavía no está en cocina. */
+      if(nueva > antes){ l.estado = "pedido"; l.enviada = horaAhora(); }
+    }
+    persist(); $("#modalCorrige").hidden = true; corrigiendo = null;
+    renderComanda(); pintaTabs();
+    toast(nueva === 0 ? "Cancelado" : "Quedó en " + nueva);
+  }
 });
 $("#comVolver").addEventListener("click", ()=>{ vaA("mesas"); });
 $("#comGente").addEventListener("click", ()=>{
@@ -972,9 +1587,9 @@ $("#comEnviar").addEventListener("click", ()=>{
   const c = comandaActual(); if(!c) return;
   const h = horaAhora();
   let n = 0;
-  (c.lineas||[]).forEach(l=>{ if(!l.enviada){ l.enviada = h; n++; } });
-  persist(); pintaLineas();
-  toast(n + " platillo(s) a cocina. Ya no se pueden quitar desde aquí.");
+  (c.lineas||[]).forEach(l=>{ if(!l.enviada && !l.cancelada){ l.enviada = h; l.estado = "pedido"; n++; } });
+  persist(); pintaLineas(); pintaTabs();
+  toast(n + " platillo(s) a cocina. Para cambiarlos ahora se usa Corregir.");
 });
 $("#comCancelar").addEventListener("click", ()=>{
   const c = comandaActual(); if(!c) return;
@@ -982,9 +1597,16 @@ $("#comCancelar").addEventListener("click", ()=>{
   if(!confirm("¿Cancelar " + c.mesaNombre + "?\n\n" +
       (enCocina ? "Ya hay " + enCocina + " platillo(s) en cocina: alguien los preparó.\n\n" : "") +
       "La cuenta se cierra en cero y queda registrada como cancelada.")) return;
-  c.estado = "cerrada"; c.cancelada = true; c.cierra = horaAhora(); c.total = 0;
+  const motivo = prompt("¿Por qué se cancela la mesa?", "El cliente se fue");
+  if(motivo === null) return;
+  vivas(c).forEach(l=>{
+    anotaCancelacion(c, l, num(l.cant,1), motivo, "", !!l.enviada);
+    l.cancelada = true; l.motivo = motivo;
+  });
+  c.estado = "cerrada"; c.cancelada = true; c.motivo = motivo;
+  c.cierra = horaAhora(); c.total = 0;
   persist(); vaA("mesas");
-  toast("Mesa cancelada");
+  toast("Mesa cancelada · " + motivo);
 });
 
 /* ---------------- modificadores ---------------- */
@@ -1054,10 +1676,127 @@ $("#modsOk").addEventListener("click", ()=>{
 function agregaLinea(p, mods, nota, cant){
   const c = comandaActual(); if(!c) return;
   c.lineas.push({id:uid(), platId:p.id, nombre:p.nombre, precio:num(p.precio),
-                 cant: Math.max(1, num(cant,1)), mods: mods||[], nota: nota||"", enviada:""});
+                 cant: Math.max(1, num(cant,1)), mods: mods||[], nota: nota||"",
+                 comensal: comensalVista, enviada:"", estado:"", ts: Date.now()});
   persist(); pintaLineas();
-  toast(p.nombre + " agregado");
+  toast(p.nombre + " → " + (comensalVista ? "comensal " + comensalVista : "para compartir"));
 }
+
+/* ===================================================================
+   COCINA
+   La comanda tenía que ir a algún lado. Va aquí: una tarjeta por mesa, los
+   platillos agrupados por comensal —que es como se emplata y como se
+   entrega— y un reloj que se pone ámbar y luego rojo. Nadie en una cocina
+   lee una tabla; lee tarjetas y colores.
+   =================================================================== */
+let kdsVista = "pendiente";
+
+const pendienteLinea = l => !l.cancelada && l.enviada &&
+      (l.estado === "pedido" || l.estado === "preparando" || l.estado === "listo");
+function porHacer(){
+  const out = [];
+  abiertas().forEach(c => vivas(c).forEach(l=>{
+    if(l.enviada && (l.estado === "pedido" || l.estado === "preparando")) out.push({c, l});
+  }));
+  return out;
+}
+function minutosEn(hora){ return Math.max(0, minutosDe(horaAhora()) - minutosDe(hora)); }
+function colorEspera(min){
+  return min >= num(P.cocinaRojo, 20) ? "rojo" : min >= num(P.cocinaAmbar, 10) ? "ambar" : "verde";
+}
+
+function renderCocina(){
+  const cs = abiertas().filter(c=>{
+    const hay = vivas(c).some(l=>l.enviada);
+    if(!hay && !(c.cancelaciones||[]).length) return false;
+    if(kdsVista === "todo") return true;
+    return vivas(c).some(l=>l.estado === "pedido" || l.estado === "preparando");
+  });
+  /* Lo más viejo primero: en una cocina la fila manda. */
+  cs.sort((a,b)=> minutosDe(a.abre) - minutosDe(b.abre));
+
+  const faltan = porHacer();
+  $("#kdsResumen").textContent = faltan.length
+    ? faltan.length + " platillo(s) por hacer en " + cs.length + " mesa(s)"
+    : "Nada pendiente en cocina";
+
+  $("#kdsRejilla").innerHTML = cs.map(c=>{
+    const n = Math.max(1, num(c.personas,1));
+    const suyas = vivas(c).filter(l=>l.enviada);
+    const esperas = suyas.filter(l=>l.estado === "pedido" || l.estado === "preparando")
+                         .map(l=>minutosEn(l.enviada));
+    const peor = esperas.length ? Math.max.apply(null, esperas) : 0;
+    const color = esperas.length ? colorEspera(peor) : "verde";
+
+    const grupos = [];
+    for(let i=1;i<=n;i++) grupos.push({k:i, et:"Comensal " + i});
+    grupos.push({k:0, et:"Para compartir"});
+
+    let cuerpo = "";
+    grupos.forEach(g=>{
+      const ls = suyas.filter(l=>{
+        const k = num(l.comensal,0);
+        return (k >= 1 && k <= n ? k : 0) === g.k;
+      }).filter(l=> kdsVista === "todo" ? true : (l.estado === "pedido" || l.estado === "preparando"));
+      if(!ls.length) return;
+      cuerpo += '<div class="kdsSeat">'+esc(g.et)+'</div>';
+      cuerpo += ls.map(l=>{
+        const mods = (l.mods||[]).map(m=>m.nombre).join(" · ");
+        const listo = l.estado === "listo" || l.estado === "entregada";
+        return '<div class="kdsLin'+(listo?" lista":"")+'" data-kl="'+esc(c.id)+'|'+esc(l.id)+'">' +
+          '<span class="c">'+num(l.cant,1)+'×</span>' +
+          '<span><b>'+esc(l.nombre)+'</b>' +
+            (mods ? '<small>'+esc(mods)+'</small>' : '') +
+            (l.nota ? '<small>✎ '+esc(l.nota)+'</small>' : '') + '</span>' +
+          (l.estado === "pedido"     ? '<button class="ir" data-paso="preparando">Empezar</button>' :
+           l.estado === "preparando" ? '<button class="ok" data-paso="listo">Listo</button>' :
+           l.estado === "listo"      ? '<button data-paso="entregada">Entregado</button>' :
+                                       '<span style="font-size:11px;color:var(--ink-3)">entregado</span>') +
+          '</div>';
+      }).join("");
+    });
+
+    const canc = (c.cancelaciones||[]).slice(-3).reverse();
+    const avisos = canc.map(x=>
+      '<div class="kdsCancel"><b>Cancelado '+num(x.cant,1)+'× '+esc(x.nombre)+'</b> · ' +
+      esc(x.motivo) + ' · ' + esc(x.hora) + (x.merma ? ' <b>(ya estaba hecho)</b>' : '') + '</div>').join("");
+
+    return '<div class="kdsCard '+color+'">' +
+      '<header><b>'+esc(c.mesaNombre)+'</b><small>'+esc(c.mesero||"")+'</small>' +
+        '<span class="reloj">'+(esperas.length ? peor + "′" : "✓")+'</span></header>' +
+      avisos +
+      '<div class="kdsCuerpo">'+(cuerpo || '<div class="empty" style="padding:16px">Todo salió.</div>')+'</div>' +
+      (suyas.some(l=>l.estado === "pedido" || l.estado === "preparando")
+        ? '<div class="kdsPie"><button class="btn bien sm ancho" data-ktodo="'+esc(c.id)+'">Toda la mesa lista</button></div>'
+        : '') +
+      '</div>';
+  }).join("") || '<div class="empty">No hay nada en cocina. Las comandas aparecen aquí en cuanto el mesero las manda.</div>';
+}
+$("#kdsVista").addEventListener("click", e=>{
+  const b = e.target.closest("[data-kv]"); if(!b) return;
+  kdsVista = b.dataset.kv;
+  $$("#kdsVista button").forEach(x=>x.setAttribute("aria-pressed", String(x.dataset.kv === kdsVista)));
+  renderCocina();
+});
+$("#kdsRejilla").addEventListener("click", e=>{
+  const todo = e.target.closest("[data-ktodo]");
+  if(todo){
+    const c = COMANDAS.find(x=>x.id === todo.dataset.ktodo); if(!c) return;
+    vivas(c).forEach(l=>{ if(l.estado === "pedido" || l.estado === "preparando") l.estado = "listo"; });
+    persist(); renderCocina(); pintaTabs();
+    toast(c.mesaNombre + ": todo listo");
+    return;
+  }
+  const b = e.target.closest("[data-paso]"); if(!b) return;
+  const fila = b.closest("[data-kl]"); if(!fila) return;
+  const [cid, lid] = fila.dataset.kl.split("|");
+  const c = COMANDAS.find(x=>x.id === cid); if(!c) return;
+  const l = (c.lineas||[]).find(x=>x.id === lid); if(!l) return;
+  l.estado = b.dataset.paso;
+  if(l.estado === "preparando") l.empezo = horaAhora();
+  if(l.estado === "listo")      l.listoA = horaAhora();
+  persist(); renderCocina(); pintaTabs();
+});
 
 /* ===================================================================
    COBRO
@@ -1597,6 +2336,460 @@ $("#tab-menu").addEventListener("click", e=>{
 });
 
 /* ===================================================================
+   CALCULADORA DE COSTOS
+   Dos, porque son dos preguntas distintas. La simple contesta «¿cómo me fue
+   hoy?» con lo que gastaste y lo que vendiste. La profesional contesta
+   «¿cuánto me cuesta de verdad este platillo?», y ésa necesita merma, gastos
+   fijos y un rato de capturar.
+   =================================================================== */
+let costVista = "simple";
+const UNIDADES = ["kg", "g", "L", "ml", "pieza", "manojo", "caja", "bolsa"];
+const comprasDe = f => COMPRAS.filter(c=>c.fecha === f);
+
+function renderCostos(){
+  $$("#costVista button").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.cv === costVista)));
+  $("#costSimple").hidden = costVista !== "simple";
+  $("#costPro").hidden    = costVista !== "pro";
+  if(costVista === "simple") renderSimple(); else renderPro();
+}
+$("#costVista").addEventListener("click", e=>{
+  const b = e.target.closest("[data-cv]"); if(!b) return;
+  costVista = b.dataset.cv; renderCostos();
+});
+
+/* ---------------- la simple: las compras del día ---------------- */
+function renderSimple(){
+  const hoy = hoyISO();
+  const cs = comprasDe(hoy);
+  $("#comprasFecha").textContent = new Date().toLocaleDateString("es-MX",{day:"numeric",month:"long"});
+  $("#t_compras").innerHTML = '<thead><tr><th>Qué compraste</th><th style="width:140px">Proveedor</th>' +
+    '<th style="width:100px">Cantidad</th><th style="width:110px">Unidad</th>' +
+    '<th style="width:120px">Lo que pagaste</th><th style="width:60px"></th></tr></thead><tbody>' +
+    cs.map(c=>'<tr data-compra="'+esc(c.id)+'">' +
+      '<td><input data-xk="insumo" value="'+esc(c.insumo)+'" placeholder="Jitomate"></td>' +
+      '<td><input data-xk="prov" value="'+esc(c.prov||"")+'" placeholder="Central"></td>' +
+      '<td><input data-xk="cant" type="number" min="0" step="0.01" value="'+num(c.cant)+'"></td>' +
+      '<td><select data-xk="unidad">'+UNIDADES.map(u=>'<option'+(u===c.unidad?" selected":"")+'>'+u+'</option>').join("")+'</select></td>' +
+      '<td><input data-xk="importe" type="number" min="0" step="0.01" value="'+num(c.importe)+'"></td>' +
+      '<td><button class="btn sm ghost" data-delcompra="'+esc(c.id)+'">x</button></td></tr>').join("") +
+    '</tbody>';
+  if(!cs.length) $("#t_compras").innerHTML += '<tbody><tr><td colspan="6"><div class="empty">' +
+    'Sin compras apuntadas hoy. Presiona <b>+ Compra</b> y apunta el ticket de la central.</div></td></tr></tbody>';
+
+  const gasto = cs.reduce((s,c)=>s+num(c.importe), 0);
+  const venta = cerradasDe(hoy).reduce((s,c)=>s+num(c.total) - num(c.propina), 0);
+  const pct = venta ? gasto/venta*100 : 0;
+  const nivel = !venta ? "ojo" : pct <= 35 ? "bien" : pct <= 40 ? "ojo" : "mal";
+  const dice = !venta
+    ? "Todavia no has vendido hoy, asi que el porcentaje no dice nada."
+    : pct <= 35 ? "Vas bien. En un restaurante sano la materia prima se lleva entre 28% y 35% de la venta."
+    : pct <= 40 ? "Esta en el limite. Arriba de 35% la utilidad se empieza a comer sola."
+    : "Esta alto. O compraste para varios dias, o hay platillos mal precados, o se esta yendo material.";
+
+  const merma = COMANDAS.filter(c=>c.fecha === hoy)
+    .reduce((s,c)=> s + (c.cancelaciones||[]).filter(x=>x.merma).reduce((x,y)=>x+num(y.importe),0), 0);
+
+  $("#costResumen").innerHTML =
+    '<div class="tiles" style="margin-bottom:14px">' +
+      '<div class="tile"><span class="et">Compraste hoy</span><span class="v">'+mx(gasto)+'</span>' +
+        '<span class="sub">'+cs.length+' compra(s)</span></div>' +
+      '<div class="tile"><span class="et">Vendiste hoy</span><span class="v">'+mx(venta)+'</span>' +
+        '<span class="sub">sin contar propinas</span></div>' +
+      '<div class="tile destacada"><span class="et">Materia prima</span><span class="v">' +
+        (venta ? pct.toFixed(1)+"%" : "-")+'</span><span class="sub">de cada peso vendido</span></div>' +
+      '<div class="tile"><span class="et">Merma de hoy</span><span class="v">'+mx(merma)+'</span>' +
+        '<span class="sub">'+(merma ? "cancelado ya hecho" : "nada se tiro")+'</span></div>' +
+    '</div>' +
+    '<div class="semaforo '+nivel+'"><span class="luz"></span>' +
+      '<span><b>'+(venta ? pct.toFixed(1)+"% de materia prima" : "Falta vender")+'</b>' +
+      '<small>'+dice+'</small></span></div>' +
+    '<p class="note" style="margin-top:14px">Ojo con leerlo dia por dia: si hoy compraste para toda la semana, ' +
+      'el porcentaje sale altisimo y no significa nada. Sirve de verdad al cerrar la semana o el mes.</p>';
+
+  $("#t_rend").innerHTML = '<thead><tr><th>Insumo</th><th style="width:130px">Costo por unidad</th>' +
+    '<th style="width:140px">Porciones que salen</th><th style="width:140px" class="der">Costo por porcion</th>' +
+    '</tr></thead><tbody>' +
+    cs.map(c=>{
+      const porUnidad = num(c.cant) ? num(c.importe)/num(c.cant) : 0;
+      const porPorcion = num(c.porciones) ? num(c.importe)/num(c.porciones) : 0;
+      return '<tr data-compra="'+esc(c.id)+'">' +
+        '<td><b>'+esc(c.insumo||"-")+'</b><br><span style="font-size:11px;color:var(--ink-3)">' +
+          num(c.cant)+' '+esc(c.unidad||"")+' - '+mx(c.importe)+'</span></td>' +
+        '<td class="mono">'+(porUnidad ? mx(porUnidad)+" / "+esc(c.unidad||"") : "-")+'</td>' +
+        '<td><input data-xk="porciones" type="number" min="0" step="1" value="'+(num(c.porciones)||"")+'" placeholder="cuantas?"></td>' +
+        '<td class="der mono" style="font-size:15px;color:'+(porPorcion?"var(--cyan)":"var(--ink-3)")+'">' +
+          (porPorcion ? mx(porPorcion) : "-")+'</td></tr>';
+    }).join("") + '</tbody>';
+  if(!cs.length) $("#t_rend").innerHTML += '<tbody><tr><td colspan="4"><div class="empty">' +
+    'Apunta una compra arriba y aqui te digo cuanto te cuesta cada porcion.</div></td></tr></tbody>';
+}
+$("#compraNueva").addEventListener("click", ()=>{
+  COMPRAS.unshift({id:uid(), fecha:hoyISO(), insumo:"", prov:"", cant:0, unidad:"kg", importe:0, porciones:0});
+  persist(); renderSimple();
+});
+
+/* ---------------- la profesional: el escandallo ---------------- */
+const GASTOS_ET = {renta:"Renta", luz:"Luz", gas:"Gas", agua:"Agua",
+                   sueldos:"Sueldos de cocina", otros:"Otros fijos"};
+let recPlatId = "";
+function recetaDe(id){
+  if(!RECETAS[id]) RECETAS[id] = {ings:[], minutos:0, rinde:1};
+  const r = RECETAS[id];
+  r.ings = r.ings || []; r.rinde = num(r.rinde,1) || 1;
+  return r;
+}
+const gastoFijoMes = () => Object.keys(GASTOS_ET).reduce((s,k)=>s+num(P.gastos[k]), 0);
+function fijoPorPorcion(){
+  const porciones = Math.max(1, num(P.diasMes,26) * num(P.porcionesDia,120));
+  return gastoFijoMes() / porciones;
+}
+function ventaPromedio(){
+  const ps = (MENU.plats||[]).filter(p=>num(p.precio));
+  return ps.length ? ps.reduce((s,p)=>s+num(p.precio),0)/ps.length : 0;
+}
+function costoPromedio(){
+  const ps = (MENU.plats||[]).filter(p=>num(p.precio));
+  return ps.length ? ps.reduce((s,p)=>s+num(p.costo),0)/ps.length : 0;
+}
+function pintaProFijos(){
+  const mes = gastoFijoMes(), porPorcion = fijoPorPorcion();
+  const alDia = mes / Math.max(1, num(P.diasMes,26));
+  const margenUnit = ventaPromedio() - costoPromedio();
+  const equilibrio = (mes && margenUnit > 0) ? Math.ceil(mes / margenUnit) : 0;
+  $("#proFijos").innerHTML =
+    '<div class="tiles" style="margin-bottom:0">' +
+      '<div class="tile"><span class="et">Al mes</span><span class="v">'+mx(mes)+'</span>' +
+        '<span class="sub">de puerta abierta</span></div>' +
+      '<div class="tile"><span class="et">Al dia</span><span class="v">'+mx(alDia)+'</span>' +
+        '<span class="sub">en '+num(P.diasMes,26)+' dias</span></div>' +
+      '<div class="tile destacada"><span class="et">Por platillo</span><span class="v">'+mx(porPorcion)+'</span>' +
+        '<span class="sub">lo que carga cada uno</span></div>' +
+      '<div class="tile"><span class="et">Punto de equilibrio</span><span class="v">' +
+        (equilibrio ? equilibrio.toLocaleString("es-MX") : "-") + '</span>' +
+        '<span class="sub">'+(equilibrio ? "platillos al mes para no perder" : "falta capturar precios y costos")+'</span></div>' +
+    '</div>';
+}
+function renderPro(){
+  $("#gastosFijos").innerHTML = Object.keys(GASTOS_ET).map(k=>
+    '<div><label class="f" for="g_'+k+'">'+esc(GASTOS_ET[k])+'</label>' +
+    '<input id="g_'+k+'" data-gk="'+k+'" type="number" min="0" step="1" value="'+num(P.gastos[k])+'"></div>').join("");
+  $("#g_dias").value = num(P.diasMes,26);
+  $("#g_porciones").value = num(P.porcionesDia,120);
+  $("#g_margen").value = num(P.margenMeta,70);
+  const ps = MENU.plats||[];
+  if(!recPlatId || !ps.some(p=>p.id === recPlatId)) recPlatId = (ps[0]||{}).id || "";
+  $("#recPlat").innerHTML = ps.map(p=>
+    '<option value="'+esc(p.id)+'"'+(p.id===recPlatId?" selected":"")+'>'+esc(p.nombre)+'</option>').join("");
+  pintaProFijos(); pintaReceta();
+}
+$("#recIngNuevo").addEventListener("click", ()=>{
+  if(!recPlatId){ toast("Primero crea un platillo en El menu"); return; }
+  recetaDe(recPlatId).ings.push({id:uid(), nombre:"", cant:0, unidad:"g", costoUnidad:0, merma:0});
+  persist(); pintaReceta();
+});
+
+/* Costo real de un ingrediente: lo que se usa mas lo que se tira al
+   limpiarlo. Un kilo con 20% de merma rinde 800 g, asi que el gramo util
+   cuesta 25% mas. Eso es lo que casi nadie suma. */
+function costoIngrediente(i){
+  const bruto = num(i.cant) * num(i.costoUnidad);
+  const m = Math.min(95, Math.max(0, num(i.merma)));
+  return m ? bruto / (1 - m/100) : bruto;
+}
+function pintaReceta(){
+  const p = (MENU.plats||[]).find(x=>x.id === recPlatId);
+  if(!p){
+    $("#t_receta").innerHTML = "";
+    $("#recResultado").innerHTML = '<div class="empty">No hay platillos. Crealos en <b>El menu</b>.</div>';
+    return;
+  }
+  const r = recetaDe(recPlatId);
+  $("#t_receta").innerHTML = '<thead><tr><th>Ingrediente</th><th style="width:95px">Cantidad</th>' +
+    '<th style="width:95px">Unidad</th><th style="width:120px">Costo por unidad</th>' +
+    '<th style="width:95px">Merma %</th><th style="width:110px" class="der">Cuesta</th>' +
+    '<th style="width:60px"></th></tr></thead><tbody>' +
+    (r.ings||[]).map(i=>'<tr data-ing="'+esc(i.id)+'">' +
+      '<td><input data-ik="nombre" value="'+esc(i.nombre)+'" placeholder="Carne de res"></td>' +
+      '<td><input data-ik="cant" type="number" min="0" step="0.01" value="'+num(i.cant)+'"></td>' +
+      '<td><select data-ik="unidad">'+UNIDADES.map(u=>'<option'+(u===i.unidad?" selected":"")+'>'+u+'</option>').join("")+'</select></td>' +
+      '<td><input data-ik="costoUnidad" type="number" min="0" step="0.01" value="'+num(i.costoUnidad)+'"></td>' +
+      '<td><input data-ik="merma" type="number" min="0" max="95" step="1" value="'+num(i.merma)+'"></td>' +
+      '<td class="der mono">'+mx(costoIngrediente(i))+'</td>' +
+      '<td><button class="btn sm ghost" data-deling="'+esc(i.id)+'">x</button></td></tr>').join("") +
+    '</tbody>';
+  if(!(r.ings||[]).length) $("#t_receta").innerHTML += '<tbody><tr><td colspan="7"><div class="empty">' +
+    'Sin ingredientes. Presiona <b>+ Ingrediente</b>.</div></td></tr></tbody>';
+
+  const materia = (r.ings||[]).reduce((s,i)=>s+costoIngrediente(i), 0);
+  const fijo = fijoPorPorcion();
+  const costoTotal = materia + fijo;
+  const precio = num(p.precio);
+  const util = precio - costoTotal;
+  const margen = precio ? util/precio*100 : 0;
+  const meta = Math.min(95, Math.max(0, num(P.margenMeta,70)));
+  const sugerido = costoTotal / (1 - meta/100);
+  const nivel = !precio ? "ojo" : margen >= meta ? "bien" : margen >= meta - 15 ? "ojo" : "mal";
+
+  $("#recResultado").innerHTML =
+    '<div class="tiles" style="margin-bottom:14px">' +
+      '<div class="tile"><span class="et">Materia prima</span><span class="v">'+mx(materia)+'</span>' +
+        '<span class="sub">con merma incluida</span></div>' +
+      '<div class="tile"><span class="et">Gasto fijo</span><span class="v">'+mx(fijo)+'</span>' +
+        '<span class="sub">lo que carga este platillo</span></div>' +
+      '<div class="tile destacada"><span class="et">Te cuesta</span><span class="v">'+mx(costoTotal)+'</span>' +
+        '<span class="sub">de verdad</span></div>' +
+      '<div class="tile"><span class="et">Lo vendes en</span><span class="v">'+mx(precio)+'</span>' +
+        '<span class="sub">'+(precio ? "dejas "+mx(util) : "sin precio")+'</span></div>' +
+    '</div>' +
+    '<div class="semaforo '+nivel+'"><span class="luz"></span><span>' +
+      '<b>'+(precio ? margen.toFixed(1)+"% de utilidad" : "Falta ponerle precio")+'</b>' +
+      '<small>'+(!precio ? "Ponle precio en El menu para comparar."
+        : margen >= meta ? "Por arriba de tu meta de "+meta+"%."
+        : "Para dejar "+meta+"% tendrias que venderlo en "+mx(sugerido)+".")+'</small></span></div>' +
+    '<div class="fila" style="margin-top:14px">' +
+      '<button class="btn" id="recAplica">Usar '+mx(Math.ceil(sugerido))+' como precio</button>' +
+      '<button class="btn ghost" id="recCosto">Guardar '+mx(materia)+' como costo del platillo</button>' +
+    '</div>' +
+    '<p class="note" style="margin-top:14px">El <b>costo del platillo</b> que guarda el menu es solo la materia ' +
+      'prima: es lo que se usa para la utilidad del dia. El gasto fijo no se guarda ahi a proposito - cambia ' +
+      'cada mes con la renta y la luz, y meterlo en el costo haria que las ventas viejas se movieran solas.</p>';
+}
+$("#recResultado").addEventListener("click", e=>{
+  const p = (MENU.plats||[]).find(x=>x.id === recPlatId); if(!p) return;
+  const r = recetaDe(recPlatId);
+  const materia = (r.ings||[]).reduce((s,i)=>s+costoIngrediente(i), 0);
+  if(e.target.closest("#recAplica")){
+    const meta = Math.min(95, Math.max(0, num(P.margenMeta,70)));
+    p.precio = Math.ceil((materia + fijoPorPorcion()) / (1 - meta/100));
+    persist(); pintaReceta();
+    toast(p.nombre + " ahora cuesta " + mx(p.precio));
+    return;
+  }
+  if(e.target.closest("#recCosto")){
+    p.costo = Math.round(materia*100)/100;
+    persist(); pintaReceta();
+    toast("Costo guardado: " + mx(p.costo));
+  }
+});
+
+/* ---------------- lo que se escribe en las dos ---------------- */
+$("#tab-costos").addEventListener("input", e=>{
+  const tr = e.target.closest("[data-compra]");
+  if(tr && e.target.dataset.xk){
+    const c = COMPRAS.find(x=>x.id === tr.dataset.compra); if(!c) return;
+    const k = e.target.dataset.xk;
+    c[k] = (k === "insumo" || k === "prov" || k === "unidad") ? e.target.value : num(e.target.value);
+    clearTimeout(window._tc2); window._tc2 = setTimeout(()=>{ persist(); renderSimple(); }, 800);
+    return;
+  }
+  if(e.target.dataset.gk){ P.gastos[e.target.dataset.gk] = num(e.target.value); persist(); pintaProFijos(); return; }
+  if(e.target.id === "g_dias"){ P.diasMes = num(e.target.value,26); persist(); pintaProFijos(); pintaReceta(); return; }
+  if(e.target.id === "g_porciones"){ P.porcionesDia = num(e.target.value,120); persist(); pintaProFijos(); pintaReceta(); return; }
+  if(e.target.id === "g_margen"){ P.margenMeta = num(e.target.value,70); persist(); pintaReceta(); return; }
+  const tri = e.target.closest("[data-ing]");
+  if(tri && e.target.dataset.ik){
+    const r = recetaDe(recPlatId);
+    const i = (r.ings||[]).find(x=>x.id === tri.dataset.ing); if(!i) return;
+    const k = e.target.dataset.ik;
+    i[k] = (k === "nombre" || k === "unidad") ? e.target.value : num(e.target.value);
+    clearTimeout(window._tc3); window._tc3 = setTimeout(()=>{ persist(); pintaReceta(); }, 800);
+  }
+});
+$("#tab-costos").addEventListener("change", e=>{
+  const tr = e.target.closest("[data-compra]");
+  if(tr && e.target.dataset.xk === "unidad"){
+    const c = COMPRAS.find(x=>x.id === tr.dataset.compra);
+    if(c){ c.unidad = e.target.value; persist(); renderSimple(); }
+    return;
+  }
+  if(e.target.id === "recPlat"){ recPlatId = e.target.value; pintaReceta(); return; }
+  const tri = e.target.closest("[data-ing]");
+  if(tri && e.target.dataset.ik === "unidad"){
+    const i = (recetaDe(recPlatId).ings||[]).find(x=>x.id === tri.dataset.ing);
+    if(i){ i.unidad = e.target.value; persist(); pintaReceta(); }
+  }
+});
+$("#tab-costos").addEventListener("click", e=>{
+  const d = e.target.closest("[data-delcompra]");
+  if(d){ COMPRAS = COMPRAS.filter(c=>c.id !== d.dataset.delcompra); persist(); renderSimple(); return; }
+  const di = e.target.closest("[data-deling]");
+  if(di){
+    const r = recetaDe(recPlatId);
+    r.ings = (r.ings||[]).filter(i=>i.id !== di.dataset.deling);
+    persist(); pintaReceta();
+  }
+});
+
+/* ===================================================================
+   RELOJ CHECADOR
+   Eventos, no turnos: entrada y salida por separado. Una jornada partida
+   —la gente del turno de comida se va y regresa— da varios turnos, y el
+   último puede quedar abierto. Así se ve: abierto, no en cero.
+   =================================================================== */
+function eventosDe(id, fecha){
+  return ASISTENCIAS.filter(a=>a.uid === id && a.fecha === fecha)
+    .slice().sort((a,b)=> a.hora < b.hora ? -1 : a.hora > b.hora ? 1 : 0);
+}
+function turnosDe(id, fecha){
+  const ev = eventosDe(id, fecha), out = [];
+  let abierto = null;
+  ev.forEach(e=>{
+    if(e.tipo === "entrada"){ if(!abierto) abierto = {entrada:e, salida:null}; }
+    else if(abierto){ abierto.salida = e; out.push(abierto); abierto = null; }
+  });
+  if(abierto) out.push(abierto);
+  return out;
+}
+const minutosTurno = x => x.salida ? Math.max(0, minutosDe(x.salida.hora) - minutosDe(x.entrada.hora)) : 0;
+const minutosDia = (id, f) => turnosDe(id, f).reduce((s,x)=>s+minutosTurno(x), 0);
+function estaDentro(id){
+  const x = turnosDe(id, hoyISO());
+  return !!(x.length && !x[x.length-1].salida);
+}
+function desdeHace(id){
+  const x = turnosDe(id, hoyISO());
+  if(!x.length || x[x.length-1].salida) return 0;
+  return Math.max(0, minutosDe(horaAhora()) - minutosDe(x[x.length-1].entrada.hora));
+}
+
+function renderPersonal(){
+  const gente = EQUIPO.filter(u=>u.activo !== false);
+  const dentro = gente.filter(u=>estaDentro(u.id)).length;
+  $("#chHoy").textContent = dentro + " de " + gente.length + " dentro";
+  $("#chGente").innerHTML = gente.map(u=>{
+    const d = estaDentro(u.id), min = minutosDia(u.id, hoyISO());
+    return '<button class="chPersona'+(d?" dentro":"")+'" data-checa="'+esc(u.id)+'">' +
+      '<span class="av">'+esc((u.nombre||"?").trim().charAt(0).toUpperCase())+'</span>' +
+      '<span><b>'+esc(u.nombre||"Sin nombre")+'</b><small>' +
+        (d ? "Dentro desde " + esc(turnosDe(u.id,hoyISO()).slice(-1)[0].entrada.hora)
+           : min ? "Fuera · hoy " + horasTxt(min) : "Sin checar hoy") + '</small></span>' +
+      '<span class="acc">'+(d ? "Salir" : "Entrar")+'</span></button>';
+  }).join("") || '<div class="empty">No hay nadie en el equipo.</div>';
+
+  $("#t_horas").innerHTML = '<thead><tr><th>Quién</th><th>Turnos de hoy</th>' +
+    '<th class="der">Horas</th><th>Estado</th></tr></thead><tbody>' +
+    gente.map(u=>{
+      const ts = turnosDe(u.id, hoyISO());
+      return '<tr><td><b>'+esc(u.nombre||"")+'</b><br><span style="font-size:11px;color:var(--ink-3)">' +
+        (ROLES[u.rol]||ROLES.mesero).nombre + '</span></td>' +
+        '<td class="mono">'+(ts.length
+          ? ts.map(x=>esc(x.entrada.hora)+"–"+(x.salida?esc(x.salida.hora):"…")).join("  ") : "—")+'</td>' +
+        '<td class="der mono">'+(minutosDia(u.id,hoyISO()) ? horasTxt(minutosDia(u.id,hoyISO())) : "—")+'</td>' +
+        '<td>'+(estaDentro(u.id)
+          ? '<span class="pill good">dentro · '+horasTxt(desdeHace(u.id))+'</span>'
+          : '<span class="pill">fuera</span>')+'</td></tr>';
+    }).join("") + '</tbody>';
+}
+$("#chGente").addEventListener("click", e=>{
+  const b = e.target.closest("[data-checa]"); if(!b) return;
+  abreCheca(b.dataset.checa);
+});
+
+/* ---------------- la ventana de checar ---------------- */
+let chQuien = null, chFoto = null, chTecleado = "", chCamara = null;
+function abreCheca(id){
+  const u = EQUIPO.find(x=>x.id === id); if(!u) return;
+  if(!tieneClave(u)){
+    toast("A " + (u.nombre||"esta persona") + " le falta su clave. Se la pone el gerente en Ajustes → Equipo.");
+    return;
+  }
+  chQuien = u; chFoto = null; chTecleado = "";
+  const d = estaDentro(id);
+  $("#chTitulo").textContent = (d ? "Salida · " : "Entrada · ") + (u.nombre||"");
+  $("#chOk").textContent = d ? "Registrar salida" : "Registrar entrada";
+  $("#chEstado").innerHTML = d
+    ? '<b>Estás dentro</b> desde las ' + esc(turnosDe(id,hoyISO()).slice(-1)[0].entrada.hora) +
+      ' · llevas ' + horasTxt(desdeHace(id))
+    : (minutosDia(id, hoyISO())
+        ? '<b>Hoy ya trabajaste</b> ' + horasTxt(minutosDia(id, hoyISO())) + ' · vas a volver a entrar'
+        : '<b>Sin registro hoy</b>');
+  $("#chShot").hidden = true; $("#chShot").removeAttribute("src");
+  $("#chVideo").hidden = false;
+  $("#chTomar").hidden = false; $("#chOtra").hidden = true;
+  $("#chTeclado").innerHTML = ["1","2","3","4","5","6","7","8","9","←","0","✓"].map(k=>
+    '<button type="button" data-tecla="'+k+'">'+k+'</button>').join("");
+  pintaChPin(); revisaChOk();
+  $("#modalCheca").hidden = false;
+  abreCamara();
+}
+async function abreCamara(){
+  if(!P.fotoCheca){ $("#chVideo").hidden = true; $("#chTomar").hidden = true; revisaChOk(); return; }
+  try{
+    chCamara = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user", width:480}});
+    $("#chVideo").srcObject = chCamara;
+  }catch(e){
+    /* Sin cámara —una caja vieja, el permiso negado— se checa igual. Es
+       preferible un registro sin foto que una persona que no puede checar. */
+    chCamara = null;
+    $("#chVideo").hidden = true; $("#chTomar").hidden = true;
+    toast("Sin cámara: se va a registrar sin foto");
+    revisaChOk();
+  }
+}
+function cierraCamara(){
+  if(chCamara){ chCamara.getTracks().forEach(t=>t.stop()); chCamara = null; }
+}
+function cierraCheca(){
+  cierraCamara(); $("#modalCheca").hidden = true;
+  chQuien = null; chFoto = null; chTecleado = "";
+}
+function pintaChPin(){
+  const largo = Math.max(4, chTecleado.length);
+  $("#chPin").innerHTML = Array.from({length:largo}, (_,i)=>
+    '<i class="'+(i < chTecleado.length ? "lleno" : "")+'"></i>').join("");
+}
+function revisaChOk(){
+  const hayFoto = !!chFoto || !chCamara;   /* sin cámara no se exige foto */
+  $("#chOk").disabled = !(hayFoto && chTecleado.length >= 1);
+}
+$("#chTomar").addEventListener("click", ()=>{
+  const v = $("#chVideo"); if(!v || !chCamara) return;
+  const lado = 320;
+  const cv = document.createElement("canvas");
+  cv.width = lado; cv.height = Math.round(lado * (v.videoHeight||3) / (v.videoWidth||4));
+  cv.getContext("2d").drawImage(v, 0, 0, cv.width, cv.height);
+  chFoto = cv.toDataURL("image/jpeg", 0.6);
+  $("#chShot").src = chFoto; $("#chShot").hidden = false;
+  $("#chVideo").hidden = true; $("#chTomar").hidden = true; $("#chOtra").hidden = false;
+  revisaChOk();
+});
+$("#chOtra").addEventListener("click", ()=>{
+  chFoto = null; $("#chShot").hidden = true;
+  $("#chVideo").hidden = false; $("#chTomar").hidden = false; $("#chOtra").hidden = true;
+  revisaChOk();
+});
+$("#chTeclado").addEventListener("click", e=>{
+  const b = e.target.closest("[data-tecla]"); if(!b) return;
+  const k = b.dataset.tecla;
+  if(k === "←") chTecleado = chTecleado.slice(0,-1);
+  else if(k === "✓"){ if(!$("#chOk").disabled) registraCheca(); return; }
+  else if(chTecleado.length < 12) chTecleado += k;
+  pintaChPin(); revisaChOk();
+});
+$("#chCerrar").addEventListener("click", cierraCheca);
+$("#chOk").addEventListener("click", registraCheca);
+function registraCheca(){
+  const u = chQuien; if(!u) return;
+  if(String(chTecleado) !== String(u.pin||"")){
+    toast("Esa no es la clave de " + (u.nombre||""));
+    chTecleado = ""; pintaChPin(); revisaChOk(); return;
+  }
+  const dentro = estaDentro(u.id);
+  ASISTENCIAS.push({
+    id: uid(), uid: u.id, nombre: u.nombre||"", fecha: hoyISO(), hora: horaAhora(),
+    tipo: dentro ? "salida" : "entrada", foto: chFoto || "",
+    desde: usuarioActual().nombre || "", ts: Date.now()
+  });
+  /* Las fotos pesan: se guardan las de los últimos 20 días y ya. */
+  const tope = new Date(Date.now() - 20*86400000);
+  const corte = tope.getFullYear()+"-"+dos(tope.getMonth()+1)+"-"+dos(tope.getDate());
+  ASISTENCIAS.forEach(a=>{ if(a.fecha < corte) a.foto = ""; });
+  persist();
+  toast((dentro ? "Salida" : "Entrada") + " de " + (u.nombre||"") + " a las " + horaAhora());
+  cierraCheca(); renderPersonal();
+}
+
+/* ===================================================================
    AJUSTES
    =================================================================== */
 function renderSet(){
@@ -1618,11 +2811,14 @@ function pintaNotaFolio(){
 }
 function renderMesasSet(){
   $("#t_mesas").innerHTML = '<thead><tr><th>Mesa</th><th style="width:150px">Zona</th>' +
-    '<th style="width:110px">Lugares</th><th style="width:80px">Activa</th><th style="width:60px"></th></tr></thead><tbody>' +
+    '<th style="width:100px">Sillas</th><th style="width:120px">Forma</th>' +
+    '<th style="width:80px">Activa</th><th style="width:60px"></th></tr></thead><tbody>' +
     MESAS.map(m=>'<tr data-mesafila="'+esc(m.id)+'">' +
       '<td><input data-mk="nombre" value="'+esc(m.nombre)+'"></td>' +
       '<td><input data-mk="zona" value="'+esc(m.zona||"Salón")+'" list="listaZonas"></td>' +
-      '<td><input data-mk="lugares" type="number" min="1" value="'+num(m.lugares,2)+'"></td>' +
+      '<td><input data-mk="lugares" type="number" min="1" max="12" value="'+num(m.lugares,2)+'"></td>' +
+      '<td><select data-mk="forma"><option value="cuadrada"'+(m.forma!=="redonda"?" selected":"")+'>Cuadrada</option>' +
+        '<option value="redonda"'+(m.forma==="redonda"?" selected":"")+'>Redonda</option></select></td>' +
       '<td style="text-align:center"><input type="checkbox" data-mk="activa" style="width:auto"'+(m.activa!==false?" checked":"")+'></td>' +
       '<td><button class="btn sm ghost" data-delmesa="'+esc(m.id)+'">✕</button></td></tr>').join("") +
     '</tbody><datalist id="listaZonas">' + zonas().map(z=>'<option value="'+esc(z)+'">').join("") + '</datalist>';
@@ -1677,6 +2873,11 @@ $("#tab-set").addEventListener("change", e=>{
     if(m){ m.activa = t.checked; persist(); }
     return;
   }
+  if(trm && t.dataset.mk === "forma"){
+    const m = MESAS.find(x=>x.id === trm.dataset.mesafila);
+    if(m){ m.forma = t.value; persist(); }
+    return;
+  }
   const tru = t.closest("[data-usr]");
   if(tru && t.dataset.uk){
     const u = EQUIPO.find(x=>x.id === tru.dataset.usr); if(!u) return;
@@ -1701,7 +2902,8 @@ $("#tab-set").addEventListener("click", e=>{
 });
 $("#mesaNueva").addEventListener("click", ()=>{
   const z = zonas()[0] || "Salón";
-  MESAS.push({id:uid(), nombre:"Mesa "+(MESAS.length+1), zona:z, lugares:4, activa:true});
+  MESAS.push({id:uid(), nombre:"Mesa "+(MESAS.length+1), zona:z, lugares:4, activa:true,
+              x:50, y:50, forma:"cuadrada"});
   persist(); renderMesasSet();
 });
 $("#userNuevo").addEventListener("click", ()=>{
@@ -1916,7 +3118,24 @@ function start(){
   pintaTabs();
   vaA(puedeVer("inicio") ? "inicio" : "mesas");
   pintaTurnoChip();
-  setInterval(()=>{ if(!$("#tab-mesas").hidden) renderMesas(); pintaTurnoChip(); }, 60000);
+  setInterval(()=>{
+    if(!$("#tab-mesas").hidden)  renderMesas();
+    if(!$("#tab-cocina").hidden) renderCocina();
+    pintaTurnoChip();
+  }, 30000);
+
+  /* Dos pestañas abiertas en la misma tableta —la comanda y la cocina— se
+     enteran una de otra sin red: localStorage avisa a las demás pestañas. */
+  window.addEventListener("storage", e=>{
+    if(!e.key || e.key.indexOf(LS) !== 0) return;
+    COMANDAS = lsGet("comandas", COMANDAS);
+    MESAS    = lsGet("mesas", MESAS);
+    TURNOS   = lsGet("turnos", TURNOS);
+    if(!$("#tab-cocina").hidden) renderCocina();
+    if(!$("#tab-mesas").hidden)  renderMesas();
+    if(!$("#tab-comanda").hidden && comandaActual()) pintaLineas();
+    pintaTabs(); pintaTurnoChip();
+  });
 }
 start();
 
