@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Makers Restaurant: mesas, comandas, cuenta dividida, propinas y corte de caja. Punto de venta para restaurantes, cafeterías y fondas.">
 <meta name="theme-color" content="#0E1226">
-<script src="config.js?v=20261016-1651"></script>
+<script src="config.js?v=20261016-1730"></script>
 <script>window.PRODUCTO={plataforma:"Makers OS",edicion:"Makers Restaurant",clave:"restaurant",giro:"Restaurante, cafetería y fonda"};</script>
 <style>:root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Makers Restaurant</title>
@@ -203,7 +203,11 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
 .comenFila button{cursor:pointer;background:var(--surface-2);border:1px solid var(--line);
   border-radius:99px;padding:5px 13px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
 .comenFila button[aria-pressed="true"]{background:var(--good);border-color:var(--good);color:#04201A}
-.comenFila .et{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-right:4px}
+.comenFila{background:var(--surface);border:1px solid var(--line);border-radius:var(--radio-sm);
+  padding:9px 11px}
+.comenFila .et{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--cyan);margin-right:6px}
+.comenFila button{padding:6px 15px;font-size:13px}
 .linGrupo{padding:7px 15px 3px;font-size:10.5px;font-weight:700;letter-spacing:.08em;
   text-transform:uppercase;color:var(--good);background:var(--surface-2);border-bottom:1px solid var(--line-soft)}
 .linGrupo span{float:right;font-family:"IBM Plex Mono",monospace;color:var(--ink-2);letter-spacing:0}
@@ -249,6 +253,36 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
 .kdsCancel b{color:var(--accent)}
 
 /* ---------- croquis ---------- */
+.decor{position:absolute;transform:translate(-50%,-50%);display:grid;place-items:center;
+  border-radius:8px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink-3);background:var(--surface-2);border:1px dashed var(--line);text-align:center;
+  line-height:1.2;padding:4px;user-select:none}
+.decor.barra{background:#2A2033;border:2px solid #4A3A58;color:#C8B5D8;border-radius:6px}
+.decor.cocina{background:#2E2512;border:2px solid #5A4A22;color:var(--warn);border-radius:6px}
+.decor.caja{background:#11283C;border:2px solid #1F4A66;color:var(--cyan);border-radius:6px}
+.decor.bano{background:#1A2338;border:2px solid #31406A;color:#9AA8D0}
+.decor.entrada{background:transparent;border:2px dashed var(--good);color:var(--good)}
+.decor.pared{background:#232845;border:0;border-radius:3px;color:transparent}
+.decor.planta{background:transparent;border:0;font-size:26px;color:var(--good)}
+.decor.arrastrando{z-index:19;opacity:.85}
+.decorPaleta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.decorPaleta button{cursor:pointer;background:var(--surface-2);border:1px dashed var(--line);
+  border-radius:8px;padding:5px 12px;font-size:12px;color:var(--ink-2)}
+.decorPaleta button:hover{border-color:var(--cyan);color:var(--cyan)}
+.cmesa.elegida{border-color:var(--cyan)!important;box-shadow:0 0 0 4px var(--cyan-soft)}
+.cmesa .tot{position:absolute;left:50%;bottom:-11px;transform:translateX(-50%);
+  background:var(--surface);border:1px solid var(--line);border-radius:6px;
+  padding:1px 7px;font-family:"IBM Plex Mono",monospace;font-size:11px;white-space:nowrap}
+.cmesa.ocupada .tot{border-color:var(--good);color:var(--good)}
+.cmesa.cuenta .tot{border-color:var(--warn);color:var(--warn)}
+.cmesa b{font-size:17px}
+.llevarFila{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.llevarCard{display:flex;flex-direction:column;gap:2px;cursor:pointer;text-align:left;
+  border:1px solid var(--warn);border-radius:var(--radio-sm);padding:10px 14px;min-width:150px;
+  background:linear-gradient(180deg,var(--warn-soft),var(--surface) 70%)}
+.llevarCard b{font-family:"Fredoka";font-size:14px}
+.llevarCard small{color:var(--ink-3);font-size:11px}
+.llevarCard .mnt{font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--warn)}
 .croquis{position:relative;border:1px dashed var(--line);border-radius:var(--radio);
   background:
     linear-gradient(var(--line-soft) 1px, transparent 1px) 0 0/40px 40px,
@@ -355,6 +389,7 @@ tr.clic:hover td{background:var(--surface-2)}
 .pill.mal{background:var(--mal);color:#2A0718}
 
 /* ---------- acceso ---------- */
+#modalCheca{z-index:9600}
 .accesoWrap{position:fixed;inset:0;z-index:9000;background:var(--bg);overflow:auto;
   display:grid;place-items:center;align-content:center;grid-auto-rows:min-content;padding:20px 16px}
 body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:none}
@@ -455,9 +490,13 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
       <button type="button" data-mv="croquis" aria-pressed="true">Croquis</button>
       <button type="button" data-mv="lista" aria-pressed="false">Lista</button>
     </div>
-    <button class="btn sm ghost" id="croqAcomodar" hidden>Acomodar mesas</button>
+    <button class="btn sm ghost" id="croqAcomodar" hidden>Acomodar el salón</button>
+    <button class="btn sm ghost" id="croqJuntar" hidden>Juntar mesas</button>
+    <button class="btn sm ghost" id="croqSeparar" hidden>Separar</button>
     <span class="croqPista" id="croqPista"></span>
   </div>
+  <div class="decorPaleta" id="decorPaleta" hidden></div>
+  <div class="llevarFila" id="llevarFila"></div>
   <div class="croquis" id="mesaCroquis"></div>
   <div class="mesas" id="mesaRejilla" hidden></div>
 </section>
@@ -654,6 +693,48 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
     </div>
   </div>
   <div class="card">
+    <header><h2>Tickets e impresión</h2><span class="hint">lo que sale en papel</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Se imprime con la impresora que ya tengas instalada en la
+        computadora o la tableta — toda térmica trae su driver. <b>El panel de cocina y el papel conviven</b>:
+        si tu cocina no tiene pantalla táctil, el ticket basta; si la tiene, los dos funcionan a la vez.</p>
+      <div class="grid g3">
+        <div><label class="f" for="tk_ancho">Ancho del papel</label>
+          <select id="tk_ancho"><option value="80">80 mm (lo normal)</option><option value="58">58 mm (chica)</option></select></div>
+        <div style="grid-column:span 2">
+          <label class="f">Logo del ticket</label>
+          <div class="fila">
+            <img id="tk_logoPrev" alt="" style="height:40px;width:auto;border-radius:6px;background:#fff;padding:3px" hidden>
+            <button class="btn sm" id="tk_logoBtn" type="button">Subir logo</button>
+            <button class="btn sm ghost" id="tk_logoQuita" type="button" hidden>Quitar</button>
+            <input id="tk_logoFile" type="file" accept="image/*" hidden>
+          </div>
+        </div>
+      </div>
+      <div class="grid g2" style="margin-top:14px">
+        <div><label class="f" for="tk_enc">Arriba del ticket</label>
+          <input id="tk_enc" placeholder="RFC, sucursal, lo que quieras"></div>
+        <div><label class="f" for="tk_pie">Abajo del ticket</label>
+          <input id="tk_pie" placeholder="¡Gracias por su visita!"></div>
+      </div>
+      <div style="margin-top:12px"><label class="f" for="tk_leyenda">Leyenda de propina</label>
+        <input id="tk_leyenda" placeholder="Propina sugerida 10% · 15% · 20%"></div>
+      <div class="grid g2" style="margin-top:14px">
+        <label class="sw"><input type="checkbox" id="tk_cuenta"> Imprimir la cuenta al cobrar</label>
+        <label class="sw"><input type="checkbox" id="tk_cocina"> Imprimir la comanda al mandar a cocina</label>
+        <label class="sw"><input type="checkbox" id="tk_iva"> Desglosar el IVA</label>
+        <label class="sw"><input type="checkbox" id="tk_propina"> Poner la leyenda de propina</label>
+      </div>
+      <div class="fila" style="margin-top:16px">
+        <button class="btn" id="tk_prueba">Imprimir una prueba</button>
+        <span class="hint" style="color:var(--ink-3);font-size:12px">sale un ticket de ejemplo para ver cómo queda</span>
+      </div>
+      <p class="note" style="margin-top:14px"><b>El ticket de cocina no lleva precios</b> — en la cocina estorban.
+        Lleva mesa o PARA LLEVAR, el folio en grande (el mismo del recibo, para que cuadren), el comensal de cada
+        platillo y lo que le quitan, en letra grande.</p>
+    </div>
+  </div>
+  <div class="card">
     <header><h2>Mesas y zonas</h2><button class="btn sm ghost" id="mesaNueva" style="margin-left:auto">+ Mesa</button></header>
     <div class="body"><div class="tbl-wrap"><table id="t_mesas"></table></div></div>
   </div>
@@ -689,6 +770,35 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
       <p class="note" id="folNota" style="margin-top:12px"></p>
     </div>
   </div>
+  <div class="card">
+    <header><h2>Tu anuncio en la pantalla bloqueada</h2><span class="hint">la pantalla que nadie usa, trabajando</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Cuando la pantalla se bloquea sola queda a la vista de todos:
+        del cliente que espera en la barra y del que pasa junto a la caja. <b>Ponle la promoción del día</b>
+        &mdash; la comida corrida, el 2x1 de los martes, el menú por QR.</p>
+      <div class="grid g3">
+        <div style="grid-column:span 2">
+          <label class="f">Imagen del anuncio</label>
+          <div class="fila">
+            <img id="pb_prev" alt="" style="height:52px;width:auto;border-radius:8px;background:#fff;padding:3px" hidden>
+            <button class="btn sm" id="pb_btn" type="button">Subir imagen</button>
+            <button class="btn sm ghost" id="pb_quita" type="button" hidden>Quitar</button>
+            <input id="pb_file" type="file" accept="image/*" hidden>
+          </div>
+        </div>
+        <div style="align-self:end">
+          <label class="sw"><input type="checkbox" id="pb_activa"> Mostrarlo</label>
+        </div>
+      </div>
+      <div class="grid g2" style="margin-top:14px">
+        <div><label class="f" for="pb_titulo">Qué dice</label>
+          <input id="pb_titulo" placeholder="Comida corrida $95 de lunes a viernes"></div>
+        <div><label class="f" for="pb_enlace">A dónde lleva (opcional)</label>
+          <input id="pb_enlace" placeholder="https://… tu menú, tu WhatsApp"></div>
+      </div>
+      <p class="note" id="pb_nota" style="margin-top:14px"></p>
+    </div>
+  </div>
 </section>
 
 </div>
@@ -710,6 +820,11 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
           <button class="btn" id="accesoVolver">Volver</button>
         </div>
         <p id="accesoError" hidden style="color:var(--mal);font-size:12.5px;margin:8px 0 0"></p>
+      </div>
+      <div class="accesoReloj" id="accesoReloj" hidden
+           style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line)">
+        <p id="accesoRelojEstado" style="margin:0 0 10px;font-size:12.5px;color:var(--ink-3)"></p>
+        <button class="btn ancho" id="accesoCheca" type="button">Checar entrada</button>
       </div>
       <button class="btn ghost ancho" id="accesoOtro" hidden type="button" style="margin-top:14px">Entrar con otro usuario</button>
     </div>
@@ -762,7 +877,8 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
       <div class="cambio" id="cobroCambio" hidden><span class="et">Cambio</span><b id="cobroCambioV">$0.00</b></div>
       <p class="note" id="cobroFalta" hidden style="margin-top:12px;border-left-color:var(--warn)"></p>
       <div class="fila" style="margin-top:18px">
-        <button class="btn bien lg ancho" id="cobroOk">Cobrar y cerrar la mesa</button>
+        <button class="btn bien lg" id="cobroOk" style="flex:1">Cobrar y cerrar la mesa</button>
+        <button class="btn" id="cobroImprime">Imprimir</button>
       </div>
     </div>
   </div>
@@ -865,6 +981,7 @@ function persist(){
     lsSet("menu", MENU); lsSet("mesas", MESAS); lsSet("comandas", COMANDAS);
     lsSet("turnos", TURNOS); lsSet("P", P); lsSet("equipo", EQUIPO);
     lsSet("asistencias", ASISTENCIAS); lsSet("compras", COMPRAS); lsSet("recetas", RECETAS);
+    lsSet("decor", DECOR);
     try{ localStorage.setItem(LS+"_latido", String(Date.now())); }catch(e){}
     subeNube();
   }, 500);
@@ -935,13 +1052,39 @@ function mesasPorDefecto(){
   m.push({id:uid(), nombre:"Barra 2", zona:"Barra", lugares:1, activa:true, x:60, y:45, forma:"redonda"});
   return m;
 }
+/* Lo que no es mesa pero ocupa lugar: la barra, la cocina, el baño, una
+   maceta. Sin esto el croquis es una cuadrícula de mesas flotando; con esto
+   el mesero reconoce el salón de un vistazo. */
+const TIPOS_DECOR = {
+  barra:   {et:"Barra",   w:26, h:7,  txt:"BARRA"},
+  cocina:  {et:"Cocina",  w:18, h:12, txt:"COCINA"},
+  caja:    {et:"Caja",    w:12, h:7,  txt:"CAJA"},
+  bano:    {et:"Baño",    w:11, h:9,  txt:"BAÑOS"},
+  entrada: {et:"Entrada", w:14, h:6,  txt:"ENTRADA"},
+  pared:   {et:"Muro",    w:24, h:2,  txt:""},
+  planta:  {et:"Planta",  w:6,  h:7,  txt:"🪴"}
+};
+function decorPorDefecto(){
+  return [
+    {id:uid(), tipo:"cocina",  zona:"Salón", x:50, y:8,  w:18, h:12},
+    {id:uid(), tipo:"entrada", zona:"Salón", x:8,  y:92, w:14, h:6},
+    {id:uid(), tipo:"planta",  zona:"Salón", x:8,  y:12, w:6,  h:7},
+    {id:uid(), tipo:"barra",   zona:"Terraza", x:50, y:12, w:30, h:7}
+  ];
+}
+
 function paramsPorDefecto(){
-  return {negocio:{nombre:"Mi restaurante", tel:"", dir:""},
+  return {negocio:{nombre:"Mi restaurante", tel:"", dir:"", logo:""},
+          ticket:{ancho:80, encabezado:"", pie:"¡Gracias por su visita!",
+                  mostrarLogo:true, mostrarIva:true, mostrarPropina:true,
+                  imprimeCocina:true, imprimeCuenta:true,
+                  leyenda:"Propina sugerida 10% · 15% · 20%"},
           iva:16, propina:10, servicio:0, bloqueoMin:10, fotoCheca:true,
           cocinaAmbar:10, cocinaRojo:20,
           gastos:{renta:0, luz:0, gas:0, agua:0, sueldos:0, otros:0},
           diasMes:26, porcionesDia:120, margenMeta:70,
-          folios:{letras:"", extra:"", digitos:5, desde:{cta:1, tur:1}}};
+          folios:{letras:"", extra:"", digitos:5, desde:{cta:1, tur:1}},
+          publi:{activa:true, imagen:"", enlace:"", titulo:""}};
 }
 function equipoPorDefecto(){
   return [{id:uid(), nombre:"Administrador", rol:"gerente", pin:"", activo:true}];
@@ -956,7 +1099,12 @@ let EQUIPO      = lsGet("equipo", null) || equipoPorDefecto();
 let ASISTENCIAS = lsGet("asistencias", []);
 let COMPRAS     = lsGet("compras", []);
 let RECETAS     = lsGet("recetas", {});   /* platId -> {ings:[], minutos:0} */
-P.negocio = Object.assign({nombre:"Mi restaurante", tel:"", dir:""}, P.negocio||{});
+let DECOR       = lsGet("decor", null) || decorPorDefecto();
+P.negocio = Object.assign({nombre:"Mi restaurante", tel:"", dir:"", logo:""}, P.negocio||{});
+P.ticket  = Object.assign({ancho:80, encabezado:"", pie:"¡Gracias por su visita!",
+                           mostrarLogo:true, mostrarIva:true, mostrarPropina:true,
+                           imprimeCocina:true, imprimeCuenta:true,
+                           leyenda:"Propina sugerida 10% · 15% · 20%"}, P.ticket||{});
 P.folios  = Object.assign({letras:"", extra:"", digitos:5, desde:{cta:1, tur:1}}, P.folios||{});
 P.gastos  = Object.assign({renta:0, luz:0, gas:0, agua:0, sueldos:0, otros:0}, P.gastos||{});
 
@@ -1117,61 +1265,140 @@ function lugaresDe(m){
   if(!grupoDe(m)) return num(m.lugares, 2);
   return mesasDelGrupo(m.grupo).reduce((s,x)=>s+num(x.lugares,2), 0);
 }
+/* Una mesa de ocho ocupa el doble que una de cuatro. Suena obvio, pero la
+   primera versión las dibujaba iguales y el croquis mentía sobre el espacio
+   que de verdad hay en el salón. El área crece con los lugares; el lado, con
+   su raíz, que es como crece una mesa de verdad. */
 function tamMesa(m){
-  const l = num(m.lugares, 2);
-  const lado = Math.min(104, 52 + l * 7);
-  return {w: lado, h: m.forma === "redonda" ? lado : Math.round(lado * 0.82)};
+  const l = Math.max(1, lugaresDe(m));
+  const base = 34 + Math.sqrt(l) * 17;
+  const redonda = (m.forma === "redonda") && l <= 6;
+  if(redonda) return {w: Math.round(base), h: Math.round(base), redonda:true};
+  /* Arriba de seis lugares una mesa deja de ser cuadrada: se alarga. */
+  const larga = l > 6;
+  return {w: Math.round(base * (larga ? 1.5 : 1)),
+          h: Math.round(base * (larga ? 0.72 : 0.84)), redonda:false};
 }
+/* Las sillas van en el borde: en el perímetro si es cuadrada, en la
+   circunferencia si es redonda. Repartidas como se sienta la gente. */
 function sillasHTML(m){
-  const n = Math.min(12, num(m.lugares, 2)), t = tamMesa(m);
-  const r = Math.max(t.w, t.h)/2 + 9;
+  const n = Math.min(16, Math.max(1, lugaresDe(m))), t = tamMesa(m);
   let s = "";
-  for(let i=0;i<n;i++){
-    const a = (i/n) * Math.PI * 2 - Math.PI/2;
-    s += '<i class="silla" style="left:calc(50% + '+Math.round(Math.cos(a)*r)+'px);' +
-         'top:calc(50% + '+Math.round(Math.sin(a)*r)+'px);transform:translate(-50%,-50%)"></i>';
+  if(t.redonda){
+    const r = t.w/2 + 9;
+    for(let i=0;i<n;i++){
+      const a = (i/n) * Math.PI * 2 - Math.PI/2;
+      s += '<i class="silla" style="left:calc(50% + '+Math.round(Math.cos(a)*r)+'px);' +
+           'top:calc(50% + '+Math.round(Math.sin(a)*r)+'px);transform:translate(-50%,-50%)"></i>';
+    }
+    return s;
   }
+  const arriba = Math.ceil(n/2 * (t.w/(t.w+t.h)) * 2 / 2) || 1;
+  const porLado = {arriba: Math.ceil(n*t.w/(2*(t.w+t.h))), abajo: 0, izq: 0, der: 0};
+  porLado.abajo = porLado.arriba;
+  const sobran = n - porLado.arriba - porLado.abajo;
+  porLado.izq = Math.ceil(sobran/2); porLado.der = sobran - porLado.izq;
+  const pon = (cuantas, lado)=>{
+    for(let i=1;i<=cuantas;i++){
+      const p = (i/(cuantas+1))*100;
+      if(lado === "arriba") s += '<i class="silla" style="left:'+p+'%;top:-9px;transform:translate(-50%,-50%)"></i>';
+      if(lado === "abajo")  s += '<i class="silla" style="left:'+p+'%;top:calc(100% + 9px);transform:translate(-50%,-50%)"></i>';
+      if(lado === "izq")    s += '<i class="silla" style="top:'+p+'%;left:-9px;transform:translate(-50%,-50%)"></i>';
+      if(lado === "der")    s += '<i class="silla" style="top:'+p+'%;left:calc(100% + 9px);transform:translate(-50%,-50%)"></i>';
+    }
+  };
+  pon(porLado.arriba,"arriba"); pon(porLado.abajo,"abajo");
+  pon(porLado.izq,"izq"); pon(porLado.der,"der");
   return s;
 }
+
+let modoJuntar = false, elegidas = [];
 
 function renderCroquis(){
   const caja = $("#mesaCroquis"); if(!caja) return;
   const mias = MESAS.filter(m=>m.activa !== false && (m.zona||"Salón") === zonaVista);
   const vistos = {};
-  caja.innerHTML = mias.map(m=>{
+
+  /* El decorado va primero: queda debajo de las mesas. */
+  let html = DECOR.filter(d=>(d.zona||"Salón") === zonaVista).map(d=>{
+    const def = TIPOS_DECOR[d.tipo] || {};
+    return '<div class="decor '+esc(d.tipo)+'" data-dec="'+esc(d.id)+'"' +
+      ' style="left:'+num(d.x,50)+'%;top:'+num(d.y,50)+'%;' +
+      'width:'+num(d.w,def.w||12)+'%;height:'+num(d.h,def.h||8)+'%">' +
+      esc(d.texto != null ? d.texto : (def.txt||"")) + '</div>';
+  }).join("");
+
+  html += mias.map(m=>{
     const g = grupoDe(m);
     if(g){ if(vistos[g]) return ""; vistos[g] = true; }
     const madre = mesaMadre(m);
     const c = comandaDe(madre.id);
     const cl = !c ? "" : c.estado === "cuenta" ? "cuenta" : "ocupada";
-    const t = tamMesa(m);
-    const nombre = g ? mesasDelGrupo(g).map(x=>x.nombre).join(" + ") : m.nombre;
-    return '<div class="cmesa '+(m.forma||"cuadrada")+' '+cl+'" data-cm="'+esc(m.id)+'"' +
-      ' style="left:'+num(m.x,50)+'%;top:'+num(m.y,50)+'%;width:'+t.w+'px;height:'+t.h+'px">' +
-      sillasHTML(m) +
-      '<b>'+esc(g ? m.nombre : nombre)+'</b>' +
+    /* Juntas se dibujan como UNA mesa del tamaño que de verdad ocupan, en
+       el punto medio de donde estaban. */
+    const hs = g ? mesasDelGrupo(g).filter(x=>(x.zona||"Salón") === zonaVista) : [m];
+    const virtual = g ? {forma:"cuadrada", lugares: hs.reduce((s,h)=>s+num(h.lugares,2),0)} : m;
+    const t = tamMesa(virtual);
+    const cx = hs.reduce((s,h)=>s+num(h.x,50),0)/hs.length;
+    const cy = hs.reduce((s,h)=>s+num(h.y,50),0)/hs.length;
+    const nombre = g ? hs.map(x=>x.nombre.replace(/^Mesa\s*/i,"")).join("+") : m.nombre;
+    const eleg = elegidas.indexOf(m.id) >= 0;
+    return '<div class="cmesa '+(virtual.forma||"cuadrada")+' '+cl+(eleg?" elegida":"")+'" data-cm="'+esc(m.id)+'"' +
+      ' style="left:'+cx+'%;top:'+cy+'%;width:'+t.w+'px;height:'+t.h+'px">' +
+      sillasHTML(virtual) +
+      '<b>'+esc(nombre)+'</b>' +
       '<small>'+lugaresDe(m)+' lug</small>' +
-      (c ? '<span class="mnt">'+mx(sumaComanda(c).total)+'</span>' : '') +
+      (c ? '<span class="tot">'+mx(sumaComanda(c).total)+'</span>' : '') +
       '</div>';
-  }).join("") +
-  /* El sello del grupo va aparte para que no estorbe al arrastrar. */
-  Object.keys(vistos).map(g=>{
-    const hs = mesasDelGrupo(g).filter(x=>(x.zona||"Salón") === zonaVista);
-    if(hs.length < 2) return "";
-    const x = hs.reduce((s,h)=>s+num(h.x,50),0)/hs.length;
-    const y = Math.min.apply(null, hs.map(h=>num(h.y,50))) - 9;
-    return '<span class="grupoSello" style="left:'+x+'%;top:'+y+'%">juntas · ' +
-      hs.reduce((s,h)=>s+num(h.lugares,2),0) + ' lugares</span>';
   }).join("");
+  caja.innerHTML = html;
 
-  $("#croqPista").textContent = modoAcomodo
-    ? "Arrastra para acomodar. Suelta una mesa encima de otra para juntarlas."
-    : "Toca una mesa para abrirla.";
+  $("#croqPista").textContent = modoJuntar
+    ? "Toca dos o más mesas y presiona «Juntar». Para separar, toca una mesa junta."
+    : modoAcomodo
+      ? "Arrastra mesas y cosas del salón. Toca una cosa dos veces para quitarla."
+      : "Toca una mesa para abrirla.";
+
   const b = $("#croqAcomodar");
-  b.hidden = !esGerente();
-  b.textContent = modoAcomodo ? "Listo, ya quedó" : "Acomodar mesas";
+  b.hidden = !esGerente() || mesaVista !== "croquis";
+  b.textContent = modoAcomodo ? "Listo, ya quedó" : "Acomodar el salón";
   b.className = "btn sm" + (modoAcomodo ? " primary" : " ghost");
+  const j = $("#croqJuntar");
+  j.hidden = !esGerente() || mesaVista !== "croquis" || modoAcomodo;
+  j.textContent = !modoJuntar ? "Juntar mesas"
+    : elegidas.length > 1 ? "Juntar las " + elegidas.length
+    : elegidas.length === 1 ? "Falta otra mesa"
+    : "Cancelar";
+  j.className = "btn sm" + (modoJuntar && elegidas.length > 1 ? " primary" : " ghost");
+  const sp = $("#croqSeparar");
+  const hayJuntas = MESAS.some(m=>m.grupo && (m.zona||"Salón") === zonaVista);
+  sp.hidden = !esGerente() || mesaVista !== "croquis" || !hayJuntas || modoAcomodo;
+  $("#decorPaleta").hidden = !modoAcomodo;
+  if(modoAcomodo && !$("#decorPaleta").innerHTML)
+    $("#decorPaleta").innerHTML = '<span style="font-size:11px;color:var(--ink-3);align-self:center">Agregar:</span>' +
+      Object.keys(TIPOS_DECOR).map(k=>'<button type="button" data-addec="'+k+'">'+esc(TIPOS_DECOR[k].et)+'</button>').join("");
 }
+
+/* ---- para llevar: cada pedido es su propio ticket, y se tiene que ver ----
+   Antes se creaba una comanda nueva en cada clic y ninguna aparecía en el
+   croquis: el menú marcaba pendientes que no se podían abrir. Ahora viven
+   aquí arriba. */
+const llevarAbiertas = () => COMANDAS.filter(c=>c.estado !== "cerrada" && c.mesaId === "llevar")
+  .slice().sort((a,b)=> num(a.ts) - num(b.ts));
+function renderLlevar(){
+  const ls = llevarAbiertas();
+  $("#llevarFila").innerHTML = ls.map(c=>
+    '<button class="llevarCard" data-llevar="'+esc(c.id)+'">' +
+    '<b>'+esc(c.mesaNombre)+'</b>' +
+    '<small>'+esc(c.folio)+' · '+esc(c.abre)+' · '+esc(c.mesero||"")+'</small>' +
+    '<span class="mnt">'+mx(sumaComanda(c).total)+'</span></button>').join("");
+}
+$("#llevarFila").addEventListener("click", e=>{
+  const b = e.target.closest("[data-llevar]"); if(!b) return;
+  const c = COMANDAS.find(x=>x.id === b.dataset.llevar); if(!c) return;
+  comandaId = c.id; catVista = ""; comensalVista = 1;
+  vaA("comanda"); renderComanda();
+});
 
 /* ---- arrastrar ---- */
 function croqXY(ev){
@@ -1179,10 +1406,10 @@ function croqXY(ev){
   return {x: ((ev.clientX - r.left)/r.width)*100, y: ((ev.clientY - r.top)/r.height)*100};
 }
 $("#mesaCroquis").addEventListener("pointerdown", e=>{
-  const el = e.target.closest("[data-cm]"); if(!el) return;
   if(!modoAcomodo) return;
-  const m = MESAS.find(x=>x.id === el.dataset.cm); if(!m) return;
-  arrastrando = {id:m.id, el, movio:false};
+  const el = e.target.closest("[data-cm],[data-dec]"); if(!el) return;
+  const esDecor = !!el.dataset.dec;
+  arrastrando = {id: esDecor ? el.dataset.dec : el.dataset.cm, el, movio:false, decor:esDecor};
   el.classList.add("arrastrando");
   el.setPointerCapture(e.pointerId);
   e.preventDefault();
@@ -1190,19 +1417,23 @@ $("#mesaCroquis").addEventListener("pointerdown", e=>{
 $("#mesaCroquis").addEventListener("pointermove", e=>{
   if(!arrastrando) return;
   const p = croqXY(e);
-  const m = MESAS.find(x=>x.id === arrastrando.id); if(!m) return;
-  const antes = {x:num(m.x,50), y:num(m.y,50)};
-  m.x = Math.max(4, Math.min(96, p.x));
-  m.y = Math.max(7, Math.min(93, p.y));
-  if(Math.abs(m.x - antes.x) > .4 || Math.abs(m.y - antes.y) > .4) arrastrando.movio = true;
-  arrastrando.el.style.left = m.x + "%";
-  arrastrando.el.style.top  = m.y + "%";
-  /* ¿Encima de otra? Se resalta la que recibiría. */
-  const blanco = mesaCerca(m);
-  $$(".cmesa.blanco").forEach(x=>x.classList.remove("blanco"));
-  if(blanco){
-    const el2 = $('.cmesa[data-cm="'+blanco.id+'"]');
-    if(el2) el2.classList.add("blanco");
+  const o = arrastrando.decor ? DECOR.find(x=>x.id === arrastrando.id)
+                              : MESAS.find(x=>x.id === arrastrando.id);
+  if(!o) return;
+  const antes = {x:num(o.x,50), y:num(o.y,50)};
+  o.x = Math.max(3, Math.min(97, p.x));
+  o.y = Math.max(5, Math.min(95, p.y));
+  if(Math.abs(o.x - antes.x) > .4 || Math.abs(o.y - antes.y) > .4) arrastrando.movio = true;
+  arrastrando.el.style.left = o.x + "%";
+  arrastrando.el.style.top  = o.y + "%";
+  /* Si la mesa que se mueve es de un grupo, sus hermanas la siguen. */
+  if(!arrastrando.decor && grupoDe(o)){
+    const dx = o.x - antes.x, dy = o.y - antes.y;
+    mesasDelGrupo(o.grupo).forEach(h=>{
+      if(h.id === o.id) return;
+      h.x = Math.max(3, Math.min(97, num(h.x,50) + dx));
+      h.y = Math.max(5, Math.min(95, num(h.y,50) + dy));
+    });
   }
 });
 function mesaCerca(m){
@@ -1214,40 +1445,39 @@ function mesaCerca(m){
   });
   return d < 9 ? cerca : null;
 }
-$("#mesaCroquis").addEventListener("pointerup", e=>{
+$("#mesaCroquis").addEventListener("pointerup", ()=>{
   if(!arrastrando) return;
-  const m = MESAS.find(x=>x.id === arrastrando.id);
   arrastrando.el.classList.remove("arrastrando");
-  $$(".cmesa.blanco").forEach(x=>x.classList.remove("blanco"));
   const movio = arrastrando.movio;
   arrastrando = null;
-  if(!m) return;
-  if(movio){
-    const otra = mesaCerca(m);
-    if(otra) proponJuntar(m, otra);
-    persist(); renderCroquis();
-  }
+  if(movio){ persist(); renderCroquis(); }
 });
 $("#mesaCroquis").addEventListener("pointercancel", ()=>{
   if(arrastrando){ arrastrando.el.classList.remove("arrastrando"); arrastrando = null; }
 });
 
-function proponJuntar(a, b){
-  const ga = grupoDe(a), gb = grupoDe(b);
-  if(ga && ga === gb) return;
-  const ca = comandaDe(mesaMadre(a).id), cb = comandaDe(mesaMadre(b).id);
-  if(ca && cb){ toast("Las dos tienen cuenta abierta: ciérrale a una antes de juntarlas"); return; }
-  if(!confirm("¿Juntar " + a.nombre + " con " + b.nombre + "?\n\n" +
-      "Quedan como una sola mesa de " + (num(a.lugares,2) + lugaresDe(b)) + " lugares y comparten la cuenta.")) return;
-  const g = gb || ga || uid();
-  [a, b].forEach(x=>{
-    if(grupoDe(x) && grupoDe(x) !== g) mesasDelGrupo(grupoDe(x)).forEach(h=>h.grupo = g);
-    x.grupo = g;
+/* Juntar es una decisión, no un accidente: se escogen las mesas y se
+   presiona el botón. Arrastrar sólo acomoda. */
+function juntaElegidas(){
+  const ms = elegidas.map(id=>MESAS.find(x=>x.id === id)).filter(Boolean);
+  if(ms.length < 2){ toast("Escoge al menos dos mesas"); return; }
+  const conCuenta = ms.filter(m=>comandaDe(mesaMadre(m).id));
+  if(conCuenta.length > 1){
+    toast("Dos de esas ya tienen cuenta abierta: ciérrale a una antes de juntarlas"); return;
+  }
+  const lugares = ms.reduce((s,m)=>s+lugaresDe(m), 0);
+  if(!confirm("¿Juntar " + ms.map(m=>m.nombre).join(" + ") + "?\n\n" +
+      "Quedan como una sola mesa de " + lugares + " lugares y comparten la cuenta.")) return;
+  const g = (ms.find(m=>grupoDe(m)) || {}).grupo || uid();
+  ms.forEach(m=>{
+    const gi = grupoDe(m);
+    if(gi && gi !== g) mesasDelGrupo(gi).forEach(h=>h.grupo = g);
+    m.grupo = g;
   });
-  /* La cuenta que ya existía se queda, pero ahora se llama por las dos. */
-  const madre = mesaMadre(a);
+  const madre = mesaMadre(ms[0]);
   const c = comandaDe(madre.id);
-  if(c) c.mesaNombre = mesasDelGrupo(g).map(x=>x.nombre).join(" + ");
+  if(c){ c.mesaNombre = mesasDelGrupo(g).map(x=>x.nombre).join(" + "); c.personas = Math.max(num(c.personas,1), lugares); }
+  elegidas = []; modoJuntar = false;
   persist(); renderMesas();
   toast("Mesas juntas: " + mesasDelGrupo(g).map(x=>x.nombre).join(" + "));
 }
@@ -1260,9 +1490,27 @@ function separaGrupo(g){
   toast("Mesas separadas");
 }
 $("#mesaCroquis").addEventListener("click", e=>{
+  /* En modo acomodo, dos toques seguidos quitan una cosa del salón. */
+  const dec = e.target.closest("[data-dec]");
+  if(dec && modoAcomodo){
+    const d = DECOR.find(x=>x.id === dec.dataset.dec); if(!d) return;
+    const ahora = Date.now();
+    if(dec._t && ahora - dec._t < 700){
+      DECOR = DECOR.filter(x=>x.id !== d.id);
+      persist(); renderCroquis(); toast("Quitado");
+    }else dec._t = ahora;
+    return;
+  }
   const el = e.target.closest("[data-cm]"); if(!el) return;
   if(modoAcomodo) return;
   const m = MESAS.find(x=>x.id === el.dataset.cm); if(!m) return;
+
+  if(modoJuntar){
+    const i = elegidas.indexOf(m.id);
+    if(i >= 0) elegidas.splice(i,1); else elegidas.push(m.id);
+    renderCroquis();
+    return;
+  }
   const g = grupoDe(m);
   if(g && mesasDelGrupo(g).length > 1 && !comandaDe(mesaMadre(m).id) && esGerente()){
     if(confirm("«" + mesasDelGrupo(g).map(x=>x.nombre).join(" + ") + "» están juntas.\n\n" +
@@ -1273,10 +1521,31 @@ $("#mesaCroquis").addEventListener("click", e=>{
   }
   abreMesa(mesaMadre(m).id);
 });
+$("#decorPaleta").addEventListener("click", e=>{
+  const b = e.target.closest("[data-addec]"); if(!b) return;
+  const k = b.dataset.addec, def = TIPOS_DECOR[k];
+  DECOR.push({id:uid(), tipo:k, zona:zonaVista, x:50, y:50, w:def.w, h:def.h});
+  persist(); renderCroquis();
+  toast(def.et + " puesta. Arrástrala a su lugar; dos toques la quitan.");
+});
 $("#croqAcomodar").addEventListener("click", ()=>{
   modoAcomodo = !modoAcomodo;
+  modoJuntar = false; elegidas = [];
   renderCroquis();
-  toast(modoAcomodo ? "Arrastra las mesas. Suelta una encima de otra para juntarlas." : "Croquis guardado");
+  toast(modoAcomodo ? "Arrastra las mesas y las cosas del salón." : "Croquis guardado");
+});
+$("#croqJuntar").addEventListener("click", ()=>{
+  if(modoJuntar && elegidas.length > 1){ juntaElegidas(); return; }
+  modoJuntar = !modoJuntar; elegidas = [];
+  renderCroquis();
+  if(modoJuntar) toast("Toca las mesas que van juntas");
+});
+$("#croqSeparar").addEventListener("click", ()=>{
+  const gs = [...new Set(MESAS.filter(m=>m.grupo && (m.zona||"Salón") === zonaVista).map(m=>m.grupo))];
+  if(!gs.length){ toast("No hay mesas juntas en esta zona"); return; }
+  if(gs.length === 1){ separaGrupo(gs[0]); return; }
+  toast("Toca una mesa junta para separarla");
+  modoJuntar = false; elegidas = []; renderCroquis();
 });
 $("#mesaVista").addEventListener("click", e=>{
   const b = e.target.closest("[data-mv]"); if(!b) return;
@@ -1301,6 +1570,7 @@ function renderMesas(){
   $("#mesaRejilla").hidden = mesaVista === "croquis";
   $("#croqAcomodar").hidden = mesaVista !== "croquis" || !esGerente();
   if(mesaVista === "croquis") renderCroquis();
+  renderLlevar();
 
   const vistos2 = {};
   const mias = MESAS.filter(m=>m.activa!==false && (m.zona||"Salón") === zonaVista)
@@ -1322,9 +1592,10 @@ function renderMesas(){
       '</button>';
   }).join("") || '<div class="empty">Esta zona no tiene mesas.</div>';
 
-  const ab = abiertas();
+  const ab = abiertas(), ll = llevarAbiertas().length;
   $("#mesasResumen").textContent = ab.length
-    ? ab.length + " abierta(s) · " + mx(ab.reduce((s,c)=>s+sumaComanda(c).total,0)) + " en el piso"
+    ? ab.length + " abierta(s)" + (ll ? " (" + ll + " para llevar)" : "") + " · " +
+      mx(ab.reduce((s,c)=>s+sumaComanda(c).total,0)) + " sin cobrar"
     : "Todas las mesas libres";
   pintaTabs();
   $$("#tabs button").forEach(b=> b.setAttribute("aria-selected", String(b.dataset.tab === "mesas")));
@@ -1353,7 +1624,8 @@ function abreMesa(mesaId){
   }
   let c;
   if(mesaId === "llevar"){
-    c = nuevaComanda({id:"llevar", nombre:"Para llevar", lugares:1});
+    const n = COMANDAS.filter(x=>x.mesaId === "llevar" && x.fecha === hoyISO()).length + 1;
+    c = nuevaComanda({id:"llevar", nombre:"Para llevar " + n, lugares:1});
   }else{
     const m = MESAS.find(x=>x.id === mesaId); if(!m) return;
     c = comandaDe(mesaId) || nuevaComanda(m);
@@ -1384,7 +1656,7 @@ function renderComanda(){
      cocina salga por persona y que la cuenta se pueda dividir por consumo. */
   if(comensalVista > num(c.personas,1)) comensalVista = 1;
   const pc = porComensal(c);
-  $("#comComensales").innerHTML = '<span class="et">Anotar a</span>' +
+  $("#comComensales").innerHTML = '<span class="et">¿Para quién es?</span>' +
     pc.lista.map(x=>'<button type="button" data-comen="'+x.comensal+'" aria-pressed="'+(x.comensal===comensalVista)+'">' +
       'Comensal ' + x.comensal + (x.consumo ? ' · ' + mx(x.consumo) : '') + '</button>').join("") +
     '<button type="button" data-comen="0" aria-pressed="'+(comensalVista===0)+'">Para compartir' +
@@ -1890,6 +2162,13 @@ $("#modalCobro").addEventListener("click", e=>{
   if(q){ cobroPagos.splice(num(q.dataset.quitapago), 1); pintaCobro(); }
 });
 $("#cobroCerrar").addEventListener("click", ()=>{ $("#modalCobro").hidden = true; });
+$("#modalCobro").addEventListener("click", e=>{
+  if(!e.target.closest("#cobroImprime")) return;
+  const c = comandaActual(); if(!c) return;
+  const s = sumaComanda(c);
+  const prop = cobroPropPct === null ? num($("#cobroPropMonto").value) : s.sub * cobroPropPct/100;
+  imprimeCuenta(c, cobroPagos, prop);
+});
 $("#cobroOk").addEventListener("click", ()=>{
   const c = comandaActual(); if(!c) return;
   const s = sumaComanda(c);
@@ -1909,6 +2188,7 @@ $("#cobroOk").addEventListener("click", ()=>{
   c.cobro = usuarioActual().nombre || "";
   persist();
 
+  if((P.ticket||{}).imprimeCuenta !== false) imprimeCuenta(c, c.pagos, prop);
   $("#modalCobro").hidden = true;
   comandaId = null;
   vaA("mesas");
@@ -2338,6 +2618,159 @@ $("#tab-menu").addEventListener("click", e=>{
     persist(); renderMenu();
   }
 });
+
+/* ===================================================================
+   TICKETS IMPRESOS
+   El panel de cocina sirve con una pantalla táctil; el papel sirve en
+   cualquier cocina. Las dos cosas conviven: la pantalla manda y el ticket
+   se imprime igual.
+
+   Se imprime con la ventana del navegador, no hablando ESC/POS directo: una
+   página web no puede abrir el puerto de una térmica sin permisos que iOS no
+   da. El driver de la impresora sí sabe hacerlo, y toda térmica trae uno.
+   =================================================================== */
+const anchoTicket = () => num((P.ticket||{}).ancho, 80) === 58 ? 58 : 80;
+
+function hojaTicket(){
+  const mm = anchoTicket();
+  return '@page{size:'+mm+'mm auto;margin:0}' +
+    'body{margin:0;padding:4mm 3mm;width:'+mm+'mm;background:#fff;color:#000;' +
+      'font-family:"Courier New",ui-monospace,monospace;font-size:'+(mm===58?10:11.5)+'px;line-height:1.35}' +
+    '.c{text-align:center}.d{text-align:right}.b{font-weight:bold}' +
+    '.g{font-size:'+(mm===58?14:17)+'px;font-weight:bold;letter-spacing:.04em}' +
+    '.xl{font-size:'+(mm===58?20:26)+'px;font-weight:bold;line-height:1.1}' +
+    'hr{border:0;border-top:1px dashed #000;margin:5px 0}' +
+    'table{width:100%;border-collapse:collapse}' +
+    'td{padding:1px 0;vertical-align:top}' +
+    '.logo{max-width:'+(mm===58?38:52)+'mm;max-height:20mm;display:block;margin:0 auto 4px}' +
+    '.sang{padding-left:9px}' +
+    '.caja{border:1.5px solid #000;padding:3px 5px;margin:4px 0;text-align:center}';
+}
+function imprimeHoja(titulo, cuerpo){
+  const w = window.open("", "_blank", "width=420,height=620");
+  if(!w){ toast("El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes."); return; }
+  w.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">' +
+    '<title>'+esc(titulo)+'</title><style>'+hojaTicket()+'</style></head><body>' +
+    cuerpo + '</body></html>');
+  w.document.close();
+  w.focus();
+  setTimeout(()=>{ try{ w.print(); }catch(e){} }, 350);
+}
+const lineaPar = (izq, der, cl) =>
+  '<table><tr><td'+(cl?' class="'+cl+'"':'')+'>'+izq+'</td>' +
+  '<td class="d'+(cl?' '+cl:'')+'" style="width:38%">'+der+'</td></tr></table>';
+
+function encabezadoTicket(){
+  const n = P.negocio || {}, tk = P.ticket || {};
+  let s = "";
+  if(tk.mostrarLogo !== false && n.logo) s += '<img class="logo" src="'+esc(n.logo)+'" alt="">';
+  s += '<div class="c g">'+esc(n.nombre||"")+'</div>';
+  if(n.dir) s += '<div class="c">'+esc(n.dir)+'</div>';
+  if(n.tel) s += '<div class="c">Tel. '+esc(n.tel)+'</div>';
+  if(tk.encabezado) s += '<div class="c">'+esc(tk.encabezado).replace(/\n/g,"<br>")+'</div>';
+  return s + '<hr>';
+}
+
+/* ---------------- el ticket de la cuenta ---------------- */
+function imprimeCuenta(c, pagos, propina){
+  if(!c) return;
+  const s = sumaComanda(c);
+  const prop = num(propina);
+  const total = s.total + prop;
+  const tk = P.ticket || {};
+  const n = Math.max(1, num(c.personas,1));
+
+  let cuerpo = encabezadoTicket();
+  cuerpo += lineaPar('<span class="b">'+esc(c.mesaNombre)+'</span>', esc(c.folio), "b");
+  cuerpo += lineaPar(esc(c.fecha)+' '+esc(c.abre), esc(c.cierra||horaAhora()));
+  if(c.mesero) cuerpo += '<div>Atendió: '+esc(c.mesero)+'</div>';
+  cuerpo += '<hr>';
+
+  /* Por comensal, igual que en pantalla: así se entrega y así se revisa. */
+  const grupos = [];
+  for(let i=1;i<=n;i++) grupos.push({k:i, et:"Comensal "+i});
+  grupos.push({k:0, et:"Para compartir"});
+  grupos.forEach(g=>{
+    const ls = vivas(c).filter(l=>{ const k = num(l.comensal,0); return (k>=1&&k<=n?k:0) === g.k; });
+    if(!ls.length) return;
+    if(n > 1 || g.k === 0) cuerpo += '<div class="b">'+esc(g.et)+'</div>';
+    ls.forEach(l=>{
+      cuerpo += lineaPar(num(l.cant,1)+' '+esc(l.nombre), mx(importeLinea(l)));
+      (l.mods||[]).forEach(m=>{
+        if(num(m.extra)) cuerpo += lineaPar('<span class="sang">+ '+esc(m.nombre)+'</span>', "");
+        else cuerpo += '<div class="sang">· '+esc(m.nombre)+'</div>';
+      });
+      if(l.nota) cuerpo += '<div class="sang">· '+esc(l.nota)+'</div>';
+    });
+  });
+  cuerpo += '<hr>';
+  cuerpo += lineaPar("Consumo", mx(s.sub));
+  if(s.serv) cuerpo += lineaPar("Servicio "+num(P.servicio)+"%", mx(s.serv));
+  if(tk.mostrarIva !== false && num(P.iva))
+    cuerpo += lineaPar("IVA incluido "+num(P.iva)+"%", mx(s.total - s.total/(1+num(P.iva)/100)));
+  if(prop) cuerpo += lineaPar("Propina", mx(prop));
+  cuerpo += '<hr>';
+  cuerpo += '<table><tr><td class="g">TOTAL</td><td class="d g">'+mx(total)+'</td></tr></table>';
+
+  (pagos||c.pagos||[]).forEach(p=> cuerpo += lineaPar(esc(p.tipo), mx(p.monto)));
+  if(num(c.cambio)) cuerpo += lineaPar("Cambio", mx(c.cambio));
+
+  if(n > 1){
+    cuerpo += '<hr><div class="b">Si se divide</div>';
+    porComensal(c).lista.forEach(x=>{
+      cuerpo += lineaPar("Comensal "+x.comensal, mx(x.total + prop/n));
+    });
+  }
+  if(tk.mostrarPropina !== false && tk.leyenda)
+    cuerpo += '<hr><div class="c">'+esc(tk.leyenda)+'</div>';
+  if(tk.pie) cuerpo += '<hr><div class="c">'+esc(tk.pie).replace(/\n/g,"<br>")+'</div>';
+  cuerpo += '<div class="c" style="margin-top:6px;font-size:9px">'+esc(c.folio)+'</div>';
+  imprimeHoja("Cuenta " + c.folio, cuerpo);
+}
+
+/* ---------------- el ticket de cocina ----------------
+   Sin un solo precio. En cocina el precio no sirve para nada y estorba;
+   lo que sirve es qué mesa, qué comensal, cuántos y qué le quitan. El folio
+   va grande para que cuadre con el recibo cuando es para llevar. */
+function imprimeComandaCocina(c, lineas){
+  if(!c || !lineas || !lineas.length) return;
+  const esLlevar = c.mesaId === "llevar";
+  const n = Math.max(1, num(c.personas,1));
+  let cuerpo = '<div class="c xl">'+(esLlevar ? "PARA LLEVAR" : esc(c.mesaNombre).toUpperCase())+'</div>';
+  cuerpo += '<div class="c g">'+esc(c.folio)+'</div>';
+  cuerpo += '<div class="c">'+esc(horaAhora())+' · '+esc(c.mesero||"")+'</div>';
+  if(!esLlevar && n > 1) cuerpo += '<div class="c">'+n+' comensales</div>';
+  cuerpo += '<hr>';
+
+  const grupos = [];
+  for(let i=1;i<=n;i++) grupos.push({k:i, et:"COMENSAL "+i});
+  grupos.push({k:0, et:"PARA COMPARTIR"});
+  grupos.forEach(g=>{
+    const ls = lineas.filter(l=>{ const k = num(l.comensal,0); return (k>=1&&k<=n?k:0) === g.k; });
+    if(!ls.length) return;
+    if(n > 1 || g.k === 0) cuerpo += '<div class="b" style="margin-top:4px">'+esc(g.et)+'</div>';
+    ls.forEach(l=>{
+      cuerpo += '<div class="g">'+num(l.cant,1)+'  '+esc(l.nombre).toUpperCase()+'</div>';
+      (l.mods||[]).forEach(m=> cuerpo += '<div class="sang">&gt; '+esc(m.nombre).toUpperCase()+'</div>');
+      if(l.nota) cuerpo += '<div class="caja">'+esc(l.nota).toUpperCase()+'</div>';
+    });
+  });
+  cuerpo += '<hr><div class="c" style="font-size:9px">'+esc(c.folio)+' · '+esc(c.fecha)+'</div>';
+  imprimeHoja("Cocina " + c.folio, cuerpo);
+}
+
+/* Lo cancelado también se imprime: si la cocina no tiene pantalla, el papel
+   es la única forma de que se entere. */
+function imprimeCancelacion(c, x){
+  let cuerpo = '<div class="c xl">CANCELAR</div>';
+  cuerpo += '<div class="c g">'+(c.mesaId === "llevar" ? "PARA LLEVAR" : esc(c.mesaNombre).toUpperCase())+'</div>';
+  cuerpo += '<div class="c">'+esc(c.folio)+' · '+esc(horaAhora())+'</div><hr>';
+  cuerpo += '<div class="xl">'+num(x.cant,1)+'  '+esc(x.nombre).toUpperCase()+'</div>';
+  cuerpo += '<div class="caja">'+esc(x.motivo).toUpperCase()+'</div>';
+  if(x.nota) cuerpo += '<div class="c">'+esc(x.nota)+'</div>';
+  cuerpo += '<div class="c">Pidió: '+esc(x.quien||"")+'</div>';
+  imprimeHoja("Cancelación " + c.folio, cuerpo);
+}
 
 /* ===================================================================
    CALCULADORA DE COSTOS
@@ -2790,7 +3223,9 @@ function registraCheca(){
   ASISTENCIAS.forEach(a=>{ if(a.fecha < corte) a.foto = ""; });
   persist();
   toast((dentro ? "Salida" : "Entrada") + " de " + (u.nombre||"") + " a las " + horaAhora());
-  cierraCheca(); renderPersonal();
+  cierraCheca();
+  if(!$("#tab-personal").hidden) renderPersonal();
+  if(!$("#acceso").hidden) pintaAccesoReloj();
 }
 
 /* ===================================================================
@@ -2803,7 +3238,34 @@ function renderSet(){
   $("#p_servicio").value = num(P.servicio,0);
   $("#p_bloqueo").value = String(num(P.bloqueoMin,10));
   $("#f_letras").value = letrasFolio(); $("#f_digitos").value = String(digitosFolio());
+  const tk = P.ticket;
+  $("#tk_ancho").value = String(num(tk.ancho,80));
+  $("#tk_enc").value = tk.encabezado||""; $("#tk_pie").value = tk.pie||"";
+  $("#tk_leyenda").value = tk.leyenda||"";
+  $("#tk_cuenta").checked  = tk.imprimeCuenta !== false;
+  $("#tk_cocina").checked  = tk.imprimeCocina !== false;
+  $("#tk_iva").checked     = tk.mostrarIva !== false;
+  $("#tk_propina").checked = tk.mostrarPropina !== false;
+  const lg = $("#tk_logoPrev");
+  if(P.negocio.logo){ lg.src = P.negocio.logo; lg.hidden = false; $("#tk_logoQuita").hidden = false; }
+  else { lg.hidden = true; $("#tk_logoQuita").hidden = true; }
+  const pb = P.publi || (P.publi = {activa:true, imagen:"", enlace:"", titulo:""});
+  $("#pb_activa").checked = pb.activa !== false;
+  $("#pb_titulo").value = pb.titulo || ""; $("#pb_enlace").value = pb.enlace || "";
+  const pp = $("#pb_prev");
+  if(pb.imagen){ pp.src = pb.imagen; pp.hidden = false; $("#pb_quita").hidden = false; }
+  else { pp.hidden = true; $("#pb_quita").hidden = true; }
+  pintaNotaPubli();
   pintaNotaBloqueo(); pintaNotaFolio(); renderMesasSet(); renderEquipo(); aplicaMarca();
+}
+function pintaNotaPubli(){
+  const n = $("#pb_nota"); if(!n) return;
+  const pb = P.publi || {};
+  n.innerHTML = !pb.imagen
+    ? 'Sin imagen, la pantalla bloqueada se queda limpia: sólo el reloj y el checador. No pasa nada malo, nada más no vende.'
+    : pb.activa === false
+      ? 'La imagen está guardada pero apagada. Préndela cuando quieras volver a mostrarla.'
+      : 'Listo: tu anuncio sale en la pantalla bloqueada. Para verlo, dale a <b>Bloquear ahora</b> aquí arriba.';
 }
 function pintaNotaFolio(){
   const n = $("#folNota"); if(!n) return;
@@ -2844,6 +3306,9 @@ $("#tab-set").addEventListener("input", e=>{
   if(t.id === "e_nombre"){ P.negocio.nombre = t.value; aplicaMarca(); persist(); return; }
   if(t.id === "e_tel"){ P.negocio.tel = t.value; persist(); return; }
   if(t.id === "e_dir"){ P.negocio.dir = t.value; persist(); return; }
+  if(t.id === "tk_enc"){ P.ticket.encabezado = t.value; persist(); return; }
+  if(t.id === "tk_pie"){ P.ticket.pie = t.value; persist(); return; }
+  if(t.id === "tk_leyenda"){ P.ticket.leyenda = t.value; persist(); return; }
   if(t.id === "p_iva"){ P.iva = num(t.value); persist(); return; }
   if(t.id === "p_propina"){ P.propina = num(t.value); persist(); return; }
   if(t.id === "p_servicio"){ P.servicio = num(t.value); persist(); return; }
@@ -2866,6 +3331,32 @@ $("#tab-set").addEventListener("input", e=>{
 $("#tab-set").addEventListener("change", e=>{
   const t = e.target;
   if(t.id === "f_digitos"){ P.folios.digitos = num(t.value,5); pintaNotaFolio(); persist(); return; }
+  if(t.id === "pb_titulo"){ P.publi.titulo = t.value.trim(); persist(); return; }
+  if(t.id === "pb_enlace"){ P.publi.enlace = t.value.trim(); persist(); return; }
+  if(t.id === "tk_ancho"){ P.ticket.ancho = num(t.value,80); persist(); return; }
+  if(t.id === "pb_activa"){ P.publi.activa = t.checked; persist(); pintaNotaPubli(); return; }
+  if(t.id === "pb_file"){
+    const f = t.files && t.files[0]; t.value = "";
+    if(!f) return;
+    if(f.size > 400*1024){ toast("Esa imagen pesa mucho. Usa una de menos de 400 KB."); return; }
+    const r = new FileReader();
+    r.onload = ()=>{ P.publi.imagen = r.result; P.publi.activa = true; persist(); renderSet(); toast("Anuncio listo"); };
+    r.readAsDataURL(f);
+    return;
+  }
+  if(t.id === "tk_cuenta"){ P.ticket.imprimeCuenta = t.checked; persist(); return; }
+  if(t.id === "tk_cocina"){ P.ticket.imprimeCocina = t.checked; persist(); return; }
+  if(t.id === "tk_iva"){ P.ticket.mostrarIva = t.checked; persist(); return; }
+  if(t.id === "tk_propina"){ P.ticket.mostrarPropina = t.checked; persist(); return; }
+  if(t.id === "tk_logoFile"){
+    const f = t.files && t.files[0]; t.value = "";
+    if(!f) return;
+    if(f.size > 400*1024){ toast("Esa imagen pesa mucho. Usa una de menos de 400 KB."); return; }
+    const r = new FileReader();
+    r.onload = ()=>{ P.negocio.logo = r.result; persist(); renderSet(); toast("Logo listo"); };
+    r.readAsDataURL(f);
+    return;
+  }
   if(t.id === "p_bloqueo"){
     P.bloqueoMin = num(t.value); reiniciaInactividad(); pintaNotaBloqueo(); persist();
     toast(num(t.value) ? "Se bloqueará a los " + num(t.value) + " min sin usarlo" : "Ya no se bloquea solo");
@@ -2902,7 +3393,12 @@ $("#tab-set").addEventListener("click", e=>{
     if(du.dataset.delusr === usuarioId){ toast("No puedes borrar al usuario con el que estás trabajando"); return; }
     EQUIPO = EQUIPO.filter(u=>u.id !== du.dataset.delusr); persist(); renderEquipo(); return;
   }
-  if(e.target.closest("#bloqueoProbar")) bloqueaPantalla(true);
+  if(e.target.closest("#bloqueoProbar")){ bloqueaPantalla(true); return; }
+  if(e.target.closest("#pb_btn")){ $("#pb_file").click(); return; }
+  if(e.target.closest("#pb_quita")){ P.publi.imagen = ""; persist(); renderSet(); return; }
+  if(e.target.closest("#tk_logoBtn")){ $("#tk_logoFile").click(); return; }
+  if(e.target.closest("#tk_logoQuita")){ P.negocio.logo = ""; persist(); renderSet(); return; }
+  if(e.target.closest("#tk_prueba")){ imprimePrueba(); return; }
 });
 $("#mesaNueva").addEventListener("click", ()=>{
   const z = zonas()[0] || "Salón";
@@ -2914,6 +3410,23 @@ $("#userNuevo").addEventListener("click", ()=>{
   EQUIPO.push({id:uid(), nombre:"Nueva persona", rol:"mesero", pin:"", activo:true});
   persist(); renderEquipo();
 });
+
+/* Un ticket de mentiras para ver cómo quedó antes de cobrarle a alguien. */
+function imprimePrueba(){
+  const p1 = (MENU.plats||[])[0] || {nombre:"Platillo", precio:100};
+  const p2 = (MENU.plats||[])[2] || {nombre:"Otro", precio:50};
+  const falsa = {
+    id:"demo", folio: folioNuevo("cta"), mesaId:"demo", mesaNombre:"Mesa de prueba",
+    personas:2, abre:horaAhora(), cierra:horaAhora(), fecha:hoyISO(),
+    mesero: usuarioActual().nombre||"", estado:"cerrada", cambio:0,
+    lineas:[
+      {id:"a", nombre:p1.nombre, precio:num(p1.precio), cant:1, comensal:1, mods:[], nota:""},
+      {id:"b", nombre:p2.nombre, precio:num(p2.precio), cant:2, comensal:2,
+       mods:[{nombre:"Sin cebolla", extra:0}], nota:"Bien cocido"}
+    ]
+  };
+  imprimeCuenta(falsa, [{tipo:"efectivo", monto: totalLineas(falsa)}], 0);
+}
 
 function aplicaMarca(){
   const n = P.negocio.nombre || "Mi restaurante";
@@ -3006,11 +3519,43 @@ function pideAcceso(opc){
     $("#accesoVolver").hidden = false;
     otro.hidden = true;
   }
+  pintaAccesoReloj();
   pintaAnuncioBloqueo();
   $("#acceso").hidden = false;
   document.body.classList.add("sin-acceso");
   if(bloq) setTimeout(()=>{ const p = $("#accesoPass"); if(p) p.focus(); }, 60);
 }
+/* El checador vive también aquí: la pantalla bloqueada es la que está
+   prendida cuando alguien llega o se va, y obligar a entrar al sistema para
+   checar es pedirle la clave dos veces. */
+function pintaAccesoReloj(){
+  const caja = $("#accesoReloj"); if(!caja) return;
+  const u = bloqueado ? usuarioActual()
+                      : (perfilPendiente ? EQUIPO.find(x=>x.id === perfilPendiente) : null);
+  if(!u || !tieneClave(u)){ caja.hidden = true; return; }
+  const d = estaDentro(u.id), min = minutosDia(u.id, hoyISO());
+  const est = $("#accesoRelojEstado");
+  if(est) est.textContent = d
+    ? "Entraste a las " + turnosDe(u.id, hoyISO()).slice(-1)[0].entrada.hora + " · llevas " + horasTxt(desdeHace(u.id))
+    : (min ? "Hoy trabajaste " + horasTxt(min) + " · estás fuera" : "Todavía no checas hoy");
+  const b = $("#accesoCheca");
+  b.textContent = d ? "Terminar jornada" : "Checar entrada";
+  b.className = "btn ancho" + (d ? "" : " primary");
+  b.dataset.quien = u.id;
+  b.dataset.dentro = d ? "1" : "";
+  caja.hidden = false;
+}
+$("#accesoCheca").addEventListener("click", ()=>{
+  const b = $("#accesoCheca"), u = EQUIPO.find(x=>x.id === b.dataset.quien);
+  if(!u) return;
+  if(b.dataset.dentro){
+    if(!confirm("¿Terminar la jornada de " + (u.nombre||"") + "?\n\n" +
+        "Llevas " + horasTxt(desdeHace(u.id)) + " dentro. Se registra tu salida de las " +
+        horaAhora() + " con foto, y queda en tu asistencia.")) return;
+  }
+  abreCheca(u.id);
+});
+
 function cierraAcceso(){
   paraAnuncioBloqueo();
   $("#acceso").hidden = true;
@@ -3026,6 +3571,7 @@ $("#accesoPerfiles").addEventListener("click", e=>{
   $("#accesoQuien").textContent = u.nombre;
   $("#accesoPass").value = ""; $("#accesoError").hidden = true;
   $("#accesoClave").hidden = false; $("#accesoPass").focus();
+  pintaAccesoReloj();
 });
 $("#accesoEntrar").addEventListener("click", ()=>{
   const u = EQUIPO.find(x=>x.id === perfilPendiente); if(!u) return;
@@ -3073,7 +3619,14 @@ function anunciosDe(){
     return !g.length || g.indexOf("restaurant") >= 0;
   });
   const vendidos = aqui.filter(a=>!a.interna);
-  return vendidos.length ? vendidos : aqui.filter(a=>a.interna);
+  if(vendidos.length) return vendidos;
+  const internos = aqui.filter(a=>a.interna);
+  if(internos.length) return internos;
+  // Nada del Lab: entonces sale lo tuyo, lo que cargaste en Ajustes.
+  const pb = P.publi || {};
+  if(pb.imagen && pb.activa !== false)
+    return [{id:"propio", imagen:pb.imagen, enlace:pb.enlace||"", alt:pb.titulo||"Promoción", propio:true}];
+  return [];
 }
 function pintaAnuncioBloqueo(){
   const caja = $("#anunBloq"); if(!caja) return;
@@ -3089,11 +3642,17 @@ function ponAnuncioBloqueo(){
   const img = '<img src="'+esc(a.imagen)+'" alt="'+esc(a.alt||a.titulo||"Anuncio")+'" style="width:100%;height:auto;display:block;max-height:140px;object-fit:cover">';
   w.innerHTML = a.enlace
     ? '<a href="'+esc(a.enlace)+'" target="_blank" rel="noopener noreferrer nofollow sponsored">'+img+'</a>' : img;
+  const pie = (a.propio && (P.publi||{}).titulo)
+    ? '<div style="padding:9px 12px;font:600 13px/1.35 Inter,system-ui,sans-serif;color:var(--ink-1);text-align:center">' +
+      esc(P.publi.titulo) + '</div>' : "";
+  if(pie) w.innerHTML = w.innerHTML + pie;
+  if(a.propio) return;
   if(a.id && !anunVistos[a.id]){
     anunVistos[a.id] = true;
     try{ if(typeof window.__anuncioMarca === "function") window.__anuncioMarca(a.id, "vista"); }catch(e){}
   }
 }
+function refrescaAnuncioPropio(){ if(!$("#acceso").hidden) pintaAnuncioBloqueo(); }
 function paraAnuncioBloqueo(){ if(anunBloqReloj){ clearInterval(anunBloqReloj); anunBloqReloj = null; } }
 async function cargaAnuncios(){
   try{
@@ -3168,10 +3727,10 @@ start();
 })();
 </script>
 
-<script>window.BUILD="20261016-1651";</script>
+<script>window.BUILD="20261016-1730";</script>
 <script>
 (function(){
-  var mio = "20261016-1651";
+  var mio = "20261016-1730";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
