@@ -2973,10 +2973,11 @@ body.conTour{overflow:hidden}
             <option value="60">A la hora</option>
           </select>
         </div>
+        <div style="align-self:end">
+          <button class="btn" id="bloqueoProbar" type="button">Bloquear ahora</button>
+        </div>
       </div>
-      <p class="note" style="margin-top:10px">Al bloquearse pide la clave de quien estaba trabajando, y desde ahí
-        también se checa la entrada y la salida sin tener que desbloquear. <b>Solo bloquea a quien tiene clave</b>:
-        sin clave no habría con qué volver a entrar.</p>
+      <p class="note" id="bloqueoNota" style="margin-top:10px"></p>
 
       <p class="note" style="margin-top:14px;border-left-color:var(--warn)">La clave de cada persona sirve para dos cosas: que nadie entre por descuido a lo que no le toca, y <b>checar su entrada y su salida</b> en el reloj. Sin clave no puede checar. Eso sí, <b>no es una contraseña de verdad</b>: quien tenga el enlace de esta página puede cambiarse de usuario. Para bloquear accesos en serio, con su propio correo y contraseña, se usa la versión instalada en tu dominio.</p>
     </div>
@@ -3236,7 +3237,10 @@ body.conTour{overflow:hidden}
           <button class="btn" id="pinCancel">Cancelar</button>
         </div>
       </div>
-      <div class="row-actions" style="margin-top:14px"><button class="btn" id="userCerrar">Cerrar</button></div>
+      <div class="row-actions" style="margin-top:14px">
+        <button class="btn" id="userBloquea">Bloquear pantalla</button>
+        <button class="btn" id="userCerrar">Cerrar</button>
+      </div>
     </div>
   </div>
 </div>
@@ -5988,6 +5992,7 @@ function renderSet(){
   $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia; $("#p_plazoCobro").value=num(P.plazoCobro,15);
   const pcb = $("#p_comisionBase"); if(pcb) pcb.value = baseComision();
   const pbl = $("#p_bloqueo"); if(pbl) pbl.value = String(num(P.bloqueoMin, MIN_BLOQUEO));
+  pintaNotaBloqueo();
   P.compras = P.compras || {tope:2000, siempre:false};
   $("#p_compraTope").value = num(P.compras.tope); $("#p_compraSiempre").checked = !!P.compras.siempre;
   $("#p_origen").value = P.origen==="lista" ? "lista" : "utilidad";
@@ -10752,7 +10757,7 @@ $("#tab-set").addEventListener("change", e=>{
   if(t.id==="p_origen"){ P.origen=t.value; renderSet(); renderApps(); }
   if(t.id==="p_redondeo") P.redondeo=num(t.value);
   if(t.id==="p_comisionBase"){ P.comisionBase = t.value; if(!$("#tab-ven").hidden) renderVentas(); }
-  if(t.id==="p_bloqueo"){ P.bloqueoMin = num(t.value); reiniciaInactividad();
+  if(t.id==="p_bloqueo"){ P.bloqueoMin = num(t.value); reiniciaInactividad(); pintaNotaBloqueo();
     toast(num(t.value) ? "Se bloqueará a los " + num(t.value) + " min sin usarlo"
                        : "Ya no se bloquea solo"); }
   if(t.id==="p_ivaOn") P.ivaOn=t.checked;
@@ -10763,6 +10768,9 @@ $("#tab-set").addEventListener("change", e=>{
 });
 $("#tab-set").addEventListener("click", e=>{
   if(e.target.closest("#csfEmpresa")) $("#csfEmpresaFile").click();
+  if(e.target.closest("#bloqueoProbar")){
+    bloqueaPantalla(true);
+  }
 });
 $("#tab-set").addEventListener("change", async e=>{
   if(e.target.id !== "csfEmpresaFile") return;
@@ -11368,6 +11376,10 @@ $("#pinOk").addEventListener("click", ()=>{
 });
 $("#pinCampo").addEventListener("keydown", e=>{ if(e.key==="Enter") $("#pinOk").click(); });
 $("#pinCancel").addEventListener("click", ()=>{ $("#pinPide").hidden = true; pinPendiente = null; });
+$("#userBloquea").addEventListener("click", ()=>{
+  $("#modalUser").hidden = true;
+  bloqueaPantalla(true);
+});
 function entraComo(id){
   usuarioId = id; pinPendiente = null;
   try{ localStorage.setItem("cotizador_usuario", id); }catch(e){}
@@ -12132,11 +12144,8 @@ function minutosBloqueo(){ const n = num(P && P.bloqueoMin, MIN_BLOQUEO); return
 
 /* Sin clave no hay con qué desbloquear: bloquear a alguien así sería
    dejarlo afuera de su propio taller. */
-function puedeBloquear(){
-  if(!minutosBloqueo()) return false;
-  const u = usuarioActual();
-  return !!(u && String(u.pin||"").trim());
-}
+function tieneClave(u){ return !!String((u||{}).pin||"").trim(); }
+function puedeBloquear(){ return minutosBloqueo() > 0; }
 
 function reiniciaInactividad(){
   clearTimeout(relojInactivo);
@@ -12144,10 +12153,10 @@ function reiniciaInactividad(){
   relojInactivo = setTimeout(bloqueaPantalla, minutosBloqueo()*60000);
 }
 
-function bloqueaPantalla(){
+function bloqueaPantalla(aMano){
   if(bloqueado) return;
   const puerta = $("#acceso"); if(!puerta || !puerta.hidden) return;
-  if(!puedeBloquear()) return;
+  if(!aMano && !puedeBloquear()) return;
   if(typeof cierraTour === "function") cierraTour();
   pideAcceso({bloqueo:true});
 }
@@ -12157,6 +12166,20 @@ function bloqueaPantalla(){
 
 /* El botón de checar vive en la puerta: se entra y se sale del turno sin
    tener que desbloquear primero. */
+/* La nota dice qué va a pasar DE VERDAD con el usuario que está sentado ahí,
+   no la regla general: sin clave el bloqueo limpia la pantalla pero no guarda
+   nada, y eso hay que decirlo donde se configura. */
+function pintaNotaBloqueo(){
+  const nb = $("#bloqueoNota"); if(!nb) return;
+  const yo = usuarioActual(), min = minutosBloqueo();
+  if(!min){ nb.innerHTML = "La pantalla se queda abierta hasta que alguien la cierre."; return; }
+  nb.innerHTML = tieneClave(yo)
+    ? 'Al bloquearse te va a pedir <b>tu clave</b>. Desde esa misma pantalla puedes checar tu entrada y tu salida sin desbloquear.'
+    : '<b>' + esc(yo.nombre||"Tu usuario") + '</b> no tiene clave, así que al bloquearse la pantalla se limpia y hay que ' +
+      'volver a elegir perfil, pero cualquiera puede entrar con un clic. Ponle una clave abajo y entonces sí la pedirá ' +
+      '— y de paso podrá checar su entrada y su salida.';
+}
+
 function pintaAccesoReloj(){
   const caja = $("#accesoReloj"); if(!caja) return;
   const u = bloqueado ? usuarioActual()
@@ -12201,20 +12224,26 @@ function pideAcceso(opc){
 
   const at = $("#accesoTitulo"), sub = $("#accesoSub"), otro = $("#accesoOtro");
   if(bloq){
-    /* Ya sabemos quién es: no se vuelve a escoger perfil, se teclea la clave. */
-    const yo = usuarioActual();
-    if(at)  at.textContent  = "Inserta tu código o PIN";
-    if(sub) sub.textContent = "Se bloqueó solo por inactividad. Escribe tu clave para seguir donde te quedaste.";
-    $("#accesoPerfiles").hidden = true;
-    perfilPendiente = yo.id;
-    $("#accesoQuien").textContent = yo.nombre || "ti";
-    $("#accesoPass").value = ""; $("#accesoError").hidden = true;
-    $("#accesoClave").hidden = false;
+    /* Con clave: ya sabemos quién es, se teclea y sigue donde se quedó.
+       Sin clave: la pantalla igual se limpia y hay que volver a elegir perfil,
+       que es lo honesto — proteger de verdad requiere una clave. */
+    const yo = usuarioActual(), conClave = tieneClave(yo);
+    if(at)  at.textContent  = conClave ? "Inserta tu código o PIN" : "Pantalla bloqueada";
+    if(sub) sub.textContent = conClave
+      ? "Se bloqueó solo por inactividad. Escribe tu clave para seguir donde te quedaste."
+      : "Se bloqueó solo por inactividad. Elige tu perfil para seguir. Si quieres que pida clave, ponle una a tu usuario en Ajustes → Equipo.";
+    $("#accesoPerfiles").hidden = conClave;
+    if(conClave){
+      perfilPendiente = yo.id;
+      $("#accesoQuien").textContent = yo.nombre || "ti";
+      $("#accesoPass").value = ""; $("#accesoError").hidden = true;
+      $("#accesoClave").hidden = false;
+    }
     /* No es un inicio de sesión nuevo: ni "Volver" a una lista que no se
        enseña, ni volver a preguntar si recordamos a quien ya estaba. */
     const vol = $("#accesoVolver"); if(vol) vol.hidden = true;
     const rec = $("#accesoRecordarFila"); if(rec) rec.hidden = true;
-    if(otro) otro.hidden = false;
+    if(otro) otro.hidden = !conClave;
   }else{
     if(at)  at.textContent  = window.CONFIG ? "¿Quién va a trabajar en " + CONFIG.MARCA + "?"
                                             : "¿Quién va a trabajar?";
