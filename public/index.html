@@ -5,12 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
-<script src="config.js?v=20261015-1334"></script>
+<script src="config.js?v=20261015-2336"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Cotizador Hey Makers</title>
+<title>Taller Makers</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
+/* Primero que nada: hidden manda sobre cualquier display nuestro. */
+[hidden]{display:none!important}
+
 :root{
   /* colores de marca Hey Makers */
   --mk-cyan:#06A1D7; --mk-magenta:#F51B95; --mk-yellow:#FFEC30; --mk-black:#141414;
@@ -1948,6 +1951,121 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
 .proDis small b{color:var(--ink-2)}
 @media (max-width:560px){ .proDis{flex-direction:column;align-items:stretch} .proDis .btn{width:100%} }
 
+/* ---- buscador del catálogo ---- */
+.catBuscar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 12px}
+.catBuscar input{flex:1;min-width:200px}
+.catCuenta{font-size:12px;color:var(--ink-3);white-space:nowrap;font-family:"IBM Plex Mono",monospace}
+.catPie{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--ink-3)}
+.catPie .empty{flex:1}
+@media (max-width:560px){ .catBuscar input{min-width:100%} }
+/* ---- el rollo de cada aplicación ---- */
+.appRollo{margin-top:10px}
+.appRolloFila{display:flex;gap:8px;align-items:center}
+.appRolloFila select{flex:1;min-width:0}
+.appRolloFila .btn{flex:none;white-space:nowrap}
+@media (max-width:560px){ .appRolloFila{flex-wrap:wrap} .appRolloFila .btn{width:100%} }
+
+/* ---- máquinas ---- */
+.maqTarifa{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 14px;border:1px solid var(--line);
+  border-radius:11px;background:var(--surface-2);margin-bottom:16px}
+.maqTarifa .f{margin:0;white-space:nowrap}
+.maqTarifa input{width:110px}
+.maqTarifa .hint{flex:1;min-width:200px;font-size:11.5px;color:var(--ink-3);line-height:1.4}
+.maqCard{border:1px solid var(--line);border-radius:var(--radio-sm,12px);padding:14px 15px;margin-bottom:12px;
+  background:var(--vidrio-fondo,var(--surface))}
+.maqTop{display:flex;gap:9px;align-items:center;margin-bottom:12px}
+.maqNombre{flex:1;min-width:0;font-weight:600}
+.maqTop select{width:auto;max-width:230px}
+.maqRejilla{display:grid;grid-template-columns:repeat(auto-fit,minmax(152px,1fr));gap:10px}
+.maqCampo{display:block;font-size:11px}
+.maqCampo>span{display:block;text-transform:uppercase;letter-spacing:.05em;font-weight:700;color:var(--ink-3);margin-bottom:4px}
+.maqCampo>span small{display:block;text-transform:none;letter-spacing:0;font-weight:400;font-size:10.5px;
+  color:var(--ink-3);opacity:.85;margin-top:1px}
+.maqCampo input{text-align:right;font-family:"IBM Plex Mono",monospace}
+.maqResultado{margin-top:13px;padding-top:12px;border-top:1px solid var(--line)}
+.maqSuma{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:11px;color:var(--ink-3)}
+.maqSuma span{display:flex;gap:6px;align-items:baseline}
+.maqSuma b{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-2)}
+.maqTotal{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-top:9px;font-size:13px}
+.maqTotal>b{font-family:"IBM Plex Mono",monospace;font-size:20px;color:var(--good)}
+.maqMin{font-size:12px;color:var(--ink-3)}
+.maqMin b{font-family:"IBM Plex Mono",monospace;color:var(--cyan);font-size:13.5px}
+.tecCampo.tecAncho{grid-column:1/-1}
+.tecNota{font-size:11.5px;color:var(--ink-3);line-height:1.55;margin:10px 0 0;padding-left:10px;
+  border-left:2px solid var(--line)}
+@media (max-width:560px){ .maqTop{flex-wrap:wrap} .maqTop select{max-width:none;flex:1} }
+
+/* ---- lanzador de aplicaciones ---- */
+.inicioSeg{display:flex;justify-content:flex-end;margin:0 0 14px}
+.lanzador{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:14px;
+  padding:22px;border-radius:var(--radio,18px);background:var(--vidrio-fondo,var(--surface));
+  border:1px solid var(--vidrio-borde,var(--line));margin-bottom:18px}
+.lzApp{display:flex;flex-direction:column;align-items:center;gap:9px;padding:16px 10px 14px;
+  border:1px solid transparent;border-radius:16px;background:transparent;cursor:pointer;font:inherit;
+  color:inherit;text-align:center;transition:background .16s,border-color .16s,transform .12s}
+.lzApp:hover,.lzApp:focus-visible{background:var(--surface-2);border-color:var(--line);
+  transform:translateY(-2px);outline:none}
+.lzIco{position:relative;display:grid;place-items:center;width:60px;height:60px;border-radius:17px;
+  background:color-mix(in oklab, var(--lzc) 20%, transparent);
+  border:1px solid color-mix(in oklab, var(--lzc) 38%, transparent);
+  color:var(--lzc);transition:background .16s}
+.lzApp:hover .lzIco{background:color-mix(in oklab, var(--lzc) 30%, transparent)}
+.lzIco svg{width:30px;height:30px}
+.lzN{position:absolute;top:-7px;right:-9px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;
+  display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;line-height:1;
+  font-family:"IBM Plex Mono",monospace;background:var(--surface-2);color:var(--ink-2);
+  border:1px solid var(--line)}
+.lzN.pide{background:var(--warn);color:#201803;border-color:transparent}
+.lzApp.pide .lzIco{box-shadow:0 0 0 3px color-mix(in oklab, var(--warn) 22%, transparent)}
+.lzEt{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:13.5px;line-height:1.2}
+.lzSub{font-size:10.5px;color:var(--ink-3);line-height:1.35;min-height:1.35em}
+@media (max-width:560px){
+  .lanzador{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;padding:14px}
+  .lzIco{width:52px;height:52px;border-radius:15px}
+  .lzIco svg{width:26px;height:26px}
+  .lzEt{font-size:12px}
+  .lzSub{display:none}
+}
+
+/* ---- tutorial guiado ---- */
+.tourCapa{position:fixed;inset:0;z-index:4000}
+/* La pantalla de acceso va por encima de TODO, tutorial incluido: es una
+   puerta, y una puerta tapada deja a la gente afuera. */
+.accesoWrap{z-index:9000!important}
+/* El reloj se checa desde la pantalla bloqueada, así que su ventana
+   tiene que ir por encima de la puerta. */
+#modalCheca{z-index:9600}
+.accesoReloj{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.accesoReloj .accesoRelojEstado{margin:0 0 10px;font-size:12.5px;color:var(--ink-3)}
+.accesoReloj .btn{width:100%;justify-content:center}
+.accesoOtro{margin-top:14px;width:100%;justify-content:center}
+.accesoCand{display:inline-flex;align-items:center;gap:6px;margin:0 0 4px;
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.tourFoco{position:fixed;border-radius:12px;pointer-events:none;
+  box-shadow:0 0 0 9999px rgba(4,6,16,.76), 0 0 0 2px var(--accent);
+  transition:left .28s cubic-bezier(.2,.8,.3,1),top .28s cubic-bezier(.2,.8,.3,1),
+             width .28s cubic-bezier(.2,.8,.3,1),height .28s cubic-bezier(.2,.8,.3,1)}
+.tourCard{position:fixed;width:min(360px,calc(100vw - 24px));padding:18px 19px 16px;
+  border-radius:16px;background:var(--surface);border:1px solid var(--line);
+  box-shadow:0 24px 60px -24px rgba(0,0,0,.85);transition:left .28s,top .28s}
+.tourTop{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.tourPaso{flex:1;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.tourX{border:0;background:none;color:var(--ink-3);font-size:15px;cursor:pointer;padding:2px 4px;line-height:1}
+.tourX:hover{color:var(--ink)}
+.tourCard h3{font-size:17px;font-weight:600;line-height:1.25;margin:0 0 7px}
+.tourCard p{margin:0;font-size:13px;line-height:1.6;color:var(--ink-2)}
+.tourPie{display:flex;align-items:center;gap:12px;margin-top:16px}
+.tourPuntos{flex:1;display:flex;gap:5px;flex-wrap:wrap}
+.tourPuntos i{width:6px;height:6px;border-radius:50%;background:var(--line);display:block;transition:background .2s}
+.tourPuntos i.hoy{background:var(--accent);width:18px;border-radius:3px}
+.tourBtns{display:flex;gap:7px;flex:none}
+body.conTour{overflow:hidden}
+@media (max-width:560px){
+  .tourCard{left:12px!important;right:12px;width:auto;top:auto!important;bottom:14px}
+  .tourCard h3{font-size:16px}
+}
+@media (prefers-reduced-motion: reduce){ .tourFoco,.tourCard{transition:none} }
+
 
 /* ---- el diagnóstico ----
    Una pregunta a la vez. Las opciones entran escalonadas: no es adorno,
@@ -2241,7 +2359,7 @@ body.rol-produccion #btnPrint{display:none!important}
   <div class="top-in">
     <div class="brand">
       <span class="plaque"><img id="brandLogo" src="" alt="Hey Makers"></span>
-      <span class="who"><b>Cotizador</b><span id="brandSlogan">Cursos y talleres</span></span>
+      <span class="who"><b id="brandProducto">Taller Makers</b><span id="brandSlogan">Cursos y talleres</span></span>
     </div>
     <div class="menuWrap">
       <button class="menuBtn" id="menuBtn" aria-expanded="false" aria-haspopup="true">
@@ -2391,6 +2509,14 @@ body.rol-produccion #btnPrint{display:none!important}
       <span class="tbCheck">✓</span> Ya lo vi
     </button>
   </div>
+  <div class="inicioSeg">
+    <div class="seg" id="inVista">
+      <button data-inv="tablero" aria-pressed="true">Tablero</button>
+      <button data-inv="apps" aria-pressed="false">Aplicaciones</button>
+    </div>
+  </div>
+  <div id="lanzador" class="lanzador" hidden></div>
+
   <div class="tbAccesos" id="tbAccesos"></div>
   <div class="tbTiles" id="tbTiles"></div>
   <div class="tbAnillos" id="tbAnillos"></div>
@@ -2632,7 +2758,14 @@ body.rol-produccion #btnPrint{display:none!important}
         <span style="font-size:12px;color:var(--ink-3);align-self:center">Con número negativo bajan.</span>
       </div>
       <p class="note" style="margin:0 0 12px"><b>Costo de producción</b> es lo que te cuesta el artículo. <b>Precio público</b> es a cómo lo vendes. Si dejas el precio en cero, el cotizador lo calcula con tu utilidad.</p>
+      <div class="catBuscar">
+        <input id="catqBusca" placeholder="Buscar por nombre, categoría o código" autocomplete="off">
+        <select id="catqCat" style="width:auto"></select>
+        <span class="catCuenta" id="catqCuenta"></span>
+      </div>
       <div class="tbl-wrap"><table id="t_articulos"></table></div>
+      <div class="catPie" id="catqPie"></div>
+
     </div>
   </div>
   <div class="card">
@@ -2706,6 +2839,21 @@ body.rol-produccion #btnPrint{display:none!important}
 
 <!-- ============ CALCULADORA ============ -->
 <section id="tab-calc" hidden>
+  <div class="card" id="cardMaq">
+    <header><h2>Máquinas y su costo por hora</h2>
+      <span class="hint" style="margin-left:auto">para cobrar por tiempo</span>
+      <button class="btn sm ghost" id="maqNueva">+ Máquina</button>
+    </header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">El minuto de máquina cuesta aunque nadie lo esté viendo: <b>luz, consumibles, mantenimiento y lo que vale la máquina repartido entre las horas que va a durar</b>. Aquí sale el costo por hora; en la técnica escoges la máquina y al cotizar pones los minutos. <b>La mano de obra va aparte</b>, en cada técnica.</p>
+      <div class="maqTarifa">
+        <label class="f" for="p_kwh">Tu tarifa de luz ($ por kWh)</label>
+        <input id="p_kwh" type="number" min="0" step="0.1">
+        <span class="hint">La de tu recibo de CFE, no la de una casa. Un taller en tarifa comercial anda arriba de los $4.</span>
+      </div>
+      <div id="maqLista"></div>
+    </div>
+  </div>
   <div class="card" id="cardCalc">
     <header><h2>Calculadora de costo de producción</h2>
       <span class="hint" style="margin-left:auto">para saber qué te cuesta imprimir</span>
@@ -3145,6 +3293,23 @@ body.rol-produccion #btnPrint{display:none!important}
       <div class="tbl-wrap"><table id="t_equipo"></table></div>
         <p class="notaCostos"><b>Quién ve los costos.</b> El administrador siempre. A los demás los autorizas tú con la casilla <b>Ve costos</b>: sin ella ven precios, piezas y totales, pero ni el costo de producción ni la utilidad. El detalle aplicación por aplicación y el aviso de venta bajo costo son sólo del administrador. Ojo: esto <b>esconde</b> los números de la pantalla, no los cifra — quien sepa abrir las herramientas del navegador los puede encontrar.</p>
 
+      <div class="grid g3" style="margin-top:18px">
+        <div>
+          <label class="f" for="p_bloqueo">Bloquear la pantalla si nadie la toca</label>
+          <select id="p_bloqueo">
+            <option value="0">Nunca</option>
+            <option value="2">A los 2 minutos</option>
+            <option value="5">A los 5 minutos</option>
+            <option value="10">A los 10 minutos</option>
+            <option value="20">A los 20 minutos</option>
+            <option value="60">A la hora</option>
+          </select>
+        </div>
+      </div>
+      <p class="note" style="margin-top:10px">Al bloquearse pide la clave de quien estaba trabajando, y desde ahí
+        también se checa la entrada y la salida sin tener que desbloquear. <b>Solo bloquea a quien tiene clave</b>:
+        sin clave no habría con qué volver a entrar.</p>
+
       <p class="note" style="margin-top:14px;border-left-color:var(--warn)">La clave de cada persona sirve para dos cosas: que nadie entre por descuido a lo que no le toca, y <b>checar su entrada y su salida</b> en el reloj. Sin clave no puede checar. Eso sí, <b>no es una contraseña de verdad</b>: quien tenga el enlace de esta página puede cambiarse de usuario. Para bloquear accesos en serio, con su propio correo y contraseña, se usa la versión instalada en tu dominio.</p>
     </div>
   </div>
@@ -3316,7 +3481,7 @@ body.rol-produccion #btnPrint{display:none!important}
     <div class="accesoBody">
       <span class="plaque" style="display:inline-grid"><img id="accesoLogo" src="" alt=""></span>
       <h1 id="accesoTitulo">¿Quién va a trabajar?</h1>
-      <p class="sub">Elige tu perfil. Cada quien ve solo lo de su área.</p>
+      <p class="sub" id="accesoSub">Elige tu perfil. Cada quien ve solo lo de su área.</p>
       <div class="perfiles" id="accesoPerfiles"></div>
       <div class="claveCaja" id="accesoClave" hidden>
         <label class="f">Contraseña de <b id="accesoQuien"></b></label>
@@ -3326,8 +3491,13 @@ body.rol-produccion #btnPrint{display:none!important}
           <button class="btn" id="accesoVolver">Volver</button>
         </div>
         <p id="accesoError" class="authMsg" hidden style="color:var(--accent)"></p>
-        <label class="sw" style="margin-top:10px"><input type="checkbox" id="accesoRecordar" checked> Recordar en este dispositivo por 12 horas</label>
+        <label class="sw" id="accesoRecordarFila" style="margin-top:10px"><input type="checkbox" id="accesoRecordar" checked> Recordar en este dispositivo por 12 horas</label>
       </div>
+      <div class="accesoReloj" id="accesoReloj" hidden>
+        <p class="accesoRelojEstado" id="accesoRelojEstado"></p>
+        <button class="btn" id="accesoCheca" type="button">Checar entrada</button>
+      </div>
+      <button class="btn ghost accesoOtro" id="accesoOtro" hidden type="button">Entrar con otro usuario</button>
     </div>
   </div>
 </div>
@@ -3448,7 +3618,7 @@ body.rol-produccion #btnPrint{display:none!important}
     <div class="cmyk"><i></i><i></i><i></i><i></i></div>
     <div class="authBody">
       <span class="plaque" style="align-self:flex-start"><img id="authLogo" src="" alt=""></span>
-      <h1 id="authTitulo">Cotizador de artículos personalizados</h1>
+      <h1 id="authTitulo">Taller Makers</h1>
       <p class="authSub">Entra a tu cuenta para cotizar, producir y llevar tus ventas.</p>
       <div class="seg" id="authTabs" style="align-self:flex-start">
         <button type="button" data-modo="entrar" aria-pressed="true">Ya tengo cuenta</button>
@@ -3526,6 +3696,23 @@ body.rol-produccion #btnPrint{display:none!important}
 <button class="ayudaBtn" id="ayudaBtn" aria-haspopup="dialog" aria-expanded="false">
   Ayuda<span class="pin" id="ayudaPin" hidden>1</span>
 </button>
+<div class="tourCapa" id="tourCapa" hidden>
+  <div class="tourFoco" id="tourFoco"></div>
+  <div class="tourCard" id="tourCard" role="dialog" aria-label="Tutorial">
+    <div class="tourTop"><span class="tourPaso" id="tourNum"></span>
+      <button class="tourX" id="tourSalir" aria-label="Salir del tutorial">✕</button></div>
+    <h3 id="tourTit"></h3>
+    <p id="tourTxt"></p>
+    <div class="tourPie">
+      <span class="tourPuntos" id="tourPuntos"></span>
+      <span class="tourBtns">
+        <button class="btn sm ghost" id="tourAtras">Atrás</button>
+        <button class="btn sm primary" id="tourSig">Siguiente</button>
+      </span>
+    </div>
+  </div>
+</div>
+
 <div class="ayudaPanel" id="ayudaPanel" role="dialog" aria-label="Ayuda y soporte" hidden>
   <header>
     <button class="btn sm ghost" id="ayudaAtras" hidden>Atrás</button>
@@ -3816,6 +4003,33 @@ body.rol-produccion #btnPrint{display:none!important}
   </div>
 </div>
 
+<div class="modal" id="modalRollo" hidden>
+  <div class="card" style="width:min(560px,100%)">
+    <header><h2>Dar de alta un ancho</h2>
+      <button class="btn sm" id="roCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Queda guardado en <b>Catálogo → Servicios y material por medida</b>, amarrado a esta técnica. Desde ahí lo puedes editar después.</p>
+      <div><label class="f" for="ro_nombre">Cómo se llama</label><input id="ro_nombre" placeholder="Papel de sublimación 3.20 m"></div>
+      <div class="grid g3" style="margin-top:12px">
+        <div><label class="f" for="ro_ancho">Ancho útil (cm)</label><input id="ro_ancho" type="number" min="1" step="1" value="110"></div>
+        <div><label class="f" for="ro_unidad">Se compra por</label><select id="ro_unidad">
+          <option value="ml">Metro lineal (ml)</option><option value="m2">Metro cuadrado (m²)</option></select></div>
+        <div><label class="f" for="ro_cat">Categoría</label><input id="ro_cat" value="Maquila"></div>
+      </div>
+      <div class="grid g2" style="margin-top:12px">
+        <div><label class="f" for="ro_costo">Lo que te cuesta ($)</label><input id="ro_costo" type="number" min="0" step="0.5"></div>
+        <div><label class="f" for="ro_precio">A cómo lo vendes ($)</label><input id="ro_precio" type="number" min="0" step="0.5"></div>
+      </div>
+      <div class="grid g3" style="margin-top:12px">
+        <div><label class="f" for="ro_minimo">Mínimo de compra</label><input id="ro_minimo" type="number" min="0" step="0.1" value="1"></div>
+        <div><label class="f" for="ro_sep">Separación entre piezas (cm)</label><input id="ro_sep" type="number" min="0" step="0.1" value="0.5"></div>
+        <div><label class="f" for="ro_orilla">Orilla que no se usa (cm)</label><input id="ro_orilla" type="number" min="0" step="0.1" value="1"></div>
+      </div>
+      <button class="btn primary" id="roGuardar" style="width:100%;margin-top:18px">Dar de alta</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="modalCobro" hidden>
   <div class="card">
     <header><h2>Registrar venta</h2></header>
@@ -4070,6 +4284,7 @@ function defaults(){ return {
 };}
 const CHECKS = ["Diseño aprobado por el cliente","Material en almacén","Archivo impreso","Prensado / aplicado","Revisión de calidad","Empacado","Entregado"];
 function defaultParams(){ return {plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
+  tarifaKwh:4, bloqueoMin:10,
   compras:{tope:2000, siempre:false},
   empresa:{nombre:"Hey Makers",eslogan:"Cursos y Talleres",tel:"",mail:"",logo:"",
   /* Lo fiscal va aparte de lo comercial a propósito: el nombre comercial es
@@ -4522,7 +4737,7 @@ function esServicio(g){ return (g||cot).modo === "servicio"; }
 /* Una técnica "lleva material" cuando hay un servicio del catálogo amarrado
    a ella. En ese caso el armado cobra el material y la técnica, sólo la
    mano de obra: así ningún peso se cobra dos veces. */
-function tieneMaterial(tecnicaId){ return !!svcParaTecnica(tecnicaId); }
+function tieneMaterial(tecnicaId){ return svcsParaTecnica(tecnicaId).length > 0; }
 function manoDeObraDe(t, cual){
   if(!t) return 0;
   if(cual==="precio") return num(t.precioMO);
@@ -4539,7 +4754,7 @@ function autoArmado(){
   const porServicio = {};
   cot.apps.forEach(a=>{
     if(a.sinArmado) return;                        // el switch de esa aplicación
-    const s = svcParaTecnica(a.tecnicaId);
+    const s = svcDeApp(a);                         // el rollo que escogió ESTA aplicación
     if(!s) return;
     (porServicio[s.id] = porServicio[s.id] || []).push(a);
   });
@@ -4987,6 +5202,13 @@ function calc(){
     let c = 0, pv = 0, base = "", ti = Math.max(1,num(a.tintas,1));
     if(t.modo==="area"){ const area = num(a.ancho)*num(a.alto); c = area*num(t.costoCm2); pv = area*num(t.precioCm2); base = area.toFixed(0)+" cm²"; }
     else if(t.modo==="tintas"){ c = ti*num(t.costoTinta); pv = ti*num(t.precioTinta); base = ti+" tinta(s)"; }
+    else if(t.modo==="tiempo"){
+      /* El minuto de máquina, por los minutos de esta pieza. La mano de obra
+         de quien la opera va aparte, abajo, como en todas las técnicas. */
+      const mn = num(a.minutos), cm = costoMinutoTec(t);
+      c = mn*cm; pv = mn*num(t.precioMinuto);
+      base = (mn||0) + " min de máquina";
+    }
     else { const pu = num(a.puntadas); c = pu*num(t.costoPuntada); pv = pu*num(t.precioPuntada); base = pu.toLocaleString("es-MX")+" puntadas"; }
     // Con material amarrado, la aplicación cobra sólo la mano de obra:
     // el material entra por el armado y así nada se cobra dos veces.
@@ -4999,15 +5221,19 @@ function calc(){
     } else {
       const min = num(t.minimo);
       aplicoMin = c < min; if(aplicoMin) c = min;
-      c += num(P.manoObra);
+      c += t.modo === "tiempo" ? manoDeObraDe(t, "costo") : num(P.manoObra);
       if(pv < num(t.precioMin)) pv = num(t.precioMin);
     }
     // Si la técnica no tiene precio público capturado, se calcula con la utilidad.
     const tienePrecio = sinMaterial ? !!num(t.precioMO)
-      : !!(num(t.precioCm2)||num(t.precioTinta)||num(t.precioPuntada)||num(t.precioMin));
+      : !!(num(t.precioCm2)||num(t.precioTinta)||num(t.precioPuntada)||num(t.precioMinuto)||num(t.precioMin));
     const precio = tienePrecio ? pv : aplicaUtil(c);
     let s = num(t.setup); if(t.modo==="tintas") s = num(t.setup)*ti;
     let sp = num(t.precioSetup); if(t.modo==="tintas") sp = num(t.precioSetup)*ti;
+    if(t.modo==="tiempo"){
+      const cm = costoMinutoTec(t), ms = num(a.minutosSetup);
+      s += ms*cm; sp += ms*num(t.precioMinuto);
+    }
     if(!num(t.precioSetup)) sp = aplicaUtil(s);
     setupCosto += s; costoApps += c; precioApps += precio; setupPrecio += sp;
     detalle.push({id:a.id,ubic:a.ubic,tecnica:t.nombre,base,costo:c,precio,setup:s,setupPrecio:sp,min:aplicoMin,sinMaterial});
@@ -5149,10 +5375,13 @@ function renderApps(){
          : modo==="tintas" ?
           '<div><label class="f">N.º de tintas</label><input type="number" min="1" step="1" data-k="tintas" value="'+(a.tintas||1)+'"></div>'+
           '<div><label class="f">Setup</label><input readonly class="num" value="'+mx((d&&d.setup)||0)+' único"></div>'
+         : modo==="tiempo" ?
+          '<div><label class="f">Minutos por pieza</label><input type="number" min="0" step="0.5" data-k="minutos" value="'+(a.minutos||0)+'"></div>'+
+          '<div><label class="f">Minutos de preparación</label><input type="number" min="0" step="1" data-k="minutosSetup" value="'+(a.minutosSetup||0)+'"></div>'
          :
           '<div><label class="f">Puntadas</label><input type="number" min="0" step="500" data-k="puntadas" value="'+(a.puntadas||0)+'"></div>'+
           '<div><label class="f">Ponchado</label><input readonly class="num" value="'+mx((d&&d.setup)||0)+' único"></div>')+
-      '</div>'+ artBox(a) +'</div>';
+      '</div>'+ selectorRollo(a) + artBox(a) +'</div>';
   }).join("");
 }
 function artBox(a){
@@ -5683,7 +5912,7 @@ function renderResultado(){
         'Tu precio de venta sale de ahí más tu utilidad, que se configura en Ajustes.</p>'+
     '</div>';
 }
-function renderCalc(){ renderPasos(); renderResultado(); }
+function renderCalc(){ renderMaquinas(); renderPasos(); renderResultado(); }
 
 /* ---------- calibrar con lo que de verdad gastaste ---------- */
 let ccCalibrando = null;
@@ -5771,7 +6000,10 @@ const COLS = {
 };
 function renderTabla(key){
   if(key==="tecnicas") return renderTecnicas();
-  const cols = COLS[key], rows = cat[key];
+  const cols = COLS[key];
+  /* Los artículos son los únicos que pueden ser miles: se pintan filtrados y
+     por partes. Las demás tablas son cortas por naturaleza. */
+  const rows = key==="articulos" ? catqLista().slice(0, catqTope) : cat[key];
   let h = "<thead><tr>"+cols.map(c=>'<th>'+c[1]+'</th>').join("")+"<th></th></tr></thead><tbody>";
   h += rows.map(r=>'<tr data-key="'+key+'" data-id="'+r.id+'">'+cols.map(c=>{
     const v = r[c[0]];
@@ -5830,6 +6062,28 @@ function renderTecnicas(){
           campo("costoPuntada","Costo / puntada","0.0001")+campo("precioPuntada","Precio / puntada","0.0001")+
           campo("minimo","Costo mínimo")+campo("precioMin","Precio mínimo")+
         '</div></div>';
+    } else if(t.modo==="tiempo"){
+      const m = maqDe(t.maquinaId), d = desgloseMaq(m);
+      propios = '<div class="tecBloque"><div class="tecTit">Se cobra por tiempo de máquina'+
+        '<span class="hint"> — los minutos se ponen en cada cotización</span></div>'+
+        '<label class="tecCampo tecAncho"><span>Con qué máquina</span>'+
+          '<select data-f="maquinaId">'+
+            '<option value="">— escoge una máquina —</option>'+
+            maquinas().map(x=>'<option value="'+esc(x.id)+'"'+(t.maquinaId===x.id?" selected":"")+'>'+
+              esc(x.nombre)+' · '+mx(costoMinutoMaq(x))+'/min</option>').join("")+
+          '</select></label>'+
+        (m
+          ? '<p class="tecNota">Un minuto de <b>'+esc(m.nombre)+'</b> cuesta <b>'+mx(d.minuto)+'</b> '+
+            '('+mx(d.hora)+' la hora: luz '+mx(d.luz)+' · consumibles '+mx(d.consumibles)+
+            ' · mantenimiento '+mx(d.mantenimiento)+' · depreciación '+mx(d.depreciacion)+'). '+
+            'Se cambia en <b>Calculadora de costos → Máquinas</b>.</p>'
+          : '<p class="tecNota" style="border-left-color:var(--warn)">Sin máquina, el minuto cuesta cero y esta técnica no te va a costear nada. Da una de alta en <b>Calculadora de costos → Máquinas</b>.</p>')+
+        '<div class="tecRejilla">'+
+          campo("precioMinuto","Precio / minuto","0.5")+
+          campo("minimo","Costo mínimo")+campo("precioMin","Precio mínimo")+
+        '</div>'+
+        '<p class="tecNota">Si dejas el precio por minuto en cero, el cotizador lo saca con tu utilidad.</p>'+
+      '</div>';
     }
 
     return '<div class="tecCard" data-key="tecnicas" data-id="'+t.id+'">'+
@@ -5839,13 +6093,17 @@ function renderTecnicas(){
           '<option value="area"'+(t.modo==="area"?" selected":"")+'>Por área</option>'+
           '<option value="tintas"'+(t.modo==="tintas"?" selected":"")+'>Por tinta</option>'+
           '<option value="puntadas"'+(t.modo==="puntadas"?" selected":"")+'>Por puntada</option>'+
+          '<option value="tiempo"'+(t.modo==="tiempo"?" selected":"")+'>Por tiempo de máquina</option>'+
         '</select>'+
         '<button class="btn icon sm" data-delrow="1" title="Quitar">✕</button>'+
       '</div>'+
       (porRollo
         ? '<div class="tecMat"><span class="pill good">material desde el armado</span>'+
-          '<span>'+esc(mat.nombre)+' · '+mx(num(mat.precio))+'/'+abrevUnidad(mat.unidad)+
-          '</span><small>El material lo calcula el armado con lo que de verdad se gasta del rollo. Aquí sólo va tu tiempo.</small></div>'
+          '<span>'+svcsParaTecnica(t.id).map(s=>esc(s.nombre)+' · '+num(s.ancho)+' cm · '+mx(num(s.precio))+'/'+abrevUnidad(s.unidad)).join(' &nbsp;·&nbsp; ')+
+          '</span><small>El material lo calcula el armado con lo que de verdad se gasta del rollo. Aquí sólo va tu tiempo. '+
+          (svcsParaTecnica(t.id).length > 1
+            ? 'Al cotizar se escoge cuál de estos anchos se usa.'
+            : 'Da de alta más anchos en <b>Servicios y material por medida</b> y al cotizar podrás escoger.')+'</small></div>'
         : (t.modo==="area"
             ? '<div class="tecMat"><span class="pill pend">sin material</span>'+
               '<small>Amárrale un rollo en <b>Servicios y material por medida</b> y deja de cobrar por cm².</small></div>'
@@ -5867,7 +6125,9 @@ function renderCatalogo(){
   normalizaCalc();
   // La primera vez que una cuenta vieja ve los servicios, se le guardan.
   if(_catSembrado){ _catSembrado = false; persist(); }
+  catqPintaFiltro();
   Object.keys(COLS).forEach(renderTabla);
+  catqPintaPie();
   renderInventario();
   const cats = [...new Set(cat.articulos.map(a=>a.cat||"Otros"))];
   $("#bulk_cat").innerHTML = '<option value="">Todas las categorías</option>' + cats.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join("");
@@ -6151,13 +6411,17 @@ function renderSaved(){
 function renderSet(){
   renderTema(); renderMO();
   const bv = $("#barraVer");
-  if(bv) bv.textContent = (P.empresa && P.empresa.nombre ? P.empresa.nombre : "Hey Makers");
+  /* En el pie va la plataforma, no el negocio del cliente: es la firma del
+     producto, como el «Windows» de abajo a la derecha. */
+  if(bv) bv.textContent = (window.PRODUCTO && window.PRODUCTO.plataforma) ||
+                          (P.empresa && P.empresa.nombre) || "Makers OS";
   $("#p_margen").value=P.margen; $("#p_modo").value=P.modo; $("#p_merma").value=P.merma; $("#p_mo").value=P.manoObra;
   $("#p_nesting").checked = P.nesting !== false;
   const pg = $("#p_nuevaGuardar"); if(pg) pg.checked = P.nuevaAlGuardar !== false;
   const pc = $("#p_nuevaCobrar");  if(pc) pc.checked = P.nuevaAlCobrar  !== false;
   $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia; $("#p_plazoCobro").value=num(P.plazoCobro,15);
   const pcb = $("#p_comisionBase"); if(pcb) pcb.value = baseComision();
+  const pbl = $("#p_bloqueo"); if(pbl) pbl.value = String(num(P.bloqueoMin, MIN_BLOQUEO));
   P.compras = P.compras || {tope:2000, siempre:false};
   $("#p_compraTope").value = num(P.compras.tope); $("#p_compraSiempre").checked = !!P.compras.siempre;
   $("#p_origen").value = P.origen==="lista" ? "lista" : "utilidad";
@@ -6430,6 +6694,7 @@ $("#tabs").addEventListener("click", e=>{
   if(b.dataset.tab==="inv") renderInvTaller();
   if(b.dataset.tab==="com") renderSolicitudesCompras();
   if(b.dataset.tab==="cat") renderCatalogo();
+  if(b.dataset.tab==="calc") renderMaquinas();
   if(b.dataset.tab==="calc") renderCalc();
   if(b.dataset.tab==="com"){ renderCompras(); renderProveedores(); }
   if(b.dataset.tab==="cli") renderClientes();
@@ -6503,6 +6768,8 @@ $("#apps").addEventListener("change", e=>{
   const a = cot.apps.find(a=>a.id===row.dataset.app); if(!a) return;
   const k = t.dataset.k;
   a[k] = t.value;
+  /* El rollo pertenece a una técnica: al cambiarla, el de antes ya no aplica. */
+  if(k==="tecnicaId") a.matId = "";
   if(k==="tamanoId"){ const s = cat.tamanos.find(s=>s.id===t.value); if(s){ a.ancho=s.ancho; a.alto=s.alto; } }
   renderApps(); renderResumen();
 });
@@ -7024,6 +7291,7 @@ function renderTablero(){
     : "Es la primera vez que abres el tablero: desde aquí empiezo a contar.";
 
   pintaAccesos(); pintaAnillos(); pintaMio(); pintaTip();
+  aplicaVistaInicio();
 
   /* tiles */
   $("#tbTiles").innerHTML = pulsoDeHoy().map(t=>
@@ -7773,8 +8041,7 @@ function specPorArticulo(o){
       .map(t=>esc(t.talla||"—")+"/"+esc(t.color||"—")+": "+Math.round(num(t.cant))).join(" · ");
     const apps = (q.apps||[]).map(a=>{
       const t = cat.tecnicas.find(t=>t.id===a.tecnicaId);
-      const med = t && t.modo==="area" ? num(a.ancho)+"×"+num(a.alto)+" cm"
-                : t && t.modo==="tintas" ? (a.tintas||1)+" tinta(s)" : (a.puntadas||0)+" puntadas";
+      const med = medidaApp(a, t);
       return '<div><span class="tag">'+esc(a.ubic||"Ubicación")+'</span> <b>'+esc(t?t.nombre:"—")+'</b> · '+med+'</div>';
     }).join("");
     return (r.varios ? '<div class="opArtN">Artículo '+(i+1)+' de '+r.partes.length+'</div>' : '')+
@@ -8505,6 +8772,7 @@ function abreCheca(id){
 }
 function cierraCheca(){
   cierraCamara();
+  setTimeout(()=>{ if(typeof pintaAccesoReloj === "function") pintaAccesoReloj(); }, 0);
   $("#modalCheca").hidden = true;
   chQuien = null; chBlob = null; chTecleado = "";
 }
@@ -10088,7 +10356,8 @@ async function zipDisenos(folio, boton){
         const ext = (a.art.nombre.split(".").pop()||"png").toLowerCase();
         const t = cat.tecnicas.find(t=>t.id===a.tecnicaId);
         const med = t && t.modo==="area" ? num(a.ancho)+"x"+num(a.alto)+"cm"
-                  : t && t.modo==="tintas" ? (a.tintas||1)+"tintas" : (a.puntadas||0)+"pts";
+                  : t && t.modo==="tintas" ? (a.tintas||1)+"tintas"
+                  : t && t.modo==="tiempo" ? (a.minutos||0)+"min" : (a.puntadas||0)+"pts";
         zip.file(base + String(i).padStart(2,"0")+"-"+limpiaNombre(a.ubic||"ubicacion")+
                  "-"+limpiaNombre(t?t.nombre:"tecnica")+"-"+med+"."+ext, b);
       }catch(e){ fallaron++; }
@@ -10160,6 +10429,559 @@ $("#tab-pro").addEventListener("click", e=>{
   const z = e.target.closest("[data-prozip]");
   if(z){ zipDisenos(z.dataset.prozip, z); return; }
 });
+
+
+/* ---------- el catálogo grande: buscar, filtrar y pintar por partes ---------- */
+const CATQ_PAGINA = 50;
+let catqBusca = "", catqCat = "", catqTope = CATQ_PAGINA;
+
+/* El texto por el que se busca. Incluye el código aunque todavía no haya una
+   columna para él: el día que entre el lector de barras, ya está. */
+function catqTexto(a){
+  return ((a.nombre||"")+" "+(a.cat||"")+" "+(a.codigo||"")).toLowerCase();
+}
+function catqLista(){
+  const t = catqBusca.trim().toLowerCase();
+  const pedazos = t ? t.split(/\s+/) : [];
+  return (cat.articulos||[]).filter(a=>{
+    if(catqCat && (a.cat||"Otros") !== catqCat) return false;
+    if(!pedazos.length) return true;
+    const s = catqTexto(a);
+    return pedazos.every(p=> s.indexOf(p) >= 0);   /* todas las palabras, en cualquier orden */
+  });
+}
+function catqPintaFiltro(){
+  const s = $("#catqCat"); if(!s) return;
+  const cats = [...new Set((cat.articulos||[]).map(a=>a.cat||"Otros"))].sort();
+  const antes = catqCat;
+  s.innerHTML = '<option value="">Todas las categorías</option>' +
+    cats.map(c=>'<option value="'+esc(c)+'"'+(antes===c?" selected":"")+'>'+esc(c)+'</option>').join("");
+  s.value = antes;
+}
+function catqPintaPie(){
+  const pie = $("#catqPie"); if(!pie) return;
+  const hay = (cat.articulos||[]).length;
+  const fil = catqLista().length;
+  const ve  = Math.min(catqTope, fil);
+  const cuenta = $("#catqCuenta");
+  if(cuenta) cuenta.textContent = (catqBusca || catqCat)
+    ? fil.toLocaleString("es-MX")+" de "+hay.toLocaleString("es-MX")
+    : hay.toLocaleString("es-MX")+" artículo(s)";
+  if(!fil){
+    pie.innerHTML = hay
+      ? '<div class="empty">Ningún artículo coincide. Borra el filtro para ver los '+hay.toLocaleString("es-MX")+'.</div>'
+      : '<div class="empty">El catálogo está vacío. Presiona <b>+ Artículo</b>.</div>';
+    return;
+  }
+  pie.innerHTML = ve < fil
+    ? '<span>Mostrando '+ve.toLocaleString("es-MX")+' de '+fil.toLocaleString("es-MX")+'</span>'+
+      '<button class="btn sm" id="catqMas">Ver '+Math.min(CATQ_PAGINA, fil-ve)+' más</button>'+
+      '<button class="btn sm ghost" id="catqTodos">Ver todos</button>'
+    : '<span>'+fil.toLocaleString("es-MX")+' artículo(s)'+(fil===hay ? "" : " de "+hay.toLocaleString("es-MX"))+'</span>';
+}
+
+/* ---------- un material por aplicación, no uno por técnica ---------- */
+/* Todos los rollos amarrados a una técnica, no nada más el primero. */
+function svcsParaTecnica(tecnicaId){
+  if(!tecnicaId) return [];
+  /* Un rollo sólo tiene sentido cuando se cobra por área: una técnica por
+     tinta, por puntada o por minuto de máquina no gasta metros de nada. Sin
+     esta guarda, una técnica por tiempo entraba al armado y el armado le
+     borraba los minutos para cobrarle sólo mano de obra. */
+  const t = (cat.tecnicas||[]).find(x=>x.id === tecnicaId);
+  if(!t || t.modo !== "area") return [];
+  return normalizaCat().filter(s=> s.tecnicaId && s.tecnicaId === tecnicaId);
+}
+/* El que escogió esta aplicación. Sin elección, el primero: así una
+   cotización vieja sigue costando exactamente lo que costaba. */
+function svcDeApp(a){
+  if(!a) return null;
+  const lista = svcsParaTecnica(a.tecnicaId);
+  if(!lista.length) return null;
+  return (a.matId && lista.find(s=>s.id === a.matId)) || lista[0];
+}
+function etiquetaRollo(s){
+  return s.nombre + " · " + num(s.ancho) + " cm · " + mx(num(s.precio)) + "/" + abrevUnidad(s.unidad);
+}
+/* El menú de anchos de una aplicación. Con un solo rollo se enseña igual,
+   pero apagado: así se ve cuál se está usando y que se puede agregar otro. */
+function selectorRollo(a){
+  const lista = svcsParaTecnica(a.tecnicaId);
+  if(!lista.length) return "";
+  const sel = svcDeApp(a) || lista[0];
+  return '<div class="appRollo">'+
+    '<label class="f" for="rollo_'+esc(a.id)+'">Material y ancho</label>'+
+    '<div class="appRolloFila">'+
+      '<select id="rollo_'+esc(a.id)+'" data-k="matId">'+
+        lista.map(s=>'<option value="'+esc(s.id)+'"'+(s.id===sel.id?" selected":"")+'>'+esc(etiquetaRollo(s))+'</option>').join("")+
+      '</select>'+
+      '<button type="button" class="btn sm" data-nuevorollo="'+esc(a.id)+'" title="Dar de alta otro ancho para esta técnica">+ Ancho</button>'+
+    '</div></div>';
+}
+
+/* ---------- alta rápida de un rollo ---------- */
+let rolloPara = null;
+function abreRollo(appId){
+  const a = cot.apps.find(x=>x.id===appId); if(!a) return;
+  const t = cat.tecnicas.find(t=>t.id===a.tecnicaId);
+  if(!t){ toast("Primero escoge la técnica"); return; }
+  rolloPara = appId;
+  const base = svcDeApp(a);
+  $("#ro_nombre").value = "";
+  $("#ro_ancho").value  = base ? num(base.ancho) : 110;
+  $("#ro_unidad").value = base ? (base.unidad||"ml") : "ml";
+  $("#ro_cat").value    = base ? (base.cat||"Maquila") : "Maquila";
+  $("#ro_costo").value  = "";
+  $("#ro_precio").value = "";
+  $("#ro_minimo").value = base ? num(base.minimo,1) : 1;
+  $("#ro_sep").value    = base ? num(base.separacion,0.5) : 0.5;
+  $("#ro_orilla").value = base ? num(base.orilla,1) : 1;
+  $("#modalRollo").hidden = false;
+  setTimeout(()=>{ const n = $("#ro_nombre"); if(n) n.focus(); }, 60);
+}
+function guardaRollo(){
+  const a = cot.apps.find(x=>x.id===rolloPara); if(!a) return;
+  const nombre = ($("#ro_nombre").value||"").trim();
+  const ancho  = num($("#ro_ancho").value);
+  const costo  = num($("#ro_costo").value);
+  if(!nombre){ toast("Ponle nombre al material"); return; }
+  if(ancho <= 0){ toast("El ancho tiene que ser mayor que cero"); return; }
+  if(costo <= 0){ toast("Escribe lo que te cuesta: sin eso no hay costo de producción"); return; }
+  const s = {id:uid(), nombre, cat:($("#ro_cat").value||"Maquila").trim(),
+             tecnicaId: a.tecnicaId, unidad: $("#ro_unidad").value,
+             ancho, costo, precio: num($("#ro_precio").value),
+             minimo: num($("#ro_minimo").value,1), incremento: $("#ro_unidad").value==="m2" ? 0.25 : 0.1,
+             separacion: num($("#ro_sep").value,0.5), orilla: num($("#ro_orilla").value,1), gramaje:0};
+  cat.servicios = cat.servicios || [];
+  cat.servicios.push(s);
+  a.matId = s.id;
+  persist();
+  $("#modalRollo").hidden = true; rolloPara = null;
+  if(!$("#tab-cat").hidden) renderCatalogo();
+  renderApps(); renderResumen();
+  toast("Alta de " + nombre + " · ya quedó escogido en esta aplicación");
+}
+
+/* ---------- eventos del buscador del catálogo ---------- */
+$("#catqBusca").addEventListener("input", e=>{
+  catqBusca = e.target.value;
+  catqTope = CATQ_PAGINA;
+  clearTimeout(window._tcatq);
+  window._tcatq = setTimeout(()=>{ renderTabla("articulos"); catqPintaPie(); }, 160);
+});
+$("#catqCat").addEventListener("change", e=>{
+  catqCat = e.target.value; catqTope = CATQ_PAGINA;
+  renderTabla("articulos"); catqPintaPie();
+});
+$("#catqPie").addEventListener("click", e=>{
+  if(e.target.id === "catqMas"){ catqTope += CATQ_PAGINA; renderTabla("articulos"); catqPintaPie(); return; }
+  if(e.target.id === "catqTodos"){
+    const n = catqLista().length;
+    if(n > 600 && !confirm("Son "+n.toLocaleString("es-MX")+" artículos. Pintarlos todos puede tardar unos segundos. ¿Seguir?")) return;
+    catqTope = n; renderTabla("articulos"); catqPintaPie();
+  }
+});
+
+/* ---------- eventos del selector de rollo ---------- */
+$("#tab-cot").addEventListener("click", e=>{
+  const n = e.target.closest("[data-nuevorollo]");
+  if(n){ abreRollo(n.dataset.nuevorollo); return; }
+});
+$("#roCerrar").addEventListener("click", ()=>{ $("#modalRollo").hidden = true; rolloPara = null; });
+$("#modalRollo").addEventListener("click", e=>{ if(e.target.id === "modalRollo"){ $("#modalRollo").hidden = true; rolloPara = null; } });
+$("#roGuardar").addEventListener("click", guardaRollo);
+
+
+/* ====================== máquinas y costo por minuto ====================== */
+const TIPOS_MAQ = {
+  laserFibra: "Láser de fibra (grabado en metal)",
+  laserCo2:   "Láser de CO₂ (corte y grabado)",
+  bordado:    "Bordadora",
+  serigrafia: "Pulpo de serigrafía",
+  sublima:    "Plancha o prensa",
+  otra:       "Otra"
+};
+/* Arranque por oficio. Son promedios para no empezar en blanco; el taller los
+   cambia por los suyos y entonces sí son suyos. */
+const MAQ_EJEMPLO = {
+  laserFibra: {kw:0.6,  consumibles:2,  mantenimiento:4,  inversion:120000, vidaHoras:20000},
+  laserCo2:   {kw:1.5,  consumibles:28, mantenimiento:10, inversion:90000,  vidaHoras:8000},
+  bordado:    {kw:0.9,  consumibles:14, mantenimiento:9,  inversion:150000, vidaHoras:15000},
+  serigrafia: {kw:0.4,  consumibles:18, mantenimiento:5,  inversion:45000,  vidaHoras:10000},
+  sublima:    {kw:1.8,  consumibles:0,  mantenimiento:3,  inversion:12000,  vidaHoras:6000},
+  otra:       {kw:1,    consumibles:0,  mantenimiento:0,  inversion:0,      vidaHoras:10000}
+};
+const tarifaKwh = () => num(P.tarifaKwh, 4);
+function maquinas(){ cat.maquinas = cat.maquinas || []; return cat.maquinas; }
+function maqDe(id){ return maquinas().find(m=>m.id===id) || null; }
+
+/* Las cuatro piezas del costo por hora, cada una por separado para poder
+   enseñarlas: un número que no se puede desarmar no se puede discutir. */
+function desgloseMaq(m){
+  if(!m) return {luz:0, consumibles:0, mantenimiento:0, depreciacion:0, hora:0, minuto:0};
+  const luz = num(m.kw) * tarifaKwh();
+  const con = num(m.consumibles);
+  const man = num(m.mantenimiento);
+  const vid = Math.max(1, num(m.vidaHoras, 10000));
+  const dep = num(m.inversion) / vid;
+  const hora = luz + con + man + dep;
+  return {luz, consumibles:con, mantenimiento:man, depreciacion:dep, hora, minuto: hora/60};
+}
+const costoMinutoMaq = m => desgloseMaq(m).minuto;
+
+/* Cómo se mide una aplicación, en una sola función. Estaba escrito a mano en
+   tres pantallas distintas —producción, diseño y el nombre del archivo del
+   zip— y agregar un modo nuevo obligaba a acordarse de los tres. */
+function medidaApp(a, t){
+  if(!t) return "—";
+  if(t.modo === "area")   return num(a.ancho)+" × "+num(a.alto)+" cm";
+  if(t.modo === "tintas") return (a.tintas||1)+" tinta(s)";
+  if(t.modo === "tiempo") return (a.minutos||0)+" min de máquina";
+  return (a.puntadas||0)+" puntadas";
+}
+/* El costo del minuto de una técnica. Sin máquina amarrada vale cero y la
+   técnica lo dice: más vale un cero visible que un número inventado. */
+function costoMinutoTec(t){
+  if(!t || t.modo !== "tiempo") return 0;
+  return costoMinutoMaq(maqDe(t.maquinaId));
+}
+
+function nuevaMaquina(tipo){
+  const base = MAQ_EJEMPLO[tipo] || MAQ_EJEMPLO.otra;
+  return Object.assign({id:uid(), nombre:(TIPOS_MAQ[tipo]||"Máquina"), tipo}, base);
+}
+function renderMaquinas(){
+  const w = $("#maqLista"); if(!w) return;
+  const k = $("#p_kwh"); if(k && document.activeElement !== k) k.value = tarifaKwh();
+  const ms = maquinas();
+  if(!ms.length){
+    w.innerHTML = '<div class="empty">Sin máquinas. Presiona <b>+ Máquina</b> y escoge el tipo: trae números del oficio para arrancar.</div>';
+    return;
+  }
+  w.innerHTML = ms.map(m=>{
+    const d = desgloseMaq(m);
+    const campo = (f, et, paso, ayuda) =>
+      '<label class="maqCampo"><span>'+et+(ayuda? '<small>'+ayuda+'</small>' : '')+'</span>'+
+      '<input type="number" min="0" step="'+(paso||"0.5")+'" data-mf="'+f+'" value="'+(m[f]==null?"":m[f])+'"></label>';
+    return '<div class="maqCard" data-maq="'+esc(m.id)+'">'+
+      '<div class="maqTop">'+
+        '<input class="maqNombre" data-mf="nombre" value="'+esc(m.nombre||"")+'" aria-label="Nombre de la máquina">'+
+        '<select data-mf="tipo" aria-label="Tipo de máquina">'+
+          Object.keys(TIPOS_MAQ).map(k2=>'<option value="'+k2+'"'+(m.tipo===k2?" selected":"")+'>'+TIPOS_MAQ[k2]+'</option>').join("")+
+        '</select>'+
+        '<button class="btn icon sm" data-delmaq="'+esc(m.id)+'" title="Quitar">✕</button>'+
+      '</div>'+
+      '<div class="maqRejilla">'+
+        campo("kw","Potencia (kW)","0.1","lo que jala prendida")+
+        campo("consumibles","Consumibles / hora ($)","1","tubo, lentes, gas, agujas, hilo")+
+        campo("mantenimiento","Mantenimiento / hora ($)","1","el servicio repartido")+
+        campo("inversion","Lo que te costó ($)","500","la máquina completa")+
+        campo("vidaHoras","Horas de vida","500","cuántas horas va a durar")+
+      '</div>'+
+      '<div class="maqResultado">'+
+        '<div class="maqSuma">'+
+          '<span>Luz<b>'+mx(d.luz)+'</b></span>'+
+          '<span>Consumibles<b>'+mx(d.consumibles)+'</b></span>'+
+          '<span>Mantenimiento<b>'+mx(d.mantenimiento)+'</b></span>'+
+          '<span>Depreciación<b>'+mx(d.depreciacion)+'</b></span>'+
+        '</div>'+
+        '<div class="maqTotal"><span>Costo por hora</span><b>'+mx(d.hora)+'</b>'+
+          '<span class="maqMin">por minuto <b>'+mx(d.minuto)+'</b></span></div>'+
+      '</div>'+
+      (num(m.inversion) && !num(m.vidaHoras)
+        ? '<div class="tecAviso">Pon las horas de vida o la depreciación no se reparte.</div>' : '')+
+    '</div>';
+  }).join("");
+}
+
+/* ---------- eventos de las máquinas ---------- */
+$("#maqNueva").addEventListener("click", ()=>{
+  maquinas().push(nuevaMaquina("laserCo2"));
+  persist(); renderMaquinas(); renderTecnicas();
+});
+$("#p_kwh").addEventListener("input", e=>{
+  P.tarifaKwh = num(e.target.value);
+  clearTimeout(window._tkwh);
+  window._tkwh = setTimeout(()=>{ persist(); renderMaquinas(); renderTecnicas(); refrescaCostos(); }, 400);
+});
+$("#maqLista").addEventListener("input", e=>{
+  const c = e.target.closest("[data-maq]"); if(!c) return;
+  const m = maqDe(c.dataset.maq); if(!m) return;
+  const f = e.target.dataset.mf; if(!f) return;
+  m[f] = f === "nombre" ? e.target.value : num(e.target.value);
+  clearTimeout(window._tmaq);
+  window._tmaq = setTimeout(()=>{ persist(); renderMaquinas(); renderTecnicas(); refrescaCostos(); }, 450);
+});
+$("#maqLista").addEventListener("change", e=>{
+  const c = e.target.closest("[data-maq]"); if(!c) return;
+  const m = maqDe(c.dataset.maq); if(!m) return;
+  if(e.target.dataset.mf === "tipo"){
+    /* Cambiar el tipo trae los números de ese oficio, pero sólo si la máquina
+       sigue como vino: lo que el taller ya capturó no se pisa. */
+    const viejo = MAQ_EJEMPLO[m.tipo] || {};
+    const sinTocar = Object.keys(viejo).every(k=> num(m[k]) === num(viejo[k]));
+    m.tipo = e.target.value;
+    if(sinTocar) Object.assign(m, MAQ_EJEMPLO[m.tipo] || {});
+    if(!m.nombre || Object.values(TIPOS_MAQ).indexOf(m.nombre) >= 0) m.nombre = TIPOS_MAQ[m.tipo];
+    persist(); renderMaquinas(); renderTecnicas(); refrescaCostos();
+  }
+});
+$("#maqLista").addEventListener("click", e=>{
+  const d = e.target.closest("[data-delmaq]"); if(!d) return;
+  const m = maqDe(d.dataset.delmaq); if(!m) return;
+  const usan = (cat.tecnicas||[]).filter(t=>t.maquinaId === m.id);
+  if(usan.length && !confirm("«"+(m.nombre||"Esta máquina")+"» la usan "+usan.length+" técnica(s): "+
+      usan.map(t=>t.nombre).join(", ")+". Si la quitas, esas técnicas se quedan en cero. ¿Seguir?")) return;
+  cat.maquinas = maquinas().filter(x=>x.id!==m.id);
+  persist(); renderMaquinas(); renderTecnicas(); refrescaCostos();
+});
+
+
+/* ====================== el lanzador de aplicaciones ====================== */
+/* Un color por sección. No son colores de gráfica —no codifican un valor—,
+   son señas para encontrar el azulejo sin leer. Cada uno va de todos modos
+   con su nombre debajo. */
+const COLOR_APP = {
+  inicio:"#22D3EE", cot:"#D6127F", sav:"#A855F7", cli:"#3B82F6", arc:"#0EA5E9",
+  dis:"#EC4899",    pro:"#F59E0B", inv:"#14B8A6", com:"#8B5CF6",
+  caj:"#22C55E",    ven:"#10B981", asi:"#F97316", nom:"#EAB308",
+  cat:"#06B6D4",    calc:"#64748B", set:"#94A3B8"
+};
+/* El orden del lanzador: como se usa, no como está el menú. Lo de todos los
+   días primero. */
+const ORDEN_APPS = ["cot","sav","pro","dis","inv","cli","caj","ven","com","arc","asi","nom","cat","calc","set"];
+
+/* Las etiquetas del lanzador son más cortas que las del tablero: debajo de un
+   icono no cabe un párrafo, y Ajustes ni siquiera tenía una. */
+const ET_APP = {
+  cot:["Cotizar","empieza una nueva"], sav:["Cotizaciones","guardadas y pedidos"],
+  cli:["Clientes","directorio"],       arc:["Archivo","papeles por cliente"],
+  dis:["Diseño","arte de cada pedido"],pro:["Producción","tablero de órdenes"],
+  inv:["Inventario","qué hay y qué falta"], com:["Compras","requisiciones"],
+  caj:["Caja","el corte del día"],     ven:["Ventas","cortes y utilidad"],
+  asi:["Asistencia","reloj checador"], nom:["Nómina","lo que se paga"],
+  cat:["Catálogo","artículos y precios"], calc:["Calculadora","costo de producción"],
+  set:["Ajustes","equipo y tu negocio"]
+};
+
+function appsDelRol(){
+  return ORDEN_APPS.filter(t=>{
+    if(!puedeVer(t)) return false;
+    if(t === "cot" && typeof puedeCotizar === "function" && !puedeCotizar()) return false;
+    return true;
+  });
+}
+function vistaInicio(){
+  try{ return localStorage.getItem("cotizador_inicio") === "apps" ? "apps" : "tablero"; }
+  catch(e){ return "tablero"; }
+}
+function ponVistaInicio(v){
+  try{ localStorage.setItem("cotizador_inicio", v); }catch(e){}
+  aplicaVistaInicio();
+}
+/* Los bloques del tablero de siempre. El lanzador no los borra: los esconde,
+   y el botón los devuelve. */
+const BLOQUES_TABLERO = ["#tbAccesos","#tbTiles","#tbAnillos",".tbCols2",".tbCols"];
+function aplicaVistaInicio(){
+  const v = vistaInicio();
+  const lz = $("#lanzador"); if(!lz) return;
+  lz.hidden = v !== "apps";
+  BLOQUES_TABLERO.forEach(s=> document.querySelectorAll("#tab-inicio "+s).forEach(el=> el.hidden = v === "apps"));
+  const seg = $("#inVista");
+  if(seg) [...seg.children].forEach(b=> b.setAttribute("aria-pressed", b.dataset.inv === v));
+  if(v === "apps") pintaLanzador();
+}
+function pintaLanzador(){
+  const lz = $("#lanzador"); if(!lz) return;
+  lz.innerHTML = appsDelRol().map(t=>{
+    const et = ET_APP[t] || (typeof ACCESOS_ET === "object" && ACCESOS_ET[t]) || [t, ""];
+    const d = datoAcceso(t);
+    const c = COLOR_APP[t] || "#64748B";
+    const pide = d.tono === "mal" || d.tono === "aviso";
+    /* Una cifra larga —«$12,000.00», «Cerrada»— no cabe de globito en la
+       esquina: se encima con el icono de al lado. Sólo se pega arriba lo que
+       de verdad es corto; lo demás baja al renglón de abajo, donde sí cabe. */
+    const dato = (d.n === "" || d.n === undefined) ? "" : String(d.n);
+    const corto = dato && dato.length <= 4;
+    const sub = (dato && !corto ? dato + " · " : "") + (d.et || et[1] || "");
+    return '<button class="lzApp'+(pide? " pide" : "")+'" data-tbtab="'+esc(t)+'" '+
+      'title="'+esc(et[0]+(et[1]? " — "+et[1] : ""))+'" style="--lzc:'+c+'">'+
+      '<span class="lzIco">'+icoSeccion(t)+
+        (corto ? '<i class="lzN'+(pide? " pide":"")+'">'+esc(dato)+'</i>' : '')+
+      '</span>'+
+      '<span class="lzEt">'+esc(et[0])+'</span>'+
+      '<span class="lzSub">'+esc(sub)+'</span>'+
+    '</button>';
+  }).join("") || '<div class="empty">Tu usuario no tiene ninguna sección abierta todavía.</div>';
+}
+
+/* ---------- eventos del lanzador ---------- */
+$("#inVista").addEventListener("click", e=>{
+  const b = e.target.closest("[data-inv]"); if(!b) return;
+  ponVistaInicio(b.dataset.inv);
+});
+
+
+/* ====================== tutorial guiado ====================== */
+/* Cada paso: a qué sección hay que ir, qué se enciende, y la UNA idea que
+   deja. Si `sel` no está en pantalla, el paso se brinca. */
+const PASOS_TOUR = [
+  {tab:"inicio", sel:"", tit:"Bienvenido",
+   txt:"En dos minutos te enseño el camino completo de un trabajo: cotizarlo, confirmarlo, producirlo y cobrarlo. Puedes salirte cuando quieras con la ✕, y volver a verlo desde el botón de Ayuda."},
+
+  {tab:"inicio", sel:"#tabs", tit:"Todo está aquí",
+   txt:"El menú agrupa por áreas: lo Comercial, lo de Producción, la Administración, el Personal y el Taller. Tocar el nombre de un grupo abre su portada, con todo lo que trae adentro."},
+
+  {tab:"inicio", sel:"#inVista", tit:"Tu pantalla de inicio",
+   txt:"Dos vistas del mismo Inicio: el Tablero, con lo que urge y tus números del día, o las Aplicaciones, la rejilla de iconos. La que escojas se queda puesta."},
+
+  {tab:"cot", sel:'[data-paso="cliente"]', tit:"1 · De quién es el trabajo",
+   txt:"Cada cotización empieza con el cliente. El folio se pone solo y ya no se cambia: es el número con el que vas a encontrar este trabajo en todos lados."},
+
+  {tab:"cot", sel:'[data-paso="articulo"]', tit:"2 · Qué le vas a vender",
+   txt:"Escoges el artículo del catálogo y el costo entra solo. Si el trabajo lleva varios artículos —playeras y gorras en el mismo pedido—, el botón «+ Otro artículo» los agrega y cada uno lleva su cuenta."},
+
+  {tab:"cot", sel:'[data-paso="apps"]', tit:"3 · Cómo se va a estampar",
+   txt:"Aquí van las aplicaciones: la ubicación, la técnica y el tamaño. Si la técnica usa rollo, escoges el ancho y el cotizador calcula cuánto material se gasta de verdad, con su acomodo y su merma. Si se cobra por tiempo de máquina, pones los minutos."},
+
+  {tab:"cot", sel:"#r_break", tit:"4 · Lo que de verdad te deja",
+   txt:"Esta columna es el corazón del cotizador: lo que te cuesta producirlo, a cómo lo vendes y cuánto te queda. Si alguna vez el precio queda abajo del costo, te lo avisa en rojo antes de que lo mandes."},
+
+  {tab:"cot", sel:"#btnSave", tit:"5 · Guardar y confirmar",
+   txt:"Guardar la deja esperando respuesta del cliente. Confirmar pedido la vuelve orden de producción, le baja el material al inventario y la manda al taller. Desde aquí también se imprime, se envía por WhatsApp y se cobra."},
+
+  {tab:"pro", sel:"#proLista", tit:"El taller",
+   txt:"Cada orden avanza de estatus y deja su bitácora: quién la movió, cuándo y por qué. Lo vencido se pinta en rojo solo, para que no haya que ir a buscarlo."},
+
+  {tab:"dis", sel:"#disLista", tit:"Diseño libera, producción imprime",
+   txt:"El diseñador sube el arte, lo palomea y libera la orden. Hasta entonces producción no ve «archivos confirmados». Si después cambia un archivo, la liberación se cae sola y el taller se entera."},
+
+  {tab:"ven", sel:"#venKpis", tit:"El dinero",
+   txt:"Lo que vendiste, lo que te queda, lo que falta por cobrar y las comisiones de cada vendedor. La Caja de al lado lleva el corte del día, movimiento por movimiento."},
+
+  {tab:"cat", sel:"#t_articulos", tit:"Los precios son tuyos",
+   txt:"Todo sale de aquí: artículos, técnicas, máquinas y sus costos. Cámbialos por los tuyos el primer día —sobre todo tu tarifa de luz y lo que te costó cada máquina— y el cotizador empieza a costear de verdad."},
+
+  {tab:"inicio", sel:"#ayudaBtn", tit:"Y si te atoras",
+   txt:"Este botón sabe en qué pantalla estás y te contesta sobre ella. Si no encuentras la respuesta, desde ahí mismo le escribes a soporte y la respuesta te llega aquí. Ya está: ponle precio a tu primer trabajo."}
+];
+
+let tourI = -1, tourPasos = [];
+const tourVisto = () => { try{ return localStorage.getItem("cotizador_tour") === "1"; }catch(e){ return true; } };
+function marcaTourVisto(){ try{ localStorage.setItem("cotizador_tour","1"); }catch(e){} }
+
+function abreTour(){
+  /* Si todavía no entra nadie, el tutorial no tiene a quién enseñarle nada
+     —y taparía la pantalla de acceso—. */
+  const puerta = $("#acceso");
+  if(puerta && !puerta.hidden) return;
+  tourPasos = PASOS_TOUR.filter(p=> !p.tab || p.tab === "inicio" || puedeVer(p.tab));
+  if(!tourPasos.length) return;
+  tourI = -1;
+  $("#tourCapa").hidden = false;
+  document.body.classList.add("conTour");
+  siguienteTour(1);
+}
+function cierraTour(){
+  $("#tourCapa").hidden = true;
+  document.body.classList.remove("conTour");
+  marcaTourVisto();
+  tourI = -1;
+}
+/* Avanza saltándose los pasos cuyo objetivo no está en pantalla: más vale
+   brincar uno que encender un hueco. */
+function siguienteTour(dir){
+  let i = tourI + dir;
+  while(i >= 0 && i < tourPasos.length){
+    if(pintaPasoTour(i)) { tourI = i; return; }
+    i += dir;
+  }
+  if(i >= tourPasos.length) cierraTour();
+  else if(i < 0) pintaPasoTour(tourI);
+}
+function pintaPasoTour(i){
+  const p = tourPasos[i]; if(!p) return false;
+  if(p.tab){
+    const b = document.querySelector('#tabs [data-tab="'+p.tab+'"]');
+    if(b && !b.hidden && b.getAttribute("aria-selected") !== "true") b.click();
+  }
+  const el = p.sel ? document.querySelector(p.sel) : null;
+  if(p.sel && (!el || !el.getBoundingClientRect().width)) return false;
+
+  $("#tourNum").textContent = "Paso " + (i+1) + " de " + tourPasos.length;
+  $("#tourTit").textContent = p.tit;
+  $("#tourTxt").textContent = p.txt;
+  $("#tourAtras").disabled = i === 0;
+  $("#tourSig").textContent = i === tourPasos.length-1 ? "Listo" : "Siguiente";
+  $("#tourPuntos").innerHTML = tourPasos.map((_,k)=>'<i'+(k===i?' class="hoy"':'')+'></i>').join("");
+  colocaTour(el);
+  return true;
+}
+/* El foco es un recuadro con una sombra enorme alrededor: lo de adentro se ve
+   normal y todo lo demás queda apagado, sin tener que tocar el resto. */
+function colocaTour(el){
+  const foco = $("#tourFoco"), card = $("#tourCard");
+  if(!el){
+    foco.style.cssText = "width:0;height:0;left:50%;top:50%";
+    card.style.left = "50%"; card.style.top = "50%";
+    card.style.transform = "translate(-50%,-50%)";
+    return;
+  }
+  try{ el.scrollIntoView({behavior:"instant", block:"center"}); }catch(e){ el.scrollIntoView(); }
+  const r = el.getBoundingClientRect(), m = 8;
+  foco.style.cssText = "left:"+(r.left-m)+"px;top:"+(r.top-m)+"px;"+
+    "width:"+(r.width+m*2)+"px;height:"+(r.height+m*2)+"px";
+  card.style.transform = "none";
+  const ancho = Math.min(360, window.innerWidth - 24);
+  const abajo = window.innerHeight - r.bottom > 260;
+  card.style.top  = (abajo ? r.bottom + 16 : Math.max(12, r.top - 252)) + "px";
+  card.style.left = Math.min(Math.max(12, r.left), window.innerWidth - ancho - 12) + "px";
+}
+/* La primera vez, cuando todavía no hay ni una cotización guardada. */
+function tourSiEsNuevo(){
+  if(tourVisto()) return;
+  /* Con la pantalla de acceso abierta se espera: el tutorial arranca cuando
+     la persona ya entró, no antes. */
+  const puerta = $("#acceso");
+  if(puerta && !puerta.hidden){ setTimeout(tourSiEsNuevo, 1500); return; }
+  const nuevo = typeof esPrimeraVez === "function" ? esPrimeraVez() : !(guardadas||[]).length;
+  if(!nuevo){ marcaTourVisto(); return; }
+  setTimeout(()=>{ if(!tourVisto()) abreTour(); }, 1200);
+}
+
+/* ---------- eventos del tutorial ---------- */
+$("#tourSig").addEventListener("click", ()=> siguienteTour(1));
+$("#tourAtras").addEventListener("click", ()=> siguienteTour(-1));
+$("#tourSalir").addEventListener("click", cierraTour);
+$("#tourCapa").addEventListener("click", e=>{ if(e.target.id === "tourCapa") cierraTour(); });
+document.addEventListener("keydown", e=>{
+  const c = $("#tourCapa"); if(!c || c.hidden) return;
+  if(e.key === "Escape"){ e.preventDefault(); cierraTour(); }
+  if(e.key === "ArrowRight" || e.key === "Enter"){ e.preventDefault(); siguienteTour(1); }
+  if(e.key === "ArrowLeft"){ e.preventDefault(); siguienteTour(-1); }
+});
+window.addEventListener("resize", ()=>{
+  const c = $("#tourCapa"); if(!c || c.hidden || tourI < 0) return;
+  const p = tourPasos[tourI];
+  colocaTour(p && p.sel ? document.querySelector(p.sel) : null);
+});
+$("#ayudaCuerpo").addEventListener("click", e=>{
+  if(e.target.closest("#ayudaTour")){ $("#ayudaPanel").hidden = true; abreTour(); }
+});
+
+/* ---------- el nombre del producto, en un solo lugar ---------- */
+/* Makers OS es la plataforma; cada giro es una edición encima. Cambiar de
+   edición es cambiar estas tres líneas, no ocho lugares del archivo. */
+const PRODUCTO = window.PRODUCTO = {
+  plataforma: "Makers OS",
+  edicion:    "Taller Makers",
+  giro:       "Imprenta, serigrafía y artículos personalizados"
+};
+function aplicaProducto(){
+  try{ document.title = PRODUCTO.edicion; }catch(e){}
+  const b = $("#brandProducto"); if(b) b.textContent = PRODUCTO.edicion;
+}
+aplicaProducto();
 
 /* ---------- eventos del armado ---------- */
 $("#armadoTab").addEventListener("click", ()=>abreArmado(true));
@@ -10365,6 +11187,9 @@ $("#tab-set").addEventListener("change", e=>{
   if(t.id==="p_origen"){ P.origen=t.value; renderSet(); renderApps(); }
   if(t.id==="p_redondeo") P.redondeo=num(t.value);
   if(t.id==="p_comisionBase"){ P.comisionBase = t.value; if(!$("#tab-ven").hidden) renderVentas(); }
+  if(t.id==="p_bloqueo"){ P.bloqueoMin = num(t.value); reiniciaInactividad();
+    toast(num(t.value) ? "Se bloqueará a los " + num(t.value) + " min sin usarlo"
+                       : "Ya no se bloquea solo"); }
   if(t.id==="p_ivaOn") P.ivaOn=t.checked;
   if(t.id==="e_regimen"){ empresaFiscal(); P.empresa.regimen=t.value; }
   if(t.id==="e_pac"){ empresaFiscal(); P.empresa.pac=t.value; notaPac(); }
@@ -11481,8 +12306,7 @@ function renderDiseno(){
       '</div>'+
       '<div class="disApps">'+ (o.apps||[]).map(a=>{
         const t = cat.tecnicas.find(t=>t.id===a.tecnicaId);
-        const med = t && t.modo==="area" ? num(a.ancho)+" × "+num(a.alto)+" cm"
-                  : t && t.modo==="tintas" ? (a.tintas||1)+" tinta(s)" : (a.puntadas||0)+" puntadas";
+        const med = medidaApp(a, t);
         const img = a.art && (a.art.tipo||"").indexOf("image")===0;
         return '<div class="disApp">'+
           '<div class="cab"><span class="tag">'+esc(a.ubic||"Ubicación")+'</span>'+
@@ -11630,7 +12454,7 @@ function renderProduccion(){
     const piezas = (o.tallas && o.tallas.length) ? sumaTallas(o) : Math.round(num(o.cantidad,1));
     const apps = (o.apps||[]).map(a=>{
       const t = cat.tecnicas.find(t=>t.id===a.tecnicaId);
-      const med = t && t.modo==="area" ? num(a.ancho)+"×"+num(a.alto)+" cm" : t && t.modo==="tintas" ? (a.tintas||1)+" tinta(s)" : (a.puntadas||0)+" puntadas";
+      const med = medidaApp(a, t);
       return '<div><span class="tag">'+esc(a.ubic||"Ubicación")+'</span> <b>'+esc(t?t.nombre:"—")+'</b> · '+med+'</div>';
     }).join("");
     const tallas = (o.tallas||[]).filter(t=>num(t.cant)>0)
@@ -11735,9 +12559,73 @@ function recuerdaSesion(id, horas){
 }
 function olvidaSesion(){ try{ localStorage.removeItem(LS_SESION); }catch(e){} }
 
+/* ---------- se bloquea solo cuando nadie lo toca ---------- */
+var bloqueado = false, relojInactivo = null;
+const MIN_BLOQUEO = 10;
+
+function minutosBloqueo(){ const n = num(P && P.bloqueoMin, MIN_BLOQUEO); return n > 0 ? n : 0; }
+
+/* Sin clave no hay con qué desbloquear: bloquear a alguien así sería
+   dejarlo afuera de su propio taller. */
+function puedeBloquear(){
+  if(!minutosBloqueo()) return false;
+  const u = usuarioActual();
+  return !!(u && String(u.pin||"").trim());
+}
+
+function reiniciaInactividad(){
+  clearTimeout(relojInactivo);
+  if(bloqueado || !puedeBloquear()) return;
+  relojInactivo = setTimeout(bloqueaPantalla, minutosBloqueo()*60000);
+}
+
+function bloqueaPantalla(){
+  if(bloqueado) return;
+  const puerta = $("#acceso"); if(!puerta || !puerta.hidden) return;
+  if(!puedeBloquear()) return;
+  if(typeof cierraTour === "function") cierraTour();
+  pideAcceso({bloqueo:true});
+}
+
+["pointerdown","keydown","wheel","touchstart","focusin"].forEach(ev=>
+  document.addEventListener(ev, reiniciaInactividad, {passive:true, capture:true}));
+
+/* El botón de checar vive en la puerta: se entra y se sale del turno sin
+   tener que desbloquear primero. */
+function pintaAccesoReloj(){
+  const caja = $("#accesoReloj"); if(!caja) return;
+  const u = bloqueado ? usuarioActual()
+                      : (perfilPendiente ? equipo.find(x=>x.id===perfilPendiente) : null);
+  if(!u || !String(u.pin||"").trim() || typeof estaDentro !== "function"){ caja.hidden = true; return; }
+  const dentro = estaDentro(u.id), min = minutosDia(u.id, hoyISO());
+  const est = $("#accesoRelojEstado");
+  if(est) est.textContent = dentro
+    ? "Entraste a las " + turnosDe(u.id, hoyISO()).slice(-1)[0].entrada.hora + " · llevas " + horasTxt(desdeHace(u.id))
+    : (min ? "Hoy trabajaste " + horasTxt(min) + " · estás fuera" : "Todavía no checas hoy");
+  const b = $("#accesoCheca");
+  b.textContent = dentro ? "Terminar jornada" : "Checar entrada";
+  b.className = "btn" + (dentro ? "" : " primary");
+  b.dataset.quien = u.id;
+  b.dataset.dentro = dentro ? "1" : "";
+  caja.hidden = false;
+}
+
 let perfilPendiente = null;
-function pideAcceso(){
-  const activos = equipo.filter(u=>u.activo!==false);
+function pideAcceso(opc){
+  const bloq = !!(opc && opc.bloqueo);
+  bloqueado = bloq;
+  let activos = equipo.filter(u=>u.activo!==false);
+  /* Sin nadie activo, la pantalla pedía escoger un perfil de una lista vacía:
+     no había cómo entrar ni cómo arreglarlo desde adentro. */
+  if(!activos.length){
+    if(!equipo.length) equipo = equipoPorDefecto();
+    equipo[0].activo = true;
+    activos = [equipo[0]];
+    guardaEquipo();
+    setTimeout(()=>{ if(typeof toast === "function")
+      toast("No había ningún usuario activo. Reactivé a " + (equipo[0].nombre||"el primero") +
+            " para que puedas entrar; revisa el equipo en Ajustes."); }, 900);
+  }
   $("#accesoPerfiles").innerHTML = activos.map(u=>
     '<button class="perfilBtn" data-perfil="'+u.id+'">'+
       '<span class="av av-'+esc(u.rol||"ventas")+'">'+esc((u.nombre||"?").charAt(0).toUpperCase())+'</span>'+
@@ -11745,11 +12633,43 @@ function pideAcceso(){
       '<span class="cand">'+(u.pin? "🔒" : "")+'</span></button>').join("");
   $("#accesoClave").hidden = true; perfilPendiente = null;
   const al = $("#accesoLogo"); if(al) al.src = logoSrc();
-  const at = $("#accesoTitulo"); if(at && window.CONFIG) at.textContent = "¿Quién va a trabajar en " + CONFIG.MARCA + "?";
+
+  const at = $("#accesoTitulo"), sub = $("#accesoSub"), otro = $("#accesoOtro");
+  if(bloq){
+    /* Ya sabemos quién es: no se vuelve a escoger perfil, se teclea la clave. */
+    const yo = usuarioActual();
+    if(at)  at.textContent  = "Inserta tu código o PIN";
+    if(sub) sub.textContent = "Se bloqueó solo por inactividad. Escribe tu clave para seguir donde te quedaste.";
+    $("#accesoPerfiles").hidden = true;
+    perfilPendiente = yo.id;
+    $("#accesoQuien").textContent = yo.nombre || "ti";
+    $("#accesoPass").value = ""; $("#accesoError").hidden = true;
+    $("#accesoClave").hidden = false;
+    /* No es un inicio de sesión nuevo: ni "Volver" a una lista que no se
+       enseña, ni volver a preguntar si recordamos a quien ya estaba. */
+    const vol = $("#accesoVolver"); if(vol) vol.hidden = true;
+    const rec = $("#accesoRecordarFila"); if(rec) rec.hidden = true;
+    if(otro) otro.hidden = false;
+  }else{
+    if(at)  at.textContent  = window.CONFIG ? "¿Quién va a trabajar en " + CONFIG.MARCA + "?"
+                                            : "¿Quién va a trabajar?";
+    if(sub) sub.textContent = "Elige tu perfil. Cada quien ve solo lo de su área.";
+    $("#accesoPerfiles").hidden = false;
+    const vol = $("#accesoVolver"); if(vol) vol.hidden = false;
+    const rec = $("#accesoRecordarFila"); if(rec) rec.hidden = false;
+    if(otro) otro.hidden = true;
+  }
+  pintaAccesoReloj();
   $("#acceso").hidden = false;
   document.body.classList.add("sin-acceso");
+  if(bloq) setTimeout(()=>{ const p = $("#accesoPass"); if(p) p.focus(); }, 60);
 }
-function cierraAcceso(){ $("#acceso").hidden = true; document.body.classList.remove("sin-acceso"); }
+function cierraAcceso(){
+  $("#acceso").hidden = true;
+  document.body.classList.remove("sin-acceso");
+  bloqueado = false;
+  reiniciaInactividad();
+}
 $("#accesoPerfiles").addEventListener("click", e=>{
   const b = e.target.closest("[data-perfil]"); if(!b) return;
   const u = equipo.find(u=>u.id===b.dataset.perfil); if(!u) return;
@@ -11768,7 +12688,23 @@ $("#accesoEntrar").addEventListener("click", ()=>{
   entraPerfil(u.id, $("#accesoRecordar").checked);
 });
 $("#accesoPass").addEventListener("keydown", e=>{ if(e.key==="Enter") $("#accesoEntrar").click(); });
-$("#accesoVolver").addEventListener("click", ()=>{ $("#accesoClave").hidden = true; perfilPendiente = null; });
+$("#accesoVolver").addEventListener("click", ()=>{
+  if(bloqueado){ pideAcceso({bloqueo:true}); return; }
+  $("#accesoClave").hidden = true; perfilPendiente = null; pintaAccesoReloj();
+});
+$("#accesoOtro").addEventListener("click", ()=>{
+  bloqueado = false; olvidaSesion(); pideAcceso();
+});
+$("#accesoCheca").addEventListener("click", ()=>{
+  const b = $("#accesoCheca"), u = equipo.find(x=>x.id===b.dataset.quien);
+  if(!u) return;
+  if(b.dataset.dentro){
+    if(!confirm("¿Terminar la jornada de " + (u.nombre||"") + "?\n\n" +
+                "Llevas " + horasTxt(desdeHace(u.id)) + " dentro. Se registra tu salida de las " +
+                horaAhora() + " con foto, y queda en tu asistencia.")) return;
+  }
+  abreCheca(u.id);
+});
 function entraPerfil(id, recordar){
   usuarioId = id;
   if(recordar) recuerdaSesion(id, 12); else olvidaSesion();
@@ -13301,7 +14237,9 @@ function arrancaEquipo(){
 function start(){
   const al = $("#authLogo"); if(al) al.src = LOGO_MARCA;
   const ad = $("#authDias"); if(ad && window.CONFIG) ad.textContent = CONFIG.DIAS_DE_PRUEBA;
-  const at = $("#authTitulo"); if(at && window.CONFIG) at.textContent = "Cotizador " + CONFIG.MARCA;
+  /* La edición es la que se lee en la puerta; la marca del taller ya va en el logo. */
+  const at = $("#authTitulo");
+  if(at && window.PRODUCTO) at.textContent = PRODUCTO.edicion;
   cot = nuevaCot(false);
   aplicaMarca();
   arrancaEquipo();
@@ -13334,6 +14272,7 @@ window.__arranca = () => initStore().then(async ()=>{
   if(typeof renderTablero === "function") renderTablero();   /* ya con datos */
   $("#catEstado").textContent = "Catálogo al día";
   arrancaAyuda();
+  tourSiEsNuevo();
   guardaFormReq();
   setTimeout(()=>{
     const a = conAviso();
@@ -14367,6 +15306,8 @@ function ayudaInicio() {
       '<button class="ayudaTema" data-ver="' + esc(t.id) + '"><b>Tu reporte: ' + esc(t.asunto) + '</b>' +
       '<small>' + esc(t.folio) + ' · ' + textoEstado(t) + '</small></button>').join("") : "") +
     (p.txt ? '<div class="ayudaAqui"><b>Estás en ' + esc(p.nombre) + '</b>' + esc(p.txt) + '</div>' : "") +
+    '<button class="ayudaTema" id="ayudaTour"><b>Ver el tutorial</b>' +
+      '<small>Dos minutos: el camino de un trabajo, de la cotización al cobro</small></button>' +
     '<h4>Lo que más preguntan</h4>' +
     PREGUNTAS.slice(0, 6).map((q, i) => '<button class="ayudaTema" data-preg="' + i + '"><b>' + esc(q.t) + '</b><small>' + esc(q.s) + '</small></button>').join("") +
     '<p style="margin-top:4px">¿No está aquí?</p>' +
@@ -14473,10 +15414,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261015-1334";</script>
+<script>window.BUILD="20261015-2336";</script>
 <script>
 (function(){
-  var mio = "20261015-1334";
+  var mio = "20261015-2336";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -14504,7 +15445,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261015-1334"></script>
-<script src="diagnostico.js?v=20261015-1334"></script>
+<script src="cuenta.js?v=20261015-2336"></script>
+<script src="diagnostico.js?v=20261015-2336"></script>
 </body>
 </html>
