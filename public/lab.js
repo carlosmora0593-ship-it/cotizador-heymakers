@@ -554,6 +554,40 @@ window.__labAnuncios = {
   }
 };
 
+/* ---------- los tips del tablero ----------
+   Mismo trato que los anuncios: tabla propia, sin cuenta, y del otro lado
+   las políticas sólo dejan escribir al staff del Lab. */
+window.__labTips = {
+  async lista(){
+    if(!SB) return [];
+    const {data, error} = await SB.from("v_tips").select("*");
+    if(error) throw error;
+    return (data||[]).map(t=>Object.assign({}, t, {
+      titulo: t.titulo || "", texto: t.texto || "", rol: t.rol || ""
+    }));
+  },
+  async guarda(t){
+    if(!SB) return null;
+    const fila = {
+      titulo: t.titulo || "", texto: t.texto || "",
+      rol: t.rol || "", activo: t.activo !== false,
+      orden: Number(t.orden) || 0
+    };
+    const esNuevo = String(t.id).indexOf("nuevo-") === 0;
+    const q = esNuevo
+      ? SB.from("tips").insert(fila).select("id").single()
+      : SB.from("tips").update(fila).eq("id", t.id).select("id").single();
+    const {data, error} = await q;
+    if(error) throw error;
+    return data;
+  },
+  async borra(id){
+    if(!SB || String(id).indexOf("nuevo-") === 0) return;
+    const {error} = await SB.from("tips").delete().eq("id", id);
+    if(error) throw error;
+  }
+};
+
 window.claude = { use: async nombre =>
   nombre === "db" ? {doc: refDoc, collection: refCol} :
   nombre === "downloads" ? PUENTE_DOWNLOADS :

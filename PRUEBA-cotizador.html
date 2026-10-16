@@ -417,6 +417,33 @@ nav.tabs button[aria-selected="true"] b{color:var(--accent)}
   background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:5px 12px;cursor:pointer;
   color:var(--ink);transition:border-color .15s}
 .userChip:hover{border-color:var(--accent)}
+.candadoBtn{display:grid;place-items:center;width:33px;height:33px;flex:none;cursor:pointer;
+  background:var(--surface);border:1px solid var(--line);border-radius:50%;color:var(--ink-2);
+  transition:border-color .15s,color .15s}
+.candadoBtn svg{width:16px;height:16px}
+.candadoBtn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ---------- claves del equipo ---------- */
+.clvLista{display:flex;flex-direction:column}
+.clvFila{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  padding:10px 2px;border-bottom:1px solid var(--line-soft)}
+.clvFila:last-child{border-bottom:0}
+.clvFila .av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;flex:none;
+  font-family:"Fredoka";font-size:12px;font-weight:600;background:var(--accent);color:var(--accent-ink)}
+.clvQ{display:grid;line-height:1.25;flex:1 1 150px;min-width:0}
+.clvQ b{font-family:"Fredoka";font-weight:500;font-size:13.5px}
+.clvQ small{color:var(--ink-3);font-size:11px}
+.clvTxt{font-size:12px;color:var(--ink-3);min-width:72px}
+.clvCampo{display:flex;gap:6px;align-items:center}
+.clvCampo input{width:140px}
+.interruptor{position:relative;width:44px;height:25px;flex:none;cursor:pointer;padding:0;
+  border:1px solid var(--line);border-radius:99px;background:var(--surface-2);
+  transition:background .18s,border-color .18s}
+.interruptor i{position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;
+  background:var(--ink-3);transition:transform .18s,background .18s}
+.interruptor.si{background:var(--good);border-color:var(--good)}
+.interruptor.si i{transform:translateX(19px);background:#fff}
+@media (max-width:560px){ .clvCampo{flex:1 1 100%} .clvCampo input{flex:1} }
 .userChip .av{width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-ink);
   display:grid;place-items:center;font-family:"Fredoka";font-size:11px;font-weight:600;flex:none}
 .userChip .rolTxt{color:var(--ink-3);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
@@ -1097,8 +1124,11 @@ nav.tabs::-webkit-scrollbar-track{background:transparent}
     max-height:calc(100vh - var(--menuTop,62px) - 16px);
     max-height:calc(100dvh - var(--menuTop,62px) - 16px)}
 }
-/* el encabezado del grupo no se pierde al recorrer */
-nav.tabs .barraGrupo{position:sticky;top:0;background:var(--surface);z-index:1}
+/* Los títulos de grupo iban pegados arriba, pero una regla posterior les
+   quitó el fondo y quedaron encimados sobre los renglones al recorrer el
+   menú. Un título que tapa lo que hay que leer estorba más de lo que ayuda:
+   son cinco en una lista corta, así que se quedan quietos. */
+nav.tabs .barraGrupo{position:static}
 
 body.conBarra{padding-left:var(--barra)}
 body.conBarra .menuWrap{display:none}
@@ -1295,6 +1325,7 @@ a.anunPieza:hover{opacity:1;border-color:var(--ink-3)}
 /* ---- las dos columnas ---- */
 .tbCols{display:grid;grid-template-columns:minmax(0,1.32fr) minmax(0,1fr);gap:14px;align-items:start}
 .tbLado{display:flex;flex-direction:column;gap:14px;min-width:0}
+.tbPila{display:flex;flex-direction:column;gap:14px;min-width:0}
 .tbPanel{min-width:0;border-radius:var(--radio,16px);
   background:var(--vidrio-fondo,var(--surface));border:1px solid var(--vidrio-borde,var(--line));
   box-shadow:var(--brillo),var(--sombra-flota)}
@@ -2148,6 +2179,15 @@ body.conTour{overflow:hidden}
       <span class="av" id="userAv">A</span>
       <span><span id="userNombre">Administrador</span> <span class="rolTxt" id="userRol">Admin</span></span>
     </button>
+    <button class="candadoBtn" id="btnBloquea" type="button"
+            title="Bloquear la pantalla" aria-label="Bloquear la pantalla">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/>
+        <path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/>
+        <circle cx="12" cy="15.4" r="1.1" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
     <span class="chip-store" id="storeChip">Cargando…</span>
   </div>
 </header>
@@ -2190,21 +2230,21 @@ body.conTour{overflow:hidden}
   <div class="tbAnillos" id="tbAnillos"></div>
 
   <div class="tbCols tbCols2">
-    <div class="tbPanel" id="tbPanelMio">
-      <header><h2>Lo tuyo</h2><span class="tbCuenta" id="tbMioCuenta"></span></header>
-      <div class="tbPanelBody"><div id="tbMio"></div></div>
+    <div class="tbPila">
+      <div class="tbPanel" id="tbPanelMio">
+        <header><h2>Lo tuyo</h2><span class="tbCuenta" id="tbMioCuenta"></span></header>
+        <div class="tbPanelBody"><div id="tbMio"></div></div>
+      </div>
+      <div class="tbPanel" id="tbCardPaso">
+        <header><h2>Mientras no estabas</h2><span class="tbDesde" id="tbDesde"></span></header>
+        <div class="tbPanelBody"><div id="tbPaso"></div></div>
+      </div>
     </div>
-    <div class="tbPanel tbPanelTip">
-      <header><h2>Tip del día</h2></header>
-      <div class="tbPanelBody"><div id="tbTip"></div></div>
-    </div>
-  </div>
-  <div class="tbCols">
-    <div class="tbPanel" id="tbCardPaso">
-      <header><h2>Mientras no estabas</h2><span class="tbDesde" id="tbDesde"></span></header>
-      <div class="tbPanelBody"><div id="tbPaso"></div></div>
-    </div>
-    <div class="tbLado">
+    <div class="tbPila">
+      <div class="tbPanel tbPanelTip">
+        <header><h2>Tip del día</h2></header>
+        <div class="tbPanelBody"><div id="tbTip"></div></div>
+      </div>
       <div class="tbPanel">
         <header><h2>Lo que urge</h2><span class="tbCuenta" id="tbUrgeCuenta"></span></header>
         <div class="tbPanelBody"><div id="tbUrge"></div></div>
@@ -2961,7 +3001,17 @@ body.conTour{overflow:hidden}
       <div class="tbl-wrap"><table id="t_equipo"></table></div>
         <p class="notaCostos"><b>Quién ve los costos.</b> El administrador siempre. A los demás los autorizas tú con la casilla <b>Ve costos</b>: sin ella ven precios, piezas y totales, pero ni el costo de producción ni la utilidad. El detalle aplicación por aplicación y el aviso de venta bajo costo son sólo del administrador. Ojo: esto <b>esconde</b> los números de la pantalla, no los cifra — quien sepa abrir las herramientas del navegador los puede encontrar.</p>
 
-      <div class="grid g3" style="margin-top:18px">
+    </div>
+  </div>
+  <div class="card" data-solo-admin>
+    <header><h2>Claves y bloqueo</h2><span class="hint">va incluido en todos los planes</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 6px">La clave de cada persona sirve para tres cosas: que nadie entre por
+        descuido a lo que no le toca, <b>checar su entrada y su salida</b> en el reloj, y volver a abrir la pantalla
+        cuando se bloquea sola. Prende el interruptor y escríbela; se la puedes poner a quien quieras.</p>
+      <div class="clvLista" id="clvLista"></div>
+
+      <div class="grid g3" style="margin-top:20px">
         <div>
           <label class="f" for="p_bloqueo">Bloquear la pantalla si nadie la toca</label>
           <select id="p_bloqueo">
@@ -2973,13 +3023,16 @@ body.conTour{overflow:hidden}
             <option value="60">A la hora</option>
           </select>
         </div>
-        <div style="align-self:end">
+        <div style="align-self:end;justify-self:start">
           <button class="btn" id="bloqueoProbar" type="button">Bloquear ahora</button>
         </div>
       </div>
       <p class="note" id="bloqueoNota" style="margin-top:10px"></p>
 
-      <p class="note" style="margin-top:14px;border-left-color:var(--warn)">La clave de cada persona sirve para dos cosas: que nadie entre por descuido a lo que no le toca, y <b>checar su entrada y su salida</b> en el reloj. Sin clave no puede checar. Eso sí, <b>no es una contraseña de verdad</b>: quien tenga el enlace de esta página puede cambiarse de usuario. Para bloquear accesos en serio, con su propio correo y contraseña, se usa la versión instalada en tu dominio.</p>
+      <p class="note" style="margin-top:14px;border-left-color:var(--warn)"><b>No es una contraseña de verdad</b>:
+        quien tenga el enlace de esta página puede cambiarse de usuario. Sirve contra el descuido, no contra alguien
+        decidido. Para bloquear accesos en serio, con su propio correo y contraseña, se usa la versión instalada en
+        tu dominio.</p>
     </div>
   </div>
   <div class="card">
@@ -5992,7 +6045,7 @@ function renderSet(){
   $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia; $("#p_plazoCobro").value=num(P.plazoCobro,15);
   const pcb = $("#p_comisionBase"); if(pcb) pcb.value = baseComision();
   const pbl = $("#p_bloqueo"); if(pbl) pbl.value = String(num(P.bloqueoMin, MIN_BLOQUEO));
-  pintaNotaBloqueo();
+  pintaNotaBloqueo(); renderClaves();
   P.compras = P.compras || {tope:2000, siempre:false};
   $("#p_compraTope").value = num(P.compras.tope); $("#p_compraSiempre").checked = !!P.compras.siempre;
   $("#p_origen").value = P.origen==="lista" ? "lista" : "utilidad";
@@ -9454,10 +9507,34 @@ const TIPS = [
   ["Una cotización vence", "La vigencia en Ajustes sale impresa en el documento. Sin fecha de vencimiento, el cliente de marzo te pide el precio de enero."],
   ["Revisa la utilidad, no el total", "Una cotización de cien mil con 8% de utilidad deja menos que una de treinta mil con 40%. El resumen te da las dos cifras."]
 ];
+/* Los tips de arriba son los de fábrica. Makers Lab puede mandar los suyos,
+   y entonces mandan esos — pero si la tabla no existe, no hay red o están
+   todos apagados, el tablero sigue enseñando uno de los de fábrica. Un
+   consejo que no carga no tiene por qué dejar un hueco. */
+let TIPS_LAB = [];
+
+async function cargaTipsLab(){
+  try{
+    if(typeof window.__tips !== "function") return;
+    const lista = await window.__tips();
+    TIPS_LAB = (lista||[]).filter(t=>t && t.titulo && t.texto);
+  }catch(e){ TIPS_LAB = []; }
+  if(TIPS_LAB.length && typeof pintaTip === "function") pintaTip();
+}
+
+/* Un tip con dueño es para ese rol; los de "Todos" los ve cualquiera. */
+function tipsDeMiRol(){
+  const r = rolActual();
+  const mios = TIPS_LAB.filter(t=> !t.rol || t.rol === r)
+    .sort((a,b)=> (Number(a.orden)||0)-(Number(b.orden)||0) || String(a.id).localeCompare(String(b.id)));
+  return mios.length ? mios.map(t=>[t.titulo, t.texto]) : TIPS;
+}
+
 function tipDeHoy(){
+  const lista = tipsDeMiRol();
   const d = new Date();
   const dia = Math.floor((d - new Date(d.getFullYear(),0,0)) / 86400000);
-  return TIPS[dia % TIPS.length];
+  return lista[dia % lista.length];
 }
 function pintaTip(){
   const w = $("#tbTip"); if(!w) return;
@@ -10351,7 +10428,7 @@ function ponVistaInicio(v){
 }
 /* Los bloques del tablero de siempre. El lanzador no los borra: los esconde,
    y el botón los devuelve. */
-const BLOQUES_TABLERO = ["#tbAccesos","#tbTiles","#tbAnillos",".tbCols2",".tbCols"];
+const BLOQUES_TABLERO = ["#tbAccesos","#tbTiles","#tbAnillos",".tbCols2"];
 function aplicaVistaInicio(){
   const v = vistaInicio();
   const lz = $("#lanzador"); if(!lz) return;
@@ -11300,11 +11377,10 @@ function aplicaRol(){
 }
 function renderEquipo(){
   const t = $("#t_equipo"); if(!t) return;
-  t.innerHTML = '<thead><tr><th>Nombre</th><th>Rol</th><th>Clave / PIN</th><th>Ve costos</th><th>Cotiza</th><th>Comisión %</th><th>Activo</th><th></th></tr></thead><tbody>'+
+  t.innerHTML = '<thead><tr><th>Nombre</th><th>Rol</th><th>Ve costos</th><th>Cotiza</th><th>Comisión %</th><th>Activo</th><th></th></tr></thead><tbody>'+
     equipo.map(u=>'<tr data-usr="'+u.id+'">'+
       '<td><input data-uk="nombre" value="'+esc(u.nombre)+'"></td>'+
       '<td><select data-uk="rol">'+Object.keys(ROLES).map(r=>'<option value="'+r+'"'+(r===u.rol?" selected":"")+'>'+ROLES[r].nombre+'</option>').join("")+'</select></td>'+
-      '<td><input data-uk="pin" inputmode="numeric" maxlength="24" value="'+esc(u.pin||"")+'" placeholder="sin contraseña"></td>'+
       celdaVeCostos(u)+ celdaCotiza(u)+ celdaComision(u)+
       '<td style="text-align:center"><input type="checkbox" data-uk="activo" style="width:auto"'+(u.activo!==false?" checked":"")+'></td>'+
       '<td><button class="btn icon sm" data-delusr="'+u.id+'"'+(equipo.length<2?" disabled":"")+'>✕</button></td></tr>').join("")+
@@ -11316,14 +11392,14 @@ async function guardaEquipo(){
 }
 $("#userNuevo").addEventListener("click", ()=>{
   equipo.push({id:uid(), nombre:"Nueva persona", rol:"ventas", pin:"", activo:true});
-  guardaEquipo(); renderEquipo();
+  guardaEquipo(); renderEquipo(); renderClaves();
 });
 $("#t_equipo").addEventListener("input", e=>{
   const tr = e.target.closest("[data-usr]"); if(!tr) return;
   const u = equipo.find(u=>u.id===tr.dataset.usr); if(!u) return;
   const k = e.target.dataset.uk; if(!k) return;
   u[k] = k==="pin" ? e.target.value.slice(0,24) : e.target.value;
-  clearTimeout(u._t); u._t = setTimeout(()=>{ guardaEquipo(); aplicaRol(); }, 600);
+  clearTimeout(u._t); u._t = setTimeout(()=>{ guardaEquipo(); aplicaRol(); renderClaves(); }, 600);
 });
 $("#t_equipo").addEventListener("change", e=>{
   const tr = e.target.closest("[data-usr]"); if(!tr) return;
@@ -11332,7 +11408,7 @@ $("#t_equipo").addEventListener("change", e=>{
   if(k==="activo") u.activo = e.target.checked;
   if(k==="veCostos") u.veCostos = e.target.checked;
   if(k==="cotiza")   u.cotiza   = e.target.checked;
-  if(k==="rol"){ u.rol = e.target.value; renderEquipo(); }
+  if(k==="rol"){ u.rol = e.target.value; renderEquipo(); renderClaves(); }
   guardaEquipo(); aplicaRol(); renderResumen();
 });
 $("#t_equipo").addEventListener("click", e=>{
@@ -11340,7 +11416,7 @@ $("#t_equipo").addEventListener("click", e=>{
   if(equipo.length<2) return;
   if(d.dataset.delusr === usuarioId){ toast("No puedes borrar al usuario con el que estás trabajando"); return; }
   equipo = equipo.filter(u=>u.id!==d.dataset.delusr);
-  guardaEquipo(); renderEquipo();
+  guardaEquipo(); renderEquipo(); renderClaves();
 });
 
 /* cambio de usuario */
@@ -11376,6 +11452,7 @@ $("#pinOk").addEventListener("click", ()=>{
 });
 $("#pinCampo").addEventListener("keydown", e=>{ if(e.key==="Enter") $("#pinOk").click(); });
 $("#pinCancel").addEventListener("click", ()=>{ $("#pinPide").hidden = true; pinPendiente = null; });
+$("#btnBloquea").addEventListener("click", ()=> bloqueaPantalla(true));
 $("#userBloquea").addEventListener("click", ()=>{
   $("#modalUser").hidden = true;
   bloqueaPantalla(true);
@@ -12169,6 +12246,76 @@ function bloqueaPantalla(aMano){
 /* La nota dice qué va a pasar DE VERDAD con el usuario que está sentado ahí,
    no la regla general: sin clave el bloqueo limpia la pantalla pero no guarda
    nada, y eso hay que decirlo donde se configura. */
+/* Un interruptor que se queda prendido mientras se escribe la clave: si
+   dependiera solo de si hay PIN, se apagaría en cuanto el campo está vacío
+   y no habría forma de teclear nada. */
+let clvAbierto = {};
+function clvOn(u){ return tieneClave(u) || !!clvAbierto[u.id]; }
+function clvFila(id, sel){ return $('#clvLista [data-clv="'+id+'"] '+sel); }
+
+function renderClaves(){
+  const w = $("#clvLista"); if(!w) return;
+  w.innerHTML = equipo.map(u=>{
+    const on = clvOn(u);
+    return '<div class="clvFila" data-clv="'+esc(u.id)+'">'+
+      '<span class="av">'+esc((u.nombre||"?").trim().charAt(0).toUpperCase())+'</span>'+
+      '<span class="clvQ"><b>'+esc(u.nombre||"Sin nombre")+'</b>'+
+        '<small>'+(ROLES[u.rol]||ROLES.ventas).nombre+'</small></span>'+
+      '<button class="interruptor'+(on?" si":"")+'" type="button" data-clvsw role="switch" '+
+        'aria-checked="'+(on?"true":"false")+'" aria-label="Pedir clave a '+esc(u.nombre||"")+'"><i></i></button>'+
+      '<span class="clvTxt">'+(tieneClave(u) ? "Pide clave" : on ? "Escríbela" : "Sin clave")+'</span>'+
+      '<span class="clvCampo"'+(on?"":" hidden")+'>'+
+        '<input data-clvpin type="password" inputmode="numeric" maxlength="24" '+
+          'value="'+esc(u.pin||"")+'" placeholder="4 dígitos o más" autocomplete="off">'+
+        '<button class="btn sm ghost" type="button" data-clvver>Ver</button></span>'+
+      '</div>';
+  }).join("") || '<div class="empty">No hay nadie en el equipo todavía.</div>';
+}
+
+$("#clvLista").addEventListener("click", e=>{
+  const fila = e.target.closest("[data-clv]"); if(!fila) return;
+  const u = equipo.find(x=>x.id===fila.dataset.clv); if(!u) return;
+
+  if(e.target.closest("[data-clvsw]")){
+    if(clvOn(u)){
+      if(tieneClave(u) && !confirm("¿Quitarle la clave a " + (u.nombre||"esta persona") + "?\n\n" +
+          "Sin clave no va a poder checar su entrada ni su salida en el reloj.")) return;
+      u.pin = ""; delete clvAbierto[u.id];
+      guardaEquipo(); renderClaves(); pintaNotaBloqueo();
+      toast((u.nombre||"Esta persona") + " ya no va a pedir clave");
+    }else{
+      clvAbierto[u.id] = true;
+      renderClaves();
+      const campo = clvFila(u.id, "[data-clvpin]"); if(campo) campo.focus();
+    }
+    return;
+  }
+
+  const ver = e.target.closest("[data-clvver]");
+  if(ver){
+    const campo = fila.querySelector("[data-clvpin]"); if(!campo) return;
+    const mostrar = campo.type === "password";
+    campo.type = mostrar ? "text" : "password";
+    ver.textContent = mostrar ? "Ocultar" : "Ver";
+  }
+});
+
+/* Al teclear no se vuelve a dibujar la lista: el campo perdería el foco a
+   media clave. Solo se actualiza el renglón de texto. */
+$("#clvLista").addEventListener("input", e=>{
+  if(!e.target.matches("[data-clvpin]")) return;
+  const fila = e.target.closest("[data-clv]");
+  const u = equipo.find(x=>x.id===fila.dataset.clv); if(!u) return;
+  u.pin = e.target.value.slice(0,24);
+  const txt = fila.querySelector(".clvTxt");
+  if(txt) txt.textContent = tieneClave(u) ? "Pide clave" : "Escríbela";
+  clearTimeout(u._tc);
+  u._tc = setTimeout(()=>{
+    guardaEquipo(); pintaNotaBloqueo();
+    if(typeof renderTablero === "function" && !$("#tab-inicio").hidden) renderTablero();
+  }, 600);
+});
+
 function pintaNotaBloqueo(){
   const nb = $("#bloqueoNota"); if(!nb) return;
   const yo = usuarioActual(), min = minutosBloqueo();
@@ -13853,6 +14000,7 @@ initStore().then(async ()=>{
   if(habia) setTimeout(()=>toast("Recuperé lo que estabas capturando"), 900);
   arrancaEquipo();
   await cargaAsistencias(); renderAsistencia();
+  cargaTipsLab();          /* sin await: el tablero ya tiene sus tips de fábrica */
   if(rolActual()==="admin"){
     await cargaExpedientes(); renderExpedientes();
     await cargaNominas(); nmPer = P.nominaPeriodo || "semana"; renderNomina();

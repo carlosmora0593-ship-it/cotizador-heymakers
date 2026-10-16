@@ -281,6 +281,23 @@ window.__anuncios = async function(){
     return data || [];
   }catch(e){ return []; }
 };
+/* ---------- los tips del tablero ----------
+   Igual que los anuncios: son del Lab y los lee todo el mundo. La base ya
+   filtra los apagados.
+
+   Si algo falla —sin red, tabla todavía sin crear— se devuelve lista vacía
+   a propósito: el cotizador trae doce tips de fábrica y usa esos. */
+window.__tips = async function(){
+  if(!SB) return [];
+  try{
+    const {data, error} = await SB.from("tips")
+      .select("id,titulo,texto,rol,orden")
+      .order("orden", {ascending:true}).order("id", {ascending:true});
+    if(error) return [];
+    return data || [];
+  }catch(e){ return []; }
+};
+
 /* Contar es lo ÚNICO que el navegador puede hacerle a un anuncio: del otro
    lado hay una función que sólo sabe sumar de uno en uno. */
 window.__anuncioMarca = function(id, tipo){

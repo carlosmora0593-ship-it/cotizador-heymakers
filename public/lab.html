@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0A7FA8">
-<script src="config.js?v=20261016-1143"></script>
+<script src="config.js?v=20261016-1215"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Makers Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -390,6 +390,27 @@ input:focus,select:focus,textarea:focus{background:var(--surface);border-color:v
 .anAcc .mal{margin-left:auto}
 @media (max-width:560px){ .anRejilla{grid-template-columns:1fr} .anAcc .mal{margin-left:0} }
 
+/* ---- tips ---- */
+.tipRejilla{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tipRejilla label{display:flex;flex-direction:column}
+.tipRejilla label.ancho{grid-column:1/-1}
+.tipRejilla label span{font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:4px}
+.tipRejilla textarea{font:inherit;resize:vertical}
+.tipRejilla label.tipSw{flex-direction:row;align-items:center;gap:7px;align-self:end;padding-bottom:7px}
+.tipRejilla label.tipSw span{margin:0;text-transform:none;letter-spacing:0;font-size:13px;color:var(--ink)}
+.tipRejilla label.tipSw input{width:auto;flex:none}
+.tipPrevio{margin-top:16px}
+.tipFoco{font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-3)}
+.tipCaja{margin-top:6px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);padding:12px 14px}
+.tipCaja b{display:block;font-size:14px;margin-bottom:4px}
+.tipCaja p{margin:0;font-size:12.5px;color:var(--ink-2);line-height:1.5}
+.tipVacio{padding:22px 16px;text-align:center;font-size:12px;color:var(--ink-3);
+  border:1px dashed var(--line);border-radius:10px}
+.tipAcc{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}
+.tipAcc .mal{margin-left:auto}
+@media (max-width:560px){ .tipRejilla{grid-template-columns:1fr} .tipAcc .mal{margin-left:0} }
+
 
 /* ---- la puerta de Makers Lab ---- */
 body.sin-sesion .app,
@@ -449,6 +470,7 @@ body.sin-sesion .telon{display:none!important}
       <button data-v="diagnosticos">Diagnósticos</button>
       <button data-v="equipo">Equipo</button>
       <button data-v="anuncios">Publicidad <span class="cuenta" id="n_anuncios">0</span></button>
+      <button data-v="tips">Tips <span class="cuenta" id="n_tips">0</span></button>
       <button data-v="numeros">Números</button>
     </div>
     <div class="sidepie">
@@ -608,7 +630,7 @@ function desempeno() {
 }
 
 let DB = null;
-let ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [], anuncios: [] };
+let ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [], anuncios: [], tips: [] };
 const COLS = ["cuentas", "tickets", "errores", "equipo", "alianzas", "citas", "cobros", "fallas", "codigos", "diagnosticos"];
 let vista = "tablero", abierta = null, esEjemplo = false, listo = false;
 let filtro = { texto: "", estado: "", plan: "" };
@@ -749,6 +771,7 @@ async function arranca() {
      no son de ninguna cuenta. Se piden aparte, sin detener el arranque, y la
      pantalla se repinta cuando lleguen. */
   cargaAnuncios().then(pinta, () => {});
+  cargaTips().then(pinta, () => {});
   if (!DB) { generaEjemplo(true); listo = true; pinta(); return; }
   const cfg = await DB.doc("meta/config").get().catch(() => ({ exists: false }));
   if (cfg.exists) CFG = Object.assign(CFG, cfg.data());
@@ -1315,6 +1338,141 @@ function guardaFicha(){
   anEditando = null;
 }
 
+
+
+/* ---------- los tips del tablero ---------- */
+const PUENTE_TIP = () => (typeof window.__labTips === "object" && window.__labTips) || null;
+const ROLES_TIP = {"":"Todos", admin:"Administrador", ventas:"Ventas", produccion:"Producción", diseno:"Diseño"};
+
+async function cargaTips(){
+  const p = PUENTE_TIP(); if(!p) return;
+  let lista = [];
+  try{ lista = await p.lista(); }catch(e){ lista = []; }
+  ficheros.tips = lista;          /* primero traer, después guardar: ver cargaAnuncios */
+}
+async function guardaTip(t){
+  const i = ficheros.tips.findIndex(x => String(x.id) === String(t.id));
+  if(i >= 0) ficheros.tips[i] = t; else ficheros.tips.unshift(t);
+  pinta();
+  const p = PUENTE_TIP(); if(!p) return;
+  try{
+    const guardado = await p.guarda(t);
+    if(guardado){ await cargaTips(); pinta(); }
+  }catch(e){ aviso("No se pudo guardar el tip. Vuelve a intentar."); }
+}
+async function borraTip(id){
+  ficheros.tips = ficheros.tips.filter(x => String(x.id) !== String(id));
+  pinta();
+  const p = PUENTE_TIP(); if(!p) return;
+  try{ await p.borra(id); }catch(e){ aviso("No se pudo quitar el tip."); }
+}
+function tipNuevo(){
+  return {id:"nuevo-"+Date.now(), titulo:"", texto:"", rol:"", activo:true,
+          orden:((ficheros.tips||[]).length+1)*10};
+}
+
+function vTips(){
+  const lista = (ficheros.tips||[]).slice()
+    .sort((a,b)=> (b.activo?1:0)-(a.activo?1:0) || (Number(a.orden)||0)-(Number(b.orden)||0));
+  const vivos = lista.filter(t=>t.activo !== false);
+  const porRol = {};
+  vivos.forEach(t=>{ const r = t.rol || ""; porRol[r] = (porRol[r]||0) + 1; });
+  const reparto = Object.keys(porRol).map(r=>(ROLES_TIP[r]||r)+": "+porRol[r]).join(" · ");
+
+  return '<div style="display:flex;flex-direction:column;gap:20px">' +
+    '<div class="tiles">' +
+      tile("Prendidos", vivos.length, vivos.length ? "rotan uno por día" : "el tablero usa los de fábrica", true) +
+      tile("Tips en total", lista.length, lista.length ? "incluye los apagados" : "todavía ninguno") +
+      tile("Para quién", Object.keys(porRol).length || "—", reparto || "sin tips prendidos") +
+      tile("Vuelta completa", vivos.length ? vivos.length + " días" : "—",
+           vivos.length ? "tarda eso en repetirse" : "pon al menos uno") +
+    '</div>' +
+
+    '<div class="aviso-demo">El tip del día sale en el tablero de <b>todos los talleres</b>, y cambia solo cada ' +
+      'día. Si no hay ninguno prendido aquí, el cotizador usa los doce que trae de fábrica: nunca se queda vacío.</div>' +
+
+    '<div class="tarjeta"><header><h2>Los tips</h2>' +
+      '<span class="pista">da clic en uno para editarlo</span>' +
+      '<button class="btn p sm" id="tipNuevo" style="margin-left:auto">Nuevo tip</button></header>' +
+      (lista.length
+        ? '<div class="marco"><table style="min-width:760px"><thead><tr>' +
+          '<th>Tip</th><th>Para quién</th><th>Estado</th><th class="der">Orden</th>' +
+          '</tr></thead><tbody>' + lista.map(t=>
+            '<tr class="clic" data-tip="'+esc(String(t.id))+'" tabindex="0">' +
+              '<td><span class="taller">'+esc(t.titulo||"Sin título")+'</span>' +
+                '<br><span class="sitio">'+esc((t.texto||"sin texto").slice(0,88))+
+                ((t.texto||"").length > 88 ? "…" : "")+'</span></td>' +
+              '<td>'+esc(ROLES_TIP[t.rol||""] || t.rol)+'</td>' +
+              '<td><span class="chip '+(t.activo!==false ? "bien" : "gris")+'">'+
+                (t.activo!==false ? "prendido" : "apagado")+'</span></td>' +
+              '<td class="der mono">'+(Number(t.orden)||0)+'</td></tr>').join("") +
+          '</tbody></table></div>'
+        : '<div class="vacio">Todavía no hay tips propios. Mientras tanto el cotizador usa los de fábrica. ' +
+          'Presiona <b>Nuevo tip</b> para escribir el primero.</div>') +
+    '</div></div>';
+}
+
+/* ---------- la ficha de un tip ---------- */
+let tipEditando = null;
+function abreTip(id){
+  tipEditando = id === "nuevo"
+    ? tipNuevo()
+    : Object.assign({}, (ficheros.tips||[]).find(t=>String(t.id)===String(id)));
+  if(!tipEditando) return;
+  const t = tipEditando, nuevo = String(t.id).indexOf("nuevo-") === 0;
+
+  $("#ficha").innerHTML =
+    '<header><div style="flex:1;min-width:0"><h2>'+(nuevo ? "Nuevo tip" : "Editar tip")+'</h2>'+
+      '<p class="sitio" style="margin-top:3px">Lo van a leer en el tablero de todos los talleres.</p></div>'+
+      '<button class="btn sm" id="cerrarFicha">Cerrar</button></header>'+
+    '<div class="cuerpo">'+
+      '<div class="tipRejilla">'+
+        '<label class="ancho"><span>Título</span>'+
+          '<input id="tip_titulo" value="'+esc(t.titulo||"")+'" maxlength="60" '+
+          'placeholder="Cobra antes de producir"></label>'+
+        '<label class="ancho"><span>El consejo</span>'+
+          '<textarea id="tip_texto" rows="4" maxlength="320" '+
+          'placeholder="Dos o tres renglones. Que diga qué hacer, no qué está mal.">'+esc(t.texto||"")+'</textarea></label>'+
+        '<label><span>Para quién</span><select id="tip_rol">'+
+          Object.keys(ROLES_TIP).map(r=>'<option value="'+r+'"'+((t.rol||"")===r?" selected":"")+'>'+
+            ROLES_TIP[r]+'</option>').join("")+'</select></label>'+
+        '<label><span>Orden</span><input id="tip_orden" type="number" value="'+(Number(t.orden)||0)+'"></label>'+
+        '<label class="tipSw"><input id="tip_activo" type="checkbox"'+(t.activo!==false?" checked":"")+'> '+
+          '<span>Prendido</span></label>'+
+      '</div>'+
+      '<div class="tipPrevio" id="tipPrevio"></div>'+
+      '<p class="pista" style="margin-top:12px">El <b>orden</b> decide la rueda: cada día avanza uno. '+
+        'Un tip con dueño —Ventas, Producción— sólo lo ve quien tiene ese rol; los de <b>Todos</b> los ve cualquiera.</p>'+
+      '<div class="tipAcc">'+
+        '<button class="btn p" id="tipGuarda">Guardar</button>'+
+        (nuevo ? '' : '<button class="btn mal" id="tipBorra">Quitar tip</button>')+
+      '</div>'+
+    '</div>';
+  pintaTipPrevio();
+  muestraPanel();
+}
+function pintaTipPrevio(){
+  const el = $("#tipPrevio"); if(!el) return;
+  const tit = ($("#tip_titulo").value||"").trim();
+  const txt = ($("#tip_texto").value||"").trim();
+  el.innerHTML = (tit || txt)
+    ? '<span class="tipFoco">Así se va a ver</span>'+
+      '<div class="tipCaja"><b>'+esc(tit||"Sin título")+'</b><p>'+esc(txt||"Sin texto")+'</p></div>'
+    : '<div class="tipVacio">Escribe el título y el consejo para ver cómo queda.</div>';
+}
+function guardaFichaTip(){
+  if(!tipEditando) return;
+  const t = tipEditando;
+  t.titulo = ($("#tip_titulo").value||"").trim();
+  t.texto  = ($("#tip_texto").value||"").trim();
+  t.rol    = $("#tip_rol").value || "";
+  t.orden  = Number($("#tip_orden").value) || 0;
+  t.activo = $("#tip_activo").checked;
+  if(!t.titulo || !t.texto){ aviso("Un tip necesita título y texto."); return; }
+  cierraPanel();
+  guardaTip(t);
+  tipEditando = null;
+}
 
 /* ================= vistas ================= */
 function vTablero() {
@@ -2563,7 +2721,7 @@ async function accion(acc) {
 function pinta() {
   const titulos = { tablero: "Tablero", cuentas: "Cuentas", agenda: "Agenda", soporte: "Soporte",
     cobros: "Cobros y facturación", equipo: "Equipo y alianzas", numeros: "Números",
-    anuncios: "Publicidad" };
+    anuncios: "Publicidad", tips: "Tips del tablero" };
   $("#titulo").textContent = titulos[vista];
   $("#n_cuentas").textContent = ficheros.cuentas.length;
   $("#n_agenda").textContent = citasHoy().length;
@@ -2576,6 +2734,7 @@ function pinta() {
   $("#n_cobros").className = "cuenta" + (rech ? " urge" : "");
   const alAire = (ficheros.anuncios||[]).filter(a=>estadoAnuncio(a)==="al aire").length;
   $("#n_anuncios").textContent = alAire;
+  $("#n_tips").textContent = (ficheros.tips||[]).filter(t=>t.activo!==false).length;
   $("#avisoDemo").hidden = !esEjemplo;
   ["busca", "filtroEstado", "filtroPlan", "btnNueva"].forEach(i => { $("#" + i).hidden = vista !== "cuentas"; });
   document.querySelectorAll("#nav button").forEach(b => b.setAttribute("aria-current", String(b.dataset.v === vista)));
@@ -2583,7 +2742,8 @@ function pinta() {
   $("#vista").innerHTML = vista === "tablero" ? vTablero() : vista === "cuentas" ? vCuentas()
     : vista === "agenda" ? vAgenda() : vista === "soporte" ? vSoporte()
     : vista === "cobros" ? vCobros() : vista === "equipo" ? vEquipo()
-    : vista === "anuncios" ? vAnuncios() : vNumeros();
+    : vista === "anuncios" ? vAnuncios()
+    : vista === "tips" ? vTips() : vNumeros();
   ponGlobos();
 }
 
@@ -2893,7 +3053,7 @@ async function borraEjemplo() {
     bajas.push(DB.doc("meta/estado").set({ ejemplo: false, creado: iso(HOY) }));
     try { await Promise.all(bajas); } catch (e) {}
   }
-  ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [], anuncios: [] };
+  ficheros = { cuentas: [], tickets: [], errores: [], equipo: [], alianzas: [], citas: [], cobros: [], fallas: [], anuncios: [], tips: [] };
   esEjemplo = false; pinta(); aviso("Listo, quedó vacío");
 }
 
@@ -2964,6 +3124,23 @@ document.addEventListener("change", async e=>{
     $("#an_imagen").value = url; pintaAnPrevio();
   }catch(err){ aviso("No se pudo subir la foto. Intenta con otra o pega la dirección."); }
   b.textContent = antes; b.disabled = false; e.target.value = "";
+});
+
+
+/* ---------- eventos de los tips ---------- */
+document.addEventListener("click", e=>{
+  if(e.target.closest("#tipNuevo")){ abreTip("nuevo"); return; }
+  const fila = e.target.closest("[data-tip]");
+  if(fila){ abreTip(fila.dataset.tip); return; }
+  if(tipEditando && e.target.closest("#cerrarFicha")){ cierraPanel(); tipEditando = null; return; }
+  if(e.target.closest("#tipGuarda")){ guardaFichaTip(); return; }
+  if(e.target.closest("#tipBorra")){
+    if(tipEditando){ const id = tipEditando.id; cierraPanel(); tipEditando = null; borraTip(id); }
+    return;
+  }
+});
+document.addEventListener("input", e=>{
+  if(e.target.id === "tip_titulo" || e.target.id === "tip_texto") pintaTipPrevio();
 });
 
 
@@ -3166,10 +3343,10 @@ function vDiagnosticos() {
 
 </script>
 
-<script>window.BUILD="20261016-1143";</script>
+<script>window.BUILD="20261016-1215";</script>
 <script>
 (function(){
-  var mio = "20261016-1143";
+  var mio = "20261016-1215";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -3197,6 +3374,6 @@ function vDiagnosticos() {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="lab.js?v=20261016-1143"></script>
+<script src="lab.js?v=20261016-1215"></script>
 </body>
 </html>
