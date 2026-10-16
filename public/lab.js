@@ -592,6 +592,19 @@ window.__labTips = {
   }
 };
 
+/* ---------- revisar la base ----------
+   Pedirle una columna a la base es la forma más barata de saber si una
+   migración ya se corrió: si la columna no existe, PostgREST lo dice. */
+window.__labBase = {
+  async hay(tabla, col){
+    if(!SB) return undefined;              // sin servidor: no se sabe
+    try{
+      const {error} = await SB.from(tabla).select(col || "*").limit(1);
+      return !error;
+    }catch(e){ return false; }
+  }
+};
+
 window.claude = { use: async nombre =>
   nombre === "db" ? {doc: refDoc, collection: refCol} :
   nombre === "downloads" ? PUENTE_DOWNLOADS :
