@@ -512,7 +512,8 @@ window.__labAnuncios = {
       desde: a.desde || "", hasta: a.hasta || "",
       enlace: a.enlace || "", alt: a.alt || "", nota: a.nota || "",
       anunciante: a.anunciante || "", titulo: a.titulo || "",
-      lugar: a.lugar || "cotizador", interna: !!a.interna
+      lugar: a.lugar || "cotizador", interna: !!a.interna,
+      giros: a.giros || [], estados: a.estados || []
     }));
   },
   async guarda(a){
@@ -523,7 +524,8 @@ window.__labAnuncios = {
       nota: a.nota || null, activo: a.activo !== false,
       orden: Number(a.orden) || 0,
       desde: a.desde || null, hasta: a.hasta || null,
-      lugar: a.lugar || "cotizador", interna: !!a.interna
+      lugar: a.lugar || "cotizador", interna: !!a.interna,
+      giros: a.giros || [], estados: a.estados || []
     };
     /* Un id que empieza con "nuevo-" lo inventó la pantalla para poder
        dibujar la ficha antes de que exista la fila. Ese no se manda: lo

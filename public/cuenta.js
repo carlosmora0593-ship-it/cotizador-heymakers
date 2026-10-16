@@ -275,7 +275,7 @@ window.__anuncios = async function(){
   if(!SB) return [];
   try{
     const {data, error} = await SB.from("anuncios")
-      .select("id,titulo,imagen,enlace,alt,lugar,interna")
+      .select("id,titulo,imagen,enlace,alt,lugar,interna,giros,estados")
       .order("orden", {ascending:true}).order("id", {ascending:true});
     if(error) return [];
     return data || [];

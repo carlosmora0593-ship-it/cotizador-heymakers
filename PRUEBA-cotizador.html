@@ -3184,7 +3184,9 @@ body.conTour{overflow:hidden}
         <div class="grid g4" style="margin-top:10px">
           <div><label class="f" for="e_colonia">Colonia</label><input id="e_colonia"></div>
           <div><label class="f" for="e_municipio">Municipio o alcaldía</label><input id="e_municipio"></div>
-          <div><label class="f" for="e_estado">Estado</label><input id="e_estado"></div>
+          <div><label class="f" for="e_estado">Estado</label>
+            <input id="e_estado" list="listaEstados" autocomplete="address-level1">
+            <datalist id="listaEstados"></datalist></div>
           <div><label class="f" for="e_pais">País</label><input id="e_pais"></div>
         </div>
         <p class="note" style="margin-top:10px">La dirección aparece en tus cotizaciones y órdenes impresas, y es la que va en la factura.</p>
@@ -6237,7 +6239,25 @@ const PAC_SITIO = {
   prodigia:["Prodigia","https://prodigia.com.mx"]
 };
 
+/* La lista de sugerencias se arma una vez. El campo sigue siendo texto
+   libre —es un dato fiscal que ya está capturado en cuentas viejas— pero
+   escribirlo bien deja de depender de la memoria de cada quien. */
+function pintaListaEstados(){
+  const d = $("#listaEstados"); if(!d || d.children.length) return;
+  const nombres = {
+    AGS:"Aguascalientes", BC:"Baja California", BCS:"Baja California Sur", CAM:"Campeche",
+    CHP:"Chiapas", CHH:"Chihuahua", CMX:"Ciudad de México", COA:"Coahuila", COL:"Colima",
+    DUR:"Durango", GUA:"Guanajuato", GRO:"Guerrero", HID:"Hidalgo", JAL:"Jalisco",
+    MEX:"Estado de México", MIC:"Michoacán", MOR:"Morelos", NAY:"Nayarit", NLE:"Nuevo León",
+    OAX:"Oaxaca", PUE:"Puebla", QUE:"Querétaro", ROO:"Quintana Roo", SLP:"San Luis Potosí",
+    SIN:"Sinaloa", SON:"Sonora", TAB:"Tabasco", TAM:"Tamaulipas", TLA:"Tlaxcala",
+    VER:"Veracruz", YUC:"Yucatán", ZAC:"Zacatecas"
+  };
+  d.innerHTML = Object.keys(nombres).map(k=>'<option value="'+esc(nombres[k])+'">').join("");
+}
+
 function renderFiscal(){
+  pintaListaEstados();
   const E = empresaFiscal();
   const reg = $("#e_regimen");
   if(reg && !reg.options.length) reg.innerHTML = opcionesSelect(REGIMENES, E.regimen);
@@ -6696,8 +6716,57 @@ function anunAlt(a){ return a.alt || a.titulo || "Anuncio"; }
    Así la publicidad propia nunca le quita lugar a quien pagó, y el hueco
    tampoco se queda vacío cuando no hay nada vendido. */
 let ANUN_TODOS = [];
+/* El estado se captura a mano en los datos fiscales, así que llega escrito
+   como se le ocurrió a cada quien: "Michoacán", "michoacan", "MICH.". Se
+   normaliza quitando acentos y se compara contra los nombres y las claves. */
+const EDOS_CLAVE = {
+  AGS:"aguascalientes", BC:"baja california", BCS:"baja california sur", CAM:"campeche",
+  CHP:"chiapas", CHH:"chihuahua", CMX:"ciudad de mexico", COA:"coahuila", COL:"colima",
+  DUR:"durango", GUA:"guanajuato", GRO:"guerrero", HID:"hidalgo", JAL:"jalisco",
+  MEX:"estado de mexico", MIC:"michoacan", MOR:"morelos", NAY:"nayarit", NLE:"nuevo leon",
+  OAX:"oaxaca", PUE:"puebla", QUE:"queretaro", ROO:"quintana roo", SLP:"san luis potosi",
+  SIN:"sinaloa", SON:"sonora", TAB:"tabasco", TAM:"tamaulipas", TLA:"tlaxcala",
+  VER:"veracruz", YUC:"yucatan", ZAC:"zacatecas"
+};
+const OTROS_NOMBRES = {
+  "cdmx":"CMX", "df":"CMX", "distrito federal":"CMX", "mexico":"MEX", "edomex":"MEX",
+  "estado de mexico":"MEX", "mich":"MIC", "michoacan de ocampo":"MIC",
+  "veracruz de ignacio de la llave":"VER", "coahuila de zaragoza":"COA", "nl":"NLE",
+  "baja california norte":"BC", "qroo":"ROO", "q roo":"ROO", "slp":"SLP"
+};
+function limpiaEdo(s){
+  return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase().replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim();
+}
+function claveEstado(txt){
+  const s = limpiaEdo(txt); if(!s) return "";
+  if(EDOS_CLAVE[s.toUpperCase()]) return s.toUpperCase();
+  if(OTROS_NOMBRES[s]) return OTROS_NOMBRES[s];
+  for(const k in EDOS_CLAVE) if(EDOS_CLAVE[k] === s) return k;
+  /* Último intento: que empiece igual, para "michoacan de ocampo" y parecidos. */
+  for(const k in EDOS_CLAVE) if(s.indexOf(EDOS_CLAVE[k]) === 0) return k;
+  return "";
+}
+const giroActual = () => (window.PRODUCTO && PRODUCTO.clave) || "taller";
+const estadoDelTaller = () => claveEstado((P.empresa || {}).estado);
+
+/* Lista vacía = a todos. Un anuncio que nadie segmentó se ve en todas partes;
+   uno segmentado por estado NO se enseña a un taller que no dijo dónde está,
+   porque no hay forma de saber si le toca. */
+function anuncioVaConmigo(a){
+  const giros = a.giros || [];
+  if(giros.length && giros.indexOf(giroActual()) < 0) return false;
+  const edos = a.estados || [];
+  if(edos.length){
+    const mio = estadoDelTaller();
+    if(!mio || edos.indexOf(mio) < 0) return false;
+  }
+  return true;
+}
+
 function anunciosDe(donde){
   const aqui = ANUN_TODOS.filter(a=>{
+    if(!anuncioVaConmigo(a)) return false;
     const l = a.lugar || "cotizador";
     return l === donde || l === "ambos";
   });
@@ -10839,6 +10908,10 @@ $("#ayudaCuerpo").addEventListener("click", e=>{
 const PRODUCTO = window.PRODUCTO = {
   plataforma: "Makers OS",
   edicion:    "Taller Makers",
+  /* La clave de la edición. "giro", más abajo, ya estaba ocupado por la
+     descripción que se lee; ésta es la que compara la publicidad. Las otras
+     ediciones cambiarán esta línea y nada más. */
+  clave:      "taller",
   giro:       "Imprenta, serigrafía y artículos personalizados"
 };
 function aplicaProducto(){
