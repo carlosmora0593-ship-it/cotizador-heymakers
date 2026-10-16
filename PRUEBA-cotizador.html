@@ -2073,6 +2073,18 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
 /* El reloj se checa desde la pantalla bloqueada, así que su ventana
    tiene que ir por encima de la puerta. */
 #modalCheca{z-index:9600}
+/* Con dos hijos, place-items:center le da a cada uno su propio renglón y
+   los separa media pantalla. El bloque va junto, centrado como un todo. */
+.accesoWrap{align-content:center;grid-auto-rows:min-content}
+.anunBloq{width:min(520px,100%);margin-top:18px;display:flex;flex-direction:column;gap:6px}
+.anunBloqSello{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);opacity:.75;align-self:flex-start}
+.anunBloqPieza{border:1px solid var(--line);border-radius:var(--radio-sm,10px);overflow:hidden;
+  background:var(--surface-2);line-height:0}
+.anunBloqPieza img{width:100%;height:auto;display:block;max-height:150px;object-fit:cover}
+.anunBloqPieza a{display:block}
+@media (max-height:700px){ .anunBloq{display:none} }
+
 .accesoReloj{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
 .accesoReloj .accesoRelojEstado{margin:0 0 10px;font-size:12.5px;color:var(--ink-3)}
 .accesoReloj .btn{width:100%;justify-content:center}
@@ -3240,6 +3252,10 @@ body.conTour{overflow:hidden}
       </div>
       <button class="btn ghost accesoOtro" id="accesoOtro" hidden type="button">Entrar con otro usuario</button>
     </div>
+  </div>
+  <div class="anunBloq" id="anunBloq" hidden aria-label="Publicidad">
+    <span class="anunBloqSello">Publicidad</span>
+    <div class="anunBloqPieza" id="anunBloqPieza"></div>
   </div>
 </div>
 
@@ -6673,13 +6689,32 @@ let ANUNCIOS = [], anunIdx = 0, anunReloj = null, anunVistos = {}, anunQuieto = 
 /* Quien no ve la imagen igual tiene que saber qué le están enseñando. */
 function anunAlt(a){ return a.alt || a.titulo || "Anuncio"; }
 
+/* Dos espacios: el pie de la pantalla de cotizar y la pantalla bloqueada.
+   Cada anuncio dice en cuál sale.
+
+   Los de casa son relleno: sólo salen si ese espacio no tiene nada vendido.
+   Así la publicidad propia nunca le quita lugar a quien pagó, y el hueco
+   tampoco se queda vacío cuando no hay nada vendido. */
+let ANUN_TODOS = [];
+function anunciosDe(donde){
+  const aqui = ANUN_TODOS.filter(a=>{
+    const l = a.lugar || "cotizador";
+    return l === donde || l === "ambos";
+  });
+  const vendidos = aqui.filter(a=>!a.interna);
+  return vendidos.length ? vendidos : aqui.filter(a=>a.interna);
+}
+
 async function cargaAnuncios(){
   const caja = $("#anuncios"); if(!caja) return;
   let lista = [];
   try{
     if(typeof window.__anuncios === "function") lista = await window.__anuncios();
   }catch(e){ lista = []; }
-  ANUNCIOS = (lista||[]).filter(a=>a && a.imagen);
+  ANUN_TODOS = (lista||[]).filter(a=>a && a.imagen);
+  ANUNCIOS = anunciosDe("cotizador");
+  /* Si la puerta está abierta en este momento, que vea lo que acaba de llegar. */
+  if(typeof pintaAnuncioBloqueo === "function" && !$("#acceso").hidden) pintaAnuncioBloqueo();
   if(!ANUNCIOS.length){ caja.hidden = true; return; }
   caja.hidden = false;
   anunIdx = 0;
@@ -6757,6 +6792,45 @@ function marcaAnuncio(a, tipo){
   }
   try{ if(typeof window.__anuncioMarca === "function") window.__anuncioMarca(a.id, tipo); }catch(e){}
 }
+
+/* ---------- el anuncio de la pantalla bloqueada ----------
+   Uno a la vez y sin flechas: nadie está ahí para navegar. Se queda prendido
+   mientras la puerta esté cerrada, y se apaga en cuanto alguien entra: una
+   pantalla que nadie ve no tiene por qué seguir contando vistas. */
+let ANUN_BLOQ = [], anunBloqIdx = 0, anunBloqReloj = null;
+
+function pintaAnuncioBloqueo(){
+  const caja = $("#anunBloq"); if(!caja) return;
+  ANUN_BLOQ = anunciosDe("bloqueo");
+  paraAnuncioBloqueo();
+  if(!ANUN_BLOQ.length){ caja.hidden = true; return; }
+  caja.hidden = false;
+  anunBloqIdx = 0;
+  ponAnuncioBloqueo();
+  const quieto = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(ANUN_BLOQ.length > 1 && !quieto)
+    anunBloqReloj = setInterval(()=>{
+      anunBloqIdx = (anunBloqIdx + 1) % ANUN_BLOQ.length;
+      ponAnuncioBloqueo();
+    }, 8000);
+}
+function ponAnuncioBloqueo(){
+  const w = $("#anunBloqPieza"), a = ANUN_BLOQ[anunBloqIdx];
+  if(!w || !a) return;
+  const img = '<img src="'+esc(a.imagen)+'" alt="'+esc(anunAlt(a))+'">';
+  w.innerHTML = a.enlace
+    ? '<a href="'+esc(a.enlace)+'" target="_blank" rel="noopener noreferrer nofollow sponsored" '+
+      'data-anunb="'+esc(String(a.id))+'">'+img+'</a>'
+    : img;
+  marcaAnuncio(a, "vista");
+}
+function paraAnuncioBloqueo(){
+  if(anunBloqReloj){ clearInterval(anunBloqReloj); anunBloqReloj = null; }
+}
+$("#anunBloq").addEventListener("click", e=>{
+  const liga = e.target.closest("[data-anunb]"); if(!liga) return;
+  marcaAnuncio(ANUN_BLOQ.find(a=>String(a.id)===liga.dataset.anunb), "clic");
+});
 
 function anunArranca(){
   anunPara();
@@ -12622,11 +12696,13 @@ function pideAcceso(opc){
     if(otro) otro.hidden = true;
   }
   pintaAccesoReloj();
+  if(typeof pintaAnuncioBloqueo === "function") pintaAnuncioBloqueo();
   $("#acceso").hidden = false;
   document.body.classList.add("sin-acceso");
   if(bloq) setTimeout(()=>{ const p = $("#accesoPass"); if(p) p.focus(); }, 60);
 }
 function cierraAcceso(){
+  if(typeof paraAnuncioBloqueo === "function") paraAnuncioBloqueo();
   $("#acceso").hidden = true;
   document.body.classList.remove("sin-acceso");
   bloqueado = false;

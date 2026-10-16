@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#0A7FA8">
-<script src="config.js?v=20261016-1215"></script>
+<script src="config.js?v=20261016-1305"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Makers Lab</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1208,7 +1208,8 @@ async function borraAnuncio(id){
 function anuncioNuevo(){
   return {id:"nuevo-"+Date.now(), titulo:"", anunciante:"", imagen:"", enlace:"", alt:"",
           nota:"", activo:true, orden:(ficheros.anuncios.length+1)*10,
-          desde:"", hasta:"", vistas:0, clics:0, estado:"apagado"};
+          desde:"", hasta:"", vistas:0, clics:0, estado:"apagado",
+          lugar:"cotizador", interna:false};
 }
 function estadoAnuncio(a){
   if(a.estado) return a.estado;
@@ -1219,6 +1220,20 @@ function estadoAnuncio(a){
   return "al aire";
 }
 const CHIP_AN = {"al aire":"bien", "programado":"info", "vencido":"aviso", "apagado":"gris"};
+const LUGAR_AN = {cotizador:"Pie de cotizar", bloqueo:"Pantalla bloqueada", ambos:"Los dos"};
+const lugarDe = a => LUGAR_AN[a.lugar || "cotizador"] || a.lugar;
+
+/* Un anuncio de casa sólo sale si ese espacio no tiene nada vendido. Esto es
+   lo que se enseña en el Lab para que se vea de un vistazo cuál está en uso
+   y cuál es puro relleno. */
+function saleAlAire(a, donde){
+  if(estadoAnuncio(a) !== "al aire") return false;
+  const l = a.lugar || "cotizador";
+  return l === donde || l === "ambos";
+}
+function ocupado(donde){
+  return (ficheros.anuncios||[]).some(a=> !a.interna && saleAlAire(a, donde));
+}
 
 function vAnuncios(){
   const lista = (ficheros.anuncios||[]).slice()
@@ -1231,7 +1246,9 @@ function vAnuncios(){
   return '<div style="display:flex;flex-direction:column;gap:20px">' +
     '<div class="tiles">' +
       tile("Al aire", alAire, alAire ? "los ven todos los talleres" : "nadie está viendo publicidad", true) +
-      tile("Anuncios en total", lista.length, lista.length ? "incluye apagados y programados" : "todavía no hay ninguno") +
+      tile("Vendidos al aire", lista.filter(a=>!a.interna && estadoAnuncio(a)==="al aire").length,
+           (ocupado("cotizador") ? "" : "pie de cotizar libre · ") +
+           (ocupado("bloqueo") ? "" : "pantalla bloqueada libre") || "los dos espacios vendidos") +
       tile("Vistas", vistas.toLocaleString("es-MX"), "una por taller y por sesión") +
       tile("Clics", clics.toLocaleString("es-MX"), vistas ? pct.toFixed(1)+"% de las vistas" : "sin vistas todavía") +
     '</div>' +
@@ -1246,7 +1263,7 @@ function vAnuncios(){
       '<button class="btn p sm" id="anNuevo">Nuevo anuncio</button></header>' +
       (lista.length
         ? '<div class="marco"><table style="min-width:960px"><thead><tr>' +
-          '<th>Anuncio</th><th>Anunciante</th><th>Estado</th><th>Vigencia</th>' +
+          '<th>Anuncio</th><th>Anunciante</th><th>Dónde sale</th><th>Estado</th><th>Vigencia</th>' +
           '<th class="der">Orden</th><th class="der">Vistas</th><th class="der">Clics</th><th class="der">% clic</th>' +
           '</tr></thead><tbody>' + lista.map(a=>{
             const e = estadoAnuncio(a), v = anNum(a.vistas), c = anNum(a.clics);
@@ -1254,7 +1271,8 @@ function vAnuncios(){
               '<td><span class="anMini">'+(a.imagen ? '<img src="'+esc(a.imagen)+'" alt="">' : '<i>sin foto</i>')+'</span>' +
                 '<span class="taller">'+esc(a.titulo||"Sin título")+'</span>' +
                 (a.enlace ? '<br><span class="sitio">'+esc(a.enlace).slice(0,52)+'</span>' : '<br><span class="sitio">sin enlace</span>')+'</td>' +
-              '<td>'+esc(a.anunciante||"—")+'</td>' +
+              '<td>'+esc(a.anunciante||"—")+(a.interna ? '<br><span class="sitio">de casa</span>' : '')+'</td>' +
+              '<td>'+esc(lugarDe(a))+'</td>' +
               '<td><span class="chip '+(CHIP_AN[e]||"gris")+'">'+e+'</span></td>' +
               '<td class="mono">'+((a.desde||a.hasta) ? esc(a.desde||"—")+" → "+esc(a.hasta||"—") : "sin fecha")+'</td>' +
               '<td class="der mono">'+anNum(a.orden)+'</td>' +
@@ -1303,12 +1321,19 @@ function abreAnuncio(id){
         campo("desde","Desde","date")+
         campo("hasta","Hasta","date")+
         campo("orden","Orden","number")+
+        '<label><span>Dónde sale</span><select id="an_lugar">'+
+          Object.keys(LUGAR_AN).map(k=>'<option value="'+k+'"'+((a.lugar||"cotizador")===k?" selected":"")+'>'+
+            LUGAR_AN[k]+'</option>').join("")+'</select></label>'+
         '<label class="anSw"><input id="an_activo" type="checkbox"'+(a.activo!==false?" checked":"")+'> '+
           '<span>Al aire</span></label>'+
+        '<label class="anSw"><input id="an_interna" type="checkbox"'+(a.interna?" checked":"")+'> '+
+          '<span>Es de casa (relleno)</span></label>'+
         campo("nota","Nota interna","text","Pagó hasta marzo, renovar antes")+
       '</div>'+
       '<p class="pista" style="margin-top:12px">Vacías las dos fechas, el anuncio corre hasta que lo apagues. '+
-        'El <b>orden</b> decide quién va primero en el carrusel: del más chico al más grande.</p>'+
+        'El <b>orden</b> decide quién va primero en el carrusel: del más chico al más grande.<br>'+
+        '<b>De casa</b> es publicidad nuestra: sólo sale cuando ese espacio no tiene nada vendido, '+
+        'así nunca le quita lugar a quien pagó y el hueco no se queda vacío.</p>'+
       '<div class="anAcc">'+
         '<button class="btn p" id="anGuarda">Guardar</button>'+
         (nuevo ? '' : '<button class="btn mal" id="anBorra">Quitar anuncio</button>')+
@@ -1332,6 +1357,8 @@ function guardaFicha(){
   });
   a.orden = anNum($("#an_orden").value);
   a.activo = $("#an_activo").checked;
+  a.lugar = $("#an_lugar").value || "cotizador";
+  a.interna = $("#an_interna").checked;
   if(!a.imagen){ aviso("Falta la foto del anuncio."); return; }
   cierraPanel();
   guardaAnuncio(a);
@@ -3343,10 +3370,10 @@ function vDiagnosticos() {
 
 </script>
 
-<script>window.BUILD="20261016-1215";</script>
+<script>window.BUILD="20261016-1305";</script>
 <script>
 (function(){
-  var mio = "20261016-1215";
+  var mio = "20261016-1305";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -3374,6 +3401,6 @@ function vDiagnosticos() {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="lab.js?v=20261016-1215"></script>
+<script src="lab.js?v=20261016-1305"></script>
 </body>
 </html>
