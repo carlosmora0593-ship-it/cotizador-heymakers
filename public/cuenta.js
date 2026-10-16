@@ -625,8 +625,14 @@ q("#authForm").addEventListener("submit", async e=>{
         if(!bueno){ avisoAuth("Revisa el código del curso, o bórralo para crear tu cuenta sin él."); return; }
       }
 
+      /* El producto va en los metadatos del alta: el disparador de la base lo
+         lee y marca la cuenta. Cada edición pone el suyo en window.PRODUCTO
+         antes de cargar este archivo; sin eso, taller, que es lo que había. */
+      const edicion = (window.PRODUCTO && window.PRODUCTO.clave) || "taller";
       const {error} = await SB.auth.signUp({email:correo, password:pass, options:{data:{
-        nombre: q("#authNombre").value.trim(), negocio: q("#authNegocio").value.trim() || "Mi taller"}}});
+        nombre: q("#authNombre").value.trim(),
+        negocio: q("#authNegocio").value.trim() || (edicion === "restaurant" ? "Mi restaurante" : "Mi taller"),
+        producto: edicion}}});
       if(error) throw error;
       const {data} = await SB.auth.getSession();
       if(!data.session){ avisoAuth("Te mandamos un correo para confirmar tu cuenta. Ábrelo y regresa a entrar.", true); return; }

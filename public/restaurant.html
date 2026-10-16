@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Makers Restaurant: mesas, comandas, cuenta dividida, propinas y corte de caja. Punto de venta para restaurantes, cafeterías y fondas.">
+<meta name="theme-color" content="#0E1226">
+<script src="config.js?v=20261016-1454"></script>
+<script>window.PRODUCTO={plataforma:"Makers OS",edicion:"Makers Restaurant",clave:"restaurant",giro:"Restaurante, cafetería y fonda"};</script>
+<style>:root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Makers Restaurant</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Primero que nada: hidden manda sobre cualquier display nuestro. */
+[hidden]{display:none!important}
+
+:root{
+  /* Paleta Tecnología, la misma familia que Taller Makers */
+  --bg:#0E1226; --surface:#171C35; --surface-2:#1E2442;
+  --line:#2F3660; --line-soft:#252B4C;
+  --ink:#E8ECFB; --ink-2:#A8B0D0; --ink-3:#7C85A8;
+  --accent:#D6127F; --accent-soft:#2B1430; --accent-ink:#FFFFFF;
+  --cyan:#22D3EE; --cyan-soft:#11283C;
+  --good:#34D399; --good-soft:#0F2A24;
+  --warn:#FBBF24; --warn-soft:#2E2512;
+  --mal:#F472B6;
+  --radio:16px; --radio-sm:10px; --radio-pill:99px;
+  --sombra:0 1px 2px rgba(0,0,0,.5), 0 14px 34px -18px rgba(0,0,0,.9);
+  --barra:218px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Nunito Sans",system-ui,sans-serif;font-size:14px;line-height:1.55;
+  -webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:"Fredoka",system-ui,sans-serif;font-weight:600;margin:0}
+button{font:inherit;color:inherit}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--surface-2);
+  border:1px solid var(--line);border-radius:var(--radio-sm);padding:9px 11px;width:100%}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--cyan);outline-offset:-1px;border-color:var(--cyan)}
+label.f{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:5px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+
+/* ---------- botones ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radio-pill);
+  padding:9px 16px;font-weight:600;font-size:13px;transition:border-color .15s,background .15s;width:auto}
+.btn:hover{border-color:var(--cyan)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.primary{background:var(--cyan);border-color:var(--cyan);color:#06121A}
+.btn.acento{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.bien{background:var(--good);border-color:var(--good);color:#04201A}
+.btn.mal{background:transparent;border-color:var(--mal);color:var(--mal)}
+.btn.ghost{background:transparent}
+.btn.sm{padding:5px 11px;font-size:12px}
+.btn.lg{padding:14px 24px;font-size:15px}
+.btn.ancho{width:100%}
+
+/* ---------- estructura ---------- */
+#barra{position:fixed;left:0;top:0;bottom:0;width:var(--barra);z-index:52;display:flex;flex-direction:column;
+  background:var(--surface);border-right:1px solid var(--line);overflow:auto}
+.barraCmyk{display:flex;height:3px;flex:none}
+.barraCmyk i{flex:1}
+.barraCmyk i:nth-child(1){background:var(--cyan)}
+.barraCmyk i:nth-child(2){background:var(--accent)}
+.barraCmyk i:nth-child(3){background:var(--warn)}
+.barraCmyk i:nth-child(4){background:#141414}
+.barraTop{padding:14px;border-bottom:1px solid var(--line-soft);flex:none;display:flex;align-items:center;gap:10px}
+.barraTop .plaque{width:38px;height:38px;border-radius:11px;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-family:"Fredoka";font-weight:700;font-size:17px;flex:none}
+.barraTop b{display:block;font-family:"Fredoka";font-weight:600;font-size:14px;line-height:1.2}
+.barraTop small{color:var(--ink-3);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.barraNav{padding:10px 8px 14px;flex:1;min-height:0;overflow-y:auto}
+.barraGrupo{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3);
+  padding:14px 11px 5px}
+.barraGrupo:first-child{padding-top:4px}
+.barraPie{padding:10px 14px;border-top:1px solid var(--line-soft);font-size:10.5px;color:var(--ink-3);flex:none}
+nav.tabs{display:grid;gap:1px}
+nav.tabs button{display:flex;align-items:center;gap:10px;text-align:left;border:0;background:transparent;
+  color:var(--ink);padding:9px 11px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;width:100%}
+nav.tabs button svg{width:17px;height:17px;flex:none;opacity:.8}
+nav.tabs button:hover{background:var(--surface-2)}
+nav.tabs button[aria-selected="true"]{background:var(--cyan);color:#06121A}
+nav.tabs button[aria-selected="true"] svg{opacity:1}
+nav.tabs .mbadge{margin-left:auto;background:var(--accent);color:#fff;border-radius:99px;
+  font-size:10px;font-weight:700;padding:1px 7px}
+
+body{padding-left:var(--barra)}
+header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line-soft)}
+.top-in{display:flex;align-items:center;gap:12px;padding:9px 18px;max-width:1280px;margin:0 auto}
+.userChip{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;
+  background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:5px 12px;cursor:pointer}
+.userChip .av{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-family:"Fredoka";font-size:11px;flex:none}
+.userChip .rolTxt{color:var(--ink-3);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.candadoBtn{display:grid;place-items:center;width:33px;height:33px;flex:none;cursor:pointer;
+  background:var(--surface);border:1px solid var(--line);border-radius:50%;color:var(--ink-2)}
+.candadoBtn svg{width:16px;height:16px}
+.candadoBtn:hover{border-color:var(--cyan);color:var(--cyan)}
+.turnoChip{margin-left:auto;font-size:11.5px;color:var(--ink-3);display:flex;align-items:center;gap:7px}
+.turnoChip b{color:var(--good)}
+.turnoChip.cerrado b{color:var(--warn)}
+.wrap{max-width:1280px;margin:0 auto;padding:20px 18px 60px}
+
+/* ---------- tarjetas ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radio);
+  box-shadow:var(--sombra);margin-bottom:16px;overflow:hidden}
+.card>header{display:flex;align-items:center;gap:10px;padding:13px 16px;
+  background:var(--surface-2);border-bottom:1px solid var(--line-soft)}
+.card>header h2{font-size:15px}
+.card>header .hint{margin-left:auto;font-size:11.5px;color:var(--ink-3)}
+.card .body{padding:16px}
+.note{background:var(--surface-2);border-left:3px solid var(--cyan);border-radius:0 8px 8px 0;
+  padding:10px 13px;font-size:12.5px;color:var(--ink-2);line-height:1.55}
+.empty{padding:28px 16px;text-align:center;color:var(--ink-3);font-size:13px}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.fila{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+
+/* ---------- tablero ---------- */
+.heroR{background:linear-gradient(120deg,var(--surface-2),var(--surface) 60%);
+  border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--radio);
+  padding:18px 22px;margin-bottom:16px}
+.heroR p{margin:0;color:var(--ink-3);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase}
+.heroR h1{font-size:25px;margin:4px 0 2px}
+.heroR .sub{color:var(--ink-2);font-size:13px;text-transform:none;letter-spacing:0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:16px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--radio);padding:14px 16px}
+.tile.destacada{border-left:3px solid var(--cyan)}
+.tile .et{display:block;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.tile .v{display:block;font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;margin:5px 0 2px}
+.tile .sub{display:block;font-size:11.5px;color:var(--ink-3)}
+
+/* ---------- mesas ---------- */
+.zonas{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.zonas button{cursor:pointer;background:var(--surface);border:1px solid var(--line);
+  border-radius:99px;padding:6px 14px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.zonas button[aria-pressed="true"]{background:var(--cyan);border-color:var(--cyan);color:#06121A}
+.mesas{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.mesa{position:relative;cursor:pointer;text-align:left;border:1px solid var(--line);
+  border-radius:var(--radio);background:var(--surface);padding:14px;min-height:112px;
+  display:flex;flex-direction:column;gap:3px;transition:transform .12s,border-color .15s}
+.mesa:hover{transform:translateY(-2px);border-color:var(--cyan)}
+.mesa b{font-family:"Fredoka";font-size:17px;font-weight:600}
+.mesa small{color:var(--ink-3);font-size:11.5px}
+.mesa .tot{margin-top:auto;font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:600}
+.mesa .pers{position:absolute;top:12px;right:12px;font-size:11px;color:var(--ink-3)}
+.mesa.libre{border-style:dashed}
+.mesa.libre b{color:var(--ink-2)}
+.mesa.ocupada{border-color:var(--good);background:linear-gradient(180deg,var(--good-soft),var(--surface) 70%)}
+.mesa.ocupada .tot{color:var(--good)}
+.mesa.cuenta{border-color:var(--warn);background:linear-gradient(180deg,var(--warn-soft),var(--surface) 70%)}
+.mesa.cuenta .tot{color:var(--warn)}
+.mesa .sello{position:absolute;bottom:12px;right:12px;font-size:9.5px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.mesa.ocupada .sello{color:var(--good)}
+.mesa.cuenta .sello{color:var(--warn)}
+
+/* ---------- comanda ---------- */
+.comanda{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,.9fr);gap:14px;align-items:start}
+@media (max-width:900px){ .comanda{grid-template-columns:minmax(0,1fr)} }
+.catFila{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.catFila button{cursor:pointer;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:99px;padding:6px 14px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.catFila button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.platillos{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+.plat{cursor:pointer;text-align:left;border:1px solid var(--line);border-radius:var(--radio-sm);
+  background:var(--surface);padding:11px;display:flex;flex-direction:column;gap:3px;min-height:82px}
+.plat:hover{border-color:var(--accent)}
+.plat b{font-size:13px;font-weight:600;line-height:1.3}
+.plat span{margin-top:auto;font-family:"IBM Plex Mono",monospace;font-size:14px;color:var(--cyan)}
+.plat.agotado{opacity:.4;cursor:not-allowed}
+.ticket{position:sticky;top:70px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radio);overflow:hidden}
+.ticket header{padding:13px 15px;background:var(--surface-2);border-bottom:1px solid var(--line-soft);
+  display:flex;align-items:center;gap:9px}
+.ticket header h2{font-size:15px}
+.ticketCuerpo{max-height:46vh;overflow:auto;padding:6px 0}
+.lin{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:9px;align-items:start;
+  padding:8px 15px;border-bottom:1px solid var(--line-soft)}
+.lin:last-child{border-bottom:0}
+.lin .cant{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--cyan);font-size:13px}
+.lin b{font-size:13px;font-weight:600;display:block;line-height:1.3}
+.lin small{display:block;color:var(--ink-3);font-size:11px;line-height:1.4}
+.lin .imp{font-family:"IBM Plex Mono",monospace;font-size:13px;text-align:right}
+.lin.enviada{opacity:.72}
+.lin .acc{display:flex;gap:4px;margin-top:4px}
+.lin .acc button{cursor:pointer;width:22px;height:22px;border-radius:6px;border:1px solid var(--line);
+  background:var(--surface-2);font-size:12px;line-height:1;display:grid;place-items:center}
+.ticketPie{padding:13px 15px;border-top:1px solid var(--line);background:var(--surface-2)}
+.sumaLin{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2);margin-bottom:5px}
+.sumaLin.total{font-size:17px;font-weight:700;color:var(--ink);margin-top:8px;
+  padding-top:9px;border-top:1px solid var(--line)}
+.sumaLin.total span:last-child{font-family:"IBM Plex Mono",monospace}
+
+/* ---------- modales ---------- */
+.modal{position:fixed;inset:0;z-index:70;background:rgba(5,8,20,.72);display:grid;place-items:center;padding:16px}
+.modal .card{width:min(540px,100%);max-height:88vh;overflow:auto;margin:0}
+.modal.ancho .card{width:min(760px,100%)}
+.mods{display:flex;flex-direction:column;gap:14px}
+.modGrupo b{display:block;font-size:13px;margin-bottom:2px}
+.modGrupo small{display:block;color:var(--ink-3);font-size:11.5px;margin-bottom:7px}
+.modChips{display:flex;gap:6px;flex-wrap:wrap}
+.modChip{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:12.5px;
+  border:1px solid var(--line);border-radius:99px;background:var(--surface-2);color:var(--ink-2);padding:6px 13px}
+.modChip input{display:none}
+.modChip.si{background:var(--cyan);border-color:var(--cyan);color:#06121A;font-weight:600}
+.modChip i{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:11px;opacity:.8}
+
+/* ---------- cobro ---------- */
+.cobroTot{text-align:center;padding:16px 0 6px}
+.cobroTot .et{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.cobroTot .v{font-family:"IBM Plex Mono",monospace;font-size:38px;font-weight:600;line-height:1.1}
+.propFila{display:flex;gap:7px;flex-wrap:wrap}
+.propFila button{cursor:pointer;flex:1;min-width:62px;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radio-sm);padding:9px;font-weight:600;font-size:13px}
+.propFila button[aria-pressed="true"]{background:var(--good);border-color:var(--good);color:#04201A}
+.pagos{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.pagoLin{display:grid;grid-template-columns:120px minmax(0,1fr) 32px;gap:8px;align-items:center}
+.teclado{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+.teclado button{cursor:pointer;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--radio-sm);padding:13px;font-family:"IBM Plex Mono",monospace;font-size:17px;font-weight:600}
+.teclado button:hover{border-color:var(--cyan)}
+.cambio{margin-top:12px;padding:12px;border-radius:var(--radio-sm);background:var(--good-soft);
+  border:1px solid var(--good);text-align:center}
+.cambio b{display:block;font-family:"IBM Plex Mono",monospace;font-size:26px;color:var(--good)}
+
+/* ---------- tablas ---------- */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radio-sm)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-3);padding:9px 11px;background:var(--surface-2);white-space:nowrap}
+td{padding:9px 11px;border-top:1px solid var(--line-soft);vertical-align:middle}
+td.der,th.der{text-align:right}
+tr.clic{cursor:pointer}
+tr.clic:hover td{background:var(--surface-2)}
+.pill{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;
+  border-radius:99px;padding:2px 9px;background:var(--surface-2);color:var(--ink-2)}
+.pill.good{background:var(--good);color:#04201A}
+.pill.warn{background:var(--warn);color:#2A1D02}
+.pill.mal{background:var(--mal);color:#2A0718}
+
+/* ---------- acceso ---------- */
+.accesoWrap{position:fixed;inset:0;z-index:9000;background:var(--bg);overflow:auto;
+  display:grid;place-items:center;align-content:center;grid-auto-rows:min-content;padding:20px 16px}
+body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:none}
+.accesoCard{width:min(460px,100%);background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radio);box-shadow:var(--sombra);overflow:hidden}
+.accesoBody{padding:24px}
+.accesoBody h1{font-size:22px;margin:14px 0 5px}
+.accesoBody .sub{color:var(--ink-3);font-size:12.5px;margin:0}
+.perfiles{display:flex;flex-direction:column;gap:7px;margin-top:18px}
+.perfilBtn{display:flex;align-items:center;gap:11px;cursor:pointer;text-align:left;width:100%;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radio-sm);padding:11px 13px}
+.perfilBtn:hover{border-color:var(--cyan)}
+.perfilBtn .av{width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font-family:"Fredoka";font-size:13px;flex:none}
+.perfilBtn b{display:block;font-size:13.5px;font-weight:600}
+.perfilBtn small{display:block;color:var(--ink-3);font-size:11px}
+.perfilBtn .cand{margin-left:auto}
+.claveCaja{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+
+/* ---------- avisos ---------- */
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:9800;
+  background:#05070F;color:#fff;border:1px solid var(--line);border-radius:99px;
+  padding:10px 20px;font-size:13px;box-shadow:var(--sombra);max-width:min(560px,92vw);text-align:center}
+
+@media (max-width:760px){
+  :root{--barra:0px}
+  #barra{position:static;width:auto;flex-direction:row;overflow-x:auto;border-right:0;
+    border-bottom:1px solid var(--line)}
+  .barraTop,.barraPie{display:none}
+  .barraNav{display:flex;padding:7px}
+  nav.tabs{display:flex;gap:4px}
+  nav.tabs button{white-space:nowrap}
+  .barraGrupo{display:none}
+  .wrap{padding:14px 12px 50px}
+}
+</style>
+</head>
+<body>
+
+
+<aside id="barra" hidden>
+  <div class="barraCmyk"><i></i><i></i><i></i><i></i></div>
+  <div class="barraTop">
+    <span class="plaque" id="brandIni">M</span>
+    <span><b id="brandNombre">Makers Restaurant</b><small id="brandGiro">Restaurante</small></span>
+  </div>
+  <div class="barraNav">
+    <div class="barraGrupo">Servicio</div>
+    <nav class="tabs" id="tabs" role="menu"></nav>
+  </div>
+  <div class="barraPie"><span id="barraVer">Makers OS</span></div>
+</aside>
+
+<header class="top">
+  <div class="top-in">
+    <button class="userChip" id="userChip" title="Cambiar de usuario">
+      <span class="av" id="userAv">A</span>
+      <span><span id="userNombre">Administrador</span> <span class="rolTxt" id="userRol">Admin</span></span>
+    </button>
+    <button class="candadoBtn" id="btnBloquea" type="button" title="Bloquear la pantalla" aria-label="Bloquear la pantalla">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/>
+        <circle cx="12" cy="15.4" r="1.1" fill="currentColor" stroke="none"/>
+      </svg>
+    </button>
+    <span class="turnoChip cerrado" id="turnoChip">Caja <b>cerrada</b></span>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ============ INICIO ============ -->
+<section id="tab-inicio">
+  <div class="heroR">
+    <p id="inFecha">—</p>
+    <h1 id="inHola">Hola</h1>
+    <p class="sub" id="inSub">—</p>
+  </div>
+  <div class="tiles" id="inTiles"></div>
+  <div class="grid g2">
+    <div class="card"><header><h2>Mesas abiertas</h2><span class="hint" id="inMesasHint"></span></header>
+      <div class="body"><div id="inMesas"></div></div></div>
+    <div class="card"><header><h2>Lo que vendiste hoy</h2><span class="hint">por categoría</span></header>
+      <div class="body"><div id="inCat"></div></div></div>
+  </div>
+</section>
+
+<!-- ============ MESAS ============ -->
+<section id="tab-mesas" hidden>
+  <div class="fila" style="margin-bottom:14px">
+    <h2 style="font-size:19px">Mesas</h2>
+    <span class="hint" id="mesasResumen" style="color:var(--ink-3);font-size:12.5px"></span>
+    <button class="btn sm" id="mesaRapida" style="margin-left:auto">Venta para llevar</button>
+  </div>
+  <div class="zonas" id="mesaZonas"></div>
+  <div class="mesas" id="mesaRejilla"></div>
+</section>
+
+<!-- ============ COMANDA ============ -->
+<section id="tab-comanda" hidden>
+  <div class="fila" style="margin-bottom:14px">
+    <button class="btn sm" id="comVolver">‹ Mesas</button>
+    <h2 style="font-size:19px" id="comTitulo">Mesa</h2>
+    <span id="comPersonas" style="color:var(--ink-3);font-size:12.5px"></span>
+    <button class="btn sm ghost" id="comGente" style="margin-left:auto">Comensales</button>
+  </div>
+  <div class="comanda">
+    <div>
+      <div class="catFila" id="comCats"></div>
+      <div class="platillos" id="comPlatillos"></div>
+    </div>
+    <div class="ticket">
+      <header><h2>La cuenta</h2><span class="hint" id="comFolio" style="margin-left:auto;font-size:11px;color:var(--ink-3)"></span></header>
+      <div class="ticketCuerpo" id="comLineas"></div>
+      <div class="ticketPie" id="comSuma"></div>
+      <div style="padding:0 15px 15px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn primary" id="comEnviar" style="flex:1">Mandar a cocina</button>
+        <button class="btn acento" id="comCobrar" style="flex:1">Cobrar</button>
+      </div>
+      <div style="padding:0 15px 15px"><button class="btn ghost sm ancho" id="comCancelar">Cancelar la mesa</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MENÚ ============ -->
+<section id="tab-menu" hidden>
+  <div class="card">
+    <header><h2>Categorías</h2><button class="btn sm ghost" id="catNueva" style="margin-left:auto">+ Categoría</button></header>
+    <div class="body"><div class="tbl-wrap"><table id="t_cats"></table></div></div>
+  </div>
+  <div class="card">
+    <header><h2>Platillos</h2><button class="btn sm ghost" id="platNuevo" style="margin-left:auto">+ Platillo</button></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">El <b>costo</b> es lo que te cuesta producirlo; con el precio sale tu utilidad por platillo.
+        Si no lo sabes todavía, déjalo en cero y lo llenas después — no estorba para cobrar.</p>
+      <div class="tbl-wrap"><table id="t_plats"></table></div>
+    </div>
+  </div>
+  <div class="card">
+    <header><h2>Grupos de modificadores</h2><button class="btn sm ghost" id="modNuevo" style="margin-left:auto">+ Grupo</button></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Un grupo es una pregunta que se le hace al mesero: «¿Término?», «¿Qué le quito?», «¿Extras?».
+        Cada opción puede costar de más. Se le asignan al platillo en su renglón.</p>
+      <div id="modLista"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CAJA ============ -->
+<section id="tab-caja" hidden>
+  <div class="card">
+    <header><h2>Turno de caja</h2><span class="hint" id="cajaHint"></span></header>
+    <div class="body" id="cajaCuerpo"></div>
+  </div>
+  <div class="card">
+    <header><h2>Movimientos del turno</h2></header>
+    <div class="body"><div class="tbl-wrap"><table id="t_movs"></table></div></div>
+  </div>
+</section>
+
+<!-- ============ VENTAS ============ -->
+<section id="tab-ventas" hidden>
+  <div class="tiles" id="venTiles"></div>
+  <div class="card">
+    <header><h2>Cuentas cerradas</h2><span class="hint" id="venHint"></span></header>
+    <div class="body"><div class="tbl-wrap"><table id="t_ventas"></table></div></div>
+  </div>
+  <div class="card">
+    <header><h2>Turnos cerrados</h2></header>
+    <div class="body"><div class="tbl-wrap"><table id="t_turnos"></table></div></div>
+  </div>
+</section>
+
+<!-- ============ AJUSTES ============ -->
+<section id="tab-set" hidden>
+  <div class="card">
+    <header><h2>Tu negocio</h2></header>
+    <div class="body">
+      <div class="grid g3">
+        <div><label class="f" for="e_nombre">Nombre</label><input id="e_nombre"></div>
+        <div><label class="f" for="e_tel">Teléfono</label><input id="e_tel"></div>
+        <div><label class="f" for="e_dir">Dirección</label><input id="e_dir"></div>
+      </div>
+      <div class="grid g3" style="margin-top:12px">
+        <div><label class="f" for="p_iva">IVA %</label><input id="p_iva" type="number" min="0" step="1"></div>
+        <div><label class="f" for="p_propina">Propina sugerida %</label><input id="p_propina" type="number" min="0" step="1"></div>
+        <div><label class="f" for="p_servicio">Cargo por servicio %</label><input id="p_servicio" type="number" min="0" step="1"></div>
+      </div>
+      <p class="note" style="margin-top:12px">El <b>cargo por servicio</b> se suma solo a la cuenta y es tuyo; la <b>propina</b> la decide el cliente al pagar
+        y se reparte. No son lo mismo y por eso van aparte: mezclarlos es de donde salen los pleitos con los meseros.</p>
+    </div>
+  </div>
+  <div class="card">
+    <header><h2>Mesas y zonas</h2><button class="btn sm ghost" id="mesaNueva" style="margin-left:auto">+ Mesa</button></header>
+    <div class="body"><div class="tbl-wrap"><table id="t_mesas"></table></div></div>
+  </div>
+  <div class="card">
+    <header><h2>Equipo y claves</h2><button class="btn sm ghost" id="userNuevo" style="margin-left:auto">+ Persona</button></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px"><b>Gerente:</b> todo.&nbsp; <b>Cajero:</b> cobra, abre y cierra turno, no edita el menú.&nbsp;
+        <b>Mesero:</b> sólo mesas y comandas; no ve ventas ni caja.</p>
+      <div class="tbl-wrap"><table id="t_equipo"></table></div>
+      <div class="grid g3" style="margin-top:18px">
+        <div><label class="f" for="p_bloqueo">Bloquear la pantalla si nadie la toca</label>
+          <select id="p_bloqueo">
+            <option value="0">Nunca</option><option value="2">A los 2 minutos</option>
+            <option value="5">A los 5 minutos</option><option value="10">A los 10 minutos</option>
+            <option value="20">A los 20 minutos</option><option value="60">A la hora</option>
+          </select></div>
+        <div style="align-self:end;justify-self:start"><button class="btn" id="bloqueoProbar" type="button">Bloquear ahora</button></div>
+      </div>
+      <p class="note" id="bloqueoNota" style="margin-top:10px"></p>
+    </div>
+  </div>
+  <div class="card">
+    <header><h2>Folios</h2><span class="hint">las letras de tu negocio en cada cuenta</span></header>
+    <div class="body">
+      <div class="grid g3">
+        <div><label class="f" for="f_letras">Tus tres letras</label>
+          <input id="f_letras" maxlength="3" placeholder="TAC" autocomplete="off"
+                 style="text-transform:uppercase;letter-spacing:.18em;font-family:'IBM Plex Mono',monospace"></div>
+        <div><label class="f" for="f_digitos">Cuántos números</label>
+          <select id="f_digitos"><option value="4">4</option><option value="5">5</option>
+            <option value="6">6</option><option value="7">7</option></select></div>
+      </div>
+      <p class="note" id="folNota" style="margin-top:12px"></p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- ============ ACCESO ============ -->
+<div class="accesoWrap" id="acceso" hidden>
+  <div class="accesoCard">
+    <div class="barraCmyk"><i></i><i></i><i></i><i></i></div>
+    <div class="accesoBody">
+      <span class="plaque" style="width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:'Fredoka';font-weight:700;font-size:19px" id="accesoIni">M</span>
+      <h1 id="accesoTitulo">¿Quién va a trabajar?</h1>
+      <p class="sub" id="accesoSub">Elige tu perfil. Cada quien ve solo lo de su área.</p>
+      <div class="perfiles" id="accesoPerfiles"></div>
+      <div class="claveCaja" id="accesoClave" hidden>
+        <label class="f">Clave de <b id="accesoQuien"></b></label>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <input id="accesoPass" type="password" inputmode="numeric" placeholder="Tu clave" autocomplete="current-password">
+          <button class="btn primary" id="accesoEntrar">Entrar</button>
+          <button class="btn" id="accesoVolver">Volver</button>
+        </div>
+        <p id="accesoError" hidden style="color:var(--mal);font-size:12.5px;margin:8px 0 0"></p>
+      </div>
+      <button class="btn ghost ancho" id="accesoOtro" hidden type="button" style="margin-top:14px">Entrar con otro usuario</button>
+    </div>
+  </div>
+  <div class="anunBloq" id="anunBloq" hidden style="width:min(460px,100%);margin-top:18px">
+    <span style="font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)">Publicidad</span>
+    <div id="anunBloqPieza" style="border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface-2);line-height:0;margin-top:6px"></div>
+  </div>
+</div>
+
+<!-- ============ MODALES ============ -->
+<div class="modal" id="modalMods" hidden>
+  <div class="card">
+    <header><h2 id="modsTitulo">Opciones</h2><button class="btn sm" id="modsCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <div class="mods" id="modsCuerpo"></div>
+      <label class="f" style="margin-top:16px" for="modsNota">Nota para la cocina</label>
+      <input id="modsNota" placeholder="Bien cocido, sin picante…">
+      <div class="fila" style="margin-top:16px">
+        <label class="f" style="margin:0">Cantidad</label>
+        <button class="btn sm" id="modsMenos">−</button>
+        <b class="mono" id="modsCant" style="min-width:34px;text-align:center;font-size:17px">1</b>
+        <button class="btn sm" id="modsMas">+</button>
+        <button class="btn primary" id="modsOk" style="margin-left:auto">Agregar <span id="modsImporte"></span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal ancho" id="modalCobro" hidden>
+  <div class="card">
+    <header><h2>Cobrar</h2><span class="hint" id="cobroMesa"></span><button class="btn sm" id="cobroCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <div class="cobroTot"><span class="et">Total a cobrar</span><span class="v" id="cobroTotal">$0.00</span>
+        <span class="et" id="cobroDesglose" style="text-transform:none;letter-spacing:0;font-size:12px"></span></div>
+      <label class="f" style="margin-top:14px">Propina</label>
+      <div class="propFila" id="cobroProp"></div>
+      <div class="grid g2" style="margin-top:14px">
+        <div><label class="f" for="cobroPropMonto">Propina en pesos</label><input id="cobroPropMonto" type="number" min="0" step="0.01"></div>
+        <div><label class="f" for="cobroPartes">Dividir entre</label><input id="cobroPartes" type="number" min="1" step="1" value="1"></div>
+      </div>
+      <p class="note" id="cobroParteNota" hidden style="margin-top:10px"></p>
+      <label class="f" style="margin-top:16px">Cómo paga</label>
+      <div class="pagos" id="cobroPagos"></div>
+      <div class="fila" style="margin-top:9px">
+        <button class="btn sm" data-pago="efectivo">+ Efectivo</button>
+        <button class="btn sm" data-pago="tarjeta">+ Tarjeta</button>
+        <button class="btn sm" data-pago="transferencia">+ Transferencia</button>
+      </div>
+      <div class="cambio" id="cobroCambio" hidden><span class="et">Cambio</span><b id="cobroCambioV">$0.00</b></div>
+      <p class="note" id="cobroFalta" hidden style="margin-top:12px;border-left-color:var(--warn)"></p>
+      <div class="fila" style="margin-top:18px">
+        <button class="btn bien lg ancho" id="cobroOk">Cobrar y cerrar la mesa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalUser" hidden>
+  <div class="card" style="width:min(420px,100%)">
+    <header><h2>¿Quién va a usar la caja?</h2></header>
+    <div class="body">
+      <div class="perfiles" id="userLista"></div>
+      <div class="fila" style="margin-top:14px">
+        <button class="btn" id="userBloquea">Bloquear pantalla</button>
+        <button class="btn" id="userCerrar">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalTurno" hidden>
+  <div class="card">
+    <header><h2 id="turnoTitulo">Abrir turno</h2><button class="btn sm" id="turnoCerrarX" style="margin-left:auto">Cerrar</button></header>
+    <div class="body" id="turnoCuerpo"></div>
+  </div>
+</div>
+
+<div id="toast" hidden></div>
+
+<script>
+/* ===================================================================
+   MAKERS RESTAURANT · mesas, comandas y cobro
+   Edición de Makers OS. Comparte plataforma con Taller Makers —cuentas,
+   roles, planes, el Lab— pero no comparte datos: cada cuenta es de un
+   producto y nunca se cruzan.
+   =================================================================== */
+
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const num = (v,d) => { const n = parseFloat(v); return isFinite(n) ? n : (d||0); };
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const mx = n => "$" + (Math.round(num(n)*100)/100).toLocaleString("es-MX",
+  {minimumFractionDigits:2, maximumFractionDigits:2});
+const uid = () => Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4);
+const dos = n => String(n).padStart(2,"0");
+const hoyISO = () => { const d=new Date(); return d.getFullYear()+"-"+dos(d.getMonth()+1)+"-"+dos(d.getDate()); };
+const horaAhora = () => { const d=new Date(); return dos(d.getHours())+":"+dos(d.getMinutes()); };
+const minutosDe = h => { const [a,b] = String(h||"0:0").split(":").map(Number); return (a||0)*60 + (b||0); };
+function horasTxt(min){
+  min = Math.max(0, Math.round(min));
+  const h = Math.floor(min/60), m = min%60;
+  if(!h) return m + " min";
+  return h + " h" + (m ? " " + m + " min" : "");
+}
+let toastT = null;
+function toast(txt){
+  const t = $("#toast"); if(!t) return;
+  t.textContent = txt; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(()=>{ t.hidden = true; }, 3200);
+}
+
+/* ---------------- guardado ----------------
+   Primero el navegador, siempre. Un punto de venta que se cae cuando se cae
+   el internet no sirve: se cobra local y, si hay nube, se sube después. */
+const LS = "makersrest_v1";
+function lsGet(k, f){ try{ const v = localStorage.getItem(LS+"_"+k); return v ? JSON.parse(v) : f; }catch(e){ return f; } }
+function lsSet(k, v){ try{ localStorage.setItem(LS+"_"+k, JSON.stringify(v)); }catch(e){} }
+
+let DB = null, laNube = false;
+let guardaT = null;
+function persist(){
+  clearTimeout(guardaT);
+  guardaT = setTimeout(()=>{
+    lsSet("menu", MENU); lsSet("mesas", MESAS); lsSet("comandas", COMANDAS);
+    lsSet("turnos", TURNOS); lsSet("P", P); lsSet("equipo", EQUIPO);
+    subeNube();
+  }, 500);
+}
+async function subeNube(){
+  if(!DB) return;
+  try{
+    await DB.doc("config/menu").set({menu: MENU});
+    await DB.doc("config/mesas").set({mesas: MESAS});
+    await DB.doc("config/parametros").set({P: P});
+    await DB.doc("config/equipo").set({equipo: EQUIPO});
+    laNube = true;
+  }catch(e){ laNube = false; }
+}
+
+/* ---------------- el menú de fábrica ----------------
+   Trae una carta chica de ejemplo para que al abrirlo por primera vez se
+   pueda levantar una comanda sin capturar nada. Se borra en dos clics. */
+function menuPorDefecto(){
+  const g1 = uid(), g2 = uid(), g3 = uid();
+  const c1 = uid(), c2 = uid(), c3 = uid(), c4 = uid();
+  return {
+    cats: [
+      {id:c1, nombre:"Para empezar", orden:10},
+      {id:c2, nombre:"Fuertes",      orden:20},
+      {id:c3, nombre:"Bebidas",      orden:30},
+      {id:c4, nombre:"Postres",      orden:40}
+    ],
+    grupos: [
+      {id:g1, nombre:"Término", min:1, max:1, ops:[
+        {id:uid(), nombre:"Tres cuartos", extra:0},
+        {id:uid(), nombre:"Término medio", extra:0},
+        {id:uid(), nombre:"Bien cocido", extra:0}]},
+      {id:g2, nombre:"¿Qué le quito?", min:0, max:4, ops:[
+        {id:uid(), nombre:"Sin cebolla", extra:0},
+        {id:uid(), nombre:"Sin cilantro", extra:0},
+        {id:uid(), nombre:"Sin chile", extra:0},
+        {id:uid(), nombre:"Sin queso", extra:0}]},
+      {id:g3, nombre:"Extras", min:0, max:3, ops:[
+        {id:uid(), nombre:"Queso extra", extra:15},
+        {id:uid(), nombre:"Guacamole", extra:25},
+        {id:uid(), nombre:"Tocino", extra:20}]}
+    ],
+    plats: [
+      {id:uid(), catId:c1, nombre:"Guacamole con totopos", precio:95,  costo:32, mods:[],       activo:true},
+      {id:uid(), catId:c1, nombre:"Queso fundido",         precio:110, costo:40, mods:[g3],     activo:true},
+      {id:uid(), catId:c2, nombre:"Arrachera 250 g",       precio:285, costo:120,mods:[g1,g3],  activo:true},
+      {id:uid(), catId:c2, nombre:"Tacos de pastor (4)",   precio:125, costo:42, mods:[g2,g3],  activo:true},
+      {id:uid(), catId:c2, nombre:"Hamburguesa de la casa",precio:165, costo:58, mods:[g1,g2,g3],activo:true},
+      {id:uid(), catId:c2, nombre:"Enchiladas verdes",     precio:135, costo:45, mods:[g2],     activo:true},
+      {id:uid(), catId:c3, nombre:"Refresco",              precio:38,  costo:12, mods:[],       activo:true},
+      {id:uid(), catId:c3, nombre:"Agua del día",          precio:42,  costo:9,  mods:[],       activo:true},
+      {id:uid(), catId:c3, nombre:"Cerveza",               precio:55,  costo:22, mods:[],       activo:true},
+      {id:uid(), catId:c4, nombre:"Flan napolitano",       precio:65,  costo:18, mods:[],       activo:true},
+      {id:uid(), catId:c4, nombre:"Pastel de chocolate",   precio:78,  costo:26, mods:[],       activo:true}
+    ]
+  };
+}
+function mesasPorDefecto(){
+  const m = [];
+  for(let i=1; i<=8; i++)  m.push({id:uid(), nombre:"Mesa "+i, zona:"Salón",   lugares:4, activa:true});
+  for(let i=1; i<=4; i++)  m.push({id:uid(), nombre:"Terraza "+i, zona:"Terraza", lugares:2, activa:true});
+  m.push({id:uid(), nombre:"Barra 1", zona:"Barra", lugares:1, activa:true});
+  m.push({id:uid(), nombre:"Barra 2", zona:"Barra", lugares:1, activa:true});
+  return m;
+}
+function paramsPorDefecto(){
+  return {negocio:{nombre:"Mi restaurante", tel:"", dir:""},
+          iva:16, propina:10, servicio:0, bloqueoMin:10,
+          folios:{letras:"", extra:"", digitos:5, desde:{cta:1, tur:1}}};
+}
+function equipoPorDefecto(){
+  return [{id:uid(), nombre:"Administrador", rol:"gerente", pin:"", activo:true}];
+}
+
+let MENU     = lsGet("menu", null)     || menuPorDefecto();
+let MESAS    = lsGet("mesas", null)    || mesasPorDefecto();
+let COMANDAS = lsGet("comandas", []);
+let TURNOS   = lsGet("turnos", []);
+let P        = Object.assign(paramsPorDefecto(), lsGet("P", {}));
+let EQUIPO   = lsGet("equipo", null)   || equipoPorDefecto();
+P.negocio = Object.assign({nombre:"Mi restaurante", tel:"", dir:""}, P.negocio||{});
+P.folios  = Object.assign({letras:"", extra:"", digitos:5, desde:{cta:1, tur:1}}, P.folios||{});
+
+/* ---------------- roles ---------------- */
+const ROLES = {
+  gerente: {nombre:"Gerente", ve:["inicio","mesas","comanda","menu","caja","ventas","set"]},
+  cajero:  {nombre:"Cajero",  ve:["inicio","mesas","comanda","caja","ventas"]},
+  mesero:  {nombre:"Mesero",  ve:["mesas","comanda"]}
+};
+let usuarioId = null;
+const usuarioActual = () => EQUIPO.find(u=>u.id===usuarioId) || EQUIPO[0] ||
+  {id:"g", nombre:"Administrador", rol:"gerente"};
+const rolActual = () => usuarioActual().rol || "gerente";
+const puedeVer = s => (ROLES[rolActual()] || ROLES.gerente).ve.indexOf(s) >= 0;
+const esGerente = () => rolActual() === "gerente";
+
+/* ---------------- las pestañas ---------------- */
+const ICO = {
+  inicio:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/>',
+  mesas: '<rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  menu:  '<path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h10"/>',
+  caja:  '<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M3 11h18"/><circle cx="12" cy="15" r="1.3"/>',
+  ventas:'<path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M21 19H3"/>',
+  set:   '<path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="17" r="2"/>'
+};
+const PESTANAS = [
+  {k:"inicio", t:"Inicio"}, {k:"mesas", t:"Mesas"}, {k:"menu", t:"El menú"},
+  {k:"caja", t:"Caja"}, {k:"ventas", t:"Ventas"}, {k:"set", t:"Ajustes"}
+];
+function pintaTabs(){
+  $("#tabs").innerHTML = PESTANAS.filter(p=>puedeVer(p.k)).map(p=>{
+    const n = p.k === "mesas" ? abiertas().length : 0;
+    return '<button role="menuitem" data-tab="'+p.k+'" aria-selected="false">'+
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+
+      ICO[p.k]+'</svg>'+esc(p.t)+
+      (n ? '<span class="mbadge">'+n+'</span>' : '')+'</button>';
+  }).join("");
+}
+function vaA(k){
+  if(!puedeVer(k) && k !== "comanda") k = PESTANAS.filter(p=>puedeVer(p.k))[0].k;
+  PESTANAS.concat([{k:"comanda"}]).forEach(p=>{
+    const s = $("#tab-"+p.k); if(s) s.hidden = (p.k !== k);
+  });
+  $$("#tabs button").forEach(b=> b.setAttribute("aria-selected", String(b.dataset.tab === k)));
+  if(k === "inicio") renderInicio();
+  if(k === "mesas")  renderMesas();
+  if(k === "menu")   renderMenu();
+  if(k === "caja")   renderCaja();
+  if(k === "ventas") renderVentas();
+  if(k === "set")    renderSet();
+  window.scrollTo(0,0);
+}
+$("#tabs").addEventListener("click", e=>{
+  const b = e.target.closest("[data-tab]"); if(b) vaA(b.dataset.tab);
+});
+
+/* ---------------- folios ---------------- */
+const letrasFolio = () => String(P.folios.letras||"").toUpperCase().replace(/[^A-Z]/g,"").slice(0,3);
+const serieFolio  = () => letrasFolio() + String(P.folios.extra||"");
+const digitosFolio = () => Math.min(8, Math.max(3, num(P.folios.digitos, 5)));
+const topeFolio = () => Math.pow(10, digitosFolio()) - 1;
+function ultimoFolio(tipo){
+  const pre = (tipo === "cta" ? "CTA-" : "TUR-") + serieFolio();
+  const lista = tipo === "cta" ? COMANDAS.map(c=>c.folio) : TURNOS.map(t=>t.folio);
+  let alto = 0;
+  lista.forEach(f=>{
+    if(!f || String(f).indexOf(pre) !== 0) return;
+    const n = parseInt(String(f).slice(pre.length).replace(/\D/g,""), 10);
+    if(isFinite(n) && n > alto) alto = n;
+  });
+  return alto;
+}
+function sumaLetra(s){
+  if(!s) return "A";
+  const i = s.charCodeAt(s.length-1) - 65;
+  if(i < 25) return s.slice(0,-1) + String.fromCharCode(66 + i);
+  return sumaLetra(s.slice(0,-1)) + "A";
+}
+function folioNuevo(tipo){
+  if(!letrasFolio()){
+    const d = new Date();
+    const base = (tipo === "cta" ? "CTA-" : "TUR-") + d.getFullYear() + dos(d.getMonth()+1) + dos(d.getDate());
+    const lista = tipo === "cta" ? COMANDAS.map(c=>c.folio) : TURNOS.map(t=>t.folio);
+    const n = lista.filter(f => f && String(f).indexOf(base) === 0).length + 1;
+    return base + "-" + dos(n);
+  }
+  let n = Math.max(num((P.folios.desde||{})[tipo], 1), ultimoFolio(tipo) + 1);
+  if(n > topeFolio()){
+    P.folios.extra = sumaLetra(String(P.folios.extra||""));
+    P.folios.desde = {cta:1, tur:1};
+    persist();
+    toast("Se agotaron los números: la serie ahora es " + serieFolio());
+    n = 1;
+  }
+  return (tipo === "cta" ? "CTA-" : "TUR-") + serieFolio() + String(n).padStart(digitosFolio(), "0");
+}
+
+/* ===================================================================
+   MESAS
+   =================================================================== */
+const comandaDe = id => COMANDAS.find(c=>c.mesaId === id && c.estado !== "cerrada");
+const abiertas  = () => COMANDAS.filter(c=>c.estado !== "cerrada");
+const zonas = () => [...new Set(MESAS.filter(m=>m.activa!==false).map(m=>m.zona||"Salón"))];
+let zonaVista = "";
+
+function totalLineas(c){
+  return (c.lineas||[]).reduce((s,l)=> s + num(l.precio) * num(l.cant,1) +
+    (l.mods||[]).reduce((x,m)=> x + num(m.extra) * num(l.cant,1), 0), 0);
+}
+function sumaComanda(c){
+  const sub = totalLineas(c);
+  const serv = sub * num(P.servicio)/100;
+  return {sub, serv, total: sub + serv};
+}
+
+function renderMesas(){
+  const zs = zonas();
+  if(!zs.length){ $("#mesaZonas").innerHTML = ""; $("#mesaRejilla").innerHTML =
+    '<div class="empty">No hay mesas dadas de alta. Ve a <b>Ajustes → Mesas y zonas</b>.</div>'; return; }
+  if(!zonaVista || zs.indexOf(zonaVista) < 0) zonaVista = zs[0];
+  $("#mesaZonas").innerHTML = zs.map(z=>{
+    const n = MESAS.filter(m=>m.activa!==false && (m.zona||"Salón")===z && comandaDe(m.id)).length;
+    return '<button type="button" data-zona="'+esc(z)+'" aria-pressed="'+(z===zonaVista)+'">'+
+      esc(z) + (n ? " · " + n : "") + '</button>';
+  }).join("");
+
+  const mias = MESAS.filter(m=>m.activa!==false && (m.zona||"Salón") === zonaVista);
+  $("#mesaRejilla").innerHTML = mias.map(m=>{
+    const c = comandaDe(m.id);
+    const cl = !c ? "libre" : c.estado === "cuenta" ? "cuenta" : "ocupada";
+    const s = c ? sumaComanda(c) : null;
+    const desde = c ? horasTxt(minutosDe(horaAhora()) - minutosDe(c.abre)) : "";
+    return '<button class="mesa '+cl+'" data-mesa="'+esc(m.id)+'">'+
+      '<b>'+esc(m.nombre)+'</b>'+
+      '<span class="pers">'+(c ? (c.personas||m.lugares||2)+" pers" : (m.lugares||2)+" lug")+'</span>'+
+      '<small>'+(c ? esc(c.mesero||"") + " · " + desde : "Libre")+'</small>'+
+      '<span class="tot">'+(c ? mx(s.total) : "")+'</span>'+
+      '<span class="sello">'+(!c ? "toca para abrir" : c.estado === "cuenta" ? "cuenta pedida" : "ocupada")+'</span>'+
+      '</button>';
+  }).join("") || '<div class="empty">Esta zona no tiene mesas.</div>';
+
+  const ab = abiertas();
+  $("#mesasResumen").textContent = ab.length
+    ? ab.length + " abierta(s) · " + mx(ab.reduce((s,c)=>s+sumaComanda(c).total,0)) + " en el piso"
+    : "Todas las mesas libres";
+  pintaTabs();
+  $$("#tabs button").forEach(b=> b.setAttribute("aria-selected", String(b.dataset.tab === "mesas")));
+}
+$("#mesaZonas").addEventListener("click", e=>{
+  const b = e.target.closest("[data-zona]"); if(!b) return;
+  zonaVista = b.dataset.zona; renderMesas();
+});
+$("#mesaRejilla").addEventListener("click", e=>{
+  const b = e.target.closest("[data-mesa]"); if(!b) return;
+  abreMesa(b.dataset.mesa);
+});
+$("#mesaRapida").addEventListener("click", ()=> abreMesa("llevar"));
+
+/* ===================================================================
+   COMANDA
+   =================================================================== */
+let comandaId = null, catVista = "";
+
+function comandaActual(){ return COMANDAS.find(c=>c.id === comandaId); }
+
+function abreMesa(mesaId){
+  if(!turnoAbierto()){
+    if(!confirm("La caja está cerrada.\n\n¿Abrir el turno ahora? Sin turno no se puede cobrar.")) return;
+    vaA("caja"); abreTurno(); return;
+  }
+  let c;
+  if(mesaId === "llevar"){
+    c = nuevaComanda({id:"llevar", nombre:"Para llevar", lugares:1});
+  }else{
+    const m = MESAS.find(x=>x.id === mesaId); if(!m) return;
+    c = comandaDe(mesaId) || nuevaComanda(m);
+  }
+  comandaId = c.id;
+  catVista = "";
+  vaA("comanda");
+  renderComanda();
+}
+function nuevaComanda(m){
+  const c = {
+    id: uid(), folio: folioNuevo("cta"), mesaId: m.id, mesaNombre: m.nombre,
+    personas: m.lugares || 2, abre: horaAhora(), fecha: hoyISO(),
+    mesero: usuarioActual().nombre || "", meseroId: usuarioActual().id || "",
+    lineas: [], estado: "abierta", pagos: [], propina: 0, ts: Date.now()
+  };
+  COMANDAS.unshift(c); persist();
+  return c;
+}
+
+function renderComanda(){
+  const c = comandaActual(); if(!c){ vaA("mesas"); return; }
+  $("#comTitulo").textContent = c.mesaNombre;
+  $("#comFolio").textContent = c.folio;
+  $("#comPersonas").textContent = c.personas + " comensal(es) · abrió " + c.abre + " · " + (c.mesero||"");
+
+  const cats = (MENU.cats||[]).slice().sort((a,b)=>num(a.orden)-num(b.orden));
+  if(!catVista || !cats.some(x=>x.id===catVista)) catVista = (cats[0]||{}).id || "";
+  $("#comCats").innerHTML = cats.map(x=>
+    '<button type="button" data-cat="'+esc(x.id)+'" aria-pressed="'+(x.id===catVista)+'">'+
+    esc(x.nombre)+'</button>').join("");
+
+  const plats = (MENU.plats||[]).filter(p=>p.catId === catVista);
+  $("#comPlatillos").innerHTML = plats.map(p=>
+    '<button class="plat'+(p.activo===false?" agotado":"")+'" data-plat="'+esc(p.id)+'"'+
+    (p.activo===false?" disabled":"")+'><b>'+esc(p.nombre)+'</b>'+
+    '<span>'+mx(p.precio)+'</span></button>').join("") ||
+    '<div class="empty">Esta categoría no tiene platillos.</div>';
+
+  pintaLineas();
+}
+function pintaLineas(){
+  const c = comandaActual(); if(!c) return;
+  $("#comLineas").innerHTML = (c.lineas||[]).map(l=>{
+    const imp = (num(l.precio) + (l.mods||[]).reduce((x,m)=>x+num(m.extra),0)) * num(l.cant,1);
+    const extras = (l.mods||[]).map(m=>m.nombre + (num(m.extra) ? " +"+mx(m.extra) : "")).join(" · ");
+    return '<div class="lin'+(l.enviada?" enviada":"")+'" data-lin="'+esc(l.id)+'">'+
+      '<span class="cant">'+num(l.cant,1)+'×</span>'+
+      '<span><b>'+esc(l.nombre)+'</b>'+
+        (extras ? '<small>'+esc(extras)+'</small>' : '')+
+        (l.nota ? '<small>✎ '+esc(l.nota)+'</small>' : '')+
+        (l.enviada ? '<small>en cocina desde '+esc(l.enviada)+'</small>'
+                   : '<span class="acc"><button data-menos="'+esc(l.id)+'">−</button>'+
+                     '<button data-mas="'+esc(l.id)+'">+</button>'+
+                     '<button data-quita="'+esc(l.id)+'">✕</button></span>')+
+      '</span>'+
+      '<span class="imp">'+mx(imp)+'</span></div>';
+  }).join("") || '<div class="empty">Nada pedido todavía. Toca un platillo.</div>';
+
+  const s = sumaComanda(c);
+  $("#comSuma").innerHTML =
+    '<div class="sumaLin"><span>Consumo</span><span class="mono">'+mx(s.sub)+'</span></div>' +
+    (num(P.servicio) ? '<div class="sumaLin"><span>Servicio '+num(P.servicio)+'%</span><span class="mono">'+mx(s.serv)+'</span></div>' : '') +
+    '<div class="sumaLin total"><span>Total</span><span>'+mx(s.total)+'</span></div>';
+
+  const faltan = (c.lineas||[]).filter(l=>!l.enviada).length;
+  $("#comEnviar").textContent = faltan ? "Mandar a cocina (" + faltan + ")" : "Todo en cocina";
+  $("#comEnviar").disabled = !faltan;
+  $("#comCobrar").disabled = !(c.lineas||[]).length;
+}
+$("#comCats").addEventListener("click", e=>{
+  const b = e.target.closest("[data-cat]"); if(!b) return;
+  catVista = b.dataset.cat; renderComanda();
+});
+$("#comPlatillos").addEventListener("click", e=>{
+  const b = e.target.closest("[data-plat]"); if(!b) return;
+  pideModificadores(b.dataset.plat);
+});
+$("#comLineas").addEventListener("click", e=>{
+  const c = comandaActual(); if(!c) return;
+  const mas = e.target.closest("[data-mas]"), menos = e.target.closest("[data-menos]"),
+        qui = e.target.closest("[data-quita]");
+  const id = (mas||menos||qui||{}).dataset;
+  if(!id) return;
+  const l = c.lineas.find(x=>x.id === (id.mas || id.menos || id.quita)); if(!l || l.enviada) return;
+  if(mas) l.cant = num(l.cant,1) + 1;
+  if(menos) l.cant = Math.max(1, num(l.cant,1) - 1);
+  if(qui) c.lineas = c.lineas.filter(x=>x.id !== l.id);
+  persist(); pintaLineas();
+});
+$("#comVolver").addEventListener("click", ()=>{ vaA("mesas"); });
+$("#comGente").addEventListener("click", ()=>{
+  const c = comandaActual(); if(!c) return;
+  const n = prompt("¿Cuántos comensales?", c.personas);
+  if(n === null) return;
+  c.personas = Math.max(1, num(n,1)); persist(); renderComanda();
+});
+$("#comEnviar").addEventListener("click", ()=>{
+  const c = comandaActual(); if(!c) return;
+  const h = horaAhora();
+  let n = 0;
+  (c.lineas||[]).forEach(l=>{ if(!l.enviada){ l.enviada = h; n++; } });
+  persist(); pintaLineas();
+  toast(n + " platillo(s) a cocina. Ya no se pueden quitar desde aquí.");
+});
+$("#comCancelar").addEventListener("click", ()=>{
+  const c = comandaActual(); if(!c) return;
+  const enCocina = (c.lineas||[]).filter(l=>l.enviada).length;
+  if(!confirm("¿Cancelar " + c.mesaNombre + "?\n\n" +
+      (enCocina ? "Ya hay " + enCocina + " platillo(s) en cocina: alguien los preparó.\n\n" : "") +
+      "La cuenta se cierra en cero y queda registrada como cancelada.")) return;
+  c.estado = "cerrada"; c.cancelada = true; c.cierra = horaAhora(); c.total = 0;
+  persist(); vaA("mesas");
+  toast("Mesa cancelada");
+});
+
+/* ---------------- modificadores ---------------- */
+let modPlat = null, modCant = 1, modElegidos = {};
+function pideModificadores(platId){
+  const p = (MENU.plats||[]).find(x=>x.id === platId); if(!p) return;
+  modPlat = p; modCant = 1; modElegidos = {};
+  const grupos = (p.mods||[]).map(g=>(MENU.grupos||[]).find(x=>x.id===g)).filter(Boolean);
+  if(!grupos.length){ agregaLinea(p, [], "", 1); return; }   /* sin preguntas, directo */
+  $("#modsTitulo").textContent = p.nombre;
+  $("#modsNota").value = "";
+  $("#modsCuerpo").innerHTML = grupos.map(g=>
+    '<div class="modGrupo" data-grupo="'+esc(g.id)+'"><b>'+esc(g.nombre)+'</b>'+
+    '<small>'+(num(g.min) ? "Escoge al menos "+num(g.min) : "Opcional")+
+      (num(g.max) ? " · hasta "+num(g.max) : "")+'</small>'+
+    '<div class="modChips">'+ g.ops.map(o=>
+      '<label class="modChip" data-op="'+esc(o.id)+'"><input type="checkbox">'+
+      esc(o.nombre)+(num(o.extra) ? ' <i>+'+mx(o.extra)+'</i>' : '')+'</label>').join("") +
+    '</div></div>').join("");
+  pintaModsImporte();
+  $("#modalMods").hidden = false;
+}
+function modsElegidos(){
+  const out = [];
+  $$("#modsCuerpo .modChip.si").forEach(ch=>{
+    const gid = ch.closest("[data-grupo]").dataset.grupo;
+    const g = (MENU.grupos||[]).find(x=>x.id===gid); if(!g) return;
+    const o = g.ops.find(x=>x.id === ch.dataset.op); if(!o) return;
+    out.push({nombre:o.nombre, extra:num(o.extra)});
+  });
+  return out;
+}
+function pintaModsImporte(){
+  if(!modPlat) return;
+  const extra = modsElegidos().reduce((s,m)=>s+num(m.extra), 0);
+  $("#modsCant").textContent = modCant;
+  $("#modsImporte").textContent = mx((num(modPlat.precio) + extra) * modCant);
+}
+$("#modsCuerpo").addEventListener("click", e=>{
+  const ch = e.target.closest(".modChip"); if(!ch) return;
+  e.preventDefault();
+  const g = ch.closest("[data-grupo]");
+  const grupo = (MENU.grupos||[]).find(x=>x.id === g.dataset.grupo) || {};
+  const max = num(grupo.max, 99);
+  const puestos = [...g.querySelectorAll(".modChip.si")];
+  if(!ch.classList.contains("si") && puestos.length >= max && max === 1){
+    puestos.forEach(x=>x.classList.remove("si"));   /* de uno solo: cambia, no suma */
+  }else if(!ch.classList.contains("si") && puestos.length >= max){
+    toast("En «"+grupo.nombre+"» se pueden escoger hasta "+max); return;
+  }
+  ch.classList.toggle("si");
+  pintaModsImporte();
+});
+$("#modsMas").addEventListener("click", ()=>{ modCant++; pintaModsImporte(); });
+$("#modsMenos").addEventListener("click", ()=>{ modCant = Math.max(1, modCant-1); pintaModsImporte(); });
+$("#modsCerrar").addEventListener("click", ()=>{ $("#modalMods").hidden = true; modPlat = null; });
+$("#modsOk").addEventListener("click", ()=>{
+  if(!modPlat) return;
+  const grupos = (modPlat.mods||[]).map(g=>(MENU.grupos||[]).find(x=>x.id===g)).filter(Boolean);
+  for(const g of grupos){
+    const n = $$('#modsCuerpo [data-grupo="'+g.id+'"] .modChip.si').length;
+    if(n < num(g.min)){ toast("Falta escoger en «"+g.nombre+"»"); return; }
+  }
+  agregaLinea(modPlat, modsElegidos(), $("#modsNota").value.trim(), modCant);
+  $("#modalMods").hidden = true; modPlat = null;
+});
+function agregaLinea(p, mods, nota, cant){
+  const c = comandaActual(); if(!c) return;
+  c.lineas.push({id:uid(), platId:p.id, nombre:p.nombre, precio:num(p.precio),
+                 cant: Math.max(1, num(cant,1)), mods: mods||[], nota: nota||"", enviada:""});
+  persist(); pintaLineas();
+  toast(p.nombre + " agregado");
+}
+
+/* ===================================================================
+   COBRO
+   =================================================================== */
+let cobroPropPct = null, cobroPagos = [];
+
+$("#comCobrar").addEventListener("click", ()=>{
+  const c = comandaActual(); if(!c || !(c.lineas||[]).length) return;
+  if(!turnoAbierto()){ toast("Abre el turno de caja antes de cobrar"); return; }
+  c.estado = "cuenta"; persist();
+  cobroPropPct = num(P.propina) || 0;
+  cobroPagos = [];
+  $("#cobroPartes").value = 1;
+  $("#cobroMesa").textContent = c.mesaNombre + " · " + c.folio;
+  pintaCobro();
+  $("#modalCobro").hidden = false;
+});
+function pintaCobro(){
+  const c = comandaActual(); if(!c) return;
+  const s = sumaComanda(c);
+  const prop = cobroPropPct === null ? num($("#cobroPropMonto").value) : s.sub * cobroPropPct/100;
+  const total = s.total + prop;
+
+  $("#cobroTotal").textContent = mx(total);
+  $("#cobroDesglose").textContent = "Consumo " + mx(s.sub) +
+    (s.serv ? " · servicio " + mx(s.serv) : "") + (prop ? " · propina " + mx(prop) : "");
+  if(cobroPropPct !== null) $("#cobroPropMonto").value = Math.round(prop*100)/100;
+
+  $("#cobroProp").innerHTML = [0,10,15,20].map(p=>
+    '<button type="button" data-prop="'+p+'" aria-pressed="'+(cobroPropPct===p)+'">'+
+    (p ? p+"%" : "Sin propina")+'</button>').join("") +
+    '<button type="button" data-prop="x" aria-pressed="'+(cobroPropPct===null)+'">Otra</button>';
+
+  const partes = Math.max(1, num($("#cobroPartes").value, 1));
+  const nota = $("#cobroParteNota");
+  if(partes > 1){
+    nota.hidden = false;
+    nota.innerHTML = "Entre " + partes + " personas toca <b>" + mx(total/partes) + "</b> a cada quien. " +
+      "La cuenta se cierra completa: esto es para que nadie saque la calculadora.";
+  }else nota.hidden = true;
+
+  $("#cobroPagos").innerHTML = cobroPagos.map((p,i)=>
+    '<div class="pagoLin"><span style="font-size:12.5px;text-transform:capitalize">'+esc(p.tipo)+'</span>'+
+    '<input type="number" min="0" step="0.01" data-pagomonto="'+i+'" value="'+(p.monto||"")+'" placeholder="0.00">'+
+    '<button class="btn sm ghost" data-quitapago="'+i+'">✕</button></div>').join("") ||
+    '<div class="empty" style="padding:12px">Escoge cómo paga.</div>';
+
+  const pagado = cobroPagos.reduce((s2,p)=>s2+num(p.monto), 0);
+  const falta = total - pagado;
+  const cambio = $("#cobroCambio"), avisa = $("#cobroFalta");
+  if(pagado && falta < -0.004){
+    const efectivo = cobroPagos.some(p=>p.tipo === "efectivo");
+    cambio.hidden = !efectivo;
+    $("#cobroCambioV").textContent = mx(-falta);
+    avisa.hidden = efectivo;
+    if(!efectivo) avisa.innerHTML = "Están pagando " + mx(-falta) + " de más y no hay efectivo: " +
+      "no hay de dónde dar cambio. Ajusta el monto.";
+  }else{
+    cambio.hidden = true;
+    avisa.hidden = !(pagado && falta > 0.004);
+    if(!avisa.hidden) avisa.innerHTML = "Faltan <b>" + mx(falta) + "</b> por cubrir.";
+  }
+  $("#cobroOk").disabled = !(pagado > 0 && falta <= 0.004);
+}
+$("#cobroProp").addEventListener("click", e=>{
+  const b = e.target.closest("[data-prop]"); if(!b) return;
+  cobroPropPct = b.dataset.prop === "x" ? null : num(b.dataset.prop);
+  pintaCobro();
+});
+$("#modalCobro").addEventListener("input", e=>{
+  if(e.target.id === "cobroPropMonto"){ cobroPropPct = null; pintaCobro(); return; }
+  if(e.target.id === "cobroPartes"){ pintaCobro(); return; }
+  const m = e.target.closest("[data-pagomonto]");
+  if(m){ cobroPagos[num(m.dataset.pagomonto)].monto = num(m.value); pintaCobro(); }
+});
+$("#modalCobro").addEventListener("click", e=>{
+  const nuevo = e.target.closest("[data-pago]");
+  if(nuevo){
+    const c = comandaActual();
+    const s = c ? sumaComanda(c) : {total:0};
+    const prop = cobroPropPct === null ? num($("#cobroPropMonto").value) : s.sub * cobroPropPct/100;
+    const falta = Math.max(0, s.total + prop - cobroPagos.reduce((x,p)=>x+num(p.monto),0));
+    cobroPagos.push({tipo:nuevo.dataset.pago, monto: Math.round(falta*100)/100});
+    pintaCobro(); return;
+  }
+  const q = e.target.closest("[data-quitapago]");
+  if(q){ cobroPagos.splice(num(q.dataset.quitapago), 1); pintaCobro(); }
+});
+$("#cobroCerrar").addEventListener("click", ()=>{ $("#modalCobro").hidden = true; });
+$("#cobroOk").addEventListener("click", ()=>{
+  const c = comandaActual(); if(!c) return;
+  const s = sumaComanda(c);
+  const prop = cobroPropPct === null ? num($("#cobroPropMonto").value) : s.sub * cobroPropPct/100;
+  const total = s.total + prop;
+  const efec = cobroPagos.filter(p=>p.tipo==="efectivo").reduce((x,p)=>x+num(p.monto),0);
+  const pagado = cobroPagos.reduce((x,p)=>x+num(p.monto),0);
+  const cambio = Math.max(0, pagado - total);
+
+  c.estado = "cerrada"; c.cierra = horaAhora();
+  c.subtotal = s.sub; c.servicio = s.serv; c.propina = prop; c.total = total;
+  /* El efectivo que entra a la caja es lo que recibió menos lo que devolvió. */
+  c.pagos = cobroPagos.map(p=>({tipo:p.tipo, monto:num(p.monto)}));
+  c.cambio = cambio;
+  c.efectivoCaja = Math.max(0, efec - cambio);
+  c.turnoId = (turnoAbierto()||{}).id || "";
+  c.cobro = usuarioActual().nombre || "";
+  persist();
+
+  $("#modalCobro").hidden = true;
+  comandaId = null;
+  vaA("mesas");
+  toast("Cobrado " + mx(total) + (cambio ? " · cambio " + mx(cambio) : "") + " · " + c.folio);
+});
+
+/* ===================================================================
+   TURNO DE CAJA
+   =================================================================== */
+const turnoAbierto = () => TURNOS.find(t=>t.abierto);
+const comandasDeTurno = id => COMANDAS.filter(c=>c.estado === "cerrada" && !c.cancelada && c.turnoId === id);
+
+function sumaTurno(t){
+  const cs = comandasDeTurno(t.id);
+  const por = {efectivo:0, tarjeta:0, transferencia:0};
+  let propinas = 0, total = 0, efectivoCaja = 0;
+  cs.forEach(c=>{
+    total += num(c.total); propinas += num(c.propina); efectivoCaja += num(c.efectivoCaja);
+    (c.pagos||[]).forEach(p=>{ por[p.tipo] = num(por[p.tipo]) + num(p.monto); });
+  });
+  const movs = (t.movs||[]).reduce((s,m)=> s + (m.tipo==="entrada" ? num(m.monto) : -num(m.monto)), 0);
+  return {cuentas:cs.length, total, propinas, por, efectivoCaja,
+          movs, enCaja: num(t.fondo) + efectivoCaja + movs};
+}
+
+function renderCaja(){
+  const t = turnoAbierto();
+  const w = $("#cajaCuerpo");
+  if(!t){
+    $("#cajaHint").textContent = "sin turno abierto";
+    const ult = TURNOS.find(x=>!x.abierto);
+    w.innerHTML = '<div class="empty" style="padding:14px 0">' +
+      '<p style="margin:0 0 14px">La caja está cerrada. Sin turno abierto no se puede cobrar: ' +
+      'así se sabe <b>quién</b> tenía el dinero cuando faltó.</p>' +
+      '<button class="btn primary lg" id="cajaAbrir">Abrir turno</button></div>' +
+      (ult ? '<p class="note" style="margin-top:16px">El último turno lo cerró <b>' + esc(ult.cajero||"—") +
+        '</b> a las ' + esc(ult.cierra||"—") + ' con ' + mx(ult.contado) +
+        ' contados' + (num(ult.diferencia) ? ' y una diferencia de <b>' + mx(ult.diferencia) + '</b>' : ' y sin diferencia') +
+        '.</p>' : '');
+    $("#t_movs").innerHTML = "";
+    pintaTurnoChip();
+    return;
+  }
+  const s = sumaTurno(t);
+  $("#cajaHint").textContent = t.folio + " · abrió " + t.abre;
+  w.innerHTML =
+    '<div class="tiles" style="margin-bottom:4px">' +
+      '<div class="tile destacada"><span class="et">Debe haber en caja</span><span class="v">' + mx(s.enCaja) + '</span>' +
+        '<span class="sub">fondo ' + mx(t.fondo) + ' + efectivo ' + mx(s.efectivoCaja) +
+        (s.movs ? (s.movs > 0 ? ' + ' : ' − ') + mx(Math.abs(s.movs)) : '') + '</span></div>' +
+      '<div class="tile"><span class="et">Cuentas cobradas</span><span class="v">' + s.cuentas + '</span>' +
+        '<span class="sub">' + (s.cuentas ? "ticket promedio " + mx(s.total/s.cuentas) : "ninguna todavía") + '</span></div>' +
+      '<div class="tile"><span class="et">Vendido</span><span class="v">' + mx(s.total) + '</span>' +
+        '<span class="sub">efectivo ' + mx(s.por.efectivo) + ' · tarjeta ' + mx(s.por.tarjeta) + '</span></div>' +
+      '<div class="tile"><span class="et">Propinas</span><span class="v">' + mx(s.propinas) + '</span>' +
+        '<span class="sub">se reparten aparte</span></div>' +
+    '</div>' +
+    '<p class="note" style="margin:14px 0">Cajero: <b>' + esc(t.cajero||"") + '</b>. ' +
+      'Al cerrar se cuenta el dinero <b>sin ver</b> cuánto debería haber — si primero se ve la cifra, ' +
+      'el conteo deja de servir para encontrar un faltante.</p>' +
+    '<div class="fila">' +
+      '<button class="btn" id="cajaEntrada">Meter dinero</button>' +
+      '<button class="btn" id="cajaSalida">Sacar dinero</button>' +
+      '<button class="btn acento" id="cajaCerrar" style="margin-left:auto">Cerrar turno</button>' +
+    '</div>';
+
+  $("#t_movs").innerHTML = '<thead><tr><th>Hora</th><th>Qué</th><th>Nota</th><th class="der">Monto</th></tr></thead><tbody>' +
+    (t.movs||[]).slice().reverse().map(m=>
+      '<tr><td class="mono">'+esc(m.hora)+'</td>' +
+      '<td><span class="pill '+(m.tipo==="entrada"?"good":"warn")+'">'+(m.tipo==="entrada"?"entrada":"salida")+'</span></td>' +
+      '<td>'+esc(m.nota||"—")+'</td>' +
+      '<td class="der mono">'+(m.tipo==="entrada"?"+":"−")+mx(m.monto)+'</td></tr>').join("") +
+    '</tbody>';
+  if(!(t.movs||[]).length)
+    $("#t_movs").innerHTML += '<tbody><tr><td colspan="4"><div class="empty">Sin movimientos. ' +
+      'Aquí van los retiros parciales y el dinero que entra que no es una venta.</div></td></tr></tbody>';
+  pintaTurnoChip();
+}
+function pintaTurnoChip(){
+  const t = turnoAbierto(), ch = $("#turnoChip");
+  if(!ch) return;
+  if(t){
+    const s = sumaTurno(t);
+    ch.className = "turnoChip";
+    ch.innerHTML = "Caja <b>abierta</b> · " + esc(t.cajero||"") + " · " + mx(s.enCaja);
+  }else{
+    ch.className = "turnoChip cerrado";
+    ch.innerHTML = "Caja <b>cerrada</b>";
+  }
+}
+$("#cajaCuerpo").addEventListener("click", e=>{
+  if(e.target.closest("#cajaAbrir"))  { abreTurno(); return; }
+  if(e.target.closest("#cajaEntrada")){ movimiento("entrada"); return; }
+  if(e.target.closest("#cajaSalida")) { movimiento("salida"); return; }
+  if(e.target.closest("#cajaCerrar")) { cierraTurno(); return; }
+});
+function abreTurno(){
+  $("#turnoTitulo").textContent = "Abrir turno";
+  $("#turnoCuerpo").innerHTML =
+    '<p class="note" style="margin:0 0 14px">El <b>fondo</b> es el dinero con el que empieza la caja ' +
+    'para dar cambio. Cuéntalo antes de escribirlo.</p>' +
+    '<label class="f" for="turFondo">Fondo de apertura</label>' +
+    '<input id="turFondo" type="number" min="0" step="0.01" value="0" autofocus>' +
+    '<div class="fila" style="margin-top:16px"><button class="btn primary ancho" id="turOk">Abrir con este fondo</button></div>';
+  $("#modalTurno").hidden = false;
+  setTimeout(()=>{ const f = $("#turFondo"); if(f){ f.focus(); f.select(); } }, 60);
+  $("#turOk").onclick = ()=>{
+    const t = {id:uid(), folio:folioNuevo("tur"), abre:horaAhora(), fecha:hoyISO(),
+               cajero: usuarioActual().nombre||"", cajeroId: usuarioActual().id||"",
+               fondo: num($("#turFondo").value), movs:[], abierto:true, ts:Date.now()};
+    TURNOS.unshift(t); persist();
+    $("#modalTurno").hidden = true;
+    renderCaja();
+    toast("Turno " + t.folio + " abierto con " + mx(t.fondo));
+  };
+}
+function movimiento(tipo){
+  const t = turnoAbierto(); if(!t) return;
+  $("#turnoTitulo").textContent = tipo === "entrada" ? "Meter dinero a la caja" : "Sacar dinero de la caja";
+  $("#turnoCuerpo").innerHTML =
+    '<label class="f" for="movMonto">Monto</label>' +
+    '<input id="movMonto" type="number" min="0" step="0.01" value="">' +
+    '<label class="f" style="margin-top:12px" for="movNota">¿Por qué?</label>' +
+    '<input id="movNota" placeholder="' + (tipo==="salida" ? "Retiro a la caja fuerte, pago al repartidor…" : "Cambio del banco, fondo extra…") + '">' +
+    '<div class="fila" style="margin-top:16px"><button class="btn primary ancho" id="movOk">Registrar</button></div>';
+  $("#modalTurno").hidden = false;
+  setTimeout(()=>{ const f = $("#movMonto"); if(f) f.focus(); }, 60);
+  $("#movOk").onclick = ()=>{
+    const m = num($("#movMonto").value);
+    if(m <= 0){ toast("Escribe el monto"); return; }
+    const nota = $("#movNota").value.trim();
+    if(!nota){ toast("Escribe por qué: un movimiento sin razón no se puede auditar"); return; }
+    t.movs = t.movs || [];
+    t.movs.push({tipo, monto:m, nota, hora:horaAhora(), quien: usuarioActual().nombre||""});
+    persist(); $("#modalTurno").hidden = true; renderCaja();
+    toast((tipo==="entrada" ? "Entraron " : "Salieron ") + mx(m));
+  };
+}
+function cierraTurno(){
+  const t = turnoAbierto(); if(!t) return;
+  const ab = abiertas();
+  if(ab.length){
+    toast("Hay " + ab.length + " mesa(s) abierta(s). Ciérralas antes de cerrar el turno.");
+    vaA("mesas"); return;
+  }
+  $("#turnoTitulo").textContent = "Cerrar turno " + t.folio;
+  $("#turnoCuerpo").innerHTML =
+    '<p class="note" style="margin:0 0 14px">Cuenta el dinero que hay en la caja y escríbelo. ' +
+    '<b>Todavía no se enseña cuánto debería haber</b>: así el conteo sirve para encontrar un faltante, ' +
+    'no para confirmarlo.</p>' +
+    '<label class="f" for="turContado">Dinero contado</label>' +
+    '<input id="turContado" type="number" min="0" step="0.01" value="">' +
+    '<div class="fila" style="margin-top:16px"><button class="btn acento ancho" id="turCierra">Cerrar y ver el corte</button></div>';
+  $("#modalTurno").hidden = false;
+  setTimeout(()=>{ const f = $("#turContado"); if(f) f.focus(); }, 60);
+  $("#turCierra").onclick = ()=>{
+    const contado = num($("#turContado").value);
+    const s = sumaTurno(t);
+    const dif = contado - s.enCaja;
+    t.abierto = false; t.cierra = horaAhora(); t.contado = contado;
+    t.deberia = s.enCaja; t.diferencia = dif;
+    t.resumen = {cuentas:s.cuentas, total:s.total, propinas:s.propinas, por:s.por, movs:s.movs};
+    persist();
+    $("#turnoTitulo").textContent = "Corte de " + t.folio;
+    $("#turnoCuerpo").innerHTML =
+      '<div class="tiles" style="margin-bottom:8px">' +
+        '<div class="tile"><span class="et">Debía haber</span><span class="v">' + mx(s.enCaja) + '</span></div>' +
+        '<div class="tile"><span class="et">Contaste</span><span class="v">' + mx(contado) + '</span></div>' +
+        '<div class="tile ' + (Math.abs(dif) < 0.01 ? '' : 'destacada') + '"><span class="et">Diferencia</span>' +
+          '<span class="v" style="color:' + (Math.abs(dif) < 0.01 ? "var(--good)" : dif < 0 ? "var(--mal)" : "var(--warn)") + '">' +
+          (dif > 0 ? "+" : "") + mx(dif) + '</span>' +
+          '<span class="sub">' + (Math.abs(dif) < 0.01 ? "cuadró" : dif < 0 ? "faltó dinero" : "sobró dinero") + '</span></div>' +
+      '</div>' +
+      '<div class="tbl-wrap"><table><tbody>' +
+        '<tr><td>Cuentas cobradas</td><td class="der mono">' + s.cuentas + '</td></tr>' +
+        '<tr><td>Vendido</td><td class="der mono">' + mx(s.total) + '</td></tr>' +
+        '<tr><td>Efectivo</td><td class="der mono">' + mx(s.por.efectivo) + '</td></tr>' +
+        '<tr><td>Tarjeta</td><td class="der mono">' + mx(s.por.tarjeta) + '</td></tr>' +
+        '<tr><td>Transferencia</td><td class="der mono">' + mx(s.por.transferencia) + '</td></tr>' +
+        '<tr><td>Propinas</td><td class="der mono">' + mx(s.propinas) + '</td></tr>' +
+      '</tbody></table></div>' +
+      '<div class="fila" style="margin-top:16px"><button class="btn primary ancho" id="turList">Listo</button></div>';
+    $("#turList").onclick = ()=>{ $("#modalTurno").hidden = true; renderCaja(); };
+  };
+}
+$("#turnoCerrarX").addEventListener("click", ()=>{ $("#modalTurno").hidden = true; });
+
+/* ===================================================================
+   INICIO · VENTAS
+   =================================================================== */
+const cerradasDe = f => COMANDAS.filter(c=>c.estado === "cerrada" && !c.cancelada && c.fecha === f);
+
+function renderInicio(){
+  const hoy = cerradasDe(hoyISO());
+  const total = hoy.reduce((s,c)=>s+num(c.total),0);
+  const u = usuarioActual();
+  const h = new Date().getHours();
+  const saludo = h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches";
+  const d = new Date();
+  $("#inFecha").textContent = d.toLocaleDateString("es-MX",
+    {weekday:"long", day:"numeric", month:"long"}) + " · " + horaAhora();
+  $("#inHola").textContent = saludo + ", " + (u.nombre||"");
+  const t = turnoAbierto();
+  $("#inSub").textContent = t
+    ? "Caja abierta por " + (t.cajero||"") + " desde las " + t.abre
+    : "La caja está cerrada: ábrela para empezar a cobrar.";
+
+  const ab = abiertas();
+  $("#inTiles").innerHTML =
+    '<div class="tile destacada"><span class="et">Vendido hoy</span><span class="v">' + mx(total) + '</span>' +
+      '<span class="sub">' + (hoy.length ? hoy.length + " cuenta(s)" : "todavía nada") + '</span></div>' +
+    '<div class="tile"><span class="et">En el piso</span><span class="v">' + ab.length + '</span>' +
+      '<span class="sub">' + (ab.length ? mx(ab.reduce((s,c)=>s+sumaComanda(c).total,0)) + " sin cobrar" : "todas libres") + '</span></div>' +
+    '<div class="tile"><span class="et">Ticket promedio</span><span class="v">' +
+      (hoy.length ? mx(total/hoy.length) : "—") + '</span>' +
+      '<span class="sub">' + (hoy.length ? "por cuenta" : "sin cuentas hoy") + '</span></div>' +
+    '<div class="tile"><span class="et">Propinas de hoy</span><span class="v">' +
+      mx(hoy.reduce((s,c)=>s+num(c.propina),0)) + '</span><span class="sub">para repartir</span></div>';
+
+  $("#inMesasHint").textContent = ab.length ? ab.length + " abierta(s)" : "ninguna";
+  $("#inMesas").innerHTML = ab.length
+    ? '<div class="tbl-wrap"><table><thead><tr><th>Mesa</th><th>Mesero</th><th>Abrió</th><th class="der">Va en</th></tr></thead><tbody>' +
+      ab.slice().sort((a,b)=>minutosDe(a.abre)-minutosDe(b.abre)).map(c=>
+        '<tr class="clic" data-irmesa="'+esc(c.id)+'"><td><b>'+esc(c.mesaNombre)+'</b>' +
+        (c.estado==="cuenta" ? ' <span class="pill warn">pidió cuenta</span>' : '') + '</td>' +
+        '<td>'+esc(c.mesero||"—")+'</td><td class="mono">'+esc(c.abre)+'</td>' +
+        '<td class="der mono">'+mx(sumaComanda(c).total)+'</td></tr>').join("") +
+      '</tbody></table></div>'
+    : '<div class="empty">No hay mesas abiertas.</div>';
+
+  const porCat = {};
+  hoy.forEach(c=>(c.lineas||[]).forEach(l=>{
+    const p = (MENU.plats||[]).find(x=>x.id === l.platId);
+    const cat = p ? ((MENU.cats||[]).find(x=>x.id===p.catId)||{}).nombre || "Otros" : "Otros";
+    porCat[cat] = num(porCat[cat]) + num(l.precio)*num(l.cant,1);
+  }));
+  const cats = Object.keys(porCat).sort((a,b)=>porCat[b]-porCat[a]);
+  const mayor = cats.length ? porCat[cats[0]] : 0;
+  $("#inCat").innerHTML = cats.length
+    ? cats.map(k=>'<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px">' +
+        '<span>'+esc(k)+'</span><span class="mono">'+mx(porCat[k])+'</span></div>' +
+        '<div style="height:7px;border-radius:99px;background:var(--surface-2);margin-top:4px;overflow:hidden">' +
+        '<i style="display:block;height:100%;width:'+Math.round(porCat[k]/mayor*100)+'%;background:var(--cyan)"></i></div></div>').join("")
+    : '<div class="empty">Sin ventas hoy.</div>';
+}
+$("#inMesas").addEventListener("click", e=>{
+  const tr = e.target.closest("[data-irmesa]"); if(!tr) return;
+  const c = COMANDAS.find(x=>x.id === tr.dataset.irmesa); if(!c) return;
+  comandaId = c.id; catVista = ""; vaA("comanda"); renderComanda();
+});
+
+function renderVentas(){
+  const hoy = cerradasDe(hoyISO());
+  const total = hoy.reduce((s,c)=>s+num(c.total),0);
+  const todas = COMANDAS.filter(c=>c.estado==="cerrada" && !c.cancelada);
+  const costo = hoy.reduce((s,c)=> s + (c.lineas||[]).reduce((x,l)=>{
+    const p = (MENU.plats||[]).find(y=>y.id===l.platId);
+    return x + num(p && p.costo) * num(l.cant,1);
+  }, 0), 0);
+  $("#venTiles").innerHTML =
+    '<div class="tile destacada"><span class="et">Hoy</span><span class="v">' + mx(total) + '</span>' +
+      '<span class="sub">' + hoy.length + ' cuenta(s)</span></div>' +
+    '<div class="tile"><span class="et">Costo de hoy</span><span class="v">' + mx(costo) + '</span>' +
+      '<span class="sub">' + (costo ? "de lo que capturaste" : "falta capturar costos") + '</span></div>' +
+    '<div class="tile"><span class="et">Utilidad de hoy</span><span class="v">' + mx(total - costo) + '</span>' +
+      '<span class="sub">' + (total ? Math.round((total-costo)/total*100) + "% del total" : "sin ventas") + '</span></div>' +
+    '<div class="tile"><span class="et">Históricas</span><span class="v">' + todas.length + '</span>' +
+      '<span class="sub">cuentas cerradas</span></div>';
+  $("#venHint").textContent = todas.length + " en total";
+  $("#t_ventas").innerHTML = '<thead><tr><th>Folio</th><th>Mesa</th><th>Fecha</th><th>Cerró</th>' +
+    '<th>Atendió</th><th class="der">Propina</th><th class="der">Total</th></tr></thead><tbody>' +
+    todas.slice(0,120).map(c=>
+      '<tr><td class="mono">'+esc(c.folio)+'</td><td>'+esc(c.mesaNombre)+'</td>' +
+      '<td class="mono">'+esc(c.fecha)+'</td><td class="mono">'+esc(c.cierra||"")+'</td>' +
+      '<td>'+esc(c.mesero||"")+'</td><td class="der mono">'+mx(c.propina)+'</td>' +
+      '<td class="der mono">'+mx(c.total)+'</td></tr>').join("") + '</tbody>';
+  if(!todas.length) $("#t_ventas").innerHTML += '<tbody><tr><td colspan="7"><div class="empty">Sin cuentas cerradas.</div></td></tr></tbody>';
+
+  const cerrados = TURNOS.filter(t=>!t.abierto);
+  $("#t_turnos").innerHTML = '<thead><tr><th>Turno</th><th>Cajero</th><th>Fecha</th><th>Horario</th>' +
+    '<th class="der">Vendido</th><th class="der">Diferencia</th></tr></thead><tbody>' +
+    cerrados.slice(0,60).map(t=>
+      '<tr><td class="mono">'+esc(t.folio)+'</td><td>'+esc(t.cajero||"")+'</td>' +
+      '<td class="mono">'+esc(t.fecha)+'</td><td class="mono">'+esc(t.abre)+'–'+esc(t.cierra||"")+'</td>' +
+      '<td class="der mono">'+mx((t.resumen||{}).total)+'</td>' +
+      '<td class="der mono" style="color:'+(Math.abs(num(t.diferencia))<0.01?"var(--good)":num(t.diferencia)<0?"var(--mal)":"var(--warn)")+'">' +
+      (num(t.diferencia)>0?"+":"")+mx(t.diferencia)+'</td></tr>').join("") + '</tbody>';
+  if(!cerrados.length) $("#t_turnos").innerHTML += '<tbody><tr><td colspan="6"><div class="empty">Sin turnos cerrados.</div></td></tr></tbody>';
+}
+
+/* ===================================================================
+   EL MENÚ
+   =================================================================== */
+function renderMenu(){
+  const cats = (MENU.cats||[]).slice().sort((a,b)=>num(a.orden)-num(b.orden));
+  $("#t_cats").innerHTML = '<thead><tr><th>Categoría</th><th style="width:110px">Orden</th>' +
+    '<th style="width:110px">Platillos</th><th style="width:60px"></th></tr></thead><tbody>' +
+    cats.map(c=>'<tr data-cat="'+esc(c.id)+'">' +
+      '<td><input data-ck="nombre" value="'+esc(c.nombre)+'"></td>' +
+      '<td><input data-ck="orden" type="number" value="'+num(c.orden)+'"></td>' +
+      '<td class="mono">'+(MENU.plats||[]).filter(p=>p.catId===c.id).length+'</td>' +
+      '<td><button class="btn sm ghost" data-delcat="'+esc(c.id)+'">✕</button></td></tr>').join("") +
+    '</tbody>';
+
+  const gruposOps = (MENU.grupos||[]).map(g=>({id:g.id, nombre:g.nombre}));
+  $("#t_plats").innerHTML = '<thead><tr><th>Platillo</th><th style="width:150px">Categoría</th>' +
+    '<th style="width:110px">Precio</th><th style="width:110px">Costo</th><th>Preguntas</th>' +
+    '<th style="width:80px">Activo</th><th style="width:60px"></th></tr></thead><tbody>' +
+    (MENU.plats||[]).map(p=>'<tr data-plat="'+esc(p.id)+'">' +
+      '<td><input data-pk="nombre" value="'+esc(p.nombre)+'"></td>' +
+      '<td><select data-pk="catId">'+cats.map(c=>'<option value="'+esc(c.id)+'"'+(c.id===p.catId?" selected":"")+'>'+esc(c.nombre)+'</option>').join("")+'</select></td>' +
+      '<td><input data-pk="precio" type="number" min="0" step="0.5" value="'+num(p.precio)+'"></td>' +
+      '<td><input data-pk="costo" type="number" min="0" step="0.5" value="'+num(p.costo)+'"></td>' +
+      '<td><div class="modChips">'+gruposOps.map(g=>
+        '<label class="modChip'+((p.mods||[]).indexOf(g.id)>=0?" si":"")+'" data-pmod="'+esc(g.id)+'">' +
+        '<input type="checkbox">'+esc(g.nombre)+'</label>').join("")+'</div></td>' +
+      '<td style="text-align:center"><input type="checkbox" data-pk="activo" style="width:auto"'+(p.activo!==false?" checked":"")+'></td>' +
+      '<td><button class="btn sm ghost" data-delplat="'+esc(p.id)+'">✕</button></td></tr>').join("") +
+    '</tbody>';
+
+  $("#modLista").innerHTML = (MENU.grupos||[]).map(g=>
+    '<div class="card" style="margin-bottom:12px" data-grupo="'+esc(g.id)+'"><div class="body">' +
+      '<div class="grid g4">' +
+        '<div><label class="f">Pregunta</label><input data-gk="nombre" value="'+esc(g.nombre)+'"></div>' +
+        '<div><label class="f">Mínimo</label><input data-gk="min" type="number" min="0" value="'+num(g.min)+'"></div>' +
+        '<div><label class="f">Máximo</label><input data-gk="max" type="number" min="1" value="'+num(g.max,1)+'"></div>' +
+        '<div style="align-self:end"><button class="btn sm ghost" data-delgrupo="'+esc(g.id)+'">Quitar grupo</button></div>' +
+      '</div>' +
+      '<div class="tbl-wrap" style="margin-top:12px"><table><thead><tr><th>Opción</th>' +
+        '<th style="width:130px">Cuesta de más</th><th style="width:60px"></th></tr></thead><tbody>' +
+        (g.ops||[]).map(o=>'<tr data-op="'+esc(o.id)+'">' +
+          '<td><input data-ok="nombre" value="'+esc(o.nombre)+'"></td>' +
+          '<td><input data-ok="extra" type="number" min="0" step="0.5" value="'+num(o.extra)+'"></td>' +
+          '<td><button class="btn sm ghost" data-delop="'+esc(o.id)+'">✕</button></td></tr>').join("") +
+      '</tbody></table></div>' +
+      '<button class="btn sm" style="margin-top:10px" data-addop="'+esc(g.id)+'">+ Opción</button>' +
+    '</div></div>').join("") || '<div class="empty">Sin grupos. Agrega uno para preguntar término, extras o qué quitar.</div>';
+}
+$("#catNueva").addEventListener("click", ()=>{
+  MENU.cats.push({id:uid(), nombre:"Nueva categoría", orden:(MENU.cats.length+1)*10});
+  persist(); renderMenu();
+});
+$("#platNuevo").addEventListener("click", ()=>{
+  if(!(MENU.cats||[]).length){ toast("Primero crea una categoría"); return; }
+  MENU.plats.unshift({id:uid(), catId:MENU.cats[0].id, nombre:"Nuevo platillo",
+                      precio:0, costo:0, mods:[], activo:true});
+  persist(); renderMenu();
+});
+$("#modNuevo").addEventListener("click", ()=>{
+  MENU.grupos.push({id:uid(), nombre:"Nueva pregunta", min:0, max:1, ops:[{id:uid(), nombre:"Opción", extra:0}]});
+  persist(); renderMenu();
+});
+$("#tab-menu").addEventListener("input", e=>{
+  const t = e.target;
+  const trc = t.closest("[data-cat]"), trp = t.closest("[data-plat]"),
+        g = t.closest("[data-grupo]"), tro = t.closest("[data-op]");
+  if(tro && g){
+    const grupo = MENU.grupos.find(x=>x.id === g.dataset.grupo);
+    const o = grupo && (grupo.ops||[]).find(x=>x.id === tro.dataset.op);
+    if(o && t.dataset.ok){ o[t.dataset.ok] = t.dataset.ok === "extra" ? num(t.value) : t.value; persist(); }
+    return;
+  }
+  if(g && t.dataset.gk){
+    const grupo = MENU.grupos.find(x=>x.id === g.dataset.grupo);
+    if(grupo){ grupo[t.dataset.gk] = t.dataset.gk === "nombre" ? t.value : num(t.value); persist(); }
+    return;
+  }
+  if(trc && t.dataset.ck){
+    const c = MENU.cats.find(x=>x.id === trc.dataset.cat);
+    if(c){ c[t.dataset.ck] = t.dataset.ck === "orden" ? num(t.value) : t.value; persist(); }
+    return;
+  }
+  if(trp && t.dataset.pk){
+    const p = MENU.plats.find(x=>x.id === trp.dataset.plat);
+    if(p){ p[t.dataset.pk] = (t.dataset.pk === "precio" || t.dataset.pk === "costo") ? num(t.value) : t.value; persist(); }
+  }
+});
+$("#tab-menu").addEventListener("change", e=>{
+  const trp = e.target.closest("[data-plat]");
+  if(trp && e.target.dataset.pk === "activo"){
+    const p = MENU.plats.find(x=>x.id === trp.dataset.plat);
+    if(p){ p.activo = e.target.checked; persist(); }
+  }
+  if(trp && e.target.dataset.pk === "catId"){
+    const p = MENU.plats.find(x=>x.id === trp.dataset.plat);
+    if(p){ p.catId = e.target.value; persist(); }
+  }
+});
+$("#tab-menu").addEventListener("click", e=>{
+  const mod = e.target.closest("[data-pmod]");
+  if(mod){
+    e.preventDefault();
+    const trp = mod.closest("[data-plat]");
+    const p = MENU.plats.find(x=>x.id === trp.dataset.plat); if(!p) return;
+    p.mods = p.mods || [];
+    const i = p.mods.indexOf(mod.dataset.pmod);
+    if(i >= 0) p.mods.splice(i,1); else p.mods.push(mod.dataset.pmod);
+    mod.classList.toggle("si");
+    persist(); return;
+  }
+  const dc = e.target.closest("[data-delcat]");
+  if(dc){
+    const n = (MENU.plats||[]).filter(p=>p.catId === dc.dataset.delcat).length;
+    if(n && !confirm("Esa categoría tiene " + n + " platillo(s). Si la quitas, se van con ella. ¿Seguir?")) return;
+    MENU.cats = MENU.cats.filter(c=>c.id !== dc.dataset.delcat);
+    MENU.plats = MENU.plats.filter(p=>p.catId !== dc.dataset.delcat);
+    persist(); renderMenu(); return;
+  }
+  const dp = e.target.closest("[data-delplat]");
+  if(dp){ MENU.plats = MENU.plats.filter(p=>p.id !== dp.dataset.delplat); persist(); renderMenu(); return; }
+  const dg = e.target.closest("[data-delgrupo]");
+  if(dg){
+    MENU.grupos = MENU.grupos.filter(g=>g.id !== dg.dataset.delgrupo);
+    (MENU.plats||[]).forEach(p=>{ p.mods = (p.mods||[]).filter(m=>m !== dg.dataset.delgrupo); });
+    persist(); renderMenu(); return;
+  }
+  const dop = e.target.closest("[data-delop]");
+  if(dop){
+    const g = MENU.grupos.find(x=>x.id === dop.closest("[data-grupo]").dataset.grupo);
+    if(g) g.ops = (g.ops||[]).filter(o=>o.id !== dop.dataset.delop);
+    persist(); renderMenu(); return;
+  }
+  const add = e.target.closest("[data-addop]");
+  if(add){
+    const g = MENU.grupos.find(x=>x.id === add.dataset.addop);
+    if(g){ g.ops = g.ops||[]; g.ops.push({id:uid(), nombre:"Opción", extra:0}); }
+    persist(); renderMenu();
+  }
+});
+
+/* ===================================================================
+   AJUSTES
+   =================================================================== */
+function renderSet(){
+  $("#e_nombre").value = P.negocio.nombre||""; $("#e_tel").value = P.negocio.tel||"";
+  $("#e_dir").value = P.negocio.dir||"";
+  $("#p_iva").value = num(P.iva,16); $("#p_propina").value = num(P.propina,10);
+  $("#p_servicio").value = num(P.servicio,0);
+  $("#p_bloqueo").value = String(num(P.bloqueoMin,10));
+  $("#f_letras").value = letrasFolio(); $("#f_digitos").value = String(digitosFolio());
+  pintaNotaBloqueo(); pintaNotaFolio(); renderMesasSet(); renderEquipo(); aplicaMarca();
+}
+function pintaNotaFolio(){
+  const n = $("#folNota"); if(!n) return;
+  n.innerHTML = letrasFolio()
+    ? 'Tus cuentas van a salir como <b>CTA-' + esc(serieFolio()) + String(1).padStart(digitosFolio(),"0") +
+      '</b> y los turnos como <b>TUR-' + esc(serieFolio()) + String(1).padStart(digitosFolio(),"0") + '</b>. ' +
+      'Los folios que ya existen no se tocan.'
+    : 'Sin letras, los folios llevan la fecha. Escribe tres letras para ponerles las de tu negocio.';
+}
+function renderMesasSet(){
+  $("#t_mesas").innerHTML = '<thead><tr><th>Mesa</th><th style="width:150px">Zona</th>' +
+    '<th style="width:110px">Lugares</th><th style="width:80px">Activa</th><th style="width:60px"></th></tr></thead><tbody>' +
+    MESAS.map(m=>'<tr data-mesafila="'+esc(m.id)+'">' +
+      '<td><input data-mk="nombre" value="'+esc(m.nombre)+'"></td>' +
+      '<td><input data-mk="zona" value="'+esc(m.zona||"Salón")+'" list="listaZonas"></td>' +
+      '<td><input data-mk="lugares" type="number" min="1" value="'+num(m.lugares,2)+'"></td>' +
+      '<td style="text-align:center"><input type="checkbox" data-mk="activa" style="width:auto"'+(m.activa!==false?" checked":"")+'></td>' +
+      '<td><button class="btn sm ghost" data-delmesa="'+esc(m.id)+'">✕</button></td></tr>').join("") +
+    '</tbody><datalist id="listaZonas">' + zonas().map(z=>'<option value="'+esc(z)+'">').join("") + '</datalist>';
+}
+function renderEquipo(){
+  $("#t_equipo").innerHTML = '<thead><tr><th>Nombre</th><th style="width:150px">Rol</th>' +
+    '<th style="width:160px">Clave</th><th style="width:80px">Activo</th><th style="width:60px"></th></tr></thead><tbody>' +
+    EQUIPO.map(u=>'<tr data-usr="'+esc(u.id)+'">' +
+      '<td><input data-uk="nombre" value="'+esc(u.nombre)+'"></td>' +
+      '<td><select data-uk="rol">'+Object.keys(ROLES).map(r=>
+        '<option value="'+r+'"'+(r===u.rol?" selected":"")+'>'+ROLES[r].nombre+'</option>').join("")+'</select></td>' +
+      '<td><input data-uk="pin" type="password" inputmode="numeric" maxlength="12" value="'+esc(u.pin||"")+'" placeholder="sin clave"></td>' +
+      '<td style="text-align:center"><input type="checkbox" data-uk="activo" style="width:auto"'+(u.activo!==false?" checked":"")+'></td>' +
+      '<td><button class="btn sm ghost" data-delusr="'+esc(u.id)+'"'+(EQUIPO.length<2?" disabled":"")+'>✕</button></td></tr>').join("") +
+    '</tbody>';
+}
+$("#tab-set").addEventListener("input", e=>{
+  const t = e.target;
+  if(t.id === "e_nombre"){ P.negocio.nombre = t.value; aplicaMarca(); persist(); return; }
+  if(t.id === "e_tel"){ P.negocio.tel = t.value; persist(); return; }
+  if(t.id === "e_dir"){ P.negocio.dir = t.value; persist(); return; }
+  if(t.id === "p_iva"){ P.iva = num(t.value); persist(); return; }
+  if(t.id === "p_propina"){ P.propina = num(t.value); persist(); return; }
+  if(t.id === "p_servicio"){ P.servicio = num(t.value); persist(); return; }
+  if(t.id === "f_letras"){
+    P.folios.letras = String(t.value||"").toUpperCase().replace(/[^A-Z]/g,"").slice(0,3);
+    t.value = P.folios.letras; pintaNotaFolio(); persist(); return;
+  }
+  const trm = t.closest("[data-mesafila]");
+  if(trm && t.dataset.mk){
+    const m = MESAS.find(x=>x.id === trm.dataset.mesafila);
+    if(m){ m[t.dataset.mk] = t.dataset.mk === "lugares" ? num(t.value) : t.value; persist(); }
+    return;
+  }
+  const tru = t.closest("[data-usr]");
+  if(tru && t.dataset.uk){
+    const u = EQUIPO.find(x=>x.id === tru.dataset.usr);
+    if(u){ u[t.dataset.uk] = t.value; pintaNotaBloqueo(); persist(); }
+  }
+});
+$("#tab-set").addEventListener("change", e=>{
+  const t = e.target;
+  if(t.id === "f_digitos"){ P.folios.digitos = num(t.value,5); pintaNotaFolio(); persist(); return; }
+  if(t.id === "p_bloqueo"){
+    P.bloqueoMin = num(t.value); reiniciaInactividad(); pintaNotaBloqueo(); persist();
+    toast(num(t.value) ? "Se bloqueará a los " + num(t.value) + " min sin usarlo" : "Ya no se bloquea solo");
+    return;
+  }
+  const trm = t.closest("[data-mesafila]");
+  if(trm && t.dataset.mk === "activa"){
+    const m = MESAS.find(x=>x.id === trm.dataset.mesafila);
+    if(m){ m.activa = t.checked; persist(); }
+    return;
+  }
+  const tru = t.closest("[data-usr]");
+  if(tru && t.dataset.uk){
+    const u = EQUIPO.find(x=>x.id === tru.dataset.usr); if(!u) return;
+    if(t.dataset.uk === "activo") u.activo = t.checked;
+    if(t.dataset.uk === "rol"){ u.rol = t.value; pintaTabs(); }
+    persist(); aplicaRol();
+  }
+});
+$("#tab-set").addEventListener("click", e=>{
+  const dm = e.target.closest("[data-delmesa]");
+  if(dm){
+    if(comandaDe(dm.dataset.delmesa)){ toast("Esa mesa tiene una cuenta abierta"); return; }
+    MESAS = MESAS.filter(m=>m.id !== dm.dataset.delmesa); persist(); renderMesasSet(); return;
+  }
+  const du = e.target.closest("[data-delusr]");
+  if(du){
+    if(EQUIPO.length < 2) return;
+    if(du.dataset.delusr === usuarioId){ toast("No puedes borrar al usuario con el que estás trabajando"); return; }
+    EQUIPO = EQUIPO.filter(u=>u.id !== du.dataset.delusr); persist(); renderEquipo(); return;
+  }
+  if(e.target.closest("#bloqueoProbar")) bloqueaPantalla(true);
+});
+$("#mesaNueva").addEventListener("click", ()=>{
+  const z = zonas()[0] || "Salón";
+  MESAS.push({id:uid(), nombre:"Mesa "+(MESAS.length+1), zona:z, lugares:4, activa:true});
+  persist(); renderMesasSet();
+});
+$("#userNuevo").addEventListener("click", ()=>{
+  EQUIPO.push({id:uid(), nombre:"Nueva persona", rol:"mesero", pin:"", activo:true});
+  persist(); renderEquipo();
+});
+
+function aplicaMarca(){
+  const n = P.negocio.nombre || "Mi restaurante";
+  $("#brandNombre").textContent = n;
+  $("#brandIni").textContent = n.trim().charAt(0).toUpperCase() || "M";
+  $("#accesoIni").textContent = n.trim().charAt(0).toUpperCase() || "M";
+  $("#barraVer").textContent = "Makers OS";
+  try{ document.title = "Makers Restaurant"; }catch(e){}
+}
+function aplicaRol(){
+  const u = usuarioActual(), r = rolActual();
+  $("#userNombre").textContent = u.nombre || "Sin nombre";
+  $("#userRol").textContent = (ROLES[r]||ROLES.gerente).nombre;
+  $("#userAv").textContent = (u.nombre||"?").trim().charAt(0).toUpperCase();
+  pintaTabs();
+  const visible = PESTANAS.filter(p=>puedeVer(p.k)).map(p=>p.k);
+  const abierta = PESTANAS.concat([{k:"comanda"}]).find(p=>{ const s=$("#tab-"+p.k); return s && !s.hidden; });
+  if(!abierta || (abierta.k !== "comanda" && visible.indexOf(abierta.k) < 0)) vaA(visible[0]);
+}
+
+/* ===================================================================
+   ACCESO Y BLOQUEO
+   =================================================================== */
+var bloqueado = false, relojInactivo = null;
+const MIN_BLOQUEO = 10;
+const tieneClave = u => !!String((u||{}).pin||"").trim();
+const minutosBloqueo = () => { const n = num(P.bloqueoMin, MIN_BLOQUEO); return n > 0 ? n : 0; };
+const puedeBloquear = () => minutosBloqueo() > 0;
+
+function reiniciaInactividad(){
+  clearTimeout(relojInactivo);
+  if(bloqueado || !puedeBloquear()) return;
+  relojInactivo = setTimeout(()=>bloqueaPantalla(), minutosBloqueo()*60000);
+}
+function bloqueaPantalla(aMano){
+  if(bloqueado) return;
+  const puerta = $("#acceso"); if(!puerta || !puerta.hidden) return;
+  if(!aMano && !puedeBloquear()) return;
+  pideAcceso({bloqueo:true});
+}
+["pointerdown","keydown","wheel","touchstart","focusin"].forEach(ev=>
+  document.addEventListener(ev, reiniciaInactividad, {passive:true, capture:true}));
+
+function pintaNotaBloqueo(){
+  const nb = $("#bloqueoNota"); if(!nb) return;
+  const yo = usuarioActual(), min = minutosBloqueo();
+  if(!min){ nb.textContent = "La pantalla se queda abierta hasta que alguien la cierre."; return; }
+  nb.innerHTML = tieneClave(yo)
+    ? 'Al bloquearse te va a pedir <b>tu clave</b>. En un restaurante conviene: la caja queda sola todo el tiempo.'
+    : '<b>' + esc(yo.nombre||"Tu usuario") + '</b> no tiene clave, así que al bloquearse la pantalla se limpia ' +
+      'y hay que volver a elegir perfil, pero cualquiera puede entrar con un clic. Ponle una clave arriba.';
+}
+
+let perfilPendiente = null;
+function pideAcceso(opc){
+  const bloq = !!(opc && opc.bloqueo);
+  bloqueado = bloq;
+  let activos = EQUIPO.filter(u=>u.activo !== false);
+  if(!activos.length){
+    if(!EQUIPO.length) EQUIPO = equipoPorDefecto();
+    EQUIPO[0].activo = true; activos = [EQUIPO[0]]; persist();
+  }
+  $("#accesoPerfiles").innerHTML = activos.map(u=>
+    '<button class="perfilBtn" data-perfil="'+esc(u.id)+'">' +
+    '<span class="av">'+esc((u.nombre||"?").trim().charAt(0).toUpperCase())+'</span>' +
+    '<span><b>'+esc(u.nombre||"Sin nombre")+'</b><small>'+(ROLES[u.rol]||ROLES.mesero).nombre+'</small></span>' +
+    '<span class="cand">'+(tieneClave(u) ? "🔒" : "")+'</span></button>').join("");
+  $("#accesoClave").hidden = true; perfilPendiente = null;
+
+  const at = $("#accesoTitulo"), sub = $("#accesoSub"), otro = $("#accesoOtro");
+  if(bloq){
+    const yo = usuarioActual(), conClave = tieneClave(yo);
+    at.textContent  = conClave ? "Inserta tu código o clave" : "Pantalla bloqueada";
+    sub.textContent = conClave
+      ? "Se bloqueó solo por inactividad. Escribe tu clave para seguir donde te quedaste."
+      : "Se bloqueó solo por inactividad. Elige tu perfil para seguir.";
+    $("#accesoPerfiles").hidden = conClave;
+    if(conClave){
+      perfilPendiente = yo.id;
+      $("#accesoQuien").textContent = yo.nombre || "ti";
+      $("#accesoPass").value = ""; $("#accesoError").hidden = true;
+      $("#accesoClave").hidden = false;
+    }
+    $("#accesoVolver").hidden = true;
+    otro.hidden = !conClave;
+  }else{
+    at.textContent  = "¿Quién va a trabajar?";
+    sub.textContent = "Elige tu perfil. Cada quien ve solo lo de su área.";
+    $("#accesoPerfiles").hidden = false;
+    $("#accesoVolver").hidden = false;
+    otro.hidden = true;
+  }
+  pintaAnuncioBloqueo();
+  $("#acceso").hidden = false;
+  document.body.classList.add("sin-acceso");
+  if(bloq) setTimeout(()=>{ const p = $("#accesoPass"); if(p) p.focus(); }, 60);
+}
+function cierraAcceso(){
+  paraAnuncioBloqueo();
+  $("#acceso").hidden = true;
+  document.body.classList.remove("sin-acceso");
+  bloqueado = false;
+  reiniciaInactividad();
+}
+$("#accesoPerfiles").addEventListener("click", e=>{
+  const b = e.target.closest("[data-perfil]"); if(!b) return;
+  const u = EQUIPO.find(x=>x.id === b.dataset.perfil); if(!u) return;
+  if(!tieneClave(u)){ entraPerfil(u.id); return; }
+  perfilPendiente = u.id;
+  $("#accesoQuien").textContent = u.nombre;
+  $("#accesoPass").value = ""; $("#accesoError").hidden = true;
+  $("#accesoClave").hidden = false; $("#accesoPass").focus();
+});
+$("#accesoEntrar").addEventListener("click", ()=>{
+  const u = EQUIPO.find(x=>x.id === perfilPendiente); if(!u) return;
+  if(($("#accesoPass").value||"") !== u.pin){
+    $("#accesoError").textContent = "Clave incorrecta"; $("#accesoError").hidden = false;
+    $("#accesoPass").value = ""; $("#accesoPass").focus(); return;
+  }
+  entraPerfil(u.id);
+});
+$("#accesoPass").addEventListener("keydown", e=>{ if(e.key === "Enter") $("#accesoEntrar").click(); });
+$("#accesoVolver").addEventListener("click", ()=>{ $("#accesoClave").hidden = true; perfilPendiente = null; });
+$("#accesoOtro").addEventListener("click", ()=>{ bloqueado = false; pideAcceso(); });
+function entraPerfil(id){
+  usuarioId = id;
+  try{ localStorage.setItem(LS+"_usuario", id); }catch(e){}
+  cierraAcceso(); aplicaRol();
+  toast("Bienvenido, " + (usuarioActual().nombre||""));
+}
+$("#userChip").addEventListener("click", ()=>{
+  $("#userLista").innerHTML = EQUIPO.filter(u=>u.activo!==false).map(u=>
+    '<button class="perfilBtn" data-perfil="'+esc(u.id)+'">' +
+    '<span class="av">'+esc((u.nombre||"?").trim().charAt(0).toUpperCase())+'</span>' +
+    '<span><b>'+esc(u.nombre||"")+'</b><small>'+(ROLES[u.rol]||ROLES.mesero).nombre+'</small></span></button>').join("");
+  $("#modalUser").hidden = false;
+});
+$("#userLista").addEventListener("click", e=>{
+  const b = e.target.closest("[data-perfil]"); if(!b) return;
+  $("#modalUser").hidden = true;
+  const u = EQUIPO.find(x=>x.id === b.dataset.perfil); if(!u) return;
+  if(tieneClave(u)){ bloqueado = false; pideAcceso(); return; }
+  entraPerfil(u.id);
+});
+$("#userCerrar").addEventListener("click", ()=>{ $("#modalUser").hidden = true; });
+$("#userBloquea").addEventListener("click", ()=>{ $("#modalUser").hidden = true; bloqueaPantalla(true); });
+$("#btnBloquea").addEventListener("click", ()=> bloqueaPantalla(true));
+
+/* ---------------- publicidad en la pantalla bloqueada ---------------- */
+let ANUN_BLOQ = [], anunBloqIdx = 0, anunBloqReloj = null, anunVistos = {};
+function anunciosDe(){
+  const todos = (window.__ANUNCIOS_REST || []).filter(a=>a && a.imagen);
+  const aqui = todos.filter(a=>{
+    const l = a.lugar || "cotizador";
+    if(l !== "bloqueo" && l !== "ambos") return false;
+    const g = a.giros || [];
+    return !g.length || g.indexOf("restaurant") >= 0;
+  });
+  const vendidos = aqui.filter(a=>!a.interna);
+  return vendidos.length ? vendidos : aqui.filter(a=>a.interna);
+}
+function pintaAnuncioBloqueo(){
+  const caja = $("#anunBloq"); if(!caja) return;
+  ANUN_BLOQ = anunciosDe();
+  paraAnuncioBloqueo();
+  if(!ANUN_BLOQ.length){ caja.hidden = true; return; }
+  caja.hidden = false; anunBloqIdx = 0; ponAnuncioBloqueo();
+  if(ANUN_BLOQ.length > 1)
+    anunBloqReloj = setInterval(()=>{ anunBloqIdx = (anunBloqIdx+1) % ANUN_BLOQ.length; ponAnuncioBloqueo(); }, 8000);
+}
+function ponAnuncioBloqueo(){
+  const w = $("#anunBloqPieza"), a = ANUN_BLOQ[anunBloqIdx]; if(!w || !a) return;
+  const img = '<img src="'+esc(a.imagen)+'" alt="'+esc(a.alt||a.titulo||"Anuncio")+'" style="width:100%;height:auto;display:block;max-height:140px;object-fit:cover">';
+  w.innerHTML = a.enlace
+    ? '<a href="'+esc(a.enlace)+'" target="_blank" rel="noopener noreferrer nofollow sponsored">'+img+'</a>' : img;
+  if(a.id && !anunVistos[a.id]){
+    anunVistos[a.id] = true;
+    try{ if(typeof window.__anuncioMarca === "function") window.__anuncioMarca(a.id, "vista"); }catch(e){}
+  }
+}
+function paraAnuncioBloqueo(){ if(anunBloqReloj){ clearInterval(anunBloqReloj); anunBloqReloj = null; } }
+async function cargaAnuncios(){
+  try{
+    if(typeof window.__anuncios === "function") window.__ANUNCIOS_REST = await window.__anuncios();
+  }catch(e){ window.__ANUNCIOS_REST = []; }
+  if(!$("#acceso").hidden) pintaAnuncioBloqueo();
+}
+
+/* ===================================================================
+   ARRANQUE
+   =================================================================== */
+function arrancaEquipo(){
+  if(!EQUIPO.length) EQUIPO = equipoPorDefecto();
+  let rec = null;
+  try{ rec = localStorage.getItem(LS+"_usuario"); }catch(e){}
+  const u = EQUIPO.find(x=>x.id === rec && x.activo !== false);
+  if(u){ usuarioId = u.id; cierraAcceso(); aplicaRol(); }
+  else if(EQUIPO.length === 1 && !tieneClave(EQUIPO[0])){
+    usuarioId = EQUIPO[0].id; cierraAcceso(); aplicaRol();
+  }else{ usuarioId = EQUIPO[0].id; pideAcceso(); }
+}
+function start(){
+  $("#barra").hidden = false;
+  aplicaMarca();
+  arrancaEquipo();
+  pintaTabs();
+  vaA(puedeVer("inicio") ? "inicio" : "mesas");
+  pintaTurnoChip();
+  setInterval(()=>{ if(!$("#tab-mesas").hidden) renderMesas(); pintaTurnoChip(); }, 60000);
+}
+start();
+
+/* La nube es opcional: si existe, se baja lo guardado y se mezcla. Si no,
+   el punto de venta funciona igual — que es justo lo que tiene que pasar
+   cuando se cae el internet a media comida. */
+(async function(){
+  try{
+    DB = await (window.claude && window.claude.use ? window.claude.use("db") : null);
+  }catch(e){ DB = null; }
+  if(DB){
+    try{
+      const m = await DB.doc("config/menu").get();
+      if(m && m.exists && m.data().menu) { MENU = m.data().menu; }
+      const ms = await DB.doc("config/mesas").get();
+      if(ms && ms.exists && ms.data().mesas) { MESAS = ms.data().mesas; }
+      const pp = await DB.doc("config/parametros").get();
+      if(pp && pp.exists && pp.data().P) { P = Object.assign(paramsPorDefecto(), pp.data().P); }
+      const eq = await DB.doc("config/equipo").get();
+      if(eq && eq.exists && eq.data().equipo) { EQUIPO = eq.data().equipo; }
+      laNube = true;
+      aplicaRol(); renderMesas();
+    }catch(e){}
+  }
+  cargaAnuncios();
+})();
+</script>
+
+<script>window.BUILD="20261016-1454";</script>
+<script>
+(function(){
+  var mio = "20261016-1454";
+  /* Un solo reintento por versión: si el servidor insistiera en
+     mandar la vieja, mejor una página vieja que un parpadeo eterno. */
+  function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
+  function anota(v){ try{ sessionStorage.setItem("hm-recarga", v); }catch(e){} }
+  function revisa(){
+    fetch("version.json?t=" + Date.now(), {cache:"no-store"})
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        var suyo = d["restaurant"] || d.build;
+        if(!suyo || suyo === mio) return;
+        /* Solo hacia ADELANTE. Si version.json se queda atras (un
+           despliegue a medias, por ejemplo), la pagina no tiene por que
+           recargarse para "actualizarse" a una version mas vieja que la
+           que ya trae. La fecha-hora del build se ordena sola. */
+        if(suyo <= mio) return;
+        if(yaLoIntente(suyo)) return;
+        anota(suyo);
+        var base = location.pathname.split("?")[0];
+        location.replace(base + "?v=" + suyo);
+      })
+      .catch(function(){});
+  }
+  setTimeout(revisa, 1500);
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden) revisa(); });
+})();
+</script>
+</body>
+</html>
