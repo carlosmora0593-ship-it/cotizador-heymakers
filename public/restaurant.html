@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Makers Restaurant: mesas, comandas, cuenta dividida, propinas y corte de caja. Punto de venta para restaurantes, cafeterías y fondas.">
 <meta name="theme-color" content="#0E1226">
-<script src="config.js?v=20261016-1730"></script>
+<script src="config.js?v=20261016-2149"></script>
 <script>window.PRODUCTO={plataforma:"Makers OS",edicion:"Makers Restaurant",clave:"restaurant",giro:"Restaurante, cafetería y fonda"};</script>
 <style>:root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Makers Restaurant</title>
@@ -262,9 +262,39 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
 .decor.caja{background:#11283C;border:2px solid #1F4A66;color:var(--cyan);border-radius:6px}
 .decor.bano{background:#1A2338;border:2px solid #31406A;color:#9AA8D0}
 .decor.entrada{background:transparent;border:2px dashed var(--good);color:var(--good)}
-.decor.pared{background:#232845;border:0;border-radius:3px;color:transparent}
+.decor.pared{background:#49527E;border:0;border-radius:2px;color:transparent;box-shadow:0 1px 0 rgba(0,0,0,.4)}
 .decor.planta{background:transparent;border:0;font-size:26px;color:var(--good)}
 .decor.arrastrando{z-index:19;opacity:.85}
+.decor.sel,.cmesa.sel{outline:2px solid var(--cyan);outline-offset:3px;z-index:18}
+.jala{position:absolute;width:14px;height:14px;border-radius:4px;background:var(--cyan);
+  border:2px solid var(--surface);z-index:22;touch-action:none}
+.jala[data-j="e"],.jala[data-j="o"]{top:50%;margin-top:-7px;cursor:ew-resize}
+.jala[data-j="n"],.jala[data-j="s"]{left:50%;margin-left:-7px;cursor:ns-resize}
+.jala[data-j="o"]{left:-7px}.jala[data-j="e"]{right:-7px}
+.jala[data-j="n"]{top:-7px}.jala[data-j="s"]{bottom:-7px}
+.jala[data-j="se"]{right:-7px;bottom:-7px;cursor:nwse-resize}
+.croqTool{position:absolute;z-index:40;display:flex;gap:4px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:10px;padding:5px;box-shadow:0 8px 22px rgba(0,0,0,.45);
+  transform:translate(-50%,-100%)}
+.croqTool button{cursor:pointer;border:1px solid var(--line);background:var(--surface);
+  color:var(--ink-1);border-radius:7px;min-width:30px;height:28px;padding:0 7px;
+  font-size:13px;font-weight:700;line-height:1}
+.croqTool button:hover{border-color:var(--cyan);color:var(--cyan)}
+.croqTool button.mal:hover{border-color:var(--accent);color:var(--accent)}
+.croqPlano{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  opacity:.45;pointer-events:none;z-index:0}
+.croquis.liso{background:var(--surface)}
+.croquis.loseta{background:
+  repeating-conic-gradient(var(--surface) 0% 25%, var(--surface-2) 0% 50%) 0 0/62px 62px}
+.croquis.madera{background:
+  repeating-linear-gradient(90deg,#241B12 0 38px,#2B2117 38px 76px),
+  linear-gradient(#2B2117,#241B12)}
+.croquis.concreto{background:
+  radial-gradient(circle at 30% 20%, rgba(255,255,255,.035), transparent 60%),
+  radial-gradient(circle at 70% 70%, rgba(255,255,255,.03), transparent 55%),
+  #1A1D2E}
+.croqFondo{background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2);
+  border-radius:8px;padding:5px 9px;font-size:12px;width:auto;flex:0 0 auto;min-width:118px}
 .decorPaleta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .decorPaleta button{cursor:pointer;background:var(--surface-2);border:1px dashed var(--line);
   border-radius:8px;padding:5px 12px;font-size:12px;color:var(--ink-2)}
@@ -345,6 +375,32 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
 .modal{position:fixed;inset:0;z-index:70;background:rgba(5,8,20,.72);display:grid;place-items:center;padding:16px}
 .modal .card{width:min(540px,100%);max-height:88vh;overflow:auto;margin:0}
 .modal.ancho .card{width:min(760px,100%)}
+.firma{background:#fff;border-radius:8px;touch-action:none;display:block;width:100%;height:150px;cursor:crosshair}
+.firmaPie{display:flex;gap:8px;align-items:center;margin-top:8px}
+.firmaPie .hint{font-size:11.5px;color:var(--ink-3)}
+.horSem{display:grid;grid-template-columns:92px 1fr 1fr 78px;gap:7px;align-items:center}
+.horSem .dia{font-size:12.5px;color:var(--ink-2);font-weight:600}
+.horSem input[type=time]{width:100%}
+.horSem .lib{font-size:11.5px;color:var(--ink-3);display:flex;gap:6px;align-items:center}
+.pill.tarde{background:rgba(255,176,32,.14);color:var(--warn)}
+.pill.mal{background:rgba(255,92,92,.14);color:var(--mal)}
+.tkLin{display:grid;grid-template-columns:34px 1fr auto;gap:8px;padding:5px 0;font-size:13px}
+.tkLin.cancel{opacity:.6}
+.tkLin.cancel .nom{text-decoration:line-through}
+.tkLin small{display:block;font-size:11px;color:var(--ink-3)}
+.tkTot{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}
+.tkTot.grande{font-size:17px;font-weight:700;border-top:1px solid var(--line);margin-top:7px;padding-top:9px}
+#t_ventas tbody tr{cursor:pointer}
+#t_ventas tbody tr:hover{background:var(--surface-2)}
+.pill.just{background:rgba(42,210,160,.13);color:var(--good)}
+.expFila{display:flex;gap:10px;align-items:center;padding:9px 11px;border:1px solid var(--line);
+  border-radius:10px;background:var(--surface-2);margin-bottom:7px;width:100%;cursor:pointer;text-align:left}
+.expFila:hover{border-color:var(--cyan)}
+.expFila .av{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);
+  display:grid;place-items:center;font-weight:700;font-size:13px;flex:0 0 auto}
+.expFila b{display:block;font-size:13.5px}
+.expFila small{display:block;font-size:11px;color:var(--ink-3)}
+.expFila .der{margin-left:auto;text-align:right;font-size:11.5px;color:var(--ink-3)}
 .mods{display:flex;flex-direction:column;gap:14px}
 .modGrupo b{display:block;font-size:13px;margin-bottom:2px}
 .modGrupo small{display:block;color:var(--ink-3);font-size:11.5px;margin-bottom:7px}
@@ -496,8 +552,12 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
     <span class="croqPista" id="croqPista"></span>
   </div>
   <div class="decorPaleta" id="decorPaleta" hidden></div>
+  <input id="croqPlanoFile" type="file" accept="image/*" hidden>
   <div class="llevarFila" id="llevarFila"></div>
-  <div class="croquis" id="mesaCroquis"></div>
+  <div style="position:relative">
+    <div class="croquis" id="mesaCroquis"></div>
+    <div class="croqTool" id="croqTool" hidden></div>
+  </div>
   <div class="mesas" id="mesaRejilla" hidden></div>
 </section>
 
@@ -528,6 +588,58 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
   <div class="card">
     <header><h2>Horas de hoy</h2></header>
     <div class="body"><div class="tbl-wrap"><table id="t_horas"></table></div></div>
+  </div>
+  <div class="card" id="cardRetardos" hidden>
+    <header><h2>Retardos</h2><span class="hint" id="retHint"></span>
+      <button class="btn sm ghost" id="retReporte" style="margin-left:auto">Imprimir reporte</button></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Un retardo se mide contra <b>el horario de esa persona</b>, con la
+        tolerancia que pusiste. Justificarlo no lo borra: queda con su motivo y la firma de quien lo justifica,
+        que es lo que sirve el día que se discute.</p>
+      <div class="fila" style="margin-bottom:12px">
+        <label class="f" for="retDesde" style="margin:0">Desde</label>
+        <input id="retDesde" type="date" style="width:auto;flex:0 0 auto">
+        <label class="f" for="retHasta" style="margin:0">Hasta</label>
+        <input id="retHasta" type="date" style="width:auto;flex:0 0 auto">
+      </div>
+      <div class="tbl-wrap"><table id="t_retardos"></table></div>
+    </div>
+  </div>
+  <div class="card" id="cardExpedientes" hidden>
+    <header><h2>Expedientes</h2><span class="hint">datos, horario y cómo se le paga</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Esto vive <b>en esta computadora</b>, no se manda a ningún lado.
+        Son los datos que necesitas tener a la mano el día de un accidente o de una aclaración del IMSS.</p>
+      <div id="expLista"></div>
+      <div class="grid g3" style="margin-top:16px;max-width:280px">
+        <div><label class="f" for="p_tolerancia">Tolerancia antes de que cuente retardo</label>
+          <select id="p_tolerancia">
+            <option value="0">Sin tolerancia</option><option value="5">5 minutos</option>
+            <option value="10">10 minutos</option><option value="15">15 minutos</option>
+            <option value="20">20 minutos</option><option value="30">30 minutos</option>
+          </select></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="cardRecibos" hidden>
+    <header><h2>Recibo de pago</h2><span class="hint">al terminar la jornada o el periodo</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Cuenta los días y las horas que <b>de verdad</b> checó en el periodo,
+        saca lo que le toca según cómo se le paga, y lo imprime con línea de firma. El recibo firmado es la
+        prueba de que se pagó.</p>
+      <div class="grid g3">
+        <div><label class="f" for="recQuien">Quién</label><select id="recQuien"></select></div>
+        <div><label class="f" for="recDesde">Del</label><input id="recDesde" type="date"></div>
+        <div><label class="f" for="recHasta">Al</label><input id="recHasta" type="date"></div>
+      </div>
+      <div class="fila" style="margin-top:12px">
+        <button class="btn sm ghost" data-recper="hoy">Hoy</button>
+        <button class="btn sm ghost" data-recper="semana">Esta semana</button>
+        <button class="btn sm ghost" data-recper="quincena">Esta quincena</button>
+        <button class="btn sm ghost" data-recper="mes">Este mes</button>
+      </div>
+      <div id="recResumen" style="margin-top:16px"></div>
+    </div>
   </div>
 </section>
 
@@ -664,8 +776,30 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
 <section id="tab-ventas" hidden>
   <div class="tiles" id="venTiles"></div>
   <div class="card">
-    <header><h2>Cuentas cerradas</h2><span class="hint" id="venHint"></span></header>
-    <div class="body"><div class="tbl-wrap"><table id="t_ventas"></table></div></div>
+    <header><h2>Tickets cobrados</h2><span class="hint" id="venHint"></span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Toca cualquier renglón para ver el ticket completo y volver a imprimirlo.
+        Cada reimpresión queda anotada con quién la hizo: un ticket que se reimprime tres veces es una pregunta.</p>
+      <div class="fila" style="margin-bottom:12px">
+        <input id="venBusca" placeholder="Buscar folio, mesa o quien atendió" style="max-width:320px">
+        <label class="f" for="venDesde" style="margin:0">Del</label>
+        <input id="venDesde" type="date" style="width:auto;flex:0 0 auto">
+        <label class="f" for="venHasta" style="margin:0">Al</label>
+        <input id="venHasta" type="date" style="width:auto;flex:0 0 auto">
+        <button class="btn sm ghost" id="venTodo">Todo</button>
+      </div>
+      <div class="tbl-wrap"><table id="t_ventas"></table></div>
+    </div>
+  </div>
+  <div class="card">
+    <header><h2>Cancelaciones</h2><span class="hint" id="canHint"></span>
+      <button class="btn sm ghost" id="canReporte" style="margin-left:auto">Imprimir reporte</button></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Aquí está el dinero que <b>no</b> entró. Lo que se canceló después de
+        salir de la cocina es <b>merma</b>: comida que sí se gastó. Si una misma persona aparece mucho con el mismo
+        motivo, ahí está la fuga.</p>
+      <div class="tbl-wrap"><table id="t_cancela"></table></div>
+    </div>
   </div>
   <div class="card">
     <header><h2>Turnos cerrados</h2></header>
@@ -720,18 +854,68 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
       <div style="margin-top:12px"><label class="f" for="tk_leyenda">Leyenda de propina</label>
         <input id="tk_leyenda" placeholder="Propina sugerida 10% · 15% · 20%"></div>
       <div class="grid g2" style="margin-top:14px">
-        <label class="sw"><input type="checkbox" id="tk_cuenta"> Imprimir la cuenta al cobrar</label>
-        <label class="sw"><input type="checkbox" id="tk_cocina"> Imprimir la comanda al mandar a cocina</label>
         <label class="sw"><input type="checkbox" id="tk_iva"> Desglosar el IVA</label>
         <label class="sw"><input type="checkbox" id="tk_propina"> Poner la leyenda de propina</label>
       </div>
       <div class="fila" style="margin-top:16px">
-        <button class="btn" id="tk_prueba">Imprimir una prueba</button>
-        <span class="hint" style="color:var(--ink-3);font-size:12px">sale un ticket de ejemplo para ver cómo queda</span>
+        <button class="btn" id="tk_prueba">Probar la cuenta</button>
+        <button class="btn" id="tk_pruebaCocina">Probar la comanda de cocina</button>
+        <span class="hint" style="color:var(--ink-3);font-size:12px">salen de ejemplo, para estrenar la impresora</span>
       </div>
       <p class="note" style="margin-top:14px"><b>El ticket de cocina no lleva precios</b> — en la cocina estorban.
         Lleva mesa o PARA LLEVAR, el folio en grande (el mismo del recibo, para que cuadren), el comensal de cada
         platillo y lo que le quitan, en letra grande.</p>
+    </div>
+  </div>
+  <div class="card">
+    <header><h2>Respaldo</h2><span class="hint" id="respHint"></span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px;border-left-color:var(--warn)">Todo tu negocio vive <b>en este
+        navegador, en esta computadora</b>. Así cobra aunque se caiga el internet, pero también significa que si
+        alguien le da «limpiar datos de navegación», o se formatea la máquina, <b>no queda nada</b>.
+        <b>Baja un respaldo cada semana</b> y guárdalo en una USB o en tu correo. Toma cinco segundos.</p>
+      <div class="fila">
+        <button class="btn primary" id="respBaja">Bajar respaldo</button>
+        <button class="btn" id="respSube">Restaurar desde un respaldo</button>
+        <input id="respFile" type="file" accept="application/json,.json" hidden>
+      </div>
+      <p class="note" style="margin-top:14px">El respaldo trae el menú, las mesas, el croquis, las comandas, los
+        turnos, el equipo con sus expedientes y horarios, las asistencias, las compras y las recetas. Restaurar
+        <b>reemplaza todo</b> lo que haya en esta pantalla — por eso pregunta dos veces.</p>
+    </div>
+  </div>
+  <div class="card">
+    <header><h2>Esta pantalla</h2><span class="hint" id="estHint"></span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Una página web <b>no puede escoger impresora</b>: siempre manda a la
+        predeterminada de la computadora donde está abierta. Por eso esto se configura <b>por pantalla</b> y no por
+        cuenta. Pon en la compu de la caja la impresora de la caja como predeterminada de Windows, y en la de la
+        cocina la suya: cada una imprime lo que le toca y ya no vuelves a escoger.</p>
+      <div class="grid g3">
+        <div><label class="f" for="est_donde">Esta pantalla es la de</label>
+          <select id="est_donde"></select></div>
+      </div>
+      <div class="grid g2" style="margin-top:14px">
+        <label class="sw"><input type="checkbox" id="est_cuenta"> Imprimir la cuenta al cobrar</label>
+        <label class="sw"><input type="checkbox" id="est_cocina"> Imprimir la comanda al mandar a cocina</label>
+        <label class="sw"><input type="checkbox" id="est_cancela"> Imprimir las cancelaciones</label>
+      </div>
+      <p class="note" id="estNota" style="margin-top:14px"></p>
+      <details style="margin-top:12px">
+        <summary style="cursor:pointer;font-size:12.5px;color:var(--cyan)">Quitar la ventana de «Imprimir» (Chrome en Windows)</summary>
+        <div class="note" style="margin-top:10px">
+          <p style="margin:0 0 8px">Para que el ticket salga solo, sin que nadie confirme:</p>
+          <ol style="margin:0;padding-left:18px;line-height:1.75">
+            <li>Pon la impresora de ticket como <b>predeterminada</b> en Windows.</li>
+            <li>Copia el acceso directo de Chrome al escritorio, clic derecho → <b>Propiedades</b>.</li>
+            <li>Al final de <b>Destino</b>, después de las comillas, agrega un espacio y
+              <code style="font-family:'IBM Plex Mono',monospace">--kiosk-printing</code>.</li>
+            <li>Abre el punto de venta con <b>ese</b> acceso directo.</li>
+          </ol>
+          <p style="margin:8px 0 0">Es una bandera de Chrome, no un truco: vale para esa ventana nada más.
+            Lo de dos impresoras en una sola computadora sí necesita la app envuelta — esa viene después.</p>
+        </div>
+      </details>
     </div>
   </div>
   <div class="card">
@@ -768,35 +952,6 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
             <option value="6">6</option><option value="7">7</option></select></div>
       </div>
       <p class="note" id="folNota" style="margin-top:12px"></p>
-    </div>
-  </div>
-  <div class="card">
-    <header><h2>Tu anuncio en la pantalla bloqueada</h2><span class="hint">la pantalla que nadie usa, trabajando</span></header>
-    <div class="body">
-      <p class="note" style="margin:0 0 14px">Cuando la pantalla se bloquea sola queda a la vista de todos:
-        del cliente que espera en la barra y del que pasa junto a la caja. <b>Ponle la promoción del día</b>
-        &mdash; la comida corrida, el 2x1 de los martes, el menú por QR.</p>
-      <div class="grid g3">
-        <div style="grid-column:span 2">
-          <label class="f">Imagen del anuncio</label>
-          <div class="fila">
-            <img id="pb_prev" alt="" style="height:52px;width:auto;border-radius:8px;background:#fff;padding:3px" hidden>
-            <button class="btn sm" id="pb_btn" type="button">Subir imagen</button>
-            <button class="btn sm ghost" id="pb_quita" type="button" hidden>Quitar</button>
-            <input id="pb_file" type="file" accept="image/*" hidden>
-          </div>
-        </div>
-        <div style="align-self:end">
-          <label class="sw"><input type="checkbox" id="pb_activa"> Mostrarlo</label>
-        </div>
-      </div>
-      <div class="grid g2" style="margin-top:14px">
-        <div><label class="f" for="pb_titulo">Qué dice</label>
-          <input id="pb_titulo" placeholder="Comida corrida $95 de lunes a viernes"></div>
-        <div><label class="f" for="pb_enlace">A dónde lleva (opcional)</label>
-          <input id="pb_enlace" placeholder="https://… tu menú, tu WhatsApp"></div>
-      </div>
-      <p class="note" id="pb_nota" style="margin-top:14px"></p>
     </div>
   </div>
 </section>
@@ -904,6 +1059,53 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
   </div>
 </div>
 
+<div class="modal" id="modalTicket" hidden>
+  <div class="card">
+    <header><h2 id="tkTitulo">Ticket</h2><button class="btn sm" id="tkCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body" id="tkCuerpo"></div>
+  </div>
+</div>
+
+<div class="modal" id="modalAuto" style="z-index:9700" hidden>
+  <div class="card">
+    <header><h2>Hace falta autorización</h2><button class="btn sm" id="autoCerrar" style="margin-left:auto">Cancelar</button></header>
+    <div class="body">
+      <p class="note" id="autoQue" style="margin:0 0 14px"></p>
+      <div id="autoLista" style="margin-bottom:14px"></div>
+      <label class="f" for="autoPin">Clave de quien autoriza</label>
+      <input id="autoPin" type="password" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="••••">
+      <div class="fila" style="margin-top:16px">
+        <button class="btn primary ancho" id="autoOk">Autorizar</button>
+      </div>
+      <p class="note" style="margin-top:14px">Queda anotado quién autorizó, a qué hora y por qué.
+        No es desconfianza del mesero: es lo que lo protege a él también.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal ancho" id="modalExp" hidden>
+  <div class="card">
+    <header><h2 id="expTitulo">Expediente</h2><button class="btn sm" id="expCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body" id="expCuerpo"></div>
+  </div>
+</div>
+
+<div class="modal" id="modalFirma" style="z-index:9650" hidden>
+  <div class="card">
+    <header><h2 id="firTitulo">Firma</h2><button class="btn sm" id="firCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <p class="note" id="firNota" style="margin:0 0 12px"></p>
+      <div id="firExtra"></div>
+      <canvas class="firma" id="firLienzo" width="640" height="300"></canvas>
+      <div class="firmaPie">
+        <button class="btn sm ghost" id="firBorra" type="button">Borrar</button>
+        <span class="hint">Firma con el dedo o con el mouse</span>
+        <button class="btn primary" id="firOk" type="button" style="margin-left:auto">Guardar firma</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="modalCorrige" hidden>
   <div class="card">
     <header><h2 id="corrTitulo">Corregir</h2><button class="btn sm" id="corrCerrar" style="margin-left:auto">Cerrar</button></header>
@@ -975,8 +1177,20 @@ function lsSet(k, v){ try{ localStorage.setItem(LS+"_"+k, JSON.stringify(v)); }c
 
 let DB = null, laNube = false;
 let guardaT = null;
+let restaurando = false;
+function guardaYa(){
+  clearTimeout(guardaT);
+  if(restaurando) return;
+  try{
+    lsSet("menu", MENU); lsSet("mesas", MESAS); lsSet("comandas", COMANDAS);
+    lsSet("turnos", TURNOS); lsSet("P", P); lsSet("equipo", EQUIPO);
+    lsSet("asistencias", ASISTENCIAS); lsSet("compras", COMPRAS); lsSet("recetas", RECETAS);
+    lsSet("decor", DECOR);
+  }catch(e){}
+}
 function persist(){
   clearTimeout(guardaT);
+  if(restaurando) return;
   guardaT = setTimeout(()=>{
     lsSet("menu", MENU); lsSet("mesas", MESAS); lsSet("comandas", COMANDAS);
     lsSet("turnos", TURNOS); lsSet("P", P); lsSet("equipo", EQUIPO);
@@ -986,6 +1200,10 @@ function persist(){
     subeNube();
   }, 500);
 }
+/* Al cerrar o al mandar la pestaña al fondo se guarda sin esperar: medio
+   segundo es poco, pero es justo el medio segundo en el que se cierra. */
+window.addEventListener("pagehide", guardaYa);
+document.addEventListener("visibilitychange", ()=>{ if(document.hidden) guardaYa(); });
 async function subeNube(){
   if(!DB) return;
   try{
@@ -1064,6 +1282,27 @@ const TIPOS_DECOR = {
   pared:   {et:"Muro",    w:24, h:2,  txt:""},
   planta:  {et:"Planta",  w:6,  h:7,  txt:"🪴"}
 };
+/* El fondo es por zona: la terraza no se parece al salón, y un croquis que
+   se parece al local se lee de un vistazo. */
+const FONDOS = {cuadricula:"Cuadrícula", loseta:"Loseta", madera:"Duela", concreto:"Concreto", liso:"Liso"};
+function croqCfg(z){
+  P.croquis = P.croquis || {};
+  const k = z || zonaVista || "Salón";
+  if(!P.croquis[k]) P.croquis[k] = {fondo:"cuadricula", plano:""};
+  return P.croquis[k];
+}
+function aplicaFondo(){
+  const caja = $("#mesaCroquis"); if(!caja) return;
+  const c = croqCfg();
+  caja.className = "croquis" + (c.fondo && c.fondo !== "cuadricula" ? " " + c.fondo : "");
+  const vieja = caja.querySelector(".croqPlano");
+  if(vieja) vieja.remove();
+  if(c.plano){
+    const img = document.createElement("img");
+    img.className = "croqPlano"; img.src = c.plano; img.alt = "";
+    caja.insertBefore(img, caja.firstChild);
+  }
+}
 function decorPorDefecto(){
   return [
     {id:uid(), tipo:"cocina",  zona:"Salón", x:50, y:8,  w:18, h:12},
@@ -1084,7 +1323,7 @@ function paramsPorDefecto(){
           gastos:{renta:0, luz:0, gas:0, agua:0, sueldos:0, otros:0},
           diasMes:26, porcionesDia:120, margenMeta:70,
           folios:{letras:"", extra:"", digitos:5, desde:{cta:1, tur:1}},
-          publi:{activa:true, imagen:"", enlace:"", titulo:""}};
+          tolerancia:10, cierreNomina:""};
 }
 function equipoPorDefecto(){
   return [{id:uid(), nombre:"Administrador", rol:"gerente", pin:"", activo:true}];
@@ -1097,6 +1336,16 @@ let TURNOS   = lsGet("turnos", []);
 let P        = Object.assign(paramsPorDefecto(), lsGet("P", {}));
 let EQUIPO      = lsGet("equipo", null) || equipoPorDefecto();
 let ASISTENCIAS = lsGet("asistencias", []);
+/* Esto NO va en P: no es de la cuenta, es de ESTA pantalla. La compu de la
+   caja y la de la cocina son la misma cuenta con distinto trabajo. */
+const ESTACIONES = {
+  caja:    {et:"Caja",    cuenta:true,  cocina:false, cancela:false},
+  cocina:  {et:"Cocina",  cuenta:false, cocina:true,  cancela:true},
+  barra:   {et:"Barra",   cuenta:false, cocina:true,  cancela:true},
+  ninguna: {et:"No imprime nada", cuenta:false, cocina:false, cancela:false}
+};
+let ESTACION = lsGet("estacion", null) || Object.assign({donde:"caja"}, ESTACIONES.caja);
+function guardaEstacion(){ lsSet("estacion", ESTACION); }
 let COMPRAS     = lsGet("compras", []);
 let RECETAS     = lsGet("recetas", {});   /* platId -> {ings:[], minutos:0} */
 let DECOR       = lsGet("decor", null) || decorPorDefecto();
@@ -1111,7 +1360,7 @@ P.gastos  = Object.assign({renta:0, luz:0, gas:0, agua:0, sueldos:0, otros:0}, P
 /* ---------------- roles ---------------- */
 const ROLES = {
   gerente: {nombre:"Gerente", ve:["inicio","mesas","comanda","cocina","menu","caja","ventas","personal","costos","set"]},
-  cajero:  {nombre:"Cajero",  ve:["inicio","mesas","comanda","cocina","caja","ventas","personal"]},
+  cajero:  {nombre:"Cajero",  ve:["inicio","mesas","comanda","cocina","caja","personal"]},
   mesero:  {nombre:"Mesero",  ve:["mesas","comanda","cocina","personal"]},
   cocina:  {nombre:"Cocina",  ve:["cocina","personal"]}
 };
@@ -1274,15 +1523,16 @@ function tamMesa(m){
   const base = 34 + Math.sqrt(l) * 17;
   const redonda = (m.forma === "redonda") && l <= 6;
   if(redonda) return {w: Math.round(base), h: Math.round(base), redonda:true};
-  /* Arriba de seis lugares una mesa deja de ser cuadrada: se alarga. */
-  const larga = l > 6;
-  return {w: Math.round(base * (larga ? 1.5 : 1)),
-          h: Math.round(base * (larga ? 0.72 : 0.84)), redonda:false};
+  /* Arriba de seis lugares una mesa deja de ser cuadrada: se alarga, y se
+     alarga de a de veras. La gente se sienta en los lados largos, asi que
+     el largo va con la mitad de los lugares, no con su raiz. */
+  if(l > 6) return {w: Math.min(430, Math.round(34 + (l/2) * 22)), h: 62, redonda:false};
+  return {w: Math.round(base), h: Math.round(base * 0.84), redonda:false};
 }
 /* Las sillas van en el borde: en el perímetro si es cuadrada, en la
    circunferencia si es redonda. Repartidas como se sienta la gente. */
 function sillasHTML(m){
-  const n = Math.min(16, Math.max(1, lugaresDe(m))), t = tamMesa(m);
+  const n = Math.min(26, Math.max(1, lugaresDe(m))), t = tamMesa(m);
   let s = "";
   if(t.redonda){
     const r = t.w/2 + 9;
@@ -1312,7 +1562,16 @@ function sillasHTML(m){
   return s;
 }
 
-let modoJuntar = false, elegidas = [];
+let modoJuntar = false, elegidas = [], selId = "", selEsDecor = false;
+/* Las mesas juntas no se estiran: lo que mide una mesa junta lo deciden los
+   lugares de las que la forman, no la mano. */
+const jalasHTML = () => ["o","e","n","s","se"].map(j=>'<i class="jala" data-j="'+j+'"></i>').join("");
+function selObj(){
+  if(!selId) return null;
+  return selEsDecor ? DECOR.find(x=>x.id === selId) : MESAS.find(x=>x.id === selId);
+}
+function escoge(id, esDecor){ selId = id; selEsDecor = !!esDecor; renderCroquis(); }
+function suelta(){ selId = ""; renderCroquis(); }
 
 function renderCroquis(){
   const caja = $("#mesaCroquis"); if(!caja) return;
@@ -1322,10 +1581,13 @@ function renderCroquis(){
   /* El decorado va primero: queda debajo de las mesas. */
   let html = DECOR.filter(d=>(d.zona||"Salón") === zonaVista).map(d=>{
     const def = TIPOS_DECOR[d.tipo] || {};
-    return '<div class="decor '+esc(d.tipo)+'" data-dec="'+esc(d.id)+'"' +
+    const gr = num(d.rot,0);
+    return '<div class="decor '+esc(d.tipo)+(selEsDecor && selId === d.id ? " sel" : "")+'" data-dec="'+esc(d.id)+'"' +
       ' style="left:'+num(d.x,50)+'%;top:'+num(d.y,50)+'%;' +
-      'width:'+num(d.w,def.w||12)+'%;height:'+num(d.h,def.h||8)+'%">' +
-      esc(d.texto != null ? d.texto : (def.txt||"")) + '</div>';
+      'width:'+num(d.w,def.w||12)+'%;height:'+num(d.h,def.h||8)+'%;' +
+      'transform:translate(-50%,-50%) rotate('+gr+'deg)">' +
+      esc(d.texto != null ? d.texto : (def.txt||"")) +
+      (modoAcomodo && selEsDecor && selId === d.id ? jalasHTML() : "") + '</div>';
   }).join("");
 
   html += mias.map(m=>{
@@ -1343,20 +1605,29 @@ function renderCroquis(){
     const cy = hs.reduce((s,h)=>s+num(h.y,50),0)/hs.length;
     const nombre = g ? hs.map(x=>x.nombre.replace(/^Mesa\s*/i,"")).join("+") : m.nombre;
     const eleg = elegidas.indexOf(m.id) >= 0;
-    return '<div class="cmesa '+(virtual.forma||"cuadrada")+' '+cl+(eleg?" elegida":"")+'" data-cm="'+esc(m.id)+'"' +
-      ' style="left:'+cx+'%;top:'+cy+'%;width:'+t.w+'px;height:'+t.h+'px">' +
+    const gr = num(m.rot,0);
+    return '<div class="cmesa '+(virtual.forma||"cuadrada")+' '+cl+(eleg?" elegida":"") +
+      (!selEsDecor && selId === m.id ? " sel" : "")+'" data-cm="'+esc(m.id)+'"' +
+      ' style="left:'+cx+'%;top:'+cy+'%;width:'+t.w+'px;height:'+t.h+'px;' +
+      'transform:translate(-50%,-50%) rotate('+gr+'deg)">' +
       sillasHTML(virtual) +
-      '<b>'+esc(nombre)+'</b>' +
-      '<small>'+lugaresDe(m)+' lug</small>' +
-      (c ? '<span class="tot">'+mx(sumaComanda(c).total)+'</span>' : '') +
+      '<div style="display:grid;place-items:center;gap:2px' +
+        (gr ? ';transform:rotate(' + (-gr) + 'deg)' : '') + '">' +
+        '<b>'+esc(nombre)+'</b>' +
+        '<small>'+lugaresDe(m)+' lug</small>' +
+        (c ? '<span class="tot">'+mx(sumaComanda(c).total)+'</span>' : '') +
+      '</div>' +
+      (modoAcomodo && !selEsDecor && selId === m.id && !g ? jalasHTML() : '') +
       '</div>';
   }).join("");
   caja.innerHTML = html;
 
+  aplicaFondo();
+  pintaBarraCroquis();
   $("#croqPista").textContent = modoJuntar
     ? "Toca dos o más mesas y presiona «Juntar». Para separar, toca una mesa junta."
     : modoAcomodo
-      ? "Arrastra mesas y cosas del salón. Toca una cosa dos veces para quitarla."
+      ? "Arrástralas para moverlas. Tócalas y jala las orillas para el tamaño, o usa la barra para girarlas y quitarlas."
       : "Toca una mesa para abrirla.";
 
   const b = $("#croqAcomodar");
@@ -1374,9 +1645,44 @@ function renderCroquis(){
   const hayJuntas = MESAS.some(m=>m.grupo && (m.zona||"Salón") === zonaVista);
   sp.hidden = !esGerente() || mesaVista !== "croquis" || !hayJuntas || modoAcomodo;
   $("#decorPaleta").hidden = !modoAcomodo;
-  if(modoAcomodo && !$("#decorPaleta").innerHTML)
-    $("#decorPaleta").innerHTML = '<span style="font-size:11px;color:var(--ink-3);align-self:center">Agregar:</span>' +
-      Object.keys(TIPOS_DECOR).map(k=>'<button type="button" data-addec="'+k+'">'+esc(TIPOS_DECOR[k].et)+'</button>').join("");
+  /* Se vuelve a dibujar sólo si cambió algo: el croquis se repinta solo cada
+     pocos segundos y un <select> que se reconstruye encima de la mano es
+     imposible de usar. */
+  const firmaP = modoAcomodo ? (zonaVista + "|" + croqCfg().fondo + "|" + (croqCfg().plano ? "1" : "0")) : "";
+  if(modoAcomodo && $("#decorPaleta").dataset.firma !== firmaP){
+    const c = croqCfg();
+    $("#decorPaleta").dataset.firma = firmaP;
+    $("#decorPaleta").innerHTML =
+      '<span style="font-size:11px;color:var(--ink-3);align-self:center">Agregar:</span>' +
+      Object.keys(TIPOS_DECOR).map(k=>'<button type="button" data-addec="'+k+'">'+esc(TIPOS_DECOR[k].et)+'</button>').join("") +
+      '<button type="button" data-addmesa="1">+ Mesa</button>' +
+      '<span style="font-size:11px;color:var(--ink-3);align-self:center;margin-left:auto">Piso:</span>' +
+      '<select class="croqFondo" id="croqFondoSel">' +
+        Object.keys(FONDOS).map(k=>'<option value="'+k+'"'+(c.fondo===k?" selected":"")+'>'+FONDOS[k]+'</option>').join("") +
+      '</select>' +
+      '<button type="button" data-plano="1">'+(c.plano ? "Cambiar plano" : "Subir plano")+'</button>' +
+      (c.plano ? '<button type="button" data-plano="0">Quitar plano</button>' : '');
+  }
+}
+
+/* La barra de la cosa escogida. Sale pegada arriba de ella, no en una
+   esquina: la mano ya está ahí. */
+function pintaBarraCroquis(){
+  const b = $("#croqTool"); if(!b) return;
+  const o = modoAcomodo ? selObj() : null;
+  if(!o){ b.hidden = true; return; }
+  b.hidden = false;
+  b.style.left = num(o.x,50) + "%";
+  b.style.top  = Math.max(8, num(o.y,50) - 7) + "%";
+  const mas = selEsDecor ? "Más grande" : "Un lugar más";
+  b.innerHTML =
+    '<button type="button" data-cb="izq" title="Girar a la izquierda">↺</button>' +
+    '<button type="button" data-cb="der" title="Girar a la derecha">↻</button>' +
+    '<button type="button" data-cb="90" title="Un cuarto de vuelta">90°</button>' +
+    '<button type="button" data-cb="-" title="Más chica">−</button>' +
+    '<button type="button" data-cb="+" title="'+mas+'">+</button>' +
+    (selEsDecor ? '<button type="button" data-cb="txt" title="Cambiar el letrero">Aa</button>' : '') +
+    '<button type="button" class="mal" data-cb="x" title="Quitar">✕</button>';
 }
 
 /* ---- para llevar: cada pedido es su propio ticket, y se tiene que ver ----
@@ -1405,8 +1711,25 @@ function croqXY(ev){
   const r = $("#mesaCroquis").getBoundingClientRect();
   return {x: ((ev.clientX - r.left)/r.width)*100, y: ((ev.clientY - r.top)/r.height)*100};
 }
+let estirando = null;
 $("#mesaCroquis").addEventListener("pointerdown", e=>{
   if(!modoAcomodo) return;
+  const j = e.target.closest(".jala");
+  if(j){
+    const o = selObj(); if(!o) return;
+    const r = $("#mesaCroquis").getBoundingClientRect();
+    const def = selEsDecor ? (TIPOS_DECOR[o.tipo] || {}) : {};
+    const tm = selEsDecor ? null : tamMesa(o);
+    estirando = {
+      lado: j.dataset.j, p0: croqXY(e), caja: r,
+      w0: selEsDecor ? num(o.w, def.w||12) : 0,
+      h0: selEsDecor ? num(o.h, def.h||8)  : 0,
+      px0: selEsDecor ? 0 : Math.max(tm.w, tm.h)
+    };
+    j.setPointerCapture(e.pointerId);
+    e.preventDefault(); e.stopPropagation();
+    return;
+  }
   const el = e.target.closest("[data-cm],[data-dec]"); if(!el) return;
   const esDecor = !!el.dataset.dec;
   arrastrando = {id: esDecor ? el.dataset.dec : el.dataset.cm, el, movio:false, decor:esDecor};
@@ -1415,6 +1738,44 @@ $("#mesaCroquis").addEventListener("pointerdown", e=>{
   e.preventDefault();
 });
 $("#mesaCroquis").addEventListener("pointermove", e=>{
+  if(estirando){
+    const o = selObj(); if(!o) return;
+    const p = croqXY(e), l = estirando.lado;
+    const dx = p.x - estirando.p0.x, dy = p.y - estirando.p0.y;
+    /* Se jala desde el centro: la cosa crece del doble de lo que mueve la
+       mano por ese lado, y se queda donde está. */
+    let w = estirando.w0, h = estirando.h0;
+    if(l === "e" || l === "se") w = estirando.w0 + dx*2;
+    if(l === "o") w = estirando.w0 - dx*2;
+    if(l === "s" || l === "se") h = estirando.h0 + dy*2;
+    if(l === "n") h = estirando.h0 - dy*2;
+    if(selEsDecor){
+      o.w = Math.max(1.5, Math.min(98, Math.round(w*10)/10));
+      o.h = Math.max(1,   Math.min(98, Math.round(h*10)/10));
+      const el = $('[data-dec="'+o.id+'"]');
+      if(el){ el.style.width = o.w + "%"; el.style.height = o.h + "%"; }
+    }else{
+      /* Una mesa no mide en centímetros: mide en lugares. Jalarla le pone o
+         le quita sillas, que es lo que de verdad cambia en el salón. Se
+         invierte tamMesa() para saber a cuántos lugares corresponde el
+         ancho al que la llevó la mano. */
+      const r2 = estirando.caja;
+      const dpx = (l === "n" || l === "s") ? (dy * r2.height / 100) : (dx * r2.width / 100);
+      const signo = (l === "o" || l === "n") ? -1 : 1;
+      const px = Math.max(20, estirando.px0 + dpx * signo * 2);
+      const lug = px > 160 ? Math.round((px - 34) * 2 / 22)
+                           : Math.round(Math.pow(Math.max(1, (px - 34) / 17), 2));
+      const fin = Math.max(1, Math.min(30, lug));
+      if(fin !== lugaresDe(o)){
+        o.lugares = fin;
+        const c = comandaDe(mesaMadre(o).id);
+        if(c) c.personas = Math.max(num(c.personas,1), fin);
+        renderCroquis();
+      }
+    }
+    estirando.movio = true;
+    return;
+  }
   if(!arrastrando) return;
   const p = croqXY(e);
   const o = arrastrando.decor ? DECOR.find(x=>x.id === arrastrando.id)
@@ -1446,13 +1807,20 @@ function mesaCerca(m){
   return d < 9 ? cerca : null;
 }
 $("#mesaCroquis").addEventListener("pointerup", ()=>{
+  if(estirando){
+    const movio = estirando.movio; estirando = null;
+    if(movio){ persist(); renderCroquis(); }
+    return;
+  }
   if(!arrastrando) return;
   arrastrando.el.classList.remove("arrastrando");
   const movio = arrastrando.movio;
   arrastrando = null;
   if(movio){ persist(); renderCroquis(); }
+  else pintaBarraCroquis();
 });
 $("#mesaCroquis").addEventListener("pointercancel", ()=>{
+  if(estirando){ estirando = null; persist(); renderCroquis(); return; }
   if(arrastrando){ arrastrando.el.classList.remove("arrastrando"); arrastrando = null; }
 });
 
@@ -1490,19 +1858,17 @@ function separaGrupo(g){
   toast("Mesas separadas");
 }
 $("#mesaCroquis").addEventListener("click", e=>{
-  /* En modo acomodo, dos toques seguidos quitan una cosa del salón. */
-  const dec = e.target.closest("[data-dec]");
-  if(dec && modoAcomodo){
-    const d = DECOR.find(x=>x.id === dec.dataset.dec); if(!d) return;
-    const ahora = Date.now();
-    if(dec._t && ahora - dec._t < 700){
-      DECOR = DECOR.filter(x=>x.id !== d.id);
-      persist(); renderCroquis(); toast("Quitado");
-    }else dec._t = ahora;
+  /* Acomodando, un toque escoge: la barra de arriba hace lo demás. */
+  if(modoAcomodo){
+    if(e.target.closest(".jala")) return;
+    const dec = e.target.closest("[data-dec]");
+    if(dec){ escoge(dec.dataset.dec, true); return; }
+    const ms = e.target.closest("[data-cm]");
+    if(ms){ escoge(ms.dataset.cm, false); return; }
+    if(selId) suelta();
     return;
   }
   const el = e.target.closest("[data-cm]"); if(!el) return;
-  if(modoAcomodo) return;
   const m = MESAS.find(x=>x.id === el.dataset.cm); if(!m) return;
 
   if(modoJuntar){
@@ -1522,17 +1888,87 @@ $("#mesaCroquis").addEventListener("click", e=>{
   abreMesa(mesaMadre(m).id);
 });
 $("#decorPaleta").addEventListener("click", e=>{
+  const pl = e.target.closest("[data-plano]");
+  if(pl){
+    if(pl.dataset.plano === "0"){ croqCfg().plano = ""; persist(); renderCroquis(); toast("Plano quitado"); }
+    else $("#croqPlanoFile").click();
+    return;
+  }
+  const nm = e.target.closest("[data-addmesa]");
+  if(nm){
+    const id = uid();
+    MESAS.push({id, nombre:"Mesa "+(MESAS.length+1), zona:zonaVista, lugares:4, activa:true,
+                x:50, y:50, forma:"cuadrada", rot:0});
+    persist(); escoge(id, false);
+    toast("Mesa puesta. Arrástrala a su lugar.");
+    return;
+  }
   const b = e.target.closest("[data-addec]"); if(!b) return;
   const k = b.dataset.addec, def = TIPOS_DECOR[k];
-  DECOR.push({id:uid(), tipo:k, zona:zonaVista, x:50, y:50, w:def.w, h:def.h});
+  const id = uid();
+  DECOR.push({id, tipo:k, zona:zonaVista, x:50, y:50, w:def.w, h:def.h, rot:0});
+  persist(); escoge(id, true);
+  toast(def.et + " puesta. Arrástrala a su lugar.");
+});
+$("#decorPaleta").addEventListener("change", e=>{
+  if(e.target.id !== "croqFondoSel") return;
+  croqCfg().fondo = e.target.value; persist(); renderCroquis();
+});
+$("#croqPlanoFile").addEventListener("change", e=>{
+  const f = e.target.files && e.target.files[0]; e.target.value = "";
+  if(!f) return;
+  if(f.size > 900*1024){ toast("Ese plano pesa mucho. Usa una imagen de menos de 900 KB."); return; }
+  const r = new FileReader();
+  r.onload = ()=>{ croqCfg().plano = r.result; persist(); renderCroquis(); toast("Plano puesto. Acomoda las mesas encima."); };
+  r.readAsDataURL(f);
+});
+$("#croqTool").addEventListener("click", e=>{
+  const b = e.target.closest("[data-cb]"); if(!b) return;
+  const o = selObj(); if(!o) return;
+  const q = b.dataset.cb;
+  if(q === "izq" || q === "der" || q === "90"){
+    const paso = q === "90" ? 90 : (q === "der" ? 15 : -15);
+    o.rot = (((num(o.rot,0) + paso) % 360) + 360) % 360;
+  }
+  else if(q === "+" || q === "-"){
+    const d = q === "+" ? 1 : -1;
+    if(selEsDecor){
+      const def = TIPOS_DECOR[o.tipo] || {};
+      o.w = Math.max(2, Math.min(96, Math.round(num(o.w, def.w||12) * (d > 0 ? 1.18 : 1/1.18))));
+      o.h = Math.max(1, Math.min(96, Math.round(num(o.h, def.h||8) * (d > 0 ? 1.18 : 1/1.18))));
+    }else{
+      o.lugares = Math.max(1, Math.min(30, num(o.lugares,4) + d));
+      const c = comandaDe(mesaMadre(o).id);
+      if(c) c.personas = Math.max(num(c.personas,1), lugaresDe(o));
+    }
+  }
+  else if(q === "txt"){
+    const def = TIPOS_DECOR[o.tipo] || {};
+    const v = prompt("¿Qué dice?", o.texto != null ? o.texto : (def.txt||""));
+    if(v === null) return;
+    o.texto = v;
+  }
+  else if(q === "x"){
+    if(selEsDecor){
+      if(!confirm("¿Quitar «" + ((TIPOS_DECOR[o.tipo]||{}).et || "esto") + "» del croquis?")) return;
+      DECOR = DECOR.filter(x=>x.id !== o.id);
+    }else{
+      if(comandaDe(mesaMadre(o).id)){ toast("Esa mesa tiene cuenta abierta"); return; }
+      if(!confirm("¿Quitar «" + o.nombre + "»?\n\nSe va del croquis y de la lista de mesas.")) return;
+      const g = grupoDe(o);
+      MESAS = MESAS.filter(x=>x.id !== o.id);
+      if(g && mesasDelGrupo(g).length < 2) mesasDelGrupo(g).forEach(x=>{ delete x.grupo; });
+    }
+    persist(); suelta(); toast("Quitado");
+    return;
+  }
   persist(); renderCroquis();
-  toast(def.et + " puesta. Arrástrala a su lugar; dos toques la quitan.");
 });
 $("#croqAcomodar").addEventListener("click", ()=>{
   modoAcomodo = !modoAcomodo;
-  modoJuntar = false; elegidas = [];
+  modoJuntar = false; elegidas = []; selId = "";
   renderCroquis();
-  toast(modoAcomodo ? "Arrastra las mesas y las cosas del salón." : "Croquis guardado");
+  toast(modoAcomodo ? "Arrástralas para moverlas; tócalas para girarlas o quitarlas." : "Croquis guardado");
 });
 $("#croqJuntar").addEventListener("click", ()=>{
   if(modoJuntar && elegidas.length > 1){ juntaElegidas(); return; }
@@ -1595,7 +2031,7 @@ function renderMesas(){
   const ab = abiertas(), ll = llevarAbiertas().length;
   $("#mesasResumen").textContent = ab.length
     ? ab.length + " abierta(s)" + (ll ? " (" + ll + " para llevar)" : "") + " · " +
-      mx(ab.reduce((s,c)=>s+sumaComanda(c).total,0)) + " sin cobrar"
+      (veDinero() ? mx(ab.reduce((s,c)=>s+sumaComanda(c).total,0)) + " sin cobrar" : "en servicio")
     : "Todas las mesas libres";
   pintaTabs();
   $$("#tabs button").forEach(b=> b.setAttribute("aria-selected", String(b.dataset.tab === "mesas")));
@@ -1807,13 +2243,19 @@ function abreCorrige(linId){
     '</div>';
   $("#modalCorrige").hidden = false;
 }
-function anotaCancelacion(c, l, cant, motivo, nota, merma){
+function anotaCancelacion(c, l, cant, motivo, nota, merma, autorizo){
+  /* A la cocina se le avisa en papel solo si ya estaba preparandolo: una
+     linea que nunca salio de la comanda no le interesa a nadie alla. */
+  if(merma && ESTACION.cancela)
+    setTimeout(()=> imprimeCancelacion(c, {cant:cant, nombre:l.nombre, motivo:motivo,
+      nota:nota||"", quien: usuarioActual().nombre||""}), 60);
   c.cancelaciones = c.cancelaciones || [];
   c.cancelaciones.push({
     id: uid(), linId: l.id, nombre: l.nombre, cant: cant,
     importe: (num(l.precio) + (l.mods||[]).reduce((x,m)=>x+num(m.extra),0)) * cant,
     motivo: motivo, nota: nota||"", merma: !!merma,
-    quien: usuarioActual().nombre||"", hora: horaAhora(), estadoAlCancelar: l.estado||"pedido"
+    quien: usuarioActual().nombre||"", hora: horaAhora(), estadoAlCancelar: l.estado||"pedido",
+    autorizo: autorizo || null
   });
 }
 $("#corrCerrar").addEventListener("click", ()=>{ $("#modalCorrige").hidden = true; corrigiendo = null; });
@@ -1827,29 +2269,46 @@ $("#corrCuerpo").addEventListener("click", e=>{
   if(e.target.closest("#corrCancela")){
     if(!confirm("¿Cancelar «" + l.nombre + "» completo?" +
         (avanzado ? "\n\nYa estaba " + (ET_EDO[l.estado]||l.estado) + ": se registra como merma." : ""))) return;
-    anotaCancelacion(c, l, num(l.cant,1), motivo, nota, avanzado);
-    l.cancelada = true; l.motivo = motivo; l.cancelaHora = horaAhora();
-    persist(); $("#modalCorrige").hidden = true; corrigiendo = null;
-    renderComanda(); pintaTabs();
-    toast("Cancelado. La cocina lo va a ver en su pantalla.");
+    /* Lo que ya salio a cocina no lo cancela cualquiera: ahi es donde se
+       va el dinero sin que nadie se entere. */
+    const hacerlo = quien=>{
+      anotaCancelacion(c, l, num(l.cant,1), motivo, nota, avanzado, quien);
+      l.cancelada = true; l.motivo = motivo; l.cancelaHora = horaAhora();
+      persist(); $("#modalCorrige").hidden = true; corrigiendo = null;
+      renderComanda(); pintaTabs();
+      toast("Cancelado" + (quien && quien.nombre && !quien.propio ? " · autorizó " + quien.nombre : "") +
+            ". La cocina lo va a ver en su pantalla.");
+    };
+    if(l.enviada)
+      pideAutorizacion('Se va a cancelar <b>' + esc(l.nombre) + '</b>, que ya está en cocina' +
+        (avanzado ? ' y ya lo estaban preparando' : '') + '. Motivo: <b>' + esc(motivo) + '</b>.', hacerlo);
+    else hacerlo({id: usuarioActual().id||"", nombre: usuarioActual().nombre||"", propio:true});
     return;
   }
   if(e.target.closest("#corrGuarda")){
     const nueva = Math.max(0, num($("#corrCant").value, 0));
     const antes = num(l.cant,1);
     if(nueva === antes){ $("#modalCorrige").hidden = true; corrigiendo = null; return; }
-    if(nueva === 0){
-      anotaCancelacion(c, l, antes, motivo, nota, avanzado);
-      l.cancelada = true; l.motivo = motivo; l.cancelaHora = horaAhora();
-    }else{
-      if(nueva < antes) anotaCancelacion(c, l, antes - nueva, motivo, nota, avanzado);
-      l.cant = nueva;
-      /* Si crece, lo que se suma todavía no está en cocina. */
-      if(nueva > antes){ l.estado = "pedido"; l.enviada = horaAhora(); }
-    }
-    persist(); $("#modalCorrige").hidden = true; corrigiendo = null;
-    renderComanda(); pintaTabs();
-    toast(nueva === 0 ? "Cancelado" : "Quedó en " + nueva);
+    const hacerlo = quien=>{
+      if(nueva === 0){
+        anotaCancelacion(c, l, antes, motivo, nota, avanzado, quien);
+        l.cancelada = true; l.motivo = motivo; l.cancelaHora = horaAhora();
+      }else{
+        if(nueva < antes) anotaCancelacion(c, l, antes - nueva, motivo, nota, avanzado, quien);
+        l.cant = nueva;
+        /* Si crece, lo que se suma todavía no está en cocina. */
+        if(nueva > antes){ l.estado = "pedido"; l.enviada = horaAhora(); }
+      }
+      persist(); $("#modalCorrige").hidden = true; corrigiendo = null;
+      renderComanda(); pintaTabs();
+      toast(nueva === 0 ? "Cancelado" : "Quedó en " + nueva);
+    };
+    /* Bajarle la cantidad a algo que ya esta en cocina es cancelar una
+       parte: pide lo mismo. Subirla no le quita nada a nadie. */
+    if(l.enviada && nueva < antes)
+      pideAutorizacion('Se le van a quitar <b>' + (antes - nueva) + '</b> de <b>' + esc(l.nombre) +
+        '</b>, que ya está en cocina. Motivo: <b>' + esc(motivo) + '</b>.', hacerlo);
+    else hacerlo({id: usuarioActual().id||"", nombre: usuarioActual().nombre||"", propio:true});
   }
 });
 $("#comVolver").addEventListener("click", ()=>{ vaA("mesas"); });
@@ -1863,9 +2322,14 @@ $("#comEnviar").addEventListener("click", ()=>{
   const c = comandaActual(); if(!c) return;
   const h = horaAhora();
   let n = 0;
-  (c.lineas||[]).forEach(l=>{ if(!l.enviada && !l.cancelada){ l.enviada = h; l.estado = "pedido"; n++; } });
+  const nuevas = [];
+  (c.lineas||[]).forEach(l=>{ if(!l.enviada && !l.cancelada){ l.enviada = h; l.estado = "pedido"; n++; nuevas.push(l); } });
   persist(); pintaLineas(); pintaTabs();
-  toast(n + " platillo(s) a cocina. Para cambiarlos ahora se usa Corregir.");
+  /* Sólo lo que se acaba de mandar: reimprimir la comanda entera hace que la
+     cocina prepare dos veces lo mismo. */
+  if(ESTACION.cocina && nuevas.length) imprimeComandaCocina(c, nuevas);
+  toast(n + " platillo(s) a cocina" + (ESTACION.cocina && nuevas.length ? " · se imprimió la comanda" : "") +
+        ". Para cambiarlos ahora se usa Corregir.");
 });
 $("#comCancelar").addEventListener("click", ()=>{
   const c = comandaActual(); if(!c) return;
@@ -1875,14 +2339,23 @@ $("#comCancelar").addEventListener("click", ()=>{
       "La cuenta se cierra en cero y queda registrada como cancelada.")) return;
   const motivo = prompt("¿Por qué se cancela la mesa?", "El cliente se fue");
   if(motivo === null) return;
-  vivas(c).forEach(l=>{
-    anotaCancelacion(c, l, num(l.cant,1), motivo, "", !!l.enviada);
-    l.cancelada = true; l.motivo = motivo;
-  });
-  c.estado = "cerrada"; c.cancelada = true; c.motivo = motivo;
-  c.cierra = horaAhora(); c.total = 0;
-  persist(); vaA("mesas");
-  toast("Mesa cancelada · " + motivo);
+  const hacerlo = quien=>{
+    vivas(c).forEach(l=>{
+      anotaCancelacion(c, l, num(l.cant,1), motivo, "", !!l.enviada, quien);
+      l.cancelada = true; l.motivo = motivo;
+    });
+    c.estado = "cerrada"; c.cancelada = true; c.motivo = motivo;
+    c.cierra = horaAhora(); c.total = 0;
+    c.autorizo = quien || null;
+    persist(); vaA("mesas");
+    toast("Mesa cancelada · " + motivo +
+          (quien && quien.nombre && !quien.propio ? " · autorizó " + quien.nombre : ""));
+  };
+  /* Una mesa entera es la cancelacion mas cara que existe. */
+  if(enCocina)
+    pideAutorizacion('Se va a cancelar <b>' + esc(c.mesaNombre) + '</b> completa, con <b>' + enCocina +
+      '</b> platillo(s) ya en cocina. Motivo: <b>' + esc(motivo) + '</b>.', hacerlo);
+  else hacerlo({id: usuarioActual().id||"", nombre: usuarioActual().nombre||"", propio:true});
 });
 
 /* ---------------- modificadores ---------------- */
@@ -2188,7 +2661,7 @@ $("#cobroOk").addEventListener("click", ()=>{
   c.cobro = usuarioActual().nombre || "";
   persist();
 
-  if((P.ticket||{}).imprimeCuenta !== false) imprimeCuenta(c, c.pagos, prop);
+  if(ESTACION.cuenta) imprimeCuenta(c, c.pagos, prop);
   $("#modalCobro").hidden = true;
   comandaId = null;
   vaA("mesas");
@@ -2267,13 +2740,19 @@ function renderCaja(){
       'Aquí van los retiros parciales y el dinero que entra que no es una venta.</div></td></tr></tbody>';
   pintaTurnoChip();
 }
+/* El dinero lo ve quien responde por el: el que puede entrar a Caja. Para
+   los demas la caja esta abierta o cerrada, que es lo unico que necesitan
+   saber para levantar una comanda. */
+const veDinero = () => puedeVer("caja");
 function pintaTurnoChip(){
   const t = turnoAbierto(), ch = $("#turnoChip");
   if(!ch) return;
   if(t){
     const s = sumaTurno(t);
     ch.className = "turnoChip";
-    ch.innerHTML = "Caja <b>abierta</b> · " + esc(t.cajero||"") + " · " + mx(s.enCaja);
+    ch.innerHTML = veDinero()
+      ? "Caja <b>abierta</b> · " + esc(t.cajero||"") + " · " + mx(s.enCaja)
+      : "Caja <b>abierta</b>";
   }else{
     ch.className = "turnoChip cerrado";
     ch.innerHTML = "Caja <b>cerrada</b>";
@@ -2457,15 +2936,24 @@ function renderVentas(){
       '<span class="sub">' + (total ? Math.round((total-costo)/total*100) + "% del total" : "sin ventas") + '</span></div>' +
     '<div class="tile"><span class="et">Históricas</span><span class="v">' + todas.length + '</span>' +
       '<span class="sub">cuentas cerradas</span></div>';
-  $("#venHint").textContent = todas.length + " en total";
+  const lista = ventasFiltradas();
+  $("#venHint").textContent = lista.length === todas.length
+    ? todas.length + " en total"
+    : lista.length + " de " + cerradasTodas().length;
   $("#t_ventas").innerHTML = '<thead><tr><th>Folio</th><th>Mesa</th><th>Fecha</th><th>Cerró</th>' +
-    '<th>Atendió</th><th class="der">Propina</th><th class="der">Total</th></tr></thead><tbody>' +
-    todas.slice(0,120).map(c=>
-      '<tr><td class="mono">'+esc(c.folio)+'</td><td>'+esc(c.mesaNombre)+'</td>' +
-      '<td class="mono">'+esc(c.fecha)+'</td><td class="mono">'+esc(c.cierra||"")+'</td>' +
-      '<td>'+esc(c.mesero||"")+'</td><td class="der mono">'+mx(c.propina)+'</td>' +
-      '<td class="der mono">'+mx(c.total)+'</td></tr>').join("") + '</tbody>';
-  if(!todas.length) $("#t_ventas").innerHTML += '<tbody><tr><td colspan="7"><div class="empty">Sin cuentas cerradas.</div></td></tr></tbody>';
+    '<th>Atendió</th><th>Cobró</th><th class="der">Propina</th><th class="der">Total</th>' +
+    '<th style="width:90px"></th></tr></thead><tbody>' +
+    (lista.length ? lista.slice(0,200).map(c=>{
+      const cans = (c.cancelaciones||[]).length, re = (c.reimpresiones||[]).length;
+      return '<tr data-tk="'+esc(c.id)+'"><td class="mono">'+esc(c.folio)+'</td><td>'+esc(c.mesaNombre)+'</td>' +
+        '<td class="mono">'+esc(c.fecha)+'</td><td class="mono">'+esc(c.cierra||"")+'</td>' +
+        '<td>'+esc(c.mesero||"")+'</td><td>'+esc(c.cobro||"")+'</td>' +
+        '<td class="der mono">'+mx(c.propina)+'</td>' +
+        '<td class="der mono">'+(c.cancelada ? '<span class="pill mal">cancelada</span>' : mx(c.total))+'</td>' +
+        '<td>'+(cans ? '<span class="pill mal" title="cancelaciones">'+cans+'</span> ' : '') +
+              (re ? '<span class="pill tarde" title="reimpresiones">'+re+'↺</span>' : '')+'</td></tr>';
+    }).join("") : '<tr><td colspan="9"><div class="empty">Nada con ese filtro.</div></td></tr>') + '</tbody>';
+  renderCancelaciones();
 
   const cerrados = TURNOS.filter(t=>!t.abierto);
   $("#t_turnos").innerHTML = '<thead><tr><th>Turno</th><th>Cajero</th><th>Fecha</th><th>Horario</th>' +
@@ -2478,6 +2966,219 @@ function renderVentas(){
       (num(t.diferencia)>0?"+":"")+mx(t.diferencia)+'</td></tr>').join("") + '</tbody>';
   if(!cerrados.length) $("#t_turnos").innerHTML += '<tbody><tr><td colspan="6"><div class="empty">Sin turnos cerrados.</div></td></tr></tbody>';
 }
+
+
+/* ===================================================================
+   AUTORIZACION
+   Quien puede autorizar: el que responde por el dinero. Si el que esta
+   operando ya es de esos, no se le pide nada a si mismo — ya es su
+   decision y queda a su nombre.
+   =================================================================== */
+const puedeAutorizar = u => u && u.activo !== false && (u.rol === "gerente" || u.rol === "cajero") && tieneClave(u);
+const jefesConClave = () => EQUIPO.filter(puedeAutorizar);
+const soyAutoridad  = () => rolActual() === "gerente" || rolActual() === "cajero";
+
+let autoDestino = null;
+/* alAutorizar recibe {id, nombre}. Si el que opera ya manda, se le llama
+   de inmediato con su propio nombre: su firma es el que haya entrado. */
+function pideAutorizacion(queTexto, alAutorizar){
+  if(soyAutoridad()){
+    const u = usuarioActual();
+    alAutorizar({id: u.id || "", nombre: u.nombre || "", propio: true});
+    return;
+  }
+  const jefes = jefesConClave();
+  if(!jefes.length){
+    /* Nadie con clave para autorizar: no se traba el servicio, pero se
+       anota que nadie autorizo. Mentir diciendo que si, seria peor. */
+    if(!confirm("Nadie del equipo tiene clave para autorizar esto.\n\n" +
+        "Se va a registrar SIN autorización. Ponle clave al gerente o al cajero en Ajustes → Equipo.\n\n¿Seguir?")) return;
+    alAutorizar({id:"", nombre:"", sinClave:true});
+    return;
+  }
+  autoDestino = alAutorizar;
+  $("#autoQue").innerHTML = queTexto;
+  $("#autoLista").innerHTML = '<span style="font-size:11.5px;color:var(--ink-3)">Puede autorizar: </span>' +
+    jefes.map(u=>'<span class="pill" style="margin-right:5px">'+esc(u.nombre||"")+'</span>').join("");
+  $("#autoPin").value = "";
+  $("#modalAuto").hidden = false;
+  setTimeout(()=>{ const i = $("#autoPin"); if(i) i.focus(); }, 60);
+}
+$("#autoCerrar").addEventListener("click", ()=>{ $("#modalAuto").hidden = true; autoDestino = null; });
+$("#autoPin").addEventListener("keydown", e=>{ if(e.key === "Enter") $("#autoOk").click(); });
+$("#autoOk").addEventListener("click", ()=>{
+  const pin = String($("#autoPin").value || "").trim();
+  const u = jefesConClave().find(x=>String(x.pin||"") === pin);
+  if(!u){ toast("Esa clave no es de nadie que pueda autorizar"); $("#autoPin").value = ""; return; }
+  const f = autoDestino; autoDestino = null;
+  $("#modalAuto").hidden = true;
+  toast("Autorizó " + (u.nombre||""));
+  if(f) f({id:u.id, nombre:u.nombre||""});
+});
+
+/* ===================================================================
+   ARCHIVO DE TICKETS
+   =================================================================== */
+let tkVista = null;
+const cerradasTodas = () => COMANDAS.filter(c=>c.estado === "cerrada")
+  .slice().sort((a,b)=> (b.fecha + (b.cierra||"")) < (a.fecha + (a.cierra||"")) ? -1 : 1);
+function ventasFiltradas(){
+  const q = (($("#venBusca")||{}).value || "").trim().toLowerCase();
+  const d = ($("#venDesde")||{}).value || "";
+  const h = ($("#venHasta")||{}).value || "";
+  return cerradasTodas().filter(c=>{
+    if(d && c.fecha < d) return false;
+    if(h && c.fecha > h) return false;
+    if(!q) return true;
+    return (c.folio + " " + c.mesaNombre + " " + (c.mesero||"") + " " + (c.cobro||"")).toLowerCase().indexOf(q) >= 0;
+  });
+}
+function abreTicket(id){
+  const c = COMANDAS.find(x=>x.id === id); if(!c) return;
+  tkVista = id;
+  const s = sumaComanda(c), prop = num(c.propina), total = num(c.total, s.total + prop);
+  const n = Math.max(1, num(c.personas,1));
+  const cans = c.cancelaciones || [];
+  const re = c.reimpresiones || [];
+  $("#tkTitulo").textContent = c.folio + " · " + c.mesaNombre;
+  let h = '<div class="grid g3" style="margin-bottom:14px">' +
+    tile("Total", mx(total)) + tile("Propina", mx(prop)) +
+    tile(c.cancelada ? "Cancelada" : "Cobrada", esc(c.cierra||"")) + '</div>' +
+    '<p class="note" style="margin:0 0 14px">' + esc(c.fecha) + ' · abrió ' + esc(c.abre||"") +
+      ' · atendió <b>' + esc(c.mesero||"—") + '</b>' +
+      (c.cobro ? ' · cobró <b>' + esc(c.cobro) + '</b>' : '') +
+      (n > 1 ? ' · ' + n + ' comensales' : '') + '</p>';
+
+  (c.lineas||[]).forEach(l=>{
+    const imp = (num(l.precio) + (l.mods||[]).reduce((x,m)=>x+num(m.extra),0)) * num(l.cant,1);
+    h += '<div class="tkLin'+(l.cancelada?" cancel":"")+'">' +
+      '<span class="mono">'+num(l.cant,1)+'×</span>' +
+      '<span><span class="nom">'+esc(l.nombre)+'</span>' +
+        (n > 1 ? '<small>'+(num(l.comensal,0) ? "Comensal "+num(l.comensal) : "Para compartir")+'</small>' : '') +
+        ((l.mods||[]).length ? '<small>'+(l.mods||[]).map(m=>esc(m.nombre)).join(" · ")+'</small>' : '') +
+        (l.nota ? '<small>'+esc(l.nota)+'</small>' : '') +
+        (l.cancelada ? '<small style="color:var(--mal)">Cancelado: '+esc(l.motivo||"")+'</small>' : '') +
+      '</span>' +
+      '<span class="mono">'+(l.cancelada ? "—" : mx(imp))+'</span></div>';
+  });
+  h += '<div style="margin-top:12px">' +
+    '<div class="tkTot"><span>Consumo</span><span class="mono">'+mx(s.sub)+'</span></div>' +
+    (s.serv ? '<div class="tkTot"><span>Servicio</span><span class="mono">'+mx(s.serv)+'</span></div>' : '') +
+    (prop ? '<div class="tkTot"><span>Propina</span><span class="mono">'+mx(prop)+'</span></div>' : '') +
+    '<div class="tkTot grande"><span>Total</span><span class="mono">'+mx(total)+'</span></div></div>';
+
+  if((c.pagos||[]).length){
+    h += '<div style="margin-top:12px">' + (c.pagos||[]).map(pg=>
+      '<div class="tkTot"><span>'+esc(pg.tipo)+'</span><span class="mono">'+mx(pg.monto)+'</span></div>').join("") +
+      (num(c.cambio) ? '<div class="tkTot"><span>Cambio</span><span class="mono">'+mx(c.cambio)+'</span></div>' : '') +
+      '</div>';
+  }
+  if(cans.length){
+    h += '<h3 style="font-size:13px;margin:20px 0 8px;color:var(--mal)">Cancelado en esta cuenta</h3>' +
+      cans.map(x=>'<div class="tkLin"><span class="mono">'+num(x.cant,1)+'×</span>' +
+        '<span><span class="nom">'+esc(x.nombre)+'</span>' +
+        '<small>'+esc(x.motivo||"")+(x.nota?" · "+esc(x.nota):"")+'</small>' +
+        '<small>'+esc(x.hora||"")+' · pidió '+esc(x.quien||"")+
+          (x.autorizo && x.autorizo.nombre ? ' · autorizó <b>'+esc(x.autorizo.nombre)+'</b>'
+            : x.autorizo && x.autorizo.sinClave ? ' · <b style="color:var(--mal)">sin autorización</b>' : '')+'</small>' +
+        '</span><span>'+(x.merma ? '<span class="pill mal">merma</span>' : '<span class="pill">a tiempo</span>')+'</span></div>').join("");
+  }
+  if(re.length){
+    h += '<p class="note" style="margin-top:16px;border-left-color:var(--warn)">Reimpreso ' + re.length + ' vez(ces): ' +
+      re.map(x=>esc(x.quien||"")+" "+esc(x.hora||"")).join(" · ") + '</p>';
+  }
+  h += '<div class="fila" style="margin-top:18px">' +
+    '<button class="btn primary" id="tkReimprime">Volver a imprimir</button>' +
+    '<button class="btn" id="tkCocina">Comanda de cocina</button></div>';
+  $("#tkCuerpo").innerHTML = h;
+  $("#modalTicket").hidden = false;
+}
+$("#tkCerrar").addEventListener("click", ()=>{ $("#modalTicket").hidden = true; tkVista = null; });
+$("#tkCuerpo").addEventListener("click", e=>{
+  const c = COMANDAS.find(x=>x.id === tkVista); if(!c) return;
+  if(e.target.closest("#tkReimprime")){
+    /* Una reimpresion no es gratis: queda anotada. Un ticket que se
+       reimprime tres veces es una pregunta, no un accidente. */
+    c.reimpresiones = c.reimpresiones || [];
+    c.reimpresiones.push({quien: usuarioActual().nombre||"", hora: horaAhora(), fecha: hoyISO()});
+    persist();
+    imprimeCuenta(c, c.pagos || [], num(c.propina));
+    abreTicket(c.id); renderVentas();
+    return;
+  }
+  if(e.target.closest("#tkCocina")){
+    const ls = (c.lineas||[]).filter(l=>!l.cancelada);
+    if(!ls.length){ toast("Esta cuenta no tiene nada que mandar"); return; }
+    imprimeComandaCocina(c, ls);
+  }
+});
+
+/* ---------------- cancelaciones de todo el negocio ---------------- */
+function todasLasCancelaciones(){
+  const out = [];
+  COMANDAS.forEach(c=>(c.cancelaciones||[]).forEach(x=> out.push({c, x})));
+  return out.sort((a,b)=> (b.c.fecha + (b.x.hora||"")) < (a.c.fecha + (a.x.hora||"")) ? -1 : 1);
+}
+function renderCancelaciones(){
+  const tb = $("#t_cancela"); if(!tb) return;
+  const cs = todasLasCancelaciones();
+  const merma = cs.filter(z=>z.x.merma);
+  const perdido = merma.reduce((s,z)=>s+num(z.x.importe), 0);
+  $("#canHint").textContent = cs.length
+    ? cs.length + " en total · " + merma.length + " con merma · " + mx(perdido) + " que no entró"
+    : "ninguna, por ahora";
+  tb.innerHTML = '<thead><tr><th style="width:105px">Día</th><th style="width:70px">Hora</th>' +
+    '<th>Qué</th><th>Motivo</th><th>Pidió</th><th>Autorizó</th>' +
+    '<th style="width:85px">Merma</th><th class="der" style="width:95px">Importe</th></tr></thead><tbody>' +
+    (cs.length ? cs.slice(0,200).map(z=>
+      '<tr><td class="mono">'+esc(z.c.fecha)+'</td><td class="mono">'+esc(z.x.hora||"")+'</td>' +
+      '<td>'+num(z.x.cant,1)+'× <b>'+esc(z.x.nombre)+'</b><br>' +
+        '<span style="font-size:11px;color:var(--ink-3)">'+esc(z.c.folio)+' · '+esc(z.c.mesaNombre)+'</span></td>' +
+      '<td>'+esc(z.x.motivo||"")+(z.x.nota?'<br><span style="font-size:11px;color:var(--ink-3)">'+esc(z.x.nota)+'</span>':'')+'</td>' +
+      '<td>'+esc(z.x.quien||"")+'</td>' +
+      '<td>'+(z.x.autorizo && z.x.autorizo.nombre
+          ? esc(z.x.autorizo.nombre) + (z.x.autorizo.propio ? '' : ' <span class="pill just">con clave</span>')
+          : '<span class="pill mal">nadie</span>')+'</td>' +
+      '<td>'+(z.x.merma ? '<span class="pill mal">sí</span>' : '<span class="pill">no</span>')+'</td>' +
+      '<td class="der mono">'+mx(z.x.importe)+'</td></tr>').join("")
+      : '<tr><td colspan="8" class="empty">No se ha cancelado nada. Ojalá siga así.</td></tr>') +
+    '</tbody>';
+}
+function imprimeReporteCancelaciones(){
+  const cs = todasLasCancelaciones();
+  if(!cs.length){ toast("No hay cancelaciones que reportar"); return; }
+  const merma = cs.filter(z=>z.x.merma);
+  const perdido = merma.reduce((s,z)=>s+num(z.x.importe), 0);
+  const cuerpo = '<h1>Reporte de cancelaciones</h1>' +
+    '<p class="sub">'+esc(P.negocio.nombre||"")+' · ' + cs.length + ' cancelaciones · ' +
+      merma.length + ' con merma · ' + mx(perdido) + ' que no entró</p>' +
+    '<table><thead><tr><th>Día</th><th>Hora</th><th>Cuenta</th><th>Qué</th><th>Motivo</th>' +
+    '<th>Pidió</th><th>Autorizó</th><th>Merma</th><th>Importe</th></tr></thead><tbody>' +
+    cs.map(z=>'<tr><td>'+esc(z.c.fecha)+'</td><td>'+esc(z.x.hora||"")+'</td>' +
+      '<td>'+esc(z.c.folio)+'</td><td>'+num(z.x.cant,1)+'× '+esc(z.x.nombre)+'</td>' +
+      '<td>'+esc(z.x.motivo||"")+'</td><td>'+esc(z.x.quien||"")+'</td>' +
+      '<td>'+((z.x.autorizo && z.x.autorizo.nombre) ? esc(z.x.autorizo.nombre) : "NADIE")+'</td>' +
+      '<td>'+(z.x.merma?"sí":"no")+'</td><td>'+mx(z.x.importe)+'</td></tr>').join("") +
+    '</tbody></table>' +
+    '<p class="pie">La <b>merma</b> es lo que ya se había preparado cuando se canceló: material gastado que no se cobró. ' +
+    'Los renglones que dicen NADIE se cancelaron sin que nadie con clave lo autorizara.</p>';
+  imprimeCarta("Cancelaciones", cuerpo);
+}
+$("#tab-ventas").addEventListener("click", e=>{
+  if(e.target.closest("#canReporte")){ imprimeReporteCancelaciones(); return; }
+  if(e.target.closest("#venTodo")){
+    $("#venBusca").value = ""; $("#venDesde").value = ""; $("#venHasta").value = "";
+    renderVentas(); return;
+  }
+  const tr = e.target.closest("#t_ventas tbody tr[data-tk]");
+  if(tr){ abreTicket(tr.dataset.tk); return; }
+});
+$("#tab-ventas").addEventListener("input", e=>{
+  if(e.target.id === "venBusca") renderVentas();
+});
+$("#tab-ventas").addEventListener("change", e=>{
+  if(e.target.id === "venDesde" || e.target.id === "venHasta") renderVentas();
+});
 
 /* ===================================================================
    EL MENÚ
@@ -2742,13 +3443,16 @@ function imprimeComandaCocina(c, lineas){
   if(!esLlevar && n > 1) cuerpo += '<div class="c">'+n+' comensales</div>';
   cuerpo += '<hr>';
 
+  /* Con un solo comensal (o para llevar) no hay nada que separar: poner
+     "PARA COMPARTIR" ahi es mentira, no hay con quien compartir. */
+  const separa = !esLlevar && n > 1;
   const grupos = [];
   for(let i=1;i<=n;i++) grupos.push({k:i, et:"COMENSAL "+i});
   grupos.push({k:0, et:"PARA COMPARTIR"});
   grupos.forEach(g=>{
     const ls = lineas.filter(l=>{ const k = num(l.comensal,0); return (k>=1&&k<=n?k:0) === g.k; });
     if(!ls.length) return;
-    if(n > 1 || g.k === 0) cuerpo += '<div class="b" style="margin-top:4px">'+esc(g.et)+'</div>';
+    if(separa) cuerpo += '<div class="b" style="margin-top:4px">'+esc(g.et)+'</div>';
     ls.forEach(l=>{
       cuerpo += '<div class="g">'+num(l.cant,1)+'  '+esc(l.nombre).toUpperCase()+'</div>';
       (l.mods||[]).forEach(m=> cuerpo += '<div class="sang">&gt; '+esc(m.nombre).toUpperCase()+'</div>');
@@ -3104,7 +3808,7 @@ function renderPersonal(){
   }).join("") || '<div class="empty">No hay nadie en el equipo.</div>';
 
   $("#t_horas").innerHTML = '<thead><tr><th>Quién</th><th>Turnos de hoy</th>' +
-    '<th class="der">Horas</th><th>Estado</th></tr></thead><tbody>' +
+    '<th class="der">Horas</th><th>Estado</th><th style="width:150px">Hoy llegó</th></tr></thead><tbody>' +
     gente.map(u=>{
       const ts = turnosDe(u.id, hoyISO());
       return '<tr><td><b>'+esc(u.nombre||"")+'</b><br><span style="font-size:11px;color:var(--ink-3)">' +
@@ -3114,13 +3818,503 @@ function renderPersonal(){
         '<td class="der mono">'+(minutosDia(u.id,hoyISO()) ? horasTxt(minutosDia(u.id,hoyISO())) : "—")+'</td>' +
         '<td>'+(estaDentro(u.id)
           ? '<span class="pill good">dentro · '+horasTxt(desdeHace(u.id))+'</span>'
-          : '<span class="pill">fuera</span>')+'</td></tr>';
+          : '<span class="pill">fuera</span>')+'</td>' +
+        '<td>'+pintaRetardoHoy(u)+'</td></tr>';
     }).join("") + '</tbody>';
+  renderRetardos(); renderExpedientes(); renderRecibos();
+}
+function pintaRetardoHoy(u){
+  const ev = primerEntrada(u.id, hoyISO());
+  if(!ev) return '<span style="font-size:11.5px;color:var(--ink-3)">—</span>';
+  const esp = entradaEsperada(u, hoyISO());
+  if(!esp) return '<span style="font-size:11.5px;color:var(--ink-3)">sin horario</span>';
+  const min = retardoDe(ev, u);
+  if(!min) return '<span class="pill good">a tiempo</span>';
+  return '<span class="pill '+(ev.justificacion?"just":"tarde")+'">' + horasTxt(min) +
+         (ev.justificacion ? " justificado" : " tarde") + '</span>';
 }
 $("#chGente").addEventListener("click", e=>{
   const b = e.target.closest("[data-checa]"); if(!b) return;
   abreCheca(b.dataset.checa);
 });
+
+/* ===================================================================
+   EXPEDIENTE, HORARIO, RETARDOS Y RECIBO DE PAGO
+   El checador solo dice la hora. La hora no significa nada sin un horario
+   contra que compararla: de ahi sale el retardo, el retardo se justifica y
+   se firma, y ese registro es el que sostiene el recibo de pago.
+   =================================================================== */
+const DIAS_SEM = [
+  {k:"dom", et:"Domingo"}, {k:"lun", et:"Lunes"}, {k:"mar", et:"Martes"},
+  {k:"mie", et:"Miércoles"}, {k:"jue", et:"Jueves"}, {k:"vie", et:"Viernes"}, {k:"sab", et:"Sábado"}
+];
+const FORMAS_PAGO = {
+  dia:      {et:"Por día",       dias:1},
+  dosdias:  {et:"Cada dos días", dias:2},
+  semana:   {et:"Por semana",    dias:7},
+  quincena: {et:"Por quincena",  dias:15},
+  mes:      {et:"Por mes",       dias:30},
+  hora:     {et:"Por hora",      dias:0}
+};
+const diaDe = f => { const d = new Date(f + "T12:00:00"); return DIAS_SEM[d.getDay()].k; };
+function expDe(u){
+  u.exp = u.exp || {};
+  return u.exp;
+}
+function horarioDe(u){
+  u.horario = u.horario || {};
+  DIAS_SEM.forEach(d=>{ if(!u.horario[d.k]) u.horario[d.k] = {e:"", s:"", libre:true}; });
+  return u.horario;
+}
+function pagoDe(u){
+  u.pago = u.pago || {forma:"semana", monto:0};
+  return u.pago;
+}
+/* La entrada programada de alguien ese dia, o "" si ese dia descansa. */
+function entradaEsperada(u, fecha){
+  const h = horarioDe(u)[diaDe(fecha)];
+  return (h && !h.libre && h.e) ? h.e : "";
+}
+/* Un retardo solo existe contra un horario. Sin horario no hay retardo:
+   no es que llegue a tiempo, es que no hay con que compararlo. */
+function retardoDe(ev, u){
+  if(!ev || ev.tipo !== "entrada") return 0;
+  const esp = entradaEsperada(u, ev.fecha);
+  if(!esp) return 0;
+  const tol = num(P.tolerancia, 10);
+  const d = minutosDe(ev.hora) - minutosDe(esp) - tol;
+  return d > 0 ? d : 0;
+}
+function primerEntrada(id, fecha){
+  return eventosDe(id, fecha).find(e=>e.tipo === "entrada") || null;
+}
+function retardosEntre(desde, hasta){
+  const out = [];
+  EQUIPO.forEach(u=>{
+    const fs = [...new Set(ASISTENCIAS.filter(a=>a.uid === u.id && a.fecha >= desde && a.fecha <= hasta).map(a=>a.fecha))];
+    fs.sort().forEach(f=>{
+      const ev = primerEntrada(u.id, f); if(!ev) return;
+      const min = retardoDe(ev, u);
+      if(min > 0) out.push({u, ev, min, esperada: entradaEsperada(u, f)});
+    });
+  });
+  return out.sort((a,b)=> a.ev.fecha < b.ev.fecha ? 1 : a.ev.fecha > b.ev.fecha ? -1 : 0);
+}
+
+/* ---------------- firma ---------------- */
+let firCtx = null, firTrazo = false, firHayAlgo = false, firDestino = null;
+function abreFirma(titulo, nota, extraHTML, alGuardar){
+  $("#firTitulo").textContent = titulo;
+  $("#firNota").innerHTML = nota;
+  $("#firExtra").innerHTML = extraHTML || "";
+  firDestino = alGuardar;
+  $("#modalFirma").hidden = false;
+  const c = $("#firLienzo");
+  firCtx = c.getContext("2d");
+  firCtx.fillStyle = "#fff"; firCtx.fillRect(0,0,c.width,c.height);
+  firCtx.strokeStyle = "#111"; firCtx.lineWidth = 3;
+  firCtx.lineCap = "round"; firCtx.lineJoin = "round";
+  firHayAlgo = false;
+}
+function firXY(e){
+  const c = $("#firLienzo"), r = c.getBoundingClientRect();
+  return {x: (e.clientX - r.left) * (c.width / r.width), y: (e.clientY - r.top) * (c.height / r.height)};
+}
+$("#firLienzo").addEventListener("pointerdown", e=>{
+  firTrazo = true; firHayAlgo = true;
+  const p = firXY(e); firCtx.beginPath(); firCtx.moveTo(p.x, p.y);
+  $("#firLienzo").setPointerCapture(e.pointerId); e.preventDefault();
+});
+$("#firLienzo").addEventListener("pointermove", e=>{
+  if(!firTrazo) return;
+  const p = firXY(e); firCtx.lineTo(p.x, p.y); firCtx.stroke();
+});
+$("#firLienzo").addEventListener("pointerup", ()=>{ firTrazo = false; });
+$("#firLienzo").addEventListener("pointercancel", ()=>{ firTrazo = false; });
+$("#firBorra").addEventListener("click", ()=>{
+  const c = $("#firLienzo");
+  firCtx.fillStyle = "#fff"; firCtx.fillRect(0,0,c.width,c.height);
+  firHayAlgo = false;
+});
+$("#firCerrar").addEventListener("click", ()=>{ $("#modalFirma").hidden = true; firDestino = null; });
+$("#firOk").addEventListener("click", ()=>{
+  if(!firHayAlgo){ toast("Falta la firma"); return; }
+  const dato = $("#firLienzo").toDataURL("image/png");
+  const f = firDestino; firDestino = null;
+  $("#modalFirma").hidden = true;
+  if(f) f(dato);
+});
+
+/* ---------------- retardos ---------------- */
+function rangoRetardos(){
+  const d = ($("#retDesde")||{}).value || hace(14);
+  const h = ($("#retHasta")||{}).value || hoyISO();
+  return {d, h};
+}
+function hace(dias){
+  const x = new Date(Date.now() - dias*86400000);
+  return x.getFullYear()+"-"+dos(x.getMonth()+1)+"-"+dos(x.getDate());
+}
+function renderRetardos(){
+  const caja = $("#cardRetardos"); if(!caja) return;
+  const manda = esGerente();
+  caja.hidden = !manda;
+  $("#cardExpedientes").hidden = !manda;
+  $("#cardRecibos").hidden = !manda;
+  if(!manda) return;
+  if(!$("#retDesde").value) $("#retDesde").value = hace(14);
+  if(!$("#retHasta").value) $("#retHasta").value = hoyISO();
+  const r = rangoRetardos();
+  const rs = retardosEntre(r.d, r.h);
+  const sinJust = rs.filter(x=>!x.ev.justificacion).length;
+  $("#retHint").textContent = rs.length
+    ? rs.length + " retardo(s) · " + sinJust + " sin justificar"
+    : "ninguno en este rango";
+  $("#t_retardos").innerHTML = '<thead><tr><th style="width:110px">Día</th><th>Quién</th>' +
+    '<th style="width:92px">Debía</th><th style="width:92px">Llegó</th><th style="width:90px" class="der">Tarde</th>' +
+    '<th>Justificación</th><th style="width:120px"></th></tr></thead><tbody>' +
+    (rs.length ? rs.map(x=>{
+      const j = x.ev.justificacion;
+      return '<tr><td class="mono">'+esc(x.ev.fecha)+'</td>' +
+        '<td><b>'+esc(x.u.nombre||"")+'</b></td>' +
+        '<td class="mono">'+esc(x.esperada)+'</td>' +
+        '<td class="mono">'+esc(x.ev.hora)+'</td>' +
+        '<td class="der"><span class="pill tarde">'+horasTxt(x.min)+'</span></td>' +
+        '<td>'+(j
+          ? '<span class="pill just">justificado</span> <span style="font-size:11.5px;color:var(--ink-2)">'+esc(j.motivo)+'</span>'
+          : '<span style="font-size:11.5px;color:var(--ink-3)">sin justificar</span>')+'</td>' +
+        '<td>'+(j
+          ? '<button class="btn sm ghost" data-verjust="'+esc(x.ev.id)+'">Ver firma</button>'
+          : '<button class="btn sm" data-justif="'+esc(x.ev.id)+'">Justificar</button>')+'</td></tr>';
+    }).join("") : '<tr><td colspan="7" class="empty">Nadie llegó tarde en este rango. O nadie tiene horario puesto.</td></tr>') +
+    '</tbody>';
+}
+$("#tab-personal").addEventListener("change", e=>{
+  if(e.target.id === "retDesde" || e.target.id === "retHasta"){ renderRetardos(); return; }
+  if(e.target.id === "p_tolerancia"){ P.tolerancia = num(e.target.value); persist(); renderRetardos(); return; }
+  if(e.target.id === "recQuien" || e.target.id === "recDesde" || e.target.id === "recHasta"){ pintaRecibo(); return; }
+});
+$("#tab-personal").addEventListener("click", e=>{
+  const j = e.target.closest("[data-justif]");
+  if(j){ justificaRetardo(j.dataset.justif); return; }
+  const v = e.target.closest("[data-verjust]");
+  if(v){
+    const ev = ASISTENCIAS.find(a=>a.id === v.dataset.verjust); if(!ev || !ev.justificacion) return;
+    const u = EQUIPO.find(x=>x.id === ev.uid) || {};
+    abreFirma("Justificación firmada",
+      '<b>'+esc(u.nombre||"")+'</b> · '+esc(ev.fecha)+' · '+esc(ev.justificacion.motivo) +
+      '<br><span style="font-size:11.5px;color:var(--ink-3)">Firmó '+esc(ev.justificacion.firmante||"")+'</span>', "", null);
+    const img = new Image();
+    img.onload = ()=>{ const c = $("#firLienzo"); firCtx.drawImage(img, 0, 0, c.width, c.height); };
+    img.src = ev.justificacion.firma;
+    $("#firOk").hidden = true; $("#firBorra").hidden = true;
+    return;
+  }
+  const ex = e.target.closest("[data-exp]");
+  if(ex){ abreExpediente(ex.dataset.exp); return; }
+  const rp = e.target.closest("[data-recper]");
+  if(rp){ ponPeriodo(rp.dataset.recper); return; }
+  if(e.target.closest("#retReporte")){ imprimeReporteRetardos(); return; }
+  if(e.target.closest("#recImprime")){ imprimeRecibo(); return; }
+  if(e.target.closest("#recFirma")){ firmaRecibo(); return; }
+});
+function justificaRetardo(evId){
+  const ev = ASISTENCIAS.find(a=>a.id === evId); if(!ev) return;
+  const u = EQUIPO.find(x=>x.id === ev.uid) || {};
+  abreFirma("Justificar retardo",
+    '<b>'+esc(u.nombre||"")+'</b> llegó a las '+esc(ev.hora)+' el '+esc(ev.fecha)+'. ' +
+    'Escribe el motivo y que firme quien lo justifica.',
+    '<label class="f" for="justMotivo">Motivo</label>' +
+    '<input id="justMotivo" placeholder="Se le descompuso el camión" autocomplete="off" style="margin-bottom:12px">',
+    firma=>{
+      const motivo = (($("#justMotivo")||{}).value || "").trim();
+      if(!motivo){ toast("Falta el motivo"); return; }
+      ev.justificacion = {motivo, firma, firmante: usuarioActual().nombre || "", ts: Date.now()};
+      persist(); renderRetardos();
+      toast("Retardo justificado y firmado");
+    });
+  setTimeout(()=>{ const i = $("#justMotivo"); if(i) i.focus(); }, 60);
+}
+function imprimeReporteRetardos(){
+  const r = rangoRetardos(), rs = retardosEntre(r.d, r.h);
+  if(!rs.length){ toast("No hay retardos en ese rango"); return; }
+  let cuerpo = '<h1>Reporte de retardos</h1>' +
+    '<p class="sub">' + esc(P.negocio.nombre||"") + ' · del ' + esc(r.d) + ' al ' + esc(r.h) + '</p>' +
+    '<table><thead><tr><th>Día</th><th>Quién</th><th>Debía</th><th>Llegó</th><th>Tarde</th>' +
+    '<th>Justificación</th><th>Firma</th></tr></thead><tbody>' +
+    rs.map(x=>{
+      const j = x.ev.justificacion;
+      return '<tr><td>'+esc(x.ev.fecha)+'</td><td>'+esc(x.u.nombre||"")+'</td>' +
+        '<td>'+esc(x.esperada)+'</td><td>'+esc(x.ev.hora)+'</td><td>'+horasTxt(x.min)+'</td>' +
+        '<td>'+(j ? esc(j.motivo) : "—")+'</td>' +
+        '<td>'+(j ? '<img src="'+esc(j.firma)+'" style="height:34px">' : '<span class="linea"></span>')+'</td></tr>';
+    }).join("") + '</tbody></table>' +
+    '<p class="pie">Los renglones sin firma son retardos que todavía nadie justificó.</p>';
+  imprimeCarta("Retardos", cuerpo);
+}
+
+/* ---------------- expediente ---------------- */
+let expId = null;
+function renderExpedientes(){
+  const l = $("#expLista"); if(!l) return;
+  $("#p_tolerancia").value = String(num(P.tolerancia,10));
+  l.innerHTML = EQUIPO.map(u=>{
+    const h = horarioDe(u), p = pagoDe(u);
+    const dias = DIAS_SEM.filter(d=>!h[d.k].libre).length;
+    return '<button class="expFila" data-exp="'+esc(u.id)+'">' +
+      '<span class="av">'+esc((u.nombre||"?").trim().charAt(0).toUpperCase())+'</span>' +
+      '<span><b>'+esc(u.nombre||"Sin nombre")+'</b>' +
+      '<small>'+(ROLES[u.rol]||ROLES.mesero).nombre + ' · ' +
+        (dias ? dias + " día(s) de horario" : "sin horario") + '</small></span>' +
+      '<span class="der">'+(num(p.monto) ? mx(p.monto) + " " + (FORMAS_PAGO[p.forma]||{}).et.toLowerCase() : "sin sueldo puesto")+'</span>' +
+      '</button>';
+  }).join("") || '<div class="empty">No hay nadie en el equipo.</div>';
+}
+function abreExpediente(id){
+  const u = EQUIPO.find(x=>x.id === id); if(!u) return;
+  expId = id;
+  const e = expDe(u), h = horarioDe(u), p = pagoDe(u);
+  $("#expTitulo").textContent = "Expediente · " + (u.nombre || "");
+  $("#expCuerpo").innerHTML =
+    '<h3 style="font-size:13px;margin:0 0 10px;color:var(--ink-2)">Datos</h3>' +
+    '<div class="grid g3">' +
+      campo("ex_tel","Teléfono", e.tel) + campo("ex_email","Correo", e.email) +
+      campo("ex_nac","Nacimiento", e.nac, "date") +
+    '</div>' +
+    '<div class="grid g2" style="margin-top:12px">' +
+      campo("ex_dir","Dirección", e.dir) + campo("ex_ingreso","Entró a trabajar", e.ingreso, "date") +
+    '</div>' +
+    '<div class="grid g3" style="margin-top:12px">' +
+      campo("ex_curp","CURP", e.curp) + campo("ex_rfc","RFC", e.rfc) + campo("ex_nss","NSS", e.nss) +
+    '</div>' +
+    '<div class="grid g2" style="margin-top:12px">' +
+      campo("ex_emerN","Avisar a (nombre)", e.emerN) + campo("ex_emerT","Avisar a (teléfono)", e.emerT) +
+    '</div>' +
+    '<div style="margin-top:12px"><label class="f" for="ex_notas">Notas</label>' +
+      '<textarea id="ex_notas" rows="2" placeholder="Alergias, talla de uniforme, lo que haga falta">'+esc(e.notas||"")+'</textarea></div>' +
+
+    '<h3 style="font-size:13px;margin:22px 0 10px;color:var(--ink-2)">Horario</h3>' +
+    '<p class="note" style="margin:0 0 12px">La hora de entrada es contra la que se mide el retardo. ' +
+      'Un día sin horario no genera retardo nunca.</p>' +
+    '<div class="horSem" style="margin-bottom:6px">' +
+      '<span class="dia" style="color:var(--ink-3);font-size:11px">DÍA</span>' +
+      '<span class="dia" style="color:var(--ink-3);font-size:11px">ENTRA</span>' +
+      '<span class="dia" style="color:var(--ink-3);font-size:11px">SALE</span>' +
+      '<span class="dia" style="color:var(--ink-3);font-size:11px">DESCANSA</span></div>' +
+    DIAS_SEM.map(d=>
+      '<div class="horSem" style="margin-bottom:6px">' +
+      '<span class="dia">'+d.et+'</span>' +
+      '<input type="time" data-hor="'+d.k+'" data-campo="e" value="'+esc(h[d.k].e||"")+'"'+(h[d.k].libre?" disabled":"")+'>' +
+      '<input type="time" data-hor="'+d.k+'" data-campo="s" value="'+esc(h[d.k].s||"")+'"'+(h[d.k].libre?" disabled":"")+'>' +
+      '<label class="lib"><input type="checkbox" data-hor="'+d.k+'" data-campo="libre" style="width:auto"'+(h[d.k].libre?" checked":"")+'></label>' +
+      '</div>').join("") +
+    '<div class="fila" style="margin-top:10px"><button class="btn sm ghost" id="expCopia">Copiar el lunes a toda la semana</button></div>' +
+
+    '<h3 style="font-size:13px;margin:22px 0 10px;color:var(--ink-2)">Cómo se le paga</h3>' +
+    '<div class="grid g3">' +
+      '<div><label class="f" for="ex_forma">Cada cuándo</label><select id="ex_forma">' +
+        Object.keys(FORMAS_PAGO).map(k=>'<option value="'+k+'"'+(p.forma===k?" selected":"")+'>'+FORMAS_PAGO[k].et+'</option>').join("") +
+      '</select></div>' +
+      campo("ex_monto","Cuánto", p.monto, "number") +
+      '<div style="align-self:end"><span class="hint" id="exPagoNota" style="font-size:11.5px;color:var(--ink-3)"></span></div>' +
+    '</div>';
+  pintaNotaPago();
+  $("#modalExp").hidden = false;
+}
+function campo(id, et, val, tipo){
+  return '<div><label class="f" for="'+id+'">'+et+'</label>' +
+    '<input id="'+id+'" type="'+(tipo||"text")+'" value="'+esc(val != null ? val : "")+'"></div>';
+}
+function pintaNotaPago(){
+  const u = EQUIPO.find(x=>x.id === expId); if(!u) return;
+  const p = pagoDe(u), f = FORMAS_PAGO[p.forma] || FORMAS_PAGO.semana;
+  const n = $("#exPagoNota"); if(!n) return;
+  n.textContent = p.forma === "hora"
+    ? mx(p.monto) + " por cada hora checada"
+    : mx(p.monto) + " por cada " + f.dias + " día(s) trabajado(s)";
+}
+$("#expCerrar").addEventListener("click", ()=>{ $("#modalExp").hidden = true; expId = null; renderExpedientes(); renderRecibos(); });
+$("#expCuerpo").addEventListener("input", e=>{
+  const u = EQUIPO.find(x=>x.id === expId); if(!u) return;
+  const t2 = e.target;
+  if(t2.id && t2.id.indexOf("ex_") === 0){
+    const k = t2.id.slice(3);
+    if(k === "monto"){ pagoDe(u).monto = num(t2.value); pintaNotaPago(); }
+    else expDe(u)[k] = t2.value;
+    persist(); return;
+  }
+  if(t2.dataset.hor){
+    const d = horarioDe(u)[t2.dataset.hor];
+    d[t2.dataset.campo] = t2.value;
+    persist(); return;
+  }
+});
+$("#expCuerpo").addEventListener("change", e=>{
+  const u = EQUIPO.find(x=>x.id === expId); if(!u) return;
+  const t2 = e.target;
+  if(t2.id === "ex_forma"){ pagoDe(u).forma = t2.value; pintaNotaPago(); persist(); return; }
+  if(t2.dataset.hor && t2.dataset.campo === "libre"){
+    horarioDe(u)[t2.dataset.hor].libre = t2.checked;
+    persist(); abreExpediente(expId); return;
+  }
+});
+$("#expCuerpo").addEventListener("click", e=>{
+  if(!e.target.closest("#expCopia")) return;
+  const u = EQUIPO.find(x=>x.id === expId); if(!u) return;
+  const h = horarioDe(u), l = h.lun;
+  ["mar","mie","jue","vie","sab"].forEach(k=>{ h[k] = {e:l.e, s:l.s, libre:l.libre}; });
+  persist(); abreExpediente(expId);
+  toast("Lunes a sábado con el mismo horario. El domingo se quedó como estaba.");
+});
+
+/* ---------------- recibo de pago ---------------- */
+function renderRecibos(){
+  const s = $("#recQuien"); if(!s) return;
+  const antes = s.value;
+  s.innerHTML = EQUIPO.filter(u=>u.activo !== false).map(u=>
+    '<option value="'+esc(u.id)+'">'+esc(u.nombre||"Sin nombre")+'</option>').join("");
+  if(antes) s.value = antes;
+  if(!$("#recDesde").value) ponPeriodo("semana"); else pintaRecibo();
+}
+function ponPeriodo(cual){
+  const hoy = new Date();
+  const iso = d => d.getFullYear()+"-"+dos(d.getMonth()+1)+"-"+dos(d.getDate());
+  let d = new Date(hoy), h = new Date(hoy);
+  if(cual === "hoy"){ /* ambos hoy */ }
+  else if(cual === "semana"){ d = new Date(hoy); d.setDate(hoy.getDate() - ((hoy.getDay()+6)%7)); }
+  else if(cual === "quincena"){
+    d = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() <= 15 ? 1 : 16);
+    h = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() <= 15 ? 15 : new Date(hoy.getFullYear(), hoy.getMonth()+1, 0).getDate());
+    if(h > hoy) h = hoy;
+  }
+  else if(cual === "mes"){ d = new Date(hoy.getFullYear(), hoy.getMonth(), 1); }
+  $("#recDesde").value = iso(d); $("#recHasta").value = iso(h);
+  pintaRecibo();
+}
+function cuentaPeriodo(u, desde, hasta){
+  const fs = [...new Set(ASISTENCIAS.filter(a=>a.uid === u.id && a.fecha >= desde && a.fecha <= hasta).map(a=>a.fecha))].sort();
+  let min = 0; const dias = [];
+  fs.forEach(f=>{
+    const m = minutosDia(u.id, f);
+    const ev = primerEntrada(u.id, f);
+    const tarde = ev ? retardoDe(ev, u) : 0;
+    const just = !!(ev && ev.justificacion);
+    min += m;
+    dias.push({f, min:m, entrada: ev ? ev.hora : "", tarde, just});
+  });
+  const p = pagoDe(u), fp = FORMAS_PAGO[p.forma] || FORMAS_PAGO.semana;
+  const horas = min/60;
+  const monto = p.forma === "hora"
+    ? horas * num(p.monto)
+    : (num(p.monto) / Math.max(1, fp.dias)) * dias.length;
+  return {dias, min, horas, monto, forma: fp,
+          tarde: dias.reduce((s,x)=>s+x.tarde,0),
+          sinJust: dias.filter(x=>x.tarde && !x.just).length};
+}
+function pintaRecibo(){
+  const caja = $("#recResumen"); if(!caja) return;
+  const u = EQUIPO.find(x=>x.id === ($("#recQuien")||{}).value);
+  if(!u){ caja.innerHTML = '<div class="empty">Escoge a quién.</div>'; return; }
+  const d = $("#recDesde").value, h = $("#recHasta").value;
+  if(!d || !h){ caja.innerHTML = '<div class="empty">Escoge las fechas.</div>'; return; }
+  const r = cuentaPeriodo(u, d, h);
+  const p = pagoDe(u);
+  if(!num(p.monto)){
+    caja.innerHTML = '<div class="empty">A ' + esc(u.nombre||"") + ' no le has puesto sueldo. ' +
+      'Se pone en su expediente, aquí arriba.</div>';
+    return;
+  }
+  caja.innerHTML =
+    '<div class="tbl-wrap"><table><thead><tr><th>Día</th><th>Entró</th><th class="der">Horas</th><th>Retardo</th></tr></thead><tbody>' +
+    (r.dias.length ? r.dias.map(x=>
+      '<tr><td class="mono">'+esc(x.f)+'</td><td class="mono">'+esc(x.entrada||"—")+'</td>' +
+      '<td class="der mono">'+(x.min ? horasTxt(x.min) : "—")+'</td>' +
+      '<td>'+(x.tarde ? '<span class="pill '+(x.just?"just":"tarde")+'">'+horasTxt(x.tarde)+(x.just?" justificado":"")+'</span>' : "—")+'</td></tr>'
+    ).join("") : '<tr><td colspan="4" class="empty">No checó ningún día en este periodo.</td></tr>') +
+    '</tbody></table></div>' +
+    '<div class="grid g3" style="margin-top:14px">' +
+      tile("Días trabajados", r.dias.length) +
+      tile("Horas checadas", horasTxt(r.min)) +
+      tile("Le toca", mx(r.monto)) +
+    '</div>' +
+    (r.sinJust ? '<p class="note" style="margin-top:12px">Tiene <b>' + r.sinJust +
+      ' retardo(s) sin justificar</b> en el periodo. El recibo los imprime: el descuento, si lo hay, lo decides tú.</p>' : "") +
+    '<div class="fila" style="margin-top:16px">' +
+      '<button class="btn primary" id="recImprime">Imprimir el recibo</button>' +
+      '<button class="btn" id="recFirma">Firmar de recibido</button>' +
+    '</div>';
+}
+function tile(et, val){
+  return '<div style="background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px">' +
+    '<div style="font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em">'+esc(et)+'</div>' +
+    '<div style="font-size:19px;font-weight:700;margin-top:3px">'+esc(String(val))+'</div></div>';
+}
+let recFirmaDato = "";
+function firmaRecibo(){
+  const u = EQUIPO.find(x=>x.id === ($("#recQuien")||{}).value); if(!u) return;
+  abreFirma("Firma de recibido",
+    '<b>'+esc(u.nombre||"")+'</b> firma que recibió su pago del ' + esc($("#recDesde").value) +
+    ' al ' + esc($("#recHasta").value) + '.', "",
+    firma=>{ recFirmaDato = firma; toast("Firmado. Ahora imprime el recibo."); imprimeRecibo(); });
+}
+function imprimeRecibo(){
+  const u = EQUIPO.find(x=>x.id === ($("#recQuien")||{}).value); if(!u) return;
+  const d = $("#recDesde").value, h = $("#recHasta").value;
+  const r = cuentaPeriodo(u, d, h), p = pagoDe(u);
+  const cuerpo = '<h1>Recibo de pago</h1>' +
+    '<p class="sub">'+esc(P.negocio.nombre||"")+(P.negocio.dir?' · '+esc(P.negocio.dir):'')+'</p>' +
+    '<table class="datos"><tr><td><b>Quién</b></td><td>'+esc(u.nombre||"")+'</td>' +
+      '<td><b>Puesto</b></td><td>'+esc((ROLES[u.rol]||ROLES.mesero).nombre)+'</td></tr>' +
+      '<tr><td><b>Periodo</b></td><td>'+esc(d)+' al '+esc(h)+'</td>' +
+      '<td><b>Forma de pago</b></td><td>'+esc(r.forma.et)+'</td></tr></table>' +
+    '<table><thead><tr><th>Día</th><th>Entró</th><th>Horas</th><th>Retardo</th></tr></thead><tbody>' +
+    r.dias.map(x=>'<tr><td>'+esc(x.f)+'</td><td>'+esc(x.entrada||"—")+'</td>' +
+      '<td>'+(x.min?horasTxt(x.min):"—")+'</td>' +
+      '<td>'+(x.tarde ? horasTxt(x.tarde) + (x.just ? " (justificado)" : "") : "—")+'</td></tr>').join("") +
+    '</tbody></table>' +
+    '<table class="datos" style="margin-top:14px">' +
+      '<tr><td><b>Días trabajados</b></td><td>'+r.dias.length+'</td>' +
+      '<td><b>Horas checadas</b></td><td>'+horasTxt(r.min)+'</td></tr>' +
+      '<tr><td><b>Retardos</b></td><td>'+(r.tarde?horasTxt(r.tarde):"ninguno")+
+        (r.sinJust?' ('+r.sinJust+' sin justificar)':'')+'</td>' +
+      '<td><b>Total a pagar</b></td><td class="tot">'+mx(r.monto)+'</td></tr></table>' +
+    '<p class="pie">Recibí de ' + esc(P.negocio.nombre||"la empresa") + ' la cantidad de <b>' + mx(r.monto) +
+      '</b> por el periodo señalado, a mi entera satisfacción.</p>' +
+    '<div class="firmas">' +
+      '<div>' + (recFirmaDato ? '<img src="'+recFirmaDato+'" style="height:52px">' : '<span class="linea"></span>') +
+        '<span>'+esc(u.nombre||"")+'<br>Recibí</span></div>' +
+      '<div><span class="linea"></span><span>'+esc(usuarioActual().nombre||"")+'<br>Entregó</span></div>' +
+    '</div>';
+  imprimeCarta("Recibo " + (u.nombre||""), cuerpo);
+  recFirmaDato = "";
+}
+
+/* Carta, no ticket: un recibo que se firma y se archiva no va en papel
+   térmico, que se borra solo en unos meses. */
+function imprimeCarta(titulo, cuerpo){
+  const w = window.open("", "_blank", "width=820,height=900");
+  if(!w){ toast("El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes."); return; }
+  const css = '@page{size:letter;margin:16mm}' +
+    'body{margin:0;background:#fff;color:#111;font:13px/1.5 Arial,Helvetica,sans-serif}' +
+    'h1{font-size:20px;margin:0 0 3px}' +
+    'p.sub{margin:0 0 18px;color:#555;font-size:12px}' +
+    'table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px}' +
+    'th,td{border:1px solid #bbb;padding:5px 7px;text-align:left}' +
+    'th{background:#eee;font-size:11px;text-transform:uppercase;letter-spacing:.04em}' +
+    'table.datos td{border:0;padding:3px 7px 3px 0}' +
+    'td.tot{font-size:16px;font-weight:bold}' +
+    'p.pie{margin-top:20px;font-size:12px;color:#333;line-height:1.7}' +
+    '.linea{display:block;border-bottom:1px solid #111;width:200px;height:52px}' +
+    '.firmas{display:flex;gap:60px;margin-top:34px}' +
+    '.firmas>div{text-align:center}' +
+    '.firmas span:last-child{display:block;font-size:11px;color:#333;margin-top:5px;border-top:1px solid #111;padding-top:5px;width:200px}' +
+    'img{max-width:100%}';
+  w.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>'+esc(titulo)+
+    '</title><style>'+css+'</style></head><body>'+cuerpo+'</body></html>');
+  w.document.close(); w.focus();
+  setTimeout(()=>{ try{ w.print(); }catch(e){} }, 400);
+}
+
 
 /* ---------------- la ventana de checar ---------------- */
 let chQuien = null, chFoto = null, chTecleado = "", chCamara = null;
@@ -3242,30 +4436,73 @@ function renderSet(){
   $("#tk_ancho").value = String(num(tk.ancho,80));
   $("#tk_enc").value = tk.encabezado||""; $("#tk_pie").value = tk.pie||"";
   $("#tk_leyenda").value = tk.leyenda||"";
-  $("#tk_cuenta").checked  = tk.imprimeCuenta !== false;
-  $("#tk_cocina").checked  = tk.imprimeCocina !== false;
   $("#tk_iva").checked     = tk.mostrarIva !== false;
   $("#tk_propina").checked = tk.mostrarPropina !== false;
   const lg = $("#tk_logoPrev");
   if(P.negocio.logo){ lg.src = P.negocio.logo; lg.hidden = false; $("#tk_logoQuita").hidden = false; }
   else { lg.hidden = true; $("#tk_logoQuita").hidden = true; }
-  const pb = P.publi || (P.publi = {activa:true, imagen:"", enlace:"", titulo:""});
-  $("#pb_activa").checked = pb.activa !== false;
-  $("#pb_titulo").value = pb.titulo || ""; $("#pb_enlace").value = pb.enlace || "";
-  const pp = $("#pb_prev");
-  if(pb.imagen){ pp.src = pb.imagen; pp.hidden = false; $("#pb_quita").hidden = false; }
-  else { pp.hidden = true; $("#pb_quita").hidden = true; }
-  pintaNotaPubli();
+  renderEstacion(); pintaNotaRespaldo();
   pintaNotaBloqueo(); pintaNotaFolio(); renderMesasSet(); renderEquipo(); aplicaMarca();
 }
-function pintaNotaPubli(){
-  const n = $("#pb_nota"); if(!n) return;
-  const pb = P.publi || {};
-  n.innerHTML = !pb.imagen
-    ? 'Sin imagen, la pantalla bloqueada se queda limpia: sólo el reloj y el checador. No pasa nada malo, nada más no vende.'
-    : pb.activa === false
-      ? 'La imagen está guardada pero apagada. Préndela cuando quieras volver a mostrarla.'
-      : 'Listo: tu anuncio sale en la pantalla bloqueada. Para verlo, dale a <b>Bloquear ahora</b> aquí arriba.';
+/* ---------------- respaldo ---------------- */
+const LLAVES_RESPALDO = ["menu","mesas","comandas","turnos","P","equipo",
+                         "asistencias","compras","recetas","decor"];
+function armaRespaldo(){
+  guardaYa();
+  const d = {_app:"makers-restaurant", _version:1, _fecha:new Date().toISOString(),
+             _negocio: (P.negocio||{}).nombre || "", datos:{}};
+  LLAVES_RESPALDO.forEach(k=>{ d.datos[k] = lsGet(k, null); });
+  return d;
+}
+function pintaNotaRespaldo(){
+  const n = $("#respHint"); if(!n) return;
+  const cu = COMANDAS.length, dias = [...new Set(COMANDAS.map(c=>c.fecha))].length;
+  n.textContent = cu ? cu + " cuenta(s) en " + dias + " día(s)" : "todavía sin movimientos";
+}
+function bajaRespaldo(){
+  const d = armaRespaldo();
+  const nombre = "respaldo-" + ((P.negocio||{}).nombre || "restaurante")
+    .toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") + "-" + hoyISO() + ".json";
+  const blob = new Blob([JSON.stringify(d)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = nombre;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  toast("Respaldo bajado: " + nombre);
+}
+function restauraRespaldo(texto){
+  let d = null;
+  try{ d = JSON.parse(texto); }catch(e){ toast("Ese archivo no se puede leer. ¿Es el respaldo?"); return; }
+  if(!d || d._app !== "makers-restaurant" || !d.datos){
+    toast("Ese archivo no es un respaldo de Makers Restaurant."); return;
+  }
+  const f = String(d._fecha||"").slice(0,10);
+  const cu = (d.datos.comandas||[]).length;
+  if(!confirm("Respaldo de «" + (d._negocio||"sin nombre") + "» del " + (f||"?") + ".\n\n" +
+      "Trae " + cu + " cuenta(s).\n\nEsto REEMPLAZA todo lo que hay en esta pantalla. ¿Seguir?")) return;
+  if(!confirm("Última vez: lo de ahorita se pierde y no se puede deshacer.\n\n¿Restaurar?")) return;
+  /* A partir de aquí nadie más escribe: lo que hay en memoria es lo viejo y
+     un guardado pendiente se comería el respaldo antes de la recarga. */
+  restaurando = true;
+  clearTimeout(guardaT);
+  LLAVES_RESPALDO.forEach(k=>{ if(d.datos[k] != null) lsSet(k, d.datos[k]); });
+  toast("Restaurado. Recargando…");
+  setTimeout(()=> location.reload(), 700);
+}
+function renderEstacion(){
+  const s = $("#est_donde"); if(!s) return;
+  s.innerHTML = Object.keys(ESTACIONES).map(k=>
+    '<option value="'+k+'"'+(ESTACION.donde===k?" selected":"")+'>'+ESTACIONES[k].et+'</option>').join("");
+  $("#est_cuenta").checked  = !!ESTACION.cuenta;
+  $("#est_cocina").checked  = !!ESTACION.cocina;
+  $("#est_cancela").checked = !!ESTACION.cancela;
+  const hace = [ESTACION.cuenta && "cuentas", ESTACION.cocina && "comandas",
+                ESTACION.cancela && "cancelaciones"].filter(Boolean);
+  $("#estHint").textContent = hace.length ? "imprime " + hace.join(", ") : "no imprime nada";
+  $("#estNota").innerHTML = hace.length
+    ? 'Esta pantalla imprime <b>' + hace.join("</b>, <b>") + '</b> en la impresora predeterminada de esta computadora. ' +
+      'Lo que configures aquí <b>no</b> le pasa a las otras pantallas: cada una trae lo suyo.'
+    : 'Esta pantalla no imprime nada sola. Los botones de imprimir siguen funcionando a mano.';
 }
 function pintaNotaFolio(){
   const n = $("#folNota"); if(!n) return;
@@ -3282,7 +4519,7 @@ function renderMesasSet(){
     MESAS.map(m=>'<tr data-mesafila="'+esc(m.id)+'">' +
       '<td><input data-mk="nombre" value="'+esc(m.nombre)+'"></td>' +
       '<td><input data-mk="zona" value="'+esc(m.zona||"Salón")+'" list="listaZonas"></td>' +
-      '<td><input data-mk="lugares" type="number" min="1" max="12" value="'+num(m.lugares,2)+'"></td>' +
+      '<td><input data-mk="lugares" type="number" min="1" max="30" value="'+num(m.lugares,2)+'"></td>' +
       '<td><select data-mk="forma"><option value="cuadrada"'+(m.forma!=="redonda"?" selected":"")+'>Cuadrada</option>' +
         '<option value="redonda"'+(m.forma==="redonda"?" selected":"")+'>Redonda</option></select></td>' +
       '<td style="text-align:center"><input type="checkbox" data-mk="activa" style="width:auto"'+(m.activa!==false?" checked":"")+'></td>' +
@@ -3331,21 +4568,24 @@ $("#tab-set").addEventListener("input", e=>{
 $("#tab-set").addEventListener("change", e=>{
   const t = e.target;
   if(t.id === "f_digitos"){ P.folios.digitos = num(t.value,5); pintaNotaFolio(); persist(); return; }
-  if(t.id === "pb_titulo"){ P.publi.titulo = t.value.trim(); persist(); return; }
-  if(t.id === "pb_enlace"){ P.publi.enlace = t.value.trim(); persist(); return; }
   if(t.id === "tk_ancho"){ P.ticket.ancho = num(t.value,80); persist(); return; }
-  if(t.id === "pb_activa"){ P.publi.activa = t.checked; persist(); pintaNotaPubli(); return; }
-  if(t.id === "pb_file"){
+  if(t.id === "respFile"){
     const f = t.files && t.files[0]; t.value = "";
     if(!f) return;
-    if(f.size > 400*1024){ toast("Esa imagen pesa mucho. Usa una de menos de 400 KB."); return; }
     const r = new FileReader();
-    r.onload = ()=>{ P.publi.imagen = r.result; P.publi.activa = true; persist(); renderSet(); toast("Anuncio listo"); };
-    r.readAsDataURL(f);
+    r.onload = ()=> restauraRespaldo(String(r.result||""));
+    r.readAsText(f);
     return;
   }
-  if(t.id === "tk_cuenta"){ P.ticket.imprimeCuenta = t.checked; persist(); return; }
-  if(t.id === "tk_cocina"){ P.ticket.imprimeCocina = t.checked; persist(); return; }
+  if(t.id === "est_donde"){
+    ESTACION = Object.assign({donde:t.value}, ESTACIONES[t.value] || ESTACIONES.caja);
+    guardaEstacion(); renderEstacion();
+    toast("Esta pantalla es la de " + (ESTACIONES[t.value]||{}).et);
+    return;
+  }
+  if(t.id === "est_cuenta" || t.id === "est_cocina" || t.id === "est_cancela"){
+    ESTACION[t.id.slice(4)] = t.checked; guardaEstacion(); renderEstacion(); return;
+  }
   if(t.id === "tk_iva"){ P.ticket.mostrarIva = t.checked; persist(); return; }
   if(t.id === "tk_propina"){ P.ticket.mostrarPropina = t.checked; persist(); return; }
   if(t.id === "tk_logoFile"){
@@ -3394,11 +4634,12 @@ $("#tab-set").addEventListener("click", e=>{
     EQUIPO = EQUIPO.filter(u=>u.id !== du.dataset.delusr); persist(); renderEquipo(); return;
   }
   if(e.target.closest("#bloqueoProbar")){ bloqueaPantalla(true); return; }
-  if(e.target.closest("#pb_btn")){ $("#pb_file").click(); return; }
-  if(e.target.closest("#pb_quita")){ P.publi.imagen = ""; persist(); renderSet(); return; }
   if(e.target.closest("#tk_logoBtn")){ $("#tk_logoFile").click(); return; }
   if(e.target.closest("#tk_logoQuita")){ P.negocio.logo = ""; persist(); renderSet(); return; }
+  if(e.target.closest("#respBaja")){ bajaRespaldo(); return; }
+  if(e.target.closest("#respSube")){ $("#respFile").click(); return; }
   if(e.target.closest("#tk_prueba")){ imprimePrueba(); return; }
+  if(e.target.closest("#tk_pruebaCocina")){ imprimePruebaCocina(); return; }
 });
 $("#mesaNueva").addEventListener("click", ()=>{
   const z = zonas()[0] || "Salón";
@@ -3427,6 +4668,29 @@ function imprimePrueba(){
   };
   imprimeCuenta(falsa, [{tipo:"efectivo", monto: totalLineas(falsa)}], 0);
 }
+function comandaDemo(llevar){
+  const ps = (MENU.plats||[]);
+  const p = i => ps[i] || {nombre:"Platillo " + (i+1), precio:100};
+  return {
+    id:"demo", folio: folioNuevo("cta"),
+    mesaId: llevar ? "llevar" : "demo",
+    mesaNombre: llevar ? "Para llevar 1" : "Mesa 7",
+    personas: llevar ? 1 : 3, abre: horaAhora(), fecha: hoyISO(),
+    mesero: usuarioActual().nombre || "Mesero", estado:"abierta",
+    lineas:[
+      {id:"a", nombre:p(0).nombre, precio:num(p(0).precio), cant:1, comensal:1,
+       mods:[{nombre:"Término medio", extra:0}], nota:""},
+      {id:"b", nombre:p(1).nombre, precio:num(p(1).precio), cant:2, comensal:2,
+       mods:[{nombre:"Sin cebolla", extra:0},{nombre:"Extra queso", extra:15}], nota:"Separado"},
+      {id:"c", nombre:p(2).nombre, precio:num(p(2).precio), cant:1, comensal:3, mods:[], nota:"Sin picante"},
+      {id:"d", nombre:p(3).nombre, precio:num(p(3).precio), cant:1, comensal:0, mods:[], nota:""}
+    ]
+  };
+}
+function imprimePruebaCocina(){
+  const c = comandaDemo(false);
+  imprimeComandaCocina(c, c.lineas);
+}
 
 function aplicaMarca(){
   const n = P.negocio.nombre || "Mi restaurante";
@@ -3442,9 +4706,14 @@ function aplicaRol(){
   $("#userRol").textContent = (ROLES[r]||ROLES.gerente).nombre;
   $("#userAv").textContent = (u.nombre||"?").trim().charAt(0).toUpperCase();
   pintaTabs();
+  /* Todo lo que dependa del rol se vuelve a pintar AQUI. Es el unico lugar
+     por donde pasa un cambio de persona, y lo que no se repinte aqui se
+     queda con lo que vio el anterior. */
+  pintaTurnoChip();
   const visible = PESTANAS.filter(p=>puedeVer(p.k)).map(p=>p.k);
   const abierta = PESTANAS.concat([{k:"comanda"}]).find(p=>{ const s=$("#tab-"+p.k); return s && !s.hidden; });
   if(!abierta || (abierta.k !== "comanda" && visible.indexOf(abierta.k) < 0)) vaA(visible[0]);
+  else if(abierta.k !== "comanda") vaA(abierta.k);   /* la misma pestaña, pero con los ojos del nuevo */
 }
 
 /* ===================================================================
@@ -3618,15 +4887,10 @@ function anunciosDe(){
     const g = a.giros || [];
     return !g.length || g.indexOf("restaurant") >= 0;
   });
+  /* Primero lo vendido, y si no hay, lo interno de Makers. El negocio no
+     pone aqui su propia imagen: este espacio es del Lab. */
   const vendidos = aqui.filter(a=>!a.interna);
-  if(vendidos.length) return vendidos;
-  const internos = aqui.filter(a=>a.interna);
-  if(internos.length) return internos;
-  // Nada del Lab: entonces sale lo tuyo, lo que cargaste en Ajustes.
-  const pb = P.publi || {};
-  if(pb.imagen && pb.activa !== false)
-    return [{id:"propio", imagen:pb.imagen, enlace:pb.enlace||"", alt:pb.titulo||"Promoción", propio:true}];
-  return [];
+  return vendidos.length ? vendidos : aqui.filter(a=>a.interna);
 }
 function pintaAnuncioBloqueo(){
   const caja = $("#anunBloq"); if(!caja) return;
@@ -3642,17 +4906,11 @@ function ponAnuncioBloqueo(){
   const img = '<img src="'+esc(a.imagen)+'" alt="'+esc(a.alt||a.titulo||"Anuncio")+'" style="width:100%;height:auto;display:block;max-height:140px;object-fit:cover">';
   w.innerHTML = a.enlace
     ? '<a href="'+esc(a.enlace)+'" target="_blank" rel="noopener noreferrer nofollow sponsored">'+img+'</a>' : img;
-  const pie = (a.propio && (P.publi||{}).titulo)
-    ? '<div style="padding:9px 12px;font:600 13px/1.35 Inter,system-ui,sans-serif;color:var(--ink-1);text-align:center">' +
-      esc(P.publi.titulo) + '</div>' : "";
-  if(pie) w.innerHTML = w.innerHTML + pie;
-  if(a.propio) return;
   if(a.id && !anunVistos[a.id]){
     anunVistos[a.id] = true;
     try{ if(typeof window.__anuncioMarca === "function") window.__anuncioMarca(a.id, "vista"); }catch(e){}
   }
 }
-function refrescaAnuncioPropio(){ if(!$("#acceso").hidden) pintaAnuncioBloqueo(); }
 function paraAnuncioBloqueo(){ if(anunBloqReloj){ clearInterval(anunBloqReloj); anunBloqReloj = null; } }
 async function cargaAnuncios(){
   try{
@@ -3727,10 +4985,10 @@ start();
 })();
 </script>
 
-<script>window.BUILD="20261016-1730";</script>
+<script>window.BUILD="20261016-2149";</script>
 <script>
 (function(){
-  var mio = "20261016-1730";
+  var mio = "20261016-2149";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
