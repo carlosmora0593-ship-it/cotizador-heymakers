@@ -1461,6 +1461,31 @@ body.conBarra nav.tabs button[aria-selected="true"] .ico{color:var(--accent-ink)
 .pedNom{min-width:0}
 .pedNom b{display:block;font-size:13px;line-height:1.35}
 .pedNom small{font-size:11.5px;color:var(--ink-3)}
+
+.segCons{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:999px;padding:3px;gap:2px;margin-bottom:16px}
+.segCons button{border:0;background:transparent;color:var(--ink-2);font:600 12.5px/1 inherit;
+  padding:8px 15px;border-radius:999px;cursor:pointer}
+.segCons button[aria-pressed="true"]{background:var(--mk-magenta);color:#fff}
+.consBloque{border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.consBloque > summary{list-style:none;cursor:pointer;padding:13px 16px;background:var(--surface-2);
+  display:flex;align-items:center;gap:10px;font:600 13.5px/1.2 inherit}
+.consBloque > summary::-webkit-details-marker{display:none}
+.consBloque > summary .cu{margin-left:auto;font:500 11.5px/1 inherit;color:var(--ink-3);
+  text-transform:uppercase;letter-spacing:.07em}
+.consBloque > summary .cn{background:var(--mk-magenta);color:#fff;border-radius:999px;
+  font:600 11px/1 inherit;padding:3px 8px}
+.consBloque > summary .cn.cero{background:var(--surface-2);color:var(--ink-3);border:1px solid var(--line)}
+.consCuerpo{padding:14px 16px;border-top:1px solid var(--line)}
+.consRen{display:grid;grid-template-columns:1fr 92px 34px 150px 34px;gap:9px;align-items:center;margin-bottom:9px}
+.consRen .cu2{font:600 11.5px/1 inherit;color:var(--ink-3)}
+.consRen select,.consRen input{width:100%}
+.consRen .quita{border:1px solid var(--line);background:var(--surface-2);color:var(--ink-3);
+  border-radius:9px;height:34px;cursor:pointer;font-size:15px;line-height:1}
+.consRen .quita:hover{color:var(--mal,#D32F2F);border-color:var(--mal,#D32F2F)}
+.consVacio{color:var(--ink-3);font-size:12.5px;margin:0 0 10px}
+.insFalta{color:var(--mal,#D32F2F)} .insPoco{color:var(--warn,#B26A00)}
+
 .avisoStock{margin:0 16px 12px;border-radius:var(--radio-sm,12px);padding:10px 12px;
   font-size:12.5px;line-height:1.5}
 .avisoStock.ok{background:var(--good-soft);color:var(--good)}
@@ -2743,6 +2768,7 @@ body.rol-produccion #btnPrint{display:none!important}
         </div>
           <div class="alertaPrecio" id="r_alerta" hidden></div>
           <div class="avisoStock" id="r_stock" hidden></div>
+          <div id="r_insumos" class="avisoStock" hidden></div>
           <div class="rVarios" id="rVarios" hidden></div>
 
         <dl class="break" id="r_break"></dl>
@@ -2893,6 +2919,34 @@ body.rol-produccion #btnPrint{display:none!important}
       <div class="tbl-wrap" style="margin-top:14px"><table id="t_invMov"></table></div>
     </div>
   </div>
+
+  <div class="card" id="cardInsumos">
+    <header><h2>Consumibles</h2>
+      <span class="hint">lo que se gasta al producir</span>
+      <button class="btn sm ghost" id="insNuevo" style="margin-left:auto">+ Consumible</button></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">La tinta, el polvo, el hilo, las bolsas, las etiquetas. No son
+        artículos que vendas: son los que se <b>gastan</b> cuando produces. Aquí van con su unidad y su
+        existencia; abajo se amarran a los materiales, a las técnicas y a los artículos que los consumen.</p>
+      <div class="tbl-wrap"><table id="t_insumos"></table></div>
+    </div>
+  </div>
+
+  <div class="card" id="cardConsumos">
+    <header><h2>Qué gasta cada cosa</h2>
+      <span class="hint" id="consHint"></span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Aquí se amarra. Un material por medida gasta por <b>metro
+        cuadrado impreso</b>; una técnica puede gastar por pieza, por área o por mil puntadas; un artículo
+        gasta por pieza terminada. Lo que pongas aquí se descuenta solo al confirmar el pedido.</p>
+      <div class="segCons" id="consSeg">
+        <button type="button" data-cons="servicio" aria-pressed="true">Materiales por medida</button>
+        <button type="button" data-cons="tecnica" aria-pressed="false">Técnicas</button>
+        <button type="button" data-cons="articulo" aria-pressed="false">Artículos</button>
+      </div>
+      <div id="consCuerpo"></div>
+    </div>
+  </div>
   <div class="card">
     <header><h2>Historial de cambios de precio</h2><button class="btn sm ghost" id="clearHist" style="margin-left:auto">Vaciar</button></header>
     <div class="body"><div class="tbl-wrap"><table id="t_hist"></table></div></div>
@@ -3040,6 +3094,15 @@ body.rol-produccion #btnPrint{display:none!important}
       <div id="ivAviso"></div>
       <div id="ivCuerpo"></div>
       <div class="tbl-wrap" id="ivTabla"><table id="t_inv"></table></div>
+    </div>
+  </div>
+
+  <div class="card" id="cardInvIns">
+    <header><h2>Consumibles</h2><span class="hint" id="invInsHint"></span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Lo que se gasta produciendo. Baja solo cuando confirmas un
+        pedido, con lo que de verdad calculó el armado — no a ojo.</p>
+      <div class="tbl-wrap"><table id="t_invIns"></table></div>
     </div>
   </div>
   <div class="card">
@@ -4349,6 +4412,19 @@ function defaults(){ return {
   {id:"a15",nombre:"Llavero MDF",cat:"Promocional",costo:12,precio:19,tallas:false,existencia:0,minimo_inv:0},
   {id:"a16",nombre:"Funda de celular sublimable",cat:"Promocional",costo:55,precio:88,tallas:false,existencia:0,minimo_inv:0}
  ],
+ insumos:[
+  {id:"i1",nombre:"Tinta DTF (blanco y color)",unidad:"ml",costo:0.9,existencia:0,minimo:0},
+  {id:"i2",nombre:"Polvo termoadhesivo",unidad:"g",costo:0.28,existencia:0,minimo:0},
+  {id:"i3",nombre:"Bolsa de celofán",unidad:"pza",costo:1.2,existencia:0,minimo:0},
+  {id:"i4",nombre:"Hilo de bordado",unidad:"m",costo:0.05,existencia:0,minimo:0}
+ ],
+ /* 50 ml de tinta y 100 g de polvo por metro cuadrado IMPRESO, que son los
+    promedios del oficio que ya usa la calculadora de costos. El polvo solo
+    se pega donde hay tinta, por eso va por area impresa y no por comprada. */
+ consumos:[
+  {id:"c1",ancla:"servicio",anclaId:"sv1",insumoId:"i1",cant:50,por:"m2"},
+  {id:"c2",ancla:"servicio",anclaId:"sv1",insumoId:"i2",cant:100,por:"m2"}
+ ],
  tecnicas:[
   {id:"t1",nombre:"DTF Textil",modo:"area",costoCm2:0.12,costoMO:0,precioMO:0,minimo:12,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.19,precioTinta:0,precioPuntada:0,precioMin:20,precioSetup:0},
   {id:"t2",nombre:"DTF UV (rígidos)",modo:"area",costoCm2:0.18,costoMO:0,precioMO:0,minimo:15,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.29,precioTinta:0,precioPuntada:0,precioMin:24,precioSetup:0},
@@ -4684,7 +4760,105 @@ function normalizaCat(){
   });
   return cat.servicios;
 }
+
+/* ============ CONSUMIBLES ============ */
+const UNIDADES_INS = [["ml","mililitros"],["g","gramos"],["m","metros"],
+                      ["m2","metros cuadrados"],["pza","piezas"],["kg","kilos"],["l","litros"]];
+const abrevIns = u => u === "m2" ? "m²" : (u || "pza");
+function insumoDe(id){ return (cat.insumos||[]).find(i=>i.id===id) || null; }
+function consumosDe(ancla, anclaId){
+  if(!anclaId) return [];
+  return (cat.consumos||[]).filter(c=>c.ancla===ancla && c.anclaId===anclaId);
+}
+function cantIns(v){
+  const n = num(v);
+  if(n === 0) return "0";
+  if(Math.abs(n) >= 100) return Math.round(n).toLocaleString("es-MX");
+  if(Math.abs(n) >= 1)   return (Math.round(n*10)/10).toLocaleString("es-MX");
+  return (Math.round(n*1000)/1000).toLocaleString("es-MX");
+}
+const POR_SERVICIO = [["m2","por m² impreso"],["m2compra","por m² comprado (con merma)"],
+                      ["unidad","por unidad comprada (ml o m²)"]];
+const POR_TECNICA  = [["pieza","por pieza"],["m2","por m² de la aplicación"],
+                      ["milpuntadas","por cada mil puntadas"],["pedido","una vez por pedido"]];
+const POR_ARTICULO = [["pieza","por pieza"],["pedido","una vez por pedido"]];
+function porDe(ancla){
+  return ancla==="servicio" ? POR_SERVICIO : ancla==="tecnica" ? POR_TECNICA : POR_ARTICULO;
+}
+
+/* Lo que gasta una cotizacion completa. Recorre PARTES: una cotizacion con
+   varios articulos tiene un armado y unas aplicaciones por articulo. */
+function consumoDe(q, r){
+  if(!q || !r) return [];
+  const acum = {};
+  const suma = (insumoId, cant, origen) => {
+    const c = num(cant);
+    if(!insumoId || !(c > 0)) return;
+    if(!acum[insumoId]) acum[insumoId] = {cant:0, de:[]};
+    acum[insumoId].cant += c;
+    acum[insumoId].de.push(origen + ": " + cantIns(c));
+  };
+  const partes = (r.partes && r.partes.length) ? r.partes : [{q:q, r:r}];
+  partes.forEach(p=>{
+    const qi = p.q || {}, ri = p.r || {};
+    const qty = num(ri.qty);
+    (ri.armado||[]).forEach(a=>{
+      const s = svcDe(a.servicioId); if(!s) return;
+      consumosDe("servicio", a.servicioId).forEach(cs=>{
+        const base = cs.por === "m2compra" ? num(a.areaCompradaM2)
+                   : cs.por === "unidad"   ? num(a.unidades)
+                   :                         num(a.areaPiezasM2);
+        suma(cs.insumoId, num(cs.cant) * base, s.nombre);
+      });
+    });
+    (qi.apps||[]).forEach(ap=>{
+      const t = (cat.tecnicas||[]).find(x=>x.id===ap.tecnicaId); if(!t) return;
+      const areaUna = num(ap.ancho) * num(ap.alto) / 10000;
+      consumosDe("tecnica", ap.tecnicaId).forEach(cs=>{
+        const base = cs.por === "m2"          ? areaUna * qty
+                   : cs.por === "milpuntadas" ? (num(ap.puntadas)/1000) * qty
+                   : cs.por === "pedido"      ? 1
+                   :                            qty;
+        suma(cs.insumoId, num(cs.cant) * base, t.nombre + " · " + (ap.ubic||"aplicación"));
+      });
+    });
+    const art = (cat.articulos||[]).find(x=>x.id===qi.articuloId);
+    if(art) consumosDe("articulo", art.id).forEach(cs=>{
+      suma(cs.insumoId, num(cs.cant) * (cs.por==="pedido" ? 1 : qty), art.nombre);
+    });
+  });
+  return Object.keys(acum).map(id=>{
+    const i = insumoDe(id);
+    return i ? {insumo:i, cant:acum[id].cant, de:acum[id].de} : null;
+  }).filter(Boolean).sort((a,b)=> a.insumo.nombre.localeCompare(b.insumo.nombre, "es"));
+}
+
+function mueveInsumo(insumoId, delta, nota, folio){
+  const i = insumoDe(insumoId); if(!i) return;
+  i.existencia = num(i.existencia) + num(delta);
+  cat.insumoMovs = cat.insumoMovs || [];
+  cat.insumoMovs.push({id:uid(), fecha:hoyISO()+" "+horaAhora(), insumo:i.nombre, insumoId,
+                       unidad:i.unidad, delta:num(delta), queda:i.existencia,
+                       nota:nota||"", folio:folio||"", quien:(usuarioActual().nombre||"")});
+  if(cat.insumoMovs.length > 400) cat.insumoMovs = cat.insumoMovs.slice(-400);
+}
+function descuentaInsumos(q, r, folio){
+  const lista = consumoDe(q, r);
+  const cortos = [];
+  lista.forEach(x=>{
+    mueveInsumo(x.insumo.id, -x.cant, "Salida por " + (q.folio||"pedido"), folio||"");
+    if(num(x.insumo.existencia) < 0) cortos.push(x.insumo.nombre);
+  });
+  if(lista.length) persist();
+  return {lista, cortos};
+}
+
 function svcDe(id){ return (cat.servicios||[]).find(s=>s.id===id) || null; }
+/* Las cuentas que ya existian no traen estas colecciones. Se crean vacias:
+   sembrar consumos en una cuenta vieja seria inventarle gastos que nadie
+   capturo, y el primer pedido le descontaria material que no sabe que tiene. */
+if(!Array.isArray(cat.insumos))  cat.insumos  = [];
+if(!Array.isArray(cat.consumos)) cat.consumos = [];
 function abrevUnidad(u){ return u==="m2" ? "m²" : "ml"; }
 function techoA(v, paso){ const p = num(paso)>0 ? num(paso) : 0.01;
   return Math.round(Math.ceil((v - 1e-9)/p)*p*10000)/10000; }
@@ -5480,6 +5654,7 @@ function calc(){
     armadoCosto += A.costo; armadoVenta += venta; armadoBruto += bruto;
     const factor = 1 - descVolPct/100;
     armado.push({id:row.id, appId:row.appId||"", principal:!!row.principal, nombre:A.s.nombre, unidad:A.unidad,
+                 servicioId:row.servicioId, areaPiezasM2:A.areaPiezasM2, areaCompradaM2:A.areaCompradaM2,
                  grupos:(A.grupos||[]).map(gr=>({appId:gr.src.appId||"", etiqueta:gr.src.etiqueta||"",
                      ancho:gr.pieza.ancho, alto:gr.pieza.alto, rot:gr.rot, porFila:gr.porFila,
                      filas:gr.filas, cant:gr.n, costo:gr.costoParte, precio:gr.precioParte*factor})),
@@ -5803,6 +5978,191 @@ function saneaPrecios(){
   if(typeof renderCatalogo==="function") renderCatalogo();
   toast(n+" precio(s) subidos con tu utilidad y guardados en el catálogo");
 }
+
+
+function renderInsumos(){
+  const t = $("#t_insumos"); if(!t) return;
+  const ls = cat.insumos || [];
+  t.innerHTML = '<thead><tr><th>Consumible</th><th style="width:110px">Unidad</th>' +
+    '<th style="width:120px" class="num">Costo por unidad</th>' +
+    '<th style="width:110px" class="num">Existencia</th>' +
+    '<th style="width:110px" class="num">Mínimo</th><th style="width:44px"></th></tr></thead><tbody>' +
+    (ls.length ? ls.map(i=>
+      '<tr data-ins="'+esc(i.id)+'">' +
+      '<td><input value="'+esc(i.nombre||"")+'" data-insf="nombre" placeholder="Tinta, polvo, hilo, bolsa…"></td>' +
+      '<td><select data-insf="unidad">' + UNIDADES_INS.map(u=>
+          '<option value="'+u[0]+'"'+(i.unidad===u[0]?" selected":"")+'>'+abrevIns(u[0])+'</option>').join("") +
+        '</select></td>' +
+      '<td><input type="number" min="0" step="0.0001" value="'+num(i.costo)+'" data-insf="costo"></td>' +
+      '<td><input type="number" step="0.01" value="'+num(i.existencia)+'" data-insf="existencia"></td>' +
+      '<td><input type="number" min="0" step="0.01" value="'+num(i.minimo)+'" data-insf="minimo"></td>' +
+      '<td><button class="quita" data-insdel="'+esc(i.id)+'" title="Quitar">&times;</button></td></tr>').join("")
+    : '<tr><td colspan="6" style="color:var(--ink-3);padding:16px">Todavía no hay consumibles. ' +
+      'Agrega la tinta, el polvo o las bolsas que de verdad gastas.</td></tr>') + '</tbody>';
+}
+
+let consVista = "servicio";
+function renderConsumos(){
+  const w = $("#consCuerpo"); if(!w) return;
+  const ins = cat.insumos || [];
+  if(!ins.length){
+    w.innerHTML = '<div class="consVacio">Primero captura tus consumibles aquí arriba. ' +
+      'Sin eso no hay qué amarrar.</div>';
+    const h0 = $("#consHint"); if(h0) h0.textContent = "";
+    return;
+  }
+  const lista = consVista === "servicio" ? (cat.servicios||[])
+              : consVista === "tecnica"  ? (cat.tecnicas||[])
+              :                            (cat.articulos||[]);
+  const porOps = porDe(consVista);
+  const total = (cat.consumos||[]).filter(c=>c.ancla===consVista).length;
+  const h = $("#consHint");
+  if(h) h.textContent = total ? total + " amarre(s) en esta pestaña" : "nada amarrado todavía";
+  w.innerHTML = lista.map(x=>{
+    const rs = consumosDe(consVista, x.id);
+    const sub = consVista === "servicio" ? (abrevUnidad(x.unidad) + " · " + num(x.ancho) + " cm")
+              : consVista === "tecnica"  ? (x.modo || "")
+              :                            (x.cat || "");
+    return '<details class="consBloque"'+(rs.length?" open":"")+'>' +
+      '<summary><span class="cn'+(rs.length?"":" cero")+'">'+rs.length+'</span>' +
+        '<b>'+esc(x.nombre||"(sin nombre)")+'</b><span class="cu">'+esc(sub)+'</span></summary>' +
+      '<div class="consCuerpo">' +
+        (rs.length ? rs.map(c=>
+          '<div class="consRen" data-cr="'+esc(c.id)+'">' +
+          '<select data-crf="insumoId">' + ins.map(i=>
+              '<option value="'+esc(i.id)+'"'+(c.insumoId===i.id?" selected":"")+'>'+esc(i.nombre||"(sin nombre)")+'</option>').join("") +
+            '</select>' +
+          '<input type="number" min="0" step="0.0001" value="'+num(c.cant)+'" data-crf="cant" title="Cuánto se gasta">' +
+          '<span class="cu2">'+abrevIns((insumoDe(c.insumoId)||{}).unidad)+'</span>' +
+          '<select data-crf="por">' + porOps.map(p=>
+              '<option value="'+p[0]+'"'+(c.por===p[0]?" selected":"")+'>'+p[1]+'</option>').join("") +
+            '</select>' +
+          '<button class="quita" data-crdel="'+esc(c.id)+'" title="Quitar">&times;</button></div>').join("")
+        : '<p class="consVacio">No gasta ningún consumible.</p>') +
+        '<button class="btn sm ghost" data-crnuevo="'+esc(x.id)+'">+ Agregar consumible</button>' +
+      '</div></details>';
+  }).join("") || '<div class="consVacio">No hay nada en esta lista todavía.</div>';
+}
+
+function estadoIns(i){
+  const e = num(i.existencia), m = num(i.minimo);
+  if(e <= 0) return {txt:"Agotado", cls:"insFalta"};
+  if(m > 0 && e <= m) return {txt:"Por acabarse", cls:"insPoco"};
+  return {txt:"Suficiente", cls:""};
+}
+function renderInvInsumos(){
+  const t = $("#t_invIns"); if(!t) return;
+  const ls = (cat.insumos||[]).filter(i=> num(i.minimo) > 0 || num(i.existencia) !== 0);
+  const bajos = ls.filter(i=> estadoIns(i).txt !== "Suficiente");
+  const h = $("#invInsHint");
+  if(h) h.textContent = ls.length
+    ? ls.length + " vigilado(s)" + (bajos.length ? " · " + bajos.length + " por resurtir" : "")
+    : "";
+  t.innerHTML = '<thead><tr><th>Consumible</th><th class="num" style="width:120px">Existencia</th>' +
+    '<th class="num" style="width:110px">Mínimo</th><th style="width:130px">Cómo está</th>' +
+    '<th class="num" style="width:130px">Se sugiere pedir</th></tr></thead><tbody>' +
+    (ls.length ? ls.map(i=>{
+      const e = estadoIns(i);
+      const pedir = Math.max(0, num(i.minimo)*2 - num(i.existencia));
+      return '<tr><td>'+esc(i.nombre||"")+'</td>' +
+        '<td class="num '+e.cls+'">'+cantIns(i.existencia)+' '+abrevIns(i.unidad)+'</td>' +
+        '<td class="num">'+(num(i.minimo) ? cantIns(i.minimo)+" "+abrevIns(i.unidad) : "—")+'</td>' +
+        '<td class="'+e.cls+'">'+e.txt+'</td>' +
+        '<td class="num">'+(pedir ? cantIns(pedir)+" "+abrevIns(i.unidad) : "—")+'</td></tr>';
+    }).join("")
+    : '<tr><td colspan="5" style="color:var(--ink-3);padding:16px">Ningún consumible con mínimo ni existencia. ' +
+      'Ponles mínimo en el Catálogo para que se vigilen aquí.</td></tr>') + '</tbody>';
+}
+
+function renderAvisoInsumos(r){
+  const w = $("#r_insumos"); if(!w) return;
+  const lista = consumoDe(cot, r);
+  if(!lista.length){ w.hidden = true; w.innerHTML = ""; return; }
+  const faltan = lista.filter(x=> num(x.insumo.existencia) < x.cant);
+  w.hidden = false;
+  w.className = "avisoStock " + (faltan.length ? "poco" : "ok");
+  w.innerHTML = faltan.length
+    ? '<b>Te va a faltar material para este pedido.</b> ' + faltan.map(x=>
+        esc(x.insumo.nombre) + ": necesitas " + cantIns(x.cant) + " " + abrevIns(x.insumo.unidad) +
+        " y tienes " + cantIns(x.insumo.existencia)).join(" · ") +
+      '. Se puede cotizar igual, nada más que lo sepas antes de prometer la fecha.'
+    : '<b>Alcanza.</b> Este pedido se lleva ' + lista.map(x=>
+        cantIns(x.cant) + " " + abrevIns(x.insumo.unidad) + " de " + esc(x.insumo.nombre)).join(" · ") + '.';
+}
+
+document.addEventListener("input", e=>{
+  const tr = e.target.closest("[data-ins]");
+  if(tr && e.target.dataset.insf){
+    const i = insumoDe(tr.dataset.ins); if(!i) return;
+    const f = e.target.dataset.insf;
+    i[f] = (f === "nombre") ? e.target.value : num(e.target.value);
+    persist(); renderInvInsumos();
+    if(f === "nombre" && $("#consCuerpo")) renderConsumos();
+    return;
+  }
+  const cr = e.target.closest("[data-cr]");
+  if(cr && e.target.dataset.crf){
+    const c = (cat.consumos||[]).find(x=>x.id===cr.dataset.cr); if(!c) return;
+    const f = e.target.dataset.crf;
+    c[f] = (f === "cant") ? num(e.target.value) : e.target.value;
+    persist(); renderResumen();
+  }
+});
+document.addEventListener("change", e=>{
+  const tr = e.target.closest("[data-ins]");
+  if(tr && e.target.dataset.insf === "unidad"){
+    const i = insumoDe(tr.dataset.ins); if(!i) return;
+    i.unidad = e.target.value; persist(); renderInvInsumos(); renderConsumos(); return;
+  }
+  const cr = e.target.closest("[data-cr]");
+  if(cr && e.target.dataset.crf){
+    const c = (cat.consumos||[]).find(x=>x.id===cr.dataset.cr); if(!c) return;
+    c[e.target.dataset.crf] = e.target.dataset.crf === "cant" ? num(e.target.value) : e.target.value;
+    persist(); renderConsumos(); renderResumen();
+  }
+});
+document.addEventListener("click", e=>{
+  if(e.target.closest("#insNuevo")){
+    cat.insumos = (cat.insumos||[]).concat([{id:uid(), nombre:"", unidad:"ml", costo:0,
+                                             existencia:0, minimo:0}]);
+    persist(); renderInsumos(); renderConsumos(); renderInvInsumos();
+    toast("Consumible agregado · ponle nombre y unidad");
+    return;
+  }
+  const d = e.target.closest("[data-insdel]");
+  if(d){
+    const i = insumoDe(d.dataset.insdel); if(!i) return;
+    const amarres = (cat.consumos||[]).filter(c=>c.insumoId===i.id).length;
+    if(!confirm("¿Quitar «" + (i.nombre||"este consumible") + "»?" +
+      (amarres ? "\n\nTambién se quitan sus " + amarres + " amarre(s)." : ""))) return;
+    cat.insumos  = (cat.insumos||[]).filter(x=>x.id!==i.id);
+    cat.consumos = (cat.consumos||[]).filter(c=>c.insumoId!==i.id);
+    persist(); renderInsumos(); renderConsumos(); renderInvInsumos(); renderResumen();
+    return;
+  }
+  const sg = e.target.closest("#consSeg [data-cons]");
+  if(sg){
+    consVista = sg.dataset.cons;
+    $("#consSeg").querySelectorAll("[data-cons]").forEach(b=>
+      b.setAttribute("aria-pressed", b.dataset.cons === consVista ? "true" : "false"));
+    renderConsumos();
+    return;
+  }
+  const nv = e.target.closest("[data-crnuevo]");
+  if(nv){
+    const ins = (cat.insumos||[])[0]; if(!ins){ toast("Primero captura un consumible"); return; }
+    cat.consumos = (cat.consumos||[]).concat([{id:uid(), ancla:consVista, anclaId:nv.dataset.crnuevo,
+                                               insumoId:ins.id, cant:0, por:porDe(consVista)[0][0]}]);
+    persist(); renderConsumos(); renderResumen();
+    return;
+  }
+  const cd = e.target.closest("[data-crdel]");
+  if(cd){
+    cat.consumos = (cat.consumos||[]).filter(c=>c.id!==cd.dataset.crdel);
+    persist(); renderConsumos(); renderResumen();
+    return;
+  }
+});
 
 function renderResumen(){
   const r = calc();
@@ -6346,6 +6706,7 @@ function renderCatalogo(){
   catqPintaFiltro();
   Object.keys(COLS).forEach(renderTabla);
   catqPintaPie();
+  renderInsumos(); renderConsumos();
   renderInventario();
   const cats = [...new Set(cat.articulos.map(a=>a.cat||"Otros"))];
   $("#bulk_cat").innerHTML = '<option value="">Todas las categorías</option>' + cats.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join("");
@@ -7777,6 +8138,7 @@ function faltantesInv(){ return articulosVigilados().filter(a=> estadoStock(a).c
 let ivFil = "faltan", ivMarcados = {};
 
 function renderInvTaller(){
+  renderInvInsumos();
   const t = $("#t_inv"); if(!t) return;
   const q = (($("#ivBuscar")||{}).value||"").trim().toLowerCase();
   const todos = articulosVigilados();
@@ -7935,6 +8297,9 @@ function badgeInv(){
    Informativo a propósito: el vendedor puede vender sin existencia, nada más
    que lo sepa antes de prometer la fecha, no cuando ya la prometió. */
 function renderAvisoStock(){
+  /* calcDe, no calc: una cotizacion con varios articulos tiene un armado y
+     unas aplicaciones por articulo, y calc() solo ve el que esta abierto. */
+  try{ renderAvisoInsumos(calcDe(cot)); }catch(e){}
   const w = $("#r_stock"); if(!w) return;
   const a = (cat.articulos||[]).find(x=>x.id===cot.articuloId);
   if(!a || !seVigila(a)){ w.hidden = true; w.innerHTML = ""; return; }
@@ -8009,12 +8374,15 @@ async function mandaAProduccion(folio){
   g.estado = "confirmada";
   g.op = {folio: folioOP(), fecha: hoyISO(), cotizacion: g.folio, estatus:"Pendiente",
           historial:[{estatus:"Pendiente", fecha:hoyISO(), hora:horaAhora()}]};
-  for(const p of calcDe(g).partes){
+  const rG = calcDe(g);
+  for(const p of rG.partes){
     const a = (cat.articulos||[]).find(a=>a.id===p.q.articuloId);
     if(a && num(a.existencia) > 0)
       await moverInventario(a.id, "salida", p.r.qty, "Salida por pedido cobrado", true,
                             {folio: g.op.folio, archivo: null});
   }
+  descuentaInsumos(g, rG, g.op.folio);
+  renderInvInsumos();
   if(cot && cot.folio === folio){ cot.estado = g.estado; cot.op = g.op; renderEstado(); }
   await guardaOrden(folio);
   renderSaved(); renderProduccion();
@@ -11651,15 +12019,20 @@ $("#btnConfirmar").addEventListener("click", async ()=>{
   cot.op = {folio: folioOP(), fecha: hoyISO(), cotizacion: cot.folio, estatus:"Pendiente",
             historial:[{estatus:"Pendiente", fecha:hoyISO(), hora:horaAhora()}]};
   guardaItemActivo(cot);
-  for(const p of calcDe(cot).partes){
+  const rC = calcDe(cot);
+  for(const p of rC.partes){
     const art = cat.articulos.find(a=>a.id===p.q.articuloId);
     if(art && num(art.existencia) > 0)
       await moverInventario(art.id, "salida", p.r.qty, "Salida por pedido confirmado", true,
                             {folio: cot.op.folio, archivo: null});
   }
+  const cons = descuentaInsumos(cot, rC, cot.op.folio);
+  if(cons.lista.length) renderInvInsumos();
   const art = cat.articulos.find(a=>a.id===cot.articuloId);
   renderEstado(); await guardaCot(); renderSaved();
-  toast("Pedido confirmado · orden "+cot.op.folio+(art && num(art.existencia)<0 ? " · ojo: existencia en negativo" : ""));
+  toast("Pedido confirmado · orden "+cot.op.folio +
+    (art && num(art.existencia)<0 ? " · ojo: existencia en negativo" : "") +
+    (cons.cortos.length ? " · sin material: " + cons.cortos.join(", ") : ""));
 });
 async function guardaCot(){
   if(typeof guardaItemActivo==="function") guardaItemActivo(cot);
@@ -15991,7 +16364,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261016-1350"></script>
-<script src="diagnostico.js?v=20261016-1350"></script>
+<script src="cuenta.js?v=20261019-1554"></script>
+<script src="diagnostico.js?v=20261019-1554"></script>
 </body>
 </html>

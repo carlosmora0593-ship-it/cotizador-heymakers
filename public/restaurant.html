@@ -307,6 +307,25 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
 .cmesa.cuenta .tot{border-color:var(--warn);color:var(--warn)}
 .cmesa b{font-size:17px}
 .llevarFila{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.appsFila{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.appsFila .et{font-size:11.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em}
+.btnApp{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--linea);
+  background:var(--panel-2);border-radius:999px;padding:7px 14px;cursor:pointer;
+  font-family:"Fredoka";font-size:13px;color:var(--ink)}
+.btnApp:hover{border-color:var(--acento)}
+.btnApp i{width:9px;height:9px;border-radius:50%;display:block;font-style:normal}
+.btnApp small{color:var(--ink-3);font-size:11px}
+.appPill{display:inline-flex;align-items:center;gap:5px;font-size:11px;border-radius:999px;
+  padding:2px 8px;background:var(--panel-2);border:1px solid var(--linea);color:var(--ink-2)}
+.appPill i{width:7px;height:7px;border-radius:50%;display:block;font-style:normal}
+.appResumen{display:grid;gap:9px;margin-top:4px}
+.appRen{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;
+  padding:11px 13px;border:1px solid var(--linea);border-radius:12px;background:var(--panel-2)}
+.appRen .nom{display:flex;align-items:center;gap:8px;font-family:"Fredoka";font-size:13.5px}
+.appRen .ci{font-family:"IBM Plex Mono",monospace;font-size:13px;text-align:right;min-width:92px}
+.appRen .ci small{display:block;font-family:"Fredoka";font-size:10px;color:var(--ink-3);
+  text-transform:uppercase;letter-spacing:.06em}
+.appRen .ci.mal{color:var(--mal)} .appRen .ci.bien{color:var(--good)}
 .llevarCard{display:flex;flex-direction:column;gap:2px;cursor:pointer;text-align:left;
   border:1px solid var(--warn);border-radius:var(--radio-sm);padding:10px 14px;min-width:150px;
   background:linear-gradient(180deg,var(--warn-soft),var(--surface) 70%)}
@@ -553,6 +572,7 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
   </div>
   <div class="decorPaleta" id="decorPaleta" hidden></div>
   <input id="croqPlanoFile" type="file" accept="image/*" hidden>
+  <div class="appsFila" id="appsFila"></div>
   <div class="llevarFila" id="llevarFila"></div>
   <div style="position:relative">
     <div class="croquis" id="mesaCroquis"></div>
@@ -776,6 +796,15 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
 <section id="tab-ventas" hidden>
   <div class="tiles" id="venTiles"></div>
   <div class="card">
+    <header><h2>De dónde salió la venta de hoy</h2></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Vender por app no es lo mismo que vender en mesa. La columna de la
+        derecha es lo que <b>de verdad te queda</b> después de la comisión y del costo del platillo. Si una
+        plataforma te sale en rojo, no estás vendiendo: estás trabajando gratis.</p>
+      <div class="appResumen" id="venCanal"></div>
+    </div>
+  </div>
+  <div class="card">
     <header><h2>Tickets cobrados</h2><span class="hint" id="venHint"></span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Toca cualquier renglón para ver el ticket completo y volver a imprimirlo.
@@ -865,6 +894,18 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
       <p class="note" style="margin-top:14px"><b>El ticket de cocina no lleva precios</b> — en la cocina estorban.
         Lleva mesa o PARA LLEVAR, el folio en grande (el mismo del recibo, para que cuadren), el comensal de cada
         platillo y lo que le quitan, en letra grande.</p>
+    </div>
+  </div>
+  <div class="card">
+    <header><h2>Apps de reparto</h2><span class="hint">Uber Eats · Rappi · DiDi Food</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Pon <b>la comisión que tú negociaste</b>, no la que trae de fábrica.
+        Cambiarla aquí no toca los pedidos ya cobrados: cada pedido se queda con la comisión que tenía el día
+        que entró, para que los reportes viejos sigan diciendo la verdad.</p>
+      <div id="appsEdit"></div>
+      <div class="fila" style="margin-top:12px">
+        <button class="btn sm" id="appsAgrega">+ Agregar otra plataforma</button>
+      </div>
     </div>
   </div>
   <div class="card">
@@ -1004,6 +1045,24 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
         <b class="mono" id="modsCant" style="min-width:34px;text-align:center;font-size:17px">1</b>
         <button class="btn sm" id="modsMas">+</button>
         <button class="btn primary" id="modsOk" style="margin-left:auto">Agregar <span id="modsImporte"></span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalApp" hidden>
+  <div class="card" style="width:min(460px,100%)">
+    <header><h2>Cerrar pedido de app</h2><span class="hint" id="apCualApp"></span>
+      <button class="btn sm" id="apAppCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <div class="cobroTot"><span class="et">Lo que cobró la plataforma</span>
+        <span class="v" id="apAppTotal">$0.00</span></div>
+      <div class="appResumen" style="margin-top:14px" id="apAppDesglose"></div>
+      <p class="note" style="margin-top:14px">Este dinero <b>no entra a tu caja</b>: la plataforma te lo
+        deposita después, ya con su comisión descontada. Por eso no te pide efectivo ni cambio, y el corte
+        del turno no lo va a buscar en el cajón.</p>
+      <div class="row-actions" style="margin-top:16px">
+        <button class="btn primary" id="apAppOk">Cerrar el pedido</button>
       </div>
     </div>
   </div>
@@ -1323,8 +1382,21 @@ function paramsPorDefecto(){
           gastos:{renta:0, luz:0, gas:0, agua:0, sueldos:0, otros:0},
           diasMes:26, porcionesDia:120, margenMeta:70,
           folios:{letras:"", extra:"", digitos:5, desde:{cta:1, tur:1}},
-          tolerancia:10, cierreNomina:""};
+          tolerancia:10, cierreNomina:"", apps:appsPorDefecto()};
 }
+/* Las comisiones de arranque son las que se ven en el mercado mexicano y
+   CADA restaurante negocia la suya: por eso se editan en Ajustes. */
+function appsPorDefecto(){
+  return [{id:"uber",  nombre:"Uber Eats",  comision:30, color:"#0DBF5B", activa:true},
+          {id:"rappi", nombre:"Rappi",      comision:30, color:"#FF5A5F", activa:true},
+          {id:"didi",  nombre:"DiDi Food",  comision:25, color:"#FF8A00", activa:true}];
+}
+const pct1 = v => (Math.round(num(v)*10)/10) + "%";
+const appsActivas = () => (P.apps||[]).filter(a=>a.activa !== false);
+const appDe = id => (P.apps||[]).find(a=>a.id === id) || null;
+/* La comision que vale es la que quedo guardada en la comanda. */
+const comisionDe = c => num(c.comisionPct) ? num(c.total) * num(c.comisionPct)/100 : 0;
+
 function equipoPorDefecto(){
   return [{id:uid(), nombre:"Administrador", rol:"gerente", pin:"", activo:true}];
 }
@@ -1334,6 +1406,7 @@ let MESAS    = lsGet("mesas", null)    || mesasPorDefecto();
 let COMANDAS = lsGet("comandas", []);
 let TURNOS   = lsGet("turnos", []);
 let P        = Object.assign(paramsPorDefecto(), lsGet("P", {}));
+if(!Array.isArray(P.apps) || !P.apps.length) P.apps = appsPorDefecto();
 let EQUIPO      = lsGet("equipo", null) || equipoPorDefecto();
 let ASISTENCIAS = lsGet("asistencias", []);
 /* Esto NO va en P: no es de la cuenta, es de ESTA pantalla. La compu de la
@@ -2028,6 +2101,7 @@ function renderMesas(){
       '</button>';
   }).join("") || '<div class="empty">Esta zona no tiene mesas.</div>';
 
+  pintaAppsFila();
   const ab = abiertas(), ll = llevarAbiertas().length;
   $("#mesasResumen").textContent = ab.length
     ? ab.length + " abierta(s)" + (ll ? " (" + ll + " para llevar)" : "") + " · " +
@@ -2045,6 +2119,32 @@ $("#mesaRejilla").addEventListener("click", e=>{
   abreMesa(b.dataset.mesa);
 });
 $("#mesaRapida").addEventListener("click", ()=> abreMesa("llevar"));
+
+/* ---- pedidos que llegan por Uber, Rappi o DiDi ---- */
+function pintaAppsFila(){
+  const w = $("#appsFila"); if(!w) return;
+  const act = appsActivas();
+  if(!act.length){ w.innerHTML = ""; return; }
+  w.innerHTML = '<span class="et">Pedido por app</span>' + act.map(a=>
+    '<button class="btnApp" data-abreapp="'+esc(a.id)+'"><i style="background:'+esc(a.color||"#888")+'"></i>'+
+    esc(a.nombre)+' <small>'+pct1(a.comision)+'</small></button>').join("");
+}
+$("#appsFila").addEventListener("click", e=>{
+  const b = e.target.closest("[data-abreapp]"); if(!b) return;
+  abreApp(b.dataset.abreapp);
+});
+function abreApp(appId){
+  const a = appDe(appId); if(!a) return;
+  if(!turnoAbierto()){ toast("Abre el turno de caja antes de tomar pedidos"); return; }
+  const n = COMANDAS.filter(x=>x.appId === appId && x.fecha === hoyISO()).length + 1;
+  const c = nuevaComanda({id:"llevar", nombre:a.nombre + " " + n, lugares:1});
+  /* La comision se congela aqui. */
+  c.appId = a.id; c.appNombre = a.nombre; c.appColor = a.color || "";
+  c.comisionPct = num(a.comision);
+  persist();
+  comandaId = c.id; comensalVista = 1;
+  vaA("comanda"); renderComanda();
+}
 
 /* ===================================================================
    COMANDA
@@ -2555,6 +2655,9 @@ let cobroPropPct = null, cobroPagos = [];
 $("#comCobrar").addEventListener("click", ()=>{
   const c = comandaActual(); if(!c || !(c.lineas||[]).length) return;
   if(!turnoAbierto()){ toast("Abre el turno de caja antes de cobrar"); return; }
+  /* Un pedido de app ya viene pagado por la plataforma: no hay propina que
+     repartir, ni efectivo, ni cambio. */
+  if(c.appId){ abreCobroApp(c); return; }
   c.estado = "cuenta"; persist();
   cobroPropPct = num(P.propina) || 0;
   cobroPagos = [];
@@ -2668,6 +2771,49 @@ $("#cobroOk").addEventListener("click", ()=>{
   toast("Cobrado " + mx(total) + (cambio ? " · cambio " + mx(cambio) : "") + " · " + c.folio);
 });
 
+/* ---- cerrar un pedido de app ---- */
+function abreCobroApp(c){
+  const s = sumaComanda(c);
+  const total = s.total, pct = num(c.comisionPct), com = total * pct/100;
+  const costo = (c.lineas||[]).reduce((x,l)=>{
+    const p = (MENU.plats||[]).find(y=>y.id === l.platId);
+    return x + num(p && p.costo) * num(l.cant,1);
+  }, 0);
+  const queda = total - com - costo;
+  c.estado = "cuenta"; persist();
+  $("#apCualApp").textContent = c.appNombre + " · " + c.folio;
+  $("#apAppTotal").textContent = mx(total);
+  $("#apAppDesglose").innerHTML =
+    '<div class="appRen"><span class="nom"><i style="background:'+esc(c.appColor||"#888")+'"></i>' +
+      esc(c.appNombre)+' se queda</span>' +
+      '<span class="ci mal">−'+mx(com)+'<small>'+pct1(pct)+'</small></span>' +
+      '<span class="ci">'+mx(total - com)+'<small>te depositan</small></span>' +
+      '<span class="ci '+(queda>0?"bien":"mal")+'">'+mx(queda)+'<small>te queda</small></span></div>' +
+    (costo ? '' : '<p class="note" style="margin:0">Captura el costo de tus platillos en el Menú para saber ' +
+      'cuánto te queda de verdad. Sin eso, sólo se ve lo que te depositan.</p>');
+  $("#modalApp").hidden = false;
+}
+$("#apAppCerrar").addEventListener("click", ()=>{ $("#modalApp").hidden = true; });
+$("#apAppOk").addEventListener("click", ()=>{
+  const c = comandaActual(); if(!c) return;
+  const s = sumaComanda(c);
+  c.estado = "cerrada"; c.cierra = horaAhora();
+  c.subtotal = s.sub; c.servicio = s.serv; c.propina = 0; c.total = s.total;
+  /* Un solo pago, de tipo app: no toca el efectivo del cajon. */
+  c.pagos = [{tipo:"app", monto:s.total}];
+  c.cambio = 0; c.efectivoCaja = 0;
+  c.comision = s.total * num(c.comisionPct)/100;
+  c.neto = s.total - c.comision;
+  c.turnoId = (turnoAbierto()||{}).id || "";
+  c.cobro = usuarioActual().nombre || "";
+  persist();
+  if(ESTACION.cuenta) imprimeCuenta(c, c.pagos, 0);
+  $("#modalApp").hidden = true;
+  comandaId = null;
+  vaA("mesas");
+  toast(c.appNombre + " " + mx(s.total) + " · te depositan " + mx(c.neto) + " · " + c.folio);
+});
+
 /* ===================================================================
    TURNO DE CAJA
    =================================================================== */
@@ -2676,14 +2822,16 @@ const comandasDeTurno = id => COMANDAS.filter(c=>c.estado === "cerrada" && !c.ca
 
 function sumaTurno(t){
   const cs = comandasDeTurno(t.id);
-  const por = {efectivo:0, tarjeta:0, transferencia:0};
-  let propinas = 0, total = 0, efectivoCaja = 0;
+  const por = {efectivo:0, tarjeta:0, transferencia:0, app:0};
+  let propinas = 0, total = 0, efectivoCaja = 0, apps = 0, comisionApps = 0;
   cs.forEach(c=>{
     total += num(c.total); propinas += num(c.propina); efectivoCaja += num(c.efectivoCaja);
+    if(c.appId){ apps += num(c.total); comisionApps += comisionDe(c); }
     (c.pagos||[]).forEach(p=>{ por[p.tipo] = num(por[p.tipo]) + num(p.monto); });
   });
   const movs = (t.movs||[]).reduce((s,m)=> s + (m.tipo==="entrada" ? num(m.monto) : -num(m.monto)), 0);
   return {cuentas:cs.length, total, propinas, por, efectivoCaja,
+          apps, comisionApps, netoApps: apps - comisionApps, propio: total - apps,
           movs, enCaja: num(t.fondo) + efectivoCaja + movs};
 }
 
@@ -2919,6 +3067,37 @@ $("#inMesas").addEventListener("click", e=>{
   comandaId = c.id; catVista = ""; vaA("comanda"); renderComanda();
 });
 
+/* Mostrador contra apps, una linea por plataforma. El margen de la derecha
+   es el real: ya le quito la comision Y el costo de los platillos. Es normal
+   que una plataforma salga en rojo; de eso se trata verlo. */
+function pintaPorCanal(lista){
+  const w = $("#venCanal"); if(!w) return;
+  const costoDe = c => (c.lineas||[]).reduce((x,l)=>{
+    const p = (MENU.plats||[]).find(y=>y.id === l.platId);
+    return x + num(p && p.costo) * num(l.cant,1);
+  }, 0);
+  const grupos = [];
+  const propias = lista.filter(c=>!c.appId);
+  if(propias.length) grupos.push({nombre:"Mostrador y para llevar", color:"#7A8A99", cs:propias});
+  (P.apps||[]).forEach(a=>{
+    const cs = lista.filter(c=>c.appId === a.id);
+    if(cs.length) grupos.push({nombre:a.nombre, color:a.color, cs:cs});
+  });
+  if(!grupos.length){ w.innerHTML = '<div class="empty">Todavía no hay ventas hoy.</div>'; return; }
+  w.innerHTML = grupos.map(g=>{
+    const vendido = g.cs.reduce((s,c)=>s+num(c.total), 0);
+    const com     = g.cs.reduce((s,c)=>s+comisionDe(c), 0);
+    const cost    = g.cs.reduce((s,c)=>s+costoDe(c), 0);
+    const queda   = vendido - com - cost;
+    const pct     = vendido ? Math.round(queda/vendido*100) : 0;
+    return '<div class="appRen"><span class="nom"><i style="background:'+esc(g.color||"#888")+'"></i>' +
+      esc(g.nombre)+' <small style="color:var(--ink-3);font-size:11px">'+g.cs.length+' pedido(s)</small></span>' +
+      '<span class="ci">'+mx(vendido)+'<small>vendido</small></span>' +
+      '<span class="ci'+(com?" mal":"")+'">'+(com?"−"+mx(com):"—")+'<small>comisión</small></span>' +
+      '<span class="ci '+(queda>0?"bien":"mal")+'">'+mx(queda)+'<small>te queda '+pct+'%</small></span></div>';
+  }).join("");
+}
+
 function renderVentas(){
   const hoy = cerradasDe(hoyISO());
   const total = hoy.reduce((s,c)=>s+num(c.total),0);
@@ -2927,32 +3106,43 @@ function renderVentas(){
     const p = (MENU.plats||[]).find(y=>y.id===l.platId);
     return x + num(p && p.costo) * num(l.cant,1);
   }, 0), 0);
+  /* La comision va antes de la utilidad porque es un costo mas, solo que
+     invisible: no llega en ninguna factura del pedido. */
+  const comHoy = hoy.reduce((s,c)=> s + comisionDe(c), 0);
+  const porApp = hoy.filter(c=>c.appId).reduce((s,c)=> s + num(c.total), 0);
   $("#venTiles").innerHTML =
     '<div class="tile destacada"><span class="et">Hoy</span><span class="v">' + mx(total) + '</span>' +
-      '<span class="sub">' + hoy.length + ' cuenta(s)</span></div>' +
+      '<span class="sub">' + hoy.length + ' cuenta(s)' +
+        (porApp ? ' · ' + mx(porApp) + ' por app' : '') + '</span></div>' +
     '<div class="tile"><span class="et">Costo de hoy</span><span class="v">' + mx(costo) + '</span>' +
       '<span class="sub">' + (costo ? "de lo que capturaste" : "falta capturar costos") + '</span></div>' +
-    '<div class="tile"><span class="et">Utilidad de hoy</span><span class="v">' + mx(total - costo) + '</span>' +
-      '<span class="sub">' + (total ? Math.round((total-costo)/total*100) + "% del total" : "sin ventas") + '</span></div>' +
-    '<div class="tile"><span class="et">Históricas</span><span class="v">' + todas.length + '</span>' +
-      '<span class="sub">cuentas cerradas</span></div>';
+    '<div class="tile"><span class="et">Comisión de apps</span><span class="v">' + mx(comHoy) + '</span>' +
+      '<span class="sub">' + (porApp ? Math.round(comHoy/porApp*100) + "% de lo vendido por app" : "sin pedidos de app") + '</span></div>' +
+    '<div class="tile"><span class="et">Utilidad de hoy</span><span class="v">' + mx(total - costo - comHoy) + '</span>' +
+      '<span class="sub">' + (total ? Math.round((total-costo-comHoy)/total*100) + "% del total, ya sin comisión" : "sin ventas") + '</span></div>';
+  pintaPorCanal(hoy);
   const lista = ventasFiltradas();
   $("#venHint").textContent = lista.length === todas.length
     ? todas.length + " en total"
     : lista.length + " de " + cerradasTodas().length;
-  $("#t_ventas").innerHTML = '<thead><tr><th>Folio</th><th>Mesa</th><th>Fecha</th><th>Cerró</th>' +
+  $("#t_ventas").innerHTML = '<thead><tr><th>Folio</th><th>Mesa</th><th>Canal</th><th>Fecha</th><th>Cerró</th>' +
     '<th>Atendió</th><th>Cobró</th><th class="der">Propina</th><th class="der">Total</th>' +
     '<th style="width:90px"></th></tr></thead><tbody>' +
     (lista.length ? lista.slice(0,200).map(c=>{
       const cans = (c.cancelaciones||[]).length, re = (c.reimpresiones||[]).length;
+      const canal = c.appId
+        ? '<span class="appPill"><i style="background:'+esc(c.appColor||"#888")+'"></i>'+esc(c.appNombre||"")+
+          ' '+pct1(c.comisionPct)+'</span>'
+        : '<span style="color:var(--ink-3);font-size:11.5px">Propia</span>';
       return '<tr data-tk="'+esc(c.id)+'"><td class="mono">'+esc(c.folio)+'</td><td>'+esc(c.mesaNombre)+'</td>' +
+        '<td>'+canal+'</td>' +
         '<td class="mono">'+esc(c.fecha)+'</td><td class="mono">'+esc(c.cierra||"")+'</td>' +
         '<td>'+esc(c.mesero||"")+'</td><td>'+esc(c.cobro||"")+'</td>' +
         '<td class="der mono">'+mx(c.propina)+'</td>' +
         '<td class="der mono">'+(c.cancelada ? '<span class="pill mal">cancelada</span>' : mx(c.total))+'</td>' +
         '<td>'+(cans ? '<span class="pill mal" title="cancelaciones">'+cans+'</span> ' : '') +
               (re ? '<span class="pill tarde" title="reimpresiones">'+re+'↺</span>' : '')+'</td></tr>';
-    }).join("") : '<tr><td colspan="9"><div class="empty">Nada con ese filtro.</div></td></tr>') + '</tbody>';
+    }).join("") : '<tr><td colspan="10"><div class="empty">Nada con ese filtro.</div></td></tr>') + '</tbody>';
   renderCancelaciones();
 
   const cerrados = TURNOS.filter(t=>!t.abierto);
@@ -3467,7 +3657,8 @@ function imprimeComandaCocina(c, lineas){
    es la única forma de que se entere. */
 function imprimeCancelacion(c, x){
   let cuerpo = '<div class="c xl">CANCELAR</div>';
-  cuerpo += '<div class="c g">'+(c.mesaId === "llevar" ? "PARA LLEVAR" : esc(c.mesaNombre).toUpperCase())+'</div>';
+  cuerpo += '<div class="c g">'+(c.appId ? esc(c.appNombre).toUpperCase() :
+    c.mesaId === "llevar" ? "PARA LLEVAR" : esc(c.mesaNombre).toUpperCase())+'</div>';
   cuerpo += '<div class="c">'+esc(c.folio)+' · '+esc(horaAhora())+'</div><hr>';
   cuerpo += '<div class="xl">'+num(x.cant,1)+'  '+esc(x.nombre).toUpperCase()+'</div>';
   cuerpo += '<div class="caja">'+esc(x.motivo).toUpperCase()+'</div>';
@@ -4425,9 +4616,44 @@ function registraCheca(){
 /* ===================================================================
    AJUSTES
    =================================================================== */
+function pintaAppsEdit(){
+  const w = $("#appsEdit"); if(!w) return;
+  w.innerHTML = (P.apps||[]).map(a=>
+    '<div class="appRen" style="grid-template-columns:auto 1fr 96px auto auto">' +
+      '<input type="color" value="'+esc(a.color||"#888888")+'" data-appcolor="'+esc(a.id)+'" ' +
+        'style="width:34px;height:34px;padding:2px;border-radius:9px;border:1px solid var(--linea);background:var(--panel-2)">' +
+      '<input value="'+esc(a.nombre)+'" data-appnom="'+esc(a.id)+'" placeholder="Nombre de la plataforma">' +
+      '<input type="number" min="0" max="100" step="0.5" value="'+num(a.comision)+'" data-appcom="'+esc(a.id)+'">' +
+      '<span style="font-size:12.5px;color:var(--ink-3)">% de comisión</span>' +
+      '<label class="sw" style="white-space:nowrap"><input type="checkbox" data-appact="'+esc(a.id)+'"' +
+        (a.activa !== false ? " checked" : "") + '> La uso</label>' +
+    '</div>').join("") || '<div class="empty">Sin plataformas. Agrega una.</div>';
+}
+document.addEventListener("input", e=>{
+  const t2 = e.target;
+  const id = t2.dataset && (t2.dataset.appnom || t2.dataset.appcom || t2.dataset.appcolor);
+  if(!id) return;
+  const a = appDe(id); if(!a) return;
+  if(t2.dataset.appnom)   a.nombre   = t2.value;
+  if(t2.dataset.appcom)   a.comision = num(t2.value);
+  if(t2.dataset.appcolor) a.color    = t2.value;
+  persist(); pintaAppsFila();
+});
+document.addEventListener("change", e=>{
+  const id = e.target.dataset && e.target.dataset.appact; if(!id) return;
+  const a = appDe(id); if(!a) return;
+  a.activa = e.target.checked; persist(); pintaAppsFila();
+});
+document.addEventListener("click", e=>{
+  if(!e.target.closest("#appsAgrega")) return;
+  P.apps = (P.apps||[]).concat([{id:uid(), nombre:"", comision:0, color:"#7A8A99", activa:true}]);
+  persist(); pintaAppsEdit(); pintaAppsFila();
+});
+
 function renderSet(){
   $("#e_nombre").value = P.negocio.nombre||""; $("#e_tel").value = P.negocio.tel||"";
   $("#e_dir").value = P.negocio.dir||"";
+  pintaAppsEdit();
   $("#p_iva").value = num(P.iva,16); $("#p_propina").value = num(P.propina,10);
   $("#p_servicio").value = num(P.servicio,0);
   $("#p_bloqueo").value = String(num(P.bloqueoMin,10));
