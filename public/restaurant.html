@@ -28,8 +28,60 @@
   --radio:16px; --radio-sm:10px; --radio-pill:99px;
   --sombra:0 1px 2px rgba(0,0,0,.5), 0 14px 34px -18px rgba(0,0,0,.9);
   --barra:218px;
+  --barra-fondo:rgba(14,18,38,.86);
   color-scheme:dark;
 }
+
+/* ---- lanzador dentro de una sección ---- */
+.secLz{margin-top:20px}
+.secBarra{display:flex;align-items:center;gap:12px;margin:0 0 16px;flex-wrap:wrap}
+.secBarra h2{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:20px;margin:0}
+.secBarra .sub{font-size:12.5px;color:var(--ink-3)}
+.secVolver{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink-2);border-radius:999px;padding:7px 14px;
+  cursor:pointer;font:inherit;font-size:13px;transition:border-color .16s,color .16s}
+.secVolver:hover{border-color:var(--accent);color:var(--accent)}
+.secVolver svg{width:15px;height:15px}
+.secMigas{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-3)}
+.secMigas b{color:var(--ink);font-weight:600}
+.secOculta{display:none!important}
+
+/* ---- azulejos ---- */
+.lanzador{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:14px;
+  padding:22px;border-radius:var(--radio);background:var(--surface);
+  border:1px solid var(--line);margin-bottom:18px}
+.lzApp{display:flex;flex-direction:column;align-items:center;gap:9px;padding:16px 10px 14px;
+  border:1px solid transparent;border-radius:16px;background:transparent;cursor:pointer;font:inherit;
+  color:inherit;text-align:center;transition:background .16s,border-color .16s,transform .12s}
+.lzApp:hover{background:var(--surface-2);border-color:var(--line);transform:translateY(-2px)}
+.lzIco{position:relative;display:grid;place-items:center;width:60px;height:60px;border-radius:17px;
+  background:color-mix(in oklab, var(--lzc) 20%, transparent);
+  border:1px solid color-mix(in oklab, var(--lzc) 38%, transparent);color:var(--lzc)}
+.lzIco svg{width:30px;height:30px}
+.lzN{position:absolute;top:-7px;right:-9px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;
+  display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;line-height:1;
+  font-family:"IBM Plex Mono",monospace;background:var(--surface-2);color:var(--ink-2);
+  border:1px solid var(--line)}
+.lzEt{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:13.5px;line-height:1.2}
+.lzSub{font-size:10.5px;color:var(--ink-3);line-height:1.35;min-height:1.35em}
+[data-theme="light"] .lzIco{background:color-mix(in oklab, var(--lzc) 13%, #fff);
+  border-color:color-mix(in oklab, var(--lzc) 30%, #fff)}
+[data-theme="light"] .lzN{background:#fff}
+@media (max-width:560px){
+  .lanzador{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;padding:14px}
+  .lzIco{width:52px;height:52px;border-radius:15px}
+  .lzIco svg{width:26px;height:26px}
+  .lzEt{font-size:12px} .lzSub{display:none}
+}
+/* ---- selector de tema ---- */
+.temaFila{display:flex;gap:10px;flex-wrap:wrap}
+.temaCard{display:flex;align-items:center;gap:11px;border:1px solid var(--line);
+  background:var(--surface-2);border-radius:14px;padding:12px 16px;cursor:pointer;font:inherit;color:inherit}
+.temaCard[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in oklab,var(--accent) 25%,transparent)}
+.temaMuestra{display:flex;gap:3px}
+.temaMuestra i{width:13px;height:26px;border-radius:4px;display:block}
+.temaCard b{font-family:"Fredoka";font-weight:500;font-size:13.5px}
+
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
   font-family:"Nunito Sans",system-ui,sans-serif;font-size:14px;line-height:1.55;
@@ -88,7 +140,7 @@ nav.tabs .mbadge{margin-left:auto;background:var(--accent);color:#fff;border-rad
   font-size:10px;font-weight:700;padding:1px 7px}
 
 body{padding-left:var(--barra)}
-header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
+header.top{position:sticky;top:0;z-index:40;background:var(--barra-fondo);
   -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line-soft)}
 .top-in{display:flex;align-items:center;gap:12px;padding:9px 18px;max-width:1280px;margin:0 auto}
 .userChip{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;
@@ -277,7 +329,7 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
   border:1px solid var(--line);border-radius:10px;padding:5px;box-shadow:0 8px 22px rgba(0,0,0,.45);
   transform:translate(-50%,-100%)}
 .croqTool button{cursor:pointer;border:1px solid var(--line);background:var(--surface);
-  color:var(--ink-1);border-radius:7px;min-width:30px;height:28px;padding:0 7px;
+  color:var(--ink);border-radius:7px;min-width:30px;height:28px;padding:0 7px;
   font-size:13px;font-weight:700;line-height:1}
 .croqTool button:hover{border-color:var(--cyan);color:var(--cyan)}
 .croqTool button.mal:hover{border-color:var(--accent);color:var(--accent)}
@@ -309,18 +361,18 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
 .llevarFila{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .appsFila{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
 .appsFila .et{font-size:11.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em}
-.btnApp{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--linea);
-  background:var(--panel-2);border-radius:999px;padding:7px 14px;cursor:pointer;
+.btnApp{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);
+  background:var(--surface-2);border-radius:999px;padding:7px 14px;cursor:pointer;
   font-family:"Fredoka";font-size:13px;color:var(--ink)}
-.btnApp:hover{border-color:var(--acento)}
+.btnApp:hover{border-color:var(--accent)}
 .btnApp i{width:9px;height:9px;border-radius:50%;display:block;font-style:normal}
 .btnApp small{color:var(--ink-3);font-size:11px}
 .appPill{display:inline-flex;align-items:center;gap:5px;font-size:11px;border-radius:999px;
-  padding:2px 8px;background:var(--panel-2);border:1px solid var(--linea);color:var(--ink-2)}
+  padding:2px 8px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2)}
 .appPill i{width:7px;height:7px;border-radius:50%;display:block;font-style:normal}
 .appResumen{display:grid;gap:9px;margin-top:4px}
 .appRen{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;
-  padding:11px 13px;border:1px solid var(--linea);border-radius:12px;background:var(--panel-2)}
+  padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
 .appRen .nom{display:flex;align-items:center;gap:8px;font-family:"Fredoka";font-size:13.5px}
 .appRen .ci{font-family:"IBM Plex Mono",monospace;font-size:13px;text-align:right;min-width:92px}
 .appRen .ci small{display:block;font-family:"Fredoka";font-size:10px;color:var(--ink-3);
@@ -596,7 +648,9 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
 
 <!-- ============ PERSONAL ============ -->
 <section id="tab-personal" hidden>
-  <div class="card">
+  <div class="secBarra" id="bar_personal" hidden><button class="secVolver" data-secvolver="personal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Volver</button><span class="secMigas">Personal</span></div>
+  <div class="lanzador secLz" id="lz_personal"></div>
+  <div class="card secOculta" data-per="reloj">
     <header><h2>Reloj checador</h2><span class="hint" id="chHoy"></span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Cada quien checa con <b>su clave</b> y una foto. La foto no es desconfianza:
@@ -605,11 +659,11 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
       <div class="chGente" id="chGente"></div>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-per="horas">
     <header><h2>Horas de hoy</h2></header>
     <div class="body"><div class="tbl-wrap"><table id="t_horas"></table></div></div>
   </div>
-  <div class="card" id="cardRetardos" hidden>
+  <div class="card secOculta" data-per="retardos" id="cardRetardos" hidden>
     <header><h2>Retardos</h2><span class="hint" id="retHint"></span>
       <button class="btn sm ghost" id="retReporte" style="margin-left:auto">Imprimir reporte</button></header>
     <div class="body">
@@ -625,7 +679,7 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
       <div class="tbl-wrap"><table id="t_retardos"></table></div>
     </div>
   </div>
-  <div class="card" id="cardExpedientes" hidden>
+  <div class="card secOculta" data-per="exp" id="cardExpedientes" hidden>
     <header><h2>Expedientes</h2><span class="hint">datos, horario y cómo se le paga</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Esto vive <b>en esta computadora</b>, no se manda a ningún lado.
@@ -641,7 +695,7 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
       </div>
     </div>
   </div>
-  <div class="card" id="cardRecibos" hidden>
+  <div class="card secOculta" data-per="recibo" id="cardRecibos" hidden>
     <header><h2>Recibo de pago</h2><span class="hint">al terminar la jornada o el periodo</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Cuenta los días y las horas que <b>de verdad</b> checó en el periodo,
@@ -838,7 +892,17 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
 
 <!-- ============ AJUSTES ============ -->
 <section id="tab-set" hidden>
-  <div class="card">
+  <div class="secBarra" id="bar_set" hidden><button class="secVolver" data-secvolver="set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Volver</button><span class="secMigas">Ajustes</span></div>
+  <div class="lanzador secLz" id="lz_set"></div>
+  <div class="card secOculta" data-set="apariencia">
+    <header><h2>Apariencia</h2><span class="hint">cómo se ve el punto de venta</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">El tema es de <b>esta pantalla</b>, no de la cuenta: la caja
+        puede estar en claro y la cocina en oscuro. Cada aparato guarda el suyo.</p>
+      <div class="temaFila" id="temaFila"></div>
+    </div>
+  </div>
+  <div class="card secOculta" data-set="negocio">
     <header><h2>Tu negocio</h2></header>
     <div class="body">
       <div class="grid g3">
@@ -855,7 +919,7 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
         y se reparte. No son lo mismo y por eso van aparte: mezclarlos es de donde salen los pleitos con los meseros.</p>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-set="ticket">
     <header><h2>Tickets e impresión</h2><span class="hint">lo que sale en papel</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Se imprime con la impresora que ya tengas instalada en la
@@ -896,7 +960,7 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
         platillo y lo que le quitan, en letra grande.</p>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-set="apps">
     <header><h2>Apps de reparto</h2><span class="hint">Uber Eats · Rappi · DiDi Food</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Pon <b>la comisión que tú negociaste</b>, no la que trae de fábrica.
@@ -908,7 +972,7 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
       </div>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-set="respaldo">
     <header><h2>Respaldo</h2><span class="hint" id="respHint"></span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px;border-left-color:var(--warn)">Todo tu negocio vive <b>en este
@@ -925,7 +989,7 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
         <b>reemplaza todo</b> lo que haya en esta pantalla — por eso pregunta dos veces.</p>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-set="pantalla">
     <header><h2>Esta pantalla</h2><span class="hint" id="estHint"></span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Una página web <b>no puede escoger impresora</b>: siempre manda a la
@@ -959,11 +1023,11 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
       </details>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-set="mesas">
     <header><h2>Mesas y zonas</h2><button class="btn sm ghost" id="mesaNueva" style="margin-left:auto">+ Mesa</button></header>
     <div class="body"><div class="tbl-wrap"><table id="t_mesas"></table></div></div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-set="equipo">
     <header><h2>Equipo y claves</h2><button class="btn sm ghost" id="userNuevo" style="margin-left:auto">+ Persona</button></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px"><b>Gerente:</b> todo.&nbsp; <b>Cajero:</b> cobra, abre y cierra turno, no edita el menú.&nbsp;
@@ -981,7 +1045,7 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
       <p class="note" id="bloqueoNota" style="margin-top:10px"></p>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-set="folios">
     <header><h2>Folios</h2><span class="hint">las letras de tu negocio en cada cuenta</span></header>
     <div class="body">
       <div class="grid g3">
@@ -1386,6 +1450,182 @@ function paramsPorDefecto(){
 }
 /* Las comisiones de arranque son las que se ven en el mercado mexicano y
    CADA restaurante negocia la suya: por eso se editan en Ajustes. */
+
+/* ============ LANZADOR DE SECCIONES ============ */
+/* Una sección declara sus tarjetas; esto hace el resto. */
+const SEC_LZ = {};
+
+/* cada tarjeta: {id, nombre, sub, color, icono, cuenta:fn, card:selector} */
+function registraLanzador(tab, tarjetas, titulo, sub){
+  SEC_LZ[tab] = {tarjetas, titulo, sub, abierta:null};
+}
+function lzIconoSvg(d){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+}
+function pintaLanzadorSec(tab){
+  const cfg = SEC_LZ[tab]; if(!cfg) return;
+  const w = document.getElementById("lz_" + tab); if(!w) return;
+  w.innerHTML = cfg.tarjetas.filter(t=>{
+    if(t.visible){ try{ return !!t.visible(); }catch(e){ return true; } }
+    if(!t.soloAdmin) return true;
+    return typeof rolActual !== "function" || rolActual() === "admin";
+  }).map(t=>{
+    let n = "";
+    try{ n = t.cuenta ? String(t.cuenta()) : ""; }catch(e){ n = ""; }
+    return '<button class="lzApp" data-seclz="'+esc(tab)+'|'+esc(t.id)+'" style="--lzc:'+esc(t.color)+'">' +
+      '<span class="lzIco">' + lzIconoSvg(t.icono) +
+        (n !== "" ? '<i class="lzN">'+esc(n)+'</i>' : '') + '</span>' +
+      '<span class="lzEt">'+esc(t.nombre)+'</span>' +
+      '<span class="lzSub">'+esc(t.sub||"")+'</span></button>';
+  }).join("");
+}
+/* Abrir una tarjeta: se esconden las demás y aparece la barra de volver.
+   No se borra nada del DOM — se esconde — porque los render de siempre
+   siguen escribiendo en esas tablas aunque no se vean. */
+function abreTarjetaSec(tab, id){
+  const cfg = SEC_LZ[tab]; if(!cfg) return;
+  const t = cfg.tarjetas.find(x=>x.id === id); if(!t) return;
+  cfg.abierta = id;
+  const sec = document.getElementById("tab-" + tab); if(!sec) return;
+  /* Primero se tapa todo y luego se destapa la elegida. Con toggle en un
+     solo paso, varias tarjetas que comparten contenedor —como las de
+     Cotizaciones, que abren la misma lista filtrada— se tapaban entre
+     ellas segun el orden del arreglo. */
+  cfg.tarjetas.forEach(x=> sec.querySelectorAll(x.card).forEach(el=> el.classList.add("secOculta")));
+  sec.querySelectorAll(t.card).forEach(el=>{
+    el.classList.remove("secOculta");
+    /* Algunas tarjetas usan hidden para el rol. Si el azulejo se pinto es
+       porque al rol SI le toca, asi que al abrirla se destapa tambien. */
+    if(t.destapa) el.hidden = false;
+  });
+  const lz = document.getElementById("lz_" + tab); if(lz) lz.hidden = true;
+  const barra = document.getElementById("bar_" + tab);
+  if(barra){
+    barra.hidden = false;
+    barra.querySelector(".secMigas").innerHTML =
+      esc(cfg.titulo) + ' <span aria-hidden="true">›</span> <b>' + esc(t.nombre) + '</b>';
+  }
+  if(t.alAbrir) try{ t.alAbrir(); }catch(e){}
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+function cierraTarjetaSec(tab){
+  const cfg = SEC_LZ[tab]; if(!cfg) return;
+  cfg.abierta = null;
+  const sec = document.getElementById("tab-" + tab); if(!sec) return;
+  cfg.tarjetas.forEach(x=> sec.querySelectorAll(x.card).forEach(el=> el.classList.add("secOculta")));
+  const lz = document.getElementById("lz_" + tab); if(lz) lz.hidden = false;
+  const barra = document.getElementById("bar_" + tab); if(barra) barra.hidden = true;
+  pintaLanzadorSec(tab);
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+/* Al entrar a la sección siempre se ve el lanzador, no lo último que se
+   abrió: entrar al Catálogo y caer en «Escalas de volumen» desorienta. */
+function reiniciaSec(tab){
+  if(SEC_LZ[tab]) cierraTarjetaSec(tab);
+}
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-seclz]");
+  if(b){ const [tab, id] = b.dataset.seclz.split("|"); abreTarjetaSec(tab, id); return; }
+  const v = e.target.closest("[data-secvolver]");
+  if(v){ cierraTarjetaSec(v.dataset.secvolver); return; }
+});
+
+/* Los azulejos de Ajustes y de Personal. Ajustes traía OCHO tarjetas
+   apiladas: la de folios quedaba a tres pantallas de scroll. */
+function registraAzulejosRest(){
+  registraLanzador("set", [
+    {id:"apariencia", nombre:"Apariencia", sub:"claro u oscuro", color:"#D2541F",
+     icono:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18Z" fill="currentColor" stroke="none"/>',
+     card:'[data-set="apariencia"]', alAbrir:()=>pintaTemaRest()},
+    {id:"negocio", nombre:"Tu negocio", sub:"nombre y datos", color:"#0680AB",
+     icono:'<path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/>', card:'[data-set="negocio"]'},
+    {id:"ticket", nombre:"Tickets", sub:"impresión y formato", color:"#8B5CF6",
+     icono:'<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2Z"/><path d="M9 8h6M9 12h6"/>', card:'[data-set="ticket"]'},
+    {id:"apps", nombre:"Apps de reparto", sub:"Uber, Rappi, DiDi", color:"#0DBF5B",
+     icono:'<path d="M6 6h15l-1.6 9H7.6Z"/><path d="M6 6 5 3H2"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17.5" cy="19.5" r="1.4"/>',
+     card:'[data-set="apps"]', cuenta:()=>appsActivas().length, alAbrir:()=>pintaAppsEdit()},
+    {id:"mesas", nombre:"Mesas y zonas", sub:"el salón", color:"#3B82F6",
+     icono:'<circle cx="12" cy="12" r="4"/><path d="M12 16v5M7 21h10M3 8h18"/>', card:'[data-set="mesas"]'},
+    {id:"equipo", nombre:"Equipo", sub:"quién entra y con qué clave", color:"#D6127F",
+     icono:'<circle cx="9" cy="8" r="3.4"/><path d="M3 20v-1.4A3.6 3.6 0 0 1 6.6 15h4.8a3.6 3.6 0 0 1 3.6 3.6V20"/><path d="M17 11h4M19 9v4"/>',
+     card:'[data-set="equipo"]', cuenta:()=>EQUIPO.filter(u=>u.activo!==false).length},
+    {id:"folios", nombre:"Folios", sub:"cómo se numeran", color:"#B26A00",
+     icono:'<path d="M4 7h16M4 12h16M4 17h10"/>', card:'[data-set="folios"]'},
+    {id:"respaldo", nombre:"Respaldo", sub:"bajar y restaurar", color:"#0E7C57",
+     icono:'<path d="M12 3v12"/><path d="M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
+     card:'[data-set="respaldo"]'},
+    {id:"pantalla", nombre:"Esta pantalla", sub:"impresora y estación", color:"#64748B",
+     icono:'<rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>', card:'[data-set="pantalla"]'}
+  ], "Ajustes");
+
+  registraLanzador("personal", [
+    {id:"reloj", nombre:"Reloj checador", sub:"entradas y salidas", color:"#0680AB",
+     icono:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>', card:'[data-per="reloj"]'},
+    {id:"horas", nombre:"Horas de hoy", sub:"quién está trabajando", color:"#0E7C57",
+     icono:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>', card:'[data-per="horas"]'},
+    {id:"retardos", nombre:"Retardos", sub:"y sus justificaciones", color:"#B26A00", visible:()=>esGerente(), destapa:true,
+     icono:'<path d="M12 3 2 20h20Z"/><path d="M12 9v5M12 17h.01"/>', card:'[data-per="retardos"]'},
+    {id:"exp", nombre:"Expedientes", sub:"los papeles de cada quien", color:"#8B5CF6", visible:()=>esGerente(), destapa:true,
+     icono:'<rect x="3" y="4" width="18" height="17" rx="2"/><circle cx="12" cy="11" r="2.4"/><path d="M8 18a4 4 0 0 1 8 0"/>',
+     card:'[data-per="exp"]', cuenta:()=>EQUIPO.length},
+    {id:"recibo", nombre:"Recibo de pago", sub:"por periodo", color:"#D6127F", visible:()=>esGerente(), destapa:true,
+     icono:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/>', card:'[data-per="recibo"]'}
+  ], "Personal");
+}
+
+/* ---------- temas ---------- */
+/* Las mismas dos paletas del cotizador. Papel es la clara: fondo crema en
+   vez de blanco puro, que en pantalla grande cansa menos. Las cuatro series
+   son las validadas con el script de dataviz. */
+const TEMAS_REST = {
+  tecno: {nombre:"Tecnología", muestra:["#0E1226","#D6127F","#22D3EE"], modo:"dark", vars:{
+    "--bg":"#0E1226","--surface":"#171C35","--surface-2":"#1E2442",
+    "--line":"#2F3660","--line-soft":"#252B4C",
+    "--ink":"#E8ECFB","--ink-2":"#A8B0D0","--ink-3":"#7C85A8",
+    "--accent":"#D6127F","--accent-soft":"#2B1430","--accent-ink":"#FFFFFF",
+    "--cyan":"#22D3EE","--cyan-soft":"#11283C","--good":"#34D399","--good-soft":"#0F2A24",
+    "--warn":"#FBBF24","--warn-soft":"#2E2512","--mal":"#F472B6",
+    "--barra-fondo":"rgba(14,18,38,.86)",
+    "--sombra":"0 1px 2px rgba(0,0,0,.5), 0 14px 34px -18px rgba(0,0,0,.9)"}},
+  papel: {nombre:"Papel", muestra:["#F6F4EF","#D2541F","#0E7C57"], modo:"light", vars:{
+    "--bg":"#F6F4EF","--surface":"#FFFFFF","--surface-2":"#F1EEE7",
+    "--line":"#E2DED4","--line-soft":"#EDEAE2",
+    "--ink":"#1C1A17","--ink-2":"#55514A","--ink-3":"#8A857B",
+    "--accent":"#D2541F","--accent-soft":"#FAEBE3","--accent-ink":"#FFFFFF",
+    "--cyan":"#0680AB","--cyan-soft":"#E2F0F7","--good":"#0E7C57","--good-soft":"#E2F1EB",
+    "--warn":"#B26A00","--warn-soft":"#F8EEDC","--mal":"#C62828",
+    "--barra-fondo":"rgba(255,255,255,.88)",
+    "--sombra":"0 1px 2px rgba(28,26,23,.06), 0 12px 28px -20px rgba(28,26,23,.30)"}}
+};
+const LS_TEMA_REST = "makersrest_tema";
+function temaRest(){ try{ return localStorage.getItem(LS_TEMA_REST) || "tecno"; }catch(e){ return "tecno"; } }
+function aplicaTemaRest(){
+  const k = temaRest(), t2 = TEMAS_REST[k] || TEMAS_REST.tecno;
+  const raiz = document.documentElement;
+  Object.keys(t2.vars).forEach(v=> raiz.style.setProperty(v, t2.vars[v]));
+  raiz.setAttribute("data-theme", t2.modo);
+  raiz.style.colorScheme = t2.modo;
+}
+function ponTemaRest(k){
+  try{ localStorage.setItem(LS_TEMA_REST, k); }catch(e){}
+  aplicaTemaRest(); pintaTemaRest();
+}
+function pintaTemaRest(){
+  const w = $("#temaFila"); if(!w) return;
+  const act = temaRest();
+  w.innerHTML = Object.keys(TEMAS_REST).map(k=>{
+    const t2 = TEMAS_REST[k];
+    return '<button type="button" class="temaCard" data-temarest="'+k+'" aria-pressed="'+(act===k)+'">' +
+      '<span class="temaMuestra">' + t2.muestra.map(c=>'<i style="background:'+c+'"></i>').join("") + '</span>' +
+      '<b>'+esc(t2.nombre)+'</b></button>';
+  }).join("");
+}
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-temarest]"); if(!b) return;
+  ponTemaRest(b.dataset.temarest);
+});
+
 function appsPorDefecto(){
   return [{id:"uber",  nombre:"Uber Eats",  comision:30, color:"#0DBF5B", activa:true},
           {id:"rappi", nombre:"Rappi",      comision:30, color:"#FF5A5F", activa:true},
@@ -1407,6 +1647,8 @@ let COMANDAS = lsGet("comandas", []);
 let TURNOS   = lsGet("turnos", []);
 let P        = Object.assign(paramsPorDefecto(), lsGet("P", {}));
 if(!Array.isArray(P.apps) || !P.apps.length) P.apps = appsPorDefecto();
+try{ aplicaTemaRest(); }catch(e){}
+try{ registraAzulejosRest(); }catch(e){}
 let EQUIPO      = lsGet("equipo", null) || equipoPorDefecto();
 let ASISTENCIAS = lsGet("asistencias", []);
 /* Esto NO va en P: no es de la cuenta, es de ESTA pantalla. La compu de la
@@ -1471,6 +1713,9 @@ function pintaTabs(){
   }).join("");
 }
 function vaA(k){
+  if(k === "set" || k === "personal"){
+    setTimeout(()=>{ try{ pintaLanzadorSec(k); reiniciaSec(k); }catch(e){} }, 0);
+  }
   if(!puedeVer(k) && k !== "comanda") k = PESTANAS.filter(p=>puedeVer(p.k))[0].k;
   if(k !== "comanda") comandaId = comandaId;   /* la comanda abierta se conserva */
   PESTANAS.concat([{k:"comanda"}]).forEach(p=>{
@@ -4621,7 +4866,7 @@ function pintaAppsEdit(){
   w.innerHTML = (P.apps||[]).map(a=>
     '<div class="appRen" style="grid-template-columns:auto 1fr 96px auto auto">' +
       '<input type="color" value="'+esc(a.color||"#888888")+'" data-appcolor="'+esc(a.id)+'" ' +
-        'style="width:34px;height:34px;padding:2px;border-radius:9px;border:1px solid var(--linea);background:var(--panel-2)">' +
+        'style="width:34px;height:34px;padding:2px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2)">' +
       '<input value="'+esc(a.nombre)+'" data-appnom="'+esc(a.id)+'" placeholder="Nombre de la plataforma">' +
       '<input type="number" min="0" max="100" step="0.5" value="'+num(a.comision)+'" data-appcom="'+esc(a.id)+'">' +
       '<span style="font-size:12.5px;color:var(--ink-3)">% de comisión</span>' +

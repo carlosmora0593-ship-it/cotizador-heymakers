@@ -2062,6 +2062,50 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
 @media (max-width:560px){ .maqTop{flex-wrap:wrap} .maqTop select{max-width:none;flex:1} }
 
 
+
+/* ---- fichas de cotización ---- */
+.cotFicha{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;
+  padding:15px 17px;border:1px solid var(--line);border-radius:var(--radio-sm,13px);
+  background:var(--surface);margin-bottom:10px;position:relative;
+  transition:border-color .16s,box-shadow .16s}
+.cotFicha:hover{border-color:var(--accent);box-shadow:var(--shadow)}
+.cotQue{min-width:0}
+.cotQue b{display:block;font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:15px;
+  line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cotQue small{display:block;font-size:11.5px;color:var(--ink-3);margin-top:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cotChips{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.cotChip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
+  border-radius:999px;padding:3px 10px;line-height:1.5;white-space:nowrap}
+.cotChip.pedido{background:var(--cyan-soft);color:var(--cyan)}
+.cotChip.vendida{background:var(--good-soft);color:var(--good)}
+.cotChip.porfact{background:var(--warn-soft);color:var(--warn)}
+.cotChip.facturada{background:var(--good-soft);color:var(--good)}
+.cotChip.debe{background:var(--guinda-tenue);color:var(--guinda-2)}
+.cotMonto{font-family:"IBM Plex Mono",monospace;font-size:18px;font-weight:600;
+  text-align:right;white-space:nowrap}
+.cotMonto i{display:block;font-style:normal;font-family:"Nunito Sans",sans-serif;font-size:10px;
+  font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-3);margin-top:4px}
+.cotAcc{display:flex;align-items:center;gap:8px}
+.cotMas{position:relative}
+.cotMasBtn{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink-2);cursor:pointer;font-size:17px;line-height:1;
+  display:grid;place-items:center}
+.cotMasBtn:hover{border-color:var(--accent);color:var(--accent)}
+.cotMenu{position:absolute;right:0;top:40px;z-index:40;min-width:186px;padding:6px;
+  border:1px solid var(--line);border-radius:13px;background:var(--surface);
+  box-shadow:0 18px 40px -20px rgba(0,0,0,.45)}
+.cotMenu button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;border:0;
+  background:transparent;color:inherit;font:inherit;font-size:13px;padding:9px 11px;
+  border-radius:9px;cursor:pointer}
+.cotMenu button:hover{background:var(--surface-2)}
+.cotMenu button.mal{color:var(--guinda-2)}
+.cotMenu hr{border:0;border-top:1px solid var(--line);margin:5px 2px}
+@media (max-width:720px){
+  .cotFicha{grid-template-columns:1fr auto;gap:10px}
+  .cotAcc{grid-column:1/-1;justify-content:flex-end}
+}
+
 /* ---- lanzador dentro de una sección ---- */
 .secLz{margin-top:20px}
 .secBarra{display:flex;align-items:center;gap:12px;margin:0 0 16px;flex-wrap:wrap}
@@ -3027,8 +3071,10 @@ body.rol-produccion #btnPrint{display:none!important}
 
 <!-- ============ GUARDADAS ============ -->
 <section id="tab-sav" hidden>
-  <div class="card" style="margin-top:20px">
-    <header><h2>Cotizaciones y pedidos</h2><span class="hint" id="savCount" style="margin-left:auto"></span><button class="btn sm" data-reporte="cotizaciones">Reporte Excel</button></header>
+  <div class="secBarra" id="bar_sav" hidden><button class="secVolver" data-secvolver="sav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Volver</button><span class="secMigas">Cotizaciones</span></div>
+  <div class="lanzador secLz" id="lz_sav"></div>
+  <div class="card secOculta" data-sav="lista" style="margin-top:20px">
+    <header><h2 id="savTitulo">Cotizaciones y pedidos</h2><span class="hint" id="savCount" style="margin-left:auto"></span><button class="btn sm" data-reporte="cotizaciones">Reporte Excel</button></header>
     <div class="body"><div class="saved" id="savedList"></div></div>
   </div>
 </section>
@@ -3058,7 +3104,9 @@ body.rol-produccion #btnPrint{display:none!important}
 
 <!-- ============ ARCHIVO ============ -->
 <section id="tab-arc" hidden>
-  <div class="card" style="margin-top:20px">
+  <div class="secBarra" id="bar_arc" hidden><button class="secVolver" data-secvolver="arc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Volver</button><span class="secMigas">Archivo</span></div>
+  <div class="lanzador secLz" id="lz_arc"></div>
+  <div class="card secOculta" data-arc="clientes" style="margin-top:20px">
     <header><h2>Archivo por cliente</h2>
       <span class="hint" id="arcResumen" style="margin-left:auto"></span>
       <button class="btn sm" data-reporte="archivo">Reporte Excel</button>
@@ -3072,7 +3120,7 @@ body.rol-produccion #btnPrint{display:none!important}
       <div id="arcLista"></div>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-arc="compras">
     <header><h2>Compras por mes</h2>
       <span class="hint" id="arcCompResumen" style="margin-left:auto"></span>
     </header>
@@ -3081,7 +3129,7 @@ body.rol-produccion #btnPrint{display:none!important}
       <div id="arcCompras"></div>
     </div>
   </div>
-  <div class="card" id="cardExp" data-solo-admin>
+  <div class="card secOculta" data-arc="exp" id="cardExp" data-solo-admin>
     <header><h2>Expedientes del personal</h2>
       <span class="hint" id="expResumen" style="margin-left:auto"></span>
       <button class="btn sm ghost" id="expCarpetas">Carpetas</button>
@@ -6748,7 +6796,11 @@ function lzIconoSvg(d){
 function pintaLanzadorSec(tab){
   const cfg = SEC_LZ[tab]; if(!cfg) return;
   const w = document.getElementById("lz_" + tab); if(!w) return;
-  w.innerHTML = cfg.tarjetas.map(t=>{
+  w.innerHTML = cfg.tarjetas.filter(t=>{
+    if(t.visible){ try{ return !!t.visible(); }catch(e){ return true; } }
+    if(!t.soloAdmin) return true;
+    return typeof rolActual !== "function" || rolActual() === "admin";
+  }).map(t=>{
     let n = "";
     try{ n = t.cuenta ? String(t.cuenta()) : ""; }catch(e){ n = ""; }
     return '<button class="lzApp" data-seclz="'+esc(tab)+'|'+esc(t.id)+'" style="--lzc:'+esc(t.color)+'">' +
@@ -6766,8 +6818,16 @@ function abreTarjetaSec(tab, id){
   const t = cfg.tarjetas.find(x=>x.id === id); if(!t) return;
   cfg.abierta = id;
   const sec = document.getElementById("tab-" + tab); if(!sec) return;
-  cfg.tarjetas.forEach(x=>{
-    sec.querySelectorAll(x.card).forEach(el=> el.classList.toggle("secOculta", x.id !== id));
+  /* Primero se tapa todo y luego se destapa la elegida. Con toggle en un
+     solo paso, varias tarjetas que comparten contenedor —como las de
+     Cotizaciones, que abren la misma lista filtrada— se tapaban entre
+     ellas segun el orden del arreglo. */
+  cfg.tarjetas.forEach(x=> sec.querySelectorAll(x.card).forEach(el=> el.classList.add("secOculta")));
+  sec.querySelectorAll(t.card).forEach(el=>{
+    el.classList.remove("secOculta");
+    /* Algunas tarjetas usan hidden para el rol. Si el azulejo se pinto es
+       porque al rol SI le toca, asi que al abrirla se destapa tambien. */
+    if(t.destapa) el.hidden = false;
   });
   const lz = document.getElementById("lz_" + tab); if(lz) lz.hidden = true;
   const barra = document.getElementById("bar_" + tab);
@@ -6801,6 +6861,51 @@ document.addEventListener("click", e=>{
   if(v){ cierraTarjetaSec(v.dataset.secvolver); return; }
 });
 
+
+/* Los azulejos del Archivo. Expedientes sólo lo ve el administrador, así
+   que su azulejo tampoco se pinta para los demás: ofrecer una puerta que
+   no abre es peor que no ofrecerla. */
+registraLanzador("arc", [
+  {id:"clientes", nombre:"Pedidos por cliente", sub:"carpeta de cada uno", color:"#0680AB",
+   icono:'<path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h4l2 2.5h9A1.5 1.5 0 0 1 21 10v8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18Z"/>',
+   card:'[data-arc="clientes"]', cuenta:()=>{
+     const s = new Set(); guardadas.forEach(g=>{ if((g.cliente||"").trim()) s.add(g.cliente.trim()); });
+     return s.size; },
+   alAbrir:()=>{ if(typeof renderArchivo === "function") renderArchivo(); }},
+  {id:"compras", nombre:"Compras por mes", sub:"PDF y XML del proveedor", color:"#B26A00",
+   icono:'<path d="M6 6h15l-1.6 9H7.6Z"/><path d="M6 6 5 3H2"/><circle cx="9" cy="19.5" r="1.4"/><circle cx="17.5" cy="19.5" r="1.4"/>',
+   card:'[data-arc="compras"]',
+   alAbrir:()=>{ if(typeof renderCompArchivo === "function") renderCompArchivo(); }},
+  {id:"exp", nombre:"Expedientes", sub:"papeles del personal", color:"#8B5CF6", soloAdmin:true,
+   icono:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 4V2.5M16 4V2.5"/><circle cx="12" cy="11" r="2.4"/><path d="M8 18a4 4 0 0 1 8 0"/>',
+   card:'[data-arc="exp"]',
+   alAbrir:()=>{ if(typeof renderExpedientes === "function") renderExpedientes(); }}
+], "Archivo");
+
+/* Los azulejos de Cotizaciones. Aquí no esconden tarjetas distintas: todas
+   abren la MISMA lista, filtrada. Por eso cada una fija el filtro al abrirse. */
+registraLanzador("sav", [
+  {id:"todas", nombre:"Todas", sub:"lo que has guardado", color:"#64748B",
+   icono:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/>',
+   card:'[data-sav="lista"]', cuenta:()=>savCuenta("todas"),
+   alAbrir:()=>{ savFiltro="todas"; renderSaved(); }},
+  {id:"cot", nombre:"Cotizaciones", sub:"todavía sin confirmar", color:"#0680AB",
+   icono:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>',
+   card:'[data-sav="lista"]', cuenta:()=>savCuenta("cot"),
+   alAbrir:()=>{ savFiltro="cot"; renderSaved(); }},
+  {id:"ped", nombre:"Pedidos", sub:"ya confirmados", color:"#D6127F",
+   icono:'<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>',
+   card:'[data-sav="lista"]', cuenta:()=>savCuenta("ped"),
+   alAbrir:()=>{ savFiltro="ped"; renderSaved(); }},
+  {id:"fac", nombre:"Facturas", sub:"emitidas y por emitir", color:"#B26A00",
+   icono:'<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2Z"/><path d="M9 8h6M9 12h6"/>',
+   card:'[data-sav="lista"]', cuenta:()=>savCuenta("fac"),
+   alAbrir:()=>{ savFiltro="fac"; renderSaved(); }},
+  {id:"cxc", nombre:"Por cobrar", sub:"vendido sin factura", color:"#0E7C57",
+   icono:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 12h.01M18 12h.01"/>',
+   card:'[data-sav="lista"]', cuenta:()=>savCuenta("cxc"),
+   alAbrir:()=>{ savFiltro="cxc"; renderSaved(); }}
+], "Cotizaciones");
 
 /* Los azulejos del Catálogo. El color es seña para encontrarlo sin leer,
    nunca un dato; cada uno lleva su nombre debajo. El número de la esquina es
@@ -7106,26 +7211,106 @@ $("#btnLlenarPrecios").addEventListener("click", ()=>{
 });
 
 /* ---------- guardadas ---------- */
-function renderSaved(){
-  $("#savCount").textContent = guardadas.length + " cotización(es)";
-  if(!guardadas.length){ $("#savedList").innerHTML = '<div class="empty">Aún no guardas cotizaciones. Arma una y presiona <b>Guardar</b>.</div>'; return; }
-  $("#savedList").innerHTML = guardadas.slice().reverse().map(g=>
-    '<div class="saved-item"><div class="meta"><b>'+esc(g.cliente||"Sin cliente")+'</b><small>'+esc(g.folio)+' · '+esc(g.fecha)+' · '+esc(g.ref||"")+' · '+
-      (()=>{ const r = calcDe(g); return r.qty+" pzas"+(r.varios ? " · "+r.partes.length+" artículos" : ""); })()+'</small></div>'+
-    (g.estado==="confirmada" && g.op ? '<span class="pill part">Pedido '+esc(g.op.folio)+'</span>' : '')+
-    (ventas.some(v=>v.folio===g.folio) ? '<span class="pill good">Vendida</span>' : '')+
-    (facturaDe(g) ? (facturaDe(g).estado==="facturada"
-        ? '<span class="pill good">Facturada</span>'
-        : '<span class="pill pend">Por facturar</span>') : '')+
-    '<span class="amt">'+mx(g._total||0)+'</span>'+
-    '<button class="btn sm" data-load="'+esc(g.folio)+'">Abrir</button>'+
-    (g.estado==="confirmada" && g.op ? '<button class="btn sm" data-verdoc-op="'+esc(g.folio)+'">Ver orden</button>' : '')+
-    (g.estado==="confirmada" && g.op ? '<button class="btn sm primary" data-avisar="'+esc(g.folio)+'|entrega" title="Avisarle que su pedido está listo">Avisar</button>' : '')+
-    '<button class="btn sm" data-enviar="'+esc(g.folio)+'">Enviar</button>'+
-    '<button class="btn sm" data-facturar="'+esc(g.folio)+'">Facturar</button>'+
-    '<button class="btn sm" data-cobrar="'+esc(g.folio)+'">Cobrar</button>'+
-    '<button class="btn sm icon" data-delcot="'+esc(g.folio)+'">✕</button></div>').join("");
+
+/* ---------- cotizaciones, pedidos, facturas y cobranza ---------- */
+let savFiltro = "todas";
+const SAV_ET = {todas:"Todas", cot:"Cotizaciones", ped:"Pedidos",
+                fac:"Facturas", cxc:"Por cobrar"};
+
+/* Dónde está cada cotización. Una sola función, para que el azulejo, el
+   contador y la ficha no puedan contar cosas distintas. */
+function estadoCot(g){
+  const esPedido  = g.estado === "confirmada" && !!g.op;
+  const vendida   = ventas.some(v=>v.folio === g.folio);
+  const f         = facturaDe(g);
+  const facturada = !!(f && f.estado === "facturada");
+  const porFact   = !!(f && f.estado !== "facturada");
+  return {esPedido, vendida, facturada, porFact};
 }
+function savPasa(g, filtro){
+  const e = estadoCot(g);
+  if(filtro === "cot") return !e.esPedido;
+  if(filtro === "ped") return e.esPedido;
+  if(filtro === "fac") return e.facturada || e.porFact;
+  if(filtro === "cxc") return e.vendida && !e.facturada;
+  return true;
+}
+function savCuenta(filtro){ return guardadas.filter(g=>savPasa(g, filtro)).length; }
+
+/* La acción que de verdad sigue. Un pedido listo se avisa; una cotización
+   sin mandar se envía; lo vendido se factura. Lo demás baja al menú. */
+function accionPrincipal(g){
+  const e = estadoCot(g);
+  if(e.esPedido && !e.vendida) return {et:"Avisar",  attr:'data-avisar="'+esc(g.folio)+'|entrega"',
+                                       ti:"Avisarle que su pedido está listo"};
+  if(e.vendida && !e.facturada) return {et:"Facturar", attr:'data-facturar="'+esc(g.folio)+'"', ti:""};
+  if(!e.esPedido) return {et:"Enviar", attr:'data-enviar="'+esc(g.folio)+'"', ti:"Mandársela al cliente"};
+  return {et:"Cobrar", attr:'data-cobrar="'+esc(g.folio)+'"', ti:""};
+}
+
+function renderSaved(){
+  const lista = guardadas.slice().reverse().filter(g=>savPasa(g, savFiltro));
+  const c = $("#savCount");
+  if(c) c.textContent = lista.length + " de " + guardadas.length;
+  const t = $("#savTitulo");
+  if(t) t.textContent = SAV_ET[savFiltro] || "Cotizaciones y pedidos";
+  if(typeof pintaLanzadorSec === "function") pintaLanzadorSec("sav");
+  const w = $("#savedList"); if(!w) return;
+  if(!guardadas.length){
+    w.innerHTML = '<div class="empty">Aún no guardas cotizaciones. Arma una y presiona <b>Guardar</b>.</div>';
+    return;
+  }
+  if(!lista.length){
+    w.innerHTML = '<div class="empty">Nada en «'+esc(SAV_ET[savFiltro]||"")+'» por ahora.</div>';
+    return;
+  }
+  w.innerHTML = lista.map(g=>{
+    const e = estadoCot(g);
+    const r = calcDe(g);
+    const chips =
+      (e.esPedido  ? '<span class="cotChip pedido">Pedido '+esc(g.op.folio)+'</span>' : '') +
+      (e.vendida   ? '<span class="cotChip vendida">Vendida</span>' : '') +
+      (e.facturada ? '<span class="cotChip facturada">Facturada</span>' :
+       e.porFact   ? '<span class="cotChip porfact">Por facturar</span>' : '');
+    const a = accionPrincipal(g);
+    return '<div class="cotFicha">' +
+      '<div class="cotQue"><b>'+esc(g.cliente||"Sin cliente")+'</b>' +
+        '<small>'+esc(g.folio)+' · '+esc(g.fecha)+(g.ref? ' · '+esc(g.ref) : '')+' · ' +
+          r.qty+' pzas'+(r.varios ? ' · '+r.partes.length+' artículos' : '')+'</small>' +
+        (chips ? '<div class="cotChips">'+chips+'</div>' : '') + '</div>' +
+      '<div class="cotMonto">'+mx(g._total||0)+'<i>total</i></div>' +
+      '<div class="cotAcc">' +
+        '<button class="btn sm" data-load="'+esc(g.folio)+'">Abrir</button>' +
+        '<button class="btn sm primary" '+a.attr+(a.ti?' title="'+esc(a.ti)+'"':'')+'>'+esc(a.et)+'</button>' +
+        '<span class="cotMas"><button class="cotMasBtn" data-cotmas="'+esc(g.folio)+'" ' +
+          'aria-label="Más opciones">&#8943;</button></span>' +
+      '</div></div>';
+  }).join("");
+}
+
+/* El menú de los tres puntos. Se arma al abrirlo y no antes: así nunca
+   ofrece «Ver orden» de un pedido que todavía no existe. */
+function cierraMenusCot(){ document.querySelectorAll(".cotMenu").forEach(m=>m.remove()); }
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-cotmas]");
+  if(!b){ if(!e.target.closest(".cotMenu")) cierraMenusCot(); return; }
+  const folio = b.dataset.cotmas;
+  const abierto = b.parentElement.querySelector(".cotMenu");
+  cierraMenusCot();
+  if(abierto) return;
+  const g = guardadas.find(x=>x.folio === folio); if(!g) return;
+  const e2 = estadoCot(g);
+  const m = document.createElement("div");
+  m.className = "cotMenu";
+  m.innerHTML =
+    (e2.esPedido ? '<button data-verdoc-op="'+esc(folio)+'">Ver la orden</button>' : '') +
+    '<button data-enviar="'+esc(folio)+'">Enviar al cliente</button>' +
+    '<button data-facturar="'+esc(folio)+'">Facturar</button>' +
+    '<button data-cobrar="'+esc(folio)+'">Cobrar</button>' +
+    (e2.esPedido ? '<button data-avisar="'+esc(folio)+'|entrega">Avisar que está lista</button>' : '') +
+    '<hr><button class="mal" data-delcot="'+esc(folio)+'">Borrar</button>';
+  b.parentElement.appendChild(m);
+});
 
 /* ---------- ajustes ---------- */
 function renderSet(){
@@ -7433,6 +7618,8 @@ $("#tabs").addEventListener("click", e=>{
   if(b.dataset.tab==="inv") renderInvTaller();
   if(b.dataset.tab==="com") renderSolicitudesCompras();
   if(b.dataset.tab==="cat"){ renderCatalogo(); reiniciaSec("cat"); }
+  if(b.dataset.tab==="sav"){ renderSaved(); reiniciaSec("sav"); }
+  if(b.dataset.tab==="arc") reiniciaSec("arc");
   if(b.dataset.tab==="calc") renderMaquinas();
   if(b.dataset.tab==="calc") renderCalc();
   if(b.dataset.tab==="com"){ renderCompras(); renderProveedores(); }
@@ -16506,7 +16693,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261019-1608"></script>
-<script src="diagnostico.js?v=20261019-1608"></script>
+<script src="cuenta.js?v=20261019-1638"></script>
+<script src="diagnostico.js?v=20261019-1638"></script>
 </body>
 </html>
