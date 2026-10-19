@@ -2061,6 +2061,21 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
   border-left:2px solid var(--line)}
 @media (max-width:560px){ .maqTop{flex-wrap:wrap} .maqTop select{max-width:none;flex:1} }
 
+
+/* ---- lanzador dentro de una sección ---- */
+.secLz{margin-top:20px}
+.secBarra{display:flex;align-items:center;gap:12px;margin:0 0 16px;flex-wrap:wrap}
+.secBarra h2{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:20px;margin:0}
+.secBarra .sub{font-size:12.5px;color:var(--ink-3)}
+.secVolver{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink-2);border-radius:999px;padding:7px 14px;
+  cursor:pointer;font:inherit;font-size:13px;transition:border-color .16s,color .16s}
+.secVolver:hover{border-color:var(--accent);color:var(--accent)}
+.secVolver svg{width:15px;height:15px}
+.secMigas{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-3)}
+.secMigas b{color:var(--ink);font-weight:600}
+.secOculta{display:none!important}
+
 /* ---- lanzador de aplicaciones ---- */
 .inicioSeg{display:flex;justify-content:flex-end;margin:0 0 14px}
 .lanzador{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:14px;
@@ -2071,6 +2086,10 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
   color:inherit;text-align:center;transition:background .16s,border-color .16s,transform .12s}
 .lzApp:hover,.lzApp:focus-visible{background:var(--surface-2);border-color:var(--line);
   transform:translateY(-2px);outline:none}
+[data-theme="light"] .lzIco{background:color-mix(in oklab, var(--lzc) 13%, #fff);
+  border-color:color-mix(in oklab, var(--lzc) 30%, #fff)}
+[data-theme="light"] .lzApp:hover .lzIco{background:color-mix(in oklab, var(--lzc) 20%, #fff)}
+[data-theme="light"] .lzN{background:#fff}
 .lzIco{position:relative;display:grid;place-items:center;width:60px;height:60px;border-radius:17px;
   background:color-mix(in oklab, var(--lzc) 20%, transparent);
   border:1px solid color-mix(in oklab, var(--lzc) 38%, transparent);
@@ -2830,7 +2849,9 @@ body.rol-produccion #btnPrint{display:none!important}
 
 <!-- ============ CATÁLOGO ============ -->
 <section id="tab-cat" hidden>
-  <div class="card" style="margin-top:20px">
+  <div class="secBarra" id="bar_cat" hidden><button class="secVolver" data-secvolver="cat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Volver</button><span class="secMigas">Catálogo</span></div>
+  <div class="lanzador secLz" id="lz_cat"></div>
+  <div class="card secOculta" data-cat="articulos" style="margin-top:20px">
     <header><h2>Artículos</h2>
       <span class="hint" id="catEstado" style="margin-left:auto"></span>
       <button class="btn sm primary" id="catActualizar">Actualizar</button>
@@ -2856,7 +2877,7 @@ body.rol-produccion #btnPrint{display:none!important}
 
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-cat="tecnicas">
     <header><h2>Técnicas de decorado</h2><button class="btn sm ghost" data-add="tecnicas" style="margin-left:auto">+ Técnica</button></header>
     <div class="body">
       <p class="note" style="margin:0 0 12px">Cada técnica enseña nada más lo suyo. La <b>mano de obra</b> es lo que te cuesta prensar, acomodar y revisar <i>una</i> aplicación, y aplica siempre. Si la técnica tiene un <b>material amarrado</b> arriba, el material lo calcula el armado con lo que de verdad se gasta del rollo y aquí ya no aparece el cobro por cm². Si no lo tiene, el cm² sigue de respaldo. Serigrafía cobra por tinta y bordado por puntada, que es como de verdad se miden. El <b>setup</b> se cobra una sola vez por pedido.</p>
@@ -2867,26 +2888,26 @@ body.rol-produccion #btnPrint{display:none!important}
       <div id="t_tecnicas"></div>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-cat="servicios">
     <header><h2>Servicios y material por medida</h2><button class="btn sm ghost" data-add="servicios" style="margin-left:auto">+ Servicio</button></header>
     <div class="body">
       <p class="note" style="margin:0 0 12px">Aquí va lo que no se cobra por pieza sino <b>por medida</b>: la maquila de DTF, la lona, el vinil, el papel. La <b>unidad</b> es cómo lo vendes — <b>ml</b> es metro lineal (todo el ancho del rollo por un metro de largo) y <b>m²</b> es metro cuadrado. La <b>técnica</b> amarra el material con la técnica que lo usa, para que el armado proponga el correcto y no te ofrezca lona cuando estás imprimiendo playeras. El <b>mínimo</b> es lo menos que puedes cobrar y el <b>incremento</b> es tu escalón de venta: si cobras de diez en diez centímetros, pon 0.1. La <b>separación</b> entre piezas y la <b>orilla</b> de los bordes son lo que hace que el armado te dé un número de verdad y no uno de pizarrón. El <b>gramaje</b> es opcional y sólo sirve para calcular el peso.</p>
       <div class="tbl-wrap"><table id="t_servicios"></table></div>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-cat="tamanos">
     <header><h2>Tamaños de impresión</h2><button class="btn sm ghost" data-add="tamanos" style="margin-left:auto">+ Tamaño</button></header>
     <div class="body"><div class="tbl-wrap"><table id="t_tamanos"></table></div></div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-cat="escalas">
     <header><h2>Escalas de volumen</h2><button class="btn sm ghost" data-add="volumen" style="margin-left:auto">+ Escala</button></header>
     <div class="body"><div class="tbl-wrap"><table id="t_volumen"></table></div></div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-cat="extras">
     <header><h2>Cargos extra predefinidos</h2><button class="btn sm ghost" data-add="extras" style="margin-left:auto">+ Cargo</button></header>
     <div class="body"><div class="tbl-wrap"><table id="t_extras"></table></div></div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-cat="inv">
     <header><h2>Inventario</h2>
       <span class="hint" id="invResumen" style="margin-left:auto"></span>
       <button class="btn sm" data-reporte="inventario">Reporte Excel</button>
@@ -2920,7 +2941,7 @@ body.rol-produccion #btnPrint{display:none!important}
     </div>
   </div>
 
-  <div class="card" id="cardInsumos">
+  <div class="card secOculta" data-cat="insumos" id="cardInsumos">
     <header><h2>Consumibles</h2>
       <span class="hint">lo que se gasta al producir</span>
       <button class="btn sm ghost" id="insNuevo" style="margin-left:auto">+ Consumible</button></header>
@@ -2932,7 +2953,7 @@ body.rol-produccion #btnPrint{display:none!important}
     </div>
   </div>
 
-  <div class="card" id="cardConsumos">
+  <div class="card secOculta" data-cat="consumos" id="cardConsumos">
     <header><h2>Qué gasta cada cosa</h2>
       <span class="hint" id="consHint"></span></header>
     <div class="body">
@@ -2947,7 +2968,7 @@ body.rol-produccion #btnPrint{display:none!important}
       <div id="consCuerpo"></div>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-cat="hist">
     <header><h2>Historial de cambios de precio</h2><button class="btn sm ghost" id="clearHist" style="margin-left:auto">Vaciar</button></header>
     <div class="body"><div class="tbl-wrap"><table id="t_hist"></table></div></div>
   </div>
@@ -4274,6 +4295,20 @@ const TEMAS = {
     "--guinda-tenue":"#2B1430", "--guinda-medio":"#3E1A42",
     "--serie-1":"#0F9AB8", "--serie-2":"#D6127F", "--serie-3":"#BC8417", "--serie-4":"#17A179",
     "--shadow":"0 1px 2px rgba(0,0,0,.5), 0 14px 34px -18px rgba(0,0,0,.9)"
+  }},
+  papel:    {nombre:"Papel",       acento:"#D2541F", amb:["#D2541F","#B26A00","#0E7C57"],
+             modo:"light", vars:{
+    "--bg":"#F6F4EF", "--surface":"#FFFFFF", "--surface-2":"#F1EEE7",
+    "--line":"#E2DED4", "--line-soft":"#EDEAE2",
+    "--ink":"#1C1A17", "--ink-2":"#55514A", "--ink-3":"#8A857B",
+    "--cyan":"#0680AB", "--cyan-soft":"#E2F0F7",
+    "--good":"#0E7C57", "--good-soft":"#E2F1EB",
+    "--warn":"#B26A00", "--warn-soft":"#F8EEDC",
+    "--yellow":"#E3B505", "--yellow-ink":"#231A00",
+    "--guinda":"#D2541F", "--guinda-2":"#A93D11",
+    "--guinda-tenue":"#FAEBE3", "--guinda-medio":"#F3D6C7",
+    "--serie-1":"#0680AB", "--serie-2":"#D6127F", "--serie-3":"#B26A00", "--serie-4":"#0E7C57",
+    "--shadow":"0 1px 2px rgba(28,26,23,.06), 0 12px 28px -20px rgba(28,26,23,.30)"
   }},
   heymakers:{nombre:"Hey Makers", acento:"#D6127F", amb:["#06A1D7","#F51B95","#FFEC30"]},
   guinda:   {nombre:"Guinda",     acento:"#A81B4A", amb:["#7A1231","#C4295C","#E8B9CA"]},
@@ -6698,6 +6733,111 @@ function renderTecnicas(){
   }).join("");
 }
 
+/* ============ LANZADOR DE SECCIONES ============ */
+/* Una sección declara sus tarjetas; esto hace el resto. */
+const SEC_LZ = {};
+
+/* cada tarjeta: {id, nombre, sub, color, icono, cuenta:fn, card:selector} */
+function registraLanzador(tab, tarjetas, titulo, sub){
+  SEC_LZ[tab] = {tarjetas, titulo, sub, abierta:null};
+}
+function lzIconoSvg(d){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+}
+function pintaLanzadorSec(tab){
+  const cfg = SEC_LZ[tab]; if(!cfg) return;
+  const w = document.getElementById("lz_" + tab); if(!w) return;
+  w.innerHTML = cfg.tarjetas.map(t=>{
+    let n = "";
+    try{ n = t.cuenta ? String(t.cuenta()) : ""; }catch(e){ n = ""; }
+    return '<button class="lzApp" data-seclz="'+esc(tab)+'|'+esc(t.id)+'" style="--lzc:'+esc(t.color)+'">' +
+      '<span class="lzIco">' + lzIconoSvg(t.icono) +
+        (n !== "" ? '<i class="lzN">'+esc(n)+'</i>' : '') + '</span>' +
+      '<span class="lzEt">'+esc(t.nombre)+'</span>' +
+      '<span class="lzSub">'+esc(t.sub||"")+'</span></button>';
+  }).join("");
+}
+/* Abrir una tarjeta: se esconden las demás y aparece la barra de volver.
+   No se borra nada del DOM — se esconde — porque los render de siempre
+   siguen escribiendo en esas tablas aunque no se vean. */
+function abreTarjetaSec(tab, id){
+  const cfg = SEC_LZ[tab]; if(!cfg) return;
+  const t = cfg.tarjetas.find(x=>x.id === id); if(!t) return;
+  cfg.abierta = id;
+  const sec = document.getElementById("tab-" + tab); if(!sec) return;
+  cfg.tarjetas.forEach(x=>{
+    sec.querySelectorAll(x.card).forEach(el=> el.classList.toggle("secOculta", x.id !== id));
+  });
+  const lz = document.getElementById("lz_" + tab); if(lz) lz.hidden = true;
+  const barra = document.getElementById("bar_" + tab);
+  if(barra){
+    barra.hidden = false;
+    barra.querySelector(".secMigas").innerHTML =
+      esc(cfg.titulo) + ' <span aria-hidden="true">›</span> <b>' + esc(t.nombre) + '</b>';
+  }
+  if(t.alAbrir) try{ t.alAbrir(); }catch(e){}
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+function cierraTarjetaSec(tab){
+  const cfg = SEC_LZ[tab]; if(!cfg) return;
+  cfg.abierta = null;
+  const sec = document.getElementById("tab-" + tab); if(!sec) return;
+  cfg.tarjetas.forEach(x=> sec.querySelectorAll(x.card).forEach(el=> el.classList.add("secOculta")));
+  const lz = document.getElementById("lz_" + tab); if(lz) lz.hidden = false;
+  const barra = document.getElementById("bar_" + tab); if(barra) barra.hidden = true;
+  pintaLanzadorSec(tab);
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+/* Al entrar a la sección siempre se ve el lanzador, no lo último que se
+   abrió: entrar al Catálogo y caer en «Escalas de volumen» desorienta. */
+function reiniciaSec(tab){
+  if(SEC_LZ[tab]) cierraTarjetaSec(tab);
+}
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-seclz]");
+  if(b){ const [tab, id] = b.dataset.seclz.split("|"); abreTarjetaSec(tab, id); return; }
+  const v = e.target.closest("[data-secvolver]");
+  if(v){ cierraTarjetaSec(v.dataset.secvolver); return; }
+});
+
+
+/* Los azulejos del Catálogo. El color es seña para encontrarlo sin leer,
+   nunca un dato; cada uno lleva su nombre debajo. El número de la esquina es
+   cuántos hay, que es lo que de verdad se quiere saber antes de entrar. */
+registraLanzador("cat", [
+  {id:"articulos", nombre:"Artículos", sub:"lo que vendes", color:"#06B6D4",
+   icono:'<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0l-7.2-7.2a2 2 0 0 1-.6-1.4V4.4A1.4 1.4 0 0 1 4.4 3h7.6a2 2 0 0 1 1.4.6l7.2 7.2a2 2 0 0 1 0 2.6Z"/><circle cx="7.5" cy="7.5" r="1.3"/>',
+   card:'[data-cat="articulos"]', cuenta:()=>(cat.articulos||[]).length},
+  {id:"tecnicas", nombre:"Técnicas", sub:"cómo se decora", color:"#D6127F",
+   icono:'<path d="M3 21h4l11-11a2.8 2.8 0 0 0-4-4L3 17Z"/><path d="M14.5 6.5 17.5 9.5"/>',
+   card:'[data-cat="tecnicas"]', cuenta:()=>(cat.tecnicas||[]).length},
+  {id:"servicios", nombre:"Materiales", sub:"rollos y por medida", color:"#A855F7",
+   icono:'<rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 7V5M12 7V5M17 7V5M7 19v-2M12 19v-2M17 19v-2"/>',
+   card:'[data-cat="servicios"]', cuenta:()=>(cat.servicios||[]).length},
+  {id:"tamanos", nombre:"Tamaños", sub:"medidas de impresión", color:"#3B82F6",
+   icono:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h5M3 15h5M9 3v5M15 3v5"/>',
+   card:'[data-cat="tamanos"]', cuenta:()=>(cat.tamanos||[]).length},
+  {id:"escalas", nombre:"Escalas", sub:"descuento por volumen", color:"#10B981",
+   icono:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+   card:'[data-cat="escalas"]', cuenta:()=>(cat.volumen||[]).length},
+  {id:"extras", nombre:"Cargos extra", sub:"urgencia, empaque", color:"#F59E0B",
+   icono:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+   card:'[data-cat="extras"]', cuenta:()=>(cat.extras||[]).length},
+  {id:"insumos", nombre:"Consumibles", sub:"tinta, polvo, hilo", color:"#14B8A6",
+   icono:'<path d="M12 3s6 6.4 6 10a6 6 0 0 1-12 0c0-3.6 6-10 6-10Z"/>',
+   card:'[data-cat="insumos"]', cuenta:()=>(cat.insumos||[]).length},
+  {id:"consumos", nombre:"Qué gasta cada cosa", sub:"los amarres", color:"#8B5CF6",
+   icono:'<path d="M9.5 14.5 14.5 9.5"/><path d="M7.8 11.2 6 13a3.5 3.5 0 0 0 5 5l1.8-1.8"/><path d="M16.2 12.8 18 11a3.5 3.5 0 0 0-5-5l-1.8 1.8"/>',
+   card:'[data-cat="consumos"]', cuenta:()=>(cat.consumos||[]).length},
+  {id:"inv", nombre:"Existencias", sub:"mover inventario", color:"#22C55E",
+   icono:'<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>',
+   card:'[data-cat="inv"]', cuenta:()=>(cat.articulos||[]).filter(a=>num(a.existencia)!==0).length},
+  {id:"hist", nombre:"Historial", sub:"cambios de precio", color:"#64748B",
+   icono:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+   card:'[data-cat="hist"]', cuenta:()=>(cat.historial||[]).length}
+], "Catálogo");
+
 function renderCatalogo(){
   normalizaCat();
   normalizaCalc();
@@ -6707,6 +6847,7 @@ function renderCatalogo(){
   Object.keys(COLS).forEach(renderTabla);
   catqPintaPie();
   renderInsumos(); renderConsumos();
+  pintaLanzadorSec("cat");
   renderInventario();
   const cats = [...new Set(cat.articulos.map(a=>a.cat||"Otros"))];
   $("#bulk_cat").innerHTML = '<option value="">Todas las categorías</option>' + cats.map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join("");
@@ -7291,7 +7432,7 @@ $("#tabs").addEventListener("click", e=>{
   if(b.dataset.tab==="inicio") renderTablero();
   if(b.dataset.tab==="inv") renderInvTaller();
   if(b.dataset.tab==="com") renderSolicitudesCompras();
-  if(b.dataset.tab==="cat") renderCatalogo();
+  if(b.dataset.tab==="cat"){ renderCatalogo(); reiniciaSec("cat"); }
   if(b.dataset.tab==="calc") renderMaquinas();
   if(b.dataset.tab==="calc") renderCalc();
   if(b.dataset.tab==="com"){ renderCompras(); renderProveedores(); }
@@ -11471,6 +11612,7 @@ $("#maqLista").addEventListener("click", e=>{
   cat.maquinas = maquinas().filter(x=>x.id!==m.id);
   persist(); renderMaquinas(); renderTecnicas(); refrescaCostos();
 });
+
 
 
 /* ====================== el lanzador de aplicaciones ====================== */
@@ -16364,7 +16506,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261019-1554"></script>
-<script src="diagnostico.js?v=20261019-1554"></script>
+<script src="cuenta.js?v=20261019-1608"></script>
+<script src="diagnostico.js?v=20261019-1608"></script>
 </body>
 </html>
