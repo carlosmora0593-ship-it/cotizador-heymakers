@@ -887,10 +887,13 @@ function vaA(pestana, ancla){
   const b = document.querySelector('#tabs [data-tab="' + pestana + '"]');
   if(!b){ alert("Esa sección no está disponible con tu plan o tu rol."); return; }
   b.click();
+  /* Las secciones con azulejos nacen tapadas: hay que abrir la tarjeta
+     que contiene el ancla antes de bajar a ella. */
+  if(ancla) try{ if(typeof window.abrePorAncla === "function") window.abrePorAncla(ancla); }catch(e){}
   if(ancla) setTimeout(()=>{
     const el = q(ancla);
     if(el) el.scrollIntoView({behavior:"smooth", block:"center"});
-  }, 260);
+  }, 320);
 }
 const btnEquipo = q("#btnEquipo");
 if(btnEquipo) btnEquipo.addEventListener("click", ()=> vaA("set", "#equipoCaja"));

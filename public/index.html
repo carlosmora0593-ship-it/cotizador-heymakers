@@ -2150,6 +2150,37 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
   .cotAcc{grid-column:1/-1;justify-content:flex-end}
 }
 
+/* ---- asistente de arranque ---- */
+#arranque{z-index:95}
+#arranque>.card{width:min(860px,96vw);max-width:none}
+.arrPasos{display:flex;gap:6px;margin-left:auto}
+.arrPasos i{width:26px;height:4px;border-radius:999px;background:var(--line);display:block}
+.arrPasos i.on{background:var(--accent)}
+.arrIntro{color:var(--ink-2);font-size:13.5px;margin:0 0 16px;max-width:62ch}
+.arrRej{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:10px}
+.arrOpc{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;
+  border:1.5px solid var(--line);background:var(--surface-2);border-radius:14px;
+  padding:13px 13px 14px;cursor:pointer;font:inherit;color:var(--ink);
+  transition:border-color .15s,background .15s,transform .1s}
+.arrOpc:hover{border-color:var(--accent);transform:translateY(-1px)}
+.arrOpc .arrIco{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  background:color-mix(in srgb, var(--arrc) 20%, transparent);color:var(--arrc);margin-bottom:2px}
+.arrOpc .arrIco svg{width:19px;height:19px}
+.arrOpc b{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:14px;line-height:1.2}
+.arrOpc small{color:var(--ink-3);font-size:11.5px;line-height:1.35}
+.arrOpc[aria-pressed="true"]{border-color:var(--arrc);background:color-mix(in srgb, var(--arrc) 11%, var(--surface-2))}
+.arrOpc .arrTic{position:absolute;opacity:0}
+.arrOpc[aria-pressed="true"] .arrIco::after{content:"";position:absolute;margin:-26px 0 0 26px;
+  width:15px;height:15px;border-radius:50%;background:var(--arrc);
+  box-shadow:0 0 0 2px var(--surface-2)}
+.arrPie{display:flex;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+.arrPie .cuenta{color:var(--ink-3);font-size:12.5px;margin-right:auto}
+.arrResumen{display:grid;gap:8px;margin:0 0 16px}
+.arrResumen div{display:flex;align-items:baseline;gap:10px;border:1px solid var(--line);
+  border-radius:12px;padding:11px 14px;background:var(--surface-2)}
+.arrResumen b{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:22px;min-width:44px}
+.arrResumen span{color:var(--ink-2);font-size:13px}
+@media(max-width:620px){ .arrRej{grid-template-columns:repeat(auto-fill,minmax(145px,1fr))} }
 /* ---- lanzador dentro de una sección ---- */
 .secLz{margin-top:20px}
 .secBarra{display:flex;align-items:center;gap:12px;margin:0 0 16px;flex-wrap:wrap}
@@ -3249,7 +3280,7 @@ body.rol-produccion #btnPrint{display:none!important}
       <div id="comSolicitudes"></div>
     </div>
   </div>
-  <div class="card secOculta" data-com="prov">
+  <div class="card secOculta" data-com="prov" id="cardProv">
     <header><h2>Proveedores</h2><button class="btn sm ghost" id="pvNuevo" style="margin-left:auto">+ Proveedor</button></header>
     <div class="body">
       <div class="tbl-wrap"><table id="t_proveedores"></table></div>
@@ -3480,7 +3511,9 @@ body.rol-produccion #btnPrint{display:none!important}
 </section>
 
 <section id="tab-set" hidden>
-  <div class="card" style="margin-top:20px">
+  <div class="secBarra" id="bar_set" hidden><button class="secVolver" data-secvolver="set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Volver</button><span class="secMigas">Ajustes</span></div>
+  <div class="lanzador secLz" id="lz_set"></div>
+  <div class="card secOculta" data-set="precio" style="margin-top:20px">
     <header><h2>Parámetros de precio</h2></header>
     <div class="body">
       <div class="grid g2" style="margin-bottom:14px">
@@ -3527,7 +3560,7 @@ body.rol-produccion #btnPrint{display:none!important}
       </div>
     </div>
   </div>
-  <div class="card" data-solo-admin>
+  <div class="card secOculta" data-set="permisos" data-solo-admin>
     <header><h2>Equipo y permisos</h2><button class="btn sm ghost" id="userNuevo" style="margin-left:auto">+ Persona</button></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px"><b>Administrador:</b> todo.&nbsp; <b>Ventas:</b> cotiza, confirma pedidos, clientes y consulta el catálogo sin poder editarlo; no ve caja ni utilidades.&nbsp; <b>Producción:</b> solo el tablero de órdenes, donde mueve el estatus y revisa los diseños; no ve precios.</p>
@@ -3536,7 +3569,7 @@ body.rol-produccion #btnPrint{display:none!important}
 
     </div>
   </div>
-  <div class="card" data-solo-admin>
+  <div class="card secOculta" data-set="folios" data-solo-admin>
     <header><h2>Folios</h2><span class="hint">las letras de tu taller en cada documento</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Escoge <b>tres letras</b> y todos los documentos nuevos las llevan:
@@ -3567,7 +3600,7 @@ body.rol-produccion #btnPrint{display:none!important}
       </div>
     </div>
   </div>
-  <div class="card" data-solo-admin>
+  <div class="card secOculta" data-set="claves" data-solo-admin>
     <header><h2>Claves y bloqueo</h2><span class="hint">va incluido en todos los planes</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 6px">La clave de cada persona sirve para tres cosas: que nadie entre por
@@ -3599,7 +3632,7 @@ body.rol-produccion #btnPrint{display:none!important}
         tu dominio.</p>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-set="cobro">
     <header><h2>Cómo se cobra la impresión</h2><span class="hint">el material por un lado y la mano de obra por otro</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Las técnicas que se miden por rollo — DTF, vinil, sublimación — ya no cobran por centímetro cuadrado. El <b>material</b> lo calcula el armado con lo que de verdad se gasta del rollo, y aquí capturas la <b>mano de obra</b>: lo que te cuesta prensar, acomodar y revisar una pieza. Serigrafía y bordado no aparecen aquí porque su cobro por tinta y por puntada ya mide lo correcto.</p>
@@ -3612,7 +3645,7 @@ body.rol-produccion #btnPrint{display:none!important}
       </div>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-set="tema">
     <header><h2>Apariencia</h2><span class="hint">se guarda en este navegador, para ti</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">El color de tu taller, como tú lo quieras ver. Lo que elijas aquí vale para ti — cada quien en el equipo puede tener el suyo sin cambiárselo a los demás.</p>
@@ -3639,7 +3672,7 @@ body.rol-produccion #btnPrint{display:none!important}
     </div>
   </div>
   
-  <div class="card" data-solo-admin>
+  <div class="card secOculta" data-set="altas" data-solo-admin>
     <header><h2>Equipo</h2><span class="hint">quién entra y qué puede hacer</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px"><b>Administrador:</b> todo, incluidos caja, ventas, compras y ajustes.
@@ -3660,7 +3693,7 @@ body.rol-produccion #btnPrint{display:none!important}
       <p class="hint" id="equipoNota" hidden style="margin-top:10px"></p>
     </div>
   </div>
-  <div class="card">
+  <div class="card secOculta" data-set="empresa">
     <header><h2>Datos de tu empresa</h2><span class="hint">aparecen en la cotización impresa</span></header>
     <div class="body">
       <div class="grid g4">
@@ -3688,7 +3721,7 @@ body.rol-produccion #btnPrint{display:none!important}
     </div>
   </div>
 
-  <div class="card" id="cardFiscal">
+  <div class="card secOculta" data-set="fiscal" id="cardFiscal">
     <header><h2>Datos fiscales y domicilio</h2><span class="hint">con los que emites tus facturas</span></header>
     <div class="body">
       <p class="note" id="fiscalCandado" hidden></p>
@@ -3727,7 +3760,7 @@ body.rol-produccion #btnPrint{display:none!important}
     </div>
   </div>
 
-  <div class="card" id="cardTimbrado">
+  <div class="card secOculta" data-set="timbrado" id="cardTimbrado">
     <header><h2>Facturación electrónica</h2><span class="hint">cómo se timbran tus facturas</span></header>
     <div class="body">
       <p class="note" id="timbradoCandado" hidden></p>
@@ -3948,6 +3981,23 @@ body.rol-produccion #btnPrint{display:none!important}
   </div>
 </div>
 
+<div class="modal" id="arranque" hidden>
+  <div class="card">
+    <header>
+      <h2 id="arrTitulo">Vamos a dejar tu taller listo</h2>
+      <span class="arrPasos" id="arrPasos" aria-hidden="true"></span>
+    </header>
+    <div class="body">
+      <p class="arrIntro" id="arrIntro"></p>
+      <div id="arrCuerpo"></div>
+      <div class="arrPie">
+        <span class="cuenta" id="arrCuenta"></span>
+        <button class="btn ghost" id="arrAtras">Atrás</button>
+        <button class="btn primary" id="arrSig">Continuar</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal" id="modalPlanes" hidden>
   <div class="card planesCard">
     <header><h2>Mi plan</h2>
@@ -4909,7 +4959,13 @@ let _catSembrado = false;
 function normalizaCat(){
   const d = defaults();
   Object.keys(d).forEach(k=>{ if(cat[k]===undefined){ cat[k] = d[k]; _catSembrado = true; } });
-  if(!Array.isArray(cat.servicios) || !cat.servicios.length){ cat.servicios = d.servicios; _catSembrado = true; }
+  /* Un taller que sólo borda se queda sin materiales por medida, y eso
+     está bien: si ya pasó por el asistente, vacío es una respuesta, no un
+     catálogo a medio sembrar. */
+  const yaEligio = !!(cat.arranque && cat.arranque.hecho);
+  if(!Array.isArray(cat.servicios) || (!cat.servicios.length && !yaEligio)){
+    cat.servicios = d.servicios; _catSembrado = true;
+  }
   cat.servicios.forEach(s=>{
     if(!s.unidad) s.unidad = "ml";
     if(s.ancho==null)      s.ancho = 60;
@@ -5910,7 +5966,7 @@ function renderApps(){
   if(!cot.apps.length){ w.innerHTML = '<div class="empty">Sin aplicaciones. Agrega al menos una ubicación (frente, espalda, manga, taza…) con su técnica.</div>'; return; }
   const r = calc();
   w.innerHTML = cot.apps.map((a,i)=>{
-    const t = cat.tecnicas.find(t=>t.id===a.tecnicaId) || cat.tecnicas[0];
+    const t = cat.tecnicas.find(t=>t.id===a.tecnicaId) || (cat.tecnicas||[])[0];
     const d = r.detalle.find(d=>d.id===a.id);
     const modo = t? t.modo : "area";
     return '<div class="app-row" data-app="'+a.id+'">'+
@@ -7079,6 +7135,27 @@ function cierraTarjetaSec(tab){
   pintaLanzadorSec(tab);
   window.scrollTo({top:0, behavior:"smooth"});
 }
+/* El tablero y el menú de la cuenta mandan a una tarjeta por su ancla
+   («#equipoCaja», «#cardExp»). Con azulejos esa tarjeta nace tapada, así
+   que antes de bajar a ella hay que abrir el azulejo que la contiene. */
+function abrePorAncla(sel){
+  let el = null;
+  try{ el = document.querySelector(sel); }catch(e){ return false; }
+  if(!el) return false;
+  const sec = el.closest("section[id^='tab-']"); if(!sec) return false;
+  const tab = sec.id.replace(/^tab-/, "");
+  const cfg = SEC_LZ[tab]; if(!cfg) return false;
+  const t = cfg.tarjetas.find(x=>{
+    try{
+      return Array.from(sec.querySelectorAll(x.card))
+        .some(c=> c === el || c.contains(el));
+    }catch(e){ return false; }
+  });
+  if(!t || t.accion) return false;
+  abreTarjetaSec(tab, t.id);
+  return true;
+}
+window.abrePorAncla = abrePorAncla;
 /* Al entrar a la sección siempre se ve el lanzador, no lo último que se
    abrió: entrar al Catálogo y caer en «Escalas de volumen» desorienta. */
 function reiniciaSec(tab){
@@ -7100,6 +7177,47 @@ document.addEventListener("click", e=>{
   if(v){ cierraTarjetaSec(v.dataset.secvolver); return; }
 });
 
+
+/* Los azulejos de Ajustes. Diez tarjetas que no se parecen en nada entre
+   ellas: tres de dinero, tres de gente, dos de la empresa y dos del SAT.
+   Puestas en fila no se distinguian; de azulejos, cada una se busca por lo
+   que es. */
+function sinClaveCuenta(){
+  try{ return equipo.filter(u=>u.activo !== false && !String(u.pin||"").trim()).length; }
+  catch(e){ return 0; }
+}
+registraLanzador("set", [
+  {id:"precio", nombre:"Parámetros de precio", sub:"utilidad, IVA y redondeo", color:"#0680AB",
+   icono:'<path d="M12 2v20"/><path d="M17 6.5c0-1.9-2.2-3-5-3s-5 1.1-5 3 2.2 2.8 5 3.3 5 1.4 5 3.4-2.2 3.3-5 3.3-5-1.4-5-3.3"/>',
+   card:'[data-set="precio"]'},
+  {id:"cobro", nombre:"Material y mano de obra", sub:"cómo se cobra la impresión", color:"#0E7C57",
+   icono:'<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/>',
+   card:'[data-set="cobro"]'},
+  {id:"folios", nombre:"Folios", sub:"las letras de tus documentos", color:"#B26A00", soloAdmin:true,
+   icono:'<path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h4"/>',
+   card:'[data-set="folios"]'},
+  {id:"altas", nombre:"Quién entra a la cuenta", sub:"da de alta a tu gente", color:"#D2541F", soloAdmin:true,
+   icono:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/>',
+   card:'[data-set="altas"]'},
+  {id:"permisos", nombre:"Permisos y costos", sub:"qué ve cada rol", color:"#8B5CF6", soloAdmin:true,
+   icono:'<path d="M12 3l7 3v6c0 4.2-2.8 7.6-7 9-4.2-1.4-7-4.8-7-9V6Z"/><path d="M9 12l2 2 4-4"/>',
+   card:'[data-set="permisos"]'},
+  {id:"claves", nombre:"Claves y bloqueo", sub:"el PIN para checar y entrar", color:"#D6127F", soloAdmin:true,
+   icono:'<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.3"/>',
+   card:'[data-set="claves"]', cuenta:sinClaveCuenta},
+  {id:"empresa", nombre:"Datos de tu empresa", sub:"lo que sale impreso", color:"#64748B",
+   icono:'<path d="M3 21V7l9-4 9 4v14"/><path d="M9 21v-6h6v6"/><path d="M7 11h.01M17 11h.01"/>',
+   card:'[data-set="empresa"]'},
+  {id:"tema", nombre:"Apariencia", sub:"tema claro u oscuro", color:"#14B8A6",
+   icono:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19"/>',
+   card:'[data-set="tema"]'},
+  {id:"fiscal", nombre:"Datos fiscales", sub:"RFC y domicilio del SAT", color:"#0680AB",
+   icono:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>',
+   card:'[data-set="fiscal"]'},
+  {id:"timbrado", nombre:"Facturación electrónica", sub:"cómo se timbran tus facturas", color:"#8B5CF6",
+   icono:'<path d="M4 4h16v13l-2.7-1.6L14.7 17 12 15.4 9.3 17 6.7 15.4 4 17Z"/><path d="M8 9h8M8 12h5"/>',
+   card:'[data-set="timbrado"]'}
+], "Ajustes");
 
 /* Los azulejos de Compras. Los cuatro primeros abren la MISMA tabla de
    requisiciones, filtrada por donde va cada una. El del taller y el de
@@ -7198,7 +7316,297 @@ registraLanzador("sav", [
 /* Los azulejos del Catálogo. El color es seña para encontrarlo sin leer,
    nunca un dato; cada uno lleva su nombre debajo. El número de la esquina es
    cuántos hay, que es lo que de verdad se quiere saber antes de entrar. */
+
+/* ============ ASISTENTE DE ARRANQUE ============ */
+/* Cada oficio dice qué se le deja al taller. Los ids son los de defaults():
+   si mañana cambia la semilla, esto se mueve con ella. */
+const ARR_OFICIOS = [
+  {id:"dtf", nombre:"DTF textil", sub:"la película que se plancha en tela", color:"#0680AB",
+   icono:'<rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 7V5M12 7V5M17 7V5"/>',
+   tecnicas:["t1"], servicios:["sv1","sv2"], insumos:["i1","i2"], familias:["Textil","Gorras"]},
+  {id:"sub", nombre:"Sublimación", sub:"tazas, termos y poliéster", color:"#D6127F",
+   icono:'<path d="M4 8h11v8a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3Z"/><path d="M15 10h3a2.5 2.5 0 0 1 0 5h-3"/>',
+   tecnicas:["t3"], servicios:["sv4"], insumos:[], familias:["Tazas","Termos","Oficina","Promocional","Textil"]},
+  {id:"uv", nombre:"DTF UV", sub:"rígidos: termos, fundas, madera", color:"#B26A00",
+   icono:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
+   tecnicas:["t2"], servicios:["sv3"], insumos:[], familias:["Termos","Promocional"]},
+  {id:"vinil", nombre:"Vinil de corte", sub:"números, nombres y logos planos", color:"#0E7C57",
+   icono:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.1 8.1 20 20M8.1 15.9 20 4"/>',
+   tecnicas:["t4"], servicios:["sv5"], insumos:[], familias:["Textil","Gorras"]},
+  {id:"seri", nombre:"Serigrafía", sub:"marcos y tinta, tiro largo", color:"#8B5CF6",
+   icono:'<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M3 20h18"/><path d="M8 9h8v4H8Z"/>',
+   tecnicas:["t5"], servicios:[], insumos:[], familias:["Textil"]},
+  {id:"bordado", nombre:"Bordado", sub:"hilo, gorras y polos", color:"#D2541F",
+   icono:'<path d="M3 20 20 3"/><path d="M15 3h5v5"/><circle cx="6.5" cy="17.5" r="2.5"/>',
+   tecnicas:["t6"], servicios:[], insumos:["i4"], familias:["Gorras","Textil"]},
+  {id:"laser", nombre:"Grabado láser", sub:"madera, acero y acrílico", color:"#14B8A6",
+   icono:'<path d="M12 2v7"/><path d="M8.5 9h7l1.5 5H7Z"/><path d="M12 14v8"/>',
+   tecnicas:["t7"], servicios:[], insumos:[], familias:["Promocional","Termos"]},
+  {id:"dtg", nombre:"DTG", sub:"impresión directa a la prenda", color:"#64748B",
+   icono:'<path d="M6 4h12l3 5-4 2v9H7v-9L3 9Z"/>',
+   tecnicas:["t8"], servicios:[], insumos:["i1"], familias:["Textil"]},
+  {id:"gran", nombre:"Gran formato", sub:"lonas y vinil adhesivo", color:"#0680AB",
+   icono:'<rect x="2" y="5" width="20" height="12" rx="1.5"/><path d="M2 20h20M6 5v12M18 5v12"/>',
+   tecnicas:[], servicios:["sv6","sv7"], insumos:[], familias:[]},
+  {id:"papel", nombre:"Imprenta y papel", sub:"tarjetas, volantes, couché", color:"#A855F7",
+   icono:'<path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><path d="M9 12h7M9 16h5"/>',
+   tecnicas:[], servicios:["sv8"], insumos:[], familias:["Oficina"]}
+];
+const ARR_FAMILIAS = [
+  ["Textil","#0680AB","Playeras, polos, sudaderas y totes",
+   '<path d="M6 4h12l3 5-4 2v9H7v-9L3 9Z"/>'],
+  ["Gorras","#D2541F","Gorras de 5 paneles y trucker",
+   '<path d="M3 15a9 9 0 0 1 18 0Z"/><path d="M21 15h1.5a1.5 1.5 0 0 0 0-3H18"/>'],
+  ["Tazas","#D6127F","Cerámica 11 oz y mágicas",
+   '<path d="M4 8h11v8a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3Z"/><path d="M15 10h3a2.5 2.5 0 0 1 0 5h-3"/>'],
+  ["Termos","#0E7C57","Acero, ánforas y cilindros",
+   '<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M7 6h10v13a3 3 0 0 1-3 3h-4a3 3 0 0 1-3-3Z"/>'],
+  ["Oficina","#8B5CF6","Mousepads, libretas y papelería",
+   '<rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 18h18"/>'],
+  ["Promocional","#B26A00","Llaveros, fundas y recuerdos",
+   '<circle cx="8" cy="8" r="4"/><path d="M11 11l8 8M16 16l-2 2M19 19l2-2"/>']
+];
+let arrEstado = {paso:0, oficios:[], familias:[], tocoFamilias:false, modo:"nuevo"};
+
+function arrIcoSvg(d){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+}
+function arrFamiliasSugeridas(){
+  const f = [];
+  ARR_OFICIOS.filter(o=>arrEstado.oficios.includes(o.id))
+    .forEach(o=> (o.familias||[]).forEach(x=>{ if(!f.includes(x)) f.push(x); }));
+  return f;
+}
+function abreArranque(modo){
+  arrEstado = {paso: modo === "agregar" ? 1 : 0, oficios:[], familias:[],
+               tocoFamilias:false, modo: modo || "nuevo", nombre:"", tel:""};
+  if(modo === "agregar"){
+    /* Se marca lo que ya tiene, para que el asistente se lea como «esto
+       traes, ¿qué más quieres?» y no como un formulario en blanco. */
+    const tengo = (cat.tecnicas||[]).map(t=>t.id);
+    const svcs  = (cat.servicios||[]).map(s=>s.id);
+    arrEstado.oficios = ARR_OFICIOS.filter(o=>
+      (o.tecnicas||[]).some(t=>tengo.includes(t)) ||
+      ((o.tecnicas||[]).length === 0 && (o.servicios||[]).some(s=>svcs.includes(s)))
+    ).map(o=>o.id);
+    const cats = (cat.articulos||[]).map(a=>a.cat);
+    arrEstado.familias = ARR_FAMILIAS.map(f=>f[0]).filter(f=>cats.includes(f));
+    arrEstado.tocoFamilias = true;
+  }
+  const m = $("#arranque"); if(!m) return;
+  m.hidden = false;
+  pintaArranque();
+}
+function cierraArranque(){ const m = $("#arranque"); if(m) m.hidden = true; }
+
+function pintaArranque(){
+  const p = arrEstado.paso, nuevo = arrEstado.modo === "nuevo";
+  const pasos = nuevo ? [0,1,2,3] : [1,2,3];
+  $("#arrPasos").innerHTML = pasos.map(x=>'<i class="'+(x===p?"on":"")+'"></i>').join("");
+  const t = $("#arrTitulo"), intro = $("#arrIntro"), cuerpo = $("#arrCuerpo");
+  const atras = $("#arrAtras"), sig = $("#arrSig"), cuenta = $("#arrCuenta");
+  atras.hidden = (p === pasos[0]);
+  cuenta.textContent = "";
+  if(p === 0){
+    t.textContent = "Vamos a dejar tu taller listo";
+    intro.textContent = "Son tres preguntas. Con lo que contestes dejo tu catálogo " +
+      "armado con lo tuyo y nada más: nada de borrar veinte artículos que no vendes.";
+    cuerpo.innerHTML =
+      '<div class="grid g2">' +
+        '<div><label class="f" for="arrNombre">¿Cómo se llama tu taller?</label>' +
+        '<input id="arrNombre" placeholder="Taller Makers" value="' +
+          esc(arrEstado.nombre || (P.empresa && P.empresa.nombre === "Hey Makers" ? "" : (P.empresa||{}).nombre) || "") + '"></div>' +
+        '<div><label class="f" for="arrTel">Teléfono o WhatsApp</label>' +
+        '<input id="arrTel" placeholder="443 000 0000" value="' + esc(arrEstado.tel || (P.empresa||{}).tel || "") + '"></div>' +
+      '</div>';
+    sig.textContent = "Continuar";
+  }
+  if(p === 1){
+    t.textContent = "¿Qué sabes hacer?";
+    intro.textContent = nuevo
+      ? "Marca todo lo que haces hoy, aunque sea maquilado. Sólo cargo las técnicas y los materiales de eso."
+      : "Marca lo que quieras traer. Lo que ya tienes capturado no se toca: sólo agrego lo que falte.";
+    cuerpo.innerHTML = '<div class="arrRej">' + ARR_OFICIOS.map(o=>
+      '<button type="button" class="arrOpc" data-arroficio="'+esc(o.id)+'" style="--arrc:'+esc(o.color)+'"' +
+      ' aria-pressed="'+(arrEstado.oficios.includes(o.id))+'">' +
+      '<span class="arrIco">'+arrIcoSvg(o.icono)+'</span>' +
+      '<b>'+esc(o.nombre)+'</b><small>'+esc(o.sub)+'</small></button>').join("") + '</div>';
+    cuenta.textContent = arrEstado.oficios.length
+      ? arrEstado.oficios.length + " seleccionada(s)" : "Marca al menos una";
+    sig.textContent = "Continuar";
+  }
+  if(p === 2){
+    t.textContent = "¿Qué artículos vendes?";
+    intro.textContent = "Marqué los que van con lo que haces. Quita o agrega lo que quieras: " +
+      "son precios de referencia que después ajustas en Catálogo.";
+    if(!arrEstado.tocoFamilias) arrEstado.familias = arrFamiliasSugeridas();
+    cuerpo.innerHTML = '<div class="arrRej">' + ARR_FAMILIAS.map(f=>
+      '<button type="button" class="arrOpc" data-arrfam="'+esc(f[0])+'" style="--arrc:'+esc(f[1])+'"' +
+      ' aria-pressed="'+(arrEstado.familias.includes(f[0]))+'">' +
+      '<span class="arrIco">'+arrIcoSvg(f[3])+'</span>' +
+      '<b>'+esc(f[0])+'</b><small>'+esc(f[2])+'</small></button>').join("") + '</div>';
+    cuenta.textContent = arrCuentaArticulos() + " artículo(s)";
+    sig.textContent = "Continuar";
+  }
+  if(p === 3){
+    const r = arrResumenNums();
+    t.textContent = nuevo ? "Así queda tu catálogo" : "Esto es lo que voy a agregar";
+    intro.textContent = nuevo
+      ? "Son precios de referencia del oficio, para que puedas cotizar hoy mismo. " +
+        "Cámbialos en Catálogo cuando tengas los tuyos; lo que no elegiste lo puedes traer después."
+      : "No borro ni cambio nada de lo que ya tienes capturado: sólo entra lo que te falta.";
+    cuerpo.innerHTML = '<div class="arrResumen">' +
+      '<div><b>'+r.tecnicas+'</b><span>técnicas de decoración</span></div>' +
+      '<div><b>'+r.articulos+'</b><span>artículos con costo y precio</span></div>' +
+      '<div><b>'+r.servicios+'</b><span>materiales por medida (rollos)</span></div>' +
+      (r.insumos ? '<div><b>'+r.insumos+'</b><span>consumibles: tinta, polvo, hilo</span></div>' : '') +
+      '</div>';
+    sig.textContent = nuevo ? "Empezar a cotizar" : "Agregar al catálogo";
+  }
+}
+function arrCuentaArticulos(){
+  return defaults().articulos.filter(a=>arrEstado.familias.includes(a.cat)).length;
+}
+/* Los números del resumen se sacan de lo que REALMENTE va a entrar, no de
+   una cuenta aparte: si mañana cambia la semilla, el resumen no miente. */
+function arrPlan(){
+  const d = defaults();
+  const ofs = ARR_OFICIOS.filter(o=>arrEstado.oficios.includes(o.id));
+  const tec = [], svc = [], ins = ["i3"];
+  ofs.forEach(o=>{
+    (o.tecnicas||[]).forEach(x=>{ if(!tec.includes(x)) tec.push(x); });
+    (o.servicios||[]).forEach(x=>{ if(!svc.includes(x)) svc.push(x); });
+    (o.insumos||[]).forEach(x=>{ if(!ins.includes(x)) ins.push(x); });
+  });
+  return {
+    d,
+    tecnicas:  d.tecnicas.filter(t=>tec.includes(t.id)),
+    servicios: d.servicios.filter(s=>svc.includes(s.id)),
+    articulos: d.articulos.filter(a=>arrEstado.familias.includes(a.cat)),
+    insumos:   d.insumos.filter(i=>ins.includes(i.id)),
+    consumos:  d.consumos.filter(c=>
+                 ins.includes(c.insumoId) &&
+                 (c.ancla !== "servicio" || svc.includes(c.anclaId)) &&
+                 (c.ancla !== "tecnica"  || tec.includes(c.anclaId)))
+  };
+}
+function arrResumenNums(){
+  const p = arrPlan();
+  if(arrEstado.modo === "nuevo")
+    return {tecnicas:p.tecnicas.length, servicios:p.servicios.length,
+            articulos:p.articulos.length, insumos:p.insumos.length};
+  const falta = (plan, actual) => plan.filter(x=>!(actual||[]).some(y=>y.id===x.id)).length;
+  return {tecnicas:falta(p.tecnicas, cat.tecnicas), servicios:falta(p.servicios, cat.servicios),
+          articulos:falta(p.articulos, cat.articulos), insumos:falta(p.insumos, cat.insumos)};
+}
+function aplicaArranque(){
+  const p = arrPlan();
+  if(arrEstado.modo === "nuevo"){
+    cat.tecnicas  = p.tecnicas.map(x=>Object.assign({}, x));
+    cat.servicios = p.servicios.map(x=>Object.assign({}, x));
+    cat.articulos = p.articulos.map(x=>Object.assign({}, x));
+    cat.insumos   = p.insumos.map(x=>Object.assign({}, x));
+    cat.consumos  = p.consumos.map(x=>Object.assign({}, x));
+    P.empresa = P.empresa || {};
+    if(arrEstado.nombre) P.empresa.nombre = arrEstado.nombre;
+    if(arrEstado.tel)    P.empresa.tel = arrEstado.tel;
+  } else {
+    const mete = (llave, lista) => {
+      cat[llave] = cat[llave] || [];
+      lista.forEach(x=>{ if(!cat[llave].some(y=>y.id === x.id)) cat[llave].push(Object.assign({}, x)); });
+    };
+    mete("tecnicas", p.tecnicas); mete("servicios", p.servicios);
+    mete("articulos", p.articulos); mete("insumos", p.insumos);
+    mete("consumos", p.consumos);
+  }
+  cat.arranque = {hecho:true, cuando:new Date().toISOString().slice(0,10),
+                  oficios:arrEstado.oficios.slice(), familias:arrEstado.familias.slice()};
+  persist();
+  /* La cotización de ejemplo apuntaba a un artículo y a una técnica que
+     quizá acaban de salir del catálogo: se vuelve a apuntar a lo que sí
+     quedó, o se queda sin aplicación si el taller no decora. */
+  if(arrEstado.modo === "nuevo" && typeof esPrimeraVez === "function" && esPrimeraVez()){
+    const a0 = (cat.articulos||[])[0], t0 = (cat.tecnicas||[])[0];
+    if(a0){ cot.articuloId = a0.id; cot.costoArt = a0.costo;
+            cot.precioArt = a0.precio; cot.desc = a0.nombre; cot.descAuto = true; }
+    else  { cot.articuloId = ""; cot.modo = "servicio"; }
+    if(cot.apps && cot.apps.length){
+      if(t0) cot.apps.forEach(ap=>{ if(!cat.tecnicas.some(t=>t.id===ap.tecnicaId)) ap.tecnicaId = t0.id; });
+      else cot.apps = [];
+    }
+  }
+  cierraArranque();
+  if(typeof renderCatalogo === "function") renderCatalogo();
+  if(typeof renderSet === "function") renderSet();
+  if(typeof renderCot === "function") renderCot();
+  if(typeof pintaLanzadorSec === "function") pintaLanzadorSec("cat");
+  const r = arrResumenNums();
+  toast(arrEstado.modo === "nuevo"
+    ? "Listo: tu catálogo quedó con lo tuyo. Lo demás lo agregas en Catálogo."
+    : "Agregué " + (r.tecnicas + r.articulos + r.servicios) + " cosa(s) al catálogo");
+}
+function arrAvanza(d){
+  const p = arrEstado.paso, nuevo = arrEstado.modo === "nuevo";
+  /* Lo del primer paso se guarda AL SALIR de él: al pintar el siguiente se
+     reemplaza el cuerpo y esos dos campos dejan de existir. */
+  if(p === 0){
+    const n = ($("#arrNombre")||{}).value, tl = ($("#arrTel")||{}).value;
+    arrEstado.nombre = (n||"").trim();
+    arrEstado.tel    = (tl||"").trim();
+  }
+  if(d > 0){
+    if(p === 1 && !arrEstado.oficios.length){ toast("Marca al menos una técnica"); return; }
+    if(p === 2 && !arrEstado.familias.length && !arrEstado.oficios.some(o=>o==="gran"||o==="papel")){
+      toast("Marca al menos una familia de artículos"); return;
+    }
+    if(p === 3){ aplicaArranque(); return; }
+  }
+  const min = nuevo ? 0 : 1;
+  arrEstado.paso = Math.max(min, Math.min(3, p + d));
+  pintaArranque();
+}
+document.addEventListener("click", e=>{
+  const o = e.target.closest("[data-arroficio]");
+  if(o){
+    const id = o.dataset.arroficio;
+    const i = arrEstado.oficios.indexOf(id);
+    if(i < 0) arrEstado.oficios.push(id); else arrEstado.oficios.splice(i,1);
+    arrEstado.tocoFamilias = false;   // se vuelven a sugerir con lo nuevo
+    pintaArranque(); return;
+  }
+  const f = e.target.closest("[data-arrfam]");
+  if(f){
+    const id = f.dataset.arrfam;
+    const i = arrEstado.familias.indexOf(id);
+    if(i < 0) arrEstado.familias.push(id); else arrEstado.familias.splice(i,1);
+    arrEstado.tocoFamilias = true;
+    pintaArranque(); return;
+  }
+});
+$("#arrSig").addEventListener("click", ()=> arrAvanza(1));
+$("#arrAtras").addEventListener("click", ()=> arrAvanza(-1));
+
+/* Se abre solo una vez, en una cuenta que todavía no ha hecho nada: si ya
+   hay cotizaciones o ya capturó su catálogo, no se le estorba. */
+function arranqueSiEsNuevo(){
+  if(cat.arranque && cat.arranque.hecho) return false;
+  if((guardadas||[]).length || (ventas||[]).length || (clientes||[]).length){
+    cat.arranque = {hecho:true, saltado:true};  // cuenta con trabajo: no se pregunta
+    persist(); return false;
+  }
+  if(typeof rolActual === "function" && rolActual() !== "admin") return false;
+  const puerta = $("#acceso");
+  if(puerta && !puerta.hidden){ setTimeout(arranqueSiEsNuevo, 1500); return true; }
+  setTimeout(()=> abreArranque("nuevo"), 500);
+  return true;
+}
+
 registraLanzador("cat", [
+  {id:"traer", nombre:"Traer ejemplos", sub:"técnicas y artículos que no cargaste", color:"#D2541F",
+   icono:'<path d="M12 3v12"/><path d="M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
+   card:'[data-cat="articulos"]',
+   accion:()=> abreArranque("agregar")},
   {id:"articulos", nombre:"Artículos", sub:"lo que vendes", color:"#06B6D4",
    icono:'<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0l-7.2-7.2a2 2 0 0 1-.6-1.4V4.4A1.4 1.4 0 0 1 4.4 3h7.6a2 2 0 0 1 1.4.6l7.2 7.2a2 2 0 0 1 0 2.6Z"/><circle cx="7.5" cy="7.5" r="1.3"/>',
    card:'[data-cat="articulos"]', cuenta:()=>(cat.articulos||[]).length},
@@ -7910,6 +8318,7 @@ $("#tabs").addEventListener("click", e=>{
   if(b.dataset.tab==="sav"){ renderSaved(); reiniciaSec("sav"); }
   if(b.dataset.tab==="arc") reiniciaSec("arc");
   if(b.dataset.tab==="com") reiniciaSec("com");
+  if(b.dataset.tab==="set") reiniciaSec("set");
   if(b.dataset.tab==="calc") renderMaquinas();
   if(b.dataset.tab==="calc") renderCalc();
   if(b.dataset.tab==="com"){ renderCompras(); renderProveedores(); }
@@ -8057,6 +8466,7 @@ async function subirArchivo(appId, file){
 }
 $("#addApp").addEventListener("click", ()=>{
   const s = cat.tamanos[2] || {ancho:20,alto:20,id:""};
+  if(!(cat.tecnicas||[]).length){ toast("Primero da de alta una técnica en Catálogo"); return; }
   cot.apps.push({id:uid(),ubic:cot.apps.length?"Espalda":"Frente",tecnicaId:cat.tecnicas[0].id,tamanoId:s.id,ancho:s.ancho,alto:s.alto,tintas:1,puntadas:8000});
   renderApps(); renderResumen();
 });
@@ -11511,7 +11921,7 @@ const HUBS = window.HUBS = {
       {t:"nom",  ico:"nom",       d:"nompend",  et:"Nómina del periodo",     det:"Lo que se le paga a cada quien, con sus horas extra"},
       {t:"nom",  ico:"historial", d:"nomcerr",  et:"Nóminas cerradas",       det:"Las ya congeladas, pagadas y por pagar", foco:"#nmCerradas"},
       {t:"arc",  ico:"expediente",d:"exped",    et:"Expedientes",            det:"Contratos, identificaciones y papeles de cada persona", foco:"#cardExp"},
-      {t:"set",  ico:"gente",     d:"equipo",   et:"Equipo y permisos",      det:"Quién entra, qué ve, quién cotiza y quién comisiona"}
+      {t:"set",  ico:"gente",     d:"equipo",   et:"Equipo y permisos",      det:"Quién entra, qué ve, quién cotiza y quién comisiona", foco:"#equipoCaja"}
     ]
   }
 };
@@ -11653,6 +12063,9 @@ function vaAEntrada(x){
     if(x.foco){
       const el = document.querySelector(x.foco);
       if(!el){ return; }
+      /* Si vive dentro de un azulejo, primero se abre: si no, se baja a
+         una tarjeta tapada y no se ve nada. */
+      try{ abrePorAncla(x.foco); }catch(e){}
       el.scrollIntoView({behavior:"smooth", block:"start"});
       el.classList.add("hubResalta");
       setTimeout(()=>el.classList.remove("hubResalta"), 1600);
@@ -12518,9 +12931,20 @@ function tourSiEsNuevo(){
      la persona ya entró, no antes. */
   const puerta = $("#acceso");
   if(puerta && !puerta.hidden){ setTimeout(tourSiEsNuevo, 1500); return; }
+  /* El asistente de arranque va primero: enseñar el tutorial encima de él
+     serían dos ventanas peleándose por la misma pantalla. */
+  const asis = $("#arranque");
+  if(asis && !asis.hidden){ setTimeout(tourSiEsNuevo, 2000); return; }
   const nuevo = typeof esPrimeraVez === "function" ? esPrimeraVez() : !(guardadas||[]).length;
   if(!nuevo){ marcaTourVisto(); return; }
-  setTimeout(()=>{ if(!tourVisto()) abreTour(); }, 1200);
+  setTimeout(()=>{
+    /* Se vuelve a mirar: el asistente se abre medio segundo después de que
+       esta función corrió, así que preguntar sólo al entrar no basta —el
+       tutorial se montaba encima y tapaba los botones del asistente. */
+    const a = $("#arranque");
+    if(a && !a.hidden){ setTimeout(tourSiEsNuevo, 2000); return; }
+    if(!tourVisto()) abreTour();
+  }, 1200);
 }
 
 /* ---------- eventos del tutorial ---------- */
@@ -16019,7 +16443,8 @@ window.__arranca = () => initStore().then(async ()=>{
   if(typeof normalizaItems === "function") normalizaItems(cot);
   const a = cat.articulos.find(a=>a.id===cot.articuloId);
   if(a && !habia) cot.costoArt = a.costo;
-  if(cot.apps.length && !cat.tecnicas.find(t=>t.id===cot.apps[0].tecnicaId)) cot.apps[0].tecnicaId = cat.tecnicas[0].id;
+  if(cot.apps.length && (cat.tecnicas||[]).length && !cat.tecnicas.find(t=>t.id===cot.apps[0].tecnicaId))
+    cot.apps[0].tecnicaId = cat.tecnicas[0].id;
   if(habia) setTimeout(()=>toast("Recuperé lo que estabas capturando"), 900);
   arrancaEquipo();
   await cargaAsistencias(); renderAsistencia();
@@ -16032,6 +16457,7 @@ window.__arranca = () => initStore().then(async ()=>{
   if(typeof renderTablero === "function") renderTablero();   /* ya con datos */
   $("#catEstado").textContent = "Catálogo al día";
   arrancaAyuda();
+  arranqueSiEsNuevo();
   tourSiEsNuevo();
   guardaFormReq();
   setTimeout(()=>{
@@ -17212,7 +17638,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261019-2051"></script>
-<script src="diagnostico.js?v=20261019-2051"></script>
+<script src="cuenta.js?v=20261019-2119"></script>
+<script src="diagnostico.js?v=20261019-2119"></script>
 </body>
 </html>
