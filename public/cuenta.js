@@ -172,6 +172,28 @@ const PUENTE_ASSETS = {
     const {data} = await SB.storage.from("disenos").createSignedUrl(ruta, 60*60*24*365);
     return {id: ruta, url: (data && data.signedUrl) || "", contentType: file.type, sizeBytes: file.size};
   },
+  /* Vuelve a firmar una ruta que ya esta guardada. Una URL firmada vence;
+     la ruta no. Por eso lo que se guarda es la ruta y la URL se pide otra
+     vez cada que se abre la app. */
+  async url(ref){
+    if(!ref) return "";
+    try{
+      const {data} = await SB.storage.from("disenos").createSignedUrl(ref, 60*60*24*7);
+      return (data && data.signedUrl) || "";
+    }catch(e){ return ""; }
+  },
+  /* Varias de un golpe: una cuenta con cien articulos no puede hacer cien
+     viajes al servidor uno por uno. */
+  async urls(refs){
+    const limpias = (refs||[]).filter(Boolean);
+    if(!limpias.length) return {};
+    try{
+      const {data} = await SB.storage.from("disenos").createSignedUrls(limpias, 60*60*24*7);
+      const m = {};
+      (data||[]).forEach(x=>{ if(x && x.path && x.signedUrl) m[x.path] = x.signedUrl; });
+      return m;
+    }catch(e){ return {}; }
+  },
   async list(){ return {assets:[], usage:{}}; },
   async delete(id){ await SB.storage.from("disenos").remove([id]); }
 };

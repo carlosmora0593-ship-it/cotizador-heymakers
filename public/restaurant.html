@@ -73,6 +73,17 @@
   .lzIco svg{width:26px;height:26px}
   .lzEt{font-size:12px} .lzSub{display:none}
 }
+/* ---- barra de utilidad ---- */
+.utilBarra{margin-top:14px;padding:14px 16px;border:1px solid var(--line);
+  border-radius:var(--radio-sm);background:var(--surface-2)}
+.utilCab{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.utilCab .et{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.utilCab b{font-family:"IBM Plex Mono",monospace;font-size:21px;line-height:1}
+.utilCab .pre{margin-left:auto;font-size:12.5px;color:var(--ink-2)}
+.utilCab .pre b{font-size:17px;color:var(--accent)}
+.utilBarra input[type="range"]{width:100%;accent-color:var(--accent);height:26px;padding:0}
+.utilPie{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);margin-top:2px}
+
 /* ---- selector de tema ---- */
 .temaFila{display:flex;gap:10px;flex-wrap:wrap}
 .temaCard{display:flex;align-items:center;gap:11px;border:1px solid var(--line);
@@ -4172,14 +4183,45 @@ function pintaReceta(){
       '<small>'+(!precio ? "Ponle precio en El menu para comparar."
         : margen >= meta ? "Por arriba de tu meta de "+meta+"%."
         : "Para dejar "+meta+"% tendrias que venderlo en "+mx(sugerido)+".")+'</small></span></div>' +
+    '<div class="utilBarra">' +
+      '<div class="utilCab"><span class="et">Utilidad que quieres dejar</span>' +
+        '<b id="utilVal">'+meta+'%</b>' +
+        '<span class="pre">tendrias que venderlo en <b id="utilPrecio">'+mx(Math.ceil(sugerido))+'</b></span></div>' +
+      '<input type="range" id="utilRango" min="0" max="90" step="1" value="'+meta+'">' +
+      '<div class="utilPie"><span>0%</span><span>45%</span><span>90%</span></div>' +
+    '</div>' +
     '<div class="fila" style="margin-top:14px">' +
-      '<button class="btn" id="recAplica">Usar '+mx(Math.ceil(sugerido))+' como precio</button>' +
+      '<button class="btn" id="recAplica">Usar <span id="utilUsar">'+mx(Math.ceil(sugerido))+'</span> como precio</button>' +
       '<button class="btn ghost" id="recCosto">Guardar '+mx(materia)+' como costo del platillo</button>' +
     '</div>' +
     '<p class="note" style="margin-top:14px">El <b>costo del platillo</b> que guarda el menu es solo la materia ' +
       'prima: es lo que se usa para la utilidad del dia. El gasto fijo no se guarda ahi a proposito - cambia ' +
       'cada mes con la renta y la luz, y meterlo en el costo haria que las ventas viejas se movieran solas.</p>';
 }
+/* Mientras se arrastra solo se repintan los tres numeros que cambian. Volver
+   a dibujar la tarjeta entera en cada pixel mataria la barra: se pierde el
+   arrastre porque el elemento se reemplaza debajo del dedo. */
+$("#recResultado").addEventListener("input", e=>{
+  if(e.target.id !== "utilRango") return;
+  const meta = Math.min(90, Math.max(0, num(e.target.value, 70)));
+  P.margenMeta = meta;
+  const p = (MENU.plats||[]).find(x=>x.id === recPlatId);
+  const r = recetaDe(recPlatId);
+  const materia = (r.ings||[]).reduce((s,i)=>s+costoIngrediente(i), 0);
+  const costoTotal = materia + fijoPorPorcion();
+  const sug = meta >= 100 ? 0 : costoTotal / (1 - meta/100);
+  const v = $("#utilVal");    if(v) v.textContent = meta + "%";
+  const pr = $("#utilPrecio");if(pr) pr.textContent = mx(Math.ceil(sug));
+  const us = $("#utilUsar");  if(us) us.textContent = mx(Math.ceil(sug));
+  const g = $("#g_margen");   if(g) g.value = meta;
+});
+/* Al soltar se guarda y se repinta todo, para que el semaforo y los
+   tiles queden al corriente. */
+$("#recResultado").addEventListener("change", e=>{
+  if(e.target.id !== "utilRango") return;
+  persist(); pintaReceta();
+});
+
 $("#recResultado").addEventListener("click", e=>{
   const p = (MENU.plats||[]).find(x=>x.id === recPlatId); if(!p) return;
   const r = recetaDe(recPlatId);

@@ -1513,6 +1513,23 @@ input.pinSecreto.verse{-webkit-text-security:none;text-security:none;letter-spac
 .nmRet .txt{flex:1;min-width:180px;font-size:12.5px;color:var(--ink-2)}
 .nmRet .txt b{color:var(--ink)}
 
+
+/* ---- importar catálogo ---- */
+.impCaja{border:1px dashed var(--line);border-radius:var(--radio-sm,12px);
+  padding:18px;text-align:center;background:var(--surface-2);margin-bottom:14px}
+.impCaja.sobre{border-color:var(--accent);background:var(--accent-soft)}
+.impCaja p{margin:0 0 10px;font-size:13px;color:var(--ink-2)}
+.impResumen{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:14px 0}
+.impT{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface)}
+.impT b{display:block;font-family:"IBM Plex Mono",monospace;font-size:20px;line-height:1.1}
+.impT small{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--ink-3);margin-top:5px}
+.impT.bien b{color:var(--good)} .impT.ojo b{color:var(--warn)} .impT.mal b{color:var(--guinda-2,var(--accent))}
+.impMal{max-height:190px;overflow:auto;border:1px solid var(--line);border-radius:12px;
+  padding:10px 12px;font-size:12px;color:var(--ink-2);background:var(--surface)}
+.impMal div{padding:3px 0;border-bottom:1px solid var(--line-soft)}
+.impMal div:last-child{border-bottom:0}
+
 .avisoStock{margin:0 16px 12px;border-radius:var(--radio-sm,12px);padding:10px 12px;
   font-size:12.5px;line-height:1.5}
 .avisoStock.ok{background:var(--good-soft);color:var(--good)}
@@ -2926,6 +2943,7 @@ body.rol-produccion #btnPrint{display:none!important}
     <header><h2>Artículos</h2>
       <span class="hint" id="catEstado" style="margin-left:auto"></span>
       <button class="btn sm primary" id="catActualizar">Actualizar</button>
+      <button class="btn sm ghost" id="catImportar">Importar de Excel</button>
       <button class="btn sm ghost" data-add="articulos">+ Artículo</button>
     </header>
     <div class="body">
@@ -4144,6 +4162,28 @@ body.rol-produccion #btnPrint{display:none!important}
   </div>
 </div>
 
+
+<div class="modal" id="modalImp" hidden>
+  <div class="card" style="width:min(640px,100%);max-height:88vh;overflow:auto">
+    <header><h2>Importar artículos</h2>
+      <button class="btn sm" id="impCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Baja la plantilla, llénala con tu lista de precios y súbela.
+        Se cruza <b>por nombre</b>: si el artículo ya está, se le actualizan los precios; si no, se agrega.
+        <b>Nada se borra</b> — lo que no venga en el archivo se queda como está.</p>
+      <div class="fila" style="margin-bottom:14px">
+        <button class="btn" id="impPlantilla">Bajar la plantilla</button>
+      </div>
+      <div class="impCaja" id="impZona">
+        <p>Arrastra aquí tu archivo, o escógelo.</p>
+        <button class="btn sm primary" id="impEscoge">Escoger archivo</button>
+        <input type="file" id="impFile" accept=".xlsx,.xls,.csv" hidden>
+      </div>
+      <div id="impPrevia"></div>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="modalArt" hidden>
   <div class="card" style="width:min(880px,100%);max-height:88vh;display:flex;flex-direction:column">
     <header><h2>Elegir artículo</h2>
@@ -4846,6 +4886,10 @@ async function initStore(){
     cortes = Object.keys(cajas).map(k=>cajas[k]).filter(c=>c && c.cierre);
     
   }
+  /* Las fotos se vuelven a firmar aqui, despues de cargar el catalogo y
+     sin hacer esperar a nadie: la app ya arranco y las fotos aparecen
+     cuando lleguen. */
+  try{ refrescaFotos(); }catch(e){}
 }
 let saveT;
 function persist(what){
@@ -6097,6 +6141,157 @@ function saneaPrecios(){
   toast(n+" precio(s) subidos con tu utilidad y guardados en el catálogo");
 }
 
+
+
+/* ============ IMPORTAR EL CATÁLOGO ============ */
+const COLS_IMP = [
+  ["nombre",   "Artículo",            true ],
+  ["cat",      "Categoría",           false],
+  ["costo",    "Costo producción",    false],
+  ["precio",   "Precio público",      false],
+  ["tallas",   "Lleva tallas (sí/no)",false],
+  ["existencia","Existencia",         false],
+  ["minimo_inv","Mínimo",             false]
+];
+function hayXLSX(){ return typeof XLSX !== "undefined" && XLSX && XLSX.utils; }
+
+function bajaPlantillaArticulos(){
+  if(!hayXLSX()){ toast("No se pudo cargar el lector de Excel. Revisa tu internet."); return; }
+  const enc = COLS_IMP.map(c=>c[1]);
+  const ejemplo = ["Playera cuello redondo algodón — blanca", "Textil", 65, 104, "sí", 0, 0];
+  const nota = ["Borra este renglón y los de abajo, y pon los tuyos.", "", "", "", "", "", ""];
+  const wb = XLSX.utils.book_new();
+  const hoja = XLSX.utils.aoa_to_sheet([enc, ejemplo, nota]);
+  hoja["!cols"] = [{wch:46},{wch:16},{wch:17},{wch:16},{wch:18},{wch:12},{wch:10}];
+  XLSX.utils.book_append_sheet(wb, hoja, "Artículos");
+  XLSX.writeFile(wb, "plantilla-articulos.xlsx");
+  toast("Plantilla descargada · llénala y súbela aquí mismo");
+}
+
+/* Lee el archivo y lo deja listo, SIN tocar el catálogo todavía. */
+let impPendiente = null;
+async function leeArchivoArticulos(file){
+  if(!hayXLSX()){ toast("No se pudo cargar el lector de Excel"); return; }
+  let filas = [];
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, {type:"array"});
+    const hoja = wb.Sheets[wb.SheetNames[0]];
+    filas = XLSX.utils.sheet_to_json(hoja, {header:1, blankrows:false});
+  }catch(e){ toast("No se pudo leer el archivo"); return; }
+  if(filas.length < 2){ toast("El archivo viene vacío"); return; }
+
+  /* El encabezado se busca por nombre, no por posición: la gente mueve las
+     columnas y eso no tiene por qué romper nada. */
+  const enc = (filas[0]||[]).map(x=>String(x||"").trim().toLowerCase());
+  const idx = {};
+  COLS_IMP.forEach(([k, et])=>{
+    const i = enc.findIndex(h=> h === et.toLowerCase() || h.indexOf(k) === 0 ||
+      (k === "nombre" && (h === "artículo" || h === "articulo" || h === "producto")) ||
+      (k === "cat" && (h === "categoría" || h === "categoria")) ||
+      (k === "minimo_inv" && (h === "mínimo" || h === "minimo")));
+    idx[k] = i;
+  });
+  if(idx.nombre < 0){
+    toast("No encontré la columna «Artículo». Usa la plantilla."); return;
+  }
+
+  const nuevos = [], actualiza = [], malos = [];
+  const vistos = {};
+  for(let f = 1; f < filas.length; f++){
+    const r = filas[f] || [];
+    const nombre = String(r[idx.nombre] == null ? "" : r[idx.nombre]).trim();
+    if(!nombre) continue;
+    if(/^borra este renglón/i.test(nombre)) continue;
+    if(vistos[nombre.toLowerCase()]){ malos.push("Renglón "+(f+1)+": «"+nombre+"» viene dos veces"); continue; }
+    vistos[nombre.toLowerCase()] = true;
+    const lee = k => idx[k] >= 0 ? r[idx[k]] : undefined;
+    const costo  = num(lee("costo"));
+    const precio = num(lee("precio"));
+    if(costo < 0 || precio < 0){ malos.push("Renglón "+(f+1)+": «"+nombre+"» trae un precio negativo"); continue; }
+    const tl = String(lee("tallas") == null ? "" : lee("tallas")).trim().toLowerCase();
+    const datos = {nombre, cat: String(lee("cat") || "Otros").trim() || "Otros",
+      costo, precio,
+      tallas: ["sí","si","s","x","1","true","verdadero"].indexOf(tl) >= 0,
+      existencia: num(lee("existencia")), minimo_inv: num(lee("minimo_inv"))};
+    const ya = (cat.articulos||[]).find(a=>(a.nombre||"").trim().toLowerCase() === nombre.toLowerCase());
+    if(ya) actualiza.push({id: ya.id, datos, antes: ya});
+    else   nuevos.push(datos);
+  }
+  impPendiente = {nuevos, actualiza, malos};
+  pintaPreviaImp();
+}
+
+function pintaPreviaImp(){
+  const w = $("#impPrevia"); if(!w) return;
+  const p = impPendiente;
+  if(!p){ w.innerHTML = ""; return; }
+  const total = p.nuevos.length + p.actualiza.length;
+  w.innerHTML =
+    '<div class="impResumen">' +
+      '<div class="impT bien"><b>'+p.nuevos.length+'</b><small>entran nuevos</small></div>' +
+      '<div class="impT ojo"><b>'+p.actualiza.length+'</b><small>se actualizan</small></div>' +
+      '<div class="impT'+(p.malos.length?" mal":"")+'"><b>'+p.malos.length+'</b><small>con problema</small></div>' +
+    '</div>' +
+    (p.malos.length ? '<div class="impMal">'+p.malos.map(m=>'<div>'+esc(m)+'</div>').join("")+'</div>' : '') +
+    (total
+      ? '<div class="fila" style="margin-top:16px">' +
+          '<button class="btn primary" id="impAplica">Importar '+total+' artículo(s)</button>' +
+          '<span class="hint" style="font-size:12px;color:var(--ink-3)">Nada se borra.</span></div>'
+      : '<p class="note" style="margin-top:14px">No hay nada que importar en ese archivo.</p>');
+}
+
+function aplicaImportacion(){
+  const p = impPendiente; if(!p) return;
+  cat.articulos = cat.articulos || [];
+  p.nuevos.forEach(d=> cat.articulos.push(Object.assign({id: uid()}, d)));
+  p.actualiza.forEach(x=>{
+    const a = cat.articulos.find(y=>y.id === x.id); if(!a) return;
+    /* La foto y el id NO se tocan: no vienen en el Excel y perderlas seria
+       tirar trabajo que ya estaba hecho. */
+    Object.keys(x.datos).forEach(k=>{ a[k] = x.datos[k]; });
+  });
+  persist();
+  renderTabla("articulos");
+  if(typeof catqPintaFiltro === "function") catqPintaFiltro();
+  if(typeof pintaLanzadorSec === "function") pintaLanzadorSec("cat");
+  if(typeof renderInventario === "function") renderInventario();
+  const n = p.nuevos.length, a = p.actualiza.length;
+  impPendiente = null;
+  $("#modalImp").hidden = true;
+  toast(n + " nuevo(s) y " + a + " actualizado(s)");
+}
+
+document.addEventListener("click", e=>{
+  if(e.target.closest("#catImportar")){
+    impPendiente = null; pintaPreviaImp();
+    $("#modalImp").hidden = false; return;
+  }
+  if(e.target.closest("#impCerrar")){ $("#modalImp").hidden = true; return; }
+  if(e.target.closest("#impPlantilla")){ bajaPlantillaArticulos(); return; }
+  if(e.target.closest("#impEscoge")){ const i = $("#impFile"); if(i) i.click(); return; }
+  if(e.target.closest("#impAplica")){ aplicaImportacion(); return; }
+});
+document.addEventListener("change", e=>{
+  if(e.target.id !== "impFile") return;
+  const f = e.target.files && e.target.files[0];
+  if(f) leeArchivoArticulos(f);
+  e.target.value = "";
+});
+/* Arrastrar y soltar, que es como la gente mueve archivos de verdad. */
+document.addEventListener("dragover", e=>{
+  const z = e.target.closest && e.target.closest("#impZona"); if(!z) return;
+  e.preventDefault(); z.classList.add("sobre");
+});
+document.addEventListener("dragleave", e=>{
+  const z = e.target.closest && e.target.closest("#impZona"); if(z) z.classList.remove("sobre");
+});
+document.addEventListener("drop", e=>{
+  const z = e.target.closest && e.target.closest("#impZona"); if(!z) return;
+  e.preventDefault(); z.classList.remove("sobre");
+  const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if(f) leeArchivoArticulos(f);
+});
 
 function renderInsumos(){
   const t = $("#t_insumos"); if(!t) return;
@@ -7546,7 +7741,8 @@ $("#logoFile").addEventListener("change", async e=>{
   if(f.size > 4*1024*1024){ toast("Usa un logo de menos de 4 MB"); return; }
   toast("Subiendo el logo…");
   if(f.size > 2*1024*1024){ toast("El logo pasa de 2 MB. Usa un PNG más chico."); return; }
-  try{ const res = await ASSETS.upload(f); P.empresa.logo = res.url; persist(); aplicaMarca(); toast("Logo actualizado"); }
+  try{ const res = await ASSETS.upload(f); P.empresa.logo = res.url; P.empresa.logoRef = res.id || "";
+       persist(); aplicaMarca(); toast("Logo actualizado"); }
   catch(err){ toast("No se pudo subir el logo"); }
 });
 $("#btnLogoDef").addEventListener("click", ()=>{ P.empresa.logo = ""; persist(); aplicaMarca(); toast("Logo original restaurado"); });
@@ -7766,7 +7962,11 @@ $("#tab-cot").addEventListener("input", e=>{
     case "c_cliente": cot.cliente=t.value; return;
     case "c_contacto": cot.contacto=t.value; return;
     case "c_ref": cot.ref=t.value; return;
-    case "c_desc": cot.desc=t.value; return;
+    case "c_desc":
+      cot.desc = t.value;
+      /* La escribio una persona: de aqui en adelante manda ella. */
+      cot.descAuto = false;
+      return;
     case "c_qty": cot.cantidad=num(t.value,1); cot.cantManual=true; pintaSumaTallas(); refrescaCostos(); return;
     case "c_descVal": cot.descVal=num(t.value); refrescaCostos(); return;
     case "c_descNota": cot.descNota=t.value; renderResumen(); return;
@@ -7796,7 +7996,19 @@ $("#apps").addEventListener("change", e=>{
 $("#c_art").addEventListener("change", e=>{
   cot.articuloId = e.target.value;
   const a = cat.articulos.find(a=>a.id===cot.articuloId);
-  if(a){ cot.costoArt = a.costo; cot.precioArt = num(a.precio); if(!cot.desc) cot.desc = a.nombre; }
+  if(a){
+    cot.costoArt = a.costo; cot.precioArt = num(a.precio);
+    /* Sigue al articulo mientras nadie la haya escrito a mano. Tambien
+       sigue cuando lo que dice es el nombre de OTRO articulo del catalogo:
+       eso es que venia de automatico aunque no estuviera marcada, como
+       pasa con las cotizaciones de antes de este cambio. */
+    const puesta = (cot.desc||"").trim();
+    const deOtro = puesta && (cat.articulos||[]).some(x=>x.nombre === puesta);
+    if(!puesta || cot.descAuto !== false || deOtro){
+      cot.desc = a.nombre;
+      cot.descAuto = true;
+    }
+  }
   aplicaPasoTallas();
   $("#c_costoArt").value = cot.costoArt; $("#c_precioArt").value = cot.precioArt || ""; $("#c_desc").value = cot.desc;
   renderResumen(); renderApps();
@@ -9221,6 +9433,33 @@ function miniArt(a, clase){
       esc(((a&&a.nombre)||"?").trim().charAt(0).toUpperCase())+'</span>';
 }
 let fotoDe_id = null;
+/* ---------- refrescar las fotos ----------
+   Lo que se guarda es la ruta; la URL se vuelve a firmar al abrir. Si el
+   puente no sabe firmar —cuenta local, o una version vieja de cuenta.js—
+   se queda con la URL que tenia y no se rompe nada. */
+async function refrescaFotos(){
+  if(!ASSETS || typeof ASSETS.urls !== "function") return;
+  const arts = (cat.articulos||[]).filter(a=>a.fotoRef);
+  const refs = arts.map(a=>a.fotoRef);
+  if(P.empresa && P.empresa.logoRef) refs.push(P.empresa.logoRef);
+  if(!refs.length) return;
+  let m = {};
+  try{ m = await ASSETS.urls(refs); }catch(e){ return; }
+  let cambio = false;
+  arts.forEach(a=>{ const u = m[a.fotoRef]; if(u && u !== a.foto){ a.foto = u; cambio = true; } });
+  if(P.empresa && P.empresa.logoRef && m[P.empresa.logoRef]){
+    P.empresa.logo = m[P.empresa.logoRef]; cambio = true;
+  }
+  if(cambio){
+    /* No se llama persist(): la URL firmada es de usar y tirar, y escribirla
+       de vuelta solo gastaria escrituras. Lo que importa ya esta guardado,
+       que es la ruta. */
+    renderTabla("articulos");
+    if(typeof pintaSelectorArt === "function") pintaSelectorArt();
+    if(typeof aplicaMarca === "function") aplicaMarca();
+  }
+}
+
 async function subeFotoArticulo(id, file){
   const a = (cat.articulos||[]).find(a=>a.id===id); if(!a) return;
   if(!ASSETS){ toast("Subir fotos necesita permiso de edición en esta página"); return; }
@@ -16973,7 +17212,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261019-1740"></script>
-<script src="diagnostico.js?v=20261019-1740"></script>
+<script src="cuenta.js?v=20261019-2051"></script>
+<script src="diagnostico.js?v=20261019-2051"></script>
 </body>
 </html>
