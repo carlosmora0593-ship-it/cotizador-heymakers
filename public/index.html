@@ -2181,6 +2181,19 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
 .arrResumen b{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:22px;min-width:44px}
 .arrResumen span{color:var(--ink-2);font-size:13px}
 @media(max-width:620px){ .arrRej{grid-template-columns:repeat(auto-fill,minmax(145px,1fr))} }
+/* ---- vales y almacén de herramienta ---- */
+.valeFila{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 13px;
+  border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.valeFila + .valeFila{margin-top:9px}
+.valeQue{min-width:0;flex:1}
+.valeQue b{display:block;font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:14.5px}
+.valeQue small{display:block;font-size:11.5px;color:var(--ink-3)}
+.valeBtns{display:flex;gap:7px;flex-wrap:wrap;margin-left:auto}
+.valeTipo{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;
+  padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.valeTipo i{width:8px;height:8px;border-radius:3px;flex:0 0 auto}
+.herrPresta{background:color-mix(in srgb, var(--accent) 12%, transparent);
+  color:var(--accent);border-color:color-mix(in srgb, var(--accent) 30%, transparent)}
 /* ---- lanzador dentro de una sección ---- */
 .secLz{margin-top:20px}
 .secBarra{display:flex;align-items:center;gap:12px;margin:0 0 16px;flex-wrap:wrap}
@@ -2597,6 +2610,7 @@ body.rol-produccion #btnPrint{display:none!important}
         <button role="menuitem" data-tab="calc" aria-selected="false"><b>Calculadora de costos</b><small>Qué te cuesta producir, paso a paso</small></button>
         <button role="menuitem" data-tab="inv" aria-selected="false"><b>Inventario <span class="mbadge" id="invBadge" hidden>0</span></b><small>Qué hay en el taller y qué hay que pedir</small></button>
         <button role="menuitem" data-tab="com" aria-selected="false"><b>Compras <span class="mbadge" hidden>0</span></b><small>Requisiciones, proveedores y facturas</small></button>
+        <button role="menuitem" data-tab="val" aria-selected="false"><b>Vales <span class="mbadge" id="valBadge" hidden>0</span></b><small>Herramienta y dinero que sale, con su firma</small></button>
         <button role="menuitem" data-tab="asi" aria-selected="false"><b>Asistencia</b><small>Reloj checador y horas trabajadas</small></button>
         <button role="menuitem" data-tab="nom" aria-selected="false"><b>Nómina</b><small>Lo que se le paga a cada quien</small></button>
         <button role="menuitem" data-tab="set" aria-selected="false" hidden><b>Ajustes</b><small>Utilidad, IVA y datos de tu empresa</small></button>
@@ -3518,6 +3532,68 @@ body.rol-produccion #btnPrint{display:none!important}
   </div>
 </section>
 
+<section id="tab-val" hidden>
+  <div class="secBarra" id="bar_val" hidden><button class="secVolver" data-secvolver="val"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Volver</button><span class="secMigas">Vales</span></div>
+  <div class="lanzador secLz" id="lz_val"></div>
+
+  <div class="card secOculta" data-val="porauth" style="margin-top:20px">
+    <header><h2>Vales por autorizar</h2><span class="hint" id="valPendHint"></span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Un vale es cualquier cosa que sale del taller y tiene que quedar
+        anotada: herramienta del almacén, o dinero de la caja para gasolina, casetas, un hotel o un material
+        urgente. Lo levanta quien lo necesita; <b>lo autoriza quien autoriza las compras</b>.</p>
+      <div id="valPendientes"></div>
+    </div>
+  </div>
+
+  <div class="card secOculta" data-val="nuevo">
+    <header><h2>Levantar un vale</h2><span class="hint">como lo ve tu gente</span></header>
+    <div class="body">
+      <div class="seg" id="valClase" style="margin-bottom:14px">
+        <button type="button" data-valclase="herr" aria-pressed="true">Sacar herramienta</button>
+        <button type="button" data-valclase="caja" aria-pressed="false">Dinero de la caja</button>
+      </div>
+      <div id="valForm"></div>
+      <div class="fila" style="margin-top:16px">
+        <span class="hint" id="valAviso" style="color:var(--warn)"></span>
+        <button class="btn primary" id="valPedir" style="margin-left:auto">Levantar el vale</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card secOculta" data-val="almacen">
+    <header><h2>Lo que hay en el almacén</h2><span class="hint" id="herrHint"></span>
+      <button class="btn sm ghost" id="herrNueva" style="margin-left:auto">+ Herramienta</button></header>
+    <div class="body">
+      <div class="periodbar">
+        <div class="seg" id="herrFiltro">
+          <button type="button" data-hf="todo" aria-pressed="true">Todo</button>
+          <button type="button" data-hf="gasta" aria-pressed="false">Lo que se gasta</button>
+          <button type="button" data-hf="presta" aria-pressed="false">Lo que se presta</button>
+          <button type="button" data-hf="pedir" aria-pressed="false">Hay que pedir</button>
+        </div>
+        <span class="hintbar">Lo que se <b>presta</b> no se gasta: sale del almacén pero sigue siendo tuyo, y por eso
+          se le pone nombre a quien se lo llevó.</span>
+      </div>
+      <div class="tbl-wrap"><table id="t_herr"></table></div>
+    </div>
+  </div>
+
+  <div class="card secOculta" data-val="prestado">
+    <header><h2>Quién trae qué</h2><span class="hint" id="prestHint"></span></header>
+    <div class="body"><div id="valPrestados"></div></div>
+  </div>
+
+  <div class="card secOculta" data-val="hist">
+    <header><h2>Vales anteriores</h2><span class="hint" id="valHistHint"></span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Todo lo que ya se autorizó, se entregó o se comprobó. Cada uno se
+        puede volver a abrir, imprimir y revisar su comprobante.</p>
+      <div id="valHistoria"></div>
+    </div>
+  </div>
+</section>
+
 <section id="tab-set" hidden>
   <div class="secBarra" id="bar_set" hidden><button class="secVolver" data-secvolver="set"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Volver</button><span class="secMigas">Ajustes</span></div>
   <div class="lanzador secLz" id="lz_set"></div>
@@ -3726,6 +3802,7 @@ body.rol-produccion #btnPrint{display:none!important}
         <button class="btn" id="btnReset">Restaurar precios de ejemplo</button>
       </div>
       <input type="file" id="fileIn" accept="application/json" hidden>
+      <input type="file" id="valeArchivo" accept="image/png,image/jpeg,image/webp,application/pdf" hidden>
     </div>
   </div>
 
@@ -7186,6 +7263,29 @@ document.addEventListener("click", e=>{
 });
 
 
+/* Los azulejos de Vales. */
+registraLanzador("val", [
+  {id:"porauth", nombre:"Por autorizar", sub:"lo que está esperando firma", color:"#D6127F",
+   icono:'<path d="M3 21h4l11-11a2.8 2.8 0 0 0-4-4L3 17Z"/><path d="M14.5 6.5 17.5 9.5"/>',
+   card:'[data-val="porauth"]',
+   cuenta:()=>{ try{ return valesPend().length; }catch(e){ return 0; } }},
+  {id:"nuevo", nombre:"Levantar un vale", sub:"herramienta o dinero", color:"#0680AB",
+   icono:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+   card:'[data-val="nuevo"]'},
+  {id:"almacen", nombre:"El almacén", sub:"qué hay y qué falta", color:"#0E7C57",
+   icono:'<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>',
+   card:'[data-val="almacen"]',
+   cuenta:()=>{ try{ return herrBajoMin().length; }catch(e){ return 0; } }},
+  {id:"prestado", nombre:"Quién trae qué", sub:"lo prestado sin devolver", color:"#B26A00",
+   icono:'<circle cx="9" cy="8" r="3.4"/><path d="M3 20v-1.4A3.6 3.6 0 0 1 6.6 15h4.8a3.6 3.6 0 0 1 3.6 3.6V20"/><path d="M18 8v8M15 11h6"/>',
+   card:'[data-val="prestado"]',
+   cuenta:()=>{ try{ return prestados().length; }catch(e){ return 0; } }},
+  {id:"hist", nombre:"Vales anteriores", sub:"lo que ya se cerró", color:"#64748B",
+   icono:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+   card:'[data-val="hist"]',
+   cuenta:()=>{ try{ return sinComprobar().length; }catch(e){ return 0; } }}
+], "Vales");
+
 /* Los azulejos de Inventario, Ventas, Asistencia y Nómina. */
 registraLanzador("inv", [
   {id:"taller", nombre:"Inventario del taller", sub:"qué hay y qué falta", color:"#22C55E",
@@ -8385,6 +8485,7 @@ $("#tabs").addEventListener("click", e=>{
   if(b.dataset.tab==="arc") reiniciaSec("arc");
   if(b.dataset.tab==="com") reiniciaSec("com");
   if(b.dataset.tab==="set") reiniciaSec("set");
+  if(b.dataset.tab==="val"){ renderVales(); reiniciaSec("val"); }
   if(b.dataset.tab==="inv") reiniciaSec("inv");
   if(b.dataset.tab==="ven") reiniciaSec("ven");
   if(b.dataset.tab==="asi") reiniciaSec("asi");
@@ -11683,7 +11784,7 @@ $("#modalNom").addEventListener("click", e=>{
 
 /* Todas las secciones que existen. Vivir en un solo lado evita el error de
    crear una pestaña y que se quede visible encima de otra. */
-const TABS_TODAS = ["inicio","cot","cat","calc","inv","com","cli","arc","caj","pro","dis","sav","ven","asi","nom","set"];
+const TABS_TODAS = ["inicio","cot","cat","calc","inv","com","val","cli","arc","caj","pro","dis","sav","ven","asi","nom","set"];
 
 /* ====================== tablero: accesos, anillos y lo tuyo ====================== */
 
@@ -13781,10 +13882,10 @@ async function bajaCarpeta(cliente, mes, boton){
 
 /* ============ EQUIPO Y ROLES ============ */
 const ROLES = {
-  admin:      {nombre:"Administrador", ve:["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","asi","nom","set"]},
-  ventas:     {nombre:"Ventas",        ve:["inicio","cot","sav","pro","dis","cli","arc","com","asi"]},
-  diseno:     {nombre:"Diseño",        ve:["inicio","dis","pro","asi"]},
-  produccion: {nombre:"Producción",    ve:["inicio","pro","inv","com","asi"]}
+  admin:      {nombre:"Administrador", ve:["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","val","asi","nom","set"]},
+  ventas:     {nombre:"Ventas",        ve:["inicio","cot","sav","pro","dis","cli","arc","com","val","asi"]},
+  diseno:     {nombre:"Diseño",        ve:["inicio","dis","pro","val","asi"]},
+  produccion: {nombre:"Producción",    ve:["inicio","pro","inv","com","val","asi"]}
 };
 let equipo = [], usuarioId = null, pinPendiente = null;
 
@@ -16200,6 +16301,441 @@ $("#venChart").addEventListener("mousemove", e=>{
 });
 $("#venChart").addEventListener("mouseleave", ()=>{ if(tipEl){ tipEl.remove(); tipEl=null; } });
 
+
+/* ============ VALES Y ALMACÉN DE HERRAMIENTA ============ */
+const TIPOS_VALE = [
+  {id:"material", et:"Material urgente",   color:"#0680AB"},
+  {id:"gasolina", et:"Gasolina",           color:"#B26A00"},
+  {id:"casetas",  et:"Casetas",            color:"#0E7C57"},
+  {id:"viatico",  et:"Hotel y viáticos",   color:"#8B5CF6"},
+  {id:"servicio", et:"Pago de un servicio",color:"#D6127F"},
+  {id:"otro",     et:"Otro",               color:"#64748B"}
+];
+const tipoValeDe = id => TIPOS_VALE.find(x=>x.id===id) || TIPOS_VALE[TIPOS_VALE.length-1];
+
+function herramienta(){ cat.herramienta = cat.herramienta || []; return cat.herramienta; }
+function vales(){ cat.vales = cat.vales || []; return cat.vales; }
+const herrDe = id => herramienta().find(h=>h.id===id) || null;
+const valeDe = id => vales().find(v=>v.id===id) || null;
+
+const valesPend   = () => vales().filter(v=>v.estado === "pedido");
+const valesHist   = () => vales().filter(v=>v.estado !== "pedido")
+                            .slice().sort((a,b)=> (b.fecha+b.hora).localeCompare(a.fecha+a.hora));
+const prestados   = () => vales().filter(v=>{
+  if(v.clase !== "herr" || v.estado !== "entregado") return false;
+  const h = herrDe(v.herrId); return h && h.tipo === "presta";
+});
+const herrBajoMin = () => herramienta().filter(h=> num(h.hay) <= num(h.min));
+const valorHerr   = () => herramienta().reduce((s,h)=> s + num(h.hay) * num(h.costo), 0);
+const sinComprobar= () => vales().filter(v=>v.clase === "caja" && v.estado === "entregado");
+
+function folioVale(v){
+  return (v.clase === "herr" ? "VH-" : "VC-") + String(v.folioN || 0).padStart(5, "0");
+}
+function nuevoFolioVale(clase){
+  return vales().filter(v=>v.clase === clase).reduce((m,v)=> Math.max(m, num(v.folioN)), 0) + 1;
+}
+const quienSoy = () => {
+  const u = usuarioActual();
+  const rol = (ROLES[u.rol] || ROLES.admin).nombre;
+  const n = u.nombre || "Sin nombre";
+  return n === rol ? n : n + " · " + rol;
+};
+
+/* ---------- lo que se guarda ---------- */
+async function guardaVales(){ persist(); }
+
+/* ---------- la interfaz ---------- */
+let valClase = "herr", herrFiltro = "todo";
+
+function pintaFormVale(){
+  const caja = $("#valForm"); if(!caja) return;
+  const hs = herramienta();
+  if(valClase === "herr"){
+    caja.innerHTML = '<div class="grid g3">' +
+      '<div><label class="f" for="vlQue">Qué necesitas</label><select id="vlQue">' +
+        (hs.length ? hs.map(h=>'<option value="'+esc(h.id)+'">'+esc(h.nombre)+' — hay '+num(h.hay)+' '+esc(h.uni)+'</option>').join("")
+                   : '<option value="">— todavía no das de alta herramienta —</option>') +
+      '</select></div>' +
+      '<div><label class="f" for="vlCuanto">Cuántas</label>' +
+        '<input id="vlCuanto" type="number" min="1" step="1" value="1"></div>' +
+      '<div><label class="f" for="vlPara">Para qué</label>' +
+        '<input id="vlPara" placeholder="OP-000312 o para qué la ocupa" autocomplete="off"></div>' +
+      '</div>';
+  } else {
+    caja.innerHTML = '<div class="grid g3">' +
+      '<div><label class="f" for="vlTipo">De qué es</label><select id="vlTipo">' +
+        TIPOS_VALE.map(t=>'<option value="'+t.id+'">'+esc(t.et)+'</option>').join("") + '</select></div>' +
+      '<div><label class="f" for="vlConcepto">Para qué</label>' +
+        '<input id="vlConcepto" placeholder="Polvo termoadhesivo, 2 kg" autocomplete="off"></div>' +
+      '<div><label class="f" for="vlMonto">Cuánto</label>' +
+        '<input id="vlMonto" type="number" min="1" step="50" value="500"></div>' +
+      '</div>' +
+      '<p class="note" style="margin-top:12px">Un vale sin comprobar <b>no es un gasto: es un préstamo</b>, y ' +
+      'mientras no traiga el ticket sigue colgado del nombre de quien se lo llevó. Y ojo con la factura: ' +
+      'un gasto sin comprobante fiscal no se deduce aunque el dinero sí haya salido.</p>';
+  }
+}
+
+function renglonVale(v, conBotones){
+  const h = v.clase === "herr" ? herrDe(v.herrId) : null;
+  const t = v.clase === "caja" ? tipoValeDe(v.tipo) : null;
+  const etiqueta = v.clase === "herr"
+    ? '<span class="valeTipo'+(h && h.tipo === "presta" ? " herrPresta" : "")+'">' +
+      num(v.cant)+' '+esc(h ? h.uni : "")+' · '+(h && h.tipo === "presta" ? "se presta" : "se gasta")+'</span>'
+    : '<span class="valeTipo"><i style="background:'+esc(t.color)+'"></i>'+esc(t.et)+'</span>';
+  const titulo = v.clase === "herr" ? (h ? h.nombre : "Herramienta dada de baja") : (v.concepto || "Sin concepto");
+  const sub = v.clase === "herr"
+    ? esc(v.quien)+' · '+esc(v.fecha)+' '+esc(v.hora)+(v.para ? ' · '+esc(v.para) : '')
+    : esc(v.quien)+' · '+esc(v.fecha)+' '+esc(v.hora)+' · '+mx(v.monto);
+
+  let estado = "";
+  const presta = v.clase === "herr" && h && h.tipo === "presta";
+  if(v.estado === "entregado" && v.clase === "caja") estado = '<span class="pill part">falta comprobar</span>';
+  /* Lo que se gasta sale y se acabó; lo que se presta sigue siendo tuyo y
+     por eso se queda marcado hasta que vuelva. */
+  else if(v.estado === "entregado") estado = presta
+    ? '<span class="pill part">afuera</span>'
+    : '<span class="pill good">entregado</span>';
+  else if(v.estado === "comprobado") estado = '<span class="pill good">comprobado</span>';
+  else if(v.estado === "devuelto") estado = '<span class="pill good">devuelto</span>';
+  else if(v.estado === "rechazado") estado = '<span class="pill pend">rechazado</span>';
+
+  let btns = '<button class="btn sm ghost" data-vale-ver="'+esc(v.id)+'">Ver el vale</button>';
+  if(conBotones && v.estado === "pedido" && puedeAutorizar()){
+    const falta = v.clase === "herr" && h && num(h.hay) < num(v.cant);
+    btns = '<button class="btn sm primary" data-vale-ok="'+esc(v.id)+'"'+(falta?" disabled":"")+'>' +
+      (v.clase === "herr" ? "Autorizar y entregar" : "Entregar el efectivo") + '</button>' + btns +
+      '<button class="btn sm ghost" data-vale-no="'+esc(v.id)+'">Rechazar</button>';
+    if(falta) estado = '<span class="pill pend">sólo hay '+num(h.hay)+'</span>';
+  }
+  if(conBotones && v.estado === "entregado" && v.clase === "herr" && h && h.tipo === "presta")
+    btns = '<button class="btn sm" data-vale-dev="'+esc(v.id)+'">Ya la devolvió</button>' + btns;
+  if(conBotones && v.estado === "entregado" && v.clase === "caja" && puedeAutorizar())
+    btns = '<input type="number" data-vale-gasto="'+esc(v.id)+'" min="0" step="10" ' +
+             'value="'+num(v.gastado || v.monto)+'" style="width:92px" aria-label="Cuánto gastó">' +
+           '<label class="sw" style="font-size:12px"><input type="checkbox" data-vale-fac="'+esc(v.id)+'"' +
+             (v.factura?" checked":"")+'> Con factura</label>' +
+           '<button class="btn sm primary" data-vale-comp="'+esc(v.id)+'">Comprobar</button>' + btns;
+
+  return '<div class="valeFila"><div class="valeQue"><b>'+esc(titulo)+'</b><small>'+sub+'</small>' +
+    (v.clase === "caja" && v.estado === "comprobado"
+      ? '<small>gastó '+mx(v.gastado)+(num(v.monto)-num(v.gastado) > 0 ? ' · devolvió '+mx(num(v.monto)-num(v.gastado)) : '')+
+        ' · '+(v.factura ? "con factura" : "sin factura")+'</small>' : '') +
+    '</div>' + etiqueta + estado +
+    (v.comprobante ? '<span class="pill good">con comprobante</span>' : '') +
+    '<div class="valeBtns">' + btns + '</div></div>';
+}
+
+function renderVales(){
+  const pend = valesPend();
+  $("#valPendHint").textContent = pend.length
+    ? pend.length + " esperando" + (puedeAutorizar() ? "" : " · los autoriza el administrador")
+    : "ninguno pendiente";
+  $("#valPendientes").innerHTML = pend.length
+    ? pend.map(v=>renglonVale(v, true)).join("")
+    : '<div class="empty">Nadie ha levantado un vale. Aquí caen conforme los pidan.</div>';
+
+  const pres = prestados();
+  $("#prestHint").textContent = pres.length ? pres.length + " sin devolver" : "nada afuera";
+  $("#valPrestados").innerHTML = pres.length
+    ? pres.map(v=>renglonVale(v, true)).join("")
+    : '<div class="empty">Todo está en su lugar.</div>';
+
+  const hist = valesHist();
+  $("#valHistHint").textContent = hist.length + " vale(s)";
+  $("#valHistoria").innerHTML = hist.length
+    ? hist.slice(0,60).map(v=>renglonVale(v, v.estado === "entregado")).join("")
+    : '<div class="empty">Todavía no hay vales cerrados.</div>';
+
+  renderHerramienta();
+  pintaFormVale();
+  if(typeof pintaLanzadorSec === "function") pintaLanzadorSec("val");
+}
+
+function renderHerramienta(){
+  const t = $("#t_herr"); if(!t) return;
+  const todo = herramienta();
+  const lista = todo.filter(h=>
+    herrFiltro === "todo"  ? true :
+    herrFiltro === "pedir" ? num(h.hay) <= num(h.min) : h.tipo === herrFiltro);
+  $("#herrHint").textContent = todo.length
+    ? todo.length + " en el almacén · " + mx(valorHerr()) + " en piso"
+    : "todavía vacío";
+  t.innerHTML = '<thead><tr><th>Herramienta</th><th>Cómo se maneja</th><th class="der">Hay</th>' +
+    '<th class="der">Mínimo</th><th class="der">Costo</th><th>Unidad</th><th>Cómo está</th><th></th></tr></thead><tbody>' +
+    (lista.length ? lista.map(h=>{
+      const afuera = prestados().filter(v=>v.herrId === h.id).reduce((s,v)=>s+num(v.cant), 0);
+      const estado = num(h.hay) <= 0 ? '<span class="pill pend">se acabó</span>'
+        : num(h.hay) <= num(h.min) ? '<span class="pill part">hay que pedir</span>'
+        : '<span class="pill good">suficiente</span>';
+      return '<tr data-herr="'+esc(h.id)+'">' +
+        '<td><input data-hk="nombre" value="'+esc(h.nombre)+'"></td>' +
+        '<td><select data-hk="tipo"><option value="gasta"'+(h.tipo!=="presta"?" selected":"")+'>Se gasta</option>' +
+          '<option value="presta"'+(h.tipo==="presta"?" selected":"")+'>Se presta y vuelve</option></select></td>' +
+        '<td class="der"><input data-hk="hay" type="number" min="0" step="1" value="'+num(h.hay)+'">' +
+          (afuera ? '<br><small style="color:var(--ink-3)">'+afuera+' afuera</small>' : '')+'</td>' +
+        '<td class="der"><input data-hk="min" type="number" min="0" step="1" value="'+num(h.min)+'"></td>' +
+        '<td class="der"><input data-hk="costo" type="number" min="0" step="1" value="'+num(h.costo)+'"></td>' +
+        '<td><input data-hk="uni" value="'+esc(h.uni||"pza")+'" style="width:80px"></td>' +
+        '<td>'+estado+'</td>' +
+        '<td><button class="btn icon sm" data-herr-del="'+esc(h.id)+'">✕</button></td></tr>';
+    }).join("")
+     : '<tr><td colspan="8"><div class="empty">' +
+       (todo.length ? "Nada con ese filtro." : "Da de alta tu primera herramienta con el botón de arriba.") +
+       '</div></td></tr>') + '</tbody>';
+}
+
+/* ---------- levantar, autorizar, entregar, comprobar ---------- */
+async function levantaVale(){
+  const base = {id:uid(), clase:valClase, quien:quienSoy(), uid:usuarioActual().id,
+                fecha:hoyISO(), hora:horaAhora(), estado:"pedido",
+                folioN:nuevoFolioVale(valClase)};
+  if(valClase === "herr"){
+    const h = herrDe(($("#vlQue")||{}).value);
+    if(!h){ toast("Escoge qué herramienta necesitas"); return; }
+    base.herrId = h.id;
+    base.cant = Math.max(1, num(($("#vlCuanto")||{}).value, 1));
+    base.para = (($("#vlPara")||{}).value || "").trim();
+  } else {
+    const concepto = (($("#vlConcepto")||{}).value || "").trim();
+    if(!concepto){ toast("Escribe para qué es el dinero"); return; }
+    base.tipo = ($("#vlTipo")||{}).value || "otro";
+    base.concepto = concepto;
+    base.monto = Math.max(1, num(($("#vlMonto")||{}).value, 0));
+  }
+  vales().push(base);
+  await guardaVales();
+  renderVales();
+  toast("Vale " + folioVale(base) + " levantado. Falta que lo autoricen.");
+}
+
+async function entregaVale(id){
+  const v = valeDe(id); if(!v || v.estado !== "pedido") return;
+  if(!puedeAutorizar()){ toast("Sólo el administrador autoriza los vales"); return; }
+  if(v.clase === "herr"){
+    const h = herrDe(v.herrId);
+    if(!h){ toast("Esa herramienta ya no está en el almacén"); return; }
+    if(num(h.hay) < num(v.cant)){ toast("No hay suficiente para entregar ese vale"); return; }
+    /* Sale del almacén en los dos casos. La diferencia es que lo prestado
+       sigue siendo tuyo y tiene que volver; lo que se gasta ya no vuelve. */
+    h.hay = num(h.hay) - num(v.cant);
+    v.estado = "entregado"; v.entregado = hoyISO() + " " + horaAhora(); v.autorizo = quienSoy();
+    await guardaVales(); renderVales();
+    toast(h.tipo === "presta"
+      ? h.nombre + " queda a nombre de " + v.quien.split(" · ")[0]
+      : "Entregado · quedan " + num(h.hay) + " " + h.uni);
+    return;
+  }
+  /* El efectivo sale de la caja del día, como la nómina: si está cerrada,
+     el vale se entrega igual pero no entra al corte, y se dice. */
+  v.estado = "entregado"; v.entregado = hoyISO() + " " + horaAhora(); v.autorizo = quienSoy();
+  v.gastado = num(v.monto);
+  const c = cajaDe(hoyISO());
+  if(c.abierta){
+    c.movs.push({id:uid(), hora:horaAhora(), tipo:"salida",
+                 concepto:"Vale " + folioVale(v) + " · " + v.concepto, folio:folioVale(v), monto:num(v.monto)});
+    await guardaCaja(c);
+    if(!$("#tab-caj").hidden) renderCaja();
+  }
+  await guardaVales(); renderVales();
+  toast(c.abierta ? "Salieron " + mx(v.monto) + " de la caja del día"
+                  : "Vale entregado. La caja de hoy está cerrada, así que no entró al corte.");
+}
+
+async function compruebaVale(id){
+  const v = valeDe(id); if(!v || v.clase !== "caja" || v.estado !== "entregado") return;
+  const campo = document.querySelector('[data-vale-gasto="'+id+'"]');
+  const fac   = document.querySelector('[data-vale-fac="'+id+'"]');
+  const gasto = Math.min(num(v.monto), Math.max(0, num(campo ? campo.value : v.monto)));
+  v.gastado = gasto;
+  v.factura = !!(fac && fac.checked);
+  v.estado = "comprobado";
+  v.comprobado = hoyISO() + " " + horaAhora();
+  const cambio = num(v.monto) - gasto;
+  if(cambio > 0){
+    const c = cajaDe(hoyISO());
+    if(c.abierta){
+      c.movs.push({id:uid(), hora:horaAhora(), tipo:"entrada",
+                   concepto:"Cambio del vale " + folioVale(v), folio:folioVale(v), monto:cambio});
+      await guardaCaja(c);
+      if(!$("#tab-caj").hidden) renderCaja();
+    }
+  }
+  await guardaVales(); renderVales();
+  toast(cambio > 0 ? "Comprobado · regresaron " + mx(cambio) + " a la caja"
+                   : "Comprobado" + (v.factura ? "" : " · sin factura no se deduce"));
+}
+
+async function devuelveVale(id){
+  const v = valeDe(id); if(!v || v.clase !== "herr" || v.estado !== "entregado") return;
+  const h = herrDe(v.herrId);
+  if(h) h.hay = num(h.hay) + num(v.cant);
+  v.estado = "devuelto"; v.devuelto = hoyISO() + " " + horaAhora();
+  await guardaVales(); renderVales();
+  toast((h ? h.nombre : "La herramienta") + " volvió al almacén");
+}
+
+/* ---------- el documento que se firma ---------- */
+function hojaVale(v){
+  const h = v.clase === "herr" ? herrDe(v.herrId) : null;
+  const t = v.clase === "caja" ? tipoValeDe(v.tipo) : null;
+  const E = P.empresa || {};
+  const ESTADOS = {pedido:"Por autorizar", entregado: v.clase === "caja" ? "Falta comprobar" : "Entregado",
+                   comprobado:"Comprobado", devuelto:"Devuelto", rechazado:"Rechazado"};
+  const filas = v.clase === "herr"
+    ? [["Sale del almacén", h ? h.nombre : "—"],
+       ["Cuánto", num(v.cant) + " " + (h ? h.uni : "")],
+       ["Cómo se maneja", h && h.tipo === "presta" ? "Se presta y tiene que volver" : "Se gasta"],
+       ["Para qué", v.para || "—"]]
+    : [["De qué es", t.et], ["Para qué", v.concepto], ["Importe", mx(v.monto)],
+       ["Comprobado", v.estado === "comprobado"
+          ? mx(v.gastado) + (num(v.monto)-num(v.gastado) > 0 ? " · devolvió " + mx(num(v.monto)-num(v.gastado)) : "")
+          : "todavía no"],
+       ["Comprobante fiscal", v.estado === "comprobado" ? (v.factura ? "con factura" : "sin factura") : "—"]];
+
+  return membrete() +
+    '<h1 style="margin-bottom:2px">' + (v.clase === "herr" ? "Vale de salida de almacén" : "Vale de caja") + '</h1>' +
+    '<p style="color:#555;margin:0 0 14px">' + esc(folioVale(v)) + ' · ' + esc(v.fecha) + ' ' + esc(v.hora) + '</p>' +
+    '<table><tbody>' +
+      '<tr><th style="width:38%">Quién lo pide</th><td>' + esc(v.quien) + '</td></tr>' +
+      filas.map(f=>'<tr><th>'+esc(f[0])+'</th><td>'+esc(f[1]||"—")+'</td></tr>').join("") +
+      '<tr><th>Autoriza</th><td>' + esc(v.autorizo || "—") + '</td></tr>' +
+      '<tr><th>Estado</th><td>' + esc(ESTADOS[v.estado] || v.estado) + '</td></tr>' +
+    '</tbody></table>' +
+    '<p style="margin-top:16px;font-size:12.5px;line-height:1.7">' + (v.clase === "herr"
+      ? "Recibí la herramienta descrita. Si es de las que se prestan, me comprometo a devolverla en las mismas condiciones."
+      : "Recibí la cantidad señalada y me comprometo a comprobarla con el ticket o la factura correspondiente.") + '</p>' +
+    '<div style="display:flex;gap:60px;margin-top:38px;flex-wrap:wrap">' +
+      '<div style="text-align:center"><span style="display:block;height:44px;border-bottom:1px solid #111;width:210px"></span>' +
+        '<span style="display:block;font-size:11px;margin-top:5px">' + esc(v.quien.split(" · ")[0]) + '<br>Recibí</span></div>' +
+      '<div style="text-align:center"><span style="display:block;height:44px;border-bottom:1px solid #111;width:210px"></span>' +
+        '<span style="display:block;font-size:11px;margin-top:5px">' + esc((v.autorizo || "").split(" · ")[0] || "") + '<br>Autorizó</span></div>' +
+    '</div>' +
+    (v.comprobante
+      ? '<div style="margin-top:22px;border-top:1px dashed #bbb;padding-top:12px">' +
+        '<b style="font-size:12px">Comprobante adjunto</b><br>' +
+        (v.comprobante.url ? '<img src="'+esc(v.comprobante.url)+'" alt="Comprobante" style="max-width:100%;max-height:340px;margin-top:8px">' : '') +
+        '<small style="display:block;color:#555;margin-top:6px">' + esc(v.comprobante.nombre || "") + '</small></div>'
+      : '');
+}
+let valeAbierto = null;
+function abreVale(id){
+  const v = valeDe(id); if(!v){ toast("No encuentro ese vale"); return; }
+  valeAbierto = id;
+  muestraDoc("Vale · " + folioVale(v), hojaVale(v) +
+    '<div class="no-print" style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap">' +
+      '<button class="btn" id="valeAdj" type="button">' +
+        (v.comprobante ? "Cambiar el comprobante" : "Adjuntar comprobante") + '</button>' +
+      (v.comprobante ? '<button class="btn ghost" id="valeQuitaAdj" type="button">Quitar el comprobante</button>' : '') +
+    '</div>');
+  const b = $("#valeAdj");
+  if(b) b.addEventListener("click", ()=>{
+    if(!ASSETS){ toast("Para adjuntar archivos necesitas permiso de edición en esta página"); return; }
+    $("#valeArchivo").click();
+  });
+  const q = $("#valeQuitaAdj");
+  if(q) q.addEventListener("click", async ()=>{
+    delete v.comprobante; await guardaVales(); abreVale(id); renderVales();
+    toast("Comprobante quitado");
+  });
+}
+
+/* ---------- eventos de los vales ---------- */
+document.addEventListener("click", e=>{
+  const ver = e.target.closest("[data-vale-ver]");
+  if(ver){ abreVale(ver.dataset.valeVer); return; }
+  const ok = e.target.closest("[data-vale-ok]");
+  if(ok){ entregaVale(ok.dataset.valeOk); return; }
+  const no = e.target.closest("[data-vale-no]");
+  if(no){
+    const v = valeDe(no.dataset.valeNo);
+    if(v && puedeAutorizar()){ v.estado = "rechazado"; v.autorizo = quienSoy(); guardaVales(); renderVales(); toast("Vale rechazado"); }
+    return;
+  }
+  const comp = e.target.closest("[data-vale-comp]");
+  if(comp){ compruebaVale(comp.dataset.valeComp); return; }
+  const dev = e.target.closest("[data-vale-dev]");
+  if(dev){ devuelveVale(dev.dataset.valeDev); return; }
+
+  const cl = e.target.closest("[data-valclase]");
+  if(cl){
+    valClase = cl.dataset.valclase;
+    $("#valClase").querySelectorAll("button").forEach(b=>
+      b.setAttribute("aria-pressed", String(b.dataset.valclase === valClase)));
+    pintaFormVale(); return;
+  }
+  if(e.target.closest("#valPedir")){ levantaVale(); return; }
+
+  const hf = e.target.closest("[data-hf]");
+  if(hf){
+    herrFiltro = hf.dataset.hf;
+    $("#herrFiltro").querySelectorAll("button").forEach(b=>
+      b.setAttribute("aria-pressed", String(b.dataset.hf === herrFiltro)));
+    renderHerramienta(); return;
+  }
+  if(e.target.closest("#herrNueva")){
+    herramienta().push({id:uid(), nombre:"Herramienta nueva", tipo:"gasta", uni:"pza", hay:0, min:0, costo:0});
+    guardaVales(); renderVales(); return;
+  }
+  const hd = e.target.closest("[data-herr-del]");
+  if(hd){
+    const id = hd.dataset.herrDel;
+    if(vales().some(v=>v.herrId === id && (v.estado === "pedido" || v.estado === "entregado"))){
+      toast("Esa herramienta tiene un vale abierto: ciérralo antes de darla de baja"); return;
+    }
+    cat.herramienta = herramienta().filter(h=>h.id !== id);
+    guardaVales(); renderVales(); return;
+  }
+});
+/* Los campos de la tabla del almacén se guardan al teclear, como el resto
+   del catálogo. */
+document.addEventListener("input", e=>{
+  const tr = e.target.closest("[data-herr]"); if(!tr) return;
+  const k = e.target.dataset.hk; if(!k) return;
+  const h = herrDe(tr.dataset.herr); if(!h) return;
+  h[k] = (k === "nombre" || k === "uni" || k === "tipo") ? e.target.value : num(e.target.value);
+  guardaVales();
+  if(typeof pintaLanzadorSec === "function") pintaLanzadorSec("val");
+});
+document.addEventListener("change", e=>{
+  const tr = e.target.closest("[data-herr]");
+  if(tr && e.target.dataset.hk === "tipo"){
+    const h = herrDe(tr.dataset.herr);
+    if(h){ h.tipo = e.target.value; guardaVales(); renderHerramienta(); }
+    return;
+  }
+  if(e.target.id === "valeArchivo"){
+    const f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if(!f || !valeAbierto) return;
+    subeComprobante(valeAbierto, f);
+  }
+});
+/* El comprobante se sube al mismo bucket privado de los diseños y se guarda
+   la RUTA, no la liga: las ligas firmadas se vencen. */
+async function subeComprobante(id, f){
+  const v = valeDe(id); if(!v) return;
+  if(f.size > 8*1024*1024){ toast("Usa un archivo de menos de 8 MB"); return; }
+  if(!ASSETS){ toast("Para adjuntar archivos necesitas permiso de edición en esta página"); return; }
+  try{
+    toast("Subiendo el comprobante…");
+    const r = await ASSETS.upload(f);
+    /* Se guarda la RUTA (r.id) y no la liga: las ligas firmadas se vencen,
+       como ya pasó con las fotos del catálogo. La liga se vuelve a pedir
+       cada que arranca la app. */
+    v.comprobante = {nombre:f.name, ref:r.id || "", url:r.url || ""};
+    await guardaVales();
+    abreVale(id); renderVales();
+    toast("Comprobante adjunto");
+  }catch(err){
+    const c = err && err.code;
+    toast(c === "not_granted" ? "Falta permiso para guardar archivos"
+        : c === "quota_exceeded" ? "Ya no hay espacio de archivos"
+        : "No se pudo subir el comprobante");
+  }
+}
+
 /* ---------- generar factura desde una cotización ---------- */
 function facturaDe(g){
   const v = ventas.find(v=>v.folio===g.folio);
@@ -16555,6 +17091,7 @@ window.__arranca = () => initStore().then(async ()=>{
   }
   renderCot(); renderSet(); renderSaved(); pintaSelectClientes();
   if(typeof renderTablero === "function") renderTablero();   /* ya con datos */
+  try{ renderVales(); }catch(e){}
   $("#catEstado").textContent = "Catálogo al día";
   arrancaAyuda();
   arranqueSiEsNuevo();
@@ -17738,7 +18275,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261019-2135"></script>
-<script src="diagnostico.js?v=20261019-2135"></script>
+<script src="cuenta.js?v=20261020-1213"></script>
+<script src="diagnostico.js?v=20261020-1213"></script>
 </body>
 </html>
