@@ -729,6 +729,8 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
         <button class="btn sm ghost" data-recper="quincena">Esta quincena</button>
         <button class="btn sm ghost" data-recper="mes">Este mes</button>
       </div>
+      <label class="sw" style="margin-top:14px"><input type="checkbox" id="recDescuenta">
+        Descontar los retardos de lo que le toca</label>
       <div id="recResumen" style="margin-top:16px"></div>
     </div>
   </div>
@@ -905,6 +907,21 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
       <div class="tbl-wrap"><table id="t_cancela"></table></div>
     </div>
   </div>
+  <div class="card secOculta" data-ven="factura">
+    <header><h2>Facturas</h2><span class="hint" id="facHint"></span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">El cliente regresa con su ticket y te pide factura.
+        Busca su <b>folio</b>, captura su RFC y queda guardada pegada a esa venta. Mientras no la
+        timbres se queda en <b>pendiente</b>, para que al cierre del mes sepas cuáles faltan.</p>
+      <div class="fila" style="margin-bottom:12px">
+        <input id="facBusca" placeholder="Buscar folio, mesa o RFC" style="max-width:300px">
+        <button class="btn sm" data-facfiltro="pend" id="facFPend">Por timbrar</button>
+        <button class="btn sm" data-facfiltro="hechas">Timbradas</button>
+        <button class="btn sm" data-facfiltro="todas">Todas las ventas</button>
+      </div>
+      <div class="tbl-wrap"><table id="t_facturas"></table></div>
+    </div>
+  </div>
   <div class="card secOculta" data-ven="turnos">
     <header><h2>Turnos cerrados</h2></header>
     <div class="body"><div class="tbl-wrap"><table id="t_turnos"></table></div></div>
@@ -1066,6 +1083,49 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
       <p class="note" id="bloqueoNota" style="margin-top:10px"></p>
     </div>
   </div>
+  <div class="card secOculta" data-set="fiscal">
+    <header><h2>Facturación</h2><span class="hint">con qué datos emites tus facturas</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Esto es lo <b>tuyo</b>: lo que va arriba de cada factura.
+        Los datos del cliente se piden al facturar cada ticket, en <b>Ventas</b>.</p>
+      <div class="grid g2">
+        <div><label class="f" for="fx_razon">Razón social</label>
+          <input id="fx_razon" placeholder="Como está en tu constancia del SAT"></div>
+        <div><label class="f" for="fx_rfc">RFC</label>
+          <input id="fx_rfc" placeholder="XAXX010101000" style="text-transform:uppercase" maxlength="13"></div>
+      </div>
+      <div class="grid g2" style="margin-top:10px">
+        <div><label class="f" for="fx_regimen">Régimen fiscal</label><select id="fx_regimen"></select></div>
+        <div><label class="f" for="fx_cp">Código postal fiscal</label>
+          <input id="fx_cp" inputmode="numeric" maxlength="5" placeholder="58000"></div>
+      </div>
+      <p class="note" style="margin-top:10px">El código postal fiscal es el <b>lugar de expedición</b>.
+        Si no coincide con tu constancia, el SAT rechaza el timbrado.</p>
+      <div class="note" style="margin-top:14px;border-left-color:var(--warn)">
+        <b>Tus sellos del SAT no se guardan aquí, y es a propósito.</b> Tu archivo .cer, tu .key y la
+        contraseña de tu llave son tu firma: quien los tiene puede facturar a tu nombre. Se suben
+        directo con el PAC, que es quien está autorizado por el SAT para guardarlos y timbrar.
+        Este programa nunca los ve ni los pide.
+      </div>
+      <div class="grid g3" style="margin-top:14px">
+        <div><label class="f" for="fx_pac">Tu PAC</label><select id="fx_pac">
+          <option value="">— Todavía no elijo —</option>
+          <option value="facturama">Facturama</option>
+          <option value="facturapi">Facturapi</option>
+          <option value="sw">SW sapien (Smarter Web)</option>
+          <option value="finkok">Finkok</option>
+          <option value="prodigia">Prodigia</option>
+          <option value="otro">Otro</option>
+        </select></div>
+        <div><label class="f" for="fx_serie">Serie</label><input id="fx_serie" maxlength="8" placeholder="A"></div>
+        <div><label class="f" for="fx_folio">Siguiente folio</label>
+          <input id="fx_folio" type="number" min="1" step="1"></div>
+      </div>
+      <label class="sw" style="margin-top:14px"><input type="checkbox" id="fx_sellos">
+        Ya di de alta mis sellos con mi PAC</label>
+      <p class="note" id="fxNota" style="margin-top:12px"></p>
+    </div>
+  </div>
   <div class="card secOculta" data-set="folios">
     <header><h2>Folios</h2><span class="hint">las letras de tu negocio en cada cuenta</span></header>
     <div class="body">
@@ -1117,6 +1177,40 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
 </div>
 
 <!-- ============ MODALES ============ -->
+<div class="modal" id="modalFacRest" hidden>
+  <div class="card" style="width:min(560px,100%)">
+    <header><h2>Facturar un ticket</h2>
+      <button class="btn sm" id="fr_cancel" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <p class="note" id="fr_resumen" style="margin:0 0 14px"></p>
+      <div class="grid g2">
+        <div><label class="f" for="fr_rfc">RFC del cliente</label>
+          <input id="fr_rfc" style="text-transform:uppercase" maxlength="13" placeholder="XAXX010101000"></div>
+        <div><label class="f" for="fr_cp">Código postal</label>
+          <input id="fr_cp" inputmode="numeric" maxlength="5"></div>
+      </div>
+      <div style="margin-top:10px"><label class="f" for="fr_razon">Razón social</label>
+        <input id="fr_razon" placeholder="Como viene en su constancia"></div>
+      <div class="grid g2" style="margin-top:10px">
+        <div><label class="f" for="fr_regimen">Régimen fiscal</label><select id="fr_regimen"></select></div>
+        <div><label class="f" for="fr_uso">Uso del CFDI</label><select id="fr_uso"></select></div>
+      </div>
+      <div class="grid g3" style="margin-top:10px">
+        <div><label class="f" for="fr_forma">Forma de pago</label><select id="fr_forma"></select></div>
+        <div><label class="f" for="fr_metodo">Método</label><select id="fr_metodo">
+          <option value="PUE">PUE — una exhibición</option>
+          <option value="PPD">PPD — en parcialidades</option></select></div>
+        <div><label class="f" for="fr_fecha">Fecha</label><input id="fr_fecha" type="date"></div>
+      </div>
+      <div style="margin-top:10px"><label class="f" for="fr_uuid">Folio fiscal (UUID), si ya la timbraste</label>
+        <input id="fr_uuid" placeholder="Déjalo vacío si todavía no la timbras"></div>
+      <div class="fila" style="margin-top:18px">
+        <button class="btn primary" id="fr_ok">Guardar y ver los datos</button>
+        <button class="btn" id="fr_quita" hidden>Quitar la factura</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal" id="modalMods" hidden>
   <div class="card">
     <header><h2 id="modsTitulo">Opciones</h2><button class="btn sm" id="modsCerrar" style="margin-left:auto">Cerrar</button></header>
@@ -1580,6 +1674,9 @@ function registraAzulejosRest(){
     {id:"equipo", nombre:"Equipo", sub:"quién entra y con qué clave", color:"#D6127F",
      icono:'<circle cx="9" cy="8" r="3.4"/><path d="M3 20v-1.4A3.6 3.6 0 0 1 6.6 15h4.8a3.6 3.6 0 0 1 3.6 3.6V20"/><path d="M17 11h4M19 9v4"/>',
      card:'[data-set="equipo"]', cuenta:()=>EQUIPO.filter(u=>u.activo!==false).length},
+    {id:"fiscal", nombre:"Facturación", sub:"RFC, régimen y tu PAC", color:"#0E7C57",
+     icono:'<path d="M4 4h16v13l-2.7-1.6L14.7 17 12 15.4 9.3 17 6.7 15.4 4 17Z"/><path d="M8 9h8M8 12h5"/>',
+     card:'[data-set="fiscal"]', alAbrir:()=>renderSetFiscal()},
     {id:"folios", nombre:"Folios", sub:"cómo se numeran", color:"#B26A00",
      icono:'<path d="M4 7h16M4 12h16M4 17h10"/>', card:'[data-set="folios"]'},
     {id:"respaldo", nombre:"Respaldo", sub:"bajar y restaurar", color:"#0E7C57",
@@ -1597,6 +1694,10 @@ function registraAzulejosRest(){
      icono:'<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2Z"/><path d="M9 8h6M9 12h6"/>',
      card:'[data-ven="tickets"]',
      cuenta:()=>COMANDAS.filter(c=>c.estado==="cerrada").length},
+    {id:"factura", nombre:"Facturas", sub:"cuando te piden factura", color:"#0E7C57",
+     icono:'<path d="M4 4h16v13l-2.7-1.6L14.7 17 12 15.4 9.3 17 6.7 15.4 4 17Z"/><path d="M8 9h8M8 12h5"/>',
+     card:'[data-ven="factura"]',
+     cuenta:()=>porFacturar().length, alAbrir:()=>renderFacturas()},
     {id:"cancel", nombre:"Cancelaciones", sub:"el dinero que no entró", color:"#C62828",
      icono:'<circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/>',
      card:'[data-ven="cancel"]',
@@ -3449,6 +3550,7 @@ function renderVentas(){
               (re ? '<span class="pill tarde" title="reimpresiones">'+re+'↺</span>' : '')+'</td></tr>';
     }).join("") : '<tr><td colspan="10"><div class="empty">Nada con ese filtro.</div></td></tr>') + '</tbody>';
   renderCancelaciones();
+  renderFacturas();
 
   const cerrados = TURNOS.filter(t=>!t.abierto);
   $("#t_turnos").innerHTML = '<thead><tr><th>Turno</th><th>Cajero</th><th>Fecha</th><th>Horario</th>' +
@@ -4520,6 +4622,7 @@ $("#tab-personal").addEventListener("change", e=>{
   if(e.target.id === "retDesde" || e.target.id === "retHasta"){ renderRetardos(); return; }
   if(e.target.id === "p_tolerancia"){ P.tolerancia = num(e.target.value); persist(); renderRetardos(); return; }
   if(e.target.id === "recQuien" || e.target.id === "recDesde" || e.target.id === "recHasta"){ pintaRecibo(); return; }
+  if(e.target.id === "recDescuenta"){ P.descuentaRetardos = e.target.checked; persist(); pintaRecibo(); return; }
 });
 $("#tab-personal").addEventListener("click", e=>{
   const j = e.target.closest("[data-justif]");
@@ -4701,6 +4804,7 @@ function renderRecibos(){
   s.innerHTML = EQUIPO.filter(u=>u.activo !== false).map(u=>
     '<option value="'+esc(u.id)+'">'+esc(u.nombre||"Sin nombre")+'</option>').join("");
   if(antes) s.value = antes;
+  const chk = $("#recDescuenta"); if(chk) chk.checked = descuentaOn();
   if(!$("#recDesde").value) ponPeriodo("semana"); else pintaRecibo();
 }
 function ponPeriodo(cual){
@@ -4718,6 +4822,59 @@ function ponPeriodo(cual){
   $("#recDesde").value = iso(d); $("#recHasta").value = iso(h);
   pintaRecibo();
 }
+/* Los dias del periodo, uno por uno. Hace falta recorrerlos TODOS —no
+   solo los que checo— porque una falta es justamente un dia sin checada. */
+function diasDelPeriodo(desde, hasta){
+  const out = [];
+  if(!desde || !hasta || desde > hasta) return out;
+  const d = new Date(desde + "T12:00:00"), fin = new Date(hasta + "T12:00:00");
+  let guarda = 0;
+  while(d <= fin && guarda++ < 400){
+    out.push(d.getFullYear()+"-"+dos(d.getMonth()+1)+"-"+dos(d.getDate()));
+    d.setDate(d.getDate() + 1);
+  }
+  return out;
+}
+/* Un dia programado al que no vino. Hoy no cuenta: todavia puede llegar. */
+function faltasDe(u, desde, hasta){
+  const hoy = hoyISO();
+  return diasDelPeriodo(desde, hasta).filter(f=>{
+    if(f >= hoy) return false;
+    if(!entradaEsperada(u, f)) return false;        // ese dia descansa
+    return !primerEntrada(u.id, f);
+  });
+}
+/* Cuanto vale un dia y una hora de esta persona. Por hora no aplica:
+   lo que no trabajo no se le pago nunca. */
+function valorDia(u){
+  const p = pagoDe(u), fp = FORMAS_PAGO[p.forma] || FORMAS_PAGO.semana;
+  if(p.forma === "hora" || !fp.dias) return 0;
+  return num(p.monto) / fp.dias;
+}
+function jornadaHoras(u){
+  const h = horarioDe(u);
+  const dias = DIAS_SEM.map(d=>h[d.k]).filter(x=>x && !x.libre && x.e && x.s);
+  if(!dias.length) return 8;
+  const min = dias.reduce((s,x)=> s + Math.max(0, minutosDe(x.s) - minutosDe(x.e)), 0);
+  return Math.max(1, (min / dias.length) / 60);
+}
+/* El recibo paga SOLO los días que checó, así que la falta ya se cobró
+   sola: descontarla otra vez sería cobrársela dos veces. Lo que el recibo
+   no descuenta es el retardo —un día que entró tarde se paga completo— y
+   eso sí va aquí. Por hora no se descuenta nada. */
+function descuentoDe(u, r){
+  const dia = valorDia(u);
+  const base = {aplica:false, porHora:!dia, faltas:r.faltas.length,
+                minTarde:r.tardeSinJust, porFaltas:0, porRetardos:0, total:0};
+  if(!dia) return base;
+  const hora = dia / jornadaHoras(u);
+  base.aplica = true;
+  base.porRetardos = (r.tardeSinJust / 60) * hora;
+  base.total = base.porRetardos;
+  return base;
+}
+const descuentaOn = () => !!P.descuentaRetardos;
+
 function cuentaPeriodo(u, desde, hasta){
   const fs = [...new Set(ASISTENCIAS.filter(a=>a.uid === u.id && a.fecha >= desde && a.fecha <= hasta).map(a=>a.fecha))].sort();
   let min = 0; const dias = [];
@@ -4734,9 +4891,17 @@ function cuentaPeriodo(u, desde, hasta){
   const monto = p.forma === "hora"
     ? horas * num(p.monto)
     : (num(p.monto) / Math.max(1, fp.dias)) * dias.length;
-  return {dias, min, horas, monto, forma: fp,
-          tarde: dias.reduce((s,x)=>s+x.tarde,0),
-          sinJust: dias.filter(x=>x.tarde && !x.just).length};
+  const faltas = faltasDe(u, desde, hasta);
+  const r = {dias, min, horas, monto, forma: fp, faltas,
+             tarde: dias.reduce((s,x)=>s+x.tarde,0),
+             tardeSinJust: dias.reduce((s,x)=> s + (x.just ? 0 : x.tarde), 0),
+             sinJust: dias.filter(x=>x.tarde && !x.just).length};
+  r.desc = descuentoDe(u, r);
+  /* Lo que se paga ya con el descuento, si esta prendido. El bruto se
+     guarda aparte para que el recibo pueda enseñar las dos cifras. */
+  r.bruto = monto;
+  r.monto = descuentaOn() && r.desc.aplica ? Math.max(0, monto - r.desc.total) : monto;
+  return r;
 }
 function pintaRecibo(){
   const caja = $("#recResumen"); if(!caja) return;
@@ -4764,8 +4929,25 @@ function pintaRecibo(){
       tile("Horas checadas", horasTxt(r.min)) +
       tile("Le toca", mx(r.monto)) +
     '</div>' +
+    (r.faltas.length ? '<p class="note" style="margin-top:12px;border-left-color:var(--mal)">' +
+      'Faltó <b>' + r.faltas.length + ' día(s)</b> que tenía programados: ' +
+      esc(r.faltas.join(", ")) + '. Esos días ya no se le están pagando — el recibo cuenta ' +
+      'los días que checó — así que no hay nada más que descontarle por ellos.</p>' : "") +
     (r.sinJust ? '<p class="note" style="margin-top:12px">Tiene <b>' + r.sinJust +
-      ' retardo(s) sin justificar</b> en el periodo. El recibo los imprime: el descuento, si lo hay, lo decides tú.</p>' : "") +
+      ' retardo(s) sin justificar</b>, ' + horasTxt(r.tardeSinJust) + ' en total.</p>' : "") +
+    (r.desc.total ? '<div class="note" style="margin-top:12px;border-left-color:' +
+      (descuentaOn() ? 'var(--mal)' : 'var(--warn)') + '">' +
+      '<b>Descuento por retardos: ' + mx(r.desc.total) + '</b><br>' +
+      horasTxt(r.desc.minTarde) + ' de retardo × ' +
+        mx(valorDia(u)/jornadaHoras(u)) + ' la hora = ' + mx(r.desc.porRetardos) + '<br>' +
+      (descuentaOn()
+        ? 'Ya está restado: de ' + mx(r.bruto) + ' le quedan <b>' + mx(r.monto) + '</b>.'
+        : 'No se está restando. Préndelo arriba si quieres descontarlo.') +
+      '</div>'
+     : (r.desc.porHora && (r.faltas.length || r.sinJust)
+        ? '<p class="note" style="margin-top:12px">A ' + esc(u.nombre||"") + ' se le paga por hora, ' +
+          'así que no hay nada que descontar: las horas que no trabajó nunca se le contaron.</p>'
+        : "")) +
     '<div class="fila" style="margin-top:16px">' +
       '<button class="btn primary" id="recImprime">Imprimir el recibo</button>' +
       '<button class="btn" id="recFirma">Firmar de recibido</button>' +
@@ -4804,7 +4986,18 @@ function imprimeRecibo(){
       '<td><b>Horas checadas</b></td><td>'+horasTxt(r.min)+'</td></tr>' +
       '<tr><td><b>Retardos</b></td><td>'+(r.tarde?horasTxt(r.tarde):"ninguno")+
         (r.sinJust?' ('+r.sinJust+' sin justificar)':'')+'</td>' +
-      '<td><b>Total a pagar</b></td><td class="tot">'+mx(r.monto)+'</td></tr></table>' +
+      '<td><b>Faltas</b></td><td>'+(r.faltas.length ? r.faltas.length+" día(s)" : "ninguna")+'</td></tr>' +
+      (descuentaOn() && r.desc.total
+        ? '<tr><td><b>Subtotal</b></td><td>'+mx(r.bruto)+'</td>' +
+          '<td><b>Descuento por retardos</b></td><td>−'+mx(r.desc.total)+'</td></tr>'
+        : '') +
+      '<tr><td><b>Total a pagar</b></td><td class="tot" colspan="3">'+mx(r.monto)+'</td></tr></table>' +
+    (descuentaOn() && r.desc.total
+      ? '<p class="pie" style="margin-top:8px">Se descontaron ' + horasTxt(r.desc.minTarde) +
+        ' de retardo por ' + mx(r.desc.porRetardos) +
+        (r.faltas.length ? '. Los ' + r.faltas.length + ' día(s) que faltó no se cobran aparte: ' +
+          'el recibo paga únicamente los días que checó' : '') + '.</p>'
+      : '') +
     '<p class="pie">Recibí de ' + esc(P.negocio.nombre||"la empresa") + ' la cantidad de <b>' + mx(r.monto) +
       '</b> por el periodo señalado, a mi entera satisfacción.</p>' +
     '<div class="firmas">' +
@@ -5003,9 +5196,262 @@ function renderSet(){
   const lg = $("#tk_logoPrev");
   if(P.negocio.logo){ lg.src = P.negocio.logo; lg.hidden = false; $("#tk_logoQuita").hidden = false; }
   else { lg.hidden = true; $("#tk_logoQuita").hidden = true; }
+  renderSetFiscal();
   renderEstacion(); pintaNotaRespaldo();
   pintaNotaBloqueo(); pintaNotaFolio(); renderMesasSet(); renderEquipo(); aplicaMarca();
 }
+
+/* ============ FACTURACIÓN ============ */
+/* Los catálogos del SAT son los mismos del cotizador: si cambian, cambian
+   en los dos. No se abrevian —un régimen de menos es una factura que el
+   PAC rechaza. */
+const REGIMENES = [["601","General de Ley Personas Morales"],["603","Personas Morales con Fines no Lucrativos"],
+ ["605","Sueldos y Salarios"],["606","Arrendamiento"],["607","Enajenación o Adquisición de Bienes"],
+ ["608","Demás ingresos"],["610","Residentes en el Extranjero"],["611","Dividendos"],
+ ["612","Personas Físicas con Actividades Empresariales y Profesionales"],["614","Ingresos por Intereses"],
+ ["616","Sin obligaciones fiscales"],["620","Sociedades Cooperativas de Producción"],["621","Incorporación Fiscal"],
+ ["622","Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras"],["623","Opcional para Grupos de Sociedades"],
+ ["624","Coordinados"],["625","Plataformas Tecnológicas"],["626","Régimen Simplificado de Confianza"]];
+const USOS_CFDI = [["G01","Adquisición de mercancías"],["G02","Devoluciones y descuentos"],["G03","Gastos en general"],
+ ["D01","Honorarios médicos"],["I02","Mobiliario y equipo de oficina"],
+ ["P01","Por definir"],["S01","Sin efectos fiscales"],["CP01","Pagos"]];
+/* En un restaurante lo que hay son estas cuatro. «app» es depósito: el
+   dinero llega de la plataforma, no de la mano del comensal. */
+const FORMAS_SAT = [["01","Efectivo"],["03","Transferencia electrónica"],["04","Tarjeta de crédito"],
+                    ["28","Tarjeta de débito"],["99","Por definir"]];
+const FORMA_DE_PAGO = {efectivo:"01", tarjeta:"04", transferencia:"03", app:"03"};
+function opcSAT(pares, sel){
+  return pares.map(p=>'<option value="'+esc(p[0])+'"'+(p[0]===sel?" selected":"")+'>'+
+    esc(p[0])+" — "+esc(p[1])+'</option>').join("");
+}
+/* Devuelve SIEMPRE el mismo objeto. Antes armaba uno nuevo con
+   Object.assign y se lo colgaba a P.fiscal: quien ya tenia la referencia
+   anterior le escribia a un huerfano, y por eso el folio de la factura
+   nunca avanzaba. */
+function fiscalRest(){
+  const d = {razon:"", rfc:"", regimen:"612", cpFiscal:"",
+             pac:"", serie:"A", folioFactura:1, sellosAlta:false};
+  if(!P.fiscal || typeof P.fiscal !== "object") P.fiscal = {};
+  Object.keys(d).forEach(k=>{ if(P.fiscal[k] === undefined) P.fiscal[k] = d[k]; });
+  return P.fiscal;
+}
+function faltaParaFacturarRest(){
+  const E = fiscalRest(), f = [];
+  if(!String(E.razon||"").trim()) f.push("la razón social");
+  if(String(E.rfc||"").trim().length < 12) f.push("el RFC");
+  if(String(E.cpFiscal||"").trim().length !== 5) f.push("el código postal fiscal");
+  return f;
+}
+function folioFacturaRest(){
+  const E = fiscalRest(), n = num(E.folioFactura, 0);
+  if(!n) return E.serie || "";
+  return (E.serie||"") + "-" + String(n).padStart(digitosFolio(), "0");
+}
+function pintaNotaFiscal(){
+  const n = $("#fxNota"); if(!n) return;
+  const falta = faltaParaFacturarRest(), E = fiscalRest();
+  if(falta.length){
+    n.innerHTML = "Te falta capturar <b>" +
+      esc(falta.join(", ").replace(/, ([^,]*)$/, " y $1")) + "</b>. Sin eso el SAT no timbra.";
+    n.style.borderLeftColor = "var(--mal)";
+    return;
+  }
+  n.style.borderLeftColor = "";
+  n.innerHTML = "Tu próxima factura saldría como <b>" + esc(folioFacturaRest()) + "</b>" +
+    (E.sellosAlta ? "." : ", pero todavía no marcas que diste de alta tus sellos con tu PAC.");
+}
+function renderSetFiscal(){
+  const E = fiscalRest();
+  $("#fx_regimen").innerHTML = opcSAT(REGIMENES, E.regimen || "612");
+  $("#fx_razon").value = E.razon || "";
+  $("#fx_rfc").value   = E.rfc || "";
+  $("#fx_cp").value    = E.cpFiscal || "";
+  $("#fx_pac").value   = E.pac || "";
+  $("#fx_serie").value = E.serie || "A";
+  $("#fx_folio").value = num(E.folioFactura, 1);
+  $("#fx_sellos").checked = !!E.sellosAlta;
+  pintaNotaFiscal();
+}
+$("#tab-set").addEventListener("input", e=>{
+  const t = e.target, E = fiscalRest();
+  if(t.id === "fx_razon"){ E.razon = t.value; pintaNotaFiscal(); persist(); return; }
+  if(t.id === "fx_rfc"){ E.rfc = String(t.value||"").toUpperCase().trim(); t.value = E.rfc;
+                         pintaNotaFiscal(); persist(); return; }
+  if(t.id === "fx_cp"){ E.cpFiscal = String(t.value||"").replace(/[^0-9]/g,"").slice(0,5);
+                        t.value = E.cpFiscal; pintaNotaFiscal(); persist(); return; }
+  if(t.id === "fx_serie"){ E.serie = t.value; pintaNotaFiscal(); persist(); return; }
+  if(t.id === "fx_folio"){ E.folioFactura = Math.max(1, num(t.value,1)); pintaNotaFiscal(); persist(); return; }
+});
+$("#tab-set").addEventListener("change", e=>{
+  const t = e.target, E = fiscalRest();
+  if(t.id === "fx_regimen"){ E.regimen = t.value; persist(); return; }
+  if(t.id === "fx_pac"){ E.pac = t.value; pintaNotaFiscal(); persist(); return; }
+  if(t.id === "fx_sellos"){ E.sellosAlta = t.checked; pintaNotaFiscal(); persist(); return; }
+});
+
+/* ---------- la lista de Ventas ---------- */
+let facFiltro = "pend", facFolio = null;
+const facturaDeTicket = c => (c && c.factura && c.factura.requiere) ? c.factura : null;
+const vendidas = () => cerradasTodas().filter(c=>!c.cancelada);
+const facturadas  = () => vendidas().filter(c=>{
+  const f = facturaDeTicket(c); return f && f.estado === "facturada";
+});
+const porFacturar = () => vendidas().filter(c=>{
+  const f = facturaDeTicket(c); return f && f.estado !== "facturada";
+});
+function facLista(){
+  const q = ($("#facBusca") ? ($("#facBusca").value||"") : "").toLowerCase().trim();
+  let base = facFiltro === "pend"   ? porFacturar()
+           : facFiltro === "hechas" ? facturadas()
+           :                          vendidas();
+  if(q) base = base.filter(c=>{
+    const f = c.factura || {};
+    return ((c.folio||"") + " " + (c.mesaNombre||"") + " " + (f.rfc||"") + " " + (f.razon||""))
+      .toLowerCase().indexOf(q) >= 0;
+  });
+  return base.slice().sort((a,b)=> String(b.fecha+b.cierra).localeCompare(String(a.fecha+a.cierra)));
+}
+function renderFacturas(){
+  const t = $("#t_facturas"); if(!t) return;
+  $$("[data-facfiltro]").forEach(b=> b.classList.toggle("primary", b.dataset.facfiltro === facFiltro));
+  const pend = porFacturar().length, hechas = facturadas().length;
+  const h = $("#facHint");
+  if(h) h.textContent = pend ? pend + " por timbrar · " + hechas + " timbrada(s)"
+                             : (hechas ? hechas + " timbrada(s)" : "todavía ninguna");
+  const lista = facLista();
+  t.innerHTML = '<thead><tr><th>Folio</th><th>Fecha</th><th>Mesa</th><th>RFC</th><th>Razón social</th>' +
+    '<th class="der">Total</th><th>Estado</th><th style="width:170px"></th></tr></thead><tbody>' +
+    (lista.length ? lista.slice(0,200).map(c=>{
+      const f = c.factura || {};
+      const pill = !f.requiere ? '<span class="pill">sin factura</span>'
+        : f.estado === "facturada" ? '<span class="pill good">timbrada</span>'
+        : '<span class="pill tarde">pendiente</span>';
+      return '<tr><td class="mono">'+esc(c.folio)+'</td><td class="mono">'+esc(c.fecha)+'</td>' +
+        '<td>'+esc(c.mesaNombre||"")+'</td><td class="mono">'+esc(f.rfc||"—")+'</td>' +
+        '<td>'+esc(f.razon||"—")+'</td><td class="der mono">'+mx(c.total)+'</td>' +
+        '<td>'+pill+'</td>' +
+        '<td><button class="btn sm" data-facticket="'+esc(c.folio)+'">' +
+          (f.requiere ? "Editar" : "Facturar") + '</button>' +
+          (f.requiere ? ' <button class="btn sm ghost" data-facver="'+esc(c.folio)+'">Ver datos</button>' : '') +
+        '</td></tr>';
+    }).join("") : '<tr><td colspan="8"><div class="empty">' +
+      (facFiltro === "pend" ? "No hay facturas por timbrar." : "Nada con ese filtro.") +
+      '</div></td></tr>') + '</tbody>';
+}
+function ticketDeFolio(folio){ return vendidas().find(c=>c.folio === folio) || null; }
+
+function abreFacturaRest(folio){
+  const c = ticketDeFolio(folio);
+  if(!c){ toast("No encuentro ese ticket"); return; }
+  facFolio = folio;
+  const f = c.factura || {};
+  const pagoTipo = ((c.pagos||[])[0]||{}).tipo || "efectivo";
+  $("#fr_resumen").innerHTML = '<b>'+esc(c.folio)+'</b> · '+esc(c.mesaNombre||"")+' · '+esc(c.fecha)+
+    '<br>'+ (c.lineas||[]).length +' platillo(s) · Total <b>'+mx(c.total)+'</b>' +
+    (num(c.propina) ? '<br><span style="color:var(--ink-3)">La propina de '+mx(c.propina)+
+      ' no se factura: es del mesero, no del negocio.</span>' : '');
+  $("#fr_regimen").innerHTML = opcSAT(REGIMENES, f.regimen || "612");
+  $("#fr_uso").innerHTML     = opcSAT(USOS_CFDI, f.uso || "G03");
+  $("#fr_forma").innerHTML   = opcSAT(FORMAS_SAT, f.formaSAT || FORMA_DE_PAGO[pagoTipo] || "99");
+  $("#fr_rfc").value   = f.rfc || "";
+  $("#fr_razon").value = f.razon || "";
+  $("#fr_cp").value    = f.cp || "";
+  $("#fr_metodo").value = f.metodoPago || "PUE";
+  $("#fr_fecha").value  = f.fecha || c.fecha || hoyISO();
+  $("#fr_uuid").value   = f.folioFiscal || "";
+  $("#fr_quita").hidden = !f.requiere;
+  $("#modalFacRest").hidden = false;
+}
+$("#fr_cancel").addEventListener("click", ()=>{ $("#modalFacRest").hidden = true; facFolio = null; });
+$("#fr_quita").addEventListener("click", ()=>{
+  const c = ticketDeFolio(facFolio); if(!c) return;
+  delete c.factura; persist();
+  $("#modalFacRest").hidden = true; facFolio = null;
+  renderFacturas(); pintaLanzadorSec("ventas");
+  toast("Factura quitada del ticket");
+});
+$("#fr_ok").addEventListener("click", ()=>{
+  const c = ticketDeFolio(facFolio); if(!c) return;
+  const rfc = ($("#fr_rfc").value||"").toUpperCase().trim();
+  if(rfc.length < 12){ toast("Escribe un RFC válido"); return; }
+  const uuid = ($("#fr_uuid").value||"").trim();
+  const antes = c.factura || {};
+  c.factura = {
+    requiere:true, estado: uuid ? "facturada" : "pendiente",
+    rfc, razon:($("#fr_razon").value||"").trim(), cp:($("#fr_cp").value||"").trim(),
+    regimen:$("#fr_regimen").value, uso:$("#fr_uso").value,
+    formaSAT:$("#fr_forma").value, metodoPago:$("#fr_metodo").value,
+    folioFiscal:uuid, fecha:$("#fr_fecha").value || c.fecha,
+    serie: antes.serie || "", quien: usuarioActual().nombre || ""
+  };
+  /* El folio se consume cuando SE TIMBRA, no cuando se captura: una factura
+     pendiente todavia no gasta ninguno. Y un folio consumido no se devuelve
+     aunque despues se desmarque — asi funcionan los folios del SAT. */
+  if(uuid && !c.factura.serie){
+    const E = fiscalRest();
+    c.factura.serie = folioFacturaRest();
+    E.folioFactura = num(E.folioFactura, 1) + 1;
+    pintaNotaFiscal();
+  }
+  persist();
+  $("#modalFacRest").hidden = true;
+  renderFacturas(); pintaLanzadorSec("ventas");
+  toast(uuid ? "Factura marcada como timbrada · "+c.folio : "Factura pendiente registrada · "+c.folio);
+  imprimeDatosFactura(c);
+  facFolio = null;
+});
+/* La hoja que se le manda al contador. Trae emisor Y receptor: con el
+   receptor solo, el contador sabe a quien facturar pero no de parte de
+   quien, y eso se acaba escribiendo a mano cada vez. */
+function imprimeDatosFactura(c){
+  const f = c.factura || {}, E = fiscalRest();
+  const reg  = (REGIMENES.find(r=>r[0]===f.regimen)||["",""])[1];
+  const regE = (REGIMENES.find(r=>r[0]===E.regimen)||["",""])[1];
+  const uso  = (USOS_CFDI.find(u=>u[0]===f.uso)||["",""])[1];
+  const forma= (FORMAS_SAT.find(x=>x[0]===f.formaSAT)||["",""])[1];
+  /* Lo facturable es el consumo CON cargo por servicio y SIN propina. */
+  const base = num(c.total) - num(c.propina);
+  const sub  = P.ticket.mostrarIva !== false && num(P.iva) ? base/(1+num(P.iva)/100) : base;
+  const iva  = base - sub;
+  const falta = faltaParaFacturarRest();
+  const datos = [
+    ["Emisor", E.razon || (P.negocio||{}).nombre], ["RFC del emisor", E.rfc],
+    ["Régimen del emisor", E.regimen ? E.regimen+" — "+regE : ""],
+    ["Lugar de expedición (CP)", E.cpFiscal],
+    ["Serie y folio", f.serie || "(se asigna al timbrarla; la siguiente sería " + folioFacturaRest() + ")"],
+    ["Folio del ticket", c.folio], ["Fecha", f.fecha || c.fecha],
+    ["Receptor", f.razon], ["RFC", f.rfc], ["Código postal", f.cp],
+    ["Régimen fiscal", f.regimen+" — "+reg], ["Uso del CFDI", f.uso+" — "+uso],
+    ["Forma de pago (SAT)", f.formaSAT+" — "+forma],
+    ["Método de pago", f.metodoPago+(f.metodoPago==="PUE"?" — Pago en una exhibición":" — Pago en parcialidades")],
+    ["Concepto", "Consumo de alimentos y bebidas"],
+    ["Clave SAT sugerida", "90101500 — Servicio de restaurante"],
+    ["Subtotal", mx(sub)], ["IVA "+num(P.iva)+"%", mx(iva)], ["Total a facturar", mx(base)]
+  ];
+  if(num(c.propina)) datos.push(["Propina (NO se factura)", mx(c.propina)]);
+  if(f.folioFiscal)  datos.push(["Folio fiscal (UUID)", f.folioFiscal]);
+  imprimeCarta("Datos para facturar · " + c.folio,
+    '<h1>Datos para facturar</h1>' +
+    '<p class="sub">' + esc((P.negocio||{}).nombre||"") + ' · ticket ' + esc(c.folio) + '</p>' +
+    (falta.length
+      ? '<p style="color:#B01660;font-weight:600">Te falta capturar ' +
+        esc(falta.join(", ").replace(/, ([^,]*)$/, " y $1")) +
+        ' en Ajustes → Facturación. El SAT lo va a pedir.</p>' : '') +
+    '<table class="datos"><tbody>' + datos.map(d=>
+      '<tr><th style="width:38%">'+esc(d[0])+'</th><td>'+esc(d[1]||"—")+'</td></tr>').join("") +
+    '</tbody></table>' +
+    '<p class="pie">Copia estos datos en tu sistema de facturación o mándaselos a tu contador.</p>');
+}
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-facticket]");
+  if(b){ abreFacturaRest(b.dataset.facticket); return; }
+  const v = e.target.closest("[data-facver]");
+  if(v){ const c = ticketDeFolio(v.dataset.facver); if(c) imprimeDatosFactura(c); return; }
+  const fl = e.target.closest("[data-facfiltro]");
+  if(fl){ facFiltro = fl.dataset.facfiltro; renderFacturas(); return; }
+});
+const fb = $("#facBusca"); if(fb) fb.addEventListener("input", renderFacturas);
+
 /* ---------------- respaldo ---------------- */
 const LLAVES_RESPALDO = ["menu","mesas","comandas","turnos","P","equipo",
                          "asistencias","compras","recetas","decor"];
