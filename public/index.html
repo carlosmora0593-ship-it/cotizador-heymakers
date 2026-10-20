@@ -2194,6 +2194,145 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
 .valeTipo i{width:8px;height:8px;border-radius:3px;flex:0 0 auto}
 .herrPresta{background:color-mix(in srgb, var(--accent) 12%, transparent);
   color:var(--accent);border-color:color-mix(in srgb, var(--accent) 30%, transparent)}
+/* El aro no es adorno: el punto negro sobre tema oscuro y el blanco sobre
+   tema claro desaparecen sin el. */
+.gotaIns{display:inline-block;width:11px;height:11px;border-radius:50%;
+  margin-right:7px;vertical-align:middle;
+  box-shadow:0 0 0 1.5px color-mix(in srgb, var(--ink-2) 55%, transparent)}
+.insRinde{line-height:1.25}
+.insRinde .insM2{font-weight:650;font-variant-numeric:tabular-nums;color:var(--ink-1)}
+.insRinde small{display:block;font-size:10.5px;color:var(--ink-3);
+  font-variant-numeric:tabular-nums}
+/* ---- la calculadora por pasos ---- */
+.cpPaso{border:1.5px solid var(--line);border-radius:16px;background:var(--surface);
+  margin-bottom:12px;overflow:hidden;transition:border-color .15s}
+.cpPaso.activo{border-color:var(--accent)}
+.cpPaso.hecho{background:var(--surface-2)}
+.cpCab{display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;
+  background:none;border:0;font:inherit;color:var(--ink);text-align:left;cursor:default}
+.cpPaso.hecho .cpCab{cursor:pointer}
+.cpNum{flex:none;width:27px;height:27px;border-radius:50%;display:grid;place-items:center;
+  background:var(--surface-2);color:var(--ink-3);font-weight:700;font-size:13px;
+  border:1.5px solid var(--line)}
+.cpPaso.activo .cpNum{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cpPaso.hecho .cpNum{background:var(--good);color:#fff;border-color:var(--good)}
+.cpTit{flex:1;min-width:0;font-weight:600;font-size:15px}
+.cpTit small{display:block;font-weight:400;font-size:12px;color:var(--ink-3);margin-top:1px}
+.cpChips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:52%}
+.cpChip{font-size:11.5px;padding:3px 9px;border-radius:999px;background:var(--surface-2);
+  border:1px solid var(--line);color:var(--ink-2);white-space:nowrap}
+.cpChip.fuerte{background:var(--accent-soft);border-color:transparent;color:var(--accent);font-weight:600}
+.cpCuerpo{padding:0 16px 16px}
+.cpRej{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:10px}
+.cpAz{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:6px;
+  text-align:left;border:1.5px solid var(--line);background:var(--surface-2);border-radius:14px;
+  padding:12px;cursor:pointer;font:inherit;color:var(--ink);
+  transition:border-color .15s,background .15s,transform .1s}
+.cpAz:hover{border-color:var(--cpc,var(--accent));transform:translateY(-1px)}
+.cpAz[aria-pressed="true"]{border-color:var(--cpc,var(--accent));
+  background:color-mix(in srgb, var(--cpc,var(--accent)) 11%, var(--surface-2))}
+.cpAz .cpIco{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
+  background:color-mix(in srgb, var(--cpc,var(--accent)) 20%, transparent);color:var(--cpc,var(--accent))}
+.cpAz .cpIco svg{width:18px;height:18px}
+.cpAz b{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:13.5px;line-height:1.2}
+.cpAz small{color:var(--ink-3);font-size:11.5px;line-height:1.35}
+.cpAz img.artMini,.cpAz .artMini{width:100%;height:68px;object-fit:cover;border-radius:10px}
+.cpBusca{display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.cpBusca input{flex:1 1 180px;min-width:150px}
+.cpCampos{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.cpCampo{display:flex;flex-direction:column;flex:1 1 170px;min-width:140px}
+.cpCampo span{font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:4px}
+.cpCampo input,.cpCampo select{min-height:44px;margin-top:auto}
+.cpCampo input[type=number]{text-align:right}
+.cpPie{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+.cpPie .cpAviso{color:var(--warn);font-size:12.5px;margin-right:auto}
+.cpPie .cpOk{color:var(--ink-3);font-size:12.5px;margin-right:auto}
+.cpNota{font-size:12.5px;line-height:1.55;color:var(--ink-3);margin:10px 0 0}
+.cpTabla{width:100%;border-collapse:collapse;font-size:13px}
+.cpTabla th{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink-3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+.cpTabla td{padding:7px 8px;border-bottom:1px solid var(--line)}
+.cpTabla td.n{text-align:right;font-variant-numeric:tabular-nums}
+.cpTabla tr:last-child td{border-bottom:0}
+.cpTabla i{font-style:normal;color:var(--ink-3);font-size:11.5px}
+.cpRes{margin-top:18px}
+.cpResTop{display:flex;gap:12px;flex-wrap:wrap}
+.cpBig{flex:1 1 230px;background:var(--accent-soft);border-radius:14px;padding:14px 16px}
+.cpBig.alt{background:var(--good-soft)}
+.cpBig span{display:block;font-size:11px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ink-3)}
+.cpBig b{display:block;font-family:"IBM Plex Mono",monospace;font-size:28px;font-weight:700;
+  color:var(--accent);margin:3px 0 1px}
+.cpBig.alt b{color:var(--good)}
+.cpBig i{font-style:normal;font-size:11.5px;color:var(--ink-3)}
+.cpBarra{display:flex;height:12px;border-radius:999px;overflow:hidden;margin:14px 0 8px;
+  background:var(--surface-2)}
+.cpBarra i{display:block;height:100%}
+.cpLeyenda{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2)}
+.cpLeyenda span{display:flex;align-items:center;gap:6px}
+.cpLeyenda u{width:10px;height:10px;border-radius:3px;text-decoration:none;display:inline-block}
+/* ---- cotizar por pasos ---- */
+body.cotGuiado [data-paso].guiaFuturo{display:none}
+body.cotGuiado [data-paso].guiaHecho>header{opacity:.78}
+body.cotGuiado [data-paso]{scroll-margin-top:90px}
+.guiaTira{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px;
+  padding:11px 14px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface-2)}
+.guiaTira .guiaP{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-3);
+  background:none;border:0;font:inherit;padding:3px 4px;border-radius:8px;cursor:default}
+.guiaTira .guiaP.hecho{cursor:pointer;color:var(--ink-2)}
+.guiaTira .guiaP.hecho:hover{color:var(--accent)}
+.guiaTira .guiaP i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;
+  font-style:normal;font-size:11px;font-weight:700;background:var(--surface);
+  border:1.5px solid var(--line);color:var(--ink-3)}
+.guiaTira .guiaP.activo{color:var(--ink);font-weight:600}
+.guiaTira .guiaP.activo i{background:var(--accent);border-color:var(--accent);color:#fff}
+.guiaTira .guiaP.hecho i{background:var(--good);border-color:var(--good);color:#fff}
+.guiaTira .guiaSep{color:var(--ink-3);opacity:.5}
+.guiaPie{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  border-top:1px solid var(--line);margin:4px 16px 0;padding:14px 0 16px}
+.guiaPie .guiaFalta{color:var(--warn);font-size:12.5px;margin-right:auto}
+.guiaPie .guiaOk{color:var(--ink-3);font-size:12.5px;margin-right:auto}
+@media(max-width:560px){
+  .guiaTira{gap:5px;padding:9px 10px}
+  .guiaTira .guiaP span{display:none}
+  .guiaTira .guiaP.activo span{display:inline}
+  /* En un telefono no caben el titulo, la pista, los botones y el resumen en
+     el mismo renglon. En un paso ya cerrado lo que importa es el resumen; en
+     el que estas llenando, el titulo y sus botones. */
+  body.cotGuiado [data-paso].guiaHecho>header{flex-wrap:nowrap;gap:8px}
+  body.cotGuiado [data-paso].guiaHecho>header .hint,
+  body.cotGuiado [data-paso].guiaHecho>header .btn{display:none}
+  body.cotGuiado [data-paso].guiaHecho>header h2{white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis;flex:0 1 auto;min-width:0}
+  body.cotGuiado [data-paso].guiaHecho>header .resumenPaso{flex:1 1 90px;min-width:0;
+    text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  body.cotGuiado [data-paso]:not(.guiaHecho)>header{flex-wrap:wrap}
+  body.cotGuiado [data-paso]:not(.guiaHecho)>header h2{flex:1 1 100%}
+  body.cotGuiado [data-paso]:not(.guiaHecho)>header .btn{margin-left:0}
+  .guiaPie{margin:4px 14px 0}
+}
+.cpGanar .f{display:block;margin-bottom:8px}
+.cpSlider{display:flex;align-items:center;gap:14px}
+.cpSlider input[type=range]{flex:1;min-width:140px;accent-color:var(--good)}
+.cpSlider b{font-family:"IBM Plex Mono",monospace;font-size:20px;color:var(--good);min-width:58px;text-align:right}
+.cpPrecio{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-top:16px}
+.cpPrecio .cpCampo{flex:0 0 190px}
+.cpPrecio input{font-family:"IBM Plex Mono",monospace;font-size:19px;font-weight:700;min-height:48px}
+.cpDesp{margin-top:16px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.cpDesp>button{width:100%;display:flex;align-items:center;gap:10px;padding:12px 14px;
+  background:var(--surface-2);border:0;font:inherit;color:var(--ink);cursor:pointer;text-align:left}
+.cpDesp>button b{flex:1;font-weight:600;font-size:13.5px}
+.cpDesp>button svg{width:16px;height:16px;transition:transform .15s}
+.cpDesp[open]>button svg{transform:rotate(90deg)}
+.cpDespCuerpo{padding:12px 14px}
+@media(max-width:560px){
+  .cpChips{max-width:100%;justify-content:flex-start}
+  .cpCab{flex-wrap:wrap}
+}
+.armSepOri{align-items:end;gap:10px}
+.armSepOri .armCampo input[readonly]{background:var(--surface-2);color:var(--ink-2);border-style:dashed}
+.armSepNota{flex-basis:100%;font-size:11.5px;color:var(--ink-3);line-height:1.45}
 /* ---- lanzador dentro de una sección ---- */
 .secLz{margin-top:20px}
 .secBarra{display:flex;align-items:center;gap:12px;margin:0 0 16px;flex-wrap:wrap}
@@ -3110,7 +3249,22 @@ body.rol-produccion #btnPrint{display:none!important}
 
 <!-- ============ CALCULADORA ============ -->
 <section id="tab-calc" hidden>
-  <div class="card" id="cardMaq">
+  <div class="secBarra" id="bar_calc" hidden><button class="secVolver" data-secvolver="calc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Volver</button><span class="secMigas">Calculadora</span></div>
+  <div class="lanzador secLz" id="lz_calc"></div>
+  <div class="card secOculta" id="cardCalcPieza" style="margin-top:20px">
+    <header><h2>¿Qué cuesta hacer una?</h2>
+      <span class="hint" style="margin-left:auto">una pieza, no un pedido</span>
+      <button class="btn sm ghost" id="cpReinicia">Empezar de nuevo</button>
+    </header>
+    <div class="body">
+      <p class="note" style="margin:0 0 16px">Esto <b>no es un cotizador</b>: no pregunta cuántas piezas lleva el pedido.
+        Contesta qué te cuesta hacer <b>una</b> y qué deberías cobrar por ella. Los precios son los mismos que ya tienes
+        capturados, así que lo que salga aquí y lo que salga en una cotización son el mismo número.</p>
+      <div id="cpPasos"></div>
+      <div id="cpResultado"></div>
+    </div>
+  </div>
+  <div class="card secOculta" id="cardMaq">
     <header><h2>Máquinas y su costo por hora</h2>
       <span class="hint" style="margin-left:auto">para cobrar por tiempo</span>
       <button class="btn sm ghost" id="maqNueva">+ Máquina</button>
@@ -3125,7 +3279,7 @@ body.rol-produccion #btnPrint{display:none!important}
       <div id="maqLista"></div>
     </div>
   </div>
-  <div class="card" id="cardCalc">
+  <div class="card secOculta" id="cardCalc">
     <header><h2>Calculadora de costo de producción</h2>
       <span class="hint" style="margin-left:auto">para saber qué te cuesta imprimir</span>
     </header>
@@ -3729,6 +3883,15 @@ body.rol-produccion #btnPrint{display:none!important}
       </div>
     </div>
   </div>
+  <div class="card secOculta" data-set="cotizar">
+    <header><h2>Cómo se cotiza</h2><span class="hint">la pantalla de cotizar, a tu modo</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">La pantalla de cotizar es la misma en los dos modos: los mismos campos, el mismo armado, los mismos botones. Lo único que cambia es si te los enseña <b>todos juntos</b> o <b>de uno en uno</b>.</p>
+      <label class="sw"><input type="checkbox" id="p_guiado"> <b>Cotizar por pasos</b></label>
+      <p class="note" style="margin:12px 0 0">Con esto prendido, la cotización va de un paso al siguiente y no deja seguir hasta que llenes lo que falta. Cada paso que terminas se cierra solo y deja su resumen a la vista. Sirve para quien apenas entra al programa, o para el vendedor nuevo. Si ya te sabes la pantalla de memoria, déjalo apagado: así ves todo de un golpe, como hasta hoy.</p>
+    </div>
+  </div>
+
   <div class="card secOculta" data-set="tema">
     <header><h2>Apariencia</h2><span class="hint">se guarda en este navegador, para ti</span></header>
     <div class="body">
@@ -4705,18 +4868,103 @@ function defaults(){ return {
   {id:"a15",nombre:"Llavero MDF",cat:"Promocional",costo:12,precio:19,tallas:false,existencia:0,minimo_inv:0},
   {id:"a16",nombre:"Funda de celular sublimable",cat:"Promocional",costo:55,precio:88,tallas:false,existencia:0,minimo_inv:0}
  ],
+ /* La tinta va por color. El blanco se lleva la mitad del consumo de un
+    DTF y se compra más caro: en un solo renglón eso no se ve, y es el que
+    se acaba primero. Los precios están por litro, que es como se vende, y
+    aquí se guardan por mililitro. */
  insumos:[
-  {id:"i1",nombre:"Tinta DTF (blanco y color)",unidad:"ml",costo:0.9,existencia:0,minimo:0},
+  {id:"i1c",nombre:"Tinta DTF · Cian",unidad:"ml",costo:0.9,existencia:0,minimo:0,canal:"c"},
+  {id:"i1m",nombre:"Tinta DTF · Magenta",unidad:"ml",costo:0.9,existencia:0,minimo:0,canal:"m"},
+  {id:"i1y",nombre:"Tinta DTF · Amarillo",unidad:"ml",costo:0.9,existencia:0,minimo:0,canal:"y"},
+  {id:"i1k",nombre:"Tinta DTF · Negro",unidad:"ml",costo:0.9,existencia:0,minimo:0,canal:"k"},
+  {id:"i1w",nombre:"Tinta DTF · Blanco",unidad:"ml",costo:1.1,existencia:0,minimo:0,canal:"w"},
   {id:"i2",nombre:"Polvo termoadhesivo",unidad:"g",costo:0.28,existencia:0,minimo:0},
   {id:"i3",nombre:"Bolsa de celofán",unidad:"pza",costo:1.2,existencia:0,minimo:0},
-  {id:"i4",nombre:"Hilo de bordado",unidad:"m",costo:0.05,existencia:0,minimo:0}
+  {id:"i4",nombre:"Hilo de bordado",unidad:"m",costo:0.05,existencia:0,minimo:0},
+  /* Sublimación: cuatro canales. No lleva blanco porque el blanco de una
+     taza o de una playera de poliéster es la prenda, no la tinta. */
+  {id:"i5c",nombre:"Tinta de sublimación · Cian",unidad:"ml",costo:0.45,existencia:0,minimo:0,canal:"c"},
+  {id:"i5m",nombre:"Tinta de sublimación · Magenta",unidad:"ml",costo:0.45,existencia:0,minimo:0,canal:"m"},
+  {id:"i5y",nombre:"Tinta de sublimación · Amarillo",unidad:"ml",costo:0.45,existencia:0,minimo:0,canal:"y"},
+  {id:"i5k",nombre:"Tinta de sublimación · Negro",unidad:"ml",costo:0.45,existencia:0,minimo:0,canal:"k"},
+  {id:"i6",nombre:"Cinta térmica",unidad:"m",costo:1.2,existencia:0,minimo:0},
+  /* DTF UV: los cinco de siempre más el barniz, que es el que da el
+     relieve y el que se lleva el gasto más grande de los seis. */
+  {id:"i7c",nombre:"Tinta UV · Cian",unidad:"ml",costo:1.6,existencia:0,minimo:0,canal:"c"},
+  {id:"i7m",nombre:"Tinta UV · Magenta",unidad:"ml",costo:1.6,existencia:0,minimo:0,canal:"m"},
+  {id:"i7y",nombre:"Tinta UV · Amarillo",unidad:"ml",costo:1.6,existencia:0,minimo:0,canal:"y"},
+  {id:"i7k",nombre:"Tinta UV · Negro",unidad:"ml",costo:1.6,existencia:0,minimo:0,canal:"k"},
+  {id:"i7w",nombre:"Tinta UV · Blanco",unidad:"ml",costo:1.8,existencia:0,minimo:0,canal:"w"},
+  {id:"i7v",nombre:"Barniz UV",unidad:"ml",costo:1.4,existencia:0,minimo:0,canal:"v"},
+  /* Gran formato: eco-solvente, cuatro canales, y es la tinta más barata
+     por mililitro de todas. */
+  {id:"i8c",nombre:"Tinta eco-solvente · Cian",unidad:"ml",costo:0.28,existencia:0,minimo:0,canal:"c"},
+  {id:"i8m",nombre:"Tinta eco-solvente · Magenta",unidad:"ml",costo:0.28,existencia:0,minimo:0,canal:"m"},
+  {id:"i8y",nombre:"Tinta eco-solvente · Amarillo",unidad:"ml",costo:0.28,existencia:0,minimo:0,canal:"y"},
+  {id:"i8k",nombre:"Tinta eco-solvente · Negro",unidad:"ml",costo:0.28,existencia:0,minimo:0,canal:"k"},
+  /* DTG: no hay rollo que comprar, así que su tinta se amarra a la
+     técnica y no a un servicio. */
+  {id:"i9c",nombre:"Tinta DTG · Cian",unidad:"ml",costo:1.9,existencia:0,minimo:0,canal:"c"},
+  {id:"i9m",nombre:"Tinta DTG · Magenta",unidad:"ml",costo:1.9,existencia:0,minimo:0,canal:"m"},
+  {id:"i9y",nombre:"Tinta DTG · Amarillo",unidad:"ml",costo:1.9,existencia:0,minimo:0,canal:"y"},
+  {id:"i9k",nombre:"Tinta DTG · Negro",unidad:"ml",costo:1.9,existencia:0,minimo:0,canal:"k"},
+  {id:"i9w",nombre:"Tinta DTG · Blanco",unidad:"ml",costo:2.1,existencia:0,minimo:0,canal:"w"},
+  {id:"i9p",nombre:"Pretratamiento DTG",unidad:"ml",costo:0.35,existencia:0,minimo:0}
  ],
  /* 50 ml de tinta y 100 g de polvo por metro cuadrado IMPRESO, que son los
     promedios del oficio que ya usa la calculadora de costos. El polvo solo
     se pega donde hay tinta, por eso va por area impresa y no por comprada. */
+ /* 50 ml de tinta por m² impreso, repartidos como los reparte un DTF:
+    6 de cada color y 25 de blanco. Son promedios para arrancar; los tuyos
+    salen del reporte de tinta del RIP o de pesar los botes. */
  consumos:[
-  {id:"c1",ancla:"servicio",anclaId:"sv1",insumoId:"i1",cant:50,por:"m2"},
-  {id:"c2",ancla:"servicio",anclaId:"sv1",insumoId:"i2",cant:100,por:"m2"}
+  {id:"c1c",ancla:"servicio",anclaId:"sv1",insumoId:"i1c",cant:6,por:"m2"},
+  {id:"c1m",ancla:"servicio",anclaId:"sv1",insumoId:"i1m",cant:6,por:"m2"},
+  {id:"c1y",ancla:"servicio",anclaId:"sv1",insumoId:"i1y",cant:6,por:"m2"},
+  {id:"c1k",ancla:"servicio",anclaId:"sv1",insumoId:"i1k",cant:7,por:"m2"},
+  {id:"c1w",ancla:"servicio",anclaId:"sv1",insumoId:"i1w",cant:25,por:"m2"},
+  {id:"c2",ancla:"servicio",anclaId:"sv1",insumoId:"i2",cant:100,por:"m2"},
+  /* El rollo de 30 cm gasta la misma tinta por metro cuadrado que el de 60.
+     Sin estos renglones, quien imprime en el chico no veia bajar nada. */
+  {id:"c3c",ancla:"servicio",anclaId:"sv2",insumoId:"i1c",cant:6,por:"m2"},
+  {id:"c3m",ancla:"servicio",anclaId:"sv2",insumoId:"i1m",cant:6,por:"m2"},
+  {id:"c3y",ancla:"servicio",anclaId:"sv2",insumoId:"i1y",cant:6,por:"m2"},
+  {id:"c3k",ancla:"servicio",anclaId:"sv2",insumoId:"i1k",cant:7,por:"m2"},
+  {id:"c3w",ancla:"servicio",anclaId:"sv2",insumoId:"i1w",cant:25,por:"m2"},
+  {id:"c3p",ancla:"servicio",anclaId:"sv2",insumoId:"i2",cant:100,por:"m2"},
+  /* Sublimación: unos 17 ml por m² impreso. Se amarra al papel, que es
+     el servicio por el que pasa el metro cuadrado. */
+  {id:"c5c",ancla:"servicio",anclaId:"sv4",insumoId:"i5c",cant:4,por:"m2"},
+  {id:"c5m",ancla:"servicio",anclaId:"sv4",insumoId:"i5m",cant:4,por:"m2"},
+  {id:"c5y",ancla:"servicio",anclaId:"sv4",insumoId:"i5y",cant:4,por:"m2"},
+  {id:"c5k",ancla:"servicio",anclaId:"sv4",insumoId:"i5k",cant:5,por:"m2"},
+  {id:"c6",ancla:"tecnica",anclaId:"t3",insumoId:"i6",cant:0.3,por:"pieza"},
+  /* DTF UV: 33 ml de color, 30 de blanco y 35 de barniz por m². El
+     barniz y el blanco se llevan dos terceras partes del gasto. */
+  {id:"c7c",ancla:"servicio",anclaId:"sv3",insumoId:"i7c",cant:8,por:"m2"},
+  {id:"c7m",ancla:"servicio",anclaId:"sv3",insumoId:"i7m",cant:8,por:"m2"},
+  {id:"c7y",ancla:"servicio",anclaId:"sv3",insumoId:"i7y",cant:8,por:"m2"},
+  {id:"c7k",ancla:"servicio",anclaId:"sv3",insumoId:"i7k",cant:9,por:"m2"},
+  {id:"c7w",ancla:"servicio",anclaId:"sv3",insumoId:"i7w",cant:30,por:"m2"},
+  {id:"c7v",ancla:"servicio",anclaId:"sv3",insumoId:"i7v",cant:35,por:"m2"},
+  /* Gran formato: 13 ml por m², y va en los dos materiales porque la
+     misma máquina imprime la lona y el vinil. */
+  {id:"c8cl",ancla:"servicio",anclaId:"sv6",insumoId:"i8c",cant:3,por:"m2"},
+  {id:"c8ml",ancla:"servicio",anclaId:"sv6",insumoId:"i8m",cant:3,por:"m2"},
+  {id:"c8yl",ancla:"servicio",anclaId:"sv6",insumoId:"i8y",cant:3,por:"m2"},
+  {id:"c8kl",ancla:"servicio",anclaId:"sv6",insumoId:"i8k",cant:4,por:"m2"},
+  {id:"c8cv",ancla:"servicio",anclaId:"sv7",insumoId:"i8c",cant:3,por:"m2"},
+  {id:"c8mv",ancla:"servicio",anclaId:"sv7",insumoId:"i8m",cant:3,por:"m2"},
+  {id:"c8yv",ancla:"servicio",anclaId:"sv7",insumoId:"i8y",cant:3,por:"m2"},
+  {id:"c8kv",ancla:"servicio",anclaId:"sv7",insumoId:"i8k",cant:4,por:"m2"},
+  /* DTG: 25 ml de color, 35 de blanco y 40 de pretratamiento por m² de
+     la aplicación, no del rollo: aquí no hay rollo. */
+  {id:"c9c",ancla:"tecnica",anclaId:"t8",insumoId:"i9c",cant:6,por:"m2"},
+  {id:"c9m",ancla:"tecnica",anclaId:"t8",insumoId:"i9m",cant:6,por:"m2"},
+  {id:"c9y",ancla:"tecnica",anclaId:"t8",insumoId:"i9y",cant:6,por:"m2"},
+  {id:"c9k",ancla:"tecnica",anclaId:"t8",insumoId:"i9k",cant:7,por:"m2"},
+  {id:"c9w",ancla:"tecnica",anclaId:"t8",insumoId:"i9w",cant:35,por:"m2"},
+  {id:"c9p",ancla:"tecnica",anclaId:"t8",insumoId:"i9p",cant:40,por:"m2"}
  ],
  tecnicas:[
   {id:"t1",nombre:"DTF Textil",modo:"area",costoCm2:0.12,costoMO:0,precioMO:0,minimo:12,setup:0,costoTinta:0,costoPuntada:0,precioCm2:0.19,precioTinta:0,precioPuntada:0,precioMin:20,precioSetup:0},
@@ -4768,7 +5016,7 @@ function defaults(){ return {
  ], compras:[]
 };}
 const CHECKS = ["Diseño aprobado por el cliente","Material en almacén","Archivo impreso","Prensado / aplicado","Revisión de calidad","Empacado","Entregado"];
-function defaultParams(){ return {plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
+function defaultParams(){ return {guiado:false,plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
   tarifaKwh:4, bloqueoMin:10,
   folios:{letras:"", extra:"", digitos:6, desde:{cot:1, op:1, req:1}},
   compras:{tope:2000, siempre:false},
@@ -5774,6 +6022,21 @@ function renderArmado(){
         '<label class="armCampo armAncho"><span>Material</span><select data-ark="servicioId">'+opsSvc+'</select></label>'+
         '<label class="armCampo armAncho"><span>Nota para producción</span><input data-ark="nota" value="'+esc(row.nota||"")+'" placeholder="Ej. dejar 1 cm de sangrado"></label>'+
       '</div>'+
+      /* Los dos números con los que de verdad se juega para ver si el rollo
+         alcanza. Estaban en Catálogo, a tres pantallas de aquí, así que
+         nadie los movía. Cambiarlos cambia EL MATERIAL, no esta cotización
+         nada más, y por eso se dice abajo. */
+      (svcDeArmado(row)
+        ? '<div class="armCampos armSepOri">'+
+            '<label class="armCampo"><span>Separación (cm)</span>'+
+              '<input type="number" min="0" step="0.1" data-arksvc="separacion" value="'+num(svcDeArmado(row).separacion)+'"></label>'+
+            '<label class="armCampo"><span>Orilla (cm)</span>'+
+              '<input type="number" min="0" step="0.1" data-arksvc="orilla" value="'+num(svcDeArmado(row).orilla)+'"></label>'+
+            '<label class="armCampo"><span>Ancho útil</span>'+
+              '<input type="text" value="'+(num(svcDeArmado(row).ancho) - 2*num(svcDeArmado(row).orilla))+' cm de '+num(svcDeArmado(row).ancho)+'" readonly></label>'+
+            '<span class="armSepNota">Esto le cambia el material a <b>'+esc(svcDeArmado(row).nombre)+'</b> en tu catálogo, no sólo a esta cotización.</span>'+
+          '</div>'
+        : '')+
       '<div class="armMedTit"><span>Medidas (cm)</span>'+
         (fijo? "" : '<button class="btn sm ghost" data-addmed="'+row.id+'">+ Medida</button>')+'</div>'+
       '<div class="armMedidas"><div class="armMedCab"><span></span><span>Ancho</span><span></span><span>Largo</span><span>Piezas</span><span></span></div>'+medidas+'</div>'+
@@ -5787,6 +6050,8 @@ function renderArmado(){
     '</div>';
   }).join("");
 }
+
+const svcDeArmado = row => (cat.servicios||[]).find(s=>s.id === (row && row.servicioId)) || null;
 
 /* Repinta sólo lo que cambia, para no robarle el foco a quien está escribiendo. */
 function pintaArmado(){
@@ -6434,24 +6699,91 @@ document.addEventListener("drop", e=>{
   if(f) leeArchivoArticulos(f);
 });
 
+/* Un bote se vende por litro o por kilo; el consumo se mide en mililitros
+   o en gramos. Las dos cifras son la misma, y cada quien tiene en la cabeza
+   la suya. */
+const porMil = i => i && (i.unidad === "ml" || i.unidad === "g");
+const esTinta = i => /tinta/i.test((i && i.nombre) || "");
+const COLOR_CANAL = {c:"#00A6E0", m:"#E6007E", y:"#FFD500", k:"#1C1619", w:"#FFFFFF", v:"#9AA7B4"};
+function gotaIns(i){
+  if(!i || !i.canal) return "";
+  return '<span class="gotaIns" style="background:'+esc(COLOR_CANAL[i.canal] || "var(--ink-3)")+'" aria-hidden="true"></span>';
+}
+/* Cuántos metros cuadrados aguanta lo que hay. Es el número que contesta
+   «¿me alcanza para el pedido?» sin sacar la calculadora, y el que enseña
+   que el blanco se acaba tres veces antes que el negro. */
+function rindeIns(i){
+  if(!i) return "";
+  /* Lo que va por metro cuadrado rinde metros cuadrados; lo que va por
+     pieza rinde piezas. La cinta térmica y las bolsas se cuentan así. */
+  const mide = (por, cuanto) => {
+    const cs = (cat.consumos||[]).filter(c=>c.insumoId === i.id && c.por === por && num(c.cant) > 0);
+    if(!cs.length) return null;
+    const cada = cs.reduce((s,c)=>s+num(c.cant), 0);
+    const rinde = num(i.existencia) / cada;
+    return '<span class="insM2">'+ (Math.round(rinde*10)/10).toLocaleString("es-MX") +' '+ cuanto +'</span>' +
+           '<small>'+ (Math.round(cada*1000)/1000) +' '+ abrevIns(i.unidad) +' '+
+           (por === "m2" ? "el m²" : "la pieza") +'</small>';
+  };
+  return mide("m2", "m²") || mide("pieza", "pzas") ||
+    '<span class="hint" style="color:var(--ink-3)">sin amarre</span>';
+}
+/* Partir la tinta en sus canales. El reparto es el de un DTF: seis de cada
+   color y veinticinco de blanco por cada cincuenta. La EXISTENCIA se deja
+   en cero a propósito: repartir a ojo lo que había en un renglón sería
+   inventarle inventario al taller. */
+const CANALES_TINTA = [["c","Cian",0.12],["m","Magenta",0.12],["y","Amarillo",0.12],
+                       ["k","Negro",0.14],["w","Blanco",0.50]];
+function parteTinta(id){
+  const i = (cat.insumos||[]).find(x=>x.id === id); if(!i) return;
+  const base = (i.nombre || "Tinta").replace(/\s*\((blanco y color|color y blanco)\)\s*/i, "").trim();
+  const amarres = (cat.consumos||[]).filter(c=>c.insumoId === id);
+  const nuevos = CANALES_TINTA.map(ch=>({
+    id: uid(), nombre: base + " · " + ch[1], unidad: i.unidad || "ml",
+    costo: num(i.costo), existencia: 0, minimo: 0, canal: ch[0]
+  }));
+  cat.insumos = (cat.insumos||[]).filter(x=>x.id !== id).concat(nuevos);
+  /* Cada amarre que tenía la tinta se reparte entre los cinco canales. */
+  const otros = (cat.consumos||[]).filter(c=>c.insumoId !== id);
+  const partidos = [];
+  amarres.forEach(c=> CANALES_TINTA.forEach((ch, n)=> partidos.push(
+    Object.assign({}, c, {id: uid(), insumoId: nuevos[n].id,
+                          cant: Math.round(num(c.cant) * ch[2] * 1000) / 1000}))));
+  cat.consumos = otros.concat(partidos);
+  persist();
+  renderInsumos(); renderConsumos();
+  if(typeof renderInvInsumos === "function") renderInvInsumos();
+  toast("Tinta partida en cinco colores. Captura lo que tienes de cada uno: la existencia quedó en cero.");
+}
+
 function renderInsumos(){
   const t = $("#t_insumos"); if(!t) return;
   const ls = cat.insumos || [];
-  t.innerHTML = '<thead><tr><th>Consumible</th><th style="width:110px">Unidad</th>' +
-    '<th style="width:120px" class="num">Costo por unidad</th>' +
-    '<th style="width:110px" class="num">Existencia</th>' +
-    '<th style="width:110px" class="num">Mínimo</th><th style="width:44px"></th></tr></thead><tbody>' +
+  t.innerHTML = '<thead><tr><th>Consumible</th><th style="width:96px">Unidad</th>' +
+    '<th style="width:118px" class="num">Costo por unidad</th>' +
+    '<th style="width:118px" class="num">Por litro / kilo</th>' +
+    '<th style="width:104px" class="num">Existencia</th>' +
+    '<th style="width:96px" class="num">Mínimo</th>' +
+    '<th style="width:120px">Rinde</th><th style="width:70px"></th></tr></thead><tbody>' +
     (ls.length ? ls.map(i=>
       '<tr data-ins="'+esc(i.id)+'">' +
-      '<td><input value="'+esc(i.nombre||"")+'" data-insf="nombre" placeholder="Tinta, polvo, hilo, bolsa…"></td>' +
+      '<td>'+gotaIns(i)+'<input value="'+esc(i.nombre||"")+'" data-insf="nombre" placeholder="Tinta, polvo, hilo, bolsa…" style="width:calc(100% - 22px)"></td>' +
       '<td><select data-insf="unidad">' + UNIDADES_INS.map(u=>
           '<option value="'+u[0]+'"'+(i.unidad===u[0]?" selected":"")+'>'+abrevIns(u[0])+'</option>').join("") +
         '</select></td>' +
       '<td><input type="number" min="0" step="0.0001" value="'+num(i.costo)+'" data-insf="costo"></td>' +
+      /* Los botes se compran por litro o por kilo, no por mililitro. Si se
+         captura el precio del bote, el por-unidad sale solo y al revés. */
+      '<td>'+(porMil(i)
+        ? '<input type="number" min="0" step="1" value="'+(Math.round(num(i.costo)*1000*100)/100)+'" data-insf="costoMil" title="Lo que te cuesta el litro o el kilo">'
+        : '<span class="hint" style="color:var(--ink-3)">—</span>')+'</td>' +
       '<td><input type="number" step="0.01" value="'+num(i.existencia)+'" data-insf="existencia"></td>' +
       '<td><input type="number" min="0" step="0.01" value="'+num(i.minimo)+'" data-insf="minimo"></td>' +
-      '<td><button class="quita" data-insdel="'+esc(i.id)+'" title="Quitar">&times;</button></td></tr>').join("")
-    : '<tr><td colspan="6" style="color:var(--ink-3);padding:16px">Todavía no hay consumibles. ' +
+      '<td class="insRinde">'+rindeIns(i)+'</td>' +
+      '<td style="white-space:nowrap">'+
+        (esTinta(i) && !i.canal ? '<button class="btn icon sm" data-inspartir="'+esc(i.id)+'" title="Partirla en cian, magenta, amarillo, negro y blanco">⑁</button> ' : '')+
+        '<button class="quita" data-insdel="'+esc(i.id)+'" title="Quitar">&times;</button></td></tr>').join("")
+    : '<tr><td colspan="8" style="color:var(--ink-3);padding:16px">Todavía no hay consumibles. ' +
       'Agrega la tinta, el polvo o las bolsas que de verdad gastas.</td></tr>') + '</tbody>';
 }
 
@@ -6549,7 +6881,26 @@ document.addEventListener("input", e=>{
   if(tr && e.target.dataset.insf){
     const i = insumoDe(tr.dataset.ins); if(!i) return;
     const f = e.target.dataset.insf;
-    i[f] = (f === "nombre") ? e.target.value : num(e.target.value);
+    /* El litro y el mililitro son el mismo dato visto de dos formas. Quien
+       compra piensa en el bote; quien calcula, en el mililitro. Se captura
+       cualquiera de los dos y el otro se acomoda. */
+    if(f === "costoMil"){
+      i.costo = num(e.target.value) / 1000;
+      const par = tr.querySelector('[data-insf="costo"]');
+      if(par) par.value = Math.round(i.costo * 10000) / 10000;
+    }else{
+      i[f] = (f === "nombre") ? e.target.value : num(e.target.value);
+      if(f === "costo"){
+        const par = tr.querySelector('[data-insf="costoMil"]');
+        if(par) par.value = Math.round(num(i.costo) * 1000 * 100) / 100;
+      }
+    }
+    /* El rinde se repinta a mano: volver a dibujar la tabla completa le
+       robaría el cursor a quien está capturando. */
+    if(f === "existencia"){
+      const celda = tr.querySelector(".insRinde");
+      if(celda) celda.innerHTML = rindeIns(i);
+    }
     persist(); renderInvInsumos();
     if(f === "nombre" && $("#consCuerpo")) renderConsumos();
     return;
@@ -6581,6 +6932,20 @@ document.addEventListener("click", e=>{
                                              existencia:0, minimo:0}]);
     persist(); renderInsumos(); renderConsumos(); renderInvInsumos();
     toast("Consumible agregado · ponle nombre y unidad");
+    return;
+  }
+  const pt = e.target.closest("[data-inspartir]");
+  if(pt){
+    const i = insumoDe(pt.dataset.inspartir); if(!i) return;
+    const amarres = (cat.consumos||[]).filter(c=>c.insumoId===i.id).length;
+    if(!confirm("¿Partir «" + (i.nombre||"esta tinta") + "» en cian, magenta, " +
+      "amarillo, negro y blanco?\n\nEl precio se copia igual a los cinco y lo " +
+      "ajustas por color." +
+      (amarres ? "\nSus " + amarres + " amarre(s) se reparten: 12% a cada color " +
+                 "y 50% al blanco." : "") +
+      "\n\nLa existencia queda en cero: lo que tienes de cada bote lo capturas tú."))
+      return;
+    parteTinta(i.id);
     return;
   }
   const d = e.target.closest("[data-insdel]");
@@ -6712,7 +7077,7 @@ const CALC_DEF = {
   tintaPagado:2900, tintaIva:true, tintaLitros:1, tintaMl:50,
   polvoOn:true, polvoPagado:1450, polvoIva:true, polvoKilos:5, polvoGr:100,
   moMin:2, moHora:60,
-  gfOn:true, gfMes:0, gfM2:0,
+  gfOn:true, gfMes:0, gfM2:0, gfPiezas:0,
   ancho:25, alto:20
 };
 function normalizaCalc(){
@@ -6944,7 +7309,583 @@ function renderResultado(){
         'Tu precio de venta sale de ahí más tu utilidad, que se configura en Ajustes.</p>'+
     '</div>';
 }
-function renderCalc(){ renderMaquinas(); renderPasos(); renderResultado(); }
+
+/* ==================== LA CALCULADORA POR PASOS ====================
+   Una pieza, de principio a fin, sin poder saltarse un paso. Lo que cuesta
+   sale del MISMO calc() que usa el cotizador: se arma una cotización de una
+   sola pieza, se corre el motor de siempre y se devuelve el global a su
+   lugar. Así nunca hay dos verdades sobre el mismo precio. */
+
+const CP_DEF = {paso:1, via:"articulo", articuloId:"", servicioId:"", tecnicaId:"",
+                medida:"fijo", tamanoId:"", ancho:25, alto:20,
+                puntadas:8000, tintas:2, minMaquina:0, maquinaId:"",
+                minutos:0, extras:{}, precio:null, precioTocado:false,
+                desglose:false, busca:""};
+let CP = Object.assign({}, CP_DEF, {extras:{}});
+
+const cpArt  = () => (cat.articulos||[]).find(a=>a.id===CP.articuloId) || null;
+const cpSvc  = () => (cat.servicios||[]).find(x=>x.id===CP.servicioId) || null;
+const cpTec  = () => (cat.tecnicas||[]).find(t=>t.id===CP.tecnicaId) || null;
+const cpTam  = () => (cat.tamanos||[]).find(t=>t.id===CP.tamanoId) || null;
+const cpPasos = () => [1,2,3,4,5,6];
+function cpAncho(){ const t = cpTam(); return CP.medida==="fijo" && t ? num(t.ancho) : num(CP.ancho); }
+function cpAlto(){  const t = cpTam(); return CP.medida==="fijo" && t ? num(t.alto)  : num(CP.alto); }
+
+/* Lo que falta para poder avanzar. Devuelve el texto del aviso o "". */
+function cpFalta(n){
+  if(n===1) return CP.via==="servicio" ? "" : (cpArt() ? "" : "Escoge el artículo que vas a costear");
+  if(n===2) return CP.via==="servicio"
+    ? (cpSvc() ? "" : "Escoge el material o servicio")
+    : (cpTec() ? "" : "Escoge con qué se decora");
+  if(n===3){
+    const t = cpTec();
+    if(CP.via!=="servicio" && t && t.modo==="tintas")   return num(CP.tintas)>0 ? "" : "¿Cuántas tintas lleva?";
+    if(CP.via!=="servicio" && t && t.modo==="puntadas") return num(CP.puntadas)>0 ? "" : "¿Cuántas puntadas lleva?";
+    if(CP.medida==="fijo") return cpTam() ? "" : "Escoge el tamaño";
+    return (num(CP.ancho)>0 && num(CP.alto)>0) ? "" : "Pon el ancho y el alto";
+  }
+  if(n===5) return num(CP.minutos)>0 ? "" : "¿Cuántos minutos te lleva hacer una?";
+  return "";
+}
+const cpListo = n => !cpFalta(n);
+
+/* ---------- la cotización de una sola pieza ---------- */
+function cpCotTemp(){
+  const a = cpArt(), t = cpTec();
+  const c = {folio:"CALC", fecha:hoyISO(), cliente:"", contacto:"", clienteId:"", ref:"",
+             articuloId: CP.via==="servicio" ? "" : (a ? a.id : ""),
+             costoArt: (CP.via==="servicio" || !a) ? 0 : num(a.costo),
+             precioArt:(CP.via==="servicio" || !a) ? 0 : num(a.precio),
+             desc:"", cantidad:1, cantManual:true, modo: CP.via==="servicio" ? "servicio" : "articulo",
+             armado:[], descOn:false, descTipo:"pct", descVal:0, descNota:"",
+             apps:[], extras:(cat.extras||[]).map(e=>({id:e.id, on:!!CP.extras[e.id]})),
+             tallas:[], notas:"", entrega:"", resp:"", checklist:{},
+             estado:"borrador", op:null, items:null, iAct:0};
+  if(CP.via==="servicio"){
+    const sv = cpSvc();
+    if(sv) c.armado = [{id:"cparm", servicioId:sv.id, appId:"", giro:"auto", cobraMerma:true,
+                        nota:"", principal:true, auto:false,
+                        piezas:[{id:"cppz", ancho:cpAncho(), alto:cpAlto(), cant:1,
+                                 appId:"", etiqueta:""}]}];
+  } else if(t){
+    c.apps = [{id:"cpapp", ubic:"Aplicación", tecnicaId:t.id,
+               tamanoId: CP.medida==="fijo" ? CP.tamanoId : "",
+               ancho:cpAncho(), alto:cpAlto(),
+               tintas:Math.max(1,num(CP.tintas,1)), puntadas:num(CP.puntadas),
+               minutos:num(CP.minMaquina), minutosSetup:0, art:null}];
+  }
+  return c;
+}
+/* El motor de siempre, con el global prestado un instante. */
+function cpCostea(){
+  const guardado = cot;
+  let r = null;
+  try{
+    cot = cpCotTemp();
+    if(CP.via !== "servicio" && typeof autoArmado === "function") autoArmado();
+    r = calc();
+    r.cot = cot;
+  }catch(e){ r = null; }
+  finally{ cot = guardado; }
+  return r;
+}
+
+/* ---------- lo que el cotizador NO cobra pero sí se gasta ---------- */
+function cpFijos(){
+  const c = normalizaCalc();
+  const mes = num(c.gfMes), pzas = num(c.gfPiezas);
+  return (c.gfOn && mes>0 && pzas>0) ? mes/pzas : 0;
+}
+function cpTiempo(){
+  const c = normalizaCalc();
+  const hora = num(c.moHora);
+  return hora>0 ? num(CP.minutos)*hora/60 : 0;
+}
+function cpLuz(){
+  const m = maqDe(CP.maquinaId);
+  if(!m) return 0;
+  const min = num(CP.minMaquina) > 0 ? num(CP.minMaquina) : num(CP.minutos);
+  return min * costoMinutoMaq(m);
+}
+/* Todo junto: lo que el cotizador ya cuenta más el tiempo, la luz y la
+   parte de la renta que le toca a esta pieza. */
+function cpTotales(){
+  const r = cpCostea();
+  const base = r ? num(r.costoTotal) : 0;
+  const tiempo = cpTiempo(), luz = cpLuz(), fijos = cpFijos();
+  const costo = base + tiempo + luz + fijos;
+  /* Lo que cobrarías es el SUBTOTAL: sin IVA, porque el IVA no es tuyo, y
+     con la preparación adentro, porque esa sí te costó. */
+  const sugerido = r ? num(r.subtotal) : 0;
+  const precio = (CP.precioTocado && CP.precio !== null) ? num(CP.precio) : sugerido;
+  return {r, base, tiempo, luz, fijos, costo, sugerido, precio,
+          utilidad: precio - costo,
+          margen: precio>0 ? (precio-costo)/precio*100 : 0};
+}
+
+/* ---------- lo que sale del almacén por una pieza ---------- */
+function cpConsumo(){
+  const T = cpTotales();
+  if(!T.r || !T.r.cot) return [];
+  try{ return consumoDe(T.r.cot, Object.assign({}, T.r, {qty:1, partes:null})); }
+  catch(e){ return []; }
+}
+
+/* ---------- pintar ---------- */
+function cpIco(d){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
+}
+function cpAzulejo(attr, id, color, dentro, elegido){
+  return '<button type="button" class="cpAz" '+attr+'="'+esc(id)+'" style="--cpc:'+esc(color)+'" '+
+    'aria-pressed="'+(elegido?"true":"false")+'">'+dentro+'</button>';
+}
+function cpChip(txt, fuerte){ return '<span class="cpChip'+(fuerte?" fuerte":"")+'">'+esc(txt)+'</span>'; }
+
+const CP_VIAS = [
+  {id:"articulo", nombre:"Un artículo de mi catálogo", sub:"playera, taza, termo, gorra", color:"#D6127F",
+   icono:'<path d="M6 4h12l3 5-4 2v9H7v-9L3 9Z"/>'},
+  {id:"servicio", nombre:"Sólo un servicio por medida", sub:"metros de rollo, lona, vinil", color:"#0680AB",
+   icono:'<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 6v12M18 6v12"/>'}
+];
+
+function cpCuerpo1(){
+  let h = '<div class="cpRej">' + CP_VIAS.map(v=>
+    cpAzulejo("data-cpvia", v.id, v.color,
+      '<span class="cpIco">'+cpIco(v.icono)+'</span><b>'+esc(v.nombre)+'</b><small>'+esc(v.sub)+'</small>',
+      CP.via===v.id)).join("") + '</div>';
+  if(CP.via !== "articulo") return h;
+  const q = (CP.busca||"").trim().toLowerCase();
+  const ls = (cat.articulos||[]).filter(a=> !q ||
+    ((a.nombre||"")+" "+(a.cat||"")).toLowerCase().indexOf(q) >= 0);
+  h += '<div class="cpBusca" style="margin-top:14px">' +
+       '<input id="cpBusca" placeholder="Buscar artículo" value="'+esc(CP.busca||"")+'">' +
+       '<span class="hint">'+ls.length+' de '+(cat.articulos||[]).length+'</span></div>';
+  h += ls.length
+    ? '<div class="cpRej">' + ls.map(a=> cpAzulejo("data-cpart", a.id, "#D6127F",
+        miniArt(a) + '<b>'+esc(a.nombre)+'</b><small>'+esc(a.cat||"Sin familia")+' · cuesta '+mx(a.costo)+'</small>',
+        CP.articuloId===a.id)).join("") + '</div>'
+    : '<p class="cpNota">Ningún artículo con ese nombre. Los artículos se capturan en Catálogo.</p>';
+  return h;
+}
+function cpCuerpo2(){
+  if(CP.via === "servicio"){
+    const ls = cat.servicios || [];
+    if(!ls.length) return '<p class="cpNota">No tienes materiales por medida capturados. Van en Catálogo · Materiales y servicios.</p>';
+    return '<div class="cpRej">' + ls.map(x=> cpAzulejo("data-cpsvc", x.id, "#0680AB",
+      '<span class="cpIco">'+cpIco('<rect x="2" y="7" width="20" height="10" rx="1.5"/><path d="M6 7v10"/>')+'</span>'+
+      '<b>'+esc(x.nombre)+'</b><small>'+num(x.ancho)+' cm de ancho · '+mx(x.costo)+' el '+
+      (x.unidad==="m2"?"m²":"metro")+'</small>',
+      CP.servicioId===x.id)).join("") + '</div>';
+  }
+  const ls = cat.tecnicas || [];
+  if(!ls.length) return '<p class="cpNota">No tienes técnicas capturadas. El asistente de arranque te las carga en un minuto.</p>';
+  const COL = {area:"#0680AB", tintas:"#8B5CF6", puntadas:"#D2541F", tiempo:"#14B8A6"};
+  const QUE = {area:"se cobra por centímetro cuadrado", tintas:"se cobra por tinta",
+               puntadas:"se cobra por puntada", tiempo:"se cobra por minuto de máquina"};
+  return '<div class="cpRej">' + ls.map(t=> cpAzulejo("data-cptec", t.id, COL[t.modo]||"#0680AB",
+    '<span class="cpIco">'+cpIco('<circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/>')+'</span>'+
+    '<b>'+esc(t.nombre)+'</b><small>'+(QUE[t.modo]||"")+'</small>',
+    CP.tecnicaId===t.id)).join("") + '</div>' +
+    '<p class="cpNota">Sólo salen las técnicas que tú tienes configuradas. Si falta alguna, se agrega en Catálogo.</p>';
+}
+function cpCuerpo3(){
+  const t = cpTec();
+  let h = "";
+  if(CP.via !== "servicio" && t && t.modo === "puntadas"){
+    h += '<div class="cpCampos"><label class="cpCampo"><span>Puntadas del diseño</span>'+
+      '<input type="number" min="100" step="500" data-cpf="puntadas" value="'+num(CP.puntadas)+'"></label></div>';
+  }
+  if(CP.via !== "servicio" && t && t.modo === "tintas"){
+    h += '<div class="cpCampos"><label class="cpCampo"><span>Tintas del diseño</span>'+
+      '<input type="number" min="1" max="12" step="1" data-cpf="tintas" value="'+num(CP.tintas,1)+'"></label></div>';
+  }
+  if(CP.via !== "servicio" && t && t.modo === "tiempo"){
+    h += '<div class="cpCampos"><label class="cpCampo"><span>Minutos de máquina</span>'+
+      '<input type="number" min="0" step="0.5" data-cpf="minMaquina" value="'+num(CP.minMaquina)+'"></label></div>';
+  }
+  h += '<div class="seg" style="margin:'+(h?"14px":"0")+' 0 12px">'+
+    '<button type="button" data-cpmed="fijo" aria-pressed="'+(CP.medida==="fijo")+'">Un tamaño de los míos</button>'+
+    '<button type="button" data-cpmed="libre" aria-pressed="'+(CP.medida==="libre")+'">A la medida</button></div>';
+  if(CP.medida === "fijo"){
+    const ls = cat.tamanos || [];
+    h += ls.length
+      ? '<div class="cpRej">' + ls.map(x=> cpAzulejo("data-cptam", x.id, "#14B8A6",
+          '<b>'+esc(x.nombre)+'</b><small>'+num(x.ancho)+' × '+num(x.alto)+' cm</small>',
+          CP.tamanoId===x.id)).join("") + '</div>'
+      : '<p class="cpNota">No tienes tamaños capturados. Van en Catálogo · Tamaños de impresión.</p>';
+  } else {
+    h += '<div class="cpCampos">'+
+      '<label class="cpCampo"><span>Ancho (cm)</span><input type="number" min="0.5" step="0.5" data-cpf="ancho" value="'+num(CP.ancho)+'"></label>'+
+      '<label class="cpCampo"><span>Alto (cm)</span><input type="number" min="0.5" step="0.5" data-cpf="alto" value="'+num(CP.alto)+'"></label>'+
+      '</div>';
+  }
+  const a = cpAncho(), al = cpAlto();
+  if(a>0 && al>0) h += '<p class="cpNota">Son <b>'+red3(a*al/10000)+' m²</b> de impresión por pieza.</p>';
+  return h;
+}
+function cpCuerpo4(){
+  const lista = cpConsumo();
+  let h = lista.length
+    ? '<table class="cpTabla"><thead><tr><th>Lo que sale del almacén</th>'+
+      '<th class="n">Por pieza</th><th class="n">Hay</th></tr></thead><tbody>'+
+      lista.map(x=>{
+        const falta = num(x.insumo.existencia) < num(x.cant);
+        return '<tr><td>'+esc(x.insumo.nombre)+'</td>'+
+          '<td class="n">'+cantIns(x.cant)+' '+abrevIns(x.insumo.unidad)+'</td>'+
+          '<td class="n"'+(falta?' style="color:var(--warn)"':'')+'>'+
+            cantIns(x.insumo.existencia)+'</td></tr>';
+      }).join("")+'</tbody></table>'+
+      '<p class="cpNota">Esto es lo que <b>se descuenta solo</b> de tu inventario cuando confirmas un pedido. '+
+      'No se suma al costo de aquí abajo: ya viene adentro de lo que cobra la técnica por centímetro cuadrado. '+
+      'Si los dos números no se parecen, el que está mal es el de la técnica.</p>'
+    : '<p class="cpNota">Esta combinación todavía no tiene consumibles amarrados, así que el almacén no se va a mover '+
+      'cuando confirmes un pedido. Los amarres van en Catálogo · Consumibles.</p>';
+  const porPieza = (cat.extras||[]).filter(x=>x.tipo==="pieza");
+  if(porPieza.length){
+    h += '<div style="margin-top:14px"><div class="cpTit" style="font-size:13.5px">Extras que van en cada pieza</div>'+
+      '<div class="cpRej">' + porPieza.map(x=> cpAzulejo("data-cpext", x.id, "#B26A00",
+        '<b>'+esc(x.nombre)+'</b><small>'+mx(x.monto)+' la pieza</small>', !!CP.extras[x.id])).join("") + '</div></div>';
+  }
+  return h;
+}
+function cpCuerpo5(){
+  const c = normalizaCalc();
+  const ms = maquinas();
+  let h = '<div class="cpCampos">'+
+    '<label class="cpCampo"><span>Minutos que te lleva hacer una</span>'+
+      '<input type="number" min="0" step="0.5" data-cpf="minutos" value="'+num(CP.minutos)+'"></label>'+
+    '<label class="cpCampo"><span>Cuánto vale tu hora</span>'+
+      '<input type="number" min="0" step="10" data-cc="moHora" value="'+num(c.moHora)+'"></label>'+
+    (ms.length
+      ? '<label class="cpCampo"><span>Máquina que se usa</span><select data-cpf="maquinaId">'+
+        '<option value="">Ninguna / a mano</option>'+
+        ms.map(m=>'<option value="'+esc(m.id)+'"'+(CP.maquinaId===m.id?" selected":"")+'>'+esc(m.nombre)+'</option>').join("")+
+        '</select></label>'
+      : '')+
+    '</div>';
+  h += '<label class="sw" style="margin:14px 0 10px"><input type="checkbox" data-cc="gfOn"'+(c.gfOn?" checked":"")+'> '+
+    'Repartir la renta, la luz y lo demás entre las piezas que hago al mes</label>';
+  if(c.gfOn){
+    h += '<div class="cpCampos">'+
+      '<label class="cpCampo"><span>Gastos fijos al mes</span>'+
+        '<input type="number" min="0" step="100" data-cc="gfMes" value="'+num(c.gfMes)+'"></label>'+
+      '<label class="cpCampo"><span>Piezas que haces al mes</span>'+
+        '<input type="number" min="0" step="10" data-cc="gfPiezas" value="'+num(c.gfPiezas)+'"></label>'+
+      '</div>';
+  }
+  const m = maqDe(CP.maquinaId);
+  if(m){
+    const d = desgloseMaq(m);
+    h += '<p class="cpNota">El minuto de <b>'+esc(m.nombre)+'</b> cuesta <b>'+mx(d.minuto)+'</b>: '+
+      mx(d.luz)+' de luz, '+mx(d.consumibles)+' de consumibles, '+mx(d.mantenimiento)+' de mantenimiento y '+
+      mx(d.depreciacion)+' de lo que vale la máquina, todo por hora.</p>';
+  }
+  h += '<p class="cpNota">Tu tiempo cuenta aunque no te lo pagues: el día que contrates a alguien para hacer esto, '+
+    'ese costo aparece igual. Y la renta se paga haya o no trabajo.</p>';
+  return h;
+}
+function cpCuerpo6(){
+  const T = cpTotales();
+  const m = Math.round(Math.max(0, Math.min(95, T.margen)));
+  return '<div class="cpGanar">'+
+      '<label class="f" for="cpMargen">De cada peso que cobres, ¿cuánto quieres que te quede?</label>'+
+      '<div class="cpSlider">'+
+        '<input type="range" id="cpMargen" min="0" max="90" step="1" value="'+m+'">'+
+        '<b id="cpMargenN">'+m+'%</b>'+
+      '</div>'+
+    '</div>'+
+    '<div class="cpCampos" style="margin-top:14px">'+
+      '<label class="cpCampo"><span>Te cuesta</span><input type="text" value="'+mx(T.costo)+'" readonly></label>'+
+      '<label class="cpCampo"><span>Con ese margen cobrarías</span>'+
+        '<input type="text" id="cpConMargen" value="'+mx(T.precio)+'" readonly></label>'+
+    '</div>'+
+    '<p class="cpNota">Con tu utilidad de Ajustes ('+(P.modo==="margen"?"margen ":"markup ")+num(P.margen)+'%) '+
+    'el cotizador cobra <b>'+mx(T.sugerido)+'</b> por esta pieza'+(P.ivaOn?", más IVA":"")+'. '+
+    (CP.precioTocado ? '<button class="btn sm ghost" id="cpVuelve2" style="margin-left:6px">Volver a ese precio</button>' : '')+
+    '</p>';
+}
+const CP_TITULOS = [
+  ["¿Qué vas a costear?", "un artículo terminado o nada más el servicio"],
+  ["¿Cómo se decora?", "sólo salen las técnicas que tú configuraste"],
+  ["¿De qué tamaño?", "uno de tus tamaños o a la medida"],
+  ["¿Qué se gasta?", "lo que se descuenta del almacén y los extras"],
+  ["Tu tiempo y la luz", "lo que se paga aunque nadie lo cobre"],
+  ["¿Cuánto quieres ganar?", "el precio sale de tu utilidad y lo puedes mover"]
+];
+function cpChipsDe(n){
+  const a = cpArt(), sv = cpSvc(), t = cpTec();
+  if(n===1) return CP.via==="servicio" ? cpChip("Servicio por medida", true)
+    : (a ? cpChip(a.nombre, true) + cpChip(mx(a.costo)+" de costo") : "");
+  if(n===2) return CP.via==="servicio" ? (sv ? cpChip(sv.nombre, true) : "")
+    : (t ? cpChip(t.nombre, true) : "");
+  if(n===3){
+    if(CP.via!=="servicio" && t && t.modo==="puntadas") return cpChip(num(CP.puntadas).toLocaleString("es-MX")+" puntadas", true);
+    if(CP.via!=="servicio" && t && t.modo==="tintas")   return cpChip(num(CP.tintas,1)+" tinta(s)", true);
+    const tm = cpTam();
+    return CP.medida==="fijo" && tm ? cpChip(tm.nombre, true) + cpChip(num(tm.ancho)+"×"+num(tm.alto)+" cm")
+                                    : cpChip(num(CP.ancho)+"×"+num(CP.alto)+" cm", true);
+  }
+  if(n===4){
+    const l = cpConsumo().length;
+    const e = Object.keys(CP.extras).filter(k=>CP.extras[k]).length;
+    return (l ? cpChip(l+" consumible(s)", true) : cpChip("sin consumibles")) +
+           (e ? cpChip(e+" extra(s)") : "");
+  }
+  if(n===5) return cpChip(num(CP.minutos)+" min", true) +
+    (cpFijos()>0 ? cpChip(mx(cpFijos())+" de fijos") : "");
+  return "";
+}
+function cpPinta(){
+  const w = $("#cpPasos"); if(!w) return;
+  const pasos = cpPasos();
+  w.innerHTML = pasos.map(n=>{
+    const i = pasos.indexOf(n), act = pasos.indexOf(CP.paso);
+    const estado = n === CP.paso ? "activo" : (i < act ? "hecho" : "");
+    const cuerpo = n === CP.paso
+      ? '<div class="cpCuerpo">' +
+        [cpCuerpo1, cpCuerpo2, cpCuerpo3, cpCuerpo4, cpCuerpo5, cpCuerpo6][n-1]() +
+        '<div class="cpPie">' +
+          (cpFalta(n) ? '<span class="cpAviso">'+esc(cpFalta(n))+'</span>'
+            : (n === pasos[pasos.length-1] ? '<span class="cpOk">Ya está. Abajo tienes el número.</span>'
+                                           : '<span class="cpOk">Listo. Puedes seguir.</span>')) +
+          (n > 1 ? '<button class="btn ghost" data-cpir="'+pasos[i-1]+'">Atrás</button>' : '') +
+          (n < pasos[pasos.length-1]
+            ? '<button class="btn primary" data-cpsig="'+pasos[i+1]+'"'+(cpFalta(n)?" disabled":"")+'>Continuar</button>'
+            : '') +
+        '</div></div>'
+      : "";
+    return '<div class="cpPaso '+estado+'">'+
+      '<'+(estado==="hecho"?'button type="button" data-cpir="'+n+'"':'div')+' class="cpCab">'+
+        '<span class="cpNum">'+(estado==="hecho"?"✓":n)+'</span>'+
+        '<span class="cpTit">'+CP_TITULOS[n-1][0]+'<small>'+CP_TITULOS[n-1][1]+'</small></span>'+
+        '<span class="cpChips">'+(estado==="activo"?"":cpChipsDe(n))+'</span>'+
+      '</'+(estado==="hecho"?'button':'div')+'>'+ cuerpo + '</div>';
+  }).join("");
+  cpResultado();
+}
+
+function cpResultado(){
+  const w = $("#cpResultado"); if(!w) return;
+  const listos = cpPasos().every(n=>cpListo(n));
+  if(!listos || CP.paso < 6){ w.innerHTML = ""; return; }
+  const T = cpTotales();
+  if(!T.r){ w.innerHTML = '<p class="cpNota">No pude calcular esta combinación. Revisa la medida y el material.</p>'; return; }
+  const r = T.r;
+  const material = num(r.costoArt) + num(r.armadoCosto);
+  const trabajo  = num(r.costoApps) + num(r.setupCosto) + T.tiempo;
+  const merma    = Math.max(0, num(r.costoDirecto) - (num(r.costoArt) + num(r.costoApps)));
+  const fijos    = T.fijos + T.luz;
+  const total    = Math.max(0.0001, material + trabajo + merma + fijos);
+  const pct = v => (v/total*100).toFixed(1) + "%";
+  const COLS = ["#0680AB", "#D2541F", "#B26A00", "#8B5CF6"];
+  const perdida = T.utilidad < 0;
+
+  w.innerHTML = '<div class="cpRes">'+
+    '<div class="cpResTop">'+
+      '<div class="cpBig"><span>Te cuesta hacer una</span><b>'+mx(T.costo)+'</b>'+
+        '<i>material, trabajo, merma y lo fijo</i></div>'+
+      '<div class="cpBig alt"><span>Deberías cobrar</span><b>'+mx(T.precio)+'</b>'+
+        '<i>'+(CP.precioTocado ? "tu precio" : "con tu utilidad de Ajustes")+
+        (P.ivaOn ? " · más IVA" : "")+'</i></div>'+
+    '</div>'+
+
+    '<div class="cpBarra">'+
+      '<i style="background:'+COLS[0]+';width:'+pct(material)+'"></i>'+
+      '<i style="background:'+COLS[1]+';width:'+pct(trabajo)+'"></i>'+
+      '<i style="background:'+COLS[2]+';width:'+pct(merma)+'"></i>'+
+      '<i style="background:'+COLS[3]+';width:'+pct(fijos)+'"></i>'+
+    '</div>'+
+    '<div class="cpLeyenda">'+
+      '<span><u style="background:'+COLS[0]+'"></u>Material '+mx(material)+'</span>'+
+      '<span><u style="background:'+COLS[1]+'"></u>Tiempo y trabajo '+mx(trabajo)+'</span>'+
+      '<span><u style="background:'+COLS[2]+'"></u>Merma '+mx(merma)+'</span>'+
+      '<span><u style="background:'+COLS[3]+'"></u>Fijos y luz '+mx(fijos)+'</span>'+
+    '</div>'+
+
+    '<div class="cpPrecio">'+
+      '<label class="cpCampo"><span>Tu precio por pieza</span>'+
+        '<input type="number" min="0" step="1" id="cpPrecio" value="'+(Math.round(num(T.precio)*100)/100)+'"></label>'+
+      '<div style="flex:1 1 240px">'+
+        '<p class="cpNota" style="margin:0">'+
+          (perdida
+            ? '<b style="color:var(--warn)">Con ese precio pierdes '+mx(-T.utilidad)+' por pieza.</b>'
+            : 'Te quedan <b>'+mx(T.utilidad)+'</b> por pieza · <b>'+T.margen.toFixed(0)+'%</b> de margen')+
+        '</p>'+
+        (CP.precioTocado ? '<button class="btn sm ghost" id="cpVuelve" style="margin-top:8px">Volver al precio de mi utilidad</button>' : '')+
+      '</div>'+
+    '</div>'+
+    (cpArt() && CP.via!=="servicio"
+      ? (P.origen === "lista"
+         ? '<div class="cpPie"><button class="btn" id="cpGuardaPrecio">Guardar este precio en «'+esc(cpArt().nombre)+'»</button>'+
+           '<span class="hint">Le cambia el precio público al artículo para que el cotizador llegue a este total.</span></div>'
+         : '<p class="cpNota">No hay dónde guardar este precio: tu cotizador saca el precio del <b>costo más tu utilidad</b> '+
+           '(Ajustes · De dónde sale el precio), no de la lista del catálogo. Para que cobre otra cosa por esta pieza, '+
+           'cambia tu utilidad, o cámbiale el precio a la técnica. Si prefieres mandar tú los precios, en Ajustes puedes '+
+           'poner que salgan de la lista del catálogo.</p>')
+      : '')+
+
+    '<div class="cpDesp"'+(CP.desglose?" open":"")+'>'+
+      '<button type="button" id="cpVerDesglose">'+
+        cpIco('<path d="M9 6l6 6-6 6"/>')+'<b>De dónde sale el costo</b>'+
+        '<span class="hint">'+mx(T.costo)+'</span></button>'+
+      (CP.desglose ? '<div class="cpDespCuerpo">'+cpTablaDesglose(T)+'</div>' : '')+
+    '</div>'+
+
+    '<p class="cpNota">Este número es de <b>una pieza suelta</b>. En un pedido de verdad el material se acomoda '+
+    'en el rollo entre todas las piezas y sale más barato: eso lo calcula el armado del cotizador, no esta pantalla.</p>'+
+  '</div>';
+}
+function cpTablaDesglose(T){
+  const r = T.r;
+  const fila = (que, cuanto, nota) =>
+    '<tr><td>'+que+(nota?' <i>'+nota+'</i>':'')+'</td><td class="n">'+mx(cuanto)+'</td></tr>';
+  let h = '<table class="cpTabla"><thead><tr><th>De qué</th><th class="n">Por pieza</th></tr></thead><tbody>';
+  if(num(r.costoArt) > 0) h += fila("El artículo", r.costoArt, "lo que te cuesta comprarlo");
+  if(num(r.armadoCosto) > 0) h += fila("El material impreso", r.armadoCosto, "con su merma de acomodo");
+  (r.detalle||[]).forEach(d=> h += fila(d.tecnica, d.costo, d.base));
+  if(num(r.setupCosto) > 0) h += fila("Preparación", r.setupCosto, "pantallas, ponchado, arranque");
+  const merma = Math.max(0, num(r.costoDirecto) - (num(r.costoArt) + num(r.costoApps)));
+  if(merma > 0) h += fila("Merma", merma, num(P.merma)+"% de lo que se echa a perder");
+  if(T.tiempo > 0) h += fila("Tu tiempo", T.tiempo, num(CP.minutos)+" min");
+  if(T.luz > 0) h += fila("La máquina", T.luz, "luz, mantenimiento y desgaste");
+  if(T.fijos > 0) h += fila("Gastos fijos", T.fijos, "la parte que le toca a esta pieza");
+  h += '</tbody><tfoot><tr><td><b>Todo junto</b></td><td class="n"><b>'+mx(T.costo)+'</b></td></tr>'+
+       '<tr><td>Lo que cobra hoy tu cotizador</td><td class="n">'+mx(T.sugerido)+'</td></tr></tfoot></table>';
+  return h;
+}
+
+/* ---------- los clics ---------- */
+document.addEventListener("click", e=>{
+  const via = e.target.closest("[data-cpvia]");
+  if(via){ CP.via = via.dataset.cpvia; CP.precioTocado = false; cpPinta(); return; }
+  const art = e.target.closest("[data-cpart]");
+  if(art){ CP.articuloId = art.dataset.cpart; CP.precioTocado = false; cpPinta(); return; }
+  const sv = e.target.closest("[data-cpsvc]");
+  if(sv){ CP.servicioId = sv.dataset.cpsvc; CP.precioTocado = false; cpPinta(); return; }
+  const tc = e.target.closest("[data-cptec]");
+  if(tc){ CP.tecnicaId = tc.dataset.cptec; CP.precioTocado = false; cpPinta(); return; }
+  const md = e.target.closest("[data-cpmed]");
+  if(md){ CP.medida = md.dataset.cpmed; cpPinta(); return; }
+  const tm = e.target.closest("[data-cptam]");
+  if(tm){ CP.tamanoId = tm.dataset.cptam; CP.precioTocado = false; cpPinta(); return; }
+  const ex = e.target.closest("[data-cpext]");
+  if(ex){ CP.extras[ex.dataset.cpext] = !CP.extras[ex.dataset.cpext]; CP.precioTocado = false; cpPinta(); return; }
+  const sig = e.target.closest("[data-cpsig]");
+  if(sig){ CP.paso = num(sig.dataset.cpsig); cpPinta(); return; }
+  const ir = e.target.closest("[data-cpir]");
+  if(ir){ CP.paso = num(ir.dataset.cpir); cpPinta(); return; }
+  if(e.target.closest("#cpVerDesglose")){ CP.desglose = !CP.desglose; cpResultado(); return; }
+  if(e.target.closest("#cpVuelve")){ CP.precioTocado = false; CP.precio = null; cpResultado(); return; }
+  if(e.target.closest("#cpVuelve2")){ CP.precioTocado = false; CP.precio = null; cpPinta(); return; }
+  if(e.target.closest("#cpReinicia")){
+    CP = Object.assign({}, CP_DEF, {extras:{}});
+    cpPinta(); toast("Listo, de cero"); return;
+  }
+  if(e.target.closest("#cpGuardaPrecio")){
+    const a = cpArt(); if(!a) return;
+    if(P.origen !== "lista") return;
+    const T = cpTotales();
+    /* Cuánto del total es del artículo y cuánto de la impresión no se adivina:
+       se le pregunta al mismo motor. Dos tiros con precios conocidos dan la
+       recta, y de la recta sale el precio que hace falta. */
+    const viejo = num(a.precio);
+    const prueba = x => { a.precio = x; const r = cpCostea(); return r ? num(r.subtotal) : 0; };
+    const s1 = prueba(100), s2 = prueba(200);
+    a.precio = viejo;
+    const k = (s2 - s1) / 100;
+    if(!(k > 0.01)){
+      alert("Este precio no depende del artículo, así que no hay nada que guardar aquí.");
+      return;
+    }
+    const b0 = s1 - k*100;
+    const nuevo = Math.round((num(T.precio) - b0) / k * 100) / 100;
+    if(!(nuevo > 0)){
+      alert("Con ese precio el artículo saldría en cero o en negativo: la decoración y el material por sí solos " +
+            "ya cobran " + mx(b0) + ". Sube el precio o baja lo que cobras por la impresión.");
+      return;
+    }
+    a.precio = nuevo;
+    const quedo = cpCostea();
+    if(!confirm("¿Dejar «" + a.nombre + "» en " + mx(nuevo) + " de precio público?\n\n" +
+                "Hoy está en " + mx(viejo) + ". Así el cotizador cobra " +
+                mx(quedo ? num(quedo.subtotal) : 0) + " por pieza.")){
+      a.precio = viejo; return;
+    }
+    persist();
+    if(typeof renderCatalogo === "function") renderCatalogo();
+    CP.precioTocado = false; CP.precio = null;
+    cpPinta();
+    toast("Precio guardado en el catálogo");
+    return;
+  }
+});
+document.addEventListener("input", e=>{
+  if(e.target.id === "cpBusca"){ CP.busca = e.target.value; cpPinta();
+    const b = $("#cpBusca"); if(b){ b.focus(); b.setSelectionRange(b.value.length, b.value.length); } return; }
+  if(e.target.id === "cpMargen"){
+    /* El margen es sobre la VENTA: de cada peso que cobras, cuánto te queda.
+       Por eso se divide y no se multiplica. Al 90% se topa para que no se
+       vaya al infinito con una división entre casi cero. */
+    const m = Math.min(90, Math.max(0, num(e.target.value)));
+    const T = cpTotales();
+    CP.precio = Math.round(T.costo / (1 - m/100) * 100) / 100;
+    CP.precioTocado = true;
+    const n = $("#cpMargenN"); if(n) n.textContent = m + "%";
+    const c = $("#cpConMargen"); if(c) c.value = mx(CP.precio);
+    cpResultado();
+    return;
+  }
+  if(e.target.id === "cpPrecio"){ CP.precio = num(e.target.value); CP.precioTocado = true;
+    /* El resultado se repinta solo; el campo del precio no, para no quitarle
+       el cursor a quien lo está escribiendo. */
+    const T = cpTotales();
+    const n = e.target.closest(".cpPrecio").querySelector(".cpNota");
+    if(n) n.innerHTML = T.utilidad < 0
+      ? '<b style="color:var(--warn)">Con ese precio pierdes '+mx(-T.utilidad)+' por pieza.</b>'
+      : 'Te quedan <b>'+mx(T.utilidad)+'</b> por pieza · <b>'+T.margen.toFixed(0)+'%</b> de margen';
+    return;
+  }
+  const f = e.target.dataset && e.target.dataset.cpf;
+  if(f && e.target.closest("#cpPasos")){
+    CP[f] = f === "maquinaId" ? e.target.value : num(e.target.value);
+    CP.precioTocado = false;
+    const aviso = e.target.closest(".cpCuerpo");
+    if(aviso){
+      const falta = cpFalta(CP.paso);
+      const av = aviso.querySelector(".cpAviso, .cpOk");
+      if(av){ av.className = falta ? "cpAviso" : "cpOk";
+              av.textContent = falta || "Listo. Puedes seguir."; }
+      const btn = aviso.querySelector("[data-cpsig]");
+      if(btn) btn.disabled = !!falta;
+    }
+    cpResultado();
+    return;
+  }
+});
+document.addEventListener("change", e=>{
+  const f = e.target.dataset && e.target.dataset.cpf;
+  if(f === "maquinaId" && e.target.closest("#cpPasos")){ CP.maquinaId = e.target.value; cpPinta(); return; }
+  /* Los campos de tu hora y de los gastos fijos son LOS MISMOS de la otra
+     calculadora: si los cambias aquí, allá quedan cambiados. Un taller tiene
+     una sola renta. */
+  const k = e.target.dataset && e.target.dataset.cc;
+  if(k && e.target.closest("#cpPasos") && e.target.type === "checkbox"){
+    normalizaCalc()[k] = e.target.checked; persist(); cpPinta(); return;
+  }
+});
+document.addEventListener("input", e=>{
+  const k = e.target.dataset && e.target.dataset.cc;
+  if(k && e.target.closest("#cpPasos") && e.target.type !== "checkbox"){
+    normalizaCalc()[k] = num(e.target.value); persist();
+    /* Igual que en la otra: se repintan los números, nunca los campos. */
+    cpResultado();
+    const chips = $("#cpPasos");
+    return;
+  }
+});
+
+function renderCalc(){ renderMaquinas(); renderPasos(); renderResultado(); cpPinta(); }
 
 /* ---------- calibrar con lo que de verdad gastaste ---------- */
 let ccCalibrando = null;
@@ -7287,6 +8228,22 @@ registraLanzador("val", [
 ], "Vales");
 
 /* Los azulejos de Inventario, Ventas, Asistencia y Nómina. */
+registraLanzador("calc", [
+  {id:"pieza", nombre:"¿Qué cuesta hacer una?", sub:"una pieza, paso a paso", color:"#D6127F",
+   icono:'<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.6a2.5 2.5 0 0 1 5 0c0 2.4-5 1.9-5 4.8a2.5 2.5 0 0 0 5 0"/>',
+   card:'#cardCalcPieza',
+   alAbrir:()=>{ if(typeof cpPinta === "function") cpPinta(); }},
+  {id:"materiales", nombre:"Calibrar mis materiales", sub:"film, tinta y polvo por m²", color:"#0680AB",
+   icono:'<path d="M12 3s6 6.4 6 10a6 6 0 0 1-12 0c0-3.6 6-10 6-10Z"/>',
+   card:'#cardCalc',
+   alAbrir:()=>{ if(typeof renderPasos === "function"){ renderPasos(); renderResultado(); } }},
+  {id:"maquinas", nombre:"Máquinas y su hora", sub:"luz, desgaste y mantenimiento", color:"#14B8A6",
+   icono:'<rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 8V5h10v3M7 18v2M17 18v2"/>',
+   card:'#cardMaq',
+   cuenta:()=>{ try{ return maquinas().length; }catch(e){ return 0; } },
+   alAbrir:()=>{ if(typeof renderMaquinas === "function") renderMaquinas(); }}
+], "Calculadora");
+
 registraLanzador("inv", [
   {id:"taller", nombre:"Inventario del taller", sub:"qué hay y qué falta", color:"#22C55E",
    icono:'<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>',
@@ -7374,6 +8331,9 @@ registraLanzador("set", [
   {id:"empresa", nombre:"Datos de tu empresa", sub:"lo que sale impreso", color:"#64748B",
    icono:'<path d="M3 21V7l9-4 9 4v14"/><path d="M9 21v-6h6v6"/><path d="M7 11h.01M17 11h.01"/>',
    card:'[data-set="empresa"]'},
+  {id:"cotizar", nombre:"Cómo se cotiza", sub:"todo junto o paso a paso", color:"#D6127F",
+   icono:'<path d="M4 6h16M4 12h10M4 18h6"/><circle cx="19" cy="15" r="3"/>',
+   card:'[data-set="cotizar"]'},
   {id:"tema", nombre:"Apariencia", sub:"tema claro u oscuro", color:"#14B8A6",
    icono:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19"/>',
    card:'[data-set="tema"]'},
@@ -7489,13 +8449,15 @@ registraLanzador("sav", [
 const ARR_OFICIOS = [
   {id:"dtf", nombre:"DTF textil", sub:"la película que se plancha en tela", color:"#0680AB",
    icono:'<rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 7V5M12 7V5M17 7V5"/>',
-   tecnicas:["t1"], servicios:["sv1","sv2"], insumos:["i1","i2"], familias:["Textil","Gorras"]},
+   tecnicas:["t1"], servicios:["sv1","sv2"], insumos:["i1c","i1m","i1y","i1k","i1w","i2"], familias:["Textil","Gorras"]},
   {id:"sub", nombre:"Sublimación", sub:"tazas, termos y poliéster", color:"#D6127F",
    icono:'<path d="M4 8h11v8a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3Z"/><path d="M15 10h3a2.5 2.5 0 0 1 0 5h-3"/>',
-   tecnicas:["t3"], servicios:["sv4"], insumos:[], familias:["Tazas","Termos","Oficina","Promocional","Textil"]},
+   tecnicas:["t3"], servicios:["sv4"], insumos:["i5c","i5m","i5y","i5k","i6"],
+   familias:["Tazas","Termos","Oficina","Promocional","Textil"]},
   {id:"uv", nombre:"DTF UV", sub:"rígidos: termos, fundas, madera", color:"#B26A00",
    icono:'<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>',
-   tecnicas:["t2"], servicios:["sv3"], insumos:[], familias:["Termos","Promocional"]},
+   tecnicas:["t2"], servicios:["sv3"], insumos:["i7c","i7m","i7y","i7k","i7w","i7v"],
+   familias:["Termos","Promocional"]},
   {id:"vinil", nombre:"Vinil de corte", sub:"números, nombres y logos planos", color:"#0E7C57",
    icono:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.1 8.1 20 20M8.1 15.9 20 4"/>',
    tecnicas:["t4"], servicios:["sv5"], insumos:[], familias:["Textil","Gorras"]},
@@ -7510,10 +8472,11 @@ const ARR_OFICIOS = [
    tecnicas:["t7"], servicios:[], insumos:[], familias:["Promocional","Termos"]},
   {id:"dtg", nombre:"DTG", sub:"impresión directa a la prenda", color:"#64748B",
    icono:'<path d="M6 4h12l3 5-4 2v9H7v-9L3 9Z"/>',
-   tecnicas:["t8"], servicios:[], insumos:["i1"], familias:["Textil"]},
+   tecnicas:["t8"], servicios:[], insumos:["i9c","i9m","i9y","i9k","i9w","i9p"],
+   familias:["Textil"]},
   {id:"gran", nombre:"Gran formato", sub:"lonas y vinil adhesivo", color:"#0680AB",
    icono:'<rect x="2" y="5" width="20" height="12" rx="1.5"/><path d="M2 20h20M6 5v12M18 5v12"/>',
-   tecnicas:[], servicios:["sv6","sv7"], insumos:[], familias:[]},
+   tecnicas:[], servicios:["sv6","sv7"], insumos:["i8c","i8m","i8y","i8k"], familias:[]},
   {id:"papel", nombre:"Imprenta y papel", sub:"tarjetas, volantes, couché", color:"#A855F7",
    icono:'<path d="M6 3h9l4 4v14H6Z"/><path d="M15 3v4h4"/><path d="M9 12h7M9 16h5"/>',
    tecnicas:[], servicios:["sv8"], insumos:[], familias:["Oficina"]}
@@ -8184,6 +9147,7 @@ function renderSet(){
                           (P.empresa && P.empresa.nombre) || "Makers OS";
   $("#p_margen").value=P.margen; $("#p_modo").value=P.modo; $("#p_merma").value=P.merma; $("#p_mo").value=P.manoObra;
   $("#p_nesting").checked = P.nesting !== false;
+  const pgu = $("#p_guiado"); if(pgu) pgu.checked = !!P.guiado;
   const pg = $("#p_nuevaGuardar"); if(pg) pg.checked = P.nuevaAlGuardar !== false;
   const pc = $("#p_nuevaCobrar");  if(pc) pc.checked = P.nuevaAlCobrar  !== false;
   $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia; $("#p_plazoCobro").value=num(P.plazoCobro,15);
@@ -8447,6 +9411,133 @@ document.querySelectorAll("[data-paso] > header").forEach(h=>{
     guardaPasos(); resumenPasos();
   });
 });
+
+/* ==================== COTIZAR POR PASOS ====================
+   Los mismos campos de siempre, de uno en uno. El interruptor vive en
+   Ajustes y se guarda con los demás parámetros, así que vale para toda la
+   cuenta: si el dueño lo prende, el vendedor nuevo lo encuentra prendido. */
+const GUIA_ORDEN = ["cliente","articulo","apps","tallas","extras","prod"];
+const GUIA_NOMBRE = {cliente:"Cliente", articulo:"Artículo", apps:"Decorado",
+                     tallas:"Tallas", extras:"Extras", prod:"Entrega"};
+let GUIA = {actual:"cliente"};
+const guiado = () => !!P.guiado;
+
+/* Las tallas sólo salen cuando el artículo las usa: preguntarle las tallas
+   a una taza es hacerle perder el tiempo a quien cotiza. */
+function guiaPasos(){
+  return GUIA_ORDEN.filter(k=>{
+    /* El paso que la pantalla ya esconde —las tallas de una taza— tampoco
+       entra en la guía: se pregunta por la MISMA regla, no por una propia. */
+    const c = document.querySelector('#tab-cot [data-paso="'+k+'"]');
+    return !(c && c.hidden);
+  });
+}
+function guiaFalta(k){
+  const q = Math.max(0, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,0)));
+  if(k === "cliente")  return (cot.cliente||"").trim() ? "" : "Escribe para quién es la cotización";
+  if(k === "articulo"){
+    if(!(cot.articuloId || (cot.desc||"").trim())) return "Escoge el artículo o escribe qué se va a hacer";
+    return q > 0 ? "" : "¿Cuántas piezas son?";
+  }
+  if(k === "tallas") return q > 0 ? "" : "Captura al menos un renglón de tallas";
+  return "";
+}
+function guiaTira(){
+  const ps = guiaPasos(), i = ps.indexOf(GUIA.actual);
+  return '<div class="guiaTira" id="guiaTira">' + ps.map((k,n)=>{
+    const est = k === GUIA.actual ? "activo" : (n < i ? "hecho" : "");
+    return (n ? '<span class="guiaSep" aria-hidden="true">›</span>' : '') +
+      '<button type="button" class="guiaP '+est+'" data-guiair="'+k+'"'+
+      (est==="hecho" ? '' : ' disabled')+'>'+
+      '<i>'+(est==="hecho" ? "✓" : (n+1))+'</i><span>'+GUIA_NOMBRE[k]+'</span></button>';
+  }).join("") + '</div>';
+}
+function guiaPinta(){
+  const sec = document.getElementById("tab-cot"); if(!sec) return;
+  const col = sec.querySelector(".cols > div"); if(!col) return;
+  document.body.classList.toggle("cotGuiado", guiado());
+  let tira = document.getElementById("guiaTira");
+  if(!guiado()){
+    if(tira) tira.remove();
+    sec.querySelectorAll("[data-paso]").forEach(c=>{
+      c.classList.remove("guiaFuturo","guiaHecho");
+      const pie = c.querySelector(".guiaPie"); if(pie) pie.remove();
+    });
+    if(typeof arrancaPasos === "function") arrancaPasos();
+    return;
+  }
+  const ps = guiaPasos();
+  if(ps.indexOf(GUIA.actual) < 0) GUIA.actual = ps[0];
+  const i = ps.indexOf(GUIA.actual);
+  /* La tira se vuelve a escribir entera: son seis botones, no cuesta nada,
+     y así nunca se queda una palomita donde ya no va. */
+  if(!tira) col.insertAdjacentHTML("afterbegin", guiaTira());
+  else      tira.outerHTML = guiaTira();
+
+  sec.querySelectorAll("[data-paso]").forEach(c=>{
+    const k = c.dataset.paso, n = ps.indexOf(k);
+    const pie = c.querySelector(".guiaPie"); if(pie) pie.remove();
+    c.classList.remove("guiaFuturo","guiaHecho");
+    if(n < 0 || n > i){ c.classList.add("guiaFuturo"); return; }
+    if(n < i){ c.classList.add("guiaHecho","cerrado"); return; }
+    c.classList.remove("cerrado");
+    const falta = guiaFalta(k);
+    const ultimo = i === ps.length - 1;
+    c.insertAdjacentHTML("beforeend",
+      '<div class="guiaPie">' +
+        (falta ? '<span class="guiaFalta">'+esc(falta)+'</span>'
+               : '<span class="guiaOk">'+(ultimo ? "Ya está: abajo tienes el total y los botones."
+                                                 : "Listo. Puedes seguir.")+'</span>') +
+        (i > 0 ? '<button class="btn ghost" data-guiair="'+ps[i-1]+'">Atrás</button>' : '') +
+        (ultimo ? '' :
+          '<button class="btn primary" data-guiasig="'+ps[i+1]+'"'+(falta?" disabled":"")+'>Continuar</button>') +
+      '</div>');
+  });
+  if(typeof resumenPasos === "function") resumenPasos();
+}
+/* Mientras se escribe, el aviso y el botón de Continuar se refrescan sin
+   volver a dibujar el paso: si lo redibujara, se perdería el cursor. */
+function guiaRevisa(){
+  if(!guiado()) return;
+  const sec = document.getElementById("tab-cot"); if(!sec) return;
+  const c = sec.querySelector('[data-paso="'+GUIA.actual+'"]'); if(!c) return;
+  const ps = guiaPasos();
+  /* El artículo decide si hay paso de tallas; si cambió, la tira cambia. */
+  const tira = document.getElementById("guiaTira");
+  if(tira && tira.querySelectorAll("[data-guiair]").length !== ps.length){ guiaPinta(); return; }
+  const falta = guiaFalta(GUIA.actual);
+  const ultimo = ps.indexOf(GUIA.actual) === ps.length - 1;
+  const av = c.querySelector(".guiaFalta, .guiaOk");
+  if(av){
+    av.className = falta ? "guiaFalta" : "guiaOk";
+    av.textContent = falta || (ultimo ? "Ya está: abajo tienes el total y los botones." : "Listo. Puedes seguir.");
+  }
+  const btn = c.querySelector("[data-guiasig]");
+  if(btn) btn.disabled = !!falta;
+}
+function guiaVaA(k){
+  GUIA.actual = k;
+  guiaPinta();
+  const c = document.querySelector('[data-paso="'+k+'"]');
+  if(c) c.scrollIntoView({behavior:"smooth", block:"start"});
+}
+document.addEventListener("click", e=>{
+  const sig = e.target.closest("[data-guiasig]");
+  if(sig && !sig.disabled){ guiaVaA(sig.dataset.guiasig); return; }
+  const ir = e.target.closest("[data-guiair]");
+  if(ir && !ir.disabled){ guiaVaA(ir.dataset.guiair); return; }
+  /* En modo guiado, abrir un paso ya hecho es volver a él. */
+  if(guiado()){
+    const h = e.target.closest("[data-paso] > header");
+    if(h && !e.target.closest("button:not(.chev)") && !e.target.closest("input,select")){
+      const c = h.parentElement;
+      if(c.classList.contains("guiaHecho")) guiaVaA(c.dataset.paso);
+    }
+  }
+});
+document.addEventListener("input",  e=>{ if(e.target.closest("#tab-cot")) guiaRevisa(); });
+document.addEventListener("change", e=>{ if(e.target.closest("#tab-cot")) guiaRevisa(); });
+
 function pon(clave, txt){ const e = document.querySelector('[data-res="'+clave+'"]'); if(e) e.textContent = txt; }
 function resumenPasos(){
   const r = calc();
@@ -8490,8 +9581,9 @@ $("#tabs").addEventListener("click", e=>{
   if(b.dataset.tab==="ven") reiniciaSec("ven");
   if(b.dataset.tab==="asi") reiniciaSec("asi");
   if(b.dataset.tab==="nom") reiniciaSec("nom");
+  if(b.dataset.tab==="cot" && typeof guiaPinta === "function") guiaPinta();
   if(b.dataset.tab==="calc") renderMaquinas();
-  if(b.dataset.tab==="calc") renderCalc();
+  if(b.dataset.tab==="calc"){ renderCalc(); reiniciaSec("calc"); }
   if(b.dataset.tab==="com"){ renderCompras(); renderProveedores(); }
   if(b.dataset.tab==="cli") renderClientes();
   if(b.dataset.tab==="arc") renderArchivo();
@@ -10430,6 +11522,8 @@ function cotizacionNueva(conEjemplo){
   if(typeof normalizaItems === "function") normalizaItems(cot);
   tiraBorrador();
   renderCot();
+  /* Una cotización nueva empieza en el primer paso, no donde quedó la anterior. */
+  if(typeof guiaPinta === "function"){ GUIA.actual = guiaPasos()[0]; guiaPinta(); }
 }
 /* Al terminar: se limpia la pantalla y se arranca una nueva, en blanco. */
 function terminaYEmpieza(queFue){
@@ -13198,6 +14292,22 @@ $("#armado").addEventListener("input", e=>{
     pintaArmado(); renderServicio(); refrescaCostos();
     return;
   }
+  const ks = e.target.dataset.arksvc;
+  if(ks){
+    const s = svcDeArmado(it);
+    if(s){
+      s[ks] = Math.max(0, num(e.target.value));
+      persist();
+      /* El ancho útil se recalcula aquí a mano: pintaArmado() repinta el
+         cuerpo pero no los campos, para no robarle el foco a quien está
+         escribiendo, y si no se toca se queda diciendo el número viejo. */
+      const caja = e.target.closest("[data-arm]");
+      const util = caja && caja.querySelector(".armSepOri input[readonly]");
+      if(util) util.value = (num(s.ancho) - 2*num(s.orilla)) + " cm de " + num(s.ancho);
+      pintaArmado(); renderServicio(); renderResumen();
+    }
+    return;
+  }
   const k = e.target.dataset.ark; if(!k) return;
   it[k] = (k==="nota") ? e.target.value : num(e.target.value);
   pintaArmado(); renderServicio(); renderResumen();
@@ -13380,6 +14490,11 @@ $("#tab-set").addEventListener("change", e=>{
     toast(num(t.value) ? "Se bloqueará a los " + num(t.value) + " min sin usarlo"
                        : "Ya no se bloquea solo"); }
   if(t.id==="p_ivaOn") P.ivaOn=t.checked;
+  if(t.id==="p_guiado"){
+    P.guiado = t.checked;
+    if(typeof guiaPinta === "function"){ GUIA.actual = guiaPasos()[0]; guiaPinta(); }
+    toast(t.checked ? "Cotizar por pasos: prendido" : "Cotizar por pasos: apagado");
+  }
   if(t.id==="e_regimen"){ empresaFiscal(); P.empresa.regimen=t.value; }
   if(t.id==="e_pac"){ empresaFiscal(); P.empresa.pac=t.value; notaPac(); }
   if(t.id==="e_sellosAlta"){ empresaFiscal(); P.empresa.sellosAlta=t.checked; }
@@ -14744,6 +15859,9 @@ function aplicaPasoTallas(){
     if(c.hidden) return;
     n++; const b = c.querySelector(".step"); if(b) b.textContent = n;
   });
+  /* Si el artículo acaba de quitar o poner el paso de tallas, la guía tiene
+     un paso de más o de menos: se vuelve a armar. */
+  if(typeof guiaPinta === "function" && typeof guiado === "function" && guiado()) guiaPinta();
 }
 
 /* ---------- acceso por perfil ---------- */
@@ -17063,6 +18181,7 @@ function start(){
   aplicaMarca();
   arrancaEquipo();
   renderCot(); renderSet(); arrancaPasos();
+  if(typeof guiaPinta === "function") guiaPinta();
   if(typeof aplicaCostos === "function") aplicaCostos();
   /* Inicio es la sección que ya está abierta al entrar: nadie la toca, así
      que si no se pinta aquí se queda en blanco hasta que el usuario se va y
@@ -18275,7 +19394,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261020-1235"></script>
-<script src="diagnostico.js?v=20261020-1235"></script>
+<script src="cuenta.js?v=20261020-1319"></script>
+<script src="diagnostico.js?v=20261020-1319"></script>
 </body>
 </html>
