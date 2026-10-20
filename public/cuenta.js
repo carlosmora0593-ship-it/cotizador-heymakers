@@ -244,14 +244,20 @@ function rol(){
   const r = ALIAS_ROL[rolCrudo()] || rolCrudo();
   return ROLES_NOMBRE[r] ? r : "admin";     // rol desconocido o sin perfil: no le escondemos nada
 }
+/* ESTA lista manda sobre la del cotizador. El cotizador reparte pestañas
+   por rol, pero aquí se esconden las que la cuenta no trae, y una pestaña
+   que no esté en esta tabla NO SE VE, aunque el cotizador la tenga.
+   Fue justo lo que pasó con Asistencia, Nómina y Vales: estaban hechas y
+   publicadas, y seguían invisibles porque nadie las dio de alta aquí.
+   Si se agrega una sección nueva al cotizador, se agrega aquí también. */
 const PERMISOS = {
-  admin:      ["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","set"],
+  admin:      ["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","val","asi","nom","set"],
   /* Ventas no entra al catálogo: ahí viven los costos y las existencias, y
      tocarlos sin querer le cambia el precio a todas las cotizaciones. */
-  ventas:     ["inicio","cot","sav","pro","dis","cli","arc","com"],
-  diseno:     ["inicio","dis","pro"],
+  ventas:     ["inicio","cot","sav","pro","dis","cli","arc","com","val","asi"],
+  diseno:     ["inicio","dis","pro","val","asi"],
   /* El taller sí ve el inventario, pero el suyo: existencias sin un peso. */
-  produccion: ["inicio","pro","inv","com"]
+  produccion: ["inicio","pro","inv","com","val","asi"]
 };
 /* Secciones que no vienen en el plan Básico */
 /* "costos" tampoco es una pestaña: es el control de quién del equipo ve los
