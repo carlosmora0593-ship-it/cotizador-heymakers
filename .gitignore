@@ -11,3 +11,7 @@ workflow-github-pages.txt
 # Las copias del SQL con tu correo escrito. El repositorio es publico:
 # estas NO deben subir nunca. Las versiones de sql/ van con marcador.
 CORRER-*.sql
+
+# La carpeta de pruebas con lo que te da otra IA. Trae una copia de
+# config.js y del index completo: no es parte del sitio y no sube.
+ChatGPT/

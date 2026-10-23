@@ -2272,6 +2272,109 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
 .cpLeyenda{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2)}
 .cpLeyenda span{display:flex;align-items:center;gap:6px}
 .cpLeyenda u{width:10px;height:10px;border-radius:3px;text-decoration:none;display:inline-block}
+
+/* ============ EL MOVIMIENTO ============
+   Nada de esto cambia un número ni esconde un dato: es cómo entra y cómo
+   responde lo que ya estaba. Si el sistema pide menos movimiento, se
+   apaga entero al final del bloque. */
+
+@keyframes mvEntra{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes mvPanea{from{background-position:0% 40%}to{background-position:100% 60%}}
+@keyframes mvRespira{from{opacity:.55}to{opacity:1}}
+@keyframes mvFlota{0%,86%,100%{transform:translateY(0)}92%{transform:translateY(-2px)}}
+@keyframes mvLatido{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 26%,transparent)}
+                    50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--accent) 0%,transparent)}}
+@keyframes mvOrbita{to{transform:rotate(360deg)}}
+@keyframes mvAmbiente{from{background-position:0% 0%,100% 100%}to{background-position:22% 12%,78% 88%}}
+
+/* ---- la puerta ---- */
+.accesoWrap{
+  background:
+    radial-gradient(ellipse at 14% 12%, color-mix(in oklab,var(--cyan) 13%,transparent) 0, transparent 40%),
+    radial-gradient(ellipse at 88% 87%, color-mix(in oklab,var(--guinda,var(--accent)) 11%,transparent) 0, transparent 38%),
+    var(--bg);
+  background-size:140% 140%,140% 140%,auto;
+  animation:mvAmbiente 16s ease-in-out infinite alternate}
+.accesoCard{position:relative;isolation:isolate;
+  transition:transform .28s cubic-bezier(.2,.8,.3,1),box-shadow .28s,border-color .28s}
+/* El aro gira despacio detrás del contenido. La tarjeta recorta lo que
+   se sale, así que se ve como una curva de luz, no como un círculo. */
+.accesoCard::before{content:"";position:absolute;z-index:0;top:-145px;right:-105px;
+  width:300px;height:300px;border-radius:50%;pointer-events:none;
+  border:1px solid color-mix(in srgb,var(--accent) 16%,transparent);
+  box-shadow:0 0 0 28px color-mix(in srgb,var(--accent) 5%,transparent),
+             0 0 0 57px color-mix(in srgb,var(--accent) 3%,transparent);
+  animation:mvOrbita 24s linear infinite}
+.accesoCard>*{position:relative;z-index:1}
+.accesoCard:hover{transform:translateY(-3px);
+  box-shadow:var(--shadow),0 26px 60px color-mix(in srgb,var(--ink-1) 12%,transparent)}
+.accesoWrap input{transition:border-color .2s,box-shadow .2s,background .2s}
+.accesoWrap input:focus{box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.accesoWrap .btn{transition:transform .18s,background .18s,border-color .18s,box-shadow .18s}
+.accesoWrap .btn:hover{transform:translateY(-2px);
+  box-shadow:0 8px 18px color-mix(in srgb,var(--ink-1) 16%,transparent)}
+.accesoWrap .btn:active{transform:translateY(0) scale(.98)}
+
+/* ---- el tablero ---- */
+.tbHero{background-size:230% 230%;animation:mvPanea 12s ease-in-out infinite alternate}
+.tbHero::before{animation:mvRespira 5.5s ease-in-out infinite alternate}
+.tbAcceso{animation:mvEntra .48s both, mvFlota 7s 1.2s ease-in-out infinite}
+.tbAcceso:nth-child(2){animation-delay:.04s,1.24s}
+.tbAcceso:nth-child(3){animation-delay:.08s,1.28s}
+.tbAcceso:nth-child(4){animation-delay:.12s,1.32s}
+.tbAcceso:nth-child(5){animation-delay:.16s,1.36s}
+.tbAcceso:nth-child(6){animation-delay:.2s,1.4s}
+.tbAcceso:hover,.tbAcceso:focus-visible{transform:translateY(-4px) scale(1.012)}
+.tbAcceso:active{transform:translateY(-1px) scale(.985)}
+.tbPanel{animation:mvEntra .42s both}
+.tbPila .tbPanel:nth-child(2){animation-delay:.06s}
+.tbPila .tbPanel:nth-child(3){animation-delay:.12s}
+
+/* ---- los azulejos, dondequiera que estén ---- */
+.lzApp,.azIt,.cpAz,.arrOpc,.secLz .lzApp{
+  transition:transform .18s cubic-bezier(.2,.8,.3,1),border-color .18s,box-shadow .18s,background .18s;
+  animation:mvEntra .34s both}
+.lzApp:nth-child(2),.azIt:nth-child(2),.cpAz:nth-child(2),.arrOpc:nth-child(2){animation-delay:.03s}
+.lzApp:nth-child(3),.azIt:nth-child(3),.cpAz:nth-child(3),.arrOpc:nth-child(3){animation-delay:.06s}
+.lzApp:nth-child(4),.azIt:nth-child(4),.cpAz:nth-child(4),.arrOpc:nth-child(4){animation-delay:.09s}
+.lzApp:nth-child(5),.azIt:nth-child(5),.cpAz:nth-child(5),.arrOpc:nth-child(5){animation-delay:.12s}
+.lzApp:nth-child(6),.azIt:nth-child(6),.cpAz:nth-child(6),.arrOpc:nth-child(6){animation-delay:.15s}
+.lzApp:hover,.azIt:hover,.cpAz:hover,.arrOpc:hover{transform:translateY(-4px) scale(1.012)}
+.lzApp:active,.azIt:active,.cpAz:active,.arrOpc:active{transform:scale(.97)}
+/* El que ya escogiste late despacio: así se ve cuál es sin tener que
+   buscar el borde de color. */
+.azIt[aria-pressed="true"],.cpAz[aria-pressed="true"],.arrOpc[aria-pressed="true"]{
+  animation:mvLatido 2.8s ease-in-out infinite}
+
+/* ---- los pasos ---- */
+.cpPaso,.guiaTira{animation:mvEntra .34s both}
+.cpPaso:nth-child(2){animation-delay:.03s}.cpPaso:nth-child(3){animation-delay:.06s}
+.cpPaso:nth-child(4){animation-delay:.09s}.cpPaso:nth-child(5){animation-delay:.12s}
+.cpPaso:nth-child(6){animation-delay:.15s}
+.guiaTira .guiaP i{transition:background .22s,border-color .22s,color .22s,transform .22s}
+.guiaTira .guiaP.activo i{transform:scale(1.12)}
+/* El pie del paso aparece después que el paso: primero lees, luego ves
+   el botón. */
+.guiaPie,.cpPaso.activo .cpPie{animation:mvEntra .3s .1s both}
+
+/* ---- los botones de siempre ---- */
+.btn{transition:transform .16s,background .18s,border-color .18s,box-shadow .18s,color .18s}
+.btn:active{transform:scale(.97)}
+.btn.primary:hover{box-shadow:0 8px 18px color-mix(in srgb,var(--accent) 30%,transparent)}
+.card{animation:mvEntra .36s both}
+
+@media (prefers-reduced-motion: reduce){
+  .accesoWrap,.accesoCard,.accesoCard::before,.accesoWrap .btn,.accesoWrap input,
+  .tbHero,.tbHero::before,.tbAcceso,.tbPanel,
+  .lzApp,.azIt,.cpAz,.arrOpc,.cpPaso,.guiaTira,.guiaPie,.card,.btn,
+  .azIt[aria-pressed="true"],.cpAz[aria-pressed="true"],.arrOpc[aria-pressed="true"]{
+    animation:none!important;transition:none!important}
+  .tbAcceso:hover,.lzApp:hover,.azIt:hover,.cpAz:hover,.arrOpc:hover,
+  .tbAcceso:active,.lzApp:active,.azIt:active,.cpAz:active,.arrOpc:active,
+  .btn:active,.accesoCard:hover{transform:none}
+}
+/* ---- fin del movimiento ---- */
+
 /* ---- los azulejos del cotizador ---- */
 /* El cuerpo de «Cliente y pedido» es una rejilla de tres columnas: sin
    esto, los azulejos se meterían en una sola y los campos se irían a
@@ -19664,7 +19767,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261023-1718"></script>
-<script src="diagnostico.js?v=20261023-1718"></script>
+<script src="cuenta.js?v=20261023-1723"></script>
+<script src="diagnostico.js?v=20261023-1723"></script>
 </body>
 </html>
