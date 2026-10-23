@@ -2272,6 +2272,40 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
 .cpLeyenda{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2)}
 .cpLeyenda span{display:flex;align-items:center;gap:6px}
 .cpLeyenda u{width:10px;height:10px;border-radius:3px;text-decoration:none;display:inline-block}
+/* ---- los azulejos del cotizador ---- */
+/* El cuerpo de «Cliente y pedido» es una rejilla de tres columnas: sin
+   esto, los azulejos se meterían en una sola y los campos se irían a
+   acomodar alrededor. */
+.azBloque{margin:0 0 16px;grid-column:1/-1}
+.azBloque>.f{display:block;margin-bottom:8px}
+.azBarra{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.azBarra input{flex:1 1 180px;min-width:150px}
+.azBarra .hint{white-space:nowrap}
+.azChips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.azChips button{font:inherit;font-size:12px;padding:5px 11px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);cursor:pointer}
+.azChips button:hover{border-color:var(--accent);color:var(--accent)}
+.azChips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.azRej{display:grid;grid-template-columns:repeat(auto-fill,minmax(164px,1fr));gap:9px}
+.azRej.chica{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}
+.azIt{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:5px;
+  text-align:left;border:1.5px solid var(--line);background:var(--surface-2);border-radius:13px;
+  padding:11px;cursor:pointer;font:inherit;color:var(--ink);min-width:0;
+  transition:border-color .15s,background .15s,transform .1s}
+.azIt:hover{border-color:var(--azc,var(--accent));transform:translateY(-1px)}
+.azIt[aria-pressed="true"]{border-color:var(--azc,var(--accent));
+  background:color-mix(in srgb, var(--azc,var(--accent)) 11%, var(--surface-2))}
+.azIt b{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:13px;line-height:1.2;
+  width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.azIt small{color:var(--ink-3);font-size:11px;line-height:1.35;width:100%;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.azIt .artMini{width:100%;height:62px;object-fit:cover;border-radius:9px}
+.azIt .azIco{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+  background:color-mix(in srgb, var(--azc,var(--accent)) 20%, transparent);color:var(--azc,var(--accent))}
+.azIt .azIco svg{width:17px;height:17px}
+.azNuevo{border-style:dashed;align-items:center;justify-content:center;text-align:center}
+.azVacio{font-size:12.5px;color:var(--ink-3);margin:2px 0 0}
+.azMas{font-size:12px;color:var(--ink-3);margin:9px 0 0}
 /* ---- cotizar por pasos ---- */
 body.cotGuiado [data-paso].guiaFuturo{display:none}
 body.cotGuiado [data-paso].guiaHecho>header{opacity:.78}
@@ -6344,6 +6378,9 @@ function renderApps(){
           '<div><label class="f">Ponchado</label><input readonly class="num" value="'+mx((d&&d.setup)||0)+' único"></div>')+
       '</div>'+ selectorRollo(a) + artBox(a) +'</div>';
   }).join("");
+  /* renderApps se vuelve a dibujar entero cada vez que cambias algo, así
+     que los azulejos hay que volver a ponerlos o desaparecen al primer clic. */
+  if(typeof azAplicaciones === "function" && typeof guiado === "function" && guiado()) azAplicaciones();
 }
 function artBox(a){
   const f = a.art;
@@ -9412,6 +9449,237 @@ document.querySelectorAll("[data-paso] > header").forEach(h=>{
   });
 });
 
+
+/* ============ LOS AZULEJOS DEL COTIZADOR ============
+   Sólo viven en el modo guiado. Cada azulejo escribe en el campo que ya
+   existía y dispara su evento: ni un cálculo nuevo, ni una verdad nueva. */
+let AZ = {cliBusca:"", artBusca:"", artCat:"", cliTodos:false};
+const AZ_TOPE = 12;   /* cuántos se enseñan antes del «ver todos» */
+
+function azIco(d){
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" ' +
+    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
+}
+function azCaja(id, padre, donde){
+  let c = document.getElementById(id);
+  if(!c){
+    const p = document.querySelector(padre); if(!p) return null;
+    p.insertAdjacentHTML(donde || "afterbegin", '<div class="azBloque" id="'+id+'"></div>');
+    c = document.getElementById(id);
+  }
+  return c;
+}
+function azQuita(id){ const c = document.getElementById(id); if(c) c.remove(); }
+/* Repintar una rejilla no debe quitarle el cursor a quien está escribiendo
+   en su buscador: se apunta dónde estaba y se devuelve. */
+function azConFoco(fn){
+  const a = document.activeElement;
+  const id = a && a.id, pos = (a && a.selectionStart != null) ? a.selectionStart : null;
+  fn();
+  if(!id) return;
+  const n = document.getElementById(id);
+  if(n && n !== document.activeElement){
+    n.focus();
+    if(pos != null){ try{ n.setSelectionRange(pos, pos); }catch(e){} }
+  }
+}
+
+/* ---------- 1. el cliente ---------- */
+function azClientes(){ azConFoco(()=>azClientesPinta()); }
+function azClientesPinta(){
+  const c = azCaja("azCli", '[data-paso="cliente"] .body', "afterbegin");
+  if(!c) return;
+  const q = (AZ.cliBusca||"").trim().toLowerCase();
+  const todos = (typeof clientes !== "undefined" && Array.isArray(clientes)) ? clientes : [];
+  const ls = todos.filter(x=> !q ||
+    ((x.nombre||"")+" "+(x.razon||"")+" "+(x.rfc||"")+" "+(x.tel||"")+" "+(x.mail||"")).toLowerCase().indexOf(q) >= 0);
+  const vista = AZ.cliTodos ? ls : ls.slice(0, AZ_TOPE);
+  c.innerHTML =
+    '<label class="f" for="azCliBusca">¿Para quién es?</label>' +
+    '<div class="azBarra"><input id="azCliBusca" placeholder="Buscar cliente por nombre, teléfono o RFC" value="'+esc(AZ.cliBusca||"")+'">' +
+      '<span class="hint">'+ls.length+' de '+todos.length+'</span></div>' +
+    '<div class="azRej">' +
+      '<button type="button" class="azIt azNuevo" data-azcli="" style="--azc:var(--accent)" aria-pressed="'+(!cot.clienteId)+'">' +
+        '<span class="azIco">'+azIco('<path d="M12 5v14M5 12h14"/>')+'</span>' +
+        '<b>Cliente nuevo</b><small>lo escribes abajo</small></button>' +
+      vista.map(x=>{
+        const cont = x.tel || x.mail || "";
+        return '<button type="button" class="azIt" data-azcli="'+esc(x.id)+'" style="--azc:#0680AB" ' +
+          'aria-pressed="'+(cot.clienteId===x.id)+'">' +
+          '<span class="azIco">'+azIco('<circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/>')+'</span>' +
+          '<b>'+esc(x.nombre||x.razon||"Sin nombre")+'</b>' +
+          '<small>'+esc(cont || x.rfc || "sin datos")+'</small></button>';
+      }).join("") +
+    '</div>' +
+    (ls.length > vista.length
+      ? '<p class="azMas"><button type="button" class="btn sm ghost" id="azCliTodos">Ver los '+ls.length+'</button></p>'
+      : '') +
+    (todos.length ? '' : '<p class="azVacio">Todavía no tienes clientes guardados. Escribe el nombre abajo y usa «Guardar como cliente».</p>');
+}
+/* ---------- 2. el artículo ---------- */
+function azArticulos(){ azConFoco(()=>azArticulosPinta()); }
+function azArticulosPinta(){
+  /* En modo servicio no hay artículo que escoger: ahí manda el material. */
+  if(cot.modo === "servicio"){ azQuita("azArt"); return; }
+  const c = azCaja("azArt", '[data-paso="articulo"] .body', "afterbegin");
+  if(!c) return;
+  const q = (AZ.artBusca||"").trim().toLowerCase();
+  let ls = (cat.articulos||[]).slice();
+  if(AZ.artCat) ls = ls.filter(a=>(a.cat||"Otros") === AZ.artCat);
+  if(q) ls = ls.filter(a=> ((a.nombre||"")+" "+(a.cat||"")).toLowerCase().indexOf(q) >= 0);
+  const cats = (typeof categoriasArt === "function") ? categoriasArt() : [];
+  c.innerHTML =
+    '<label class="f" for="azArtBusca">¿Qué se va a personalizar?</label>' +
+    '<div class="azBarra"><input id="azArtBusca" placeholder="Buscar artículo" value="'+esc(AZ.artBusca||"")+'">' +
+      '<span class="hint">'+ls.length+' de '+(cat.articulos||[]).length+'</span></div>' +
+    (cats.length > 1
+      ? '<div class="azChips" id="azArtCats"><button type="button" data-azartcat=""'+(AZ.artCat?'':' aria-pressed="true"')+'>Todos</button>' +
+        cats.map(x=>'<button type="button" data-azartcat="'+esc(x)+'"'+(AZ.artCat===x?' aria-pressed="true"':'')+'>'+esc(x)+'</button>').join("") +
+        '</div>'
+      : '') +
+    '<div class="azRej">' +
+      '<button type="button" class="azIt azNuevo" data-artpick="" aria-pressed="'+(!cot.articuloId)+'">' +
+        '<span class="azIco">'+azIco('<path d="M12 5v14M5 12h14"/>')+'</span>' +
+        '<b>A mi manera</b><small>nombre y costo a mano</small></button>' +
+      ls.map(a=>
+        '<button type="button" class="azIt" data-artpick="'+esc(a.id)+'" style="--azc:#D6127F" ' +
+        'aria-pressed="'+(cot.articuloId===a.id)+'">' + miniArt(a) +
+        '<b>'+esc(a.nombre)+'</b><small>'+esc(a.cat||"Sin familia")+' · '+mx(num(a.costo))+'</small></button>'
+      ).join("") +
+    '</div>' +
+    (ls.length ? '' : '<p class="azVacio">Nada con ese nombre. Puedes capturarlo a mano aquí abajo.</p>');
+}
+/* ---------- 3. la técnica y el tamaño, dentro de cada aplicación ---------- */
+const AZ_COLTEC = {area:"#0680AB", tintas:"#8B5CF6", puntadas:"#D2541F", tiempo:"#14B8A6"};
+/* El dibujo de cada técnica. Se busca por el nombre, no por el id, porque
+   un taller puede llamarle «DTF 60» a la suya y seguir siendo un DTF. */
+const AZ_DIBUJOS = [
+  [/dtf.*(uv|r[ií]gid)|uv/i, '<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'],
+  [/dtf|pel[ií]cula/i,       '<rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 7V5M12 7V5M17 7V5"/>'],
+  [/sublim/i,                '<path d="M4 8h11v8a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3Z"/><path d="M15 10h3a2.5 2.5 0 0 1 0 5h-3"/>'],
+  [/vinil|corte/i,           '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.1 8.1 20 20M8.1 15.9 20 4"/>'],
+  [/serigraf/i,              '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M3 20h18"/><path d="M8 9h8v4H8Z"/>'],
+  [/bordad|puntad/i,         '<path d="M3 20 20 3"/><path d="M15 3h5v5"/><circle cx="6.5" cy="17.5" r="2.5"/>'],
+  [/l[áa]ser|grabad/i,       '<path d="M12 2v7"/><path d="M8.5 9h7l1.5 5H7Z"/><path d="M12 14v8"/>'],
+  [/dtg|directo/i,           '<path d="M6 4h12l3 5-4 2v9H7v-9L3 9Z"/>'],
+  [/lona|gran formato/i,     '<rect x="2" y="5" width="20" height="12" rx="1.5"/><path d="M2 20h20M6 5v12M18 5v12"/>']
+];
+function azDibujoTec(t){
+  const n = (t && t.nombre) || "";
+  for(let i=0;i<AZ_DIBUJOS.length;i++){ if(AZ_DIBUJOS[i][0].test(n)) return AZ_DIBUJOS[i][1]; }
+  return '<circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/>';
+}
+function azAplicaciones(){
+  document.querySelectorAll("#apps [data-app]").forEach(row=>{
+    const a = cot.apps.find(x=>x.id === row.dataset.app); if(!a) return;
+    if(row.querySelector(".azBloque")) return;          // ya los tiene
+    const selTec = row.querySelector('[data-k="tecnicaId"]');
+    const selTam = row.querySelector('[data-k="tamanoId"]');
+    let h = '<div class="azBloque">' +
+      '<label class="f">¿Cómo se decora?</label><div class="azRej chica">' +
+      (cat.tecnicas||[]).map(t=>
+        '<button type="button" class="azIt" data-aztec="'+esc(a.id)+'|'+esc(t.id)+'" ' +
+        'style="--azc:'+(AZ_COLTEC[t.modo]||"#0680AB")+'" aria-pressed="'+(a.tecnicaId===t.id)+'">' +
+        '<span class="azIco">'+azIco(azDibujoTec(t))+'</span>' +
+        '<b>'+esc(t.nombre)+'</b></button>').join("") +
+      '</div>';
+    if(selTam){
+      h += '<label class="f" style="margin-top:12px">¿De qué tamaño?</label><div class="azRej chica">' +
+        '<button type="button" class="azIt azNuevo" data-aztam="'+esc(a.id)+'|" aria-pressed="'+(!a.tamanoId)+'">' +
+          '<b>A la medida</b><small>lo escribes abajo</small></button>' +
+        (cat.tamanos||[]).map(x=>
+          '<button type="button" class="azIt" data-aztam="'+esc(a.id)+'|'+esc(x.id)+'" ' +
+          'style="--azc:#14B8A6" aria-pressed="'+(a.tamanoId===x.id)+'">' +
+          '<b>'+esc(x.nombre)+'</b><small>'+num(x.ancho)+' × '+num(x.alto)+' cm</small></button>').join("") +
+        '</div>';
+    }
+    h += '</div>';
+    /* Los desplegables se quedan: son los que guardan el dato y los que oye
+       el programa. Nada más dejan de verse. */
+    const rej = row.querySelector(".grid.g4");
+    if(rej) rej.insertAdjacentHTML("beforebegin", h);
+    [selTec, selTam].forEach(sel=>{
+      if(!sel) return;
+      const caja = sel.closest("div");
+      if(caja) caja.hidden = true;
+    });
+  });
+}
+function azPinta(){
+  if(typeof guiado !== "function" || !guiado()){
+    azQuita("azCli"); azQuita("azArt");
+    /* Apagar el modo no deja rastro: se van los azulejos de cada
+       aplicación y vuelven a verse los desplegables de siempre. */
+    document.querySelectorAll("#apps .azBloque").forEach(x=> x.remove());
+    azTapa('#c_artBtn', false); azTapa('#c_clienteSel', false);
+    document.querySelectorAll('#apps [data-k="tecnicaId"], #apps [data-k="tamanoId"]').forEach(sel=>{
+      const caja = sel.closest("div"); if(caja) caja.hidden = false;
+    });
+    return;
+  }
+  azClientes(); azArticulos(); azAplicaciones();
+  /* Lo que los azulejos ya resuelven deja de estar dos veces en pantalla:
+     el botón del artículo y el desplegable de clientes guardados. Los
+     campos siguen ahí, nada más que tapados; el dato lo guardan ellos. */
+  azTapa('#c_artBtn', cot.modo !== "servicio");
+  azTapa('#c_clienteSel', true);
+}
+/* Tapar, no quitar: lo que se borra del DOM deja de recibir los render de
+   siempre y vuelve roto cuando se apaga el modo. */
+function azTapa(sel, tapar){
+  const el = document.querySelector(sel); if(!el) return;
+  const caja = el.closest("div"); if(!caja) return;
+  caja.hidden = !!tapar;
+}
+/* Los clics. Todo termina en el campo de siempre. */
+document.addEventListener("click", e=>{
+  const cl = e.target.closest("[data-azcli]");
+  if(cl){
+    const id = cl.dataset.azcli;
+    const sel = $("#c_clienteSel");
+    const x = id ? (clientes||[]).find(k=>k.id === id) : null;
+    /* Se escribe en la cotización y en los campos de siempre. El
+       desplegable se pone al día si el cliente está en su lista, pero ya
+       no es el que manda: antes, si la lista todavía no se había pintado,
+       el azulejo no hacía nada y parecía que no servía. */
+    cot.clienteId = x ? x.id : "";
+    cot.cliente   = x ? (x.nombre || x.razon || "") : "";
+    cot.contacto  = x ? (x.tel || x.mail || "") : "";
+    if($("#c_cliente"))  $("#c_cliente").value  = cot.cliente;
+    if($("#c_contacto")) $("#c_contacto").value = cot.contacto;
+    if(sel){ try{ sel.value = cot.clienteId; }catch(e){} }
+    azClientes();
+    if(!x){ const n = $("#c_cliente"); if(n) n.focus(); }
+    if(typeof persist === "function") persist();
+    if(typeof resumenPasos === "function") resumenPasos();
+    if(typeof guiaRevisa === "function") guiaRevisa();
+    return;
+  }
+  if(e.target.closest("#azCliTodos")){ AZ.cliTodos = true; azClientes(); return; }
+  const ac = e.target.closest("[data-azartcat]");
+  if(ac){ AZ.artCat = ac.dataset.azartcat; azArticulos(); return; }
+  const tc = e.target.closest("[data-aztec]");
+  if(tc){
+    const p = tc.dataset.aztec.split("|");
+    const row = document.querySelector('#apps [data-app="'+p[0]+'"]');
+    const sel = row && row.querySelector('[data-k="tecnicaId"]');
+    if(sel){ sel.value = p[1]; sel.dispatchEvent(new Event("change", {bubbles:true})); }
+    return;
+  }
+  const tm = e.target.closest("[data-aztam]");
+  if(tm){
+    const p = tm.dataset.aztam.split("|");
+    const row = document.querySelector('#apps [data-app="'+p[0]+'"]');
+    const sel = row && row.querySelector('[data-k="tamanoId"]');
+    if(sel){ sel.value = p[1] || ""; sel.dispatchEvent(new Event("change", {bubbles:true})); }
+    return;
+  }
+});
+document.addEventListener("input", e=>{
+  if(e.target.id === "azCliBusca"){ AZ.cliBusca = e.target.value; AZ.cliTodos = false; azClientes(); return; }
+  if(e.target.id === "azArtBusca"){ AZ.artBusca = e.target.value; azArticulos(); return; }
+});
+
 /* ==================== COTIZAR POR PASOS ====================
    Los mismos campos de siempre, de uno en uno. El interruptor vive en
    Ajustes y se guarda con los demás parámetros, así que vale para toda la
@@ -9459,6 +9727,7 @@ function guiaPinta(){
   let tira = document.getElementById("guiaTira");
   if(!guiado()){
     if(tira) tira.remove();
+    if(typeof azPinta === "function") azPinta();
     sec.querySelectorAll("[data-paso]").forEach(c=>{
       c.classList.remove("guiaFuturo","guiaHecho");
       const pie = c.querySelector(".guiaPie"); if(pie) pie.remove();
@@ -9493,6 +9762,7 @@ function guiaPinta(){
           '<button class="btn primary" data-guiasig="'+ps[i+1]+'"'+(falta?" disabled":"")+'>Continuar</button>') +
       '</div>');
   });
+  if(typeof azPinta === "function") azPinta();
   if(typeof resumenPasos === "function") resumenPasos();
 }
 /* Mientras se escribe, el aviso y el botón de Continuar se refrescan sin
@@ -19394,7 +19664,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261020-1319"></script>
-<script src="diagnostico.js?v=20261020-1319"></script>
+<script src="cuenta.js?v=20261023-1718"></script>
+<script src="diagnostico.js?v=20261023-1718"></script>
 </body>
 </html>

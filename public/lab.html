@@ -2447,6 +2447,7 @@ function abreFicha(id) {
           '<option value="mensual"' + (c.periodo === "mensual" ? " selected" : "") + '>Mensual</option>' +
           '<option value="anual"' + (c.periodo === "anual" ? " selected" : "") + '>Anual</option></select></div></div>' +
       '<div class="fila">' +
+        '<button class="btn sm p" data-acc="guardaplan">Guardar plan y periodo</button>' +
         '<button class="btn sm" data-acc="mas7">+7 días</button>' +
         '<button class="btn sm" data-acc="mas15">+15 días</button>' +
         (c.estado === "pausada" || c.estado === "vencida" || c.estado === "baja"
@@ -2988,30 +2989,101 @@ async function accion(acc) {
     c.apoyo = null; await guarda("cuentas", c); abreFicha(c.id); return;
   }
 
-  if (acc === "mas7" || acc === "mas15") {
-    const n = acc === "mas7" ? 7 : 15;
-    c.vence = iso(masDias(dObj(c.vence < iso(HOY) ? iso(HOY) : c.vence), n));
-    if (c.estado === "vencida") c.estado = "prueba";
-    anota(c, "Se le dieron " + dias(n) + " más. Ahora vence el " + fFecha(c.vence) + ".");
-    aviso("Vence el " + fFecha(c.vence));
-  } else if (acc === "pausa") { c.estado = "pausada"; anota(c, "Cuenta pausada. Los datos se conservan.");
-  } else if (acc === "reactiva") {
-    c.estado = "activa"; c.baja = null; c.vence = iso(masDias(HOY, 30));
-    anota(c, "Cuenta reactivada. Siguiente cobro el " + fFecha(c.vence) + ".");
-  } else if (acc === "cobra") {
-    c.estado = "activa"; c.vence = iso(masDias(HOY, c.periodo === "anual" ? 365 : 30));
-    anota(c, "Pasó de prueba a " + planDe(c).nombre + " " + c.periodo + ".");
-    aviso("Bien: " + c.taller + " ya está pagando");
-  } else if (acc === "baja") {
-    if (!confirm("¿Dar de baja a " + c.taller + "? Deja de cobrarse, pero sus datos se conservan.")) return;
-    c.estado = "baja"; c.baja = iso(HOY); anota(c, "Se dio de baja la cuenta.");
-  } else if (acc === "nota") {
+  /* Todo lo que toca la suscripción va por la base, no por la pantalla.
+     Antes esto cambiaba el objeto de aquí y lo mandaba a guarda(), que
+     sólo escribe tus notas: la ficha se veía reactivada y el taller
+     seguía con el letrero de prueba terminada. */
+  if (acc === "mas7" || acc === "mas15" || acc === "pausa" || acc === "reactiva" ||
+      acc === "cobra" || acc === "baja" || acc === "guardaplan") {
+    await mueveSuscripcion(c, acc);
+    return;
+  }
+  if (acc === "nota") {
     const t = ($("#fNota").value || "").trim();
     if (!t) { aviso("Escribe la nota antes de guardarla."); return; }
     anota(c, t); aviso("Nota guardada");
   }
   await guarda("cuentas", c);
   abreFicha(c.id);
+}
+
+/* La única puerta que la base acepta para mover una suscripción.
+   staff_cambia_plan vive en la migración 08: comprueba que seas del
+   equipo y deja escrito en lab_bitacora quién cambió qué y cuándo. */
+async function mueveSuscripcion(c, acc) {
+  const planFicha = ($("#fPlan") && $("#fPlan").value) || c.planReal || c.plan;
+  const periodo   = ($("#fPeriodo") && $("#fPeriodo").value) || c.periodo || "mensual";
+  const nombreDe  = p => (PLANES[p] || { nombre: p }).nombre;
+  const campos    = { p_cuenta: c.id };
+  let texto = "";
+
+  if (acc === "mas7" || acc === "mas15") {
+    const n = acc === "mas7" ? 7 : 15;
+    /* Si ya venció, los días se cuentan desde hoy: regalarle siete días
+       a una fecha de la semana pasada no le sirve a nadie. */
+    const desde = (c.vence && c.vence >= iso(HOY)) ? c.vence : iso(HOY);
+    campos.p_vence  = iso(masDias(dObj(desde), n));
+    campos.p_estado = "activa";
+    /* Alargar la fecha de una cuenta sin plan no la deja trabajar: el
+       cotizador pide las dos cosas. */
+    if ((c.planReal || c.plan) === "ninguno") {
+      if (planFicha === "ninguno") { aviso("Esta cuenta no tiene plan. Escoge uno arriba antes de darle días."); return; }
+      campos.p_plan = planFicha;
+    }
+    texto = "Se le dieron " + dias(n) + " más. Ahora vence el " + fFecha(campos.p_vence) + ".";
+  } else if (acc === "pausa") {
+    campos.p_estado = "vencida";
+    texto = "Cuenta pausada. Los datos se conservan.";
+  } else if (acc === "reactiva") {
+    const p = (planFicha && planFicha !== "ninguno") ? planFicha
+            : ((c.planReal && c.planReal !== "ninguno") ? c.planReal : "");
+    if (!p) { aviso("Esta cuenta no tiene plan. Escoge uno arriba antes de reactivarla."); return; }
+    campos.p_plan   = p;
+    campos.p_estado = "activa";
+    campos.p_vence  = iso(masDias(HOY, 30));
+    texto = "Cuenta reactivada en plan " + nombreDe(p) + ". Siguiente cobro el " + fFecha(campos.p_vence) + ".";
+  } else if (acc === "cobra") {
+    if (planFicha === "ninguno" || planFicha === "prueba") { aviso("Escoge el plan que va a pagar antes de marcarla como pagada."); return; }
+    campos.p_plan      = planFicha;
+    campos.p_estado    = "activa";
+    campos.p_ciclo     = periodo;
+    campos.p_es_prueba = false;
+    campos.p_vence     = iso(masDias(HOY, periodo === "anual" ? 365 : 30));
+    texto = "Pasó de prueba a " + nombreDe(planFicha) + " " + periodo + ".";
+  } else if (acc === "baja") {
+    if (!confirm("¿Dar de baja a " + c.taller + "? Deja de cobrarse, pero sus datos se conservan.")) return;
+    campos.p_estado = "cancelada";
+    texto = "Se dio de baja la cuenta.";
+  } else if (acc === "guardaplan") {
+    campos.p_plan  = planFicha;
+    campos.p_ciclo = periodo;
+    if (planFicha !== "prueba") campos.p_es_prueba = false;
+    texto = "Plan cambiado a " + nombreDe(planFicha) + " " + periodo + ".";
+  }
+  campos.p_motivo = texto;
+
+  if (!window.SB) { aviso("Sin conexión con la base: el cambio no se mandó."); return; }
+  let r;
+  try { r = await SB.rpc("staff_cambia_plan", campos); }
+  catch (e) { aviso("No se pudo cambiar el plan: " + ((e && e.message) || e)); return; }
+
+  if (r && r.error) {
+    const m = String(r.error.message || "");
+    /* El error de "no existe la función" es cierto y perfectamente inútil:
+       lo que hay que hacer es correr la migración. */
+    aviso(/staff_cambia_plan|schema cache|does not exist/i.test(m)
+      ? "Falta correr CORRER-8-lab-manda.sql en Supabase. Sin eso, los botones de plan no llegan a la base."
+      : "No se pudo cambiar el plan: " + m);
+    console.error("staff_cambia_plan", r.error);
+    return;
+  }
+  if (r && r.data && r.data.ok === false) { aviso(r.data.motivo || "La base no aceptó el cambio."); return; }
+
+  anota(c, texto);
+  await guarda("cuentas", c);     // la nota, que sí es tuya
+  await recarga("cuentas");       // los números, que son de la base
+  abreFicha(c.id);
+  aviso(texto + " Ya le llegó al taller.");
 }
 
 /* ================= pintar ================= */
