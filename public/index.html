@@ -2273,6 +2273,33 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
 .cpLeyenda span{display:flex;align-items:center;gap:6px}
 .cpLeyenda u{width:10px;height:10px;border-radius:3px;text-decoration:none;display:inline-block}
 
+
+/* ---- detalles de diseño ---- */
+/* La palomita del elegido. El borde de color solo no basta: en una rejilla
+   de dieciséis artículos hay que poder ver cuál es de un vistazo. */
+.azIt,.cpAz,.arrOpc{position:relative}
+.azIt[aria-pressed="true"]::after,.cpAz[aria-pressed="true"]::after{
+  content:"\2713";position:absolute;right:8px;top:8px;width:18px;height:18px;
+  border-radius:50%;display:grid;place-items:center;font-size:11px;line-height:1;
+  background:var(--azc,var(--cpc,var(--accent)));color:#fff;
+  box-shadow:0 0 0 2px var(--surface-2)}
+/* El aro de foco: quien se mueve con el teclado tiene que ver dónde está. */
+.azIt:focus-visible,.cpAz:focus-visible,.lzApp:focus-visible,.arrOpc:focus-visible,
+.guiaTira .guiaP:focus-visible,.cpPaso .cpCab:focus-visible{
+  outline:3px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  outline-offset:2px}
+/* El icono se ladea un poco cuando el puntero entra. Es el detalle que hace
+   que el azulejo se sienta un botón y no una estampa. */
+.azIco,.cpIco,.lzIco,.tbAccIco,.arrOpc .arrIco{
+  transition:transform .25s cubic-bezier(.2,.8,.3,1),background .2s,color .2s}
+.azIt:hover .azIco,.cpAz:hover .cpIco,.lzApp:hover .lzIco,
+.tbAcceso:hover .tbAccIco,.arrOpc:hover .arrIco{transform:scale(1.07) rotate(-4deg)}
+@media (prefers-reduced-motion: reduce){
+  .azIco,.cpIco,.lzIco,.tbAccIco,.arrOpc .arrIco{transition:none!important}
+  .azIt:hover .azIco,.cpAz:hover .cpIco,.lzApp:hover .lzIco,
+  .tbAcceso:hover .tbAccIco,.arrOpc:hover .arrIco{transform:none}
+}
+
 /* ============ EL MOVIMIENTO ============
    Nada de esto cambia un número ni esconde un dato: es cómo entra y cómo
    responde lo que ya estaba. Si el sistema pide menos movimiento, se
@@ -4867,6 +4894,23 @@ const TEMAS = {
     "--guinda-tenue":"#FAEBE3", "--guinda-medio":"#F3D6C7",
     "--serie-1":"#0680AB", "--serie-2":"#D6127F", "--serie-3":"#B26A00", "--serie-4":"#0E7C57",
     "--shadow":"0 1px 2px rgba(28,26,23,.06), 0 12px 28px -20px rgba(28,26,23,.30)"
+  }},
+  estudio:  {nombre:"Estudio",     acento:"#173E36", amb:["#173E36","#508B6E","#D7FA75"],
+             modo:"light", vars:{
+    "--bg":"#F4F3ED", "--surface":"#FFFEFA", "--surface-2":"#F4F6EF",
+    "--line":"#E5E2D8", "--line-soft":"#EDEBE2",
+    /* El #858C83 del archivo original se queda en 3.4:1 contra la tarjeta:
+       las pistas y los subtítulos se leen mal. Bajado a #6A7268 da 4.9:1
+       sobre la tarjeta y 4.6:1 sobre el fondo gris, que ya pasa AA. */
+    "--ink":"#202724", "--ink-2":"#45544A", "--ink-3":"#6A7268",
+    "--cyan":"#1F6E7A", "--cyan-soft":"#E3EFF1",
+    "--good":"#347856", "--good-soft":"#EAF4EB",
+    "--warn":"#9B6A12", "--warn-soft":"#FFF6DF",
+    "--yellow":"#C79A14", "--yellow-ink":"#231A00",
+    "--guinda":"#B45B3C", "--guinda-2":"#8F4328",
+    "--guinda-tenue":"#FFF0E9", "--guinda-medio":"#F6DDD1",
+    "--serie-1":"#173E36", "--serie-2":"#508B6E", "--serie-3":"#B45B3C", "--serie-4":"#9B6A12",
+    "--shadow":"0 1px 2px rgba(23,62,54,.05), 0 16px 42px -24px rgba(23,62,54,.38)"
   }},
   heymakers:{nombre:"Hey Makers", acento:"#D6127F", amb:["#06A1D7","#F51B95","#FFEC30"]},
   guinda:   {nombre:"Guinda",     acento:"#A81B4A", amb:["#7A1231","#C4295C","#E8B9CA"]},
@@ -7583,9 +7627,9 @@ function cpAzulejo(attr, id, color, dentro, elegido){
 function cpChip(txt, fuerte){ return '<span class="cpChip'+(fuerte?" fuerte":"")+'">'+esc(txt)+'</span>'; }
 
 const CP_VIAS = [
-  {id:"articulo", nombre:"Un artículo de mi catálogo", sub:"playera, taza, termo, gorra", color:"#D6127F",
+  {id:"articulo", nombre:"Un artículo de mi catálogo", sub:"playera, taza, termo, gorra", color:"var(--guinda)",
    icono:'<path d="M6 4h12l3 5-4 2v9H7v-9L3 9Z"/>'},
-  {id:"servicio", nombre:"Sólo un servicio por medida", sub:"metros de rollo, lona, vinil", color:"#0680AB",
+  {id:"servicio", nombre:"Sólo un servicio por medida", sub:"metros de rollo, lona, vinil", color:"var(--cyan)",
    icono:'<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 6v12M18 6v12"/>'}
 ];
 
@@ -7602,7 +7646,7 @@ function cpCuerpo1(){
        '<input id="cpBusca" placeholder="Buscar artículo" value="'+esc(CP.busca||"")+'">' +
        '<span class="hint">'+ls.length+' de '+(cat.articulos||[]).length+'</span></div>';
   h += ls.length
-    ? '<div class="cpRej">' + ls.map(a=> cpAzulejo("data-cpart", a.id, "#D6127F",
+    ? '<div class="cpRej">' + ls.map(a=> cpAzulejo("data-cpart", a.id, "var(--guinda)",
         miniArt(a) + '<b>'+esc(a.nombre)+'</b><small>'+esc(a.cat||"Sin familia")+' · cuesta '+mx(a.costo)+'</small>',
         CP.articuloId===a.id)).join("") + '</div>'
     : '<p class="cpNota">Ningún artículo con ese nombre. Los artículos se capturan en Catálogo.</p>';
@@ -7612,7 +7656,7 @@ function cpCuerpo2(){
   if(CP.via === "servicio"){
     const ls = cat.servicios || [];
     if(!ls.length) return '<p class="cpNota">No tienes materiales por medida capturados. Van en Catálogo · Materiales y servicios.</p>';
-    return '<div class="cpRej">' + ls.map(x=> cpAzulejo("data-cpsvc", x.id, "#0680AB",
+    return '<div class="cpRej">' + ls.map(x=> cpAzulejo("data-cpsvc", x.id, "var(--cyan)",
       '<span class="cpIco">'+cpIco('<rect x="2" y="7" width="20" height="10" rx="1.5"/><path d="M6 7v10"/>')+'</span>'+
       '<b>'+esc(x.nombre)+'</b><small>'+num(x.ancho)+' cm de ancho · '+mx(x.costo)+' el '+
       (x.unidad==="m2"?"m²":"metro")+'</small>',
@@ -7684,7 +7728,7 @@ function cpCuerpo4(){
   const porPieza = (cat.extras||[]).filter(x=>x.tipo==="pieza");
   if(porPieza.length){
     h += '<div style="margin-top:14px"><div class="cpTit" style="font-size:13.5px">Extras que van en cada pieza</div>'+
-      '<div class="cpRej">' + porPieza.map(x=> cpAzulejo("data-cpext", x.id, "#B26A00",
+      '<div class="cpRej">' + porPieza.map(x=> cpAzulejo("data-cpext", x.id, "var(--warn)",
         '<b>'+esc(x.nombre)+'</b><small>'+mx(x.monto)+' la pieza</small>', !!CP.extras[x.id])).join("") + '</div></div>';
   }
   return h;
@@ -9607,7 +9651,7 @@ function azClientesPinta(){
         '<b>Cliente nuevo</b><small>lo escribes abajo</small></button>' +
       vista.map(x=>{
         const cont = x.tel || x.mail || "";
-        return '<button type="button" class="azIt" data-azcli="'+esc(x.id)+'" style="--azc:#0680AB" ' +
+        return '<button type="button" class="azIt" data-azcli="'+esc(x.id)+'" style="--azc:var(--cyan)" ' +
           'aria-pressed="'+(cot.clienteId===x.id)+'">' +
           '<span class="azIco">'+azIco('<circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/>')+'</span>' +
           '<b>'+esc(x.nombre||x.razon||"Sin nombre")+'</b>' +
@@ -9645,7 +9689,7 @@ function azArticulosPinta(){
         '<span class="azIco">'+azIco('<path d="M12 5v14M5 12h14"/>')+'</span>' +
         '<b>A mi manera</b><small>nombre y costo a mano</small></button>' +
       ls.map(a=>
-        '<button type="button" class="azIt" data-artpick="'+esc(a.id)+'" style="--azc:#D6127F" ' +
+        '<button type="button" class="azIt" data-artpick="'+esc(a.id)+'" style="--azc:var(--guinda)" ' +
         'aria-pressed="'+(cot.articuloId===a.id)+'">' + miniArt(a) +
         '<b>'+esc(a.nombre)+'</b><small>'+esc(a.cat||"Sin familia")+' · '+mx(num(a.costo))+'</small></button>'
       ).join("") +
@@ -9653,7 +9697,9 @@ function azArticulosPinta(){
     (ls.length ? '' : '<p class="azVacio">Nada con ese nombre. Puedes capturarlo a mano aquí abajo.</p>');
 }
 /* ---------- 3. la técnica y el tamaño, dentro de cada aplicación ---------- */
-const AZ_COLTEC = {area:"#0680AB", tintas:"#8B5CF6", puntadas:"#D2541F", tiempo:"#14B8A6"};
+/* Los colores salen de la paleta del taller, no escritos a mano: así la
+   misma pantalla se ve bien en el tema oscuro, en Papel y en Estudio. */
+const AZ_COLTEC = {area:"var(--cyan)", tintas:"var(--guinda)", puntadas:"var(--warn)", tiempo:"var(--good)"};
 /* El dibujo de cada técnica. Se busca por el nombre, no por el id, porque
    un taller puede llamarle «DTF 60» a la suya y seguir siendo un DTF. */
 const AZ_DIBUJOS = [
@@ -9692,7 +9738,7 @@ function azAplicaciones(){
           '<b>A la medida</b><small>lo escribes abajo</small></button>' +
         (cat.tamanos||[]).map(x=>
           '<button type="button" class="azIt" data-aztam="'+esc(a.id)+'|'+esc(x.id)+'" ' +
-          'style="--azc:#14B8A6" aria-pressed="'+(a.tamanoId===x.id)+'">' +
+          'style="--azc:var(--good)" aria-pressed="'+(a.tamanoId===x.id)+'">' +
           '<b>'+esc(x.nombre)+'</b><small>'+num(x.ancho)+' × '+num(x.alto)+' cm</small></button>').join("") +
         '</div>';
     }
@@ -19767,7 +19813,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261023-1723"></script>
-<script src="diagnostico.js?v=20261023-1723"></script>
+<script src="cuenta.js?v=20261023-1740"></script>
+<script src="diagnostico.js?v=20261023-1740"></script>
 </body>
 </html>

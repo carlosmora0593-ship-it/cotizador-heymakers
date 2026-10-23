@@ -3072,7 +3072,7 @@ async function mueveSuscripcion(c, acc) {
     /* El error de "no existe la función" es cierto y perfectamente inútil:
        lo que hay que hacer es correr la migración. */
     aviso(/staff_cambia_plan|schema cache|does not exist/i.test(m)
-      ? "Falta correr CORRER-8-lab-manda.sql en Supabase. Sin eso, los botones de plan no llegan a la base."
+      ? "Falta correr el SQL «lab-manda» en Supabase (tu archivo CORRER-5-lab-manda.sql, que aquí sale como 08-lab-manda.sql). Sin eso, los botones de plan no llegan a la base."
       : "No se pudo cambiar el plan: " + m);
     console.error("staff_cambia_plan", r.error);
     return;
