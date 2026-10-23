@@ -5197,7 +5197,7 @@ function defaults(){ return {
  ], compras:[]
 };}
 const CHECKS = ["Diseño aprobado por el cliente","Material en almacén","Archivo impreso","Prensado / aplicado","Revisión de calidad","Empacado","Entregado"];
-function defaultParams(){ return {guiado:false,plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
+function defaultParams(){ return {guiado:true,plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
   tarifaKwh:4, bloqueoMin:10,
   folios:{letras:"", extra:"", digitos:6, desde:{cot:1, op:1, req:1}},
   compras:{tope:2000, siempre:false},
@@ -9331,7 +9331,7 @@ function renderSet(){
                           (P.empresa && P.empresa.nombre) || "Makers OS";
   $("#p_margen").value=P.margen; $("#p_modo").value=P.modo; $("#p_merma").value=P.merma; $("#p_mo").value=P.manoObra;
   $("#p_nesting").checked = P.nesting !== false;
-  const pgu = $("#p_guiado"); if(pgu) pgu.checked = !!P.guiado;
+  const pgu = $("#p_guiado"); if(pgu) pgu.checked = (P.guiado !== false);
   const pg = $("#p_nuevaGuardar"); if(pg) pg.checked = P.nuevaAlGuardar !== false;
   const pc = $("#p_nuevaCobrar");  if(pc) pc.checked = P.nuevaAlCobrar  !== false;
   $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia; $("#p_plazoCobro").value=num(P.plazoCobro,15);
@@ -9837,7 +9837,11 @@ const GUIA_ORDEN = ["cliente","articulo","apps","tallas","extras","prod"];
 const GUIA_NOMBRE = {cliente:"Cliente", articulo:"Artículo", apps:"Decorado",
                      tallas:"Tallas", extras:"Extras", prod:"Entrega"};
 let GUIA = {actual:"cliente"};
-const guiado = () => !!P.guiado;
+/* Prendido salvo que lo apaguen a mano. Una cuenta que ya existía no trae
+   este parámetro, así que `undefined` cuenta como prendido: si no, el
+   interruptor venía apagado para todos y nadie se enteraba de que existía
+   la pantalla nueva. Apagarlo es un clic en Ajustes. */
+const guiado = () => P.guiado !== false;
 
 /* Las tallas sólo salen cuando el artículo las usa: preguntarle las tallas
    a una taza es hacerle perder el tiempo a quien cotiza. */
@@ -19813,7 +19817,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261023-1740"></script>
-<script src="diagnostico.js?v=20261023-1740"></script>
+<script src="cuenta.js?v=20261023-1749"></script>
+<script src="diagnostico.js?v=20261023-1749"></script>
 </body>
 </html>
