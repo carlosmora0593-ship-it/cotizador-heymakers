@@ -655,6 +655,14 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#57816a;box-shado
 .heroR h1{font-family:"DM Serif Display",Georgia,serif;font-size:clamp(31px,4vw,47px);font-weight:400;line-height:1.08;letter-spacing:-.03em;color:#fffdf7;margin:9px 0 8px}
 .heroR .sub{font-size:13.5px;color:#dce7da;max-width:550px}
 .heroRStatus{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.androidApkLink{display:inline-flex;align-items:center;gap:10px;max-width:100%;margin-top:16px;padding:9px 13px;border:1px solid rgba(245,230,193,.76);border-radius:13px;background:#f1e6c9;color:#244c3a;text-decoration:none;box-shadow:0 8px 18px rgba(8,29,18,.15);transition:transform .2s,background .2s,box-shadow .2s}
+.androidApkLink:hover{transform:translateY(-2px);background:#fff7e7;box-shadow:0 12px 22px rgba(8,29,18,.2)}
+.androidApkIcon{width:34px;height:34px;display:grid;place-items:center;flex:none;border-radius:10px;background:#e4d7b6;color:#285a45}
+.androidApkIcon svg{width:19px;height:19px}
+.androidApkCopy{display:grid;line-height:1.2}
+.androidApkCopy b{font-size:12px;font-weight:800}
+.androidApkCopy small{margin-top:3px;color:#657465;font-size:10px}
+.androidApkArrow{margin-left:5px;font-size:18px;color:#568063}
 .heroRBadge{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(239,224,187,.3);border-radius:99px;padding:5px 10px;background:rgba(255,255,255,.1);font-size:10.5px;font-weight:700;color:#f5ecd4}
 .heroRBadge:before{content:"";width:6px;height:6px;border-radius:50%;background:#deb66a}
 .heroRBadge.abierta{border-color:rgba(192,225,176,.38);background:rgba(139,183,112,.17);color:#e3f1d9}
@@ -956,6 +964,11 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
         <span class="heroRBadge" id="inCajaBadge">Caja cerrada</span>
         <span class="heroRBadge tenue" id="inPrepBadge">Cocina en calma</span>
       </div>
+      <a class="androidApkLink" href="./Makers-Restaurant.apk" download aria-label="Descargar APK de Makers Restaurant para Android">
+        <span class="androidApkIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9a5 5 0 0 1 10 0v1H7V9Z"/><path d="M8 5 6.8 3.7M16 5l1.2-1.3M7 10v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-6M5 10v5M19 10v5M10 13h.01M14 13h.01"/><path d="M12 17v4m-2-2 2 2 2-2"/></svg></span>
+        <span class="androidApkCopy"><b>Descargar APK para Android</b><small>Instalaci&oacute;n de prueba</small></span>
+        <span class="androidApkArrow" aria-hidden="true">↓</span>
+      </a>
     </div>
     <div class="heroRActions" aria-label="Acciones rápidas">
       <button class="heroAction" id="inicioVerMesas" type="button">
@@ -1325,6 +1338,33 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
     </div>
   </div>
   <div class="card">
+    <header><h2>Impresora de esta pantalla</h2><span class="hint" id="btPrinterHint">Bluetooth del APK</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Elige conexión directa para térmicas Bluetooth ESC/POS de 58 u 80 mm. Para impresoras USB, Wi-Fi o de otro protocolo, usa los servicios de impresión de Android; ese modo muestra una confirmación en cada trabajo y puede requerir el complemento del fabricante.</p>
+      <div id="btPrinterWebHint" class="note" style="margin:0;border-left-color:var(--warn)">La conexión Bluetooth directa estará disponible en la versión Android con el puente nativo de impresión.</div>
+      <div id="btPrinterControls" hidden>
+        <div class="grid g2">
+          <div><label class="f" for="btPrinterMode">Método de conexión</label>
+            <select id="btPrinterMode"><option value="bluetooth">Bluetooth directo · ESC/POS</option><option value="android">Servicios de impresión Android</option></select></div>
+          <div><label class="f" for="btPrinterWidth">Ancho del papel</label>
+            <select id="btPrinterWidth"><option value="58">58 mm</option><option value="80">80 mm</option></select></div>
+        </div>
+        <div id="btPrinterBluetoothOptions" class="grid g2" style="margin-top:10px">
+          <div><label class="f" for="btPrinterSelect">Impresora emparejada</label>
+            <select id="btPrinterSelect"><option value="">Busca impresoras emparejadas</option></select></div>
+          <div style="display:flex;align-items:end;gap:8px;flex-wrap:wrap">
+            <button class="btn sm" id="btPrinterFind" type="button">Buscar emparejadas</button>
+          </div>
+        </div>
+        <div class="fila" style="margin-top:12px">
+          <button class="btn sm primary" id="btPrinterSave" type="button">Guardar conexión</button>
+          <button class="btn sm" id="btPrinterTest" type="button">Imprimir prueba</button>
+          <span class="hint" id="btPrinterStatus" aria-live="polite">Sin impresora seleccionada.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
     <header><h2>Respaldo</h2><span class="hint" id="respHint"></span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px;border-left-color:var(--warn)">Todo tu negocio vive <b>en este
@@ -1344,10 +1384,7 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
   <div class="card">
     <header><h2>Esta pantalla</h2><span class="hint" id="estHint"></span></header>
     <div class="body">
-      <p class="note" style="margin:0 0 14px">Una página web <b>no puede escoger impresora</b>: siempre manda a la
-        predeterminada de la computadora donde está abierta. Por eso esto se configura <b>por pantalla</b> y no por
-        cuenta. Pon en la compu de la caja la impresora de la caja como predeterminada de Windows, y en la de la
-        cocina la suya: cada una imprime lo que le toca y ya no vuelves a escoger.</p>
+      <p class="note" style="margin:0 0 14px">Esta pantalla se configura por dispositivo. En Android puedes elegir una térmica Bluetooth emparejada para mandar cuentas o comandas directamente; en navegador se usa la impresora predeterminada o el diálogo de impresión del sistema.</p>
       <div class="grid g3">
         <div><label class="f" for="est_donde">Esta pantalla es la de</label>
           <select id="est_donde"></select></div>
@@ -1809,7 +1846,10 @@ const ESTACIONES = {
   barra:   {et:"Barra",   cuenta:false, cocina:true,  cancela:true},
   ninguna: {et:"No imprime nada", cuenta:false, cocina:false, cancela:false}
 };
-let ESTACION = lsGet("estacion", null) || Object.assign({donde:"caja"}, ESTACIONES.caja);
+const estacionGuardada = lsGet("estacion", null) || {};
+let ESTACION = Object.assign({donde:"caja", impresoraBt:"", impresoraNombre:"", anchoPapelBt:0, modoImpresion:"android"},
+  estacionGuardada);
+if(!estacionGuardada.modoImpresion && estacionGuardada.impresoraBt) ESTACION.modoImpresion = "bluetooth";
 function guardaEstacion(){ lsSet("estacion", ESTACION); }
 let COMPRAS     = lsGet("compras", []);
 let RECETAS     = lsGet("recetas", {});   /* platId -> {ings:[], minutos:0} */
@@ -3978,7 +4018,58 @@ function hojaTicket(){
     '.sang{padding-left:9px}' +
     '.caja{border:1.5px solid #000;padding:3px 5px;margin:4px 0;text-align:center}';
 }
+function ticketHtmlATexto(titulo, cuerpo, anchoMm){
+  const columnas = num(anchoMm,80) === 58 ? 32 : 48;
+  const doc = new DOMParser().parseFromString(String(cuerpo||""), "text/html");
+  const lineas = [];
+  const texto = n => String(n && n.textContent || "").replace(/\u00a0/g," ").replace(/[\t\r\n ]+/g," ").trim();
+  const envolver = (s, limite) => {
+    const palabras = String(s||"").split(/\s+/).filter(Boolean), salida=[];
+    let linea="";
+    palabras.forEach(p=>{
+      while(p.length > limite){ if(linea) { salida.push(linea); linea=""; } salida.push(p.slice(0,limite)); p=p.slice(limite); }
+      if(!linea) linea=p; else if(linea.length+1+p.length<=limite) linea+=" "+p;
+      else { salida.push(linea); linea=p; }
+    });
+    if(linea) salida.push(linea);
+    return salida;
+  };
+  const filaTabla = tr => {
+    const celdas = Array.from(tr.children).filter(x=>x.tagName==="TD"||x.tagName==="TH");
+    const izq=texto(celdas[0]), der=texto(celdas[1]);
+    if(!der) return envolver(izq,columnas);
+    const anchoIzq=Math.max(1,columnas-der.length-1);
+    const izqs=envolver(izq,anchoIzq);
+    izqs[izqs.length-1]=(izqs[izqs.length-1]||"").padEnd(anchoIzq," ")+" "+der;
+    return izqs;
+  };
+  const recorrer = n => {
+    if(n.nodeType===Node.TEXT_NODE) return n.nodeValue||"";
+    if(n.nodeType!==Node.ELEMENT_NODE) return "";
+    if(n.tagName==="BR") return "\n";
+    if(n.tagName==="HR") return "\n"+"-".repeat(columnas)+"\n";
+    if(n.tagName==="IMG") return "";
+    if(n.tagName==="TABLE"){
+      const filas=Array.from(n.querySelectorAll("tr")).filter(tr=>tr.closest("table")===n);
+      return filas.map(tr=>filaTabla(tr).join("\n")).join("\n")+"\n";
+    }
+    const contenido=Array.from(n.childNodes).map(recorrer).join("");
+    return /^(DIV|P|SECTION|HEADER|FOOTER|H[1-6]|LI)$/.test(n.tagName) ? contenido+"\n" : contenido;
+  };
+  const contenido=Array.from(doc.body.childNodes).map(recorrer).join("");
+  const limpias=contenido.split("\n").map(x=>x.replace(/[\t ]+/g," ").trim()).filter(Boolean);
+  return [titulo, ...limpias.flatMap(x=>envolver(x,columnas))].join("\n")+"\n\n";
+}
 function imprimeHoja(titulo, cuerpo){
+  if(window.MakersPrinter){
+    const mm=num(ESTACION.anchoPapelBt,0)||num(P.ticket.ancho,80);
+    if(ESTACION.modoImpresion !== "android" && ESTACION.impresoraBt){
+      window.MakersPrinter.printText(uid(), ESTACION.impresoraBt, mm, ticketHtmlATexto(titulo,cuerpo,mm));
+    }else{
+      window.MakersPrinter.printHtmlSystem("sys-"+uid(), titulo, mm, cuerpo, hojaTicket());
+    }
+    return;
+  }
   const w = window.open("", "_blank", "width=420,height=620");
   if(!w){ toast("El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes."); return; }
   w.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">' +
@@ -5130,11 +5221,121 @@ function renderEstacion(){
   const hace = [ESTACION.cuenta && "cuentas", ESTACION.cocina && "comandas",
                 ESTACION.cancela && "cancelaciones"].filter(Boolean);
   $("#estHint").textContent = hace.length ? "imprime " + hace.join(", ") : "no imprime nada";
+  const bt = !!(ESTACION.modoImpresion !== "android" && ESTACION.impresoraBt && window.MakersPrinter);
+  const destinoImpresion = bt
+    ? 'directamente en <b>'+esc(ESTACION.impresoraNombre||"la impresora Bluetooth")+'</b>. '
+    : (window.MakersPrinter
+      ? 'con los servicios de impresión de Android; confirmarás cada trabajo. '
+      : 'con la impresora predeterminada del navegador o su diálogo del sistema. ');
   $("#estNota").innerHTML = hace.length
-    ? 'Esta pantalla imprime <b>' + hace.join("</b>, <b>") + '</b> en la impresora predeterminada de esta computadora. ' +
-      'Lo que configures aquí <b>no</b> le pasa a las otras pantallas: cada una trae lo suyo.'
-    : 'Esta pantalla no imprime nada sola. Los botones de imprimir siguen funcionando a mano.';
+    ? 'Esta pantalla imprime <b>' + hace.join("</b>, <b>") + '</b> ' +
+      destinoImpresion +
+      'La configuración pertenece a este dispositivo.'
+    : 'Esta pantalla no imprime automáticamente. Los botones de impresión siguen disponibles.';
+  pintaImpresoraBluetooth();
 }
+let impresorasBluetooth = [];
+function pintaImpresoraBluetooth(){
+  const controles = $("#btPrinterControls"), webHint = $("#btPrinterWebHint");
+  if(!controles || !webHint) return;
+  const nativa = !!window.MakersPrinter;
+  controles.hidden = !nativa; webHint.hidden = nativa;
+  $("#btPrinterHint").textContent = nativa ? "Conexión de este Android" : "Disponible en el APK Android";
+  if(!nativa) return;
+  const select = $("#btPrinterSelect");
+  const mode = ESTACION.modoImpresion === "bluetooth" ? "bluetooth" : "android";
+  $("#btPrinterMode").value = mode;
+  $("#btPrinterBluetoothOptions").hidden = mode !== "bluetooth";
+  const guardada = String(ESTACION.impresoraBt||"");
+  const conocidos = impresorasBluetooth.slice();
+  if(guardada && !conocidos.some(d=>d.address===guardada))
+    conocidos.unshift({address:guardada,name:ESTACION.impresoraNombre||"Impresora guardada"});
+  select.innerHTML = '<option value="">Selecciona una impresora emparejada</option>' + conocidos.map(d=>
+    '<option value="'+esc(d.address)+'"'+(d.address===guardada?' selected':'')+'>'+esc(d.name||"Impresora Bluetooth")+
+      (d.address?' · '+esc(String(d.address).slice(-5)):'')+'</option>').join("");
+  const mm = num(ESTACION.anchoPapelBt,0) || num(P.ticket.ancho,80);
+  $("#btPrinterWidth").value = mm === 58 ? "58" : "80";
+  $("#btPrinterStatus").textContent = mode === "android"
+    ? 'Modo de impresión Android. “Imprimir prueba” abre la lista de servicios disponibles.'
+    : (guardada ? 'Guardada: '+(ESTACION.impresoraNombre||guardada)+'. Pulsa “Imprimir prueba” para confirmar.'
+      : 'Empareja la impresora en Android y pulsa “Buscar emparejadas”.');
+}
+function buscaImpresorasBluetooth(){
+  if(!window.MakersPrinter){ toast("La conexión Bluetooth directa requiere el APK Android."); return; }
+  let respuesta;
+  try{ respuesta = JSON.parse(window.MakersPrinter.listPairedDevices() || "{}"); }
+  catch(e){ $("#btPrinterStatus").textContent = "No se pudo consultar Bluetooth. Revisa los permisos del APK."; return; }
+  if(respuesta.error === "permission_required"){
+    $("#btPrinterStatus").textContent = "Android te pedirá permiso para ver dispositivos emparejados.";
+    window.MakersPrinter.requestBluetoothPermission(); return;
+  }
+  if(respuesta.error === "bluetooth_off"){
+    impresorasBluetooth = []; pintaImpresoraBluetooth();
+    $("#btPrinterStatus").textContent = "Enciende Bluetooth en Android y vuelve a buscar."; return;
+  }
+  if(respuesta.error === "bluetooth_unavailable"){
+    impresorasBluetooth = []; pintaImpresoraBluetooth();
+    $("#btPrinterStatus").textContent = "Este dispositivo no tiene Bluetooth disponible."; return;
+  }
+  impresorasBluetooth = Array.isArray(respuesta.devices) ? respuesta.devices : [];
+  pintaImpresoraBluetooth();
+  if(!impresorasBluetooth.length)
+    $("#btPrinterStatus").textContent = "No hay impresoras emparejadas. Empareja una en Ajustes de Android y vuelve a buscar.";
+  else $("#btPrinterStatus").textContent = "Encontré "+impresorasBluetooth.length+" dispositivo(s) Bluetooth emparejado(s).";
+}
+window.onMakersPrinterPermissionResult = function(concedido){
+  if(concedido) buscaImpresorasBluetooth();
+  else if($("#btPrinterStatus")) $("#btPrinterStatus").textContent = "Sin permiso Bluetooth. Puedes habilitarlo en Ajustes de Android.";
+};
+window.onMakersPrinterResult = function(id, ok, mensaje){
+  if(id === "bt-test" && $("#btPrinterStatus")){
+    $("#btPrinterStatus").textContent = ok ? "Prueba enviada a la impresora." : (mensaje||"No se pudo conectar. Revisa que esté encendida y emparejada.");
+  }else if(String(id||"").indexOf("sys-")===0){
+    if(!ok) toast(mensaje||"No se pudo abrir la impresión del sistema.");
+    else toast("Elige la impresora y confirma la impresión en Android.");
+  }else if(!ok){
+    toast("No se pudo enviar a la impresora: "+(mensaje||"revisa la conexión Bluetooth"));
+  }else if(id && id !== "") toast("Impresión enviada a la impresora.");
+};
+$("#btPrinterFind").addEventListener("click", buscaImpresorasBluetooth);
+$("#btPrinterMode").addEventListener("change", ()=>{
+  ESTACION.modoImpresion = $("#btPrinterMode").value;
+  pintaImpresoraBluetooth();
+});
+$("#btPrinterSelect").addEventListener("change", ()=>{
+  const device=impresorasBluetooth.find(d=>d.address===$("#btPrinterSelect").value);
+  const name=String(device && device.name||"").toLowerCase();
+  if(/5890|pos-58/.test(name)) $("#btPrinterWidth").value="58";
+  else if(/my-a1|gomita/.test(name)) $("#btPrinterWidth").value="80";
+});
+$("#btPrinterSave").addEventListener("click", ()=>{
+  ESTACION.modoImpresion = $("#btPrinterMode").value;
+  if(ESTACION.modoImpresion === "bluetooth"){
+    const address = $("#btPrinterSelect").value;
+    if(!address){ toast("Primero busca y elige una impresora emparejada"); return; }
+    const found = impresorasBluetooth.find(d=>d.address===address);
+    ESTACION.impresoraBt = address;
+    ESTACION.impresoraNombre = found ? (found.name||"") : (ESTACION.impresoraNombre||"");
+  }
+  ESTACION.anchoPapelBt = num($("#btPrinterWidth").value,80);
+  guardaEstacion(); renderEstacion();
+  toast(ESTACION.modoImpresion === "bluetooth" ? "Impresora guardada para esta pantalla" : "Servicio Android guardado para esta pantalla");
+});
+$("#btPrinterTest").addEventListener("click", ()=>{
+  const mm = num($("#btPrinterWidth").value,80);
+  if($("#btPrinterMode").value === "android"){
+    const nombre = esc(P.negocio.nombre||"Makers Restaurant");
+    window.MakersPrinter.printHtmlSystem("sys-bt-test", "Prueba de impresora", mm,
+      '<div class="c g">'+nombre+'</div><hr><div>PRUEBA DE IMPRESION</div><div>Papel '+mm+' mm</div><div>Servicio de impresión Android</div><hr><div class="c">Listo</div>', hojaTicket());
+    $("#btPrinterStatus").textContent = "Elige una impresora y confirma la prueba en Android.";
+    return;
+  }
+  const address = $("#btPrinterSelect").value || ESTACION.impresoraBt;
+  if(!address || !window.MakersPrinter){ toast("Busca y selecciona una impresora primero"); return; }
+  $("#btPrinterStatus").textContent = "Conectando e imprimiendo prueba…";
+  window.MakersPrinter.printText("bt-test", address, mm,
+    (P.negocio.nombre||"Makers Restaurant")+"\nPRUEBA DE IMPRESION\nPapel "+mm+" mm\nBluetooth ESC/POS\n");
+});
 function pintaNotaFolio(){
   const n = $("#folNota"); if(!n) return;
   n.innerHTML = letrasFolio()
@@ -5209,7 +5410,10 @@ $("#tab-set").addEventListener("change", e=>{
     return;
   }
   if(t.id === "est_donde"){
-    ESTACION = Object.assign({donde:t.value}, ESTACIONES[t.value] || ESTACIONES.caja);
+    ESTACION = Object.assign({impresoraBt:ESTACION.impresoraBt||"",
+      impresoraNombre:ESTACION.impresoraNombre||"", anchoPapelBt:num(ESTACION.anchoPapelBt,0),
+      modoImpresion:ESTACION.modoImpresion||"android",
+      donde:t.value}, ESTACIONES[t.value] || ESTACIONES.caja);
     guardaEstacion(); renderEstacion();
     toast("Esta pantalla es la de " + (ESTACIONES[t.value]||{}).et);
     return;

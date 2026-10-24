@@ -2,13 +2,26 @@ $ErrorActionPreference = "Stop"
 
 $projectRoot = $PSScriptRoot
 $sourcePath = Join-Path $projectRoot "PRUEBA-restaurant.html"
+if (-not (Test-Path -LiteralPath $sourcePath)) {
+  throw "No encuentro PRUEBA-restaurant.html en $projectRoot"
+}
+$nativeApkPath = Join-Path $projectRoot "android-native\app\build\outputs\apk\release\app-release.apk"
+$nativeHashPath = Join-Path $projectRoot "android-release\Makers-Restaurant.native-source.sha256"
+$legacyApkPath = Join-Path $projectRoot "android-release\Makers-Restaurant.apk"
+$nativeIsCurrent = $false
+if ((Test-Path -LiteralPath $nativeApkPath) -and (Test-Path -LiteralPath $nativeHashPath)) {
+  $sourceHash = (Get-FileHash -LiteralPath $sourcePath -Algorithm SHA256).Hash
+  $builtSourceHash = [IO.File]::ReadAllText($nativeHashPath).Trim()
+  $nativeIsCurrent = $sourceHash -eq $builtSourceHash
+}
+$apkSourcePath = if ($nativeIsCurrent) { $nativeApkPath } else { $legacyApkPath }
 $appPath = Join-Path $projectRoot "public\restaurante"
 $iconPath = Join-Path $appPath "icons"
 $indexPath = Join-Path $appPath "index.html"
 $swPath = Join-Path $appPath "sw.js"
 
-if (-not (Test-Path -LiteralPath $sourcePath)) {
-  throw "No encuentro PRUEBA-restaurant.html en $projectRoot"
+if (-not (Test-Path -LiteralPath $apkSourcePath)) {
+  throw "No encuentro android-release\Makers-Restaurant.apk. El boton de descarga necesita el APK firmado."
 }
 if (-not (Test-Path -LiteralPath $iconPath)) {
   New-Item -ItemType Directory -Path $iconPath -Force | Out-Null
@@ -44,7 +57,7 @@ $pwaScript = @'
   const button=document.getElementById("pwaInstall");
   if(!button||location.protocol==="file:") return;
   const standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;
-  if(standalone){button.hidden=true;return;}
+  if(standalone||window.MakersPrinter){button.hidden=true;return;}
   let installEvent=null;
   button.hidden=false;
   window.addEventListener("beforeinstallprompt",event=>{
@@ -122,6 +135,7 @@ self.addEventListener("fetch", event => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   if (url.origin !== APP_SCOPE.origin || !url.pathname.startsWith(APP_SCOPE.pathname)) return;
+  if (url.pathname.endsWith("/Makers-Restaurant.apk")) return;
 
   if (request.mode === "navigate") {
     event.respondWith(fetch(request).then(response => {
@@ -144,6 +158,11 @@ self.addEventListener("fetch", event => {
 $buildId = (Get-FileHash -LiteralPath $indexPath -Algorithm SHA256).Hash.Substring(0, 12).ToLowerInvariant()
 $serviceWorker = $serviceWorker.Replace("__BUILD_ID__", $buildId)
 [IO.File]::WriteAllText($swPath, $serviceWorker, [Text.UTF8Encoding]::new($false))
+Copy-Item -LiteralPath $apkSourcePath -Destination (Join-Path $appPath "Makers-Restaurant.apk") -Force
 
 Write-Host "App web lista en public/restaurante/ (version $buildId)."
+Write-Host "Incluye el boton de descarga Android y Makers-Restaurant.apk."
+if (-not $nativeIsCurrent) {
+  Write-Host "Aviso: aun se usa el APK anterior; compila android-native para incluir la impresion directa."
+}
 Write-Host "Al publicarla en HTTPS, se podra instalar desde el menu del navegador."

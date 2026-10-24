@@ -3150,7 +3150,8 @@ async function mueveSuscripcion(c, acc) {
 function pinta() {
   const titulos = { tablero: "Tablero", cuentas: "Cuentas", agenda: "Agenda", soporte: "Soporte",
     cobros: "Cobros y facturación", equipo: "Equipo y alianzas", numeros: "Números",
-    anuncios: "Publicidad", tips: "Tips del tablero", base: "Base de datos" };
+    anuncios: "Publicidad", tips: "Tips del tablero", base: "Base de datos",
+    codigos: "Códigos de curso", diagnosticos: "Qué necesita cada taller" };
   $("#titulo").textContent = titulos[vista];
   $("#n_cuentas").textContent = ficheros.cuentas.length;
   $("#n_agenda").textContent = citasHoy().length;
@@ -3176,6 +3177,14 @@ function pinta() {
     : vista === "cobros" ? vCobros() : vista === "equipo" ? vEquipo()
     : vista === "anuncios" ? vAnuncios()
     : vista === "tips" ? vTips()
+    /* ESTO ERA EL BUG: las dos pantallas estaban escritas —vCodigos() en
+       la línea 3639 y vDiagnosticos() en la 3749— pero nadie las llamaba.
+       Al no coincidir con ningún caso, la cadena caía hasta vNumeros(), así
+       que darle clic a Códigos o a Diagnósticos dejaba la pantalla de
+       Números puesta. Se veía como "no hace nada" y en realidad era "está
+       dibujando otra cosa". */
+    : vista === "codigos" ? vCodigos()
+    : vista === "diagnosticos" ? vDiagnosticos()
     : vista === "base" ? vBase() : vNumeros();
   ponGlobos();
 }

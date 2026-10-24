@@ -663,6 +663,14 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#57816a;box-shado
 .heroR h1{font-family:"DM Serif Display",Georgia,serif;font-size:clamp(31px,4vw,47px);font-weight:400;line-height:1.08;letter-spacing:-.03em;color:#fffdf7;margin:9px 0 8px}
 .heroR .sub{font-size:13.5px;color:#dce7da;max-width:550px}
 .heroRStatus{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.androidApkLink{display:inline-flex;align-items:center;gap:10px;max-width:100%;margin-top:16px;padding:9px 13px;border:1px solid rgba(245,230,193,.76);border-radius:13px;background:#f1e6c9;color:#244c3a;text-decoration:none;box-shadow:0 8px 18px rgba(8,29,18,.15);transition:transform .2s,background .2s,box-shadow .2s}
+.androidApkLink:hover{transform:translateY(-2px);background:#fff7e7;box-shadow:0 12px 22px rgba(8,29,18,.2)}
+.androidApkIcon{width:34px;height:34px;display:grid;place-items:center;flex:none;border-radius:10px;background:#e4d7b6;color:#285a45}
+.androidApkIcon svg{width:19px;height:19px}
+.androidApkCopy{display:grid;line-height:1.2}
+.androidApkCopy b{font-size:12px;font-weight:800}
+.androidApkCopy small{margin-top:3px;color:#657465;font-size:10px}
+.androidApkArrow{margin-left:5px;font-size:18px;color:#568063}
 .heroRBadge{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(239,224,187,.3);border-radius:99px;padding:5px 10px;background:rgba(255,255,255,.1);font-size:10.5px;font-weight:700;color:#f5ecd4}
 .heroRBadge:before{content:"";width:6px;height:6px;border-radius:50%;background:#deb66a}
 .heroRBadge.abierta{border-color:rgba(192,225,176,.38);background:rgba(139,183,112,.17);color:#e3f1d9}
@@ -965,6 +973,11 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
         <span class="heroRBadge" id="inCajaBadge">Caja cerrada</span>
         <span class="heroRBadge tenue" id="inPrepBadge">Cocina en calma</span>
       </div>
+      <a class="androidApkLink" href="./Makers-Restaurant.apk" download aria-label="Descargar APK de Makers Restaurant para Android">
+        <span class="androidApkIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9a5 5 0 0 1 10 0v1H7V9Z"/><path d="M8 5 6.8 3.7M16 5l1.2-1.3M7 10v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-6M5 10v5M19 10v5M10 13h.01M14 13h.01"/><path d="M12 17v4m-2-2 2 2 2-2"/></svg></span>
+        <span class="androidApkCopy"><b>Descargar APK para Android</b><small>Instalaci&oacute;n de prueba</small></span>
+        <span class="androidApkArrow" aria-hidden="true">↓</span>
+      </a>
     </div>
     <div class="heroRActions" aria-label="Acciones rápidas">
       <button class="heroAction" id="inicioVerMesas" type="button">

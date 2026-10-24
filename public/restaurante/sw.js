@@ -1,4 +1,4 @@
-const CACHE_NAME = "makers-restaurant-a501140ebda4";
+const CACHE_NAME = "makers-restaurant-966ebe04a3ae";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,
@@ -24,6 +24,7 @@ self.addEventListener("fetch", event => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   if (url.origin !== APP_SCOPE.origin || !url.pathname.startsWith(APP_SCOPE.pathname)) return;
+  if (url.pathname.endsWith("/Makers-Restaurant.apk")) return;
 
   if (request.mode === "navigate") {
     event.respondWith(fetch(request).then(response => {
