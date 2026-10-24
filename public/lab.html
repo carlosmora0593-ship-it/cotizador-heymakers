@@ -3014,13 +3014,27 @@ async function accion(acc) {
   abreFicha(c.id);
 }
 
+/* ESTO ERA EL BUG, y costó tres días de publicar en vano:
+   `SB` se declara con `const` en lab.js. Una declaración así vive en el
+   ámbito global del documento —cualquier script la ve por su nombre— pero
+   NO se cuelga de `window`. Yo escribí `if (!window.SB)`, que siempre daba
+   verdadero, así que todos los botones de plan salían por la puerta de
+   "sin conexión" sin siquiera intentar llamar a la base. El Lab se veía
+   muerto teniendo todo bien: la función estaba en Supabase y el código
+   estaba publicado.
+   La lección: a `SB` se le pregunta por su nombre, nunca por `window`. */
+function hayBase(){
+  try{ return typeof SB !== "undefined" && SB && typeof SB.rpc === "function"; }
+  catch(e){ return false; }
+}
+
 /* ¿Está puesta la puerta? Se pregunta con una cuenta que no existe: la
    función revisa que seas del equipo, no encuentra la cuenta y contesta
    "no existe" sin tocar un solo renglón. Si la función no está, Postgres
    contesta que no la encuentra, y eso es justo lo que queremos saber. */
 let PUERTA_PLAN = null;      /* null = sin preguntar, true/false = respuesta */
 async function revisaPuertaPlan(){
-  if(PUERTA_PLAN !== null || !window.SB) return PUERTA_PLAN;
+  if(PUERTA_PLAN !== null || !hayBase()) return PUERTA_PLAN;
   try{
     const r = await SB.rpc("staff_cambia_plan",
       {p_cuenta:"00000000-0000-0000-0000-000000000000", p_motivo:"revisión"});
@@ -3103,7 +3117,7 @@ async function mueveSuscripcion(c, acc) {
   }
   campos.p_motivo = texto;
 
-  if (!window.SB) { aviso("Sin conexión con la base: el cambio no se mandó."); return; }
+  if (!hayBase()) { aviso("Sin conexión con la base: el cambio no se mandó."); return; }
   if (PUERTA_PLAN === false) {
     aviso("Falta correr CORRER-5-lab-manda.sql en Supabase: sin eso el cambio no llega a la base.");
     pintaAvisoPuerta();
