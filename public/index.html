@@ -1020,6 +1020,7 @@ input[readonly],textarea[readonly]{background:var(--vidrio-fondo-2)}
 
 /* ---- el selector de apariencia ---- */
 .temaRejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+.temaCard small{display:block;margin-top:3px;font-size:11px;font-weight:400;color:var(--ink-3);line-height:1.35}
 .temaCard{position:relative;border:1px solid var(--vidrio-borde);border-radius:var(--radio-sm);padding:10px;
   background:var(--vidrio-fondo-2);cursor:pointer;text-align:left;font:inherit;color:var(--ink);
   box-shadow:var(--brillo);transition:transform .14s,box-shadow .14s,border-color .14s}
@@ -2196,6 +2197,11 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
   color:var(--accent);border-color:color-mix(in srgb, var(--accent) 30%, transparent)}
 /* El aro no es adorno: el punto negro sobre tema oscuro y el blanco sobre
    tema claro desaparecen sin el. */
+.artDibujo{display:grid;place-items:center;background:var(--surface-2);
+  box-shadow:inset 0 0 0 1px var(--line-soft)}
+.artDibujo svg{width:66%;height:66%;max-width:64px;max-height:64px;
+  stroke-linecap:round;stroke-linejoin:round}
+.azIt .artDibujo{width:100%;height:62px;border-radius:9px}
 .gotaIns{display:inline-block;width:11px;height:11px;border-radius:50%;
   margin-right:7px;vertical-align:middle;
   box-shadow:0 0 0 1.5px color-mix(in srgb, var(--ink-2) 55%, transparent)}
@@ -2273,6 +2279,21 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
 .cpLeyenda span{display:flex;align-items:center;gap:6px}
 .cpLeyenda u{width:10px;height:10px;border-radius:3px;text-decoration:none;display:inline-block}
 
+
+/* ---- la luz que sigue al cursor ---- */
+/* Es de ChatGPT y está bien pensada: en vez de un brillo fijo, el botón se
+   ilumina justo donde está el puntero. Aquí usa el acento del taller en vez
+   de un verde escrito a mano, para que valga en los dos modos. */
+.lucecita{position:relative;isolation:isolate;overflow:hidden}
+.lucecita>.luz{position:absolute;z-index:-1;inset:-1px;display:block;
+  border-radius:inherit;pointer-events:none;opacity:0;transform:scale(.96);
+  background:radial-gradient(170px circle at var(--luz-x,50%) var(--luz-y,50%),
+    color-mix(in srgb, var(--accent) 34%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 16%, transparent) 42%, transparent 78%);
+  transition:opacity .2s, transform .38s cubic-bezier(.2,.8,.25,1)}
+.lucecita:hover>.luz,.lucecita:focus-visible>.luz{opacity:1;transform:scale(1.08)}
+.lucecita>:not(.luz){position:relative;z-index:1}
+@media (prefers-reduced-motion: reduce){ .lucecita>.luz{transition:none!important} }
 
 /* ---- detalles de diseño ---- */
 /* La palomita del elegido. El borde de color solo no basta: en una rejilla
@@ -4895,23 +4916,6 @@ const TEMAS = {
     "--serie-1":"#0680AB", "--serie-2":"#D6127F", "--serie-3":"#B26A00", "--serie-4":"#0E7C57",
     "--shadow":"0 1px 2px rgba(28,26,23,.06), 0 12px 28px -20px rgba(28,26,23,.30)"
   }},
-  estudio:  {nombre:"Estudio",     acento:"#173E36", amb:["#173E36","#508B6E","#D7FA75"],
-             modo:"light", vars:{
-    "--bg":"#F4F3ED", "--surface":"#FFFEFA", "--surface-2":"#F4F6EF",
-    "--line":"#E5E2D8", "--line-soft":"#EDEBE2",
-    /* El #858C83 del archivo original se queda en 3.4:1 contra la tarjeta:
-       las pistas y los subtítulos se leen mal. Bajado a #6A7268 da 4.9:1
-       sobre la tarjeta y 4.6:1 sobre el fondo gris, que ya pasa AA. */
-    "--ink":"#202724", "--ink-2":"#45544A", "--ink-3":"#6A7268",
-    "--cyan":"#1F6E7A", "--cyan-soft":"#E3EFF1",
-    "--good":"#347856", "--good-soft":"#EAF4EB",
-    "--warn":"#9B6A12", "--warn-soft":"#FFF6DF",
-    "--yellow":"#C79A14", "--yellow-ink":"#231A00",
-    "--guinda":"#B45B3C", "--guinda-2":"#8F4328",
-    "--guinda-tenue":"#FFF0E9", "--guinda-medio":"#F6DDD1",
-    "--serie-1":"#173E36", "--serie-2":"#508B6E", "--serie-3":"#B45B3C", "--serie-4":"#9B6A12",
-    "--shadow":"0 1px 2px rgba(23,62,54,.05), 0 16px 42px -24px rgba(23,62,54,.38)"
-  }},
   heymakers:{nombre:"Hey Makers", acento:"#D6127F", amb:["#06A1D7","#F51B95","#FFEC30"]},
   guinda:   {nombre:"Guinda",     acento:"#A81B4A", amb:["#7A1231","#C4295C","#E8B9CA"]},
   oceano:   {nombre:"Océano",     acento:"#0A7EA4", amb:["#06A1D7","#19C3C3","#7FE3F0"]},
@@ -4919,6 +4923,19 @@ const TEMAS = {
   atardecer:{nombre:"Atardecer",  acento:"#DB4C2C", amb:["#FF8A3D","#F51B95","#FFC43D"]},
   grafito:  {nombre:"Grafito",    acento:"#3F5160", amb:["#7E8B95","#4E5A63","#B9CEDB"]}
 };
+/* Dos modos, no nueve paletas. Un taller no necesita escoger decoración:
+   necesita ver bien de día y no quemarse los ojos de noche. Las demás
+   paletas siguen arriba por si algún día vuelven, pero no se enseñan, y a
+   quien tenía una escogida se le respeta el modo —claro o oscuro— que ya
+   traía. El color de acento se sigue eligiendo aparte. */
+const MODOS = [["papel","Día","el fondo claro, para el taller de día"],
+               ["tecno","Oscuro","el fondo oscuro, para la noche y la pantalla grande"]];
+const esModo = k => MODOS.some(m=>m[0]===k);
+function modoDe(k){
+  if(esModo(k)) return k;
+  const t = TEMAS[k];
+  return (t && t.modo === "light") ? "papel" : "tecno";
+}
 const VIDRIOS   = [["nitido","Nítido"],["normal","Normal"],["vidrio","Vidrio"]];
 const ESQUINAS  = [["recto","Recto"],["suave","Suave"],["redondo","Redondo"]];
 const BLUR  = {nitido:"0px", normal:"20px", vidrio:"34px"};
@@ -4941,7 +4958,12 @@ function migraTema(t, crudo){
 function leeTema(){
   try{
     const crudo = JSON.parse(localStorage.getItem(LS_TEMA)||"null") || {};
-    return migraTema(Object.assign(temaPorOmision(), crudo), crudo);
+    const t = migraTema(Object.assign(temaPorOmision(), crudo), crudo);
+    /* Quien traía Guinda, Océano o cualquier otra se queda en el modo que
+       esa paleta tenía: claro con claro, oscuro con oscuro. Nadie abre el
+       programa y se lo encuentra del otro color. */
+    t.preset = modoDe(t.preset);
+    return t;
   }catch(e){ return temaPorOmision(); }
 }
 let TEMA = temaPorOmision();
@@ -4995,12 +5017,12 @@ function aplicaTema(){
 
 function renderTema(){
   const rej = $("#temaRejilla"); if(!rej) return;
-  rej.innerHTML = Object.keys(TEMAS).map(k=>{
-    const t = TEMAS[k];
+  rej.innerHTML = MODOS.map(m=>{
+    const k = m[0], t = TEMAS[k];
     return '<button type="button" class="temaCard" data-tema="'+k+'" aria-pressed="'+(TEMA.preset===k)+'">'+
       '<span class="temaMuestra">'+t.amb.map(c=>'<i style="background:'+c+'"></i>').join("")+
         '<i style="background:'+t.acento+';flex:1.4"></i></span>'+
-      '<b>'+esc(t.nombre)+'</b></button>';
+      '<b>'+esc(m[1])+'</b><small>'+esc(m[2])+'</small></button>';
   }).join("");
   const pinta = (id, lista, valor, clave) => {
     const w = $(id); if(!w) return;
@@ -5197,7 +5219,20 @@ function defaults(){ return {
  ], compras:[]
 };}
 const CHECKS = ["Diseño aprobado por el cliente","Material en almacén","Archivo impreso","Prensado / aplicado","Revisión de calidad","Empacado","Entregado"];
-function defaultParams(){ return {guiado:true,plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
+/* Estrenar el cotizador por pasos, UNA vez.
+   El problema: `P` guardado le gana al valor de fábrica. Quien abrió la
+   versión en que el interruptor nacía apagado se llevó `guiado:false`
+   grabado en su cuenta, y ponerlo en `true` aquí ya no lo alcanzaba:
+   seguía viendo la pantalla de siempre sin saber que había otra.
+   Esto lo prende una sola vez y deja la marca; a partir de ahí manda lo
+   que el usuario escoja, incluso si lo apaga. */
+function estrenaGuiado(){
+  if(!P || P.guiadoElegido) return;
+  P.guiado = true;
+  P.guiadoElegido = true;
+  try{ persist(); }catch(e){}
+}
+function defaultParams(){ return {guiado:true, guiadoElegido:false, plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
   tarifaKwh:4, bloqueoMin:10,
   folios:{letras:"", extra:"", digitos:6, desde:{cot:1, op:1, req:1}},
   compras:{tope:2000, siempre:false},
@@ -5429,6 +5464,7 @@ async function initStore(){
       if(c.exists && c.data().cat) cat = Object.assign({historial:[]}, c.data().cat);
       const p = await DB.doc("config/parametros").get();
       if(p.exists && p.data().P) P = Object.assign(defaultParams(), p.data().P);
+      estrenaGuiado();
       const eq = await DB.doc("config/equipo").get();
       if(eq.exists && eq.data().equipo && eq.data().equipo.length) equipo = eq.data().equipo;
       const q = await DB.collection("cotizaciones").orderBy("fecha","desc").limit(200).get();
@@ -5444,6 +5480,7 @@ async function initStore(){
     
   } else {
     cat = Object.assign({historial:[]}, lsGet("cat", cat)); P = Object.assign(defaultParams(), lsGet("P", P));
+    estrenaGuiado();
     guardadas = lsGet("cots", []); ventas = lsGet("ventas", []);
     clientes = lsGet("clientes", []); cajas = lsGet("cajas", {});
     equipo = lsGet("equipo", []);
@@ -9597,6 +9634,36 @@ document.querySelectorAll("[data-paso] > header").forEach(h=>{
 });
 
 
+/* ============ LA LUZ QUE SIGUE AL CURSOR ============
+   Tomada del archivo de ChatGPT. Se cuelga UNA vez del documento y vale
+   para los botones que nazcan después, que en este programa son casi
+   todos. En pantalla táctil no hace nada: ahí no hay puntero que seguir. */
+function prendeLuz(b){
+  if(!b.querySelector(":scope > .luz")){
+    const l = document.createElement("span");
+    l.className = "luz"; l.setAttribute("aria-hidden", "true");
+    b.prepend(l);
+  }
+  b.classList.add("lucecita");
+}
+function sigueElCursor(e){
+  if(e.pointerType === "touch") return;
+  const b = e.target && e.target.closest(
+    "button.btn, .lzApp, .azIt, .cpAz, .arrOpc, .tbAcceso, .temaCard");
+  if(!b || b.disabled) return;
+  const r = b.getBoundingClientRect();
+  prendeLuz(b);
+  b.style.setProperty("--luz-x", (e.clientX - r.left) + "px");
+  b.style.setProperty("--luz-y", (e.clientY - r.top) + "px");
+}
+document.addEventListener("pointerover", sigueElCursor);
+document.addEventListener("pointermove", sigueElCursor);
+document.addEventListener("focusin", e=>{
+  const b = e.target && e.target.closest(
+    "button.btn, .lzApp, .azIt, .cpAz, .arrOpc, .tbAcceso, .temaCard");
+  if(b && !b.disabled) prendeLuz(b);
+});
+
 /* ============ LOS AZULEJOS DEL COTIZADOR ============
    Sólo viven en el modo guiado. Cada azulejo escribe en el campo que ya
    existía y dispara su evento: ni un cálculo nuevo, ni una verdad nueva. */
@@ -11521,12 +11588,44 @@ document.addEventListener("click", e=>{
 
 /* ---------- la foto del artículo ---------- */
 function fotoDe(a){ return (a && a.foto) ? String(a.foto) : ""; }
+/* El dibujo de cada artículo. Sin foto, antes salía la inicial en un
+   cuadrito: dieciséis cuadritos con letras no se leen de un vistazo. Estos
+   dibujos son los que hizo ChatGPT y se escogen por lo que dice el nombre
+   o la familia, así que un artículo capturado a mano también lo recibe.
+   Llevan color propio a propósito —como un emoji—: se ven igual en los dos
+   modos y no compiten con el acento del taller. */
+const ART_SIN_ACENTO = s => String(s||"").toLowerCase()
+  .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const ART_DIBUJOS = [
+  [/taza|termo|anfora|vaso|tarro/,
+   '<path fill="#b9a8ed" stroke="#65528f" stroke-width="1.1" d="M6 7h11v10a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3z"/><path fill="none" stroke="#65528f" stroke-width="1.4" d="M17 10h2a3 3 0 0 1 0 6h-2M9 4h5"/><path fill="none" stroke="#eee8ff" stroke-width="1.3" d="M8 9v7"/>'],
+  [/gorra|cap\b|visera/,
+   '<path fill="#f4a782" stroke="#93513c" stroke-width="1.1" d="M3 15h18l-3 3H7a4 4 0 0 1-4-3Z"/><path fill="#ffd2ae" stroke="#93513c" stroke-width="1.1" d="M5 15a7 7 0 0 1 14 0z"/><path fill="none" stroke="#93513c" stroke-width="1.2" d="M11 8V5"/>'],
+  [/tote|bolsa|morral|mochila/,
+   '<path fill="#e6b578" stroke="#805a34" stroke-width="1.1" d="M5 9h14l1 12H4z"/><path fill="none" stroke="#805a34" stroke-width="1.4" d="M8 9V6a4 4 0 0 1 8 0v3"/><path fill="none" stroke="#ffe5bd" stroke-width="1.2" d="M7 11h10"/>'],
+  [/sudader|hoodie|chamarra/,
+   '<path fill="#d99b72" stroke="#80533f" stroke-width="1.1" d="m8 5-4.4 2.4L5 13l3-1v8.5h8V12l3 1 1.4-5.6L16 5c-.4 2-1.8 3.1-4 3.1S8.4 7 8 5Z"/><path fill="#f1c3a5" stroke="#80533f" stroke-width="1" d="M8.7 5.1C9 2.9 10.3 1.8 12 1.8s3 1.1 3.3 3.3c-.8 1.3-1.9 2-3.3 2s-2.5-.7-3.3-2Z"/><path fill="none" stroke="#80533f" stroke-width="1" d="m10 7 1 3m3-3-1 3"/><path fill="#efbd99" stroke="#80533f" stroke-width=".9" d="M9 15h6v3H9z"/>'],
+  [/playera|camiseta|polo|textil|camisa/,
+   '<path fill="#92d47a" stroke="#386c48" stroke-width="1.1" d="m8 4-5 3 2 5 3-1v9h8v-9l3 1 2-5-5-3-3 2a3 3 0 0 1-5 0Z"/><path fill="none" stroke="#386c48" stroke-width="1.1" d="M9 4c.4 1.5 1.4 2.3 3 2.3S14.6 5.5 15 4"/><path fill="none" stroke="#dff4d2" stroke-width="1.2" d="M8.5 16h7"/>'],
+  [/lona|vinil|rollo|papel|couche/,
+   '<path fill="#8fc5e8" stroke="#2f5f80" stroke-width="1.1" d="M4 6h16v12H4z"/><path fill="none" stroke="#2f5f80" stroke-width="1.2" d="M8 6v12M16 6v12"/><path fill="none" stroke="#e3f3ff" stroke-width="1.2" d="M6 9h1m9 0h1"/>'],
+  [/llavero|funda|mousepad|promo/,
+   '<path fill="#f2cf74" stroke="#8a6a1c" stroke-width="1.1" d="M9 4h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"/><path fill="none" stroke="#8a6a1c" stroke-width="1.2" d="M11 6h2"/><circle cx="12" cy="18" r="1.3" fill="#fff6d8"/>']
+];
+function dibujoArt(a){
+  const n = ART_SIN_ACENTO(((a&&a.cat)||"") + " " + ((a&&a.nombre)||""));
+  for(let i=0;i<ART_DIBUJOS.length;i++){ if(ART_DIBUJOS[i][0].test(n)) return ART_DIBUJOS[i][1]; }
+  /* Lo que no se parece a nada: una caja. Mejor una caja honesta que una
+     playera que no es. */
+  return '<path fill="#83d9cb" stroke="#347c73" stroke-width="1.1" d="M5 7.5 12 4l7 3.5v9L12 20l-7-3.5z"/>' +
+         '<path fill="none" stroke="#347c73" stroke-width="1.1" d="m5.5 8 6.5 3.5L18.5 8M12 11.5V20"/>' +
+         '<path fill="none" stroke="#d8fff4" stroke-width="1.1" d="m8 6 4 2 4-2"/>';
+}
 function miniArt(a, clase){
   const f = fotoDe(a);
-  return f
-    ? '<img class="'+(clase||"artMini")+'" src="'+esc(f)+'" alt="'+esc(a.nombre||"")+'" loading="lazy">'
-    : '<span class="'+(clase||"artMini")+' artSinFoto" aria-hidden="true">'+
-      esc(((a&&a.nombre)||"?").trim().charAt(0).toUpperCase())+'</span>';
+  if(f) return '<img class="'+(clase||"artMini")+'" src="'+esc(f)+'" alt="'+esc(a.nombre||"")+'" loading="lazy">';
+  return '<span class="'+(clase||"artMini")+' artDibujo" aria-hidden="true">' +
+    '<svg viewBox="0 0 24 24">'+dibujoArt(a)+'</svg></span>';
 }
 let fotoDe_id = null;
 /* ---------- refrescar las fotos ----------
@@ -14915,6 +15014,7 @@ $("#tab-set").addEventListener("change", e=>{
   if(t.id==="p_ivaOn") P.ivaOn=t.checked;
   if(t.id==="p_guiado"){
     P.guiado = t.checked;
+    P.guiadoElegido = true;      /* a partir de aquí manda lo que tú escojas */
     if(typeof guiaPinta === "function"){ GUIA.actual = guiaPasos()[0]; guiaPinta(); }
     toast(t.checked ? "Cotizar por pasos: prendido" : "Cotizar por pasos: apagado");
   }
@@ -19817,7 +19917,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261023-1749"></script>
-<script src="diagnostico.js?v=20261023-1749"></script>
+<script src="cuenta.js?v=20261023-1810"></script>
+<script src="diagnostico.js?v=20261023-1810"></script>
 </body>
 </html>

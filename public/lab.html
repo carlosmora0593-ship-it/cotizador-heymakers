@@ -828,6 +828,9 @@ async function arranca() {
   /* Revisar la base no detiene el arranque: si tarda o truena, el Lab abre
      igual y la pantalla se repinta cuando haya respuesta. */
   revisaMigraciones().catch(() => {});
+  /* Sin await: si la base tarda, el Lab abre igual y el letrero aparece
+     cuando haya respuesta. */
+  revisaPuertaPlan().catch(() => {});
   if (!DB) { generaEjemplo(true); listo = true; pinta(); return; }
   const cfg = await DB.doc("meta/config").get().catch(() => ({ exists: false }));
   if (cfg.exists) CFG = Object.assign(CFG, cfg.data());
@@ -3007,6 +3010,40 @@ async function accion(acc) {
   abreFicha(c.id);
 }
 
+/* ¿Está puesta la puerta? Se pregunta con una cuenta que no existe: la
+   función revisa que seas del equipo, no encuentra la cuenta y contesta
+   "no existe" sin tocar un solo renglón. Si la función no está, Postgres
+   contesta que no la encuentra, y eso es justo lo que queremos saber. */
+let PUERTA_PLAN = null;      /* null = sin preguntar, true/false = respuesta */
+async function revisaPuertaPlan(){
+  if(PUERTA_PLAN !== null || !window.SB) return PUERTA_PLAN;
+  try{
+    const r = await SB.rpc("staff_cambia_plan",
+      {p_cuenta:"00000000-0000-0000-0000-000000000000", p_motivo:"revisión"});
+    const m = String((r && r.error && r.error.message) || "");
+    PUERTA_PLAN = !/could not find|does not exist|schema cache|staff_cambia_plan/i.test(m);
+    if(!PUERTA_PLAN) console.warn("staff_cambia_plan no está en la base:", m);
+  }catch(e){ PUERTA_PLAN = null; }   /* sin red: no se concluye nada */
+  pintaAvisoPuerta();
+  return PUERTA_PLAN;
+}
+function pintaAvisoPuerta(){
+  const viejo = document.getElementById("avisoPuerta");
+  if(viejo) viejo.remove();
+  if(PUERTA_PLAN !== false) return;
+  const d = document.createElement("div");
+  d.id = "avisoPuerta";
+  d.style.cssText = "margin:0 0 14px;padding:12px 15px;border-radius:12px;" +
+    "border:1px solid #e0b24a;background:#fff8e8;color:#5c4410;font-size:13px;line-height:1.5";
+  d.innerHTML = "<b>Los botones de plan no van a llegar a la base.</b> " +
+    "Falta correr en Supabase el SQL <b>CORRER-5-lab-manda.sql</b> " +
+    "(aquí sale como 08-lab-manda.sql). Mientras no esté, puedes mirar las " +
+    "cuentas pero no cambiarles el plan, la vigencia ni darlas de baja: la " +
+    "base rechaza cualquier intento desde el navegador, a propósito.";
+  const cont = document.querySelector("main") || document.body;
+  cont.insertBefore(d, cont.firstChild);
+}
+
 /* La única puerta que la base acepta para mover una suscripción.
    staff_cambia_plan vive en la migración 08: comprueba que seas del
    equipo y deja escrito en lab_bitacora quién cambió qué y cuándo. */
@@ -3063,6 +3100,11 @@ async function mueveSuscripcion(c, acc) {
   campos.p_motivo = texto;
 
   if (!window.SB) { aviso("Sin conexión con la base: el cambio no se mandó."); return; }
+  if (PUERTA_PLAN === false) {
+    aviso("Falta correr CORRER-5-lab-manda.sql en Supabase: sin eso el cambio no llega a la base.");
+    pintaAvisoPuerta();
+    return;
+  }
   let r;
   try { r = await SB.rpc("staff_cambia_plan", campos); }
   catch (e) { aviso("No se pudo cambiar el plan: " + ((e && e.message) || e)); return; }
