@@ -727,7 +727,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#57816a;box-shado
 .mesa.cuenta{background:linear-gradient(145deg,#fffaf1,#fbf0dd 76%)}
 .croqBarra{padding:9px 11px;background:#fffdf8;border:1px solid #e4dece;border-radius:13px;box-shadow:0 4px 12px rgba(48,61,46,.04)}
 .croqPista{margin-left:auto;color:#7d897e}
-.croquis{height:min(68vh,640px);min-height:380px;background-color:#f3efe4}
+.croquis{height:min(72vh,720px);min-height:500px;background-color:#f3efe4}
 .cmesa{font-family:"DM Sans",sans-serif;font-weight:700;box-shadow:0 8px 16px rgba(82,66,43,.18);transition:box-shadow .18s,filter .18s,border-color .18s}
 .cmesa.redonda{border-radius:50%}
 .cmesa.cuadrada{border-radius:15px}
@@ -802,6 +802,12 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
 .pill{background:#f0eee6;color:#69786a}
 .pill.good{background:#e1efe0;color:#36714a}.pill.warn{background:#f7edda;color:#91661e}.pill.mal{background:#f7e3df;color:#a3463d}
 .note b{color:#385540}
+.satAviso{display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center;margin:0 0 12px;padding:11px 13px;border:1px solid #d8e2d0;border-radius:12px;background:#f0f5eb;color:#526b50;font-size:11.5px}
+.satAviso a{color:#286b4a;font-weight:800;text-decoration:none;white-space:nowrap}
+.satAviso a:hover{text-decoration:underline}
+.satProducto{display:grid;gap:4px;min-width:225px}
+.satProducto input{width:100%;min-width:0}
+.satProducto small{color:#788578;font-size:10px;line-height:1.25}
 .modal{background:rgba(23,43,32,.62);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
 .modal .card{box-shadow:0 28px 80px rgba(20,38,27,.25);border-color:#e4ddcf;border-radius:20px}
 .modal .card>header{position:sticky;top:0;z-index:2;background:#fffdf8}
@@ -818,6 +824,44 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
 .chPersona.dentro{background:#edf5e9;border-color:#a9c8a7}
 .semaforo{border-radius:14px;background:#fffdf8}
 .semaforo.bien{border-color:#b6d2b4;background:#edf5e9}.semaforo.ojo{border-color:#e5d0a1;background:#fbf3e2}.semaforo.mal{border-color:#dfb1a7;background:#fbefec}
+/* Mesas cálidas y sillas individuales; los asientos ocupados muestran
+   comensales para que el equipo lea el aforo de un vistazo. */
+.cmesa{display:block;overflow:visible;isolation:isolate;border:2px solid #a98255;color:#473824;background:linear-gradient(145deg,#ead7b5,#c9a474 75%,#b98e5e);box-shadow:0 10px 20px rgba(83,59,33,.2),inset 0 1px rgba(255,255,255,.55);transition:filter .2s,box-shadow .2s,border-color .2s}
+.cmesa::before{content:"";position:absolute;inset:5px;z-index:0;pointer-events:none;border:1px solid rgba(255,250,234,.46);border-radius:inherit;box-shadow:inset 0 2px 6px rgba(255,255,255,.2)}
+.cmesa.redonda{border-radius:50%;background:radial-gradient(circle at 34% 27%,#efdfbf,#d0ae7e 70%,#bd9664)}
+.cmesa.cuadrada{border-radius:16px;background:linear-gradient(145deg,#ead7b5,#c8a170 78%,#b78d5d)}
+.cmesa.ocupada{border-color:#638d63;background:linear-gradient(145deg,#dbe8ce,#aec59b 78%,#91ad7d)}
+.cmesa.cuenta{border-color:#c3954e;background:linear-gradient(145deg,#f4e4c3,#e5c78d 78%,#d6b372)}
+.cmesa:hover{filter:brightness(1.04);box-shadow:0 14px 24px rgba(83,59,33,.25),inset 0 1px rgba(255,255,255,.6)}
+.cmesaCentro{position:absolute;inset:7px;z-index:1;display:grid;place-items:center;align-content:center;gap:2px;border-radius:inherit;pointer-events:none;background:rgba(255,250,238,.2)}
+.cmesaCentro b{position:relative;z-index:1;color:#354b38;font-family:"DM Sans",sans-serif;font-size:13px;font-weight:800;line-height:1.1;text-shadow:0 1px rgba(255,255,255,.45)}
+.cmesaCentro .cmesaConteo{position:relative;z-index:1;color:#5e705d;font-size:9px;font-weight:700;line-height:1.1;white-space:nowrap}
+.cmesa.ocupada .cmesaConteo{color:#326447}
+.cmesa.cuenta .cmesaConteo{color:#805a20}
+.silla{position:absolute;z-index:4;width:27px;height:29px;display:grid;place-items:center;opacity:1;pointer-events:none;border:1px solid #9d8969;border-radius:9px 9px 11px 11px;background:linear-gradient(145deg,#fffdf5,#e4dac5);color:#907d5f;box-shadow:0 3px 7px rgba(68,53,34,.18);transform:translate(-50%,-50%) rotate(var(--giro-silla,0deg));transition:transform .2s,background .2s,color .2s,box-shadow .2s}
+.silla svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.silla.ocupada{border-color:#3f7254;background:linear-gradient(145deg,#4f9065,#2f684b);color:#fffdf5;box-shadow:0 4px 9px rgba(38,87,56,.32)}
+.cmesa.ocupada .silla.libre{border-color:#9d8969;background:linear-gradient(145deg,#fffdf5,#e4dac5);color:#907d5f;box-shadow:0 3px 7px rgba(68,53,34,.18)}
+.cmesa.ocupada .silla.ocupada{border-color:#3f7254;background:linear-gradient(145deg,#4f9065,#2f684b);color:#fffdf5;box-shadow:0 4px 9px rgba(38,87,56,.32)}
+.silla.ocupada svg path{fill:currentColor}
+.cmesa:hover .silla.ocupada{transform:translate(-50%,-50%) rotate(var(--giro-silla,0deg)) scale(1.08)}
+.cmesa .tot{z-index:2;font-family:"DM Sans",sans-serif;font-weight:800}
+.cobroPartesRapidas,.cobroAtajos{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.cobroPartesRapidas{margin-top:8px}
+.cobroPartesRapidas button{border:1px solid #d8dfd1;background:#f4f6ef;color:#49644c;border-radius:9px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;transition:background .17s,transform .17s,border-color .17s}
+.cobroPartesRapidas button:hover{background:#e8f1e4;border-color:#9db89a;transform:translateY(-1px)}
+.cobroAtajos .btn{min-height:38px;border-color:#d8dfd1;background:#f8f8f3;color:#385743;font-weight:700}
+.cobroAtajos .btn:hover{background:#eaf2e7;border-color:#9bb89a;transform:translateY(-1px)}
+.cobroWhatsApp{display:grid;gap:9px;margin-top:18px;padding:14px;border:1px solid #cce0cf;border-radius:14px;background:linear-gradient(135deg,#f1f7ef,#e7f2e8)}
+.cobroWhatsApp>div:first-child{display:grid;gap:2px}
+.cobroWhatsApp b{color:#2e6346;font-size:13px}
+.cobroWhatsApp small{color:#677d6a;font-size:11.5px}
+.cobroWhatsAppFila{display:flex;gap:8px;align-items:center}
+.cobroWhatsAppFila input{flex:1;min-width:150px}
+.cobroWhatsAppFila .btn{background:#26764d;border-color:#26764d;color:white;white-space:nowrap}
+.cobroWhatsAppFila .btn:hover{background:#1f6541}
+@media(max-width:540px){.cobroWhatsAppFila{align-items:stretch;flex-direction:column}.cobroWhatsAppFila .btn{width:100%}.cobroAtajos .btn{flex:1 1 44%}.cmesaCentro b{font-size:11px}.silla{width:23px;height:25px}}
+@media(prefers-reduced-motion:reduce){.cmesa,.silla,.cobroPartesRapidas button,.cobroAtajos .btn{transition:none!important}}
 @keyframes liveGlow{0%,100%{box-shadow:0 0 0 4px rgba(216,191,123,.14)}50%{box-shadow:0 0 0 7px rgba(216,191,123,.08)}}
 @media(max-width:980px){
   .heroR{grid-template-columns:minmax(0,1fr) minmax(230px,.8fr);gap:20px}
@@ -834,7 +878,7 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
   .heroR h1{font-size:35px}
   #tab-inicio>.grid.g2{grid-template-columns:1fr}
   .dashboardHeading{margin-top:22px}
-  .croquis{min-height:310px;height:58vh}
+  .croquis{min-height:500px;height:72vh}
   .kds{grid-template-columns:1fr}
   .ticket{position:static}
 }
@@ -855,6 +899,15 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
   .wrap>section>.fila:first-child h2{font-size:21px!important}
   .pageHeading{min-height:98px;padding:17px;border-radius:15px}
   .pageHeading h1{font-size:22px}
+}
+
+@media(max-width:620px){
+  .croqBarra{gap:7px;padding:8px}
+  .croqPista{display:none}
+  .mesas{grid-template-columns:1fr;gap:12px}
+  .mesa{min-height:146px;padding:17px 18px 16px 78px}
+  .mesaIcon{left:17px;top:20px;width:46px;height:46px}
+  .mesa .sello{left:78px;max-width:calc(100% - 92px)}
 }
 </style>
 </head>
@@ -1145,6 +1198,9 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
     <div class="body">
       <p class="note" style="margin:0 0 14px">El <b>costo</b> es lo que te cuesta producirlo; con el precio sale tu utilidad por platillo.
         Si no lo sabes todavía, déjalo en cero y lo llenas después — no estorba para cobrar.</p>
+      <p class="satAviso"><b>Datos para facturar:</b> asigna a cada platillo su clave SAT y unidad. Las sugerencias ayudan a buscar; valida la clave antes de emitir el CFDI.
+        <a href="https://wwwmat.sat.gob.mx/consultas/53693/catalogo-de-productos-y-servicios" target="_blank" rel="noopener noreferrer">Abrir buscador oficial del SAT ↗</a></p>
+      <datalist id="satProdCatalogo"></datalist>
       <div class="tbl-wrap"><table id="t_plats"></table></div>
     </div>
   </div>
@@ -1422,14 +1478,22 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
         <div><label class="f" for="cobroPropMonto">Propina en pesos</label><input id="cobroPropMonto" type="number" min="0" step="0.01"></div>
         <div><label class="f" for="cobroPartes">Dividir entre</label><input id="cobroPartes" type="number" min="1" step="1" value="1"></div>
       </div>
+      <div class="cobroPartesRapidas" aria-label="Dividir cuenta rápidamente">
+        <button type="button" data-partes="2">2 personas</button>
+        <button type="button" data-partes="3">3 personas</button>
+        <button type="button" data-partes="4">4 personas</button>
+      </div>
       <p class="note" id="cobroParteNota" hidden style="margin-top:10px"></p>
       <label class="f" style="margin-top:16px">Cómo paga</label>
       <div class="pagos" id="cobroPagos"></div>
-      <div class="fila" style="margin-top:9px">
-        <button class="btn sm" data-pago="efectivo">+ Efectivo</button>
-        <button class="btn sm" data-pago="tarjeta">+ Tarjeta</button>
-        <button class="btn sm" data-pago="transferencia">+ Transferencia</button>
-      </div>
+      <div class="cobroAtajos" id="cobroAtajos" style="margin-top:10px"></div>
+      <section class="cobroWhatsApp">
+        <div><b>Compartir cuenta por WhatsApp</b><small>Se abrirá el mensaje para que lo revises y decidas si lo envías.</small></div>
+        <div class="cobroWhatsAppFila">
+          <input id="cobroTelefono" type="tel" inputmode="tel" autocomplete="tel" placeholder="Teléfono con código de país · 5255…" aria-label="Teléfono del cliente para WhatsApp">
+          <button class="btn" id="cobroWhatsApp" type="button"><span aria-hidden="true">↗</span> Preparar mensaje</button>
+        </div>
+      </section>
       <div class="cambio" id="cobroCambio" hidden><span class="et">Cambio</span><b id="cobroCambioV">$0.00</b></div>
       <p class="note" id="cobroFalta" hidden style="margin-top:12px;border-left-color:var(--warn)"></p>
       <div class="fila" style="margin-top:18px">
@@ -1901,6 +1965,7 @@ function sumaComanda(c){
    croquis se ve igual en la tableta del mostrador y en la pantalla grande
    de la oficina. */
 let mesaVista = lsGet("mesaVista", "croquis");
+let vistaMesaPhoneInicializada = false;
 let modoAcomodo = false, arrastrando = null;
 
 const grupoDe = m => m && m.grupo ? m.grupo : "";
@@ -1921,30 +1986,38 @@ function lugaresDe(m){
    su raíz, que es como crece una mesa de verdad. */
 function tamMesa(m){
   const l = Math.max(1, lugaresDe(m));
-  const base = 34 + Math.sqrt(l) * 17;
+  const base = 46 + Math.sqrt(l) * 20;
   const redonda = (m.forma === "redonda") && l <= 6;
   if(redonda) return {w: Math.round(base), h: Math.round(base), redonda:true};
   /* Arriba de seis lugares una mesa deja de ser cuadrada: se alarga, y se
      alarga de a de veras. La gente se sienta en los lados largos, asi que
      el largo va con la mitad de los lugares, no con su raiz. */
-  if(l > 6) return {w: Math.min(430, Math.round(34 + (l/2) * 22)), h: 62, redonda:false};
+  if(l > 6) return {w: Math.min(460, Math.round(48 + (l/2) * 24)), h: Math.min(110, Math.round(54 + Math.sqrt(l) * 9)), redonda:false};
   return {w: Math.round(base), h: Math.round(base * 0.84), redonda:false};
 }
 /* Las sillas van en el borde: en el perímetro si es cuadrada, en la
    circunferencia si es redonda. Repartidas como se sienta la gente. */
-function sillasHTML(m){
+function sillaHTML(i, ocupadas, style){
+  const sentada = i < ocupadas;
+  const dibujo = sentada
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3"/><path d="M5.5 20v-2.3a6.5 6.5 0 0 1 13 0V20z"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="5" rx="2"/><rect x="6" y="10" width="12" height="9" rx="3"/><path d="M8 19v2m8-2v2"/></svg>';
+  return '<i class="silla '+(sentada?'ocupada':'libre')+'" style="'+style+'" role="img" aria-label="Asiento '+(i+1)+(sentada?' ocupado':' libre')+'">'+dibujo+'</i>';
+}
+function sillasHTML(m, ocupadas=0){
   const n = Math.min(26, Math.max(1, lugaresDe(m))), t = tamMesa(m);
-  let s = "";
+  ocupadas = Math.max(0, Math.min(n, num(ocupadas)));
+  let s = "", indice = 0;
   if(t.redonda){
-    const r = t.w/2 + 9;
+    const r = t.w/2 + 17;
     for(let i=0;i<n;i++){
       const a = (i/n) * Math.PI * 2 - Math.PI/2;
-      s += '<i class="silla" style="left:calc(50% + '+Math.round(Math.cos(a)*r)+'px);' +
-           'top:calc(50% + '+Math.round(Math.sin(a)*r)+'px);transform:translate(-50%,-50%)"></i>';
+      const giro = Math.round((a*180/Math.PI)+90);
+      const estilo = 'left:calc(50% + '+Math.round(Math.cos(a)*r)+'px);top:calc(50% + '+Math.round(Math.sin(a)*r)+'px);--giro-silla:'+giro+'deg';
+      s += sillaHTML(indice++, ocupadas, estilo);
     }
     return s;
   }
-  const arriba = Math.ceil(n/2 * (t.w/(t.w+t.h)) * 2 / 2) || 1;
   const porLado = {arriba: Math.ceil(n*t.w/(2*(t.w+t.h))), abajo: 0, izq: 0, der: 0};
   porLado.abajo = porLado.arriba;
   const sobran = n - porLado.arriba - porLado.abajo;
@@ -1952,10 +2025,11 @@ function sillasHTML(m){
   const pon = (cuantas, lado)=>{
     for(let i=1;i<=cuantas;i++){
       const p = (i/(cuantas+1))*100;
-      if(lado === "arriba") s += '<i class="silla" style="left:'+p+'%;top:-9px;transform:translate(-50%,-50%)"></i>';
-      if(lado === "abajo")  s += '<i class="silla" style="left:'+p+'%;top:calc(100% + 9px);transform:translate(-50%,-50%)"></i>';
-      if(lado === "izq")    s += '<i class="silla" style="top:'+p+'%;left:-9px;transform:translate(-50%,-50%)"></i>';
-      if(lado === "der")    s += '<i class="silla" style="top:'+p+'%;left:calc(100% + 9px);transform:translate(-50%,-50%)"></i>';
+      const lugar = lado === "arriba" ? 'left:'+p+'%;top:-14px' :
+        lado === "abajo" ? 'left:'+p+'%;top:calc(100% + 14px)' :
+        lado === "izq" ? 'top:'+p+'%;left:-14px' : 'top:'+p+'%;left:calc(100% + 14px)';
+      const giro = lado === "abajo" ? 180 : lado === "izq" ? -90 : lado === "der" ? 90 : 0;
+      s += sillaHTML(indice++, ocupadas, lugar+';--giro-silla:'+giro+'deg');
     }
   };
   pon(porLado.arriba,"arriba"); pon(porLado.abajo,"abajo");
@@ -2011,11 +2085,11 @@ function renderCroquis(){
       (!selEsDecor && selId === m.id ? " sel" : "")+'" data-cm="'+esc(m.id)+'"' +
       ' style="left:'+cx+'%;top:'+cy+'%;width:'+t.w+'px;height:'+t.h+'px;' +
       'transform:translate(-50%,-50%) rotate('+gr+'deg)">' +
-      sillasHTML(virtual) +
-      '<div style="display:grid;place-items:center;gap:2px' +
+      sillasHTML(virtual, c ? num(c.personas) : 0) +
+      '<div class="cmesaCentro" style="display:grid;place-items:center;gap:2px' +
         (gr ? ';transform:rotate(' + (-gr) + 'deg)' : '') + '">' +
         '<b>'+esc(nombre)+'</b>' +
-        '<small>'+lugaresDe(m)+' lug</small>' +
+        '<small class="cmesaConteo">'+(c ? Math.max(0,num(c.personas))+' / ' : '')+lugaresDe(virtual)+(c?' sentados':' lugares')+'</small>' +
         (c ? '<span class="tot">'+mx(sumaComanda(c).total)+'</span>' : '') +
       '</div>' +
       (modoAcomodo && !selEsDecor && selId === m.id && !g ? jalasHTML() : '') +
@@ -2392,6 +2466,12 @@ $("#mesaVista").addEventListener("click", e=>{
 });
 
 function renderMesas(){
+  /* En teléfono, la lista usa el ancho completo y evita que las mesas y sillas se encimen.
+     En tablets y escritorio se conserva el croquis visual. */
+  if(!vistaMesaPhoneInicializada && window.matchMedia && window.matchMedia("(max-width: 620px)").matches){
+    mesaVista = "lista";
+    vistaMesaPhoneInicializada = true;
+  }
   const zs = zonas();
   if(!zs.length){ $("#mesaZonas").innerHTML = ""; $("#mesaRejilla").innerHTML =
     '<div class="empty">No hay mesas dadas de alta. Ve a <b>Ajustes → Mesas y zonas</b>.</div>'; return; }
@@ -2828,6 +2908,7 @@ function agregaLinea(p, mods, nota, cant){
   const c = comandaActual(); if(!c) return;
   c.lineas.push({id:uid(), platId:p.id, nombre:p.nombre, precio:num(p.precio),
                  cant: Math.max(1, num(cant,1)), mods: mods||[], nota: nota||"",
+                 satClave:p.satClave||"", satNombre:p.satNombre||"", satUnidad:p.satUnidad||"",
                  comensal: comensalVista, enviada:"", estado:"", ts: Date.now()});
   persist(); pintaLineas();
   toast(p.nombre + " → " + (comensalVista ? "comensal " + comensalVista : "para compartir"));
@@ -2969,11 +3050,6 @@ function pintaCobro(){
   const c = comandaActual(); if(!c) return;
   const s = sumaComanda(c);
   const prop = cobroPropPct === null ? num($("#cobroPropMonto").value) : s.sub * cobroPropPct/100;
-  const total = s.total + prop;
-
-  $("#cobroTotal").textContent = mx(total);
-  $("#cobroDesglose").textContent = "Consumo " + mx(s.sub) +
-    (s.serv ? " · servicio " + mx(s.serv) : "") + (prop ? " · propina " + mx(prop) : "");
   if(cobroPropPct !== null) $("#cobroPropMonto").value = Math.round(prop*100)/100;
 
   $("#cobroProp").innerHTML = [0,10,15,20].map(p=>
@@ -2981,36 +3057,66 @@ function pintaCobro(){
     (p ? p+"%" : "Sin propina")+'</button>').join("") +
     '<button type="button" data-prop="x" aria-pressed="'+(cobroPropPct===null)+'">Otra</button>';
 
-  const partes = Math.max(1, num($("#cobroPartes").value, 1));
-  const nota = $("#cobroParteNota");
-  if(partes > 1){
-    nota.hidden = false;
-    nota.innerHTML = "Entre " + partes + " personas toca <b>" + mx(total/partes) + "</b> a cada quien. " +
-      "La cuenta se cierra completa: esto es para que nadie saque la calculadora.";
-  }else nota.hidden = true;
-
   $("#cobroPagos").innerHTML = cobroPagos.map((p,i)=>
     '<div class="pagoLin"><span style="font-size:12.5px;text-transform:capitalize">'+esc(p.tipo)+'</span>'+
     '<input type="number" min="0" step="0.01" data-pagomonto="'+i+'" value="'+(p.monto||"")+'" placeholder="0.00">'+
     '<button class="btn sm ghost" data-quitapago="'+i+'">✕</button></div>').join("") ||
     '<div class="empty" style="padding:12px">Escoge cómo paga.</div>';
 
+  actualizaBalanceCobro();
+}
+function actualizaBalanceCobro(){
+  const c = comandaActual(); if(!c) return;
+  const s = sumaComanda(c);
+  const prop = cobroPropPct === null ? Math.max(0,num($("#cobroPropMonto").value)) : s.sub * cobroPropPct/100;
+  const total = s.total + prop;
+  $("#cobroTotal").textContent = mx(total);
+  $("#cobroDesglose").textContent = "Consumo " + mx(s.sub) +
+    (s.serv ? " · servicio " + mx(s.serv) : "") + (prop ? " · propina " + mx(prop) : "");
+
+  const partes = Math.max(1, Math.floor(num($("#cobroPartes").value,1)));
+  const nota = $("#cobroParteNota");
+  if(partes > 1){
+    nota.hidden = false;
+    nota.innerHTML = "Entre " + partes + " personas toca <b>" + mx(total/partes) + "</b> a cada quien. La cuenta se cobra completa.";
+  }else nota.hidden = true;
+
   const pagado = cobroPagos.reduce((s2,p)=>s2+num(p.monto), 0);
   const falta = total - pagado;
+  const efectivoRecibido = cobroPagos.filter(p=>p.tipo === "efectivo").reduce((x,p)=>x+num(p.monto),0);
   const cambio = $("#cobroCambio"), avisa = $("#cobroFalta");
   if(pagado && falta < -0.004){
-    const efectivo = cobroPagos.some(p=>p.tipo === "efectivo");
+    const efectivo = efectivoRecibido > 0;
     cambio.hidden = !efectivo;
     $("#cobroCambioV").textContent = mx(-falta);
-    avisa.hidden = efectivo;
-    if(!efectivo) avisa.innerHTML = "Están pagando " + mx(-falta) + " de más y no hay efectivo: " +
-      "no hay de dónde dar cambio. Ajusta el monto.";
+    const cambioPosible = efectivoRecibido + 0.004 >= -falta;
+    avisa.hidden = efectivo && cambioPosible;
+    if(!avisa.hidden) avisa.innerHTML = efectivo
+      ? "El cambio de " + mx(-falta) + " supera el efectivo recibido (" + mx(efectivoRecibido) + "). Ajusta el pago en efectivo."
+      : "Están pagando " + mx(-falta) + " de más y no hay efectivo para dar cambio. Ajusta el monto.";
   }else{
     cambio.hidden = true;
     avisa.hidden = !(pagado && falta > 0.004);
     if(!avisa.hidden) avisa.innerHTML = "Faltan <b>" + mx(falta) + "</b> por cubrir.";
   }
-  $("#cobroOk").disabled = !(pagado > 0 && falta <= 0.004);
+  const cubierto = pagado > 0 && falta <= 0.004 && (falta >= -0.004 || efectivoRecibido + 0.004 >= -falta);
+  const confirmar = $("#cobroOk");
+  confirmar.disabled = !cubierto;
+  confirmar.textContent = cubierto
+    ? (falta < -0.004 ? "Cobrar · cambio " + mx(-falta) : "Cobrar " + mx(total) + " y cerrar")
+    : (pagado > 0 ? "Faltan " + mx(Math.max(0,falta)) + " para cerrar" : "Agregar un pago");
+
+  const faltante = Math.max(0,falta);
+  const atajos = [];
+  if(faltante > 0.004){
+    atajos.push('<button class="btn sm" data-pago="efectivo">Efectivo exacto · '+mx(faltante)+'</button>');
+    [100,200,500].forEach(v=>{
+      atajos.push('<button class="btn sm" data-pago="efectivo" data-recibido="'+v+'">Recibió '+mx(v)+'</button>');
+    });
+    atajos.push('<button class="btn sm" data-pago="tarjeta">Tarjeta · '+mx(faltante)+'</button>');
+    atajos.push('<button class="btn sm" data-pago="transferencia">Transferencia · '+mx(faltante)+'</button>');
+  }
+  $("#cobroAtajos").innerHTML = atajos.join("");
 }
 $("#cobroProp").addEventListener("click", e=>{
   const b = e.target.closest("[data-prop]"); if(!b) return;
@@ -3018,23 +3124,53 @@ $("#cobroProp").addEventListener("click", e=>{
   pintaCobro();
 });
 $("#modalCobro").addEventListener("input", e=>{
-  if(e.target.id === "cobroPropMonto"){ cobroPropPct = null; pintaCobro(); return; }
-  if(e.target.id === "cobroPartes"){ pintaCobro(); return; }
+  if(e.target.id === "cobroPropMonto"){
+    cobroPropPct = null;
+    $("#cobroProp").querySelectorAll("[data-prop]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.prop === "x" ? "true" : "false"));
+    actualizaBalanceCobro(); return;
+  }
+  if(e.target.id === "cobroPartes"){ actualizaBalanceCobro(); return; }
   const m = e.target.closest("[data-pagomonto]");
-  if(m){ cobroPagos[num(m.dataset.pagomonto)].monto = num(m.value); pintaCobro(); }
+  if(m){ cobroPagos[num(m.dataset.pagomonto)].monto = Math.max(0,num(m.value)); actualizaBalanceCobro(); }
 });
 $("#modalCobro").addEventListener("click", e=>{
+  const partes = e.target.closest("[data-partes]");
+  if(partes){ $("#cobroPartes").value = partes.dataset.partes; actualizaBalanceCobro(); return; }
   const nuevo = e.target.closest("[data-pago]");
   if(nuevo){
     const c = comandaActual();
     const s = c ? sumaComanda(c) : {total:0};
     const prop = cobroPropPct === null ? num($("#cobroPropMonto").value) : s.sub * cobroPropPct/100;
     const falta = Math.max(0, s.total + prop - cobroPagos.reduce((x,p)=>x+num(p.monto),0));
-    cobroPagos.push({tipo:nuevo.dataset.pago, monto: Math.round(falta*100)/100});
+    const monto = nuevo.dataset.recibido ? num(nuevo.dataset.recibido) : falta;
+    cobroPagos.push({tipo:nuevo.dataset.pago, monto: Math.round(monto*100)/100});
     pintaCobro(); return;
   }
   const q = e.target.closest("[data-quitapago]");
   if(q){ cobroPagos.splice(num(q.dataset.quitapago), 1); pintaCobro(); }
+});
+$("#cobroWhatsApp").addEventListener("click", ()=>{
+  const c = comandaActual(); if(!c) return;
+  let telefono = $("#cobroTelefono").value.replace(/\D/g,"");
+  if(telefono.length === 10) telefono = "52" + telefono;
+  if(telefono && (telefono.length < 11 || telefono.length > 15)){
+    toast("Escribe el teléfono con código de país, por ejemplo 525512345678"); return;
+  }
+  const s = sumaComanda(c);
+  const prop = cobroPropPct === null ? Math.max(0,num($("#cobroPropMonto").value)) : s.sub * cobroPropPct/100;
+  const total = s.total + prop;
+  const detalle = vivas(c).map(l=>{
+    const mods = (l.mods||[]).map(m=>m.nombre||m.texto).filter(Boolean).join(", ");
+    return "• "+num(l.cant,1)+" × "+(l.nombre||"Platillo")+(mods?" ("+mods+")":"")+" · "+mx(importeLinea(l));
+  }).join("\n");
+  const mensaje = "Hola, te compartimos la cuenta de "+(P.negocio.nombre||"nuestro restaurante")+".\n"+
+    "Mesa: "+(c.mesaNombre||"Para llevar")+" · Folio: "+c.folio+"\n\n"+
+    (detalle?detalle+"\n\n":"")+"Consumo: "+mx(s.sub)+(s.serv?"\nServicio: "+mx(s.serv):"")+
+    (prop?"\nPropina: "+mx(prop):"")+"\nTotal: "+mx(total)+"\n\nGracias por visitarnos.";
+  const url = "https://wa.me/"+telefono+"?text="+encodeURIComponent(mensaje);
+  const ventana = window.open("about:blank","_blank");
+  if(!ventana) toast("El navegador bloqueó la ventana. Permite las ventanas emergentes para preparar WhatsApp.");
+  else{ ventana.opener = null; ventana.location = url; }
 });
 $("#cobroCerrar").addEventListener("click", ()=>{ $("#modalCobro").hidden = true; });
 $("#modalCobro").addEventListener("click", e=>{
@@ -3600,8 +3736,59 @@ $("#tab-ventas").addEventListener("change", e=>{
 /* ===================================================================
    EL MENÚ
    =================================================================== */
+/* Sugerencias basadas en la guía del SAT para venta de comida en local o
+   para llevar y para cafetería. La elección final corresponde al emisor. */
+const SAT_PRODUCTOS = [
+  {clave:"90101501", nombre:"Restaurantes", unidad:"E48"},
+  {clave:"90101500", nombre:"Establecimientos para comer y beber", unidad:"E48"},
+  {clave:"90101700", nombre:"Servicios de cafetería", unidad:"E48"},
+  {clave:"90101502", nombre:"Bares", unidad:"E48"},
+  {clave:"90101503", nombre:"Establecimientos de comida rápida", unidad:"E48"},
+  {clave:"90101800", nombre:"Servicios de comida para llevar y a domicilio", unidad:"E48"},
+  {clave:"50191500", nombre:"Sopas y estofados", unidad:"C62"},
+  {clave:"50192100", nombre:"Botanas", unidad:"C62"},
+  {clave:"50192300", nombre:"Postres y decoraciones de postres", unidad:"C62"},
+  {clave:"50111500", nombre:"Carne y aves de corral", unidad:"C62"},
+  {clave:"50192500", nombre:"Sándwiches y panecillos con relleno", unidad:"C62"},
+  {clave:"50192600", nombre:"Acompañamientos preparados", unidad:"C62"},
+  {clave:"50192700", nombre:"Platos combinados empaquetados", unidad:"C62"},
+  {clave:"50192800", nombre:"Empanadas, quiches y pasteles", unidad:"C62"},
+  {clave:"50192900", nombre:"Pasta o tallarines naturales", unidad:"C62"},
+  {clave:"50193000", nombre:"Bebidas y comidas infantiles", unidad:"C62"},
+  {clave:"50193100", nombre:"Sopas instantáneas", unidad:"C62"},
+  {clave:"50193200", nombre:"Ensaladas preparadas", unidad:"C62"},
+  {clave:"50131800", nombre:"Queso", unidad:"C62"},
+  {clave:"50131609", nombre:"Huevos preparados", unidad:"C62"},
+  {clave:"50121900", nombre:"Pescados y mariscos preservados en sal", unidad:"C62"},
+  {clave:"50201712", nombre:"Bebidas de té", unidad:"C62"},
+  {clave:"50202301", nombre:"Agua", unidad:"C62"},
+  {clave:"50202305", nombre:"Jugo fresco", unidad:"C62"},
+  {clave:"50202306", nombre:"Refrescos", unidad:"C62"},
+  {clave:"50202307", nombre:"Bebida de chocolate o malta", unidad:"C62"},
+  {clave:"50202400", nombre:"Jugos o concentrados de cítricos frescos", unidad:"C62"},
+  {clave:"50201708", nombre:"Bebida de café", unidad:"C62"},
+  {clave:"50201715", nombre:"Té de frutas", unidad:"C62"},
+  {clave:"50181900", nombre:"Pan, galletas y pastelitos dulces", unidad:"C62"},
+  {clave:"50181901", nombre:"Pan fresco", unidad:"C62"},
+  {clave:"50182000", nombre:"Tartas, empanadas y pastas", unidad:"C62"},
+  {clave:"50182001", nombre:"Panqués, pasteles o biscochos frescos", unidad:"C62"},
+  {clave:"50192501", nombre:"Emparedados frescos", unidad:"C62"},
+  {clave:"50131700", nombre:"Productos de leche y mantequilla", unidad:"C62"},
+  {clave:"50192303", nombre:"Helado y postres de helado", unidad:"C62"},
+  {clave:"50202200", nombre:"Bebidas alcohólicas", unidad:"C62"},
+  {clave:"50202201", nombre:"Cerveza", unidad:"C62"},
+  {clave:"50202203", nombre:"Vino", unidad:"C62"},
+  {clave:"50202207", nombre:"Cocteles de alcohol o bebidas mixtas", unidad:"C62"}
+];
+const SAT_UNIDADES = [
+  {clave:"C62", nombre:"Uno"}, {clave:"H87", nombre:"Pieza"},
+  {clave:"E48", nombre:"Unidad de servicio"}, {clave:"KGM", nombre:"Kilogramo"},
+  {clave:"LTR", nombre:"Litro"}, {clave:"MLT", nombre:"Mililitro"},
+  {clave:"XPK", nombre:"Paquete"}, {clave:"XBX", nombre:"Caja"}
+];
 function renderMenu(){
   const cats = (MENU.cats||[]).slice().sort((a,b)=>num(a.orden)-num(b.orden));
+  $("#satProdCatalogo").innerHTML = SAT_PRODUCTOS.map(s=>'<option value="'+esc(s.nombre+' — '+s.clave)+'"></option>').join("");
   $("#t_cats").innerHTML = '<thead><tr><th>Categoría</th><th style="width:110px">Orden</th>' +
     '<th style="width:110px">Platillos</th><th style="width:60px"></th></tr></thead><tbody>' +
     cats.map(c=>'<tr data-cat="'+esc(c.id)+'">' +
@@ -3614,7 +3801,8 @@ function renderMenu(){
   const gruposOps = (MENU.grupos||[]).map(g=>({id:g.id, nombre:g.nombre}));
   $("#t_plats").innerHTML = '<thead><tr><th>Platillo</th><th style="width:150px">Categoría</th>' +
     '<th style="width:110px">Precio</th><th style="width:110px">Costo</th><th>Preguntas</th>' +
-    '<th style="width:80px">Activo</th><th style="width:60px"></th></tr></thead><tbody>' +
+      '<th style="width:275px">Buscar clave SAT</th><th style="width:155px">Unidad SAT</th>' +
+      '<th style="width:80px">Activo</th><th style="width:60px"></th></tr></thead><tbody>' +
     (MENU.plats||[]).map(p=>'<tr data-plat="'+esc(p.id)+'">' +
       '<td><input data-pk="nombre" value="'+esc(p.nombre)+'"></td>' +
       '<td><select data-pk="catId">'+cats.map(c=>'<option value="'+esc(c.id)+'"'+(c.id===p.catId?" selected":"")+'>'+esc(c.nombre)+'</option>').join("")+'</select></td>' +
@@ -3623,6 +3811,11 @@ function renderMenu(){
       '<td><div class="modChips">'+gruposOps.map(g=>
         '<label class="modChip'+((p.mods||[]).indexOf(g.id)>=0?" si":"")+'" data-pmod="'+esc(g.id)+'">' +
         '<input type="checkbox">'+esc(g.nombre)+'</label>').join("")+'</div></td>' +
+      '<td><div class="satProducto"><input type="search" data-pk="satBusqueda" list="satProdCatalogo" ' +
+        'value="'+esc(p.satNombre ? p.satNombre+' — '+p.satClave : (p.satClave||""))+'" placeholder="Busca nombre o clave SAT">' +
+        '<small>'+(p.satClave ? 'Clave '+esc(p.satClave)+(p.satNombre?' · '+esc(p.satNombre):' · capturada manualmente') : 'Sin clave asignada')+'</small></div></td>' +
+      '<td><select data-pk="satUnidad"><option value="">Elegir unidad</option>'+SAT_UNIDADES.map(u=>
+        '<option value="'+u.clave+'"'+(u.clave===p.satUnidad?' selected':'')+'>'+u.clave+' · '+esc(u.nombre)+'</option>').join("")+'</select></td>' +
       '<td style="text-align:center"><input type="checkbox" data-pk="activo" style="width:auto"'+(p.activo!==false?" checked":"")+'></td>' +
       '<td><button class="btn sm ghost" data-delplat="'+esc(p.id)+'">✕</button></td></tr>').join("") +
     '</tbody>';
@@ -3680,12 +3873,33 @@ $("#tab-menu").addEventListener("input", e=>{
     return;
   }
   if(trp && t.dataset.pk){
+    if(t.dataset.pk === "satBusqueda") return;
     const p = MENU.plats.find(x=>x.id === trp.dataset.plat);
     if(p){ p[t.dataset.pk] = (t.dataset.pk === "precio" || t.dataset.pk === "costo") ? num(t.value) : t.value; persist(); }
   }
 });
 $("#tab-menu").addEventListener("change", e=>{
   const trp = e.target.closest("[data-plat]");
+  if(trp && e.target.dataset.pk === "satBusqueda"){
+    const p = MENU.plats.find(x=>x.id === trp.dataset.plat); if(!p) return;
+    const valor = e.target.value.trim();
+    if(!valor){ p.satClave=""; p.satNombre=""; p.satUnidad=""; persist(); renderMenu(); return; }
+    const opcion = SAT_PRODUCTOS.find(s=>
+      valor.toLocaleLowerCase() === (s.nombre+' — '+s.clave).toLocaleLowerCase() ||
+      valor.toLocaleLowerCase() === s.nombre.toLocaleLowerCase() || valor === s.clave);
+    const manual = valor.match(/^(\d{8})$/);
+    if(opcion){
+      p.satClave = opcion.clave; p.satNombre = opcion.nombre;
+      if(!p.satUnidad) p.satUnidad = opcion.unidad;
+    }else if(manual){ p.satClave = manual[1]; p.satNombre = ""; }
+    else{ toast("Elige una sugerencia o captura una clave SAT de 8 dígitos"); renderMenu(); return; }
+    persist(); renderMenu(); return;
+  }
+  if(trp && e.target.dataset.pk === "satUnidad"){
+    const p = MENU.plats.find(x=>x.id === trp.dataset.plat);
+    if(p){ p.satUnidad = e.target.value; persist(); }
+    return;
+  }
   if(trp && e.target.dataset.pk === "activo"){
     const p = MENU.plats.find(x=>x.id === trp.dataset.plat);
     if(p){ p.activo = e.target.checked; persist(); }

@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.heymakers.restaurant",
+        "sha256_cert_fingerprints": ["00:31:BF:F3:89:BD:E7:A9:BB:78:E5:AB:66:A8:16:99:9A:55:E7:E9:B8:6F:F5:39:2E:6F:31:23:97:85:35:C1"]
+      }
+    }]
