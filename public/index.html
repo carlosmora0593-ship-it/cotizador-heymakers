@@ -521,6 +521,35 @@ body.rol-produccion .estadoPedido{display:none!important}
   padding:1px 7px;border-radius:5px}
 .clase-oc{background:var(--cyan-soft);color:var(--cyan)}
 .clase-factura{background:var(--good-soft);color:var(--good)}
+/* ---- códigos del artículo ---- */
+.cdFila{display:flex;gap:6px;align-items:stretch}
+.cdFila input{min-width:0;flex:1}
+.cdFila .btn{white-space:nowrap;align-self:stretch}
+.cCods{white-space:nowrap}
+.codsBtn{display:flex;flex-direction:column;align-items:flex-start;gap:1px;
+  width:100%;min-width:132px;padding:6px 9px;border:1px solid var(--line);
+  border-radius:9px;background:var(--surface-2);color:var(--ink);cursor:pointer;
+  font:inherit;text-align:left;line-height:1.25}
+.codsBtn:hover{border-color:var(--brand);background:var(--surface)}
+.codsBtn b{font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.codsBtn small{font-size:10.5px;color:var(--ink-3)}
+.codsBtn.falta{border-style:dashed}
+.codsBtn.falta b{color:var(--ink-3);font-weight:500}
+.cdVista{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;
+  margin-top:18px;padding:16px;border:1px solid var(--line);border-radius:14px;
+  background:#fff}
+.cdVista .cdBarras{min-width:0;overflow:auto}
+.cdVista svg{max-width:100%;height:auto;display:block}
+.cdVista .cdNada{grid-column:1/-1;margin:0;color:var(--ink-3);font-size:13px;text-align:center}
+@media(max-width:620px){.cdVista{grid-template-columns:1fr;justify-items:center}}
+/* ---- hoja de etiquetas ---- */
+.etHoja{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.etIt{border:1px solid #bbb;border-radius:6px;padding:8px;text-align:center;
+  break-inside:avoid;page-break-inside:avoid}
+.etIt b{display:block;font-size:11px;line-height:1.25;margin-bottom:4px}
+.etIt small{display:block;font-size:9px;color:#555;margin-top:3px}
+.etIt svg{max-width:100%;height:auto;margin:0 auto;display:block}
+@media print{.etHoja{grid-template-columns:repeat(3,1fr)}}
 .leerCsf{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border:1px dashed var(--line);
   border-radius:10px;padding:12px 14px;background:var(--surface-2)}
 .leerCsf>div{flex:1;min-width:220px}
@@ -3347,6 +3376,8 @@ body.rol-produccion #btnPrint{display:none!important}
       <span class="hint" id="catEstado" style="margin-left:auto"></span>
       <button class="btn sm primary" id="catActualizar">Actualizar</button>
       <button class="btn sm ghost" id="catImportar">Importar de Excel</button>
+      <button class="btn sm ghost" id="catCodsTodos" title="Le pone SKU y clave del SAT a los que no tengan">Completar códigos</button>
+      <button class="btn sm ghost" id="catEtiquetas" title="Hoja para imprimir y pegar">Etiquetas</button>
       <button class="btn sm ghost" data-add="articulos">+ Artículo</button>
     </header>
     <div class="body">
@@ -3360,7 +3391,7 @@ body.rol-produccion #btnPrint{display:none!important}
       </div>
       <p class="note" style="margin:0 0 12px"><b>Costo de producción</b> es lo que te cuesta el artículo. <b>Precio público</b> es a cómo lo vendes. Si dejas el precio en cero, el cotizador lo calcula con tu utilidad.</p>
       <div class="catBuscar">
-        <input id="catqBusca" placeholder="Buscar por nombre, categoría o código" autocomplete="off">
+        <input id="catqBusca" placeholder="Buscar por nombre, categoría, SKU — o escanea el código" autocomplete="off">
         <select id="catqCat" style="width:auto"></select>
         <span class="catCuenta" id="catqCuenta"></span>
       </div>
@@ -4714,6 +4745,45 @@ body.rol-produccion #btnPrint{display:none!important}
   </div>
 </div>
 
+<div class="modal" id="modalCods" hidden>
+  <div class="card" style="width:min(760px,100%);max-height:92vh;overflow:auto">
+    <header><h2>Códigos del artículo</h2>
+      <button class="btn sm" id="cdCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <p class="note" id="cdQuien" style="margin:0 0 16px"></p>
+      <div class="grid g2">
+        <div><label class="f" for="cd_sku">SKU interno</label>
+          <div class="cdFila"><input id="cd_sku" placeholder="TEXT-0001" autocomplete="off" maxlength="24">
+            <button class="btn sm ghost" id="cd_skuGen" type="button">Generar</button></div></div>
+        <div><label class="f" for="cd_barras">Código de barras</label>
+          <div class="cdFila"><input id="cd_barras" placeholder="el mismo SKU" autocomplete="off" maxlength="24">
+            <button class="btn sm ghost" id="cd_barrasSku" type="button">Usar el SKU</button></div></div>
+      </div>
+      <div class="grid g2" style="margin-top:14px">
+        <div><label class="f" for="cd_satSel">Clave del SAT · producto o servicio</label>
+          <select id="cd_satSel"></select></div>
+        <div><label class="f" for="cd_unidad">Clave de unidad</label>
+          <select id="cd_unidad"></select></div>
+      </div>
+      <div id="cdOtraBox" hidden style="margin-top:14px">
+        <label class="f" for="cd_sat">Escribe la clave, ocho dígitos</label>
+        <input id="cd_sat" inputmode="numeric" maxlength="8" placeholder="01010101" style="max-width:200px">
+        <p class="note" id="cdOtraAviso" style="margin:8px 0 0"></p>
+      </div>
+      <p class="note" style="margin:16px 0 0">
+        Las claves de la lista son las del giro, tomadas del catálogo del SAT.
+        <b>La clave la decide quien factura</b>: si tu contador te dice otra, ésa es la buena.
+        El catálogo completo está en <b>pys.sat.gob.mx</b>.
+      </p>
+      <div class="cdVista" id="cdVista"></div>
+      <div class="row-actions" style="margin-top:18px">
+        <button class="btn primary" id="cd_ok">Guardar</button>
+        <button class="btn" id="cd_etiq">Imprimir esta etiqueta</button>
+        <button class="btn ghost" id="cd_cancel">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal" id="modalCheca" hidden>
   <div class="card" style="width:min(460px,100%);max-height:94vh;overflow:auto">
     <header><h2 id="chTitulo">Checar</h2>
@@ -8212,6 +8282,7 @@ function ccGuardaTecnica(){
 /* ---------- render catálogo ---------- */
 const COLS = {
   articulos:[["foto","Foto","foto"],["nombre","Artículo","text"],["cat","Categoría","text"],["costo","Costo producción $","num"],["precio","Precio público $","num"],
+    ["sku","Códigos","cods"],
     ["tallas","¿Lleva tallas?","si"],["existencia","Existencia","ro"],["minimo_inv","Mínimo","num"]],
   tecnicas:[["nombre","Técnica","text"],["modo","Cobro","modo"],
     ["costoMO","Mano de obra · costo","num"],["precioMO","Mano de obra · precio","num"],
@@ -8243,6 +8314,13 @@ function renderTabla(key){
       '<span class="catFotoBtns"><button type="button" data-fotoart="'+esc(r.id)+'">'+(fotoDe(r)?"Cambiar":"Subir")+'</button>'+
       (fotoDe(r)? '<button type="button" data-fotoquita="'+esc(r.id)+'">Quitar</button>' : '')+
       '</span></div></td>';
+    if(c[2]==="cods"){
+      const sat = r.claveSat || "", falta = !r.sku || !sat;
+      return '<td class="cCods"><button type="button" class="codsBtn'+(falta?" falta":"")+
+        '" data-cods="'+esc(r.id)+'" title="SKU, clave del SAT y código de barras">'+
+        '<b>'+esc(r.sku || "— poner SKU —")+'</b>'+
+        '<small>'+esc(sat ? ("SAT " + sat) : "sin clave del SAT")+'</small></button></td>';
+    }
     if(c[2]==="ro") return '<td class="n"><input readonly title="Se mueve solo con requisición, desde Inventario" value="'+(v==null?0:v)+'" style="background:var(--surface-2);color:var(--ink-2);text-align:right"></td>';
     if(c[2]==="si") return '<td style="text-align:center"><input type="checkbox" data-f="'+c[0]+'" style="width:auto"'+(v?" checked":"")+'></td>';
     if(c[2]==="tipo") return '<td><select data-f="tipo"><option value="unico"'+(v==="unico"?" selected":"")+'>Único</option><option value="pieza"'+(v==="pieza"?" selected":"")+'>Por pieza</option><option value="porcentaje"'+(v==="porcentaje"?" selected":"")+'>Porcentaje</option></select></td>';
@@ -11734,7 +11812,12 @@ function pintaSelectorArt(){
   const q = artBusca.trim().toLowerCase();
   let lista = (cat.articulos||[]).slice();
   if(artCat) lista = lista.filter(a=>(a.cat||"Otros") === artCat);
-  if(q) lista = lista.filter(a=> ((a.nombre||"")+" "+(a.cat||"")).toLowerCase().indexOf(q) >= 0);
+  /* Escanear el código de barras en esta caja deja un solo artículo:
+     el de ese código. Es la forma rápida de cotizar con lector. */
+  const porCod = q ? artPorCodigo(q) : null;
+  if(porCod) lista = [porCod];
+  else if(q) lista = lista.filter(a=> ((a.nombre||"")+" "+(a.cat||"")+" "+
+    (a.sku||"")+" "+(a.barras||"")).toLowerCase().indexOf(q) >= 0);
 
   const tabs = $("#artCats");
   if(tabs) tabs.innerHTML = '<button type="button" data-artcat=""'+(artCat?"":' aria-pressed="true"')+'>Todos</button>'+
@@ -11757,7 +11840,7 @@ function pintaSelectorArt(){
         return '<button type="button" class="artIt'+(sel?" act":"")+'" data-artpick="'+esc(a.id)+'">'+
           miniArt(a)+
           '<span class="artTxt"><b>'+esc(a.nombre)+'</b>'+
-            '<small>'+esc(a.cat||"Sin categoría")+' · '+mx(num(a.costo))+' costo'+
+            '<small>'+(a.sku ? esc(a.sku)+' · ' : '')+esc(a.cat||"Sin categoría")+' · '+mx(num(a.costo))+' costo'+
             (num(a.precio) ? ' · '+mx(num(a.precio))+' público' : '')+'</small></span>'+
           ((bajo || a.tallas)
             ? '<span class="artSellos">'+
@@ -11813,6 +11896,143 @@ function tarjetasInv(lista){
       '</div></label>';
   }).join("") +'</div>';
 }
+
+/* ---------- la ficha de códigos de un artículo ---------- */
+let cdId = null;
+function abreCodigos(id){
+  const a = (cat.articulos||[]).find(x=>x.id===id);
+  if(!a){ toast("No encuentro ese artículo"); return; }
+  cdId = id;
+  $("#cdQuien").innerHTML = '<b>'+esc(a.nombre||"Artículo")+'</b> · '+esc(a.cat||"sin categoría")+
+    (num(a.precio) ? ' · '+mx(num(a.precio))+' público' : '');
+  $("#cd_sku").value    = a.sku || "";
+  $("#cd_barras").value = a.barras || "";
+  const clave = a.claveSat || claveSatSugerida(a);
+  const enLista = CLAVES_SAT.some(k=>k[0]===clave);
+  $("#cd_satSel").innerHTML =
+    CLAVES_SAT.map(k=>'<option value="'+k[0]+'"'+(enLista&&k[0]===clave?" selected":"")+'>'+
+      k[0]+' — '+esc(k[1])+'</option>').join("") +
+    '<option value="__otra"'+(enLista?"":" selected")+'>— otra clave, la escribo yo —</option>';
+  $("#cd_sat").value = enLista ? "" : clave;
+  $("#cd_unidad").innerHTML = CLAVES_UNIDAD.map(k=>{
+    const sel = (a.claveUnidad || unidadSugerida(clave)) === k[0];
+    return '<option value="'+k[0]+'"'+(sel?" selected":"")+'>'+k[0]+' — '+esc(k[1])+'</option>';
+  }).join("");
+  cdSincroniza();
+  $("#modalCods").hidden = false;
+}
+/* Lo que se va a guardar, leído de los campos tal como están ahora. */
+function cdLee(){
+  const sel = $("#cd_satSel").value;
+  return {
+    sku:    limpiaSku($("#cd_sku").value),
+    barras: limpiaSku($("#cd_barras").value),
+    claveSat: sel === "__otra" ? ($("#cd_sat").value||"").replace(/\D/g,"").slice(0,8) : sel,
+    claveUnidad: $("#cd_unidad").value
+  };
+}
+function cdSincroniza(){
+  const d = cdLee();
+  const otra = $("#cd_satSel").value === "__otra";
+  $("#cdOtraBox").hidden = !otra;
+  const av = $("#cdOtraAviso");
+  if(av) av.innerHTML = !otra ? "" :
+    (d.claveSat.length === 8
+      ? '<span style="color:var(--good)">Ocho dígitos: así la acepta el SAT.</span>'
+      : '<span style="color:var(--warn)">Le faltan dígitos: la clave del SAT son exactamente ocho.</span>');
+  /* Que se vea lo que se va a imprimir, no una descripción de ello. */
+  const texto = d.barras || d.sku;
+  const art = Object.assign({}, (cat.articulos||[]).find(x=>x.id===cdId) || {}, d);
+  const w = $("#cdVista");
+  if(!w) return;
+  w.innerHTML = texto
+    ? '<div class="cdBarras">'+c128SVG(texto, {mod:1.6, alto:52})+'</div>'+
+      '<div>'+qrSVG(qrTextoDe(art), {px:3})+'</div>'
+    : '<p class="cdNada">Pon un SKU y aquí aparece el código de barras y el QR, '+
+      'listos para imprimir y pegar.</p>';
+}
+function cdGuarda(){
+  const a = (cat.articulos||[]).find(x=>x.id===cdId);
+  if(!a) return false;
+  const d = cdLee();
+  if(d.claveSat && d.claveSat.length !== 8){
+    toast("La clave del SAT son ocho dígitos");
+    return false;
+  }
+  if(d.sku){
+    const choca = (cat.articulos||[]).find(x=>x.id!==a.id && String(x.sku||"").toUpperCase()===d.sku);
+    if(choca){ toast('Ese SKU ya lo tiene “'+(choca.nombre||choca.id)+'”'); return false; }
+  }
+  a.sku = d.sku; a.barras = d.barras;
+  a.claveSat = d.claveSat; a.claveUnidad = d.claveUnidad;
+  persist();
+  renderTabla("articulos");
+  return true;
+}
+/* La etiqueta de un artículo, o la hoja completa del catálogo filtrado. */
+function etiquetaHTML(a){
+  const txt = barrasDe(a);
+  return '<div class="etIt"><b>'+esc(a.nombre||"Artículo")+'</b>'+
+    (txt ? c128SVG(txt, {mod:1.3, alto:44}) : '<small>sin código</small>')+
+    '<small>'+esc(a.cat||"")+(num(a.precio)? ' · '+mx(num(a.precio)) : '')+'</small></div>';
+}
+function hojaEtiquetas(lista, titulo){
+  const con = (lista||[]).filter(a=>barrasDe(a));
+  if(!con.length){
+    toast("Ningún artículo tiene código todavía. Usa “Completar códigos”.");
+    return;
+  }
+  muestraDoc(titulo || "Etiquetas", membrete()+
+    '<h1 style="margin-bottom:4px">Etiquetas</h1>'+
+    '<p style="color:#555">'+con.length+' etiqueta(s). Imprime, corta y pega. '+
+    'El lector de códigos las encuentra escribiendo o escaneando en el buscador del catálogo.</p>'+
+    '<div class="etHoja">'+con.map(etiquetaHTML).join("")+'</div>');
+}
+
+document.addEventListener("click", e=>{
+  const bc = e.target.closest("[data-cods]");
+  if(bc){ abreCodigos(bc.dataset.cods); return; }
+  if(e.target.closest("#cdCerrar") || e.target.closest("#cd_cancel") || e.target.id === "modalCods"){
+    $("#modalCods").hidden = true; cdId = null; return;
+  }
+  if(e.target.closest("#cd_skuGen")){
+    const a = (cat.articulos||[]).find(x=>x.id===cdId);
+    $("#cd_sku").value = skuSugerido(a || {}); cdSincroniza(); return;
+  }
+  if(e.target.closest("#cd_barrasSku")){
+    $("#cd_barras").value = limpiaSku($("#cd_sku").value); cdSincroniza(); return;
+  }
+  if(e.target.closest("#cd_ok")){
+    if(cdGuarda()){ $("#modalCods").hidden = true; cdId = null; toast("Códigos guardados"); }
+    return;
+  }
+  if(e.target.closest("#cd_etiq")){
+    if(!cdGuarda()) return;
+    const a = (cat.articulos||[]).find(x=>x.id===cdId);
+    $("#modalCods").hidden = true;
+    hojaEtiquetas(a?[a]:[], "Etiqueta · "+((a&&a.nombre)||""));
+    cdId = null; return;
+  }
+  if(e.target.closest("#catCodsTodos")){
+    const n = completaCodigos();
+    renderTabla("articulos");
+    toast(n ? ("Listo: "+n+" artículo(s) ya tienen SKU y clave del SAT")
+            : "Todos ya tenían sus códigos");
+    return;
+  }
+  if(e.target.closest("#catEtiquetas")){
+    hojaEtiquetas(catqLista(), "Etiquetas del catálogo");
+    return;
+  }
+});
+document.addEventListener("input", e=>{
+  if(!$("#modalCods") || $("#modalCods").hidden) return;
+  if(e.target.closest("#modalCods")) cdSincroniza();
+});
+document.addEventListener("change", e=>{
+  if(!$("#modalCods") || $("#modalCods").hidden) return;
+  if(e.target.closest("#modalCods")) cdSincroniza();
+});
 
 /* ---------- eventos de las fotos y del selector ---------- */
 document.addEventListener("click", e=>{
@@ -14262,7 +14482,8 @@ let catqBusca = "", catqCat = "", catqTope = CATQ_PAGINA;
 /* El texto por el que se busca. Incluye el código aunque todavía no haya una
    columna para él: el día que entre el lector de barras, ya está. */
 function catqTexto(a){
-  return ((a.nombre||"")+" "+(a.cat||"")+" "+(a.codigo||"")).toLowerCase();
+  return ((a.nombre||"")+" "+(a.cat||"")+" "+(a.codigo||"")+" "+
+          (a.sku||"")+" "+(a.barras||"")+" "+(a.claveSat||"")).toLowerCase();
 }
 function catqLista(){
   const t = catqBusca.trim().toLowerCase();
@@ -17057,6 +17278,474 @@ const USOS_CFDI = [["G01","Adquisición de mercancías"],["G02","Devoluciones y 
  ["P01","Por definir"],["S01","Sin efectos fiscales"],["D01","Honorarios médicos"],["CP01","Pagos"]];
 const FORMAS_SAT = {"Efectivo":"01","Transferencia":"03","Tarjeta":"04","Depósito":"03","Otro":"99"};
 
+/* ============================================================
+   CÓDIGOS DE BARRAS Y QR, DIBUJADOS AQUÍ MISMO
+   ------------------------------------------------------------
+   La página publicada no carga programas de fuera (ni fuentes,
+   ni librerías: todo va dentro del archivo). Así que el código
+   de barras y el QR se dibujan a mano, en SVG, con estas dos
+   funciones. No dependen de internet ni de nada instalado.
+   ============================================================ */
+
+/* ---------- Code 128, subconjunto B ----------
+   Es el que leen todos los lectores de tienda y acepta letras,
+   números y guiones —justo lo que lleva un SKU como HM-PLAY-0001.
+   Cada caracter son 11 módulos: tres barras y tres espacios. */
+const C128 = [
+"212222","222122","222221","121223","121322","131222","122213","122312","132212","221213",
+"221312","231212","112232","122132","122231","113222","123122","123221","223211","221132",
+"221231","213212","223112","312131","311222","321122","321221","312212","322112","322211",
+"212123","212321","232121","111323","131123","131321","112313","132113","132311","211313",
+"231113","231311","112133","112331","132131","113123","113321","133121","313121","211331",
+"231131","213113","213311","213131","311123","311321","331121","312113","312311","332111",
+"314111","221411","431111","111224","111422","121124","121421","141122","141221","112214",
+"112412","122114","122411","142112","142211","241211","221114","413111","241112","134111",
+"111242","121142","121241","114212","124112","124211","411212","421112","421211","212141",
+"214121","412121","111143","111341","131141","114113","114311","411113","411311","113141",
+"114131","311141","411131","211412","211214","211232","2331112"];
+
+/* Lo que no se puede codificar en el subconjunto B se cambia por
+   un guion, en vez de sacar un código que el lector no lea. */
+function c128Limpia(txt){
+  return String(txt == null ? "" : txt).split("").map(ch=>{
+    const c = ch.charCodeAt(0);
+    return (c >= 32 && c <= 126) ? ch : "-";
+  }).join("");
+}
+
+/* Devuelve la tira de anchos: start B, datos, verificador, stop. */
+function c128Tiras(txt){
+  const s = c128Limpia(txt);
+  if(!s) return null;
+  const vals = [104];                       /* START B */
+  for(let i=0;i<s.length;i++) vals.push(s.charCodeAt(i) - 32);
+  /* El verificador: suma ponderada por la posición, módulo 103.
+     El START pesa 1, el primer dato 1, el segundo 2, y así. */
+  let suma = vals[0];
+  for(let i=1;i<vals.length;i++) suma += vals[i] * i;
+  vals.push(suma % 103);
+  vals.push(106);                           /* STOP */
+  return vals.map(v=>C128[v]).join("");
+}
+
+/* El SVG. ancho = módulos * mod. Con texto abajo, opcional. */
+function c128SVG(txt, opc){
+  const o = opc || {};
+  const mod = o.mod || 2, alto = o.alto || 56, quiet = 10;
+  const tiras = c128Tiras(txt);
+  if(!tiras) return "";
+  const total = tiras.split("").reduce((s,d)=>s+ +d, 0) + quiet*2;
+  const altoTxt = o.texto === false ? 0 : 14;
+  let x = quiet, barra = true, rects = "";
+  for(let i=0;i<tiras.length;i++){
+    const w = +tiras[i];
+    if(barra) rects += '<rect x="'+x+'" y="0" width="'+w+'" height="'+alto+'"/>';
+    x += w; barra = !barra;
+  }
+  return '<svg class="bcSVG" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+total+' '+
+    (alto+altoTxt)+'" width="'+(total*mod)+'" height="'+((alto+altoTxt)*mod)+'" '+
+    'role="img" aria-label="Código de barras '+c128Limpia(txt)+'">'+
+    '<rect x="0" y="0" width="'+total+'" height="'+(alto+altoTxt)+'" fill="#fff"/>'+
+    '<g fill="#000">'+rects+'</g>'+
+    (altoTxt ? '<text x="'+(total/2)+'" y="'+(alto+11)+'" font-family="monospace" '+
+      'font-size="11" text-anchor="middle" fill="#000">'+
+      c128Limpia(txt).replace(/[<>&]/g,"")+'</text>' : '')+
+    '</svg>';
+}
+
+/* ---------- QR, modo byte, corrección M ----------
+   Versiones 1 a 10, que alcanzan de sobra para un SKU, una liga
+   o una ficha corta. Lo de abajo es la norma: Reed-Solomon para
+   los bloques de corrección, los patrones fijos, y la máscara
+   que menos castigo saca. */
+
+const QR_CAP = {            /* version: [total codewords, ec por bloque, [bloques grupo1, datos g1, bloques g2, datos g2]] */
+  1:[26, 10,[1,16,0,0]],  2:[44, 16,[1,28,0,0]],  3:[70, 26,[1,44,0,0]],
+  4:[100,18,[2,32,0,0]],  5:[134,24,[2,43,0,0]],  6:[172,16,[4,27,0,0]],
+  7:[196,18,[4,31,0,0]],  8:[242,22,[2,38,2,39]], 9:[292,22,[3,36,2,37]],
+  10:[346,26,[4,43,1,44]]
+};
+const QR_ALIN = {1:[],2:[6,18],3:[6,22],4:[6,26],5:[6,30],6:[6,34],
+                 7:[6,22,38],8:[6,24,42],9:[6,26,46],10:[6,28,50]};
+
+/* Aritmética en GF(256), la del QR: polinomio 0x11d. */
+const GF_EXP = new Array(512), GF_LOG = new Array(256);
+(function(){
+  let x = 1;
+  for(let i=0;i<255;i++){ GF_EXP[i] = x; GF_LOG[x] = i; x <<= 1; if(x & 0x100) x ^= 0x11d; }
+  for(let i=255;i<512;i++) GF_EXP[i] = GF_EXP[i-255];
+})();
+function gfMul(a,b){ return (a===0||b===0) ? 0 : GF_EXP[GF_LOG[a]+GF_LOG[b]]; }
+
+/* El polinomio generador de grado n. */
+function rsGen(n){
+  let g = [1];
+  for(let i=0;i<n;i++){
+    const nuevo = new Array(g.length+1).fill(0);
+    for(let j=0;j<g.length;j++){
+      nuevo[j]   ^= gfMul(g[j], 1);
+      nuevo[j+1] ^= gfMul(g[j], GF_EXP[i]);
+    }
+    g = nuevo;
+  }
+  return g;
+}
+/* El residuo: los bytes de corrección de un bloque de datos. */
+function rsResto(datos, n){
+  const g = rsGen(n);
+  const r = datos.concat(new Array(n).fill(0));
+  for(let i=0;i<datos.length;i++){
+    const c = r[i];
+    if(!c) continue;
+    for(let j=0;j<g.length;j++) r[i+j] ^= gfMul(g[j], c);
+  }
+  return r.slice(datos.length);
+}
+
+function qrBytes(txt){
+  /* UTF-8 a mano: el QR lleva bytes, no caracteres. */
+  const s = unescape(encodeURIComponent(String(txt == null ? "" : txt)));
+  const b = [];
+  for(let i=0;i<s.length;i++) b.push(s.charCodeAt(i) & 255);
+  return b;
+}
+
+function qrVersion(nBytes){
+  for(let v=1;v<=10;v++){
+    const [tot, ecb, g] = QR_CAP[v];
+    const datos = tot - ecb*(g[0]+g[2]);
+    const cab = 4 + (v <= 9 ? 8 : 16);
+    if(datos*8 >= cab + nBytes*8) return v;
+  }
+  return 0;
+}
+
+/* Los codewords finales, ya intercalados como pide la norma. */
+function qrCodewords(txt){
+  const bytes = qrBytes(txt);
+  const v = qrVersion(bytes.length);
+  if(!v) return null;
+  const [tot, ecb, g] = QR_CAP[v];
+  const nDatos = tot - ecb*(g[0]+g[2]);
+
+  /* El flujo de bits: modo 0100 (byte), largo, datos, terminador. */
+  let bits = "";
+  const pon = (val, n) => { for(let i=n-1;i>=0;i--) bits += ((val>>i)&1); };
+  pon(4, 4);
+  pon(bytes.length, v <= 9 ? 8 : 16);
+  bytes.forEach(b=>pon(b,8));
+  const tope = nDatos*8;
+  pon(0, Math.min(4, tope - bits.length));
+  while(bits.length % 8) bits += "0";
+  const relleno = [0xEC, 0x11];
+  let k = 0;
+  while(bits.length < tope){ pon(relleno[k++ % 2], 8); }
+
+  const dcw = [];
+  for(let i=0;i<bits.length;i+=8) dcw.push(parseInt(bits.substr(i,8), 2));
+
+  /* Partir en bloques, calcular corrección de cada uno. */
+  const bloques = [], ecs = [];
+  let p = 0;
+  for(let i=0;i<g[0];i++){ bloques.push(dcw.slice(p, p+g[1])); p += g[1]; }
+  for(let i=0;i<g[2];i++){ bloques.push(dcw.slice(p, p+g[3])); p += g[3]; }
+  bloques.forEach(b=> ecs.push(rsResto(b, ecb)));
+
+  /* Intercalado: primer byte de cada bloque, luego el segundo... */
+  const salida = [];
+  const maxD = Math.max.apply(null, bloques.map(b=>b.length));
+  for(let i=0;i<maxD;i++) bloques.forEach(b=>{ if(i < b.length) salida.push(b[i]); });
+  for(let i=0;i<ecb;i++) ecs.forEach(e=> salida.push(e[i]));
+  return {v, cw:salida, nDatos, ecb, grupos:g};
+}
+
+/* La cuadrícula: patrones fijos, datos en zigzag, máscara. */
+function qrMatriz(txt){
+  const cod = qrCodewords(txt);
+  if(!cod) return null;
+  const v = cod.v, n = 17 + v*4;
+  const m = [], res = [];                   /* res = celda reservada */
+  for(let i=0;i<n;i++){ m.push(new Array(n).fill(0)); res.push(new Array(n).fill(false)); }
+
+  const buscador = (fy, fx) => {
+    for(let y=-1;y<=7;y++) for(let x=-1;x<=7;x++){
+      const Y = fy+y, X = fx+x;
+      if(Y<0||X<0||Y>=n||X>=n) continue;
+      const borde = (y>=0&&y<=6&&(x===0||x===6)) || (x>=0&&x<=6&&(y===0||y===6));
+      const centro = y>=2&&y<=4&&x>=2&&x<=4;
+      m[Y][X] = (borde||centro) ? 1 : 0;
+      res[Y][X] = true;
+    }
+  };
+  buscador(0,0); buscador(0,n-7); buscador(n-7,0);
+
+  /* Tiempos: la línea alternada de la fila y columna 6. */
+  for(let i=8;i<n-8;i++){
+    const b = i % 2 === 0 ? 1 : 0;
+    m[6][i] = b; res[6][i] = true;
+    m[i][6] = b; res[i][6] = true;
+  }
+  /* El módulo oscuro, siempre. */
+  m[4*v+9][8] = 1; res[4*v+9][8] = true;
+
+  /* Alineación, menos donde choca con un buscador. */
+  const al = QR_ALIN[v];
+  al.forEach(cy=> al.forEach(cx=>{
+    if((cy===6&&cx===6)||(cy===6&&cx===n-7)||(cy===n-7&&cx===6)) return;
+    for(let y=-2;y<=2;y++) for(let x=-2;x<=2;x++){
+      const may = Math.max(Math.abs(y), Math.abs(x));
+      m[cy+y][cx+x] = (may===1) ? 0 : 1;
+      res[cy+y][cx+x] = true;
+    }
+  }));
+
+  /* Reservar el espacio del formato (y de la versión, si aplica). */
+  for(let i=0;i<9;i++){
+    if(!res[8][i]){ res[8][i] = true; }
+    if(!res[i][8]){ res[i][8] = true; }
+  }
+  for(let i=0;i<8;i++){ res[8][n-1-i] = true; res[n-1-i][8] = true; }
+  if(v >= 7){
+    for(let i=0;i<6;i++) for(let j=0;j<3;j++){ res[i][n-11+j] = true; res[n-11+j][i] = true; }
+  }
+
+  /* Los datos, en zigzag de derecha a izquierda, de dos en dos. */
+  const cw = cod.cw;
+  let bit = 0;
+  const total = cw.length*8;
+  const siguiente = () => {
+    if(bit >= total) return 0;
+    const b = (cw[bit>>3] >> (7 - (bit & 7))) & 1;
+    bit++; return b;
+  };
+  let arriba = true;
+  for(let col=n-1; col>0; col-=2){
+    if(col === 6) col = 5;                  /* la columna de tiempos se salta */
+    for(let f=0; f<n; f++){
+      const y = arriba ? n-1-f : f;
+      for(let d=0; d<2; d++){
+        const x = col - d;
+        if(res[y][x]) continue;
+        m[y][x] = siguiente();
+      }
+    }
+    arriba = !arriba;
+  }
+
+  /* La máscara que menos castigo saque, de las ocho. */
+  const formulas = [
+    (y,x)=>(y+x)%2===0, (y,x)=>y%2===0, (y,x)=>x%3===0, (y,x)=>(y+x)%3===0,
+    (y,x)=>(Math.floor(y/2)+Math.floor(x/3))%2===0, (y,x)=>((y*x)%2 + (y*x)%3)===0,
+    (y,x)=>(((y*x)%2 + (y*x)%3)%2)===0, (y,x)=>(((y+x)%2 + (y*x)%3)%2)===0
+  ];
+  let mejor = null;
+  for(let k=0;k<8;k++){
+    const t = m.map(f=>f.slice());
+    for(let y=0;y<n;y++) for(let x=0;x<n;x++)
+      if(!res[y][x] && formulas[k](y,x)) t[y][x] ^= 1;
+    ponFormato(t, res, k, v, n);
+    const p = castigo(t, n);
+    if(mejor === null || p < mejor.p) mejor = {p, k, t};
+  }
+  return {n, m:mejor.t, v, mask:mejor.k};
+}
+
+/* El formato: nivel M (00) + máscara, con su BCH y su XOR fijo. */
+function ponFormato(t, res, mask, v, n){
+  let datos = (0x00 << 3) | mask;           /* 00 = nivel M */
+  let val = datos << 10;
+  for(let i=4;i>=0;i--) if(val & (1<<(i+10))) val ^= 0x537 << i;
+  const fmt = ((datos<<10) | val) ^ 0x5412;
+  const bitF = i => (fmt >> i) & 1;
+  for(let i=0;i<=5;i++)  t[8][i] = bitF(i);
+  t[8][7] = bitF(6); t[8][8] = bitF(7); t[7][8] = bitF(8);
+  for(let i=9;i<=14;i++) t[14-i][8] = bitF(i);
+  /* La segunda copia: 7 módulos hacia arriba por la columna 8 y 8
+     módulos hacia la derecha por la fila 8. Son 15, no 16: la celda
+     (n-8, 8) es el módulo oscuro y no lleva formato. */
+  for(let i=0;i<=6;i++)  t[n-1-i][8] = bitF(i);
+  for(let i=7;i<=14;i++) t[8][n-8+(i-7)] = bitF(i);
+  t[n-8][8] = 1;                            /* módulo oscuro */
+  if(v >= 7){
+    let vv = v << 12;
+    for(let i=5;i>=0;i--) if(vv & (1<<(i+12))) vv ^= 0x1f25 << i;
+    const ver = (v<<12) | vv;
+    for(let i=0;i<18;i++){
+      const b = (ver >> i) & 1;
+      t[Math.floor(i/3)][n-11 + (i%3)] = b;
+      t[n-11 + (i%3)][Math.floor(i/3)] = b;
+    }
+  }
+}
+
+function castigo(t, n){
+  let p = 0;
+  /* 1: cinco o más del mismo color seguidos. */
+  for(let y=0;y<n;y++){
+    let c=1; for(let x=1;x<n;x++){ if(t[y][x]===t[y][x-1]) c++; else { if(c>=5) p += 3+(c-5); c=1; } }
+    if(c>=5) p += 3+(c-5);
+  }
+  for(let x=0;x<n;x++){
+    let c=1; for(let y=1;y<n;y++){ if(t[y][x]===t[y-1][x]) c++; else { if(c>=5) p += 3+(c-5); c=1; } }
+    if(c>=5) p += 3+(c-5);
+  }
+  /* 2: bloques de 2x2 del mismo color. */
+  for(let y=0;y<n-1;y++) for(let x=0;x<n-1;x++)
+    if(t[y][x]===t[y][x+1] && t[y][x]===t[y+1][x] && t[y][x]===t[y+1][x+1]) p += 3;
+  /* 3: el patrón que se confunde con un buscador. */
+  const pat = [1,0,1,1,1,0,1,0,0,0,0];
+  const casa = (arr) => { for(let i=0;i<pat.length;i++) if(arr[i]!==pat[i]) return false; return true; };
+  for(let y=0;y<n;y++) for(let x=0;x+11<=n;x++){
+    const h = t[y].slice(x,x+11);
+    if(casa(h) || casa(h.slice().reverse())) p += 40;
+  }
+  for(let x=0;x<n;x++) for(let y=0;y+11<=n;y++){
+    const vcol = []; for(let i=0;i<11;i++) vcol.push(t[y+i][x]);
+    if(casa(vcol) || casa(vcol.slice().reverse())) p += 40;
+  }
+  /* 4: qué tan lejos está del 50% de módulos oscuros. */
+  let osc = 0; for(let y=0;y<n;y++) for(let x=0;x<n;x++) osc += t[y][x];
+  p += Math.floor(Math.abs(osc*100/(n*n) - 50)/5)*10;
+  return p;
+}
+
+function qrSVG(txt, opc){
+  const o = opc || {};
+  const q = qrMatriz(txt);
+  if(!q) return "";
+  const quiet = o.quiet == null ? 4 : o.quiet;
+  const lado = q.n + quiet*2, px = o.px || 4;
+  let d = "";
+  for(let y=0;y<q.n;y++) for(let x=0;x<q.n;x++)
+    if(q.m[y][x]) d += "M"+(x+quiet)+" "+(y+quiet)+"h1v1h-1z";
+  return '<svg class="qrSVG" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+lado+' '+lado+'" '+
+    'width="'+(lado*px)+'" height="'+(lado*px)+'" shape-rendering="crispEdges" '+
+    'role="img" aria-label="Código QR">'+
+    '<rect width="'+lado+'" height="'+lado+'" fill="#fff"/><path d="'+d+'" fill="#000"/></svg>';
+}
+
+
+/* ============ CLAVES DEL SAT, SKU Y CÓDIGOS ============
+   Las claves de abajo están tomadas del catálogo c_ClaveProdServ y son
+   las del giro: playeras, gorras, tazas, impresión y bordado. No es el
+   catálogo completo —son 52 mil claves— sino las que de verdad se usan
+   aquí, y siempre se puede escribir otra a mano.
+
+   Aviso que vale la pena leer: la clave la elige quien factura, no el
+   programa. Si tu contador te dice otra, ésa es la buena. */
+const CLAVES_SAT = [
+  ["53103001","Camisetas y playeras"],
+  ["53103000","Camisetas · clase general"],
+  ["53102516","Gorras"],
+  ["53102503","Sombreros"],
+  ["53101700","Suéteres y sudaderas"],
+  ["53102900","Prendas de deporte"],
+  ["53102700","Uniformes"],
+  ["53103100","Chalecos"],
+  ["53102100","Batas, mandiles y delantales"],
+  ["53101500","Pantalones y shorts"],
+  ["53102400","Medias y calcetines"],
+  ["53102500","Accesorios de vestir"],
+  ["53121600","Bolsas, bolsos de mano y morrales"],
+  ["52152101","Tazas de café o té"],
+  ["48101905","Tazas o tazones (mugs) para servicio de comidas"],
+  ["52152100","Cristalería y vasos"],
+  ["82121510","Impresión textil"],
+  ["82121504","Impresión por serigrafía"],
+  ["82121505","Impresión promocional o publicitaria"],
+  ["82121500","Impresión"],
+  ["73141715","Bordado y costura industrial"],
+  ["01010101","No existe en el catálogo"]
+];
+const CLAVES_UNIDAD = [
+  ["H87","Pieza"],["E48","Unidad de servicio"],["ACT","Actividad"],
+  ["XPK","Paquete"],["XBX","Caja"],["PR","Par"],
+  ["MTR","Metro"],["MTK","Metro cuadrado"],["KGM","Kilogramo"],["HUR","Hora"]
+];
+const nombreClaveSat = c => (CLAVES_SAT.find(k=>k[0]===c)||["",""])[1];
+const nombreUnidad   = c => (CLAVES_UNIDAD.find(k=>k[0]===c)||["",""])[1];
+
+/* La clave que le toca a un artículo según cómo se llama. Es una
+   sugerencia: se pone sola la primera vez y se puede cambiar. */
+const SAT_PISTAS = [
+  [/playera|camiset|polo|t-?shirt/i, "53103001"],
+  [/sudader|hoodie|su[eé]ter/i,      "53101700"],
+  [/gorra|cachuch|visera/i,          "53102516"],
+  [/sombrer/i,                       "53102503"],
+  [/taza|tarro|mug/i,                "52152101"],
+  [/vaso|cristal|copa|termo/i,       "52152100"],
+  [/bolsa|tote|morral|mochila/i,     "53121600"],
+  [/mandil|bata|delantal/i,          "53102100"],
+  [/chaleco/i,                       "53103100"],
+  [/uniforme/i,                      "53102700"],
+  [/pantal[oó]n|short/i,             "53101500"],
+  [/calcet|media/i,                  "53102400"],
+  [/bordad/i,                        "73141715"],
+  [/serigraf/i,                      "82121504"],
+  [/dtf|vinil|sublima|impres|transfer|plotter/i, "82121510"],
+  [/llaver|pluma|promocional|publicitar|souvenir/i, "82121505"]
+];
+function claveSatSugerida(a){
+  const t = ((a && a.nombre) || "") + " " + ((a && a.cat) || "");
+  for(const [re, clave] of SAT_PISTAS) if(re.test(t)) return clave;
+  return "01010101";
+}
+/* Los servicios se facturan por unidad de servicio, no por pieza. */
+function unidadSugerida(clave){
+  const c = String(clave || "");
+  return (c.indexOf("82") === 0 || c.indexOf("73") === 0) ? "E48" : "H87";
+}
+
+/* Sin acentos y sin rarezas: el lector de códigos de barras sólo
+   entiende letras y números, y un SKU con acento no se lee. */
+function limpiaSku(t){
+  return String(t == null ? "" : t)
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase().replace(/[^A-Z0-9\-]/g, "").slice(0, 24);
+}
+/* El SKU se arma con las primeras letras de la categoría y un número
+   que no se repita. Así se lee en el almacén sin consultar nada. */
+function skuSugerido(a){
+  const raiz = (limpiaSku((a && a.cat) || "GEN").replace(/-/g,"") || "GEN").slice(0,4);
+  const usados = new Set((cat.articulos||[]).map(x=>String(x.sku||"").toUpperCase()));
+  for(let n=1; n<10000; n++){
+    const trv = raiz + "-" + String(n).padStart(4, "0");
+    if(!usados.has(trv)) return trv;
+  }
+  return raiz + "-" + Date.now().toString().slice(-4);
+}
+/* Lo que lleva el código de barras: el que se capturó, o el SKU. */
+const barrasDe = a => limpiaSku((a && (a.barras || a.sku)) || "");
+/* Lo que lleva el QR: el SKU, el nombre y el precio, en una línea que
+   cualquier lector muestra como texto. */
+function qrTextoDe(a){
+  if(!a) return "";
+  const p = num(a.precio) ? (" | $" + num(a.precio).toFixed(2)) : "";
+  return (a.sku || a.id) + " | " + (a.nombre || "") + p;
+}
+/* Busca un artículo por SKU o por código de barras. Es lo que hace que
+   escanear en el buscador encuentre la pieza. */
+function artPorCodigo(txt){
+  const t = limpiaSku(txt);
+  if(!t) return null;
+  const l = cat.articulos || [];
+  return l.find(a=>String(a.sku||"").toUpperCase() === t) ||
+         l.find(a=>barrasDe(a) === t) || null;
+}
+/* Le pone SKU y claves a todos los que no tengan. No toca lo capturado. */
+function completaCodigos(lista){
+  let n = 0;
+  (lista || cat.articulos || []).forEach(a=>{
+    let toco = false;
+    if(!a.sku){ a.sku = skuSugerido(a); toco = true; }
+    if(!a.claveSat){ a.claveSat = claveSatSugerida(a); toco = true; }
+    if(!a.claveUnidad){ a.claveUnidad = unidadSugerida(a.claveSat); toco = true; }
+    if(toco) n++;
+  });
+  if(n) persist();
+  return n;
+}
+
 let clientes = [], clienteSel = null;
 
 function opcionesSelect(pares, sel){
@@ -18736,6 +19425,61 @@ $("#fa_ok").addEventListener("click", async ()=>{
   toast("Factura registrada para "+g.folio);
 });
 
+/* Los conceptos del CFDI: un renglón por artículo, con la clave del SAT
+   que se le puso en el catálogo. Si a un artículo le falta la clave, se
+   dice en la cara en vez de mandar una factura que el SAT va a rechazar. */
+function conceptosCFDI(v){
+  const g = v._cot;
+  if(!g) return {html:"", texto:""};
+  let partes;
+  try{ partes = (calcDe(g).partes) || []; }catch(e){ return {html:"", texto:""}; }
+  if(!partes.length) return {html:"", texto:""};
+
+  const faltan = [];
+  const fil = partes.map((p, i)=>{
+    const it = p.it, r = p.r;
+    const a = (cat.articulos||[]).find(x=>x.id===it.articuloId) || null;
+    const nom = nombreItem(it, i+1);
+    const clave = (a && a.claveSat) || (a ? claveSatSugerida(a) : "01010101");
+    const unidad = (a && a.claveUnidad) || unidadSugerida(clave);
+    const sku = (a && a.sku) || "";
+    if(a && !a.claveSat) faltan.push(nom);
+    const qty = Math.max(1, num(r.qty));
+    const importeReal = num(r.subtotal) + num(r.urgencia);
+    const unit = Math.round(importeReal/qty*10000)/10000;
+    const importe = Math.round(unit*qty*100)/100;
+    return {nom, clave, unidad, sku, qty, unit, importe};
+  });
+  const suma = fil.reduce((s,f)=>s+f.importe, 0);
+
+  const html = '<h2 style="margin:22px 0 6px;font-size:16px">Conceptos</h2>'+
+    (faltan.length
+      ? '<p style="color:#B01660;font-weight:600;margin:0 0 8px">Sin clave del SAT: '+
+        esc(faltan.join(", "))+'. Ponla en Catálogo → Artículos → Códigos; '+
+        'mientras no esté va <b>01010101</b>, que casi ningún PAC acepta.</p>'
+      : '')+
+    '<table><thead><tr>'+
+      '<th>Clave SAT</th><th>Unidad</th><th>SKU</th><th>Descripción</th>'+
+      '<th style="text-align:right">Cant.</th><th style="text-align:right">Valor unitario</th>'+
+      '<th style="text-align:right">Importe</th></tr></thead><tbody>'+
+    fil.map(f=>'<tr><td>'+esc(f.clave)+'</td><td>'+esc(f.unidad)+'</td><td>'+esc(f.sku||"—")+'</td>'+
+      '<td>'+esc(f.nom)+'</td><td style="text-align:right">'+f.qty+'</td>'+
+      '<td style="text-align:right">'+mx(f.unit)+'</td>'+
+      '<td style="text-align:right">'+mx(f.importe)+'</td></tr>').join("")+
+    '<tr><th colspan="6" style="text-align:right">Suma de conceptos</th>'+
+      '<th style="text-align:right">'+mx(suma)+'</th></tr>'+
+    '</tbody></table>'+
+    '<p style="color:#555;font-size:12px;margin:6px 0 0">El valor unitario va con cuatro '+
+    'decimales para que la suma cuadre con el subtotal. Las claves son las del catálogo del '+
+    'SAT; la última palabra la tiene tu contador.</p>';
+
+  const texto = "\n\nCONCEPTOS\n" + fil.map(f=>
+    [f.clave, f.unidad, f.sku||"-", f.nom, f.qty, f.unit.toFixed(4), f.importe.toFixed(2)].join(" | ")
+  ).join("\n") + "\nSuma de conceptos: " + suma.toFixed(2);
+
+  return {html, texto};
+}
+
 /* ---------- factura ---------- */
 function abreFactura(v){
   const f = v.factura || {};
@@ -18765,6 +19509,12 @@ function abreFactura(v){
     ["Subtotal", mx(subtotal)], ["IVA "+P.iva+"%", mx(iva)], ["Total", mx(v.total)]
   ];
   if(f.folioFiscal) datos.push(["Folio fiscal (UUID)", f.folioFiscal]);
+
+  /* Los conceptos, uno por artículo, con su clave del SAT y su clave de
+     unidad. Sin esto el contador tenía que inventárselas, y una clave
+     inventada es una factura rechazada. El importe de cada renglón
+     suma exactamente el subtotal de arriba. */
+  const cfd = conceptosCFDI(v);
   muestraDoc("Datos para facturar · "+v.folio, membrete()+
     '<h1 style="margin-bottom:4px">Datos para facturar</h1>'+
     '<p style="color:#555">Copia estos datos en tu sistema de facturación o mándaselos a tu contador.</p>'+
@@ -18774,12 +19524,13 @@ function abreFactura(v){
         ' en Ajustes. El SAT lo va a pedir.</p>'
       : '')+
     '<table><tbody>'+datos.map(d=>'<tr><th style="width:38%">'+esc(d[0])+'</th><td>'+esc(d[1]||"—")+'</td></tr>').join("")+'</tbody></table>'+
+    cfd.html+
     '<div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap">'+
       '<button class="btn primary" id="factCopiar" type="button">Copiar los datos</button>'+
       '<button class="btn" id="factHecha" data-folio="'+esc(v.folio)+'" type="button">'+
       (f.estado==="facturada" ? "Marcar como NO facturada" : "Ya la facturé")+'</button></div>');
   $("#factCopiar").addEventListener("click", ()=>{
-    const txt = datos.map(d=>d[0]+": "+(d[1]||"")).join("\n");
+    const txt = datos.map(d=>d[0]+": "+(d[1]||"")).join("\n") + cfd.texto;
     if(navigator.clipboard) navigator.clipboard.writeText(txt).then(()=>toast("Datos copiados"),()=>toast("No se pudo copiar"));
   });
   $("#factHecha").addEventListener("click", async ()=>{
@@ -20199,7 +20950,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261024-1003"></script>
-<script src="diagnostico.js?v=20261024-1003"></script>
+<script src="cuenta.js?v=20261024-1113"></script>
+<script src="diagnostico.js?v=20261024-1113"></script>
 </body>
 </html>
