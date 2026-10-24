@@ -657,6 +657,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#57816a;box-shado
 .heroRStatus{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
 .androidApkLink{display:inline-flex;align-items:center;gap:10px;max-width:100%;margin-top:16px;padding:9px 13px;border:1px solid rgba(245,230,193,.76);border-radius:13px;background:#f1e6c9;color:#244c3a;text-decoration:none;box-shadow:0 8px 18px rgba(8,29,18,.15);transition:transform .2s,background .2s,box-shadow .2s}
 .androidApkLink:hover{transform:translateY(-2px);background:#fff7e7;box-shadow:0 12px 22px rgba(8,29,18,.2)}
+.androidUpdateButton{font:inherit;cursor:pointer}.androidUpdateButton:disabled{cursor:wait;opacity:.7}
 .androidApkIcon{width:34px;height:34px;display:grid;place-items:center;flex:none;border-radius:10px;background:#e4d7b6;color:#285a45}
 .androidApkIcon svg{width:19px;height:19px}
 .androidApkCopy{display:grid;line-height:1.2}
@@ -969,6 +970,11 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
         <span class="androidApkCopy"><b>Descargar APK para Android</b><small>Instalaci&oacute;n de prueba</small></span>
         <span class="androidApkArrow" aria-hidden="true">↓</span>
       </a>
+      <button id="androidUpdateButton" class="androidApkLink androidUpdateButton" type="button" hidden aria-label="Buscar actualizaciones de Makers Restaurant">
+        <span class="androidApkIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5"/><path d="M4.9 9a7.5 7.5 0 0 1 12.4-2L20 12M4 17v-5h5"/><path d="M19.1 15a7.5 7.5 0 0 1-12.4 2L4 12"/></svg></span>
+        <span class="androidApkCopy"><b id="androidUpdateTitle">Buscar actualizaciones</b><small id="androidUpdateHint">Revisar la versión instalada</small></span>
+        <span class="androidApkArrow" aria-hidden="true">↻</span>
+      </button>
     </div>
     <div class="heroRActions" aria-label="Acciones rápidas">
       <button class="heroAction" id="inicioVerMesas" type="button">
@@ -5297,6 +5303,49 @@ window.onMakersPrinterResult = function(id, ok, mensaje){
     toast("No se pudo enviar a la impresora: "+(mensaje||"revisa la conexión Bluetooth"));
   }else if(id && id !== "") toast("Impresión enviada a la impresora.");
 };
+let actualizacionDisponible = false;
+window.onMakersAppUpdateResult = function(json){
+  const boton = $("#androidUpdateButton");
+  if(!boton) return;
+  let respuesta;
+  try{ respuesta = JSON.parse(String(json||"{}")); }
+  catch(e){ respuesta = {status:"error",message:"Respuesta de actualización inválida."}; }
+  boton.disabled = false;
+  if(respuesta.status === "available"){
+    actualizacionDisponible = true;
+    $("#androidUpdateTitle").textContent = "Descargar actualización " + String(respuesta.versionName||"");
+    $("#androidUpdateHint").textContent = "Toca para descargar e instalar desde Android";
+    toast("Hay una actualización disponible.");
+  }else if(respuesta.status === "download_started"){
+    actualizacionDisponible = false;
+    $("#androidUpdateTitle").textContent = "Buscar actualizaciones";
+    $("#androidUpdateHint").textContent = "Abre la descarga y confirma la instalación";
+    toast("Se abrió la descarga. Android te pedirá confirmar la instalación.");
+  }else if(respuesta.status === "current"){
+    actualizacionDisponible = false;
+    $("#androidUpdateTitle").textContent = "Buscar actualizaciones";
+    $("#androidUpdateHint").textContent = "Revisar la versión instalada";
+    toast("Makers Restaurant ya está actualizado.");
+  }else{
+    actualizacionDisponible = false;
+    $("#androidUpdateTitle").textContent = "Buscar actualizaciones";
+    $("#androidUpdateHint").textContent = respuesta.message||"No se pudo consultar. Revisa tu conexión.";
+    toast(respuesta.message||"No se pudo consultar la actualización.");
+  }
+};
+$("#androidUpdateButton").addEventListener("click", ()=>{
+  if(!window.MakersPrinter) return;
+  const boton = $("#androidUpdateButton");
+  boton.disabled = true;
+  if(actualizacionDisponible){
+    $("#androidUpdateTitle").textContent = "Abriendo descarga…";
+    window.MakersPrinter.openAppUpdate();
+  }else{
+    $("#androidUpdateTitle").textContent = "Buscando…";
+    $("#androidUpdateHint").textContent = "Consultando la versión publicada";
+    window.MakersPrinter.checkForAppUpdate();
+  }
+});
 $("#btPrinterFind").addEventListener("click", buscaImpresorasBluetooth);
 $("#btPrinterMode").addEventListener("change", ()=>{
   ESTACION.modoImpresion = $("#btPrinterMode").value;

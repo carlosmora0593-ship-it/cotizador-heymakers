@@ -12,6 +12,6 @@ workflow-github-pages.txt
 # estas NO deben subir nunca. Las versiones de sql/ van con marcador.
 CORRER-*.sql
 
-# La carpeta de pruebas con lo que te da otra IA. Trae una copia de
-# config.js y del index completo: no es parte del sitio y no sube.
-ChatGPT/
+# Las pruebas de SQL tambien llevan tu correo. Misma regla que CORRER-*.
+REVISAR-*.sql
+PROBAR-*.sql

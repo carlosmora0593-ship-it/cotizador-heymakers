@@ -8,7 +8,7 @@
   # nombres y palabras de ejemplo que pueden coincidir con alguna de tus
   # claves. Se quedan fuera de esa revision.
   [build.environment]
-    SECRETS_SCAN_OMIT_PATHS = "sql/*,*.md"
+    SECRETS_SCAN_OMIT_PATHS = "sql/*,*.sql,*.md"
 
     # Estas dos llaves son publicas por diseno: viven en config.js porque el
     # navegador las necesita, y no dan acceso a los datos de nadie (la base

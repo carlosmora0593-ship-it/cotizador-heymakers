@@ -5,18 +5,22 @@ param(
 
 $ErrorActionPreference = "Stop"
 $projectRoot = $PSScriptRoot
-$gradleCommand = Get-Command $GradleCommand -ErrorAction SilentlyContinue
-$gradlePath = if ($gradleCommand) { if ($gradleCommand.Path) { $gradleCommand.Path } else { $gradleCommand.Source } }
-if (-not $gradlePath) {
-  $gradleCache = Join-Path $env:USERPROFILE ".gradle\wrapper\dists\gradle-8.13-bin"
-  if (Test-Path -LiteralPath $gradleCache) {
-    $cachedGradle = Get-ChildItem -LiteralPath $gradleCache -Filter "gradle.bat" -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($cachedGradle) { $gradlePath = $cachedGradle.FullName }
-  }
+
+function Get-NativeBuildFingerprint([string]$root) {
+  $inputs = @(
+    "settings.gradle.kts",
+    "build.gradle.kts",
+    "gradle.properties",
+    "gradle\wrapper\gradle-wrapper.properties",
+    "app\build.gradle.kts"
+  ) | ForEach-Object { Join-Path $root $_ }
+  $inputs += (Get-ChildItem -LiteralPath (Join-Path $root "app\src\main") -File -Recurse | Select-Object -ExpandProperty FullName)
+  return ($inputs | Sort-Object -Unique | ForEach-Object {
+    $relativePath = $_.Substring($root.Length).TrimStart('\').ToLowerInvariant()
+    "$relativePath=$((Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash)"
+  }) -join "`n"
 }
-if (-not $gradlePath) {
-  throw "No encuentro Gradle 8.13. Instálalo o indica la ruta a gradle.bat con -GradleCommand."
-}
+
 $studioJavaHome = $null
 if (-not (Get-Command java -ErrorAction SilentlyContinue)) {
   $javaCandidates = @(
@@ -32,6 +36,43 @@ $sdkPath = if ($env:ANDROID_HOME) { $env:ANDROID_HOME } else { $env:ANDROID_SDK_
 if (-not $sdkPath) { $sdkPath = Join-Path $env:LOCALAPPDATA "Android\Sdk" }
 if (-not (Test-Path -LiteralPath $sdkPath)) {
   throw "No encuentro Android SDK. Instala Android SDK Platform 35 desde Android Studio."
+}
+
+$gradleCommand = Get-Command $GradleCommand -ErrorAction SilentlyContinue
+$gradlePath = if ($gradleCommand) { if ($gradleCommand.Path) { $gradleCommand.Path } else { $gradleCommand.Source } }
+if (-not $gradlePath) {
+  $gradleCache = Join-Path $env:USERPROFILE ".gradle\wrapper\dists\gradle-8.13-bin"
+  if (Test-Path -LiteralPath $gradleCache) {
+    $cachedGradle = Get-ChildItem -LiteralPath $gradleCache -Filter "gradle.bat" -File -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($cachedGradle) { $gradlePath = $cachedGradle.FullName }
+  }
+}
+if (-not $gradlePath) {
+  $gradleRoot = Join-Path $env:LOCALAPPDATA "MakersRestaurant\tools\gradle-8.13"
+  $downloadedGradle = Join-Path $gradleRoot "bin\gradle.bat"
+  if (-not (Test-Path -LiteralPath $downloadedGradle)) {
+    $toolsRoot = Split-Path $gradleRoot -Parent
+    $archivePath = Join-Path ([IO.Path]::GetTempPath()) ("gradle-8.13-" + [guid]::NewGuid().ToString("N") + ".zip")
+    $archiveUrl = "https://services.gradle.org/distributions/gradle-8.13-bin.zip"
+    $expectedHash = "20f1b1176237254a6fc204d8434196fa11a4cfb387567519c61556e8710aed78"
+    Write-Host "No encontré Gradle 8.13. Descargando la versión oficial (aprox. 131 MB)..."
+    try {
+      $oldProgressPreference = $ProgressPreference
+      $ProgressPreference = "SilentlyContinue"
+      Invoke-WebRequest -Uri $archiveUrl -OutFile $archivePath -UseBasicParsing
+      $actualHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
+      if ($actualHash -ne $expectedHash) { throw "La verificación SHA-256 de Gradle no coincide; se canceló la instalación." }
+      New-Item -ItemType Directory -Path $toolsRoot -Force | Out-Null
+      Expand-Archive -LiteralPath $archivePath -DestinationPath $toolsRoot -Force
+    } finally {
+      if ($null -ne $oldProgressPreference) { $ProgressPreference = $oldProgressPreference }
+      Remove-Item -LiteralPath $archivePath -Force -ErrorAction SilentlyContinue
+    }
+  }
+  if (Test-Path -LiteralPath $downloadedGradle) { $gradlePath = $downloadedGradle }
+}
+if (-not $gradlePath) {
+  throw "No pude instalar Gradle 8.13 automáticamente. Comprueba la conexión o indica la ruta a gradle.bat con -GradleCommand."
 }
 if (-not (Test-Path -LiteralPath $SigningPackageZip)) {
   throw "No encuentro el paquete de firma de PWABuilder. Indica el ZIP que contiene signing.keystore y signing-key-info.txt."
@@ -99,8 +140,8 @@ try {
   $releaseFolder = Join-Path (Split-Path $projectRoot -Parent) "android-release"
   New-Item -ItemType Directory -Path $releaseFolder -Force | Out-Null
   Copy-Item -LiteralPath $builtApk -Destination (Join-Path $releaseFolder "Makers-Restaurant.apk") -Force
-  $sourceHash = (Get-FileHash -LiteralPath $pagePath -Algorithm SHA256).Hash
-  [IO.File]::WriteAllText((Join-Path $releaseFolder "Makers-Restaurant.native-source.sha256"), $sourceHash)
+  $buildFingerprint = Get-NativeBuildFingerprint $projectRoot
+  [IO.File]::WriteAllText((Join-Path $releaseFolder "Makers-Restaurant.native-source.sha256"), $buildFingerprint)
 
   $preparer = Join-Path (Split-Path $projectRoot -Parent) "preparar-app-restaurante.ps1"
   & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $preparer

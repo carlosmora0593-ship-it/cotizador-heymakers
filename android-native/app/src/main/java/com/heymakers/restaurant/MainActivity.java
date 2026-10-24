@@ -79,7 +79,9 @@ public final class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 view.evaluateJavascript(
-                        "document.querySelectorAll('.androidApkLink,#pwaInstall').forEach(e=>e.hidden=true);",
+                        "document.querySelectorAll('a.androidApkLink,#pwaInstall').forEach(e=>e.hidden=true);"
+                                + "const updateButton=document.getElementById('androidUpdateButton');"
+                                + "if(updateButton)updateButton.hidden=false;",
                         null);
             }
 
@@ -163,6 +165,7 @@ public final class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if (printerBridge != null) printerBridge.close();
         if (webView != null) {
             webView.removeJavascriptInterface("MakersPrinter");
             webView.destroy();

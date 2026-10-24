@@ -2280,6 +2280,36 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
 .cpLeyenda u{width:10px;height:10px;border-radius:3px;text-decoration:none;display:inline-block}
 
 
+/* ---- líneas de crédito ---- */
+.cliCred{margin-left:7px;font-size:10.5px;vertical-align:middle}
+.credCaja{margin-top:14px;padding:13px 15px;border:1.5px solid var(--line);
+  border-radius:var(--radio-sm,12px);background:var(--surface-2)}
+.credCaja.frenado{border-color:var(--warn);
+  background:color-mix(in srgb, var(--warn) 9%, var(--surface-2))}
+.credNums{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.credNums span{display:block;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ink-3)}
+.credNums b{display:block;font-family:"IBM Plex Mono",monospace;font-size:17px;margin-top:2px}
+.credNums b.mal{color:var(--warn)}
+.credBarra{height:7px;border-radius:999px;background:var(--surface);overflow:hidden;margin:11px 0 0;
+  box-shadow:inset 0 0 0 1px var(--line-soft)}
+.credBarra i{display:block;height:100%;border-radius:999px;transition:width .3s}
+.credAviso{margin:11px 0 0;font-size:12.5px;line-height:1.5;color:var(--warn)}
+.credBien{margin:11px 0 0;font-size:12.5px;line-height:1.5;color:var(--ink-2)}
+.credAcc{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:11px}
+.credAcc .hint{font-size:11.5px}
+.tbDebe{display:flex;align-items:center;gap:10px;width:100%;text-align:left;cursor:pointer;
+  padding:10px 11px;border:1px solid var(--line);border-radius:var(--radio-sm,11px);
+  background:var(--surface-2);color:inherit;font:inherit;margin-bottom:7px;
+  transition:border-color .16s,transform .12s}
+.tbDebe:hover{border-color:var(--accent);transform:translateY(-1px)}
+.tbDebeNom{flex:1;min-width:0}
+.tbDebeNom b{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tbDebeNom small{display:block;font-size:11px;color:var(--ink-3);margin-top:1px}
+.tbDebeMonto{font-family:"IBM Plex Mono",monospace;font-size:14px;font-weight:650}
+.tbDebeMonto.mal{color:var(--warn)}
+.tbVacio{font-size:12.5px;color:var(--ink-3);padding:6px 2px}
+
 /* ---- la luz que sigue al cursor ---- */
 /* Es de ChatGPT y está bien pensada: en vez de un brillo fijo, el botón se
    ilumina justo donde está el puntero. Aquí usa el acento del taller en vez
@@ -3103,6 +3133,10 @@ body.rol-produccion #btnPrint{display:none!important}
       <div class="tbPanel">
         <header><h2>Lo que urge</h2><span class="tbCuenta" id="tbUrgeCuenta"></span></header>
         <div class="tbPanelBody"><div id="tbUrge"></div></div>
+      </div>
+      <div class="tbPanel" id="tbPanelDeben" data-solo-admin>
+        <header><h2>Quién debe más</h2><span class="tbCuenta" id="tbDebenCuenta"></span></header>
+        <div class="tbPanelBody"><div id="tbDeben"></div></div>
       </div>
       <div class="tbPanel" id="tbPanelSemana">
         <header><h2>Entregado por día</h2><span class="tbDesde">últimos 7 días</span></header>
@@ -10777,6 +10811,7 @@ const TB_MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agos
 const TB_DIAS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
 
 function renderTablero(){
+  if(typeof renderDeben === "function") renderDeben();
   if(!$("#tab-inicio")) return;
   const u = usuarioActual();
   const d = new Date(), h = d.getHours();
@@ -17035,7 +17070,7 @@ function renderClientes(){
   const lista = clientes.filter(c=> !f || (c.nombre+" "+c.rfc+" "+c.razon).toLowerCase().indexOf(f)>=0);
   $("#cliLista").innerHTML = lista.length ? lista.map(c=>
     '<button class="cliItem" data-cli="'+c.id+'" aria-selected="'+(clienteSel===c.id)+'">'+
-    '<b>'+esc(c.nombre||"Sin nombre")+'</b><small>'+esc(c.rfc||"sin RFC")+
+    '<b>'+esc(c.nombre||"Sin nombre")+'</b>'+chipCredito(c)+'<small>'+esc(c.rfc||"sin RFC")+
     (c.docs&&c.docs.length? ' · '+c.docs.length+' doc(s)':'')+'</small></button>').join("")
     : '<div class="empty">Sin clientes. Dale a <b>+ Cliente</b> o guarda uno desde una cotización.</div>';
   renderFicha();
@@ -17206,6 +17241,14 @@ function renderFicha(){
    '<div><label class="f">Teléfono</label><input data-ck="tel" value="'+esc(c.tel)+'"></div>'+
    '<div><label class="f">Correo</label><input data-ck="mail" value="'+esc(c.mail)+'"></div>'+
    '<div><label class="f">Estado</label><input data-ck="estado" value="'+esc(c.estado)+'"></div></div>'+
+   /* La explicación va DEBAJO de la rejilla, no como tercera columna: ahí
+      dentro el texto se parte en dos renglones y le desalinea la fila. */
+   '<div class="grid g2" style="margin-top:12px">'+
+   '<div><label class="f">Línea de crédito</label><input type="number" min="0" step="100" data-ck="credito" value="'+num(c.credito,0)+'"></div>'+
+   '<div><label class="f">Días de crédito</label><input type="number" min="0" step="1" data-ck="plazo" value="'+num(c.plazo,0)+'" placeholder="'+plazoCxc()+'"></div></div>'+
+   '<p class="note" style="margin:8px 0 0">Línea en <b>cero</b> = sólo de contado, no se le factura a crédito. '+
+   'Días en <b>cero</b> = usa los '+plazoCxc()+' del taller.</p>'+
+   bloqueCredito(c)+
    '<div style="margin-top:12px"><label class="f">Notas</label><textarea data-ck="notas" rows="2">'+esc(c.notas)+'</textarea></div>'+
    '<div style="margin-top:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
      '<label class="f" style="margin:0">Expediente</label>'+
@@ -17234,7 +17277,9 @@ $("#cliLista").addEventListener("click", e=>{ const b=e.target.closest("[data-cl
 $("#cliFicha").addEventListener("input", e=>{
   const k = e.target.dataset.ck; if(!k) return;
   const c = clientes.find(c=>c.id===clienteSel); if(!c) return;
-  c[k] = k==="rfc" ? e.target.value.toUpperCase() : e.target.value;
+  c[k] = k==="rfc" ? e.target.value.toUpperCase()
+       : (k==="credito" || k==="plazo") ? Math.max(0, num(e.target.value))
+       : e.target.value;
   clearTimeout(c._t); c._t = setTimeout(()=>{ guardaCliente(c); renderListaSolo(); }, 700);
 });
 $("#cliFicha").addEventListener("change", async e=>{
@@ -17595,6 +17640,218 @@ $("#btnCobrar").addEventListener("click", ()=> abrirCobro(cot));
 let cxcFiltro = "", cxcEdad = "", abonando = null;
 
 function saldoDe(v){ return Math.max(0, Math.round((num(v.total) - num(v.recibido))*100)/100); }
+/* ==================== LÍNEAS DE CRÉDITO ====================
+   Dos candados que no son el mismo:
+
+     · VENCIDO — ya se le pasó el plazo de algo. Esto se perdona con una
+       autorización, y sólo si ya pagó lo más viejo que debía.
+     · LÍMITE  — lo que debe más lo nuevo se pasa de su línea. Esto NO se
+       perdona nunca: es el tope que tú pusiste.
+
+   Por eso una autorización puede dejar pasar una factura y la siguiente
+   volver a frenarse. No es un error: es que el crédito ya no da. */
+
+function clienteDe(id){ return (clientes||[]).find(c=>c.id === id) || null; }
+/* El plazo propio le gana al del taller: hay clientes a 30 días y clientes
+   de contado, y meterlos a todos en el mismo cajón no refleja el trato. */
+function plazoDeCliente(c){
+  const p = num(c && c.plazo, 0);
+  return p > 0 ? p : plazoCxc();
+}
+/* Las ventas de un cliente. Se busca por su id, y si la venta es vieja y no
+   lo trae, por el nombre: así las de antes de este cambio también cuentan. */
+function ventasDeCliente(c){
+  if(!c) return [];
+  const nom = (c.nombre||"").trim().toLowerCase();
+  return (ventas||[]).filter(v=>{
+    if(v.clienteId) return v.clienteId === c.id;
+    return nom && (v.cliente||"").trim().toLowerCase() === nom;
+  });
+}
+function vencidaDe(v, c){
+  return saldoDe(v) > 0 && diasDe(v.fecha) > plazoDeCliente(c);
+}
+/* La foto completa de un cliente: cuánto debe, cuánto de eso ya se venció,
+   cuánto le queda de línea y qué lo está frenando. */
+function creditoDe(c){
+  const r = {limite:num(c && c.credito, 0), deuda:0, vencido:0, disponible:0,
+             conSaldo:[], vencidas:[], masVieja:null, dias:0, plazo:plazoDeCliente(c),
+             bloqueo:null, motivo:"", autoriza:autorizacionVigente(c)};
+  if(!c) return r;
+  const vs = ventasDeCliente(c);
+  vs.forEach(v=>{
+    const sal = saldoDe(v);
+    if(sal <= 0) return;
+    r.deuda += sal;
+    r.conSaldo.push(v);
+    if(vencidaDe(v, c)){
+      r.vencido += sal;
+      r.vencidas.push(v);
+    }
+  });
+  r.deuda = Math.round(r.deuda*100)/100;
+  r.vencido = Math.round(r.vencido*100)/100;
+  r.vencidas.sort((a,b)=> (a.fecha<b.fecha?-1:a.fecha>b.fecha?1:0));
+  r.masVieja = r.vencidas[0] || null;
+  r.dias = r.masVieja ? diasDe(r.masVieja.fecha) : 0;
+  r.disponible = r.limite > 0 ? Math.round((r.limite - r.deuda)*100)/100 : 0;
+  if(r.vencido > 0 && !r.autoriza){
+    r.bloqueo = "vencido";
+    r.motivo = "Debe " + mx(r.vencido) + " vencido" +
+      (r.masVieja ? " · lo más viejo lleva " + r.dias + " día(s)" : "");
+  }else if(r.limite > 0 && r.disponible <= 0){
+    r.bloqueo = "limite";
+    r.motivo = "Ya se pasó de su línea de " + mx(r.limite) + ": debe " + mx(r.deuda);
+  }
+  return r;
+}
+/* La autorización vale para HOY y para una sola cosa. Un permiso que dura
+   para siempre deja de ser permiso y se vuelve un agujero. */
+function autorizacionVigente(c){
+  const a = c && c.autoriza;
+  if(!a || !a.dia) return null;
+  return a.dia === hoyISO() ? a : null;
+}
+/* ¿Se puede facturar? Devuelve el porqué, no sólo sí o no: un "no" sin
+   razón obliga a adivinar, y aquí hay dinero de por medio. */
+/* `folio` es la venta que se está facturando. Hay que descontarla de lo que
+   ya debe: esa venta YA entró en la deuda cuando se registró, y sumarla otra
+   vez la hacía contar doble — una factura de ocho mil con línea de diez mil
+   se frenaba sola diciendo que se pasaba por seis. */
+function puedeFacturar(c, monto, folio){
+  if(!c) return {ok:true};
+  const r = creditoDe(c);
+  const yaContada = folio
+    ? (r.conSaldo.filter(v=>v.folio === folio).reduce((s,v)=>s+saldoDe(v), 0))
+    : 0;
+  const deudaPrevia = Math.round((r.deuda - yaContada)*100)/100;
+  const m = num(monto, 0);
+  if(r.bloqueo === "vencido")
+    return {ok:false, tipo:"vencido", cred:r,
+            motivo:"Tiene " + mx(r.vencido) + " vencido" +
+                   (r.masVieja ? ", lo más viejo de hace " + r.dias + " día(s)" : "") + "."};
+  /* El límite se revisa SIEMPRE, con autorización o sin ella. */
+  if(r.limite > 0 && (deudaPrevia + m) > r.limite + 0.004)
+    return {ok:false, tipo:"limite", cred:r,
+            motivo:"Su línea es de " + mx(r.limite) + " y ya debe " + mx(deudaPrevia) +
+                   (m > 0 ? ". Con esta factura de " + mx(m) + " se pasa por " +
+                            mx(deudaPrevia + m - r.limite) + "." : ".")};
+  return {ok:true, cred:r};
+}
+/* El semáforo que se pinta junto al nombre. */
+function chipCredito(c){
+  const r = creditoDe(c);
+  if(!r.limite && !r.deuda) return "";
+  const cls = r.bloqueo === "vencido" ? "warn" : r.bloqueo === "limite" ? "pend" : "part";
+  const txt = r.bloqueo === "vencido" ? "vencido " + mx(r.vencido)
+            : r.bloqueo === "limite"  ? "sin cupo"
+            : r.limite ? "le quedan " + mx(r.disponible)
+                       : "debe " + mx(r.deuda);
+  return '<span class="pill '+cls+' cliCred">'+esc(txt)+'</span>';
+}
+
+/* ---------- autorizar una factura con vencido ---------- */
+function autorizaFactura(idCliente){
+  const c = clienteDe(idCliente); if(!c) return;
+  const r = creditoDe(c);
+  if(!r.masVieja && !r.vencido){ toast("Este cliente no tiene nada vencido"); return; }
+  /* La condición de Carlos: la autorización sólo existe si ya pagó lo más
+     viejo. Mientras eso siga abierto, el botón no sirve. */
+  if(r.masVieja && saldoDe(r.masVieja) > 0){
+    alert("Todavía no se puede autorizar.\n\n" +
+          "Lo más viejo que debe es el folio " + (r.masVieja.folio||"—") + " del " +
+          (r.masVieja.fecha||"—") + ", con " + mx(saldoDe(r.masVieja)) + " pendientes " +
+          "desde hace " + r.dias + " día(s).\n\n" +
+          "Regístrale ese abono en Ventas → Cuentas por cobrar y vuelve aquí.");
+    return;
+  }
+  const nota = prompt("¿Por qué se autoriza?\n\nQueda escrito con tu nombre y la fecha.",
+                      "Pagó lo más viejo y se le factura hoy");
+  if(nota === null) return;
+  c.autoriza = {dia:hoyISO(), quien:(usuarioActual().nombre || "—"),
+                nota:(nota||"").trim(), cuando:new Date().toISOString()};
+  guardaCliente(c);
+  renderClientes();
+  toast("Autorizado por hoy. El límite sigue aplicando.");
+}
+function quitaAutorizacion(idCliente){
+  const c = clienteDe(idCliente); if(!c) return;
+  c.autoriza = null; guardaCliente(c); renderClientes();
+  toast("Autorización retirada");
+}
+
+/* ---------- el bloque que se pinta en la ficha ---------- */
+function bloqueCredito(c){
+  const r = creditoDe(c);
+  const a = r.autoriza;
+  const barra = r.limite > 0
+    ? '<div class="credBarra"><i style="width:'+
+      Math.min(100, Math.round(r.deuda / r.limite * 100))+'%;background:'+
+      (r.bloqueo ? "var(--warn)" : "var(--good)")+'"></i></div>'
+    : '';
+  return '<div class="credCaja'+(r.bloqueo ? " frenado" : "")+'">' +
+    '<div class="credNums">' +
+      '<div><span>Línea</span><b>'+(r.limite ? mx(r.limite) : "sin línea")+'</b></div>' +
+      '<div><span>Debe hoy</span><b>'+mx(r.deuda)+'</b></div>' +
+      '<div><span>Vencido</span><b class="'+(r.vencido?"mal":"")+'">'+mx(r.vencido)+'</b></div>' +
+      /* "Le queda -2,000" no se lee. Si ya se pasó, se dice que se pasó. */
+      '<div><span>'+(r.disponible < 0 ? "Se pasó por" : "Le queda")+'</span>' +
+        '<b'+(r.disponible < 0 ? ' class="mal"' : '')+'>'+
+        (r.limite ? mx(Math.abs(r.disponible)) : "—")+'</b></div>' +
+    '</div>' + barra +
+    (r.bloqueo
+      ? '<p class="credAviso"><b>No se le puede facturar.</b> '+esc(r.motivo)+'</p>'
+      : '<p class="credBien">Puede facturar.' +
+        (a ? ' <b>Autorizado hoy</b> por '+esc(a.quien)+(a.nota?' — '+esc(a.nota):'')+'.' : '') +
+        '</p>') +
+    '<div class="credAcc">' +
+      (r.bloqueo === "vencido"
+        ? '<button class="btn sm" data-credauth="'+esc(c.id)+'">Autorizar una factura</button>'
+        : '') +
+      (a ? '<button class="btn sm ghost" data-credquita="'+esc(c.id)+'">Quitar la autorización</button>' : '') +
+      (r.masVieja
+        ? '<span class="hint">Lo más viejo: folio '+esc(r.masVieja.folio||"—")+' del '+
+          esc(r.masVieja.fecha||"—")+' · '+mx(saldoDe(r.masVieja))+' · '+r.dias+' día(s)</span>'
+        : '') +
+    '</div></div>';
+}
+
+/* ---------- quién debe más, en el tablero ---------- */
+function renderDeben(){
+  const w = $("#tbDeben"); if(!w) return;
+  const filas = (clientes||[]).map(c=>({c, r:creditoDe(c)}))
+    .filter(x=> x.r.deuda > 0)
+    .sort((a,b)=> (b.r.vencido - a.r.vencido) || (b.r.deuda - a.r.deuda))
+    .slice(0, 6);
+  const cnt = $("#tbDebenCuenta");
+  const totalVenc = (clientes||[]).reduce((s,c)=> s + creditoDe(c).vencido, 0);
+  if(cnt) cnt.textContent = totalVenc > 0 ? mx(totalVenc)+" vencido" : "nadie debe de más";
+  w.innerHTML = filas.length
+    ? filas.map(x=>
+        '<button class="tbDebe" data-debe="'+esc(x.c.id)+'">' +
+          '<span class="tbDebeNom"><b>'+esc(x.c.nombre||"Sin nombre")+'</b>' +
+            '<small>'+(x.r.vencido > 0
+              ? mx(x.r.vencido)+' vencido · '+x.r.dias+' día(s)'
+              : (x.r.limite ? 'al corriente · le quedan '+mx(x.r.disponible) : 'al corriente'))+
+            '</small></span>' +
+          '<span class="tbDebeMonto'+(x.r.vencido>0?" mal":"")+'">'+mx(x.r.deuda)+'</span>' +
+        '</button>').join("")
+    : '<div class="tbVacio">Nadie te debe nada. Así se ve un taller sano.</div>';
+}
+document.addEventListener("click", e=>{
+  const a = e.target.closest("[data-credauth]");
+  if(a){ autorizaFactura(a.dataset.credauth); return; }
+  const q = e.target.closest("[data-credquita]");
+  if(q){ quitaAutorizacion(q.dataset.credquita); return; }
+  const d = e.target.closest("[data-debe]");
+  if(d){
+    clienteSel = d.dataset.debe;
+    const b = document.querySelector('[data-tab="cli"]'); if(b) b.click();
+    setTimeout(()=>{ if(typeof renderClientes === "function") renderClientes(); }, 60);
+    return;
+  }
+});
+
 function diasDe(fecha){
   const d = dmy(fecha); if(isNaN(d)) return 0;
   return Math.max(0, Math.round((Date.now() - d.getTime())/86400000));
@@ -18388,6 +18645,31 @@ let facturando = null;
 function abreGeneraFactura(folio){
   const g = guardadas.find(g=>g.folio===folio) || (cot.folio===folio ? cot : null);
   if(!g){ toast("No encuentro esa cotización"); return; }
+  /* El candado del crédito. Antes de timbrarle a alguien hay que mirar lo
+     que ya debe: una factura más a quien no ha pagado la anterior es cómo
+     se juntan las carteras incobrables. */
+  const cliCred = clienteDe(g.clienteId);
+  if(cliCred){
+    const vta = (ventas||[]).find(v=>v.folio === folio);
+    const monto = vta ? num(vta.total) : 0;
+    const paso = puedeFacturar(cliCred, monto, folio);
+    if(!paso.ok){
+      const r = paso.cred;
+      if(paso.tipo === "vencido"){
+        alert("No se le puede facturar a " + (cliCred.nombre||"este cliente") + ".\n\n" +
+              paso.motivo + "\n\n" +
+              "Para destrabarlo: que pague lo más viejo (folio " +
+              ((r.masVieja && r.masVieja.folio) || "—") + ") y después autorízalo " +
+              "en Clientes → su ficha.");
+      }else{
+        alert("No se le puede facturar a " + (cliCred.nombre||"este cliente") + ".\n\n" +
+              paso.motivo + "\n\n" +
+              "Esto no se autoriza: o cobra algo de lo que debe, o súbele la " +
+              "línea de crédito en su ficha si así lo decidiste.");
+      }
+      return;
+    }
+  }
   facturando = folio;
   const r = calcDe(g);
   const v = ventas.find(v=>v.folio===folio);
@@ -19917,7 +20199,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261024-0932"></script>
-<script src="diagnostico.js?v=20261024-0932"></script>
+<script src="cuenta.js?v=20261024-1003"></script>
+<script src="diagnostico.js?v=20261024-1003"></script>
 </body>
 </html>

@@ -5,14 +5,31 @@ $sourcePath = Join-Path $projectRoot "PRUEBA-restaurant.html"
 if (-not (Test-Path -LiteralPath $sourcePath)) {
   throw "No encuentro PRUEBA-restaurant.html en $projectRoot"
 }
+
+function Get-NativeBuildFingerprint([string]$root) {
+  $inputs = @(
+    "settings.gradle.kts",
+    "build.gradle.kts",
+    "gradle.properties",
+    "gradle\wrapper\gradle-wrapper.properties",
+    "app\build.gradle.kts"
+  ) | ForEach-Object { Join-Path $root $_ }
+  $inputs += (Get-ChildItem -LiteralPath (Join-Path $root "app\src\main") -File -Recurse | Select-Object -ExpandProperty FullName)
+  return ($inputs | Sort-Object -Unique | ForEach-Object {
+    $relativePath = $_.Substring($root.Length).TrimStart('\').ToLowerInvariant()
+    "$relativePath=$((Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash)"
+  }) -join "`n"
+}
+
 $nativeApkPath = Join-Path $projectRoot "android-native\app\build\outputs\apk\release\app-release.apk"
 $nativeHashPath = Join-Path $projectRoot "android-release\Makers-Restaurant.native-source.sha256"
 $legacyApkPath = Join-Path $projectRoot "android-release\Makers-Restaurant.apk"
 $nativeIsCurrent = $false
 if ((Test-Path -LiteralPath $nativeApkPath) -and (Test-Path -LiteralPath $nativeHashPath)) {
-  $sourceHash = (Get-FileHash -LiteralPath $sourcePath -Algorithm SHA256).Hash
+  $androidRoot = Join-Path $projectRoot "android-native"
+  $expectedBuildHash = Get-NativeBuildFingerprint $androidRoot
   $builtSourceHash = [IO.File]::ReadAllText($nativeHashPath).Trim()
-  $nativeIsCurrent = $sourceHash -eq $builtSourceHash
+  $nativeIsCurrent = $expectedBuildHash -eq $builtSourceHash
 }
 $apkSourcePath = if ($nativeIsCurrent) { $nativeApkPath } else { $legacyApkPath }
 $appPath = Join-Path $projectRoot "public\restaurante"
@@ -160,8 +177,26 @@ $serviceWorker = $serviceWorker.Replace("__BUILD_ID__", $buildId)
 [IO.File]::WriteAllText($swPath, $serviceWorker, [Text.UTF8Encoding]::new($false))
 Copy-Item -LiteralPath $apkSourcePath -Destination (Join-Path $appPath "Makers-Restaurant.apk") -Force
 
+if ($nativeIsCurrent) {
+  $appConfigPath = Join-Path $projectRoot "android-native\app\build.gradle.kts"
+  $appConfig = [IO.File]::ReadAllText($appConfigPath)
+  $versionCodeMatch = [regex]::Match($appConfig, '(?m)^\s*versionCode\s*=\s*(\d+)\s*$')
+  $versionNameMatch = [regex]::Match($appConfig, '(?m)^\s*versionName\s*=\s*"([^"]+)"\s*$')
+  if (-not $versionCodeMatch.Success -or -not $versionNameMatch.Success) {
+    throw "No pude leer versionCode y versionName de android-native/app/build.gradle.kts."
+  }
+  $releaseInfo = [ordered]@{
+    packageName = "com.heymakers.restaurant"
+    versionCode = [long]::Parse($versionCodeMatch.Groups[1].Value)
+    versionName = $versionNameMatch.Groups[1].Value
+  }
+  $versionJson = $releaseInfo | ConvertTo-Json -Depth 3
+  [IO.File]::WriteAllText((Join-Path $appPath "version.json"), $versionJson, [Text.UTF8Encoding]::new($false))
+}
+
 Write-Host "App web lista en public/restaurante/ (version $buildId)."
 Write-Host "Incluye el boton de descarga Android y Makers-Restaurant.apk."
+if ($nativeIsCurrent) { Write-Host "Incluye version.json para el boton Buscar actualizaciones del APK." }
 if (-not $nativeIsCurrent) {
   Write-Host "Aviso: aun se usa el APK anterior; compila android-native para incluir la impresion directa."
 }

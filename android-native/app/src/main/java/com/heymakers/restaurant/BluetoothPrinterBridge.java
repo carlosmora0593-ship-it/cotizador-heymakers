@@ -5,7 +5,10 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.print.PrintAttributes;
 import android.print.PrintManager;
@@ -17,7 +20,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -33,7 +40,9 @@ public final class BluetoothPrinterBridge {
     private final Activity activity;
     private final WebView appWebView;
     private final ExecutorService printQueue = Executors.newSingleThreadExecutor();
+    private final ExecutorService updateQueue = Executors.newSingleThreadExecutor();
     private final ArrayList<WebView> systemPrintViews = new ArrayList<>();
+    private volatile long pendingUpdateVersion;
 
     BluetoothPrinterBridge(Activity activity, WebView appWebView) {
         this.activity = activity;
@@ -114,6 +123,103 @@ public final class BluetoothPrinterBridge {
     @JavascriptInterface
     public void printHtmlSystem(String jobId, String title, int paperWidthMm, String bodyHtml, String ticketCss) {
         activity.runOnUiThread(() -> openSystemPrint(jobId, title, paperWidthMm, bodyHtml, ticketCss));
+    }
+
+    @JavascriptInterface
+    public void checkForAppUpdate() {
+        updateQueue.execute(() -> {
+            JSONObject result = new JSONObject();
+            HttpURLConnection connection = null;
+            try {
+                URL url = new URL(MainActivity.APP_URL + "version.json?t=" + System.currentTimeMillis());
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(12000);
+                connection.setReadTimeout(12000);
+                connection.setUseCaches(false);
+                connection.setRequestProperty("Cache-Control", "no-cache");
+                connection.setRequestProperty("Pragma", "no-cache");
+                int responseCode = connection.getResponseCode();
+                if (responseCode != HttpURLConnection.HTTP_OK)
+                    throw new IOException("No se encontró la versión publicada. Publica primero la actualización.");
+
+                StringBuilder body = new StringBuilder();
+                try (BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) body.append(line);
+                }
+                JSONObject published = new JSONObject(body.toString());
+                if (!"com.heymakers.restaurant".equals(published.optString("packageName")))
+                    throw new IOException("La versión publicada no corresponde a Makers Restaurant.");
+
+                long latestVersion = published.getLong("versionCode");
+                long installedVersion = installedVersionCode();
+                if (latestVersion > installedVersion) {
+                    pendingUpdateVersion = latestVersion;
+                    result.put("status", "available");
+                    result.put("versionCode", latestVersion);
+                    result.put("versionName", published.optString("versionName", "nueva"));
+                } else {
+                    pendingUpdateVersion = 0L;
+                    result.put("status", "current");
+                }
+            } catch (Exception e) {
+                pendingUpdateVersion = 0L;
+                try {
+                    result.put("status", "error");
+                    result.put("message", e.getMessage() == null
+                            ? "No se pudo consultar la versión. Revisa tu conexión."
+                            : e.getMessage());
+                } catch (Exception ignored) { }
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+            reportUpdateResult(result);
+        });
+    }
+
+    @JavascriptInterface
+    public void openAppUpdate() {
+        activity.runOnUiThread(() -> {
+            JSONObject result = new JSONObject();
+            try {
+                if (pendingUpdateVersion <= installedVersionCode()) {
+                    pendingUpdateVersion = 0L;
+                    result.put("status", "error");
+                    result.put("message", "Vuelve a buscar; no hay una actualización pendiente.");
+                } else {
+                    Intent intent = new Intent(Intent.ACTION_VIEW,
+                            Uri.parse(MainActivity.APP_URL + "Makers-Restaurant.apk"));
+                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                    activity.startActivity(intent);
+                    pendingUpdateVersion = 0L;
+                    result.put("status", "download_started");
+                }
+            } catch (Exception e) {
+                try {
+                    result.put("status", "error");
+                    result.put("message", "No se pudo abrir la descarga del APK.");
+                } catch (Exception ignored) { }
+            }
+            reportUpdateResult(result);
+        });
+    }
+
+    private long installedVersionCode() throws Exception {
+        PackageInfo info = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.P ? info.getLongVersionCode() : info.versionCode;
+    }
+
+    private void reportUpdateResult(JSONObject result) {
+        String js = "window.onMakersAppUpdateResult&&window.onMakersAppUpdateResult("
+                + JSONObject.quote(result.toString()) + ");";
+        appWebView.post(() -> appWebView.evaluateJavascript(js, null));
+    }
+
+    void close() {
+        printQueue.shutdownNow();
+        updateQueue.shutdownNow();
     }
 
     private void openSystemPrint(String jobId, String title, int paperWidthMm,
