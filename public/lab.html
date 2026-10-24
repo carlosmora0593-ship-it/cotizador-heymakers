@@ -179,6 +179,10 @@ td.der,th.der{text-align:right;font-variant-numeric:tabular-nums}
 .leyenda i{width:11px;height:11px;border-radius:3px;display:inline-block}
 .globo{position:fixed;z-index:60;pointer-events:none;background:var(--ink);color:var(--ground);
   border-radius:7px;padding:7px 10px;font-size:12px;line-height:1.35;box-shadow:var(--sombra);white-space:nowrap}
+/* El globo fijo lleva mensajes largos —"falta correr tal archivo"— y con
+   nowrap se salían de la pantalla por los dos lados: el aviso más
+   importante era justo el que no se alcanzaba a leer. */
+.globo.fijo{white-space:normal;max-width:min(560px,92vw);text-align:left;padding:11px 14px;font-size:12.5px}
 
 .telon{position:fixed;inset:0;background:rgba(10,16,22,.42);z-index:40;opacity:0;transition:opacity .18s}
 .telon[hidden]{display:none!important}
