@@ -42,6 +42,16 @@
     Cache-Control = "no-cache"
 
 [[headers]]
+  for = "/tiendita/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/tiendita/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
   for = "/version.json"
   [headers.values]
     Cache-Control = "no-store"

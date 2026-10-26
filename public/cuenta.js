@@ -251,10 +251,10 @@ function rol(){
    publicadas, y seguían invisibles porque nadie las dio de alta aquí.
    Si se agrega una sección nueva al cotizador, se agrega aquí también. */
 const PERMISOS = {
-  admin:      ["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","val","asi","nom","set"],
+  admin:      ["inicio","cot","mos","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","val","asi","nom","set"],
   /* Ventas no entra al catálogo: ahí viven los costos y las existencias, y
      tocarlos sin querer le cambia el precio a todas las cotizaciones. */
-  ventas:     ["inicio","cot","sav","pro","dis","cli","arc","com","val","asi"],
+  ventas:     ["inicio","cot","mos","sav","pro","dis","cli","arc","com","val","asi"],
   diseno:     ["inicio","dis","pro","val","asi"],
   /* El taller sí ve el inventario, pero el suyo: existencias sin un peso. */
   produccion: ["inicio","pro","inv","com","val","asi"]

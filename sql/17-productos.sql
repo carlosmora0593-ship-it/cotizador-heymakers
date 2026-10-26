@@ -6,7 +6,7 @@
 --
 --    taller      · Taller Makers      — imprenta y serigrafía (el cotizador)
 --    restaurant  · Makers Restaurant  — mesas, comandas y cobro
---    tiendita    · Tiendita Makers    — abarrotes (todavía no existe)
+--    tiendita    · Tiendita Makers    — punto de venta e inventario para abarrotes
 --
 --  Una decisión que conviene entender: **no hay base aparte por producto**.
 --  Cada cuenta dice de qué producto es, y los datos ya estaban separados por

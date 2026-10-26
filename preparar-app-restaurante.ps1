@@ -47,9 +47,9 @@ if (-not (Test-Path -LiteralPath $iconPath)) {
 $page = [IO.File]::ReadAllText($sourcePath)
 $viewport = '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
 if (-not $page.Contains($viewport)) { throw "No encontré el punto de inserción del encabezado de la app." }
-$storageAnchor = 'const LS = "makersrest_v1";'
+$storageAnchor = 'const LS_BASE = "makersrest_v1";'
 if (-not $page.Contains($storageAnchor)) { throw "No encontré la clave de almacenamiento para aislar los datos de la app." }
-$page = $page.Replace($storageAnchor, 'const LS = "makersrest_pwa_v1";')
+$page = $page.Replace($storageAnchor, 'const LS_BASE = "makersrest_pwa_v1";')
 
 $pwaHead = @'
 <meta name="theme-color" content="#204a3b">

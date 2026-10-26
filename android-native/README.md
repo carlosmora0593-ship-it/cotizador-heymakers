@@ -25,4 +25,4 @@ Requisitos en Windows: Android Studio con JDK 17 y Android SDK Platform 35. El s
 
 Antes de sustituir el APK que ya usas, exporta un respaldo desde Ajustes → Respaldo. La nueva versión es una app WebView y Android mantiene su almacenamiento del sitio separado del almacenamiento de Chrome/TWA; después de instalar, restaura ese respaldo.
 
-La compilación copia `PRUEBA-restaurant.html` a los recursos Android antes de compilar, deja el APK firmado en `android-release/Makers-Restaurant.apk` y prepara `public/restaurante/` para publicar en Netlify. Para actualizar una versión existente, publica esa carpeta y luego instala el APK firmado con la misma llave.
+La compilación copia la fuente estable `PRUEBA-restaurant.html` a los recursos Android antes de compilar, deja el APK firmado en `android-release/Makers-Restaurant.apk` y prepara `public/restaurante/` para publicar en Netlify. Para actualizar una versión existente, publica esa carpeta y luego instala el APK firmado con la misma llave.

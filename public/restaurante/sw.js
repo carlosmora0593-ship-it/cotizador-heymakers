@@ -1,4 +1,4 @@
-const CACHE_NAME = "makers-restaurant-966ebe04a3ae";
+const CACHE_NAME = "makers-restaurant-event-return-v4";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,

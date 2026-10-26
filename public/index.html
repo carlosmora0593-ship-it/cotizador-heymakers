@@ -203,6 +203,22 @@ tr:hover td{background:var(--surface-2)}
 /* tallas */
 .tallas{display:grid;gap:6px}
 .talla-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.4fr) 88px 34px;gap:8px;align-items:center}
+/* Cuando el artículo no lleva una de las dos, su columna no se dibuja y
+   la cuadrícula se cierra sola: no quedan huecos ni cosas desalineadas. */
+.tallas.sinTalla .talla-row{grid-template-columns:minmax(0,1.6fr) 88px 34px}
+.tallas.sinColor .talla-row{grid-template-columns:minmax(0,1.6fr) 88px 34px}
+.talla-row select{min-width:0}
+/* la casilla de colores en el catálogo */
+.cColor{white-space:nowrap}
+.colSw{display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}
+.colSw input{width:auto}
+.colSw span{font-size:11px;color:var(--ink-3)}
+.colLista{margin-top:6px;font-size:12px;min-width:176px}
+/* La tabla de artículos ya lleva diez columnas. Sin un ancho mínimo, el
+   nombre —que es lo que uno lee— se aplasta hasta volverse "Playe…".
+   La tabla ya se desliza de lado; el nombre no se negocia. */
+#t_articulos input[data-f="nombre"]{min-width:200px}
+#t_articulos input[data-f="cat"]{min-width:116px}
 .talla-head{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);font-weight:600}
 .sum-bad{color:var(--warn);font-weight:600}
 
@@ -521,7 +537,171 @@ body.rol-produccion .estadoPedido{display:none!important}
   padding:1px 7px;border-radius:5px}
 .clase-oc{background:var(--cyan-soft);color:var(--cyan)}
 .clase-factura{background:var(--good-soft);color:var(--good)}
+/* ---- mostrador ---- */
+.mosWrap{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:18px;align-items:start}
+.mosBuscar{display:flex;gap:8px}
+.mosBuscar input{flex:1;min-width:0;font-size:16px}
+.mosCats{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 12px}
+.mosCats button{border:1px solid var(--line);background:var(--surface-2);color:var(--ink-2);
+  border-radius:999px;padding:6px 13px;font:inherit;font-size:12.5px;cursor:pointer}
+.mosCats button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink,#fff)}
+.mosRejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.mosIt{display:flex;flex-direction:column;gap:6px;padding:10px;border:1px solid var(--line);
+  border-radius:12px;background:var(--surface-2);cursor:pointer;font:inherit;color:var(--ink);
+  text-align:left;transition:transform .08s ease,border-color .12s ease}
+.mosIt:hover{border-color:var(--cyan);transform:translateY(-1px)}
+.mosIt:active{transform:translateY(0) scale(.985)}
+.mosIt .artMini,.mosIt .artSinFoto{width:100%;height:76px;border-radius:8px;object-fit:cover}
+.mosIt b{font-size:12.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;
+  -webkit-box-orient:vertical;overflow:hidden}
+.mosIt .mosPrecio{font-weight:700;font-size:15px;color:var(--cyan)}
+.mosIt small{font-size:10.5px;color:var(--ink-3)}
+.mosIt .mosAgotado{color:var(--warn);font-weight:600}
+.mosVacio{grid-column:1/-1;color:var(--ink-3);font-size:13px;padding:22px;text-align:center}
+.mosTicket{position:sticky;top:14px}
+.mosLineas{margin:14px 0 0;display:grid;gap:8px;max-height:46vh;overflow:auto}
+.mosLin{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;
+  padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2)}
+.mosLin b{font-size:12.5px;line-height:1.3;min-width:0}
+.mosLin .mosImp{font-weight:700;font-size:13.5px;white-space:nowrap;text-align:right}
+.mosLin .mosCant{grid-column:1/-1;display:flex;align-items:center;gap:7px;margin-top:2px}
+.mosLin .mosCant button{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink);font:inherit;font-size:15px;line-height:1;cursor:pointer}
+.mosLin .mosCant input{width:56px;text-align:center;padding:3px 4px;font-size:13px}
+.mosLin .mosCant small{color:var(--ink-3);font-size:11px;margin-left:auto}
+.mosLin .mosX{margin-left:4px;color:var(--ink-3)}
+.mosTickVacio{color:var(--ink-3);font-size:13px;padding:26px 6px;text-align:center}
+.mosTot{margin-top:14px;border-top:1px solid var(--line);padding-top:12px;display:grid;gap:5px}
+.mosTot div{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-2)}
+.mosTot div.gran{font-size:19px;font-weight:700;color:var(--ink);margin-top:4px;
+  border-top:1px solid var(--line);padding-top:9px}
+.mosBtnCobrar{width:100%;margin-top:14px;font-size:16px;padding:13px}
+.mpTotal{display:flex;justify-content:space-between;align-items:baseline;
+  padding:14px 16px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+.mpTotal b{font-size:28px}
+.mpFormas{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.mpFormas button{flex:1 1 110px;padding:11px 10px;border-radius:11px;border:1px solid var(--line);
+  background:var(--surface-2);color:var(--ink-2);font:inherit;font-size:13px;cursor:pointer}
+.mpFormas button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink,#fff);font-weight:600}
+.mpRapido{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.mpRapido button{padding:8px 14px;border-radius:9px;border:1px solid var(--line);
+  background:var(--surface-2);color:var(--ink);font:inherit;font-size:13.5px;cursor:pointer}
+.mpCambio{margin:14px 0 0;font-size:15px}
+.mpCambio b{font-size:22px}
+@media(max-width:1000px){
+  .mosWrap{grid-template-columns:1fr}
+  .mosTicket{position:static}
+  .mosLineas{max-height:none}
+}
+/* el ticket impreso, angosto como el papel térmico */
+.paper.ticket{max-width:302px;padding:16px 14px;font-size:11.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.paper.ticket h1{font-size:15px;text-align:center;margin:0 0 2px}
+.paper.ticket .tkCentro{text-align:center;font-size:10.5px;line-height:1.45}
+.paper.ticket table{width:100%;font-size:11px;margin:10px 0}
+.paper.ticket td{padding:2px 0;vertical-align:top}
+.paper.ticket .tkD{text-align:right;white-space:nowrap}
+.paper.ticket .tkRaya{border-top:1px dashed #000;margin:8px 0}
+.paper.ticket .tkTot{display:flex;justify-content:space-between;font-size:13px;font-weight:700}
+
+/* ---- turno de caja ---- */
+.tnAbrir{margin-left:auto;display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+.tnAbrir select,.tnAbrir input{width:150px}
+.tnCorte{margin-top:20px;border-top:1px solid var(--line);padding-top:16px}
+.tnCorteCab{display:flex;align-items:center;gap:10px}
+.tnCorteCab b{font-size:15px}
+.tnCiego{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;
+  padding:3px 9px;border-radius:999px;background:var(--accent);color:var(--accent-ink,#fff)}
+.tnPasados{margin-top:22px;border-top:1px solid var(--line);padding-top:16px}
+.tnPasadosCab{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);
+  font-weight:700;margin-bottom:10px}
+.tnFila{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:11px 13px;margin-bottom:8px;
+  border:1px solid var(--line);border-left-width:4px;border-radius:10px;background:var(--surface-2)}
+.tnFila.tnOk{border-left-color:var(--good)}
+.tnFila.tnFalta{border-left-color:var(--accent)}
+.tnFila.tnSobra{border-left-color:var(--warn)}
+.tnQ{display:flex;flex-direction:column;min-width:150px}
+.tnQ small{font-size:11px;color:var(--ink-3);font-family:ui-monospace,Menlo,monospace}
+.tnDato{display:flex;flex-direction:column;font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.tnDato small{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
+  font-family:var(--fuente,inherit);font-weight:600}
+.tnDif{margin-left:auto;font-weight:700;font-size:13.5px}
+.tnFila.tnOk .tnDif{color:var(--good)}
+.tnFila.tnFalta .tnDif{color:var(--accent)}
+.tnFila.tnSobra .tnDif{color:var(--warn)}
+.tnFila .tnNota{flex-basis:100%;font-size:12px;color:var(--ink-2)}
+.mov.retiro .monto{color:var(--warn)}
+
+.tnHuerfanos{margin-top:20px;padding:13px 15px;border:1px solid var(--warn);border-radius:12px;
+  background:var(--warn-soft,color-mix(in srgb,var(--warn) 10%,transparent));font-size:13px;line-height:1.5}
+.tnHuerfanos b{font-size:15px}
+
+/* ---- granel, promociones y caducidad ---- */
+.mosBascula{margin-top:14px;border:1px solid var(--warn);border-radius:13px;padding:15px;
+  background:var(--warn-soft,color-mix(in srgb,var(--warn) 10%,transparent))}
+.mosBascula h3{margin:0}
+.bsFila{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.bsFila input{max-width:140px;font-family:ui-monospace,Menlo,monospace;font-size:17px;text-align:right}
+.bsRapidos{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+.bsImporte{margin:13px 0 0;font-size:14px}
+.bsImporte b{font-size:21px;font-family:ui-monospace,Menlo,monospace;color:var(--good)}
+.mosCinta{position:absolute;top:7px;right:7px;z-index:2;font-size:9.5px;padding:2px 7px;
+  border-radius:999px;letter-spacing:.04em;text-transform:uppercase;font-weight:700;
+  font-family:ui-monospace,Menlo,monospace}
+.mosCinta.promo{background:var(--accent);color:var(--accent-ink,#fff)}
+.mosCinta.granel{background:var(--warn);color:#2a1a00;top:auto;bottom:7px;right:7px}
+.mosCinta.caduca{background:var(--accent);color:var(--accent-ink,#fff);top:7px;right:auto;left:7px}
+.mosIt{position:relative}
+.mosUni{font-style:normal;font-size:11px;color:var(--ink-3);font-weight:400}
+.mosPeso{min-width:62px;text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+/* La regla de arriba fija TODOS los botones del renglón a 26x26 —que es
+   lo que quieren el + y el −— y aplastaba "Volver a pesar" hasta que el
+   texto se encimaba con el peso. Los botones con palabras van aparte. */
+.mosLin .mosCant .btn{width:auto;height:auto;padding:4px 11px;font-size:11.5px;
+  white-space:nowrap;flex:none;line-height:1.4}
+.mosLin .mosCant{flex-wrap:wrap;row-gap:5px}
+.mosAhorro{grid-column:1/-1;font-size:11px;color:var(--good);font-family:ui-monospace,Menlo,monospace}
+.mosAhorrado span{color:var(--good)}
+.pistaOjo{color:var(--ink)!important}
+.cPromo{white-space:nowrap}
+.promoBtn{display:flex;flex-direction:column;align-items:flex-start;gap:1px;width:100%;
+  min-width:140px;padding:6px 9px;border:1px dashed var(--line);border-radius:9px;
+  background:var(--surface-2);color:var(--ink);cursor:pointer;font:inherit;text-align:left;line-height:1.25}
+.promoBtn:hover{border-color:var(--accent)}
+.promoBtn b{font-size:12.5px;color:var(--ink-3);font-weight:500}
+.promoBtn small{font-size:10.5px;color:var(--ink-3)}
+.promoBtn.hay{border-style:solid;border-color:var(--accent)}
+.promoBtn.hay b{color:var(--accent);font-weight:700;font-family:ui-monospace,Menlo,monospace}
+.cCaduca{white-space:nowrap;min-width:150px}
+.cCaduca input{min-width:132px}
+.caducaEt{display:block;margin-top:4px;font-size:10.5px;font-weight:600}
+.caducaEt.pronto{color:var(--warn)}
+.caducaEt.hoy,.caducaEt.vencido{color:var(--accent)}
+.prTipos{display:grid;gap:8px}
+.prTipo{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:12px 14px;
+  border:1px solid var(--line);border-radius:12px;background:var(--surface-2);color:var(--ink);
+  font:inherit;text-align:left;cursor:pointer}
+.prTipo:hover{border-color:var(--accent)}
+.prTipo.act{border-color:var(--good);background:var(--good-soft)}
+.prTipo b{font-size:14px;font-weight:600}
+.prTipo small{font-size:12px;color:var(--ink-3)}
+.prTipo.act small{color:var(--ink-2)}
+
 /* ---- códigos del artículo ---- */
+/* ---- el giro ---- */
+.giroOps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.giroOp{position:relative;display:flex;flex-direction:column;gap:3px;align-items:flex-start;
+  padding:14px 15px;border:1px solid var(--line);border-radius:13px;background:var(--surface-2);
+  color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.giroOp:hover{border-color:var(--cyan)}
+.giroOp.act{border-color:var(--good);background:var(--good-soft)}
+.giroOp b{font-size:14.5px;font-weight:600}
+.giroOp small{font-size:12px;color:var(--ink-3);line-height:1.4}
+.giroOp.act small{color:var(--ink-2)}
+.giroCheck{position:absolute;top:12px;right:13px;width:17px;height:17px;border-radius:50%;
+  border:1.5px solid var(--line)}
+.giroOp.act .giroCheck{border-color:var(--good);background:var(--good)}
+.giroOp.act .giroCheck::after{content:"";position:absolute;left:5px;top:2px;width:5px;height:9px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(42deg)}
 .cdFila{display:flex;gap:6px;align-items:stretch}
 .cdFila input{min-width:0;flex:1}
 .cdFila .btn{white-space:nowrap;align-self:stretch}
@@ -530,7 +710,7 @@ body.rol-produccion .estadoPedido{display:none!important}
   width:100%;min-width:132px;padding:6px 9px;border:1px solid var(--line);
   border-radius:9px;background:var(--surface-2);color:var(--ink);cursor:pointer;
   font:inherit;text-align:left;line-height:1.25}
-.codsBtn:hover{border-color:var(--brand);background:var(--surface)}
+.codsBtn:hover{border-color:var(--cyan);background:var(--surface)}
 .codsBtn b{font-size:12.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .codsBtn small{font-size:10.5px;color:var(--ink-3)}
 .codsBtn.falta{border-style:dashed}
@@ -2982,6 +3162,7 @@ body.rol-produccion #btnPrint{display:none!important}
       <nav class="tabs" id="tabs" role="menu" hidden>
         <button role="menuitem" data-tab="inicio" aria-selected="true"><b>Inicio</b><small>Qué pasó y qué urge</small></button>
         <button role="menuitem" data-tab="cot" aria-selected="false"><b>Cotizar</b><small>Armar una cotización nueva</small></button>
+        <button role="menuitem" data-tab="mos" aria-selected="false"><b>Mostrador</b><small>Vender y cobrar en el momento</small></button>
         <button role="menuitem" data-tab="sav" aria-selected="false"><b>Cotizaciones / Pedidos</b><small>Guardadas, confirmadas y por facturar</small></button>
         <button role="menuitem" data-tab="dis" aria-selected="false"><b>Diseño</b><small>Archivos de impresión de cada orden</small></button>
         <button role="menuitem" data-tab="pro" aria-selected="false"><b>Producción</b><small>Tablero de órdenes y su estatus</small></button>
@@ -3365,6 +3546,55 @@ body.rol-produccion #btnPrint{display:none!important}
     </div>
   </div>
 </div>
+</section>
+
+<!-- ============ MOSTRADOR ============ -->
+<section id="tab-mos" hidden>
+  <div class="mosWrap">
+    <div class="mosIzq">
+      <div class="card">
+        <div class="body">
+          <div class="mosBuscar">
+            <input id="mosQ" placeholder="Escanea el código o escribe el nombre" autocomplete="off"
+                   autocapitalize="off" spellcheck="false">
+            <button class="btn ghost" id="mosLimpia" type="button">Limpiar</button>
+          </div>
+          <p class="note" id="mosPista" style="margin:10px 0 0">
+            Con un lector conectado, basta escanear: el artículo entra solo al ticket.
+            Sin lector, escribe y toca el artículo.
+          </p>
+          <div class="mosBascula" id="mosBascula" hidden>
+            <h3 id="bsQue">Pesar</h3>
+            <p class="note" id="bsPrecio" style="margin:2px 0 0"></p>
+            <div class="bsFila">
+              <label class="f" for="bsPeso" style="position:absolute;left:-9999px">Peso</label>
+              <input id="bsPeso" type="number" min="0" step="0.001" inputmode="decimal">
+              <button class="btn primary" id="bsOk" type="button">Agregar</button>
+              <button class="btn ghost" id="bsNo" type="button">Cancelar</button>
+            </div>
+            <div class="bsRapidos" id="bsRapidos"></div>
+            <p class="bsImporte" id="bsImporte"></p>
+          </div>
+          <div class="mosCats" id="mosCats"></div>
+          <div class="mosRejilla" id="mosRejilla"></div>
+        </div>
+      </div>
+    </div>
+    <aside class="mosDer">
+      <div class="card mosTicket">
+        <header><h2>Ticket</h2>
+          <span class="hint" id="mosFolio"></span>
+          <button class="btn sm ghost" id="mosVacia" type="button">Vaciar</button></header>
+        <div class="body">
+          <label class="f" for="mosCli">Cliente</label>
+          <select id="mosCli"></select>
+          <div class="mosLineas" id="mosLineas"></div>
+          <div class="mosTot" id="mosTot"></div>
+          <button class="btn primary mosBtnCobrar" id="mosCobrar" type="button" disabled>Cobrar</button>
+        </div>
+      </div>
+    </aside>
+  </div>
 </section>
 
 <!-- ============ CATÁLOGO ============ -->
@@ -4258,6 +4488,26 @@ body.rol-produccion #btnPrint{display:none!important}
     </div>
   </div>
 
+  <div class="card secOculta" data-set="giro" id="cardGiro">
+    <header><h2>Giro del negocio</h2><span class="hint">qué edición de Makers OS usas</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">
+        Es el mismo programa. Lo que cambia es qué secciones se ven y cómo se llaman:
+        un abarrotes no cotiza ni produce, pero sí cobra, sí lleva inventario y sí fía.
+        <b>Nada se borra al cambiar de giro</b>: lo que esconde una edición sigue ahí si
+        regresas a la otra.
+      </p>
+      <div class="giroOps" id="giroOps"></div>
+      <p class="note" id="giroQueCambia" style="margin-top:14px"></p>
+      <label class="sw" style="margin-top:16px"><input type="checkbox" id="p_turnos">
+        Llevar la caja por <b>turno de cajero</b></label>
+      <p class="note" style="margin-top:8px">
+        Cada quien abre su turno con el fondo que recibe y lo entrega contando a ciegas —sin
+        ver cuánto debería haber—. Es la única forma de saber de quién era el cajón cuando
+        falta dinero. En la tiendita viene prendido; en el taller, apagado.
+      </p>
+    </div>
+  </div>
   <div class="card secOculta" data-set="timbrado" id="cardTimbrado">
     <header><h2>Facturación electrónica</h2><span class="hint">cómo se timbran tus facturas</span></header>
     <div class="body">
@@ -4745,6 +4995,61 @@ body.rol-produccion #btnPrint{display:none!important}
   </div>
 </div>
 
+<div class="modal" id="modalMos" hidden>
+  <div class="card" style="width:min(620px,100%);max-height:92vh;overflow:auto">
+    <header><h2>Cobrar</h2>
+      <button class="btn sm" id="mpCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <div class="mpTotal"><span>Total a cobrar</span><b id="mpTotal">$0.00</b></div>
+      <div class="mpFormas" id="mpFormas"></div>
+      <div id="mpEfectivo">
+        <label class="f" for="mp_recibe">¿Con cuánto paga?</label>
+        <div class="mosBuscar"><input id="mp_recibe" type="number" min="0" step="0.5" inputmode="decimal">
+          <button class="btn ghost" id="mp_exacto" type="button">Exacto</button></div>
+        <div class="mpRapido" id="mpRapido"></div>
+        <p class="mpCambio" id="mpCambio"></p>
+      </div>
+      <p class="note" id="mpAviso" style="margin:14px 0 0" hidden></p>
+      <div class="row-actions" style="margin-top:18px">
+        <button class="btn primary" id="mp_ok">Cobrar e imprimir</button>
+        <button class="btn" id="mp_okSin">Cobrar sin ticket</button>
+        <button class="btn ghost" id="mp_cancel">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal" id="modalPromo" hidden>
+  <div class="card" style="width:min(560px,100%)">
+    <header><h2>Promoción del artículo</h2>
+      <button class="btn sm" id="prCerrar" style="margin-left:auto">Cerrar</button></header>
+    <div class="body">
+      <p class="note" id="prQuien" style="margin:0 0 16px"></p>
+      <div class="prTipos" id="prTipos"></div>
+      <div id="prNxm" hidden style="margin-top:14px">
+        <div class="grid g2">
+          <div><label class="f" for="pr_lleva">Si se lleva</label>
+            <input id="pr_lleva" type="number" min="2" step="1" value="3"></div>
+          <div><label class="f" for="pr_paga">Paga nada más</label>
+            <input id="pr_paga" type="number" min="1" step="1" value="2"></div>
+        </div>
+      </div>
+      <div id="prPaq" hidden style="margin-top:14px">
+        <div class="grid g2">
+          <div><label class="f" for="pr_piezas">Paquete de</label>
+            <input id="pr_piezas" type="number" min="2" step="1" value="2"></div>
+          <div><label class="f" for="pr_precio">Se cobra en</label>
+            <input id="pr_precio" type="number" min="0" step="0.5" value="0"></div>
+        </div>
+      </div>
+      <p class="note" id="prEjemplo" style="margin-top:16px"></p>
+      <div class="row-actions" style="margin-top:18px">
+        <button class="btn primary" id="pr_ok">Guardar</button>
+        <button class="btn" id="pr_quita">Quitar la promoción</button>
+        <button class="btn ghost" id="pr_cancel">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal" id="modalCods" hidden>
   <div class="card" style="width:min(760px,100%);max-height:92vh;overflow:auto">
     <header><h2>Códigos del artículo</h2>
@@ -5159,21 +5464,21 @@ const uid = () => Math.random().toString(36).slice(2,9);
 function defaults(){ return {
  articulos:[
   {id:"a1",nombre:"Playera cuello redondo algodón — blanca",cat:"Textil",costo:65,precio:104,tallas:true,existencia:0,minimo_inv:0},
-  {id:"a2",nombre:"Playera cuello redondo algodón — color",cat:"Textil",costo:78,precio:125,tallas:true,existencia:0,minimo_inv:0},
-  {id:"a3",nombre:"Playera poliéster deportiva (sublimable)",cat:"Textil",costo:72,precio:115,tallas:true,existencia:0,minimo_inv:0},
+  {id:"a2",nombre:"Playera cuello redondo algodón — color",cat:"Textil",costo:78,precio:125,tallas:true,colores:true,listaColores:"Negra, Marino, Roja, Gris jaspe, Vino",existencia:0,minimo_inv:0},
+  {id:"a3",nombre:"Playera poliéster deportiva (sublimable)",cat:"Textil",costo:72,precio:115,tallas:true,colores:true,listaColores:"Blanca, Negra, Marino, Roja",existencia:0,minimo_inv:0},
   {id:"a4",nombre:"Playera premium 24/1 peinada",cat:"Textil",costo:110,precio:176,tallas:true,existencia:0,minimo_inv:0},
   {id:"a5",nombre:"Camisa polo piqué",cat:"Textil",costo:165,precio:264,tallas:true,existencia:0,minimo_inv:0},
-  {id:"a6",nombre:"Sudadera con capucha",cat:"Textil",costo:230,precio:368,tallas:true,existencia:0,minimo_inv:0},
-  {id:"a7",nombre:"Gorra 5 paneles",cat:"Gorras",costo:85,precio:136,tallas:false,existencia:0,minimo_inv:0},
-  {id:"a8",nombre:"Gorra trucker malla",cat:"Gorras",costo:95,precio:152,tallas:false,existencia:0,minimo_inv:0},
+  {id:"a6",nombre:"Sudadera con capucha",cat:"Textil",costo:230,precio:368,tallas:true,colores:true,listaColores:"Negra, Gris, Marino",existencia:0,minimo_inv:0},
+  {id:"a7",nombre:"Gorra 5 paneles",cat:"Gorras",costo:85,precio:136,tallas:false,colores:true,listaColores:"Negra, Blanca, Marino, Roja, Beige",existencia:0,minimo_inv:0},
+  {id:"a8",nombre:"Gorra trucker malla",cat:"Gorras",costo:95,precio:152,tallas:false,colores:true,listaColores:"Negra/blanca, Marino/blanca, Roja/blanca",existencia:0,minimo_inv:0},
   {id:"a9",nombre:"Taza cerámica 11 oz blanca",cat:"Tazas",costo:28,precio:45,tallas:false,existencia:0,minimo_inv:0},
-  {id:"a10",nombre:"Taza mágica 11 oz",cat:"Tazas",costo:45,precio:72,tallas:false,existencia:0,minimo_inv:0},
-  {id:"a11",nombre:"Termo acero 20 oz",cat:"Termos",costo:150,precio:240,tallas:false,existencia:0,minimo_inv:0},
-  {id:"a12",nombre:"Ánfora aluminio 750 ml",cat:"Termos",costo:95,precio:152,tallas:false,existencia:0,minimo_inv:0},
+  {id:"a10",nombre:"Taza mágica 11 oz",cat:"Tazas",costo:45,precio:72,tallas:false,colores:true,listaColores:"Negra, Roja, Azul, Verde",existencia:0,minimo_inv:0},
+  {id:"a11",nombre:"Termo acero 20 oz",cat:"Termos",costo:150,precio:240,tallas:false,colores:true,listaColores:"Acero, Negro, Blanco, Rosa",existencia:0,minimo_inv:0},
+  {id:"a12",nombre:"Ánfora aluminio 750 ml",cat:"Termos",costo:95,precio:152,tallas:false,colores:true,listaColores:"Plata, Negra, Azul, Roja",existencia:0,minimo_inv:0},
   {id:"a13",nombre:"Tote bag manta cruda",cat:"Textil",costo:45,precio:72,tallas:true,existencia:0,minimo_inv:0},
   {id:"a14",nombre:"Mousepad sublimable",cat:"Oficina",costo:25,precio:40,tallas:false,existencia:0,minimo_inv:0},
   {id:"a15",nombre:"Llavero MDF",cat:"Promocional",costo:12,precio:19,tallas:false,existencia:0,minimo_inv:0},
-  {id:"a16",nombre:"Funda de celular sublimable",cat:"Promocional",costo:55,precio:88,tallas:false,existencia:0,minimo_inv:0}
+  {id:"a16",nombre:"Funda de celular sublimable",cat:"Promocional",costo:55,precio:88,tallas:false,colores:true,listaColores:"Transparente, Negra, Blanca",existencia:0,minimo_inv:0}
  ],
  /* La tinta va por color. El blanco se lleva la mitad del consumo de un
     DTF y se compra más caro: en un solo renglón eso no se ve, y es el que
@@ -5336,7 +5641,7 @@ function estrenaGuiado(){
   P.guiadoElegido = true;
   try{ persist(); }catch(e){}
 }
-function defaultParams(){ return {guiado:true, guiadoElegido:false, plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
+function defaultParams(){ return {giro:"taller", guiado:true, guiadoElegido:false, plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
   tarifaKwh:4, bloqueoMin:10,
   folios:{letras:"", extra:"", digitos:6, desde:{cot:1, op:1, req:1}},
   compras:{tope:2000, siempre:false},
@@ -5385,11 +5690,12 @@ function esTextil(g){ const a = cat.articulos.find(a=>a.id===(g||cot).articuloId
    alto que ya existe con esas letras. Es a propósito: una cotización que se
    empieza y no se guarda no debe quemarse un folio, y si alguien restaura un
    respaldo viejo el número se reacomoda solo en vez de repetirse. */
-const PREFIJO_FOLIO = {cot:"COT", op:"OP", req:"REQ"};
+const PREFIJO_FOLIO = {cot:"COT", op:"OP", req:"REQ", mos:"VTA"};
 
 function foliosCfg(){
-  if(!P.folios) P.folios = {letras:"", extra:"", digitos:6, desde:{cot:1, op:1, req:1}};
-  if(!P.folios.desde) P.folios.desde = {cot:1, op:1, req:1};
+  if(!P.folios) P.folios = {letras:"", extra:"", digitos:6, desde:{cot:1, op:1, req:1, mos:1}};
+  if(!P.folios.desde) P.folios.desde = {cot:1, op:1, req:1, mos:1};
+  if(P.folios.desde.mos == null) P.folios.desde.mos = 1;
   return P.folios;
 }
 const letrasFolio = () => String(foliosCfg().letras||"").toUpperCase().replace(/[^A-Z]/g,"").slice(0,3);
@@ -5407,6 +5713,7 @@ function foliosDe(tipo){
   if(tipo === "cot") return guardadas.map(g=>g.folio);
   if(tipo === "op")  return guardadas.map(g=> g.op && g.op.folio);
   if(tipo === "req") return (typeof compras === "function" ? compras() : []).map(r=>r.folio);
+  if(tipo === "mos") return (ventas||[]).map(v=>v.folio);
   return [];
 }
 function ultimoFolio(tipo){
@@ -6714,12 +7021,31 @@ function animaNum(el, destino){
 function renderTallas(){
   const w = $("#tallas");
   if(!cot.tallas.length){
-    w.innerHTML = '<div class="empty">Sin desglose. Si lo llenas, la cantidad de piezas se calcula sola y el desglose aparece en la orden de producción.</div>';
+    w.classList.remove("sinTalla","sinColor");
+    w.innerHTML = '<div class="empty">Sin desglose. Si lo llenas, la cantidad de piezas se calcula sola y '+
+      'el desglose aparece en la orden de producción.</div>';
   } else {
-    w.innerHTML = '<div class="talla-row talla-head"><span>Talla</span><span>Color</span><span>Cantidad</span><span></span></div>' +
+    /* Las columnas son las que el artículo usa. Una taza no enseña una
+       casilla de talla vacía que nadie va a llenar. */
+    const conT = llevaTallas(cot), conC = llevaColores(cot) || !conT;
+    const lista = coloresDe(cot);
+    w.classList.toggle("sinTalla", !conT);
+    w.classList.toggle("sinColor", !conC);
+    const campoColor = t => lista.length
+      ? '<select data-tk="color">'+
+        '<option value=""'+(t.color?"":" selected")+'>— color —</option>'+
+        lista.map(c=>'<option'+(c===t.color?" selected":"")+'>'+esc(c)+'</option>').join("")+
+        (t.color && lista.indexOf(t.color)<0
+          ? '<option selected>'+esc(t.color)+'</option>' : '')+
+        '<option value="__otro">Otro…</option></select>'
+      : '<input data-tk="color" value="'+esc(t.color)+'" placeholder="Negro">';
+    w.innerHTML = '<div class="talla-row talla-head">'+
+        (conT ? '<span>Talla</span>' : '')+
+        (conC ? '<span>Color</span>' : '')+
+        '<span>Cantidad</span><span></span></div>' +
       cot.tallas.map(t=>'<div class="talla-row" data-talla="'+t.id+'">'+
-        '<input data-tk="talla" value="'+esc(t.talla)+'" placeholder="M">'+
-        '<input data-tk="color" value="'+esc(t.color)+'" placeholder="Negro">'+
+        (conT ? '<input data-tk="talla" value="'+esc(t.talla)+'" placeholder="M">' : '')+
+        (conC ? campoColor(t) : '')+
         '<input type="number" min="0" step="1" data-tk="cant" value="'+num(t.cant)+'">'+
         '<button class="btn icon sm" data-deltalla="'+t.id+'">✕</button></div>').join("");
   }
@@ -6881,6 +7207,8 @@ const COLS_IMP = [
   ["costo",    "Costo producción",    false],
   ["precio",   "Precio público",      false],
   ["tallas",   "Lleva tallas (sí/no)",false],
+  ["colores",  "Lleva colores (sí/no)",false],
+  ["listaColores","Colores",false],
   ["existencia","Existencia",         false],
   ["minimo_inv","Mínimo",             false]
 ];
@@ -6941,9 +7269,13 @@ async function leeArchivoArticulos(file){
     const precio = num(lee("precio"));
     if(costo < 0 || precio < 0){ malos.push("Renglón "+(f+1)+": «"+nombre+"» trae un precio negativo"); continue; }
     const tl = String(lee("tallas") == null ? "" : lee("tallas")).trim().toLowerCase();
+    const cl = String(lee("colores") == null ? "" : lee("colores")).trim().toLowerCase();
+    const SI = ["sí","si","s","x","1","true","verdadero"];
     const datos = {nombre, cat: String(lee("cat") || "Otros").trim() || "Otros",
       costo, precio,
-      tallas: ["sí","si","s","x","1","true","verdadero"].indexOf(tl) >= 0,
+      tallas: SI.indexOf(tl) >= 0,
+      colores: SI.indexOf(cl) >= 0 || !!String(lee("listaColores")||"").trim(),
+      listaColores: String(lee("listaColores") == null ? "" : lee("listaColores")).trim(),
       existencia: num(lee("existencia")), minimo_inv: num(lee("minimo_inv"))};
     const ya = (cat.articulos||[]).find(a=>(a.nombre||"").trim().toLowerCase() === nombre.toLowerCase());
     if(ya) actualiza.push({id: ya.id, datos, antes: ya});
@@ -8283,7 +8615,9 @@ function ccGuardaTecnica(){
 const COLS = {
   articulos:[["foto","Foto","foto"],["nombre","Artículo","text"],["cat","Categoría","text"],["costo","Costo producción $","num"],["precio","Precio público $","num"],
     ["sku","Códigos","cods"],
-    ["tallas","¿Lleva tallas?","si"],["existencia","Existencia","ro"],["minimo_inv","Mínimo","num"]],
+    ["granel","Se vende","granel"],["promo","Promoción","promo"],["caduca","Caduca","caduca"],
+    ["tallas","¿Lleva tallas?","si"],["colores","¿Lleva colores?","colores"],
+    ["existencia","Existencia","ro"],["minimo_inv","Mínimo","num"]],
   tecnicas:[["nombre","Técnica","text"],["modo","Cobro","modo"],
     ["costoMO","Mano de obra · costo","num"],["precioMO","Mano de obra · precio","num"],
     ["costoCm2","Costo / cm²","num"],["costoTinta","Costo / tinta","num"],["costoPuntada","Costo / puntada","num"],["minimo","Costo mínimo","num"],["setup","Costo setup","num"],
@@ -8297,9 +8631,20 @@ const COLS = {
   volumen:[["desde","Desde pzas","num"],["hasta","Hasta pzas","num"],["desc","Descuento %","num"]],
   extras:[["nombre","Concepto","text"],["tipo","Tipo","tipo"],["monto","Monto","num"]]
 };
+/* La tabla de artículos ya lleva diez columnas. Meterle tres más a un
+   taller que nunca va a vender por kilo la vuelve ilegible, y preguntarle
+   tallas a una tiendita, también. Cada giro ve las suyas. */
+const COLS_TALLER   = ["tallas","colores"];
+const COLS_TIENDITA = ["granel","promo","caduca"];
+function colsDe(key){
+  const cols = COLS[key] || [];
+  if(key !== "articulos") return cols;
+  const fuera = esTiendita() ? COLS_TALLER : COLS_TIENDITA;
+  return cols.filter(c=> fuera.indexOf(c[0]) < 0);
+}
 function renderTabla(key){
   if(key==="tecnicas") return renderTecnicas();
-  const cols = COLS[key];
+  const cols = colsDe(key);
   /* Los artículos son los únicos que pueden ser miles: se pintan filtrados y
      por partes. Las demás tablas son cortas por naturaleza. */
   const rows = key==="articulos" ? catqLista().slice(0, catqTope) : cat[key];
@@ -8314,6 +8659,35 @@ function renderTabla(key){
       '<span class="catFotoBtns"><button type="button" data-fotoart="'+esc(r.id)+'">'+(fotoDe(r)?"Cambiar":"Subir")+'</button>'+
       (fotoDe(r)? '<button type="button" data-fotoquita="'+esc(r.id)+'">Quitar</button>' : '')+
       '</span></div></td>';
+    if(c[2]==="granel"){
+      return '<td><select data-f="granel">'+UNIDADES_GRANEL.map(u=>
+        '<option value="'+u[0]+'"'+(v===u[0]||(!v&&!u[0])?" selected":"")+'>'+esc(u[1])+'</option>').join("")+
+        '</select></td>';
+    }
+    if(c[2]==="promo"){
+      const p = promoDe(r);
+      return '<td class="cPromo"><button type="button" class="promoBtn'+(p?" hay":"")+
+        '" data-promo="'+esc(r.id)+'" title="Promoción de este artículo">'+
+        (p ? '<b>'+esc(p.texto)+'</b><small>'+esc(p.detalle)+'</small>'
+           : '<b>— sin promo —</b><small>toca para poner una</small>')+'</button></td>';
+    }
+    if(c[2]==="caduca"){
+      const e2 = estadoCaducidad(r);
+      return '<td class="cCaduca"><input type="date" data-f="caduca" value="'+esc(r.caduca||"")+'">'+
+        (e2 && e2.clase !== "bien"
+          ? '<span class="caducaEt '+esc(e2.clase)+'">'+esc(e2.et)+'</span>' : '')+'</td>';
+    }
+    if(c[2]==="colores"){
+      /* La casilla y, debajo, los colores que maneja ese artículo. La
+         lista no es obligatoria: sin ella el color se escribe a mano al
+         cotizar, como siempre. Con ella sale un desplegable y se acaban
+         los "Negro", "negro" y "NEGRO" que luego no cuadran. */
+      return '<td class="cColor"><label class="colSw"><input type="checkbox" data-f="colores"'+
+        (v?" checked":"")+'><span>sí</span></label>'+
+        '<input class="colLista" data-f="listaColores" placeholder="Blanca, Negra, Roja"'+
+        (v?"":" hidden")+' value="'+esc(r.listaColores||"")+'" title="'+
+        esc(r.listaColores || "Separa los colores con comas")+'"></td>';
+    }
     if(c[2]==="cods"){
       const sat = r.claveSat || "", falta = !r.sku || !sat;
       return '<td class="cCods"><button type="button" class="codsBtn'+(falta?" falta":"")+
@@ -8670,6 +9044,10 @@ registraLanzador("set", [
   {id:"tema", nombre:"Apariencia", sub:"tema claro u oscuro", color:"#14B8A6",
    icono:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19"/>',
    card:'[data-set="tema"]'},
+  {id:"giro", nombre:"Giro del negocio", sub:"taller, tiendita…", color:"#45D483",
+   icono:'<path d="M3 9.5h18v10a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19.5Z"/>'+
+         '<path d="M3 9.5 5.5 4h13L21 9.5"/><path d="M8.5 14h7"/>',
+   card:'[data-set="giro"]'},
   {id:"fiscal", nombre:"Datos fiscales", sub:"RFC y domicilio del SAT", color:"#0680AB",
    icono:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>',
    card:'[data-set="fiscal"]'},
@@ -9471,8 +9849,30 @@ document.addEventListener("click", e=>{
 });
 
 /* ---------- ajustes ---------- */
+/* Las dos ediciones, como tarjetas: se escoge mirando, no leyendo. */
+function renderGiro(){
+  const w = $("#giroOps"); if(!w) return;
+  const act = giroActual();
+  w.innerHTML = Object.keys(GIROS).map(k=>{
+    const g = GIROS[k];
+    return '<button type="button" class="giroOp'+(k===act?" act":"")+'" data-giro="'+k+'"'+
+      (k===act?' aria-pressed="true"':'')+'>'+
+      '<b>'+esc(g.edicion)+'</b><small>'+esc(g.giro)+'</small>'+
+      '<span class="giroCheck" aria-hidden="true"></span></button>';
+  }).join("");
+  const q = $("#giroQueCambia");
+  if(q){
+    const g = cfgGiro();
+    q.innerHTML = g.sin.length
+      ? 'En esta edición se esconden <b>'+g.sin.length+' secciones</b> que no aplican '+
+        '(cotizar, diseño, producción, archivo y la calculadora de costos) y el catálogo '+
+        'deja sólo los productos. Todo eso vuelve en cuanto cambies de regreso.'
+      : 'Es la edición completa: se ven todas las secciones.';
+  }
+}
 function renderSet(){
-  renderTema(); renderMO();
+  renderTema(); renderMO(); renderGiro();
+  const pt = $("#p_turnos"); if(pt) pt.checked = usaTurnos();
   const bv = $("#barraVer");
   /* En el pie va la plataforma, no el negocio del cliente: es la firma del
      producto, como el «Windows» de abajo a la derecha. */
@@ -9633,7 +10033,7 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !$("#tabs").hid
 /* Agrupadas por para qué sirven, no por orden de aparición. */
 const GRUPOS_BARRA = [
   ["",           ["inicio"]],
-  ["Comercial",  ["cot","sav","cli","arc"]],
+  ["Comercial",  ["cot","mos","sav","cli","arc"]],
   ["Producción", ["dis","pro","inv"]],
   ["Administración", ["caj","ven","com","val"]],
   ["Personal",    ["asi","nom"]],
@@ -10014,7 +10414,7 @@ document.addEventListener("input", e=>{
    cuenta: si el dueño lo prende, el vendedor nuevo lo encuentra prendido. */
 const GUIA_ORDEN = ["cliente","articulo","apps","tallas","extras","prod"];
 const GUIA_NOMBRE = {cliente:"Cliente", articulo:"Artículo", apps:"Decorado",
-                     tallas:"Tallas", extras:"Extras", prod:"Entrega"};
+                     tallas:"Desglose", extras:"Extras", prod:"Entrega"};
 let GUIA = {actual:"cliente"};
 /* Prendido salvo que lo apaguen a mano. Una cuenta que ya existía no trae
    este parámetro, así que `undefined` cuenta como prendido: si no, el
@@ -10039,7 +10439,8 @@ function guiaFalta(k){
     if(!(cot.articuloId || (cot.desc||"").trim())) return "Escoge el artículo o escribe qué se va a hacer";
     return q > 0 ? "" : "¿Cuántas piezas son?";
   }
-  if(k === "tallas") return q > 0 ? "" : "Captura al menos un renglón de tallas";
+  if(k === "tallas") return q > 0 ? "" :
+    ("Captura al menos un renglón de " + (llevaTallas(cot) ? "tallas" : "colores"));
   return "";
 }
 function guiaTira(){
@@ -10187,6 +10588,7 @@ $("#tabs").addEventListener("click", e=>{
   if(b.dataset.tab==="calc") renderMaquinas();
   if(b.dataset.tab==="calc"){ renderCalc(); reiniciaSec("calc"); }
   if(b.dataset.tab==="com"){ renderCompras(); renderProveedores(); }
+  if(b.dataset.tab==="mos"){ renderMostrador(); setTimeout(mosEnfoca, 90); }
   if(b.dataset.tab==="cli") renderClientes();
   if(b.dataset.tab==="arc") renderArchivo();
   if(b.dataset.tab==="pro"){ renderProduccion(); vigilaProduccion(true); } else vigilaProduccion(false);
@@ -10302,6 +10704,23 @@ $("#tab-cot").addEventListener("click", e=>{
   if(us){ cot.cantManual = false; cot.cantidad = sumaTallas(cot); pintaSumaTallas(); refrescaCostos(); return; }
 });
 $("#tab-cot").addEventListener("change", async e=>{
+  /* El color sale de un desplegable cuando el artículo trae su lista. El
+     oyente de "input" descarta los SELECT a propósito, así que el color
+     se atiende aquí. */
+  const trC = e.target.closest("[data-talla]");
+  if(trC && e.target.dataset.tk === "color"){
+    const it = cot.tallas.find(x=>x.id===trC.dataset.talla);
+    if(it){
+      if(e.target.value === "__otro"){
+        /* "Otro…" no es un color: es la petición de escribir uno que no
+           está en la lista del catálogo. */
+        it.color = (prompt("¿Qué color?", it.color || "") || "").trim();
+        renderTallas();
+      }else it.color = e.target.value;
+      refrescaCostos();
+    }
+    return;
+  }
   if(e.target.id==="c_descOn"){ cot.descOn = e.target.checked; renderResumen(); return; }
   if(e.target.id==="c_descTipo"){ cot.descTipo = e.target.value; renderResumen(); return; }
   const x = e.target.closest("[data-extra]");
@@ -10452,7 +10871,11 @@ function claveEstado(txt){
   for(const k in EDOS_CLAVE) if(s.indexOf(EDOS_CLAVE[k]) === 0) return k;
   return "";
 }
-const giroActual = () => (window.PRODUCTO && PRODUCTO.clave) || "taller";
+/* El giro vive en los ajustes, no en la marca: PRODUCTO.clave lo copia
+   para la publicidad, pero durante el arranque todavía no se ha copiado.
+   Una sola fuente de verdad, y es P.giro. */
+const giroActual = () => (typeof GIROS === "object" && GIROS[P.giro]) ? P.giro
+                       : ((window.PRODUCTO && PRODUCTO.clave) || "taller");
 const estadoDelTaller = () => claveEstado((P.empresa || {}).estado);
 
 /* Lista vacía = a todos. Un anuncio que nadie segmentó se ve en todas partes;
@@ -10968,6 +11391,9 @@ function ponIconos(){
   /* inicio: una casa */
   inicio:'<path d="M3.5 10.2L12 3.5l8.5 6.7"/><path d="M5.5 9v10a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5V9"/>'+
          '<path d="M9.5 20.5v-6h5v6"/>',
+  /* mostrador: una caja registradora */
+  mos:'<path d="M3 9.5h18v10a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19.5Z"/>'+
+      '<path d="M3 9.5 5.5 4h13L21 9.5"/><path d="M8.5 14h7"/><path d="M12 4v5.5"/>',
   /* cotizar: una hoja nueva */
   cot:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>'+
       '<path d="M14 3v5h5"/><path d="M12 11.5v6M9 14.5h6"/>',
@@ -11624,9 +12050,21 @@ function bloqueArticuloOrden(p, n, varios, cuantos){
   return (varios ? '<div class="op-art">' : '')+
    '<h2>'+(varios ? 'Artículo '+(n+1)+' de '+cuantos : 'Artículo')+'</h2>'+
    '<p><b>'+esc(nombreItem(p.it, n+1) || (art?art.nombre:"—"))+'</b> · <b>'+r.qty+' pieza(s)</b></p>'+
-   (tal.length ? '<h3>Tallas y colores</h3><table><thead><tr><th>Talla</th><th>Color</th><th>Cantidad</th></tr></thead><tbody>'+
-     tal.map(t=>'<tr><td>'+esc(t.talla||"—")+'</td><td>'+esc(t.color||"—")+'</td><td>'+Math.round(num(t.cant))+'</td></tr>').join("")+
-     '<tr><td colspan="2"><b>Total</b></td><td><b>'+sumaTallas(q)+'</b></td></tr></tbody></table>' : '')+
+   (tal.length ? (function(){
+     /* La orden enseña las columnas que se llenaron. Una hoja con una
+        columna "Talla" llena de guiones se lee peor, no mejor. */
+     const hayT = tal.some(t=>(t.talla||"").trim()), hayC = tal.some(t=>(t.color||"").trim());
+     const cols = (hayT?1:0) + (hayC?1:0) || 1;
+     return '<h3>'+(hayT ? (hayC ? "Tallas y colores" : "Tallas") : "Colores")+'</h3>'+
+       '<table><thead><tr>'+(hayT?'<th>Talla</th>':'')+(hayC?'<th>Color</th>':'')+
+       (!hayT&&!hayC?'<th>Renglón</th>':'')+'<th>Cantidad</th></tr></thead><tbody>'+
+       tal.map(t=>'<tr>'+(hayT?'<td>'+esc(t.talla||"—")+'</td>':'')+
+         (hayC?'<td>'+esc(t.color||"—")+'</td>':'')+
+         (!hayT&&!hayC?'<td>—</td>':'')+
+         '<td>'+Math.round(num(t.cant))+'</td></tr>').join("")+
+       '<tr><td colspan="'+cols+'"><b>Total</b></td><td><b>'+sumaTallas(q)+'</b></td></tr>'+
+       '</tbody></table>';
+   })() : '')+
    '<h3>Aplicaciones</h3><table><thead><tr><th>Ubicación</th><th>Técnica</th><th>Medidas</th><th>Detalle</th><th>Archivo a imprimir</th></tr></thead><tbody>'+
    ((q.apps||[]).length
      ? (q.apps||[]).map(a=>{ const d = (r.detalle||[]).find(d=>d.id===a.id); const t = cat.tecnicas.find(t=>t.id===a.tecnicaId);
@@ -11660,7 +12098,10 @@ function specPorArticulo(o){
   return r.partes.map((p, i)=>{
     const q = p.q;
     const tallas = (q.tallas||[]).filter(t=>num(t.cant)>0)
-      .map(t=>esc(t.talla||"—")+"/"+esc(t.color||"—")+": "+Math.round(num(t.cant))).join(" · ");
+      .map(t=>{
+        const a = [t.talla, t.color].map(x=>(x||"").trim()).filter(Boolean);
+        return (a.length ? esc(a.join(" ")) : "Renglón") + ": " + Math.round(num(t.cant));
+      }).join(" · ");
     const apps = (q.apps||[]).map(a=>{
       const t = cat.tecnicas.find(t=>t.id===a.tecnicaId);
       const med = medidaApp(a, t);
@@ -11897,6 +12338,670 @@ function tarjetasInv(lista){
   }).join("") +'</div>';
 }
 
+
+/* ============ LO PROPIO DE UNA TIENDA ============
+   Granel, promociones y caducidades. Los tres son campos del artículo y
+   los tres se cobran en el mostrador. Un artículo que no los use se
+   porta igual que siempre. */
+
+const UNIDADES_GRANEL = [["","por pieza"],["kg","por kilo"],["g","por gramo"],
+                         ["l","por litro"],["ml","por mililitro"],["m","por metro"]];
+const nombreUnidadGranel = u => (UNIDADES_GRANEL.find(x=>x[0]===u)||["",""])[1];
+/* Un artículo es de granel cuando se vende por peso o por medida: el
+   precio es por unidad y la cantidad lleva decimales. */
+const esGranel = a => !!(a && a.granel);
+/* Cuánto se escribe de una cantidad: 3 piezas, pero 0.850 kg. */
+function cantTxt(cant, granel){
+  if(!granel) return String(Math.round(num(cant)));
+  return num(cant).toFixed(3).replace(/0+$/,"").replace(/\.$/,"") + " " + granel;
+}
+
+/* ---------- promociones ----------
+   Dos formas, que son las que de verdad se usan en un mostrador:
+   · "nxm"    — lleva 3, paga 2
+   · "paquete"— 2 por $35, y lo suelto a su precio
+   El descuento no se reparte renglón por renglón: se cuentan los grupos
+   completos y lo que sobra se cobra normal. */
+function promoDe(a){
+  const p = a && a.promo;
+  if(!p || !p.tipo) return null;
+  if(p.tipo === "nxm"){
+    const lleva = Math.max(2, Math.round(num(p.lleva, 0)));
+    const paga  = Math.max(1, Math.round(num(p.paga, 0)));
+    if(paga >= lleva) return null;            /* no es promoción */
+    return {tipo:"nxm", lleva, paga,
+            texto: lleva + "×" + paga,
+            detalle: "Lleva " + lleva + ", paga " + paga};
+  }
+  if(p.tipo === "paquete"){
+    const piezas = Math.max(2, Math.round(num(p.piezas, 0)));
+    const precio = num(p.precio, 0);
+    if(precio <= 0) return null;
+    return {tipo:"paquete", piezas, precio,
+            texto: piezas + " × " + mx(precio),
+            detalle: piezas + " piezas por " + mx(precio)};
+  }
+  return null;
+}
+/* Lo que cuesta de verdad un renglón, con su promoción aplicada. */
+function cobraLinea(ln){
+  const a = (cat.articulos||[]).find(x=>x.id === ln.artId) || null;
+  const precio = num(ln.precio), cant = num(ln.cant);
+  const bruto = Math.round(precio*cant*100)/100;
+  const p = esGranel(a) ? null : promoDe(a);      /* el granel no lleva promo de piezas */
+  if(!p) return {bruto, neto:bruto, ahorro:0, promo:null};
+  const n = Math.round(cant);
+  let neto;
+  if(p.tipo === "nxm"){
+    const grupos = Math.floor(n / p.lleva);
+    neto = (grupos*p.paga + (n - grupos*p.lleva)) * precio;
+  }else{
+    const grupos = Math.floor(n / p.piezas);
+    neto = grupos*p.precio + (n - grupos*p.piezas)*precio;
+  }
+  neto = Math.round(neto*100)/100;
+  return {bruto, neto, ahorro: Math.round((bruto-neto)*100)/100, promo:p};
+}
+
+/* ---------- caducidades ----------
+   La fecha vive en el artículo. No es control de lotes —eso es otro
+   programa— sino lo que una tiendita de verdad necesita: saber qué
+   sacar antes de perderlo. */
+function diasParaCaducar(a){
+  const f = a && a.caduca;
+  if(!f) return null;
+  const hoy = new Date(hoyISO() + "T00:00:00");
+  const d = new Date(String(f) + "T00:00:00");
+  if(isNaN(d)) return null;
+  return Math.round((d - hoy) / 86400000);
+}
+function estadoCaducidad(a){
+  const d = diasParaCaducar(a);
+  if(d === null) return null;
+  if(d < 0)  return {d, clase:"vencido", et:"Caducado", tono:"mal"};
+  if(d === 0) return {d, clase:"hoy", et:"Caduca hoy", tono:"mal"};
+  if(d <= num(P.avisoCaduca, 7)) return {d, clase:"pronto", et:"Caduca en "+d+" día(s)", tono:"aviso"};
+  return {d, clase:"bien", et:"Caduca en "+d+" días", tono:""};
+}
+/* Lo que está por caducar, de lo más urgente a lo menos. */
+function porCaducar(){
+  return (cat.articulos||[])
+    .map(a=>({a, e:estadoCaducidad(a)}))
+    .filter(x=> x.e && x.e.clase !== "bien")
+    .sort((x,y)=> x.e.d - y.e.d);
+}
+
+/* ============ MOSTRADOR: VENTA RÁPIDA ============
+   Tres toques: tocar el artículo, tocar cobrar, dar el cambio. Todo lo
+   demás —catálogo, caja, ventas, inventario, clientes con su crédito—
+   ya existía; aquí sólo se usa. */
+
+const MOS_PISTA = "Con un lector conectado, basta escanear: el artículo entra solo al ticket. " +
+                  "Sin lector, escribe y toca el artículo.";
+let mosTicket = {lineas:[], clienteId:""};
+let mosQ = "", mosCat = "", mosForma = "Efectivo";
+
+/* El precio de mostrador: el público del catálogo y, si no lo capturaron,
+   el costo con la utilidad de la casa. Nunca se vende a costo por un
+   campo vacío. */
+function precioMostrador(a){
+  const p = num(a && a.precio);
+  if(p > 0) return p;
+  const c = num(a && a.costo);
+  const m = num(P.margen, 0);
+  return Math.round(c * (1 + m/100) * 100) / 100;
+}
+function mosLista(){
+  const t = mosQ.trim().toLowerCase();
+  let l = (cat.articulos||[]).slice();
+  if(mosCat) l = l.filter(a=>(a.cat||"Otros") === mosCat);
+  if(t){
+    const pedazos = t.split(/\s+/);
+    l = l.filter(a=>{
+      const txt = ((a.nombre||"")+" "+(a.cat||"")+" "+(a.sku||"")+" "+(a.barras||"")).toLowerCase();
+      return pedazos.every(p=> txt.indexOf(p) >= 0);
+    });
+  }
+  return l;
+}
+function mosAgrega(artId, cuantos){
+  const a = (cat.articulos||[]).find(x=>x.id===artId);
+  if(!a){ toast("No encuentro ese artículo"); return; }
+  /* Lo que se vende por kilo no se puede meter de a uno: hay que pesarlo.
+     Si no viene la cantidad, se abre la báscula. */
+  if(esGranel(a) && cuantos == null){ abreBascula(a); return; }
+  const n = esGranel(a) ? num(cuantos) : Math.max(1, Math.round(num(cuantos, 1)));
+  if(n <= 0) return;
+  const ya = mosTicket.lineas.find(l=>l.artId===artId);
+  if(ya) ya.cant = Math.round((num(ya.cant) + n)*1000)/1000;
+  else mosTicket.lineas.push({id:uid(), artId, nombre:a.nombre||"Artículo",
+                              sku:a.sku||"", precio:precioMostrador(a),
+                              costo:num(a.costo), cant:n, granel:a.granel||""});
+  renderMostrador();
+  avisaCaducidadMos(a);
+}
+/* ---------- la báscula ----------
+   El cajero teclea lo que marca la báscula de mostrador. Conectarla por
+   cable es otro cuento —y necesita la app instalada—, pero sin esto no
+   se puede vender ni un kilo de huevo. */
+let pesando = null;
+function abreBascula(a){
+  pesando = a;
+  const w = $("#mosBascula"); if(!w) return;
+  w.hidden = false;
+  $("#bsQue").textContent = a.nombre || "Artículo";
+  $("#bsPrecio").textContent = mx(precioMostrador(a)) + " " + nombreUnidadGranel(a.granel) +
+    " · pon lo que marque la báscula";
+  $("#bsPeso").value = "1";
+  $("#bsRapidos").innerHTML = [0.25, 0.5, 1, 1.5, 2, 3]
+    .map(k=>'<button type="button" class="btn sm ghost" data-bspeso="'+k+'">'+k+' '+esc(a.granel)+'</button>').join("");
+  pintaImporteBascula();
+  w.scrollIntoView({block:"nearest", behavior:"smooth"});
+  const i = $("#bsPeso"); if(i){ i.focus(); i.select(); }
+}
+function cierraBascula(){ pesando = null; const w = $("#mosBascula"); if(w) w.hidden = true; }
+function pintaImporteBascula(){
+  if(!pesando) return;
+  const k = num($("#bsPeso").value), el = $("#bsImporte");
+  if(!el) return;
+  el.innerHTML = k > 0
+    ? cantTxt(k, pesando.granel) + " × " + mx(precioMostrador(pesando)) +
+      " = <b>" + mx(k * precioMostrador(pesando)) + "</b>"
+    : '<span style="color:var(--ink-3)">Pon el peso y aquí sale el importe.</span>';
+}
+/* El aviso de caducidad al meterlo al ticket. No lo bloquea —el dueño
+   decide si lo vende rebajado— pero no se puede decir que no se avisó. */
+function avisaCaducidadMos(a){
+  const e = estadoCaducidad(a);
+  const w = $("#mosPista"); if(!w) return;
+  if(!e || e.clase === "bien"){ w.textContent = MOS_PISTA; w.classList.remove("pistaOjo"); return; }
+  w.classList.add("pistaOjo");
+  w.innerHTML = '<b>Ojo:</b> ' + esc(a.nombre || "este artículo") + ' ' +
+    (e.clase === "vencido" ? 'ya <b>caducó</b> hace ' + Math.abs(e.d) + ' día(s).'
+     : e.clase === "hoy"   ? '<b>caduca hoy</b>.'
+     : 'caduca en <b>' + e.d + ' día(s)</b>.') +
+    ' Decide tú si se vende.';
+}
+function mosCambia(lid, cant){
+  const l = mosTicket.lineas.find(x=>x.id===lid); if(!l) return;
+  const n = Math.round(num(cant, 0));
+  if(n <= 0) mosTicket.lineas = mosTicket.lineas.filter(x=>x.id!==lid);
+  else l.cant = n;
+  renderMostrador();
+}
+function mosTotales(){
+  let bruto = 0, sub = 0, ahorro = 0, piezas = 0, costo = 0;
+  mosTicket.lineas.forEach(l=>{
+    const c = cobraLinea(l);
+    bruto  += c.bruto; sub += c.neto; ahorro += c.ahorro;
+    costo  += num(l.costo)*num(l.cant);
+    /* Un renglón de granel es un renglón, no 0.85 piezas. */
+    piezas += l.granel ? 1 : num(l.cant);
+  });
+  sub = Math.round(sub*100)/100;
+  const iva = P.ivaOn ? sub*num(P.iva)/100 : 0;
+  const total = Math.round((sub + iva)*100)/100;
+  return {bruto:Math.round(bruto*100)/100, ahorro:Math.round(ahorro*100)/100,
+          sub, piezas, costo:Math.round(costo*100)/100,
+          iva:Math.round(iva*100)/100, total, utilidad: Math.round((sub-costo)*100)/100};
+}
+function mosClienteSel(){
+  return (clientes||[]).find(c=>c.id===mosTicket.clienteId) || null;
+}
+
+function renderMostrador(){
+  const rej = $("#mosRejilla"); if(!rej) return;
+
+  /* Las categorías, como pestañas: en un mostrador se toca, no se escribe. */
+  const cats = [...new Set((cat.articulos||[]).map(a=>a.cat||"Otros"))].sort();
+  const tabs = $("#mosCats");
+  if(tabs) tabs.innerHTML = '<button type="button" data-moscat=""'+(mosCat?"":' aria-pressed="true"')+'>Todos</button>'+
+    cats.map(c=>'<button type="button" data-moscat="'+esc(c)+'"'+
+      (mosCat===c?' aria-pressed="true"':'')+'>'+esc(c)+'</button>').join("");
+
+  const l = mosLista();
+  rej.innerHTML = l.length ? l.map(a=>{
+    const ex = num(a.existencia), vig = seVigila(a);
+    const p = promoDe(a), ec = estadoCaducidad(a);
+    const cintas =
+      (p  ? '<span class="mosCinta promo" title="'+esc(p.detalle)+'">'+esc(p.texto)+'</span>' : '')+
+      (esGranel(a) ? '<span class="mosCinta granel">por '+esc(a.granel)+'</span>' : '')+
+      (ec && ec.clase !== "bien"
+        ? '<span class="mosCinta caduca">'+(ec.clase==="vencido"?"caducado":"caduca")+'</span>' : '');
+    return '<button type="button" class="mosIt" data-mosadd="'+esc(a.id)+'">'+ cintas +
+      miniArt(a)+
+      '<b>'+esc(a.nombre||"Artículo")+'</b>'+
+      '<span class="mosPrecio">'+mx(precioMostrador(a))+
+        (esGranel(a) ? ' <i class="mosUni">/ '+esc(a.granel)+'</i>' : '')+'</span>'+
+      '<small>'+(a.sku ? esc(a.sku)+' · ' : '')+
+        (vig ? (ex > 0 ? ex+' en existencia' : '<span class="mosAgotado">agotado</span>')
+             : esc(a.cat||"")) + '</small></button>';
+  }).join("") : '<p class="mosVacio">Nada con eso. Escribe otra cosa o escanea el código.</p>';
+
+  /* El cliente: público en general, salvo que se escoja. El crédito es de
+     la ficha del cliente, así que sin cliente no hay venta a crédito. */
+  const sel = $("#mosCli");
+  if(sel){
+    const antes = mosTicket.clienteId;
+    sel.innerHTML = '<option value="">Público en general</option>'+
+      (clientes||[]).map(c=>'<option value="'+esc(c.id)+'"'+(antes===c.id?" selected":"")+'>'+
+        esc(c.nombre||"Sin nombre")+'</option>').join("");
+    sel.value = antes;
+  }
+
+  const w = $("#mosLineas");
+  if(w) w.innerHTML = mosTicket.lineas.length
+    ? mosTicket.lineas.map(ln=>{
+        const c = cobraLinea(ln);
+        return '<div class="mosLin" data-moslin="'+esc(ln.id)+'">'+
+        '<b>'+esc(ln.nombre)+'</b>'+
+        '<span class="mosImp">'+mx(c.neto)+'</span>'+
+        '<span class="mosCant">'+
+          /* Lo que se pesa no se sube de uno en uno: se vuelve a pesar. */
+          (ln.granel
+            ? '<button type="button" class="btn sm ghost" data-mospesa="'+esc(ln.id)+'">Volver a pesar</button>'+
+              '<span class="mosPeso">'+esc(cantTxt(ln.cant, ln.granel))+'</span>'
+            : '<button type="button" data-mosmenos="'+esc(ln.id)+'" aria-label="Uno menos">−</button>'+
+              '<input type="number" min="0" step="1" data-moscant="'+esc(ln.id)+'" value="'+num(ln.cant)+'">'+
+              '<button type="button" data-mosmas="'+esc(ln.id)+'" aria-label="Uno más">+</button>')+
+          '<small>'+mx(num(ln.precio))+(ln.granel ? '/'+esc(ln.granel) : ' c/u')+'</small>'+
+          '<button type="button" class="mosX" data-mosquita="'+esc(ln.id)+'" aria-label="Quitar">✕</button>'+
+        '</span>'+
+        (c.ahorro > 0
+          ? '<span class="mosAhorro">'+esc(c.promo.texto)+' · se ahorra '+mx(c.ahorro)+'</span>' : '')+
+        '</div>';
+      }).join("")
+    : '<p class="mosTickVacio">El ticket está vacío. Escanea o toca un artículo.</p>';
+
+  const t = mosTotales();
+  const tot = $("#mosTot");
+  if(tot) tot.innerHTML =
+    '<div><span>'+t.piezas+' artículo(s)</span><span>'+mx(t.bruto)+'</span></div>'+
+    (t.ahorro > 0 ? '<div class="mosAhorrado"><span>Promociones</span><span>−'+mx(t.ahorro)+'</span></div>' : '')+
+    (P.ivaOn ? '<div><span>IVA '+num(P.iva)+'%</span><span>'+mx(t.iva)+'</span></div>' : '')+
+    '<div class="gran"><span>Total</span><span>'+mx(t.total)+'</span></div>';
+
+  const b = $("#mosCobrar");
+  if(b){ b.disabled = !mosTicket.lineas.length; b.textContent = mosTicket.lineas.length
+    ? "Cobrar " + mx(t.total) : "Cobrar"; }
+  const f = $("#mosFolio");
+  if(f) f.textContent = mosTicket.lineas.length ? "siguiente: " + folioMostrador() : "";
+}
+function folioMostrador(){
+  if(letrasFolio()) return siguienteFolio("mos");
+  return folioPorFecha("VTA", (ventas||[]).map(v=>v.folio));
+}
+/* El cursor vive en la caja de búsqueda: con lector, ahí es donde cae lo
+   que se escanea. No se le roba el foco a quien está cobrando. */
+function mosEnfoca(){
+  const i = $("#mosQ"), m = $("#modalMos");
+  if(!i || (m && !m.hidden)) return;
+  i.focus(); i.select();
+}
+
+/* ---------- el cobro ---------- */
+const MOS_FORMAS = ["Efectivo","Transferencia","Tarjeta","Crédito"];
+function abreCobroMostrador(){
+  if(!mosTicket.lineas.length) return;
+  mosForma = "Efectivo";
+  const t = mosTotales();
+  $("#mpTotal").textContent = mx(t.total);
+  $("#mp_recibe").value = "";
+  pintaFormasMos();
+  $("#modalMos").hidden = false;
+  setTimeout(()=>{ const r = $("#mp_recibe"); if(r) r.focus(); }, 60);
+}
+function pintaFormasMos(){
+  const t = mosTotales();
+  $("#mpFormas").innerHTML = MOS_FORMAS.map(f=>
+    '<button type="button" data-mosforma="'+f+'"'+(mosForma===f?' aria-pressed="true"':'')+'>'+f+'</button>').join("");
+  const esEf = mosForma === "Efectivo";
+  $("#mpEfectivo").hidden = !esEf;
+  if(esEf){
+    /* Con lo que de verdad paga la gente: el exacto, el redondeo de arriba
+       y los billetes que siguen. Nada de teclear 500 a mano cada vez. */
+    const techo = (p) => Math.ceil(t.total/p)*p;
+    const subs = [Math.ceil(t.total*100)/100, techo(50), techo(100)]
+      .concat([100,200,500,1000,2000].filter(p=> p > t.total));
+    const vistos = [];
+    $("#mpRapido").innerHTML = subs.filter(v=>{
+      const k = v.toFixed(2);
+      if(vistos.indexOf(k) >= 0) return false;
+      vistos.push(k); return true;
+    }).slice(0, 5)
+      .map(v=>'<button type="button" data-mosrecibe="'+v+'">'+mx(v)+'</button>').join("");
+    pintaCambioMos();
+  }
+  const av = $("#mpAviso");
+  if(mosForma === "Crédito"){
+    const c = mosClienteSel();
+    if(!c){
+      av.hidden = false;
+      av.innerHTML = '<b>Escoge primero al cliente.</b> A crédito se le vende a alguien con ' +
+        'ficha, porque el saldo se le carga a él. "Público en general" no tiene a quién cobrarle después.';
+    }else{
+      const paso = puedeFacturar(c, t.total, null);
+      if(!paso.ok){
+        av.hidden = false;
+        av.innerHTML = '<b>'+esc(c.nombre||"Este cliente")+' no puede llevar a crédito.</b><br>'+
+          esc(paso.motivo)+'<br>Cóbralo de otra forma, o arregla su crédito en su ficha.';
+      }else{
+        av.hidden = false;
+        const r = paso.cred;
+        av.innerHTML = 'Se le carga a su cuenta. Le quedarían ' +
+          '<b>'+mx(Math.max(0, num(r.limite) - num(r.deuda) - t.total))+'</b> de línea.';
+      }
+    }
+  }else av.hidden = true;
+  const ok = $("#mp_ok"), okSin = $("#mp_okSin");
+  const bloquea = mosForma === "Crédito" && !cobroCreditoOK();
+  if(ok) ok.disabled = bloquea;
+  if(okSin) okSin.disabled = bloquea;
+}
+function cobroCreditoOK(){
+  const c = mosClienteSel(); if(!c) return false;
+  return puedeFacturar(c, mosTotales().total, null).ok;
+}
+function pintaCambioMos(){
+  const t = mosTotales(), r = num($("#mp_recibe").value);
+  const el = $("#mpCambio"); if(!el) return;
+  if(!r){ el.innerHTML = '<span style="color:var(--ink-3)">Escribe con cuánto paga y aquí sale el cambio.</span>'; return; }
+  const dif = Math.round((r - t.total)*100)/100;
+  el.innerHTML = dif >= 0
+    ? 'Cambio: <b style="color:var(--good)">'+mx(dif)+'</b>'
+    : '<span style="color:var(--warn)">Faltan <b>'+mx(-dif)+'</b></span>';
+}
+
+async function cobraMostrador(conTicket){
+  const t = mosTotales();
+  if(!mosTicket.lineas.length) return;
+  if(mosForma === "Crédito" && !cobroCreditoOK()){ toast("Ese cliente no puede llevar a crédito"); return; }
+  const recibido = mosForma === "Efectivo" ? num($("#mp_recibe").value) : t.total;
+  if(mosForma === "Efectivo" && recibido > 0 && recibido < t.total - 0.004){
+    toast("Falta dinero: " + mx(t.total - recibido)); return;
+  }
+  const c = mosClienteSel();
+  const folio = folioMostrador();
+  const u = usuarioActual();
+  const venta = {
+    folio, fecha: hoyISO(), hora: horaAhora(),
+    cliente: c ? (c.nombre||"") : "Público en general",
+    clienteId: c ? c.id : "",
+    articulo: mosTicket.lineas.length === 1
+      ? mosTicket.lineas[0].nombre
+      : mosTicket.lineas.length + " artículos de mostrador",
+    piezas: t.piezas, total: t.total, costo: t.costo, utilidad: t.utilidad,
+    pago: mosForma === "Crédito" ? "Crédito" : mosForma,
+    estado: mosForma === "Crédito" ? "pendiente" : "pagado",
+    recibido: mosForma === "Crédito" ? 0 : t.total,
+    mostrador: true,
+    cambio: mosForma === "Efectivo" && recibido > 0 ? Math.round((recibido - t.total)*100)/100 : 0,
+    pagoCon: mosForma === "Efectivo" ? recibido : 0,
+    vendedor: u ? {id:u.id, nombre:u.nombre} : null,
+    /* Cada renglón se guarda con lo que de verdad se cobró y con la
+       promoción que se le aplicó: una reimpresión del ticket seis meses
+       después tiene que decir lo mismo, aunque la promoción ya no exista. */
+    lineas: mosTicket.lineas.map(l=>{
+      const c = cobraLinea(l);
+      return Object.assign(JSON.parse(JSON.stringify(l)),
+        {neto:c.neto, ahorro:c.ahorro, promoTxt: c.promo ? c.promo.texto : ""});
+    }),
+    ahorro: t.ahorro,
+    factura: {requiere:false}
+  };
+  ventas.push(venta);
+  if(DB){ try{ await DB.collection("ventas").doc(folio).set({venta, fecha:venta.fecha, total:venta.total}); }
+          catch(e){ toast("No se pudo guardar la venta en la nube"); } }
+  else lsSet("ventas", ventas);
+
+  /* La existencia baja sola, pero sólo de lo que se vigila: meterle
+     números en rojo a un catálogo que nadie inventaría es ruido. */
+  for(const ln of mosTicket.lineas){
+    const a = (cat.articulos||[]).find(x=>x.id===ln.artId);
+    if(a && seVigila(a)) await moverInventario(a.id, "salida", num(ln.cant),
+      "Venta de mostrador " + folio, true);
+  }
+
+  /* Y si cobró en efectivo con la caja abierta, el movimiento entra solo:
+     un corte que no cuadra porque alguien se le olvidó anotar es el
+     problema que esto viene a quitar. */
+  if(venta.pago === "Efectivo"){
+    const caja = cajaDe(venta.fecha);
+    const tAb = usaTurnos() ? turnoAbierto(caja) : null;
+    /* Con turnos el movimiento SIEMPRE se registra, haya turno o no. El
+       billete ya está en el cajón: no anotarlo no lo desaparece, nada
+       más deja el corte del día corto sin que nadie sepa por qué. Lo que
+       cambia es que queda sin dueño, y el corte lo dice. */
+    if(caja.abierta || tAb || usaTurnos()){
+      caja.movs.push({id:uid(), hora:venta.hora, tipo:"venta",
+        concepto:"Mostrador · "+venta.cliente, folio, monto:venta.total,
+        /* El efectivo cae en el cajón de quien lo recibió. Sin esto, el
+           faltante del turno de la tarde se le carga al de la mañana. */
+        turnoId: tAb ? tAb.id : undefined,
+        quien: tAb ? cajeroDeTurno(tAb) : undefined});
+      venta.turnoId = tAb ? tAb.id : "";
+      await guardaCaja(caja);
+      if(!$("#tab-caj").hidden) renderCaja();
+      if(usaTurnos() && !tAb)
+        toast("Cobrado, pero sin turno abierto: ese efectivo quedó sin dueño.");
+    }
+  }
+
+  persist();
+  $("#modalMos").hidden = true;
+  if(conTicket) imprimeTicket(venta);
+  else toast("Venta " + folio + " · " + mx(venta.total));
+  mosTicket = {lineas:[], clienteId: mosTicket.clienteId};
+  renderMostrador();
+  if(typeof renderVentas === "function" && !$("#tab-ven").hidden) renderVentas();
+  if(typeof renderCobranza === "function") renderCobranza();
+  setTimeout(mosEnfoca, 120);
+}
+
+/* El ticket, del ancho del papel térmico de 80 mm. */
+function imprimeTicket(v){
+  const E = P.empresa || {};
+  const fil = (v.lineas||[]).map(l=>{
+    const neto = l.neto != null ? num(l.neto) : num(l.precio)*num(l.cant);
+    return '<tr><td colspan="2">'+esc(l.nombre)+'</td></tr>'+
+      '<tr><td>'+esc(cantTxt(l.cant, l.granel))+' x '+mx(num(l.precio))+'</td>'+
+      '<td class="tkD">'+mx(neto)+'</td></tr>'+
+      (num(l.ahorro) > 0
+        ? '<tr><td colspan="2" style="font-size:10px">   '+esc(l.promoTxt||"promoción")+
+          ' −'+mx(num(l.ahorro))+'</td></tr>' : '');
+  }).join("");
+  const sub = (v.lineas||[]).reduce((s,l)=>
+    s + (l.neto != null ? num(l.neto) : num(l.precio)*num(l.cant)), 0);
+  const ahorro = (v.lineas||[]).reduce((s,l)=> s + num(l.ahorro), 0);
+  const iva = Math.round((num(v.total) - sub)*100)/100;
+  const html =
+    (E.logo ? '<p class="tkCentro"><img src="'+esc(E.logo)+'" style="max-height:48px"></p>' : '')+
+    '<h1>'+esc(E.nombre || PRODUCTO.edicion)+'</h1>'+
+    '<p class="tkCentro">'+[E.calle && (E.calle+" "+(E.numExt||"")), E.colonia, E.municipio]
+      .filter(Boolean).map(esc).join("<br>")+
+      (E.tel ? '<br>Tel. '+esc(E.tel) : '')+
+      (E.rfc ? '<br>RFC '+esc(E.rfc) : '')+'</p>'+
+    '<div class="tkRaya"></div>'+
+    '<p class="tkCentro"><b>'+esc(v.folio)+'</b><br>'+esc(v.fecha)+' '+esc(v.hora||"")+
+      '<br>'+esc(v.cliente||"Público en general")+
+      ((v.vendedor && v.vendedor.nombre) ? '<br>Te atendió: '+esc(v.vendedor.nombre) : '')+'</p>'+
+    '<div class="tkRaya"></div>'+
+    '<table><tbody>'+fil+'</tbody></table>'+
+    '<div class="tkRaya"></div>'+
+    (ahorro > 0.004 ? '<div class="tkTot" style="font-weight:400;font-size:11.5px">'+
+      '<span>Te ahorraste</span><span>'+mx(ahorro)+'</span></div>' : '')+
+    '<div class="tkTot"><span>Subtotal</span><span>'+mx(sub)+'</span></div>'+
+    (iva > 0.004 ? '<div class="tkTot" style="font-weight:400;font-size:11.5px">'+
+      '<span>IVA</span><span>'+mx(iva)+'</span></div>' : '')+
+    '<div class="tkTot" style="font-size:15px;margin-top:4px"><span>TOTAL</span><span>'+mx(num(v.total))+'</span></div>'+
+    '<div class="tkRaya"></div>'+
+    '<p style="font-size:11px;margin:0">'+esc(v.pago)+
+      (num(v.pagoCon) ? '<br>Pagó con '+mx(num(v.pagoCon))+'<br>Cambio '+mx(num(v.cambio)) : '')+
+      (v.pago === "Crédito" ? '<br><b>Queda a crédito</b>' : '')+'</p>'+
+    '<div class="tkRaya"></div>'+
+    '<p class="tkCentro">¡Gracias por tu compra!<br>'+
+      esc(P.empresa && P.empresa.cond ? "" : "")+'</p>';
+  muestraDoc("Ticket · "+v.folio, html);
+  const papel = $("#docPaper"), hoja = $("#hoja");
+  if(papel) papel.classList.add("ticket");
+  if(hoja) hoja.classList.add("ticket");
+}
+
+/* ---------- eventos del mostrador ---------- */
+document.addEventListener("click", e=>{
+  const add = e.target.closest("[data-mosadd]");
+  if(add){ mosAgrega(add.dataset.mosadd, 1); mosEnfoca(); return; }
+  const ct = e.target.closest("[data-moscat]");
+  if(ct){ mosCat = ct.dataset.moscat; renderMostrador(); return; }
+  const mas = e.target.closest("[data-mosmas]");
+  if(mas){ const l = mosTicket.lineas.find(x=>x.id===mas.dataset.mosmas);
+           if(l) mosCambia(l.id, num(l.cant)+1); return; }
+  const men = e.target.closest("[data-mosmenos]");
+  if(men){ const l = mosTicket.lineas.find(x=>x.id===men.dataset.mosmenos);
+           if(l) mosCambia(l.id, num(l.cant)-1); return; }
+  const qt = e.target.closest("[data-mosquita]");
+  if(qt){ mosCambia(qt.dataset.mosquita, 0); return; }
+  const bp = e.target.closest("[data-bspeso]");
+  if(bp){ $("#bsPeso").value = bp.dataset.bspeso; pintaImporteBascula(); return; }
+  if(e.target.closest("#bsOk")){
+    const k = num($("#bsPeso").value);
+    if(k <= 0){ toast("Pon un peso mayor que cero"); return; }
+    const a = pesando; cierraBascula();
+    if(a) mosAgrega(a.id, k);
+    mosEnfoca(); return;
+  }
+  if(e.target.closest("#bsNo")){ cierraBascula(); mosEnfoca(); return; }
+  const rp = e.target.closest("[data-mospesa]");
+  if(rp){
+    const ln = mosTicket.lineas.find(x=>x.id === rp.dataset.mospesa);
+    if(ln){
+      const a = (cat.articulos||[]).find(x=>x.id === ln.artId);
+      mosTicket.lineas = mosTicket.lineas.filter(x=>x.id !== ln.id);
+      renderMostrador();
+      if(a) abreBascula(a);
+    }
+    return;
+  }
+  if(e.target.closest("#mosVacia")){
+    if(mosTicket.lineas.length && !confirm("¿Vaciar el ticket?")) return;
+    mosTicket.lineas = []; cierraBascula(); renderMostrador(); mosEnfoca(); return;
+  }
+  if(e.target.closest("#mosLimpia")){ mosQ = ""; mosCat = ""; const i=$("#mosQ"); if(i) i.value="";
+    renderMostrador(); mosEnfoca(); return; }
+  if(e.target.closest("#mosCobrar")){ abreCobroMostrador(); return; }
+
+  const fm = e.target.closest("[data-mosforma]");
+  if(fm){ mosForma = fm.dataset.mosforma; pintaFormasMos(); return; }
+  const rc = e.target.closest("[data-mosrecibe]");
+  if(rc){ $("#mp_recibe").value = rc.dataset.mosrecibe; pintaCambioMos(); return; }
+  if(e.target.closest("#mp_exacto")){ $("#mp_recibe").value = mosTotales().total; pintaCambioMos(); return; }
+  if(e.target.closest("#mpCerrar") || e.target.closest("#mp_cancel") || e.target.id === "modalMos"){
+    $("#modalMos").hidden = true; setTimeout(mosEnfoca, 60); return;
+  }
+  if(e.target.closest("#mp_ok")){ cobraMostrador(true); return; }
+  if(e.target.closest("#mp_okSin")){ cobraMostrador(false); return; }
+});
+document.addEventListener("input", e=>{
+  if(e.target.id === "mosQ"){ mosQ = e.target.value; renderMostrador(); return; }
+  if(e.target.id === "mp_recibe"){ pintaCambioMos(); return; }
+  const mc = e.target.closest("[data-moscant]");
+  if(mc){ mosCambia(mc.dataset.moscant, mc.value); return; }
+});
+document.addEventListener("change", e=>{
+  if(e.target.id === "mosCli"){
+    mosTicket.clienteId = e.target.value;
+    if(!$("#modalMos").hidden) pintaFormasMos();
+  }
+});
+/* El lector de códigos se porta como un teclado y termina con Enter. */
+document.addEventListener("keydown", e=>{
+  if(e.target.id !== "mosQ" || e.key !== "Enter") return;
+  e.preventDefault();
+  const txt = (e.target.value||"").trim();
+  if(!txt) return;
+  const a = artPorCodigo(txt);
+  if(a){ mosAgrega(a.id, 1); e.target.value = ""; mosQ = ""; renderMostrador(); mosEnfoca(); return; }
+  /* Sin código exacto: si la búsqueda dejó uno solo, ése es. */
+  const l = mosLista();
+  if(l.length === 1){ mosAgrega(l[0].id, 1); e.target.value = ""; mosQ = ""; renderMostrador(); mosEnfoca(); return; }
+  toast(l.length ? "Hay " + l.length + " que coinciden: escoge uno" : "Nada con ese código");
+});
+
+/* ---------- la promoción de un artículo ---------- */
+let prId = null, prTipo = "";
+function abrePromo(id){
+  const a = (cat.articulos||[]).find(x=>x.id===id);
+  if(!a){ toast("No encuentro ese artículo"); return; }
+  prId = id;
+  const p = a.promo || {};
+  prTipo = p.tipo || "";
+  $("#prQuien").innerHTML = '<b>'+esc(a.nombre||"Artículo")+'</b> · '+mx(precioMostrador(a))+' cada uno';
+  $("#pr_lleva").value  = num(p.lleva, 3);
+  $("#pr_paga").value   = num(p.paga, 2);
+  $("#pr_piezas").value = num(p.piezas, 2);
+  $("#pr_precio").value = num(p.precio, 0) || Math.round(precioMostrador(a)*1.8*100)/100;
+  pintaPromo();
+  $("#modalPromo").hidden = false;
+}
+function pintaPromo(){
+  $("#prTipos").innerHTML = [
+    ["",        "Sin promoción",  "se cobra a su precio"],
+    ["nxm",     "Lleva N, paga M","el clásico 3×2"],
+    ["paquete", "Precio por paquete","2 por $35, y lo suelto a su precio"]
+  ].map(t=>'<button type="button" class="prTipo'+(prTipo===t[0]?" act":"")+'" data-prtipo="'+t[0]+'"'+
+    (prTipo===t[0]?' aria-pressed="true"':'')+'><b>'+esc(t[1])+'</b><small>'+esc(t[2])+'</small></button>').join("");
+  $("#prNxm").hidden = prTipo !== "nxm";
+  $("#prPaq").hidden = prTipo !== "paquete";
+  const a = (cat.articulos||[]).find(x=>x.id===prId) || {};
+  const prueba = Object.assign({}, a, {promo: prLee()});
+  const p = promoDe(prueba);
+  const el = $("#prEjemplo");
+  if(!p){ el.textContent = prTipo ? "Con esos números no hay descuento: revísalos." :
+    "Sin promoción el artículo se cobra a su precio, como siempre."; return; }
+  /* Se enseña con números, no con reglas: cuánto paga quien lleva uno,
+     cuántos la aprovechan y cuánto se ahorra. */
+  const pr = precioMostrador(a);
+  const n = p.tipo === "nxm" ? p.lleva : p.piezas;
+  const ln = {artId:a.id, precio:pr, cant:n};
+  const c = cobraLinea(Object.assign({}, ln));
+  el.innerHTML = 'Quien se lleve <b>'+n+'</b> paga <b>'+mx(c.neto)+'</b> en vez de '+mx(pr*n)+
+    ' — se ahorra <b>'+mx(c.ahorro)+'</b>. Lo suelto sigue a '+mx(pr)+'.';
+}
+function prLee(){
+  if(prTipo === "nxm") return {tipo:"nxm", lleva:num($("#pr_lleva").value), paga:num($("#pr_paga").value)};
+  if(prTipo === "paquete") return {tipo:"paquete", piezas:num($("#pr_piezas").value), precio:num($("#pr_precio").value)};
+  return null;
+}
+document.addEventListener("click", e=>{
+  const bp = e.target.closest("[data-promo]");
+  if(bp){ abrePromo(bp.dataset.promo); return; }
+  const tp = e.target.closest("[data-prtipo]");
+  if(tp){ prTipo = tp.dataset.prtipo; pintaPromo(); return; }
+  if(e.target.closest("#prCerrar") || e.target.closest("#pr_cancel") || e.target.id === "modalPromo"){
+    $("#modalPromo").hidden = true; prId = null; return;
+  }
+  if(e.target.closest("#pr_quita")){
+    const a = (cat.articulos||[]).find(x=>x.id===prId);
+    if(a){ delete a.promo; persist(); renderTabla("articulos"); }
+    $("#modalPromo").hidden = true; prId = null;
+    toast("Sin promoción"); return;
+  }
+  if(e.target.closest("#pr_ok")){
+    const a = (cat.articulos||[]).find(x=>x.id===prId);
+    if(!a) return;
+    const nueva = prLee();
+    if(nueva && !promoDe({promo:nueva})){ toast("Con esos números no hay descuento"); return; }
+    if(nueva) a.promo = nueva; else delete a.promo;
+    persist(); renderTabla("articulos");
+    $("#modalPromo").hidden = true; prId = null;
+    toast(nueva ? "Promoción guardada" : "Sin promoción");
+    return;
+  }
+});
+document.addEventListener("input", e=>{
+  if($("#modalPromo") && !$("#modalPromo").hidden && e.target.closest("#modalPromo")) pintaPromo();
+});
+
 /* ---------- la ficha de códigos de un artículo ---------- */
 let cdId = null;
 function abreCodigos(id){
@@ -11990,6 +13095,22 @@ function hojaEtiquetas(lista, titulo){
 }
 
 document.addEventListener("click", e=>{
+  const gi = e.target.closest("[data-giro]");
+  if(gi){
+    const k = gi.dataset.giro;
+    if(k === giroActual()) return;
+    P.giro = k; persist();
+    aplicaGiro(); renderGiro();
+    /* Si la pestaña abierta ya no existe en este giro, se va a la que
+       manda en la edición nueva en vez de dejar la pantalla en blanco. */
+    const abierta = document.querySelector('#tabs [data-tab][aria-selected="true"]');
+    if(!abierta || abierta.hidden){
+      const quiero = cfgGiro().arranca || "inicio";
+      if(typeof vaATab === "function" && !vaATab(quiero)) vaATab("inicio");
+    }
+    toast(cfgGiro().edicion + ": listo");
+    return;
+  }
   const bc = e.target.closest("[data-cods]");
   if(bc){ abreCodigos(bc.dataset.cods); return; }
   if(e.target.closest("#cdCerrar") || e.target.closest("#cd_cancel") || e.target.id === "modalCods"){
@@ -12024,6 +13145,12 @@ document.addEventListener("click", e=>{
     hojaEtiquetas(catqLista(), "Etiquetas del catálogo");
     return;
   }
+});
+document.addEventListener("input", e=>{
+  if(e.target.id === "bsPeso") pintaImporteBascula();
+});
+document.addEventListener("keydown", e=>{
+  if(e.target.id === "bsPeso" && e.key === "Enter"){ e.preventDefault(); $("#bsOk").click(); }
 });
 document.addEventListener("input", e=>{
   if(!$("#modalCods") || $("#modalCods").hidden) return;
@@ -13655,7 +14782,7 @@ $("#modalNom").addEventListener("click", e=>{
 
 /* Todas las secciones que existen. Vivir en un solo lado evita el error de
    crear una pestaña y que se quede visible encima de otra. */
-const TABS_TODAS = ["inicio","cot","cat","calc","inv","com","val","cli","arc","caj","pro","dis","sav","ven","asi","nom","set"];
+const TABS_TODAS = ["inicio","cot","mos","cat","calc","inv","com","val","cli","arc","caj","pro","dis","sav","ven","asi","nom","set"];
 
 /* ====================== tablero: accesos, anillos y lo tuyo ====================== */
 
@@ -13663,13 +14790,14 @@ const TABS_TODAS = ["inicio","cot","cat","calc","inv","com","val","cli","arc","c
 /* Por rol, en el orden en que de verdad se usan. Se filtran además por lo que
    el rol puede ver, así que agregar una sección aquí nunca abre una puerta. */
 const ACCESOS_ROL = {
-  admin:      ["cot","pro","ven","caj","inv","nom"],
-  ventas:     ["cot","sav","cli","pro","arc","asi"],
+  admin:      ["cot","mos","pro","ven","caj","inv"],
+  ventas:     ["cot","mos","sav","cli","pro","asi"],
   produccion: ["pro","inv","asi","com"],
   diseno:     ["dis","pro","asi"]
 };
 const ACCESOS_ET = {
   cot: ["Cotizar",      "Empieza una cotización"],
+  mos: ["Mostrador",    "Vender y cobrar en el momento"],
   sav: ["Cotizaciones", "Lo guardado y los pedidos"],
   cli: ["Clientes",     "Directorio y su historial"],
   arc: ["Archivo",      "Papeles por cliente"],
@@ -13688,6 +14816,24 @@ const ACCESOS_ET = {
    existe en esta versión, el acceso se pinta sin número en vez de tronar. */
 function datoAcceso(t){
   try{
+    if(t === "caj" && usaTurnos()){
+      const c = cajaDe(hoyISO()), ab = turnoAbierto(c), ce = turnosCaja(c).filter(x=>x.cierre);
+      if(ab) return {n:0, et:"turno de "+cajeroDeTurno(ab), tono:"bien"};
+      if(ce.length){
+        const mal = ce.filter(x=>Math.abs(num(x.cierre.dif)) >= 0.5).length;
+        return {n:ce.length, et: mal ? mal+" turno(s) sin cuadrar" : "todos cuadraron",
+                tono: mal ? "mal" : "bien"};
+      }
+      return {n:0, et:"sin turno abierto", tono:"aviso"};
+    }
+    if(t === "mos"){
+      /* Lo que lleva el mostrador hoy. Un acceso que sólo dice su nombre
+         obliga a entrar para saber cómo va el día. */
+      const hoy = (ventas||[]).filter(v=>v.mostrador && v.fecha === hoyISO());
+      const suma = hoy.reduce((s,v)=> s + num(v.total), 0);
+      return {n: hoy.length, et: hoy.length ? mx(suma)+" hoy" : "ninguna venta hoy",
+              tono: hoy.length ? "bien" : ""};
+    }
     const vivas = guardadas.filter(g=>g.op && (g.op.estatus||"Pendiente") !== "Entregada");
     if(t === "pro"){
       const v = vivas.filter(g=>faltaPara(g).vencida).length;
@@ -13748,7 +14894,7 @@ function pintaAccesos(){
     return true;
   });
   w.innerHTML = lista.map(t=>{
-    const et = ACCESOS_ET[t] || [t, ""], d = datoAcceso(t);
+    const et = etiquetaSec(t, ACCESOS_ET[t] || [t, ""]), d = datoAcceso(t);
     return '<button class="tbAcceso'+(d.tono? " "+d.tono : "")+'" data-tbtab="'+esc(t)+'">'+
       '<span class="tbAccIco">'+icoSeccion(t)+'</span>'+
       '<span class="tbAccTxt"><b>'+esc(et[0])+'</b><small>'+esc(et[1])+'</small></span>'+
@@ -14795,12 +15941,13 @@ const COLOR_APP = {
 };
 /* El orden del lanzador: como se usa, no como está el menú. Lo de todos los
    días primero. */
-const ORDEN_APPS = ["cot","sav","pro","dis","inv","cli","caj","ven","com","arc","asi","nom","cat","calc","set"];
+const ORDEN_APPS = ["cot","mos","sav","pro","dis","inv","cli","caj","ven","com","arc","asi","nom","cat","calc","set"];
 
 /* Las etiquetas del lanzador son más cortas que las del tablero: debajo de un
    icono no cabe un párrafo, y Ajustes ni siquiera tenía una. */
 const ET_APP = {
-  cot:["Cotizar","empieza una nueva"], sav:["Cotizaciones","guardadas y pedidos"],
+  cot:["Cotizar","empieza una nueva"], mos:["Mostrador","vender y cobrar ya"],
+  sav:["Cotizaciones","guardadas y pedidos"],
   cli:["Clientes","directorio"],       arc:["Archivo","papeles por cliente"],
   dis:["Diseño","arte de cada pedido"],pro:["Producción","tablero de órdenes"],
   inv:["Inventario","qué hay y qué falta"], com:["Compras","requisiciones"],
@@ -14840,7 +15987,7 @@ function aplicaVistaInicio(){
 function pintaLanzador(){
   const lz = $("#lanzador"); if(!lz) return;
   lz.innerHTML = appsDelRol().map(t=>{
-    const et = ET_APP[t] || (typeof ACCESOS_ET === "object" && ACCESOS_ET[t]) || [t, ""];
+    const et = etiquetaSec(t, ET_APP[t] || (typeof ACCESOS_ET === "object" && ACCESOS_ET[t]) || [t, ""]);
     const d = datoAcceso(t);
     const c = COLOR_APP[t] || "#64748B";
     const pide = d.tono === "mal" || d.tono === "aviso";
@@ -15029,6 +16176,41 @@ $("#ayudaCuerpo").addEventListener("click", e=>{
 /* ---------- el nombre del producto, en un solo lugar ---------- */
 /* Makers OS es la plataforma; cada giro es una edición encima. Cambiar de
    edición es cambiar estas tres líneas, no ocho lugares del archivo. */
+/* ============ EL GIRO ============
+   Las ediciones de Makers OS. La diferencia entre una y otra no es el
+   programa: es qué secciones se ven, cómo se llaman y qué trae el
+   catálogo. Lo caro —cuentas, permisos, planes, respaldo, el Lab— es
+   el mismo para todas. */
+const GIROS = {
+  taller: {
+    edicion:"Taller Makers", clave:"taller",
+    giro:"Imprenta, serigrafía y artículos personalizados",
+    /* nada escondido: el taller es el que ya existía */
+    sin:[], nombres:{}, tarjetas:[]
+  },
+  tiendita: {
+    edicion:"Tiendita Makers", clave:"tiendita",
+    giro:"Abarrotes, misceláneas y tiendas de barrio",
+    /* Cotizar, diseño, producción y archivo no son de una tiendita, y
+       la calculadora de costos de impresión menos. */
+    sin:["cot","sav","dis","pro","arc","calc","val"],
+    nombres:{
+      mos:  ["Vender", "la caja de la tienda"],
+      caj:  ["Corte del día", "el efectivo que entró"],
+      cat:  ["Productos", "lo que vendes y a cómo"],
+      cli:  ["Clientes y fiado", "quién debe y cuánto"],
+      inv:  ["Inventario", "qué hay y qué falta"],
+      ven:  ["Ventas", "cortes y utilidad"],
+      com:  ["Compras", "proveedores y pedidos"]
+    },
+    /* del catálogo sólo queda lo que una tienda usa */
+    tarjetas:["traer","tecnicas","servicios","tamanos","escalas","extras","insumos","consumos"],
+    arranca:"mos"
+  }
+};
+const esTiendita = () => giroActual() === "tiendita";
+const cfgGiro = () => GIROS[giroActual()];
+
 const PRODUCTO = window.PRODUCTO = {
   plataforma: "Makers OS",
   edicion:    "Taller Makers",
@@ -15222,6 +16404,14 @@ $("#tab-cat").addEventListener("change", e=>{
   }
   const tr = e.target.closest("[data-id]");
   if(tr && e.target.type==="checkbox"){ const o = cat[tr.dataset.key].find(o=>o.id===tr.dataset.id); if(o){ o[e.target.dataset.f]=e.target.checked; persist(); renderResumen(); } }
+  /* Se enseña o se esconde la lista de colores sin volver a dibujar la
+     tabla: repintarla aquí le quitaría el cursor a quien está escribiendo
+     en otro renglón. */
+  if(tr && e.target.dataset.f==="colores"){
+    const cel = e.target.closest("td"), li = cel && cel.querySelector(".colLista");
+    if(li){ li.hidden = !e.target.checked; if(e.target.checked) li.focus(); }
+    if(typeof aplicaPasoTallas === "function") aplicaPasoTallas();
+  }
   if(tr && e.target.tagName==="SELECT"){ const obj = cat[tr.dataset.key].find(o=>o.id===tr.dataset.id); if(obj){ obj[e.target.dataset.f]=e.target.value; persist(); renderTabla(tr.dataset.key); } }
 });
 $("#tab-cat").addEventListener("click", e=>{
@@ -15243,6 +16433,7 @@ $("#tab-set").addEventListener("input", e=>{
   const t=e.target;
   const map={p_margen:"margen",p_merma:"merma",p_mo:"manoObra",p_iva:"iva",p_vigencia:"vigencia",p_plazoCobro:"plazoCobro"};
   if(map[t.id]) P[map[t.id]] = num(t.value);
+  if(t.id==="p_turnos"){ P.turnos = t.checked; persist(); if(typeof renderCaja==="function") renderCaja(); }
   if(t.id==="e_nombre"){ P.empresa.nombre=t.value; }
   if(t.id==="e_slogan"){ P.empresa.eslogan=t.value; const s=$("#brandSlogan"); if(s) s.textContent=t.value; }
   if(t.id==="e_tel") P.empresa.tel=t.value;
@@ -15776,8 +16967,8 @@ async function bajaCarpeta(cliente, mes, boton){
 
 /* ============ EQUIPO Y ROLES ============ */
 const ROLES = {
-  admin:      {nombre:"Administrador", ve:["inicio","cot","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","val","asi","nom","set"]},
-  ventas:     {nombre:"Ventas",        ve:["inicio","cot","sav","pro","dis","cli","arc","com","val","asi"]},
+  admin:      {nombre:"Administrador", ve:["inicio","cot","mos","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","val","asi","nom","set"]},
+  ventas:     {nombre:"Ventas",        ve:["inicio","cot","mos","sav","pro","dis","cli","arc","com","val","asi"]},
   diseno:     {nombre:"Diseño",        ve:["inicio","dis","pro","val","asi"]},
   produccion: {nombre:"Producción",    ve:["inicio","pro","inv","com","val","asi"]}
 };
@@ -15785,9 +16976,82 @@ let equipo = [], usuarioId = null, pinPendiente = null;
 
 function usuarioActual(){ return equipo.find(u=>u.id===usuarioId) || equipo[0] || {id:"admin",nombre:"Administrador",rol:"admin"}; }
 function rolActual(){ return (window.__rolServidor && window.__rolServidor()) || (usuarioActual().rol) || "admin"; }
-function puedeVer(sec){ return (ROLES[rolActual()] || ROLES.admin).ve.indexOf(sec) >= 0; }
+/* Una sola puerta. El menú, los grupos del menú, los accesos del tablero
+   y los azulejos preguntan aquí, así que el giro se respeta en los cuatro
+   sin tener que acordarse de cada uno. */
+function puedeVer(sec){
+  if(cfgGiro().sin.indexOf(sec) >= 0) return false;
+  return (ROLES[rolActual()] || ROLES.admin).ve.indexOf(sec) >= 0;
+}
 
 function equipoPorDefecto(){ return [{id:uid(), nombre:"Administrador", rol:"admin", pin:"", activo:true}]; }
+
+/* Los nombres de las pestañas del menú, guardados tal como venían para
+   poder volver a ellos sin recargar la página. */
+let NOMBRES_ORIG = null;
+function guardaNombresTabs(){
+  if(NOMBRES_ORIG) return;
+  NOMBRES_ORIG = {};
+  document.querySelectorAll('#tabs button[data-tab]').forEach(b=>{
+    const t = b.dataset.tab, n = b.querySelector("b"), sb = b.querySelector("small");
+    if(!n) return;
+    /* El contador vive dentro del <b>; se guarda sólo el texto. */
+    const copia = n.cloneNode(true);
+    const bd = copia.querySelector(".mbadge"); if(bd) bd.remove();
+    NOMBRES_ORIG[t] = [copia.textContent.trim(), sb ? sb.textContent : ""];
+  });
+}
+/* Cómo se llama una sección en este giro. El menú, los azulejos y los
+   accesos del tablero preguntan aquí: si sólo se renombrara el menú, el
+   tablero seguiría diciendo "Mostrador" en una tiendita. */
+function etiquetaSec(t, porOmision){
+  const n = (cfgGiro().nombres || {})[t];
+  if(n) return n;
+  return porOmision || [t, ""];
+}
+function aplicaGiro(){
+  guardaNombresTabs();
+  const g = cfgGiro();
+  document.body.classList.toggle("giro-tiendita", esTiendita());
+
+  PRODUCTO.edicion = g.edicion;
+  PRODUCTO.clave   = g.clave;
+  PRODUCTO.giro    = g.giro;
+  const marca = document.getElementById("brandProducto");
+  if(marca) marca.textContent = g.edicion;
+  if(document.title && /Makers/.test(document.title)) document.title = g.edicion;
+
+  /* Los nombres: "Mostrador" en el taller es "Vender" en la tienda. Lo
+     que se llama distinto en la calle tiene que llamarse distinto aquí. */
+  document.querySelectorAll('#tabs button[data-tab]').forEach(b=>{
+    const t = b.dataset.tab;
+    const et = etiquetaSec(t, NOMBRES_ORIG[t]);
+    if(!et || !NOMBRES_ORIG[t]) return;
+    const n = b.querySelector("b"), sb = b.querySelector("small");
+    if(n){
+      const bd = n.querySelector(".mbadge");
+      n.textContent = et[0];
+      if(bd) n.appendChild(bd);
+    }
+    if(sb) sb.textContent = et[1];
+  });
+
+  /* Las tarjetas del catálogo que no son de este giro. Se esconden, no
+     se borran: los render de siempre siguen escribiendo en sus tablas. */
+  const cfg = (typeof SEC_LZ === "object") && SEC_LZ.cat;
+  if(cfg) cfg.tarjetas.forEach(t=>{
+    if(!t._visOrig) t._visOrig = t.visible || null;
+    t.visible = () => {
+      if((cfgGiro().tarjetas||[]).indexOf(t.id) >= 0) return false;
+      return t._visOrig ? !!t._visOrig() : true;
+    };
+  });
+  if(typeof pintaLanzadorSec === "function" && document.getElementById("lz_cat")) pintaLanzadorSec("cat");
+
+  if(typeof aplicaRol === "function") aplicaRol();
+  if(typeof renderApps === "function") renderApps();
+  if(typeof renderTablero === "function" && !document.getElementById("tab-inicio").hidden) renderTablero();
+}
 
 function aplicaRol(){
   const u = usuarioActual(), r = rolActual();
@@ -16625,12 +17889,41 @@ function llevaTallas(g){
   // Artículo capturado a mano: se respeta lo que ya tenga el desglose.
   return (g.tallas||[]).length > 0;
 }
+/* Una taza no tiene talla pero sí tiene color, y son tres cosas distintas
+   para producción. Por eso el artículo lo dice por separado. */
+function llevaColores(g){
+  g = g || cot;
+  const a = cat.articulos.find(a=>a.id===g.articuloId);
+  if(a) return !!a.colores;
+  /* Capturado a mano: se enseñan las dos columnas, como siempre. */
+  return (g.tallas||[]).length > 0;
+}
+/* El paso del desglose sale si el artículo lleva tallas, colores o las dos. */
+function llevaDesglose(g){ return llevaTallas(g) || llevaColores(g); }
+/* Los colores que maneja el artículo, si los capturó. */
+function coloresDe(g){
+  g = g || cot;
+  const a = cat.articulos.find(a=>a.id===g.articuloId);
+  if(!a || !a.colores) return [];
+  return String(a.listaColores||"").split(/[,;\/|]+/)
+    .map(x=>x.trim()).filter(Boolean).filter((x,i,l)=>l.indexOf(x)===i);
+}
 function aplicaPasoTallas(){
   aplicaModo();
   const card = document.querySelector('[data-paso="tallas"]');
   if(!card) return;
-  const aplica = llevaTallas(cot);
+  const aplica = llevaDesglose(cot);
   card.hidden = !aplica;
+  /* El título dice lo que de verdad se va a capturar. Pedirle "tallas" a
+     quien está cotizando tazas es hacerlo dudar de si escogió bien. */
+  const h = card.querySelector("header h2");
+  if(h) h.textContent = llevaTallas(cot)
+    ? (llevaColores(cot) ? "Desglose de tallas y colores" : "Desglose de tallas")
+    : "Desglose de colores";
+  /* Al cambiar de artículo cambian las columnas del desglose —y la lista
+     de colores—, así que hay que volver a dibujarlo. Sin esto, escoger
+     una taza después de una playera deja la columna de talla puesta. */
+  if(aplica && typeof renderTallas === "function") renderTallas();
   if(!aplica && cot.tallas && cot.tallas.length){ cot.tallas = []; }
   // Renumeramos los pasos visibles para que no queden huecos.
   let n = 0;
@@ -18106,9 +19399,53 @@ function cajaDe(f){ return cajas[f] || (cajas[f] = cajaVacia(f)); }
 function horaAhora(){ const d=new Date(); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
 
 function saldoCaja(c){
-  return num(c.fondo) + (c.movs||[]).reduce((s,m)=> s + (m.tipo==="salida" ? -num(m.monto) : num(m.monto)), 0);
+  return num(c.fondo) + (c.movs||[]).reduce((s,m)=>
+    s + (m.tipo === "salida" || m.tipo === "retiro" ? -num(m.monto) : num(m.monto)), 0);
 }
+/* ============ TURNO DE CAJA POR CAJERO ============ */
+const usaTurnos = () => P.turnos === true || (P.turnos == null && esTiendita());
+/* OJO: turnosDe() ya existe y es del reloj checador —las entradas y
+   salidas del personal—. Esto es otra cosa: el turno del CAJÓN. */
+const turnosCaja = c => (c.turnos = c.turnos || []);
+const turnoAbierto = c => turnosCaja(c).find(t=>!t.cierre) || null;
+const movsDeTurno = (c, t) => (c.movs||[]).filter(m=> m.turnoId === t.id);
+/* Lo que debe haber en el cajón de ese turno: su fondo más lo que entró
+   menos lo que salió. Las ventas que no son en efectivo nunca llegan al
+   cajón, así que nunca entran a esta cuenta. */
+function esperadoTurno(c, t){
+  return Math.round((num(t.fondo) + movsDeTurno(c, t).reduce((s,m)=>
+    s + (m.tipo === "salida" || m.tipo === "retiro" ? -num(m.monto) : num(m.monto)), 0))*100)/100;
+}
+function cajeroDeTurno(t){ return (t && t.cajero && t.cajero.nombre) || "sin nombre"; }
+function abreTurno(c, cajeroId, fondo){
+  const u = equipo.find(x=>x.id === cajeroId) || usuarioActual();
+  const t = {id:uid(), cajero:{id:u.id, nombre:u.nombre||"Sin nombre"},
+             fondo:num(fondo), abre:horaAhora(), cierre:null};
+  turnosCaja(c).push(t);
+  /* El día queda abierto mientras haya un turno abierto: los totales del
+     día y los cortes viejos siguen leyendo estos mismos campos. */
+  c.abierta = true;
+  if(!c.hora) c.hora = t.abre;
+  c.fondo = turnosCaja(c).reduce((s,x)=> s + num(x.fondo), 0);
+  return t;
+}
+function cierraTurno(c, t, contado, nota){
+  const esperado = esperadoTurno(c, t);
+  t.cierre = {hora:horaAhora(), contado:num(contado), esperado,
+              dif: Math.round((num(contado) - esperado)*100)/100, nota:(nota||"").trim()};
+  if(!turnoAbierto(c)) c.abierta = false;
+  return t.cierre;
+}
+/* El turno al que le toca una venta nueva. Sin turno abierto, la venta
+   se registra igual —no se le va a negar la venta a nadie— pero queda
+   sin dueño, y el corte lo dice. */
+function turnoParaCobrar(){
+  if(!usaTurnos()) return null;
+  return turnoAbierto(cajaDe(hoyISO()));
+}
+
 function renderCaja(){
+  if(usaTurnos()) return renderCajaTurnos();
   $("#cajaFecha").value = cajaFecha;
   $("#cajaFechaTxt").textContent = etiquetaRango("dia", {ini:cajaFecha, fin:cajaFecha});
   const c = cajaDe(cajaFecha), w = $("#cajaCuerpo");
@@ -18158,16 +19495,143 @@ function renderCaja(){
      '<div class="row-actions" style="margin-top:12px"><button class="btn primary" id="cajaCerrar">Cerrar caja y hacer corte</button></div>'+
    '</div>';
 }
+/* La caja por turnos. Tres estados: sin turno, turno abierto, y el
+   momento de contar —que es el único que importa de verdad—. */
+function renderCajaTurnos(){
+  $("#cajaFecha").value = cajaFecha;
+  $("#cajaFechaTxt").textContent = etiquetaRango("dia", {ini:cajaFecha, fin:cajaFecha});
+  const c = cajaDe(cajaFecha), w = $("#cajaCuerpo");
+  const esHoy = cajaFecha === hoyISO();
+  const t = turnoAbierto(c);
+  const cerrados = turnosCaja(c).filter(x=>x.cierre);
+
+  let h = "";
+
+  if(!t){
+    h += '<div class="cajaEstado"><div><b>No hay turno abierto</b><br>'+
+      '<span style="color:var(--ink-2);font-size:13px">'+
+      (esHoy ? "Quien se queda en la caja abre su turno con el fondo que recibe."
+             : "No se abrió turno este día.")+'</span></div>'+
+      (esHoy ? '<div class="tnAbrir">'+
+        '<div><label class="f" for="tnQuien">Cajero</label><select id="tnQuien">'+
+          (equipo||[]).filter(u=>u.activo!==false).map(u=>'<option value="'+esc(u.id)+'"'+
+            (u.id===usuarioActual().id?" selected":"")+'>'+esc(u.nombre||"Sin nombre")+'</option>').join("")+
+        '</select></div>'+
+        '<div><label class="f" for="tnFondo">Fondo que recibe</label>'+
+          '<input id="tnFondo" type="number" min="0" step="10" value="500"></div>'+
+        '<button class="btn primary" id="tnAbrir">Abrir turno</button></div>' : '')+
+      '</div>';
+  }else{
+    const ms = movsDeTurno(c, t);
+    const ventas = ms.filter(m=>m.tipo==="venta").reduce((s,m)=>s+num(m.monto),0);
+    const retiros = ms.filter(m=>m.tipo==="retiro").reduce((s,m)=>s+num(m.monto),0);
+    h += '<div class="cajaEstado abierta"><div><b>Turno de '+esc(cajeroDeTurno(t))+
+      '</b> · desde las '+esc(t.abre)+'<br>'+
+      '<span style="color:var(--ink-2);font-size:13px">Fondo '+mx(t.fondo)+
+      ' · ventas en efectivo '+mx(ventas)+
+      (retiros ? ' · retirado '+mx(retiros) : '')+'</span></div>'+
+      '<div style="margin-left:auto;text-align:right">'+
+        '<div style="font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;font-weight:700">Movimientos</div>'+
+        '<div class="big">'+ms.length+'</div></div></div>';
+
+    h += '<div class="grid g4" style="margin-top:14px;align-items:end">'+
+      '<div><label class="f" for="movTipo">Movimiento</label><select id="movTipo">'+
+        '<option value="entrada">Entrada de dinero</option>'+
+        '<option value="salida">Salida de dinero</option>'+
+        '<option value="retiro">Retiro a la caja fuerte</option></select></div>'+
+      '<div style="grid-column:span 2"><label class="f" for="movConcepto">Concepto</label>'+
+        '<input id="movConcepto" placeholder="Retiro parcial, compra de hielo, anticipo…"></div>'+
+      '<div style="display:flex;gap:8px"><div style="flex:1"><label class="f" for="movMonto">Monto</label>'+
+        '<input id="movMonto" type="number" min="0" step="10"></div>'+
+      '<button class="btn" id="movAgregar">Agregar</button></div></div>';
+
+    h += '<div class="movs">'+renderMovs({movs:ms})+'</div>';
+
+    /* El arqueo a ciegas. No se enseña cuánto debería haber: si el cajero
+       lo ve antes de contar, el conteo deja de medir nada. */
+    h += '<div class="tnCorte">'+
+      '<div class="tnCorteCab"><b>Entregar el turno</b>'+
+        '<span class="tnCiego">arqueo a ciegas</span></div>'+
+      '<p class="note" style="margin:6px 0 12px">Cuenta el efectivo del cajón y escribe lo que '+
+        'contaste. <b>El sistema no te dice cuánto debería haber hasta que lo entregues</b> — '+
+        'así el conteo mide de verdad.</p>'+
+      '<div class="conteo">'+
+        '<div><label class="f" for="tnContado">Efectivo contado</label>'+
+          '<input id="tnContado" type="number" min="0" step="1" placeholder="0.00"></div>'+
+        '<div style="grid-column:span 3"><label class="f" for="tnNota">Nota del corte</label>'+
+          '<input id="tnNota" placeholder="Opcional: por qué falta o sobra"></div>'+
+      '</div>'+
+      '<div class="row-actions" style="margin-top:12px">'+
+        '<button class="btn primary" id="tnCerrar">Entregar turno</button></div></div>';
+  }
+
+  /* El dinero que entró sin turno abierto. Está en el cajón de alguien y
+     el corte tiene que decirlo, no esconderlo. */
+  const huerfanos = (c.movs||[]).filter(m=>!m.turnoId);
+  if(huerfanos.length){
+    const suma = huerfanos.reduce((s,m)=>
+      s + (m.tipo === "salida" || m.tipo === "retiro" ? -num(m.monto) : num(m.monto)), 0);
+    h += '<div class="tnHuerfanos">'+
+      '<b>'+mx(suma)+' sin dueño</b> · '+huerfanos.length+' movimiento(s) que entraron sin ningún '+
+      'turno abierto. Ese dinero está en el cajón pero no es de nadie: no va a aparecer como '+
+      'faltante ni como sobrante de ningún cajero.'+
+      '<div class="movs" style="margin-top:10px">'+renderMovs({movs:huerfanos})+'</div></div>';
+  }
+
+  if(cerrados.length){
+    h += '<div class="tnPasados"><div class="tnPasadosCab">Turnos de este día</div>'+
+      cerrados.map(x=>{
+        const d = num(x.cierre.dif);
+        /* Con prefijo a propósito: ".falta" y ".ok" ya existen en esta
+           hoja de estilos como pastillas, y le robaban el display al
+           renglón. Un nombre de clase es un nombre global. */
+        const cl = Math.abs(d) < 0.5 ? "tnOk" : (d > 0 ? "tnSobra" : "tnFalta");
+        return '<div class="tnFila '+cl+'">'+
+          '<span class="tnQ"><b>'+esc(cajeroDeTurno(x))+'</b><small>'+esc(x.abre)+' – '+esc(x.cierre.hora)+'</small></span>'+
+          '<span class="tnDato"><small>Fondo</small>'+mx(x.fondo)+'</span>'+
+          '<span class="tnDato"><small>Debía haber</small>'+mx(x.cierre.esperado)+'</span>'+
+          '<span class="tnDato"><small>Contó</small>'+mx(x.cierre.contado)+'</span>'+
+          '<span class="tnDif">'+(Math.abs(d)<0.5 ? "Cuadró" : (d>0?"Sobró ":"Faltó ")+mx(Math.abs(d)))+'</span>'+
+          (x.cierre.nota ? '<span class="tnNota">'+esc(x.cierre.nota)+'</span>' : '')+
+        '</div>';
+      }).join("")+'</div>';
+  }
+  w.innerHTML = h;
+}
+
 function renderMovs(c){
   const ms = (c.movs||[]);
   if(!ms.length) return '<div class="empty">Sin movimientos todavía. Las ventas que cobres en efectivo entran solas.</div>';
+  /* Un retiro saca dinero del cajón igual que una salida. Enseñarlo con
+     signo de más es decirle al cajero que tiene $200 que ya no están. */
+  const resta = t => t === "salida" || t === "retiro";
   return ms.map(m=>'<div class="mov '+esc(m.tipo)+'"><span class="hora">'+esc(m.hora)+'</span>'+
     '<span>'+esc(m.concepto)+(m.folio?' <small>'+esc(m.folio)+'</small>':'')+'</span>'+
-    '<span class="monto">'+(m.tipo==="salida"?"−":"+")+mx(m.monto)+'</span>'+
+    '<span class="monto">'+(resta(m.tipo)?"−":"+")+mx(m.monto)+'</span>'+
     '<button class="btn icon sm" data-delmov="'+m.id+'" title="Quitar">✕</button></div>').join("");
 }
 $("#tab-caj").addEventListener("click", async e=>{
   const c = cajaDe(cajaFecha);
+
+  if(e.target.closest("#tnAbrir")){
+    const t = abreTurno(c, $("#tnQuien").value, $("#tnFondo").value);
+    await guardaCaja(c); renderCaja();
+    toast("Turno de " + cajeroDeTurno(t) + " abierto con " + mx(t.fondo));
+    return;
+  }
+  if(e.target.closest("#tnCerrar")){
+    const t = turnoAbierto(c);
+    if(!t) return;
+    const v = ($("#tnContado").value || "").trim();
+    if(v === ""){ toast("Cuenta el efectivo y escribe cuánto contaste"); return; }
+    const cie = cierraTurno(c, t, v, $("#tnNota").value);
+    await guardaCaja(c); renderCaja();
+    toast(Math.abs(cie.dif) < 0.5
+      ? "Turno entregado: cuadró"
+      : "Turno entregado: " + (cie.dif > 0 ? "sobraron " : "faltaron ") + mx(Math.abs(cie.dif)));
+    return;
+  }
+
   if(e.target.closest("#cajaAbrir")){
     c.abierta = true; c.fondo = num($("#cajaFondo").value); c.hora = horaAhora(); c.cierre = null;
     c.movs = c.movs || []; await guardaCaja(c); renderCaja(); toast("Caja abierta con "+mx(c.fondo)); return;
@@ -18176,7 +19640,10 @@ $("#tab-caj").addEventListener("click", async e=>{
     const monto = num($("#movMonto").value), concepto = ($("#movConcepto").value||"").trim();
     if(!monto){ toast("Escribe el monto"); return; }
     if(!concepto){ toast("Escribe el concepto"); return; }
-    c.movs.push({id:uid(), hora:horaAhora(), tipo:$("#movTipo").value, concepto, monto});
+    const tAb = usaTurnos() ? turnoAbierto(c) : null;
+    c.movs.push({id:uid(), hora:horaAhora(), tipo:$("#movTipo").value, concepto, monto,
+                 turnoId: tAb ? tAb.id : undefined,
+                 quien: tAb ? cajeroDeTurno(tAb) : undefined});
     await guardaCaja(c); renderCaja(); toast("Movimiento registrado"); return;
   }
   const dm = e.target.closest("[data-delmov]");
@@ -18423,7 +19890,7 @@ function puedeFacturar(c, monto, folio){
   if(r.limite > 0 && (deudaPrevia + m) > r.limite + 0.004)
     return {ok:false, tipo:"limite", cred:r,
             motivo:"Su línea es de " + mx(r.limite) + " y ya debe " + mx(deudaPrevia) +
-                   (m > 0 ? ". Con esta factura de " + mx(m) + " se pasa por " +
+                   (m > 0 ? ". Con este cargo de " + mx(m) + " se pasa por " +
                             mx(deudaPrevia + m - r.limite) + "." : ".")};
   return {ok:true, cred:r};
 }
@@ -19764,6 +21231,7 @@ window.__arranca = () => initStore().then(async ()=>{
     await cargaExpedientes(); renderExpedientes();
     await cargaNominas(); nmPer = P.nominaPeriodo || "semana"; renderNomina();
   }
+  aplicaGiro();
   renderCot(); renderSet(); renderSaved(); pintaSelectClientes();
   if(typeof renderTablero === "function") renderTablero();   /* ya con datos */
   try{ renderVales(); }catch(e){}
@@ -20950,7 +22418,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261024-1113"></script>
-<script src="diagnostico.js?v=20261024-1113"></script>
+<script src="cuenta.js?v=20261025-1835"></script>
+<script src="diagnostico.js?v=20261025-1835"></script>
 </body>
 </html>

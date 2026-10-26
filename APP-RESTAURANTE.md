@@ -1,10 +1,16 @@
 # App de restaurante
 
-La app instalable se publica desde `public/restaurante/`. Su página se genera desde `PRUEBA-restaurant.html` para que el prototipo siga siendo la fuente de trabajo.
+## Fuente estable
+
+`PRUEBA-restaurant.html` queda como la versión estable y fuente principal de Makers Restaurant. El nombre “PRUEBA” se conserva por compatibilidad con la carpeta actual; no indica que la versión publicada sea temporal.
+
+`public/restaurante/index.html` se genera desde ese archivo y suma el manifiesto, la instalación PWA y el almacenamiento separado de la app web. El APK también incorpora la misma página al compilarse. Para que las versiones no se desalineen, los cambios del restaurante se hacen primero en `PRUEBA-restaurant.html` y luego se preparan con el script.
+
+La carpeta instalable se publica desde `public/restaurante/`.
 
 ## Preparar o actualizar
 
-Haz doble clic en `PREPARAR-APP-RESTAURANTE.bat`. El script copia la versión actual, agrega el manifiesto, la opción de instalación y una caché offline. También cambia la versión del service worker cuando cambia la página y separa el almacenamiento de esta app del cotizador/restaurante existente en el mismo dominio.
+Haz doble clic en `PREPARAR-APP-RESTAURANTE.bat`. El script toma la versión estable, agrega el manifiesto, la opción de instalación y una caché offline. También renueva la caché del service worker cuando cambia la página y separa el almacenamiento de esta app del cotizador/restaurante existente en el mismo dominio.
 
 ## Instalar
 

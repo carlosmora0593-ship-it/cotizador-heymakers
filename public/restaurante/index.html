@@ -107,6 +107,50 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
 .turnoChip{margin-left:auto;font-size:11.5px;color:var(--ink-3);display:flex;align-items:center;gap:7px}
 .turnoChip b{color:var(--good)}
 .turnoChip.cerrado b{color:var(--warn)}
+.contextPOS{display:flex;align-items:center;gap:8px;max-width:min(36vw,340px);padding:7px 12px;border:1px solid rgba(34,211,238,.36);border-radius:999px;background:linear-gradient(110deg,rgba(34,211,238,.15),rgba(214,18,127,.12));color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.contextPOS:hover{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(34,211,238,.1)}
+.contextPOS svg{width:17px;height:17px;flex:none;color:var(--cyan)}
+.eventBanner{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,30%);gap:18px;align-items:center;margin:14px 0 22px;padding:20px 24px;border:1px solid rgba(34,211,238,.32);border-radius:20px;background:radial-gradient(ellipse at 85% 10%,rgba(34,211,238,.18),transparent 37%),linear-gradient(120deg,#171c35,#132d3a 60%,#221b3b);box-shadow:var(--sombra);overflow:hidden;position:relative}
+.eventBanner h2{font-size:20px;margin:3px 0 5px}.eventBanner p{margin:0;color:var(--ink-2);font-size:13px}.eventBanner small{color:var(--cyan);font-size:10px;font-weight:800;letter-spacing:.15em}
+.eventBannerArt{height:105px;display:flex;align-items:center;justify-content:center;color:#7de8ed;position:relative}
+.eventBannerArt:before{content:"";position:absolute;left:0;right:0;bottom:18px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),var(--accent),transparent);opacity:.7}
+.eventBannerArt svg{width:100%;height:100%;max-width:250px;filter:drop-shadow(0 8px 14px rgba(0,0,0,.28))}
+.eventPageHead{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin:4px 0 18px}.eventPageHead h1{font-size:27px}.eventPageHead p{color:var(--ink-2);margin:4px 0 0}
+.eventGrid{display:grid;grid-template-columns:minmax(280px,.8fr) minmax(0,1.4fr);gap:16px;align-items:start}
+.eventForm{display:grid;gap:12px}.eventForm .grid{gap:10px}.eventList{display:grid;gap:12px}
+.eventCard{border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,var(--surface),rgba(34,211,238,.035));padding:16px;position:relative;overflow:hidden}
+.eventCard:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(var(--cyan),var(--accent))}
+.eventCard h3{font-size:16px}.eventCardTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.eventMeta{color:var(--ink-2);font-size:12px;margin-top:7px;display:grid;gap:3px}.eventActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.eventDates{display:inline-flex;border:1px solid var(--line);border-radius:99px;padding:5px 9px;color:var(--cyan);font:600 11px "IBM Plex Mono",monospace;white-space:nowrap}
+.eventAppts{margin-top:12px;padding-top:11px;border-top:1px solid var(--line-soft)}.eventAppts summary{cursor:pointer;color:var(--ink-2);font-size:12px;font-weight:700}.eventApptLine{padding:9px 0 0;color:var(--ink-2);font-size:12px}.eventApptLine b{color:var(--ink)}
+.eventEmpty{padding:24px;border:1px dashed var(--line);border-radius:14px;text-align:center;color:var(--ink-3)}
+.eventPosGuide{margin:14px 0 22px;padding:20px;border:1px solid rgba(34,211,238,.32);border-radius:20px;background:radial-gradient(ellipse at 100% 0,rgba(34,211,238,.16),transparent 42%),linear-gradient(130deg,#142f3a,#171c35 70%,#24192f);box-shadow:var(--sombra)}
+.eventPosGuideTop{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.eventPosGuideTop h2{font-size:21px;margin:3px 0}.eventPosGuideTop p{margin:3px 0 0;color:var(--ink-2);font-size:13px}.eventPosGuideEyebrow{color:var(--cyan);font-size:10px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
+.eventPosState{flex:none;padding:7px 11px;border:1px solid var(--line);border-radius:999px;background:rgba(8,16,30,.4);font-size:11px;color:var(--ink-2)}.eventPosState.abierta{border-color:rgba(52,211,153,.45);color:var(--good)}
+.eventGuideSteps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:17px}
+.eventGuideStep{display:flex;gap:10px;align-items:flex-start;padding:13px;border:1px solid rgba(168,176,208,.16);border-radius:14px;background:rgba(10,16,30,.32)}
+.eventGuideNum{width:27px;height:27px;flex:none;display:grid;place-items:center;border-radius:9px;background:var(--cyan);color:#06121a;font-weight:800}
+.eventGuideStep b{display:block;font-size:12.5px}.eventGuideStep small{display:block;color:var(--ink-2);line-height:1.4;margin-top:2px}
+.eventGuideControls{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.eventGuideBottom{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:13px;padding-top:12px;border-top:1px solid rgba(168,176,208,.16);color:var(--ink-2);font-size:11.5px}.eventGuideEndActions{display:flex;gap:8px;flex-wrap:wrap}
+.eventReportList{display:grid;gap:10px}.eventReport{border:1px solid var(--line);border-radius:14px;background:var(--surface)}.eventReport>summary{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px;cursor:pointer;list-style:none}.eventReport>summary::-webkit-details-marker,.eventReportTicket>summary::-webkit-details-marker{display:none}.eventReport>summary span{display:grid;gap:3px}.eventReport>summary small,.eventReportTicket small{color:var(--ink-3)}.eventReport>summary strong{font-size:18px;color:var(--green)}.eventReportBody{padding:0 14px 14px}.eventReportTickets{display:grid;gap:7px;margin:10px 0}.eventReportTicket{border:1px solid var(--line-soft);border-radius:10px;padding:9px 11px}.eventReportTicket>summary{display:flex;justify-content:space-between;gap:10px;cursor:pointer;list-style:none}.eventReportLines{display:grid;gap:5px;margin-top:9px;padding-top:8px;border-top:1px solid var(--line-soft);font-size:12px}.eventCashTable td{vertical-align:middle}
+.eventRoute{position:fixed;inset:0;z-index:120;background:radial-gradient(ellipse at 50% 110%,rgba(34,211,238,.19),transparent 48%),#0d1225;display:grid;place-items:center;padding:22px;overflow:hidden;animation:routeBackdropIn .45s ease both}
+.eventRoute[hidden]{display:none}.eventRoutePanel{width:min(850px,100%);border:1px solid rgba(125,232,237,.3);border-radius:26px;background:linear-gradient(155deg,rgba(25,34,60,.98),rgba(12,29,40,.98));box-shadow:0 28px 100px rgba(0,0,0,.55);padding:clamp(20px,4vw,38px);position:relative;overflow:hidden}
+.eventRoutePanel:before,.eventRoutePanel:after{content:"";position:absolute;border:1px solid rgba(34,211,238,.13);border-radius:50%;width:340px;height:340px;right:-110px;top:-210px;pointer-events:none}.eventRoutePanel:after{width:460px;height:460px;right:-170px;top:-270px}
+.eventRouteEyebrow{color:var(--cyan);font-size:10px;font-weight:800;letter-spacing:.18em}.eventRoutePanel h2{font-size:clamp(24px,5vw,38px);margin:6px 0}.eventRoutePanel p{color:var(--ink-2);margin:0}
+.eventRouteMap{margin:24px 0 12px;border:1px solid rgba(125,232,237,.16);border-radius:18px;background:linear-gradient(180deg,#152a3b,#172033);overflow:hidden;position:relative}
+.eventRouteMap svg{display:block;width:100%;height:auto;min-height:210px}.routeRoad{fill:none;stroke:#34445a;stroke-width:32;stroke-linecap:round;stroke-dasharray:2 2}.routeCenter{fill:none;stroke:#d5c782;stroke-width:2;stroke-dasharray:13 12;opacity:.85}.routeCart{filter:drop-shadow(0 5px 6px rgba(0,0,0,.45))}.routeCartMotion{transform-box:fill-box;transform-origin:center}.routeWheel{animation:routeWheel .5s linear infinite;transform-box:fill-box;transform-origin:center}.routeDestination{animation:routePulse 1.6s ease-in-out infinite}.routeTrees{opacity:.65}
+@keyframes routeWheel{to{transform:rotate(360deg)}}@keyframes routePulse{50%{opacity:.45;transform:scale(1.1);transform-origin:center}}
+@keyframes routeBackdropIn{from{opacity:0}to{opacity:1}}
+.routeRestaurant{display:none}.eventRoute.returning .routeRestaurant{display:block}
+.eventRoute.returning .routeRoad{stroke:#397063}.eventRoute.returning .routeCenter{stroke:#f0c66e}
+.eventRoute.returning .eventRoutePanel{border-color:rgba(151,220,177,.4)}
+.eventRoute.returning .eventRouteEyebrow{color:#a9dfb4}
+.eventRoute.returning .eventRouteStatus strong{color:#b9e6ae}
+.eventRoute.returning #eventRouteProgress{color:#e6c46d}
+.eventRouteStatus{display:flex;justify-content:space-between;gap:12px;align-items:center;color:var(--ink-2);font-size:12px}.eventRouteStatus strong{color:var(--cyan)}.eventRouteActions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
+@media(max-width:900px){.eventGrid{grid-template-columns:1fr}.eventForm .grid.g2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.eventBanner{grid-template-columns:1fr;padding:17px;gap:3px}.eventBannerArt{height:70px;justify-content:flex-end}.eventBannerArt svg{max-width:190px}.eventPageHead{align-items:flex-start}.eventCardTop{flex-direction:column}.eventDates{white-space:normal}.eventForm .grid.g2{grid-template-columns:1fr}.eventRoute{padding:10px}.eventRoutePanel{padding:19px;border-radius:18px}.eventRouteMap{margin:17px 0 10px}.eventRouteMap svg{min-height:165px}.eventRouteStatus{align-items:flex-start;flex-direction:column;gap:2px}.eventPosGuide{padding:15px}.eventPosGuideTop{flex-direction:column}.eventGuideSteps{grid-template-columns:1fr}.eventGuideStep{padding:11px}.eventGuideBottom{align-items:flex-start;flex-direction:column}.eventGuideEndActions{width:100%}.eventGuideEndActions .btn{flex:1}.contextPOS{max-width:42vw;padding:6px 9px;font-size:10px}.contextPOS svg{width:15px;height:15px}.top-in{gap:7px;padding:8px}.turnoChip{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.routeWheel,.routeDestination{animation:none!important}.eventBannerArt svg{transition:none!important}}
 .wrap{max-width:1280px;margin:0 auto;padding:20px 18px 60px}
 
 /* ---------- tarjetas ---------- */
@@ -665,6 +709,7 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#57816a;box-shado
 .heroRStatus{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
 .androidApkLink{display:inline-flex;align-items:center;gap:10px;max-width:100%;margin-top:16px;padding:9px 13px;border:1px solid rgba(245,230,193,.76);border-radius:13px;background:#f1e6c9;color:#244c3a;text-decoration:none;box-shadow:0 8px 18px rgba(8,29,18,.15);transition:transform .2s,background .2s,box-shadow .2s}
 .androidApkLink:hover{transform:translateY(-2px);background:#fff7e7;box-shadow:0 12px 22px rgba(8,29,18,.2)}
+.androidUpdateButton{font:inherit;cursor:pointer}.androidUpdateButton:disabled{cursor:wait;opacity:.7}
 .androidApkIcon{width:34px;height:34px;display:grid;place-items:center;flex:none;border-radius:10px;background:#e4d7b6;color:#285a45}
 .androidApkIcon svg{width:19px;height:19px}
 .androidApkCopy{display:grid;line-height:1.2}
@@ -925,6 +970,202 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
   .mesaIcon{left:17px;top:20px;width:46px;height:46px}
   .mesa .sello{left:78px;max-width:calc(100% - 92px)}
 }
+
+/* El punto móvil usa una identidad turquesa y cálida, con contraste alto. */
+body.modoEvento{
+  --event-bg:#f4f2e9;--event-surface:#fffdf8;--event-light:#eaf3ef;--event-border:#d4e2dc;
+  --event-ink:#203b35;--event-text:#4c655d;--event-muted:#718078;
+  --event-deep:#143f36;--event-forest:#1b6555;--event-blue:#2c8178;
+  --event-accent:#c9684c;--event-gold:#e9ad4e;
+  --bg:var(--event-bg);--surface:var(--event-surface);--surface-2:var(--event-light);
+  --line:var(--event-border);--line-soft:var(--event-border);
+  --ink:var(--event-ink);--ink-2:var(--event-text);--ink-3:var(--event-muted);
+  --accent:var(--event-accent);--accent-soft:#fff0e7;--accent-ink:#fff;
+  --cyan:var(--event-blue);--cyan-soft:var(--event-light);
+  --good:#247b64;--good-soft:#e3f4ec;
+  --warn:#b67525;--warn-soft:#fff3df;--mal:#c65d63;
+  --forest:var(--event-forest);--forest-2:var(--event-blue);--olive:#318d93;
+  --gold:var(--event-gold);--clay:var(--event-accent);--focus:rgba(22,132,151,.25);
+}
+body.modoEvento{background:radial-gradient(ellipse at 82% 0%,rgba(161,211,194,.28),transparent 35%),var(--bg)}
+body.modoEvento #barra{background:linear-gradient(180deg,var(--event-deep),#174b40);color:#f7faf5}
+body.modoEvento header.top{background:var(--event-deep);color:#f7faf5}
+body.modoEvento .barraTop b{color:#fffdf7}
+body.modoEvento .barraTop small,body.modoEvento .barraPie{color:#c7d9cc}
+body.modoEvento .barraGrupo{color:#b5cdbb}
+body.modoEvento nav.tabs button{color:#e9f2e9}
+body.modoEvento nav.tabs button:hover{background:rgba(255,255,255,.11);color:#fff}
+body.modoEvento .barraTop .plaque{background:#e6efda;color:#17483d}
+body.modoEvento nav.tabs button[aria-selected="true"]{background:#e6efda;color:#17483d;box-shadow:inset 3px 0 var(--event-gold),0 5px 14px rgba(9,40,34,.16)}
+body.modoEvento .heroR{border-left-color:var(--event-gold);background:linear-gradient(118deg,#174b40 0%,var(--event-forest) 58%,#28766b 100%);box-shadow:0 22px 50px -27px rgba(22,88,70,.42)}
+body.modoEvento .heroR h1{color:#fffdf7}
+body.modoEvento .heroR .sub,body.modoEvento .heroEyebrow{color:#e1f0e7}
+body.modoEvento .heroR:before{box-shadow:0 0 0 27px rgba(225,245,232,.07),0 0 0 54px rgba(225,245,232,.045),0 0 0 81px rgba(225,245,232,.025)}
+body.modoEvento .heroR:after{background:radial-gradient(circle,rgba(241,183,99,.2),transparent 68%)}
+body.modoEvento .heroRBadge:before{background:var(--event-gold)}
+body.modoEvento .heroAction:not(.destacado){background:rgba(9,47,40,.33);border-color:rgba(230,243,230,.27);color:#fffdf7}
+body.modoEvento .heroAction:not(.destacado) .heroActionCopy small{color:#d4e6da}
+body.modoEvento .heroAction.destacado{background:#e6efda;border-color:#e6efda;color:#17483d}
+body.modoEvento .heroAction.destacado .heroActionIcon{background:#d0e3c4;color:#176356}
+body.modoEvento .heroAction.destacado .heroActionCopy small{color:#526e5e}
+body.modoEvento .heroAction.destacado .heroArrow{color:#247b71}
+body.modoEvento .dashboardHeading span{color:#52786b}
+body.modoEvento .dashboardHeading h2{color:#203b35}
+body.modoEvento .dashboardHeading small{color:#667b70}
+body.modoEvento #inTiles .tile .v{color:#176356}
+body.modoEvento #inTiles .tile.destacada{border-top-color:var(--event-accent)}
+body.modoEvento #inTiles .tile.destacada:before{background:#fff0e7}
+body.modoEvento #inTiles .tile.destacada:after{background:radial-gradient(circle,rgba(201,104,76,.13),transparent 70%)}
+body.modoEvento .eventPosGuide{border-color:rgba(84,168,145,.48);background:radial-gradient(ellipse at 100% 0,rgba(122,210,181,.18),transparent 42%),linear-gradient(130deg,#16483f,#1c6657 72%,#276e68)}
+body.modoEvento .eventPosGuide{color:#f4faf7}
+body.modoEvento .eventPosGuide h2,body.modoEvento .eventGuideStep b{color:#f7fbf8}
+body.modoEvento .eventPosGuide p,body.modoEvento .eventGuideStep small,body.modoEvento .eventGuideBottom{color:rgba(239,248,250,.82)}
+body.modoEvento .eventGuideNum{background:#efb25c;color:#173e50}
+body.modoEvento .eventGuideStep{border-color:rgba(211,239,239,.2);background:rgba(10,34,48,.35)}
+body.modoEvento .pageHeading{background:linear-gradient(110deg,#fff,#e9f3f5);border-color:#d8e6e9}
+body.modoEvento .pageHeading>div>span{color:#327985}
+body.modoEvento .pageHeading h1{color:#204756}
+body.modoEvento .pageHeading p{color:#607b82}
+body.modoEvento .card>header{background:linear-gradient(110deg,#eaf3f4,#fff)}
+body.modoEvento .card>header h2{color:#204756}
+body.modoEvento .btn.primary{background:#1d7180;border-color:#1d7180}
+body.modoEvento .btn.primary:hover:not(:disabled){background:#155a69;border-color:#155a69}
+body.modoEvento .btn.acento{background:#d97750;border-color:#d97750}
+.eventBanner{color:#f7fbfc}
+.eventBanner h2{color:#f7fbfc}
+.eventBanner p{color:rgba(239,248,250,.82)}
+.eventBanner small{color:#83e4df}
+.eventBannerArt:after{content:"🎪";position:absolute;right:9%;top:6px;font-size:37px;line-height:1;filter:drop-shadow(0 5px 8px rgba(0,0,0,.28));animation:eventTentFloat 3.2s ease-in-out infinite}
+.eventBannerArt svg>path:nth-of-type(5),.eventBannerArt svg>path:nth-of-type(6),.eventBannerArt svg>circle:nth-of-type(3){display:none}
+@keyframes eventTentFloat{50%{transform:translateY(-5px) rotate(2deg)}}
+@media(max-width:620px){.eventBannerArt:after{right:12%;top:-2px;font-size:31px}}
+/* Transición cinemática de módulos: profundidad, barrido y entrada en cascada. */
+@keyframes makersModuleFlight{
+  0%{opacity:0;filter:blur(12px);clip-path:inset(0 0 16% 0 round 42px);transform:perspective(1250px) translate3d(var(--module-shift,78px),46px,-40px) rotateY(var(--module-angle,-6deg)) scale(.91)}
+  58%{opacity:1;filter:blur(0);clip-path:inset(0 round 16px);transform:perspective(1250px) translate3d(-8px,-5px,0) rotateY(1deg) scale(1.012)}
+  78%{transform:perspective(1250px) translate3d(3px,1px,0) rotateY(-.4deg) scale(.998)}
+  100%{opacity:1;filter:none;clip-path:inset(0 round 0);transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes makersModuleSweep{0%{background-position:145% 0;opacity:0}22%{opacity:.8}100%{background-position:-125% 0;opacity:0}}
+@keyframes makersCascade{0%{opacity:0;filter:blur(8px);transform:translate3d(0,34px,0) scale(.965)}68%{opacity:1;filter:blur(0);transform:translate3d(0,-4px,0) scale(1.008)}100%{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@keyframes makersPanelPop{0%{opacity:0;transform:translate3d(0,28px,0) scale(.91) rotateX(8deg)}70%{opacity:1;transform:translate3d(0,-5px,0) scale(1.025) rotateX(0)}100%{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@keyframes makersNavPulse{0%{opacity:.8;transform:scale(.18)}100%{opacity:0;transform:scale(1.25)}}
+@keyframes makersNavIcon{0%{transform:translateY(0) scale(1) rotate(0)}42%{transform:translateY(-5px) scale(1.28) rotate(-10deg)}72%{transform:translateY(1px) scale(.92) rotate(4deg)}100%{transform:translateY(0) scale(1) rotate(0)}}
+section[id^="tab-"].module-entering{position:relative;isolation:isolate;transform-origin:50% 45%;animation:makersModuleFlight .92s cubic-bezier(.16,1,.3,1) both}
+section[id^="tab-"].module-entering::after{content:"";position:absolute;z-index:60;inset:0;pointer-events:none;border-radius:inherit;background:linear-gradient(112deg,transparent 0 36%,rgba(238,255,222,.08) 43%,rgba(255,255,255,.66) 49%,rgba(214,172,105,.38) 53%,rgba(105,187,143,.2) 57%,transparent 67% 100%);background-size:260% 100%;mix-blend-mode:screen;animation:makersModuleSweep .98s cubic-bezier(.22,.72,.23,1) both}
+section[id^="tab-"].module-entering>*{animation:makersCascade .7s cubic-bezier(.18,1,.32,1) both}
+section[id^="tab-"].module-entering>*:nth-child(2){animation-delay:.08s}
+section[id^="tab-"].module-entering>*:nth-child(3){animation-delay:.16s}
+section[id^="tab-"].module-entering>*:nth-child(4){animation-delay:.24s}
+section[id^="tab-"].module-entering>*:nth-child(5){animation-delay:.32s}
+section[id^="tab-"].module-entering>*:nth-child(6){animation-delay:.4s}
+section[id^="tab-"].module-entering .tile,
+section[id^="tab-"].module-entering .card,
+section[id^="tab-"].module-entering .eventBanner,
+section[id^="tab-"].module-entering .pageHeading{animation:makersPanelPop .72s cubic-bezier(.18,1,.3,1) both}
+section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(2),
+section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(4){animation-delay:.12s}
+section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(3),
+section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-delay:.22s}
+#tabs button{position:relative;isolation:isolate;transform-origin:center}
+#tabs button::before{content:"";position:absolute;z-index:0;inset:-55%;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(circle,rgba(255,241,190,.76) 0,rgba(214,172,105,.38) 28%,rgba(75,163,125,.2) 48%,transparent 70%)}
+#tabs button>svg,#tabs button>.tab-label{position:relative;z-index:1}
+#tabs button>.mbadge{z-index:1}
+#tabs button.section-selected-pulse{animation:makersCascade .52s cubic-bezier(.18,1,.3,1) both}
+#tabs button.section-selected-pulse::before{animation:makersNavPulse .72s ease-out both}
+#tabs button.section-selected-pulse svg{animation:makersNavIcon .72s cubic-bezier(.2,1.5,.35,1) both}
+#tabs button[aria-selected="true"]{box-shadow:inset 3px 0 var(--gold),0 0 0 1px rgba(214,172,105,.28),0 10px 28px rgba(32,74,59,.2)}
+#tabs button:active{transform:scale(.94)}
+@media(hover:hover){
+  #tabs button:not([aria-selected="true"]):hover{transform:translateX(4px) scale(1.025);box-shadow:0 8px 22px rgba(32,74,59,.16)}
+  section[id^="tab-"] .tile,section[id^="tab-"] .card,section[id^="tab-"] .eventBanner{transition:transform .28s cubic-bezier(.2,.9,.2,1),box-shadow .28s ease}
+  section[id^="tab-"] .tile:hover,section[id^="tab-"] .card:hover,section[id^="tab-"] .eventBanner:hover{transform:translateY(-6px) scale(1.012);box-shadow:0 20px 42px rgba(28,62,47,.18)}
+}
+@media(hover:none){#tabs button:active,section[id^="tab-"] button:active{transform:scale(.95)}}
+@media(prefers-reduced-motion:reduce){
+  section[id^="tab-"].module-entering,section[id^="tab-"].module-entering>*{animation:none!important}
+  section[id^="tab-"].module-entering::after{display:none!important}
+  #tabs button.section-selected-pulse,#tabs button.section-selected-pulse::before,#tabs button.section-selected-pulse svg{animation:none!important}
+}
+</style>
+<style>
+#tab-menu .menuTools{display:flex;gap:10px;align-items:center;margin:2px 0 14px}
+#tab-menu .menuSearch{display:flex;align-items:center;gap:8px;flex:1;min-width:180px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:0 12px;color:var(--ink-3)}
+#tab-menu .menuSearch>span{font-size:21px;line-height:1}
+#tab-menu .menuSearch input{border:0!important;box-shadow:none!important;background:transparent;min-width:0}
+#tab-menu #menuFiltroCategoria{width:min(230px,35%)}
+#tab-menu .menuCount{white-space:nowrap;color:var(--ink-3);font-size:11px}
+#tab-menu .menuItemList{display:grid;gap:10px}
+#tab-menu .menuItemCard{min-width:0;border:1px solid var(--line);border-radius:15px;background:var(--surface);padding:12px 14px;box-shadow:0 3px 12px rgba(39,57,42,.035);transition:border-color .18s,box-shadow .18s,transform .18s}
+#tab-menu .menuItemCard:hover{border-color:#b7cbb4;box-shadow:0 8px 22px rgba(39,57,42,.075);transform:translateY(-1px)}
+#tab-menu .menuItemMain{display:grid;grid-template-columns:76px minmax(0,1fr);gap:14px;align-items:center}
+#tab-menu .menuPhotoPick{position:relative;width:76px;height:76px;display:grid;place-items:center;overflow:hidden;border:1px dashed #cbd5c6;border-radius:13px;background:#f3f5ed;color:#547456;cursor:pointer}
+#tab-menu .menuPhotoPick>img{width:100%;height:100%;object-fit:cover}
+#tab-menu .menuPhotoPlaceholder{font-size:29px;line-height:1}
+#tab-menu .menuPhotoHint{position:absolute;inset:auto 0 0;background:rgba(27,68,52,.82);color:white;text-align:center;font-size:9px;padding:3px}
+#tab-menu .menuPhotoPick input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+#tab-menu .menuPhotoPick:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+#tab-menu .menuItemFields{min-width:0;display:grid;gap:8px}
+#tab-menu .menuItemTitle{display:flex;gap:9px;align-items:end}
+#tab-menu .menuItemTitle label,#tab-menu .menuItemNumbers label,#tab-menu .menuSatFields label{display:grid;gap:4px;min-width:0;flex:1}
+#tab-menu .menuItemTitle label>span,#tab-menu .menuItemNumbers label>span,#tab-menu .menuSatFields label>span{font-size:9px;font-weight:800;letter-spacing:.065em;text-transform:uppercase;color:var(--ink-3)}
+#tab-menu .menuItemTitle input{font-weight:750;font-size:14px}
+#tab-menu .menuDelete{flex:0 0 auto;color:#8b6457}
+#tab-menu .menuItemNumbers{display:grid;grid-template-columns:minmax(115px,1.15fr) minmax(82px,.75fr) minmax(82px,.75fr) minmax(135px,1fr);gap:9px}
+#tab-menu .menuItemNumbers select,#tab-menu .menuItemNumbers input{width:100%;min-width:0}
+#tab-menu .menuMoney{display:flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0 9px;color:var(--ink-3)}
+#tab-menu .menuMoney input{border:0!important;box-shadow:none!important;padding-left:0;padding-right:0}
+#tab-menu .menuActive{display:flex;align-items:center;gap:7px;color:#426a4d;font-size:11px;font-weight:700}
+#tab-menu .menuActive input{width:16px;height:16px;accent-color:#34734f}
+#tab-menu .menuItemAdvanced{margin-top:10px;border-top:1px solid var(--line-soft);padding-top:8px}
+#tab-menu .menuItemAdvanced>summary{display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none;color:#47644c;font-size:11px;font-weight:750}
+#tab-menu .menuItemAdvanced>summary::-webkit-details-marker,#tab-menu .menuAdvanced>summary::-webkit-details-marker{display:none}
+#tab-menu .menuItemAdvanced>summary:after{content:"＋";margin-left:auto;color:var(--ink-3)}
+#tab-menu .menuItemAdvanced[open]>summary:after{content:"−"}
+#tab-menu .menuItemAdvanced>summary small{font-weight:500;color:var(--ink-3)}
+#tab-menu .menuItemAdvancedBody{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,1.15fr);gap:16px;margin-top:12px;padding:12px;border-radius:12px;background:var(--bg)}
+#tab-menu .menuMods,#tab-menu .menuSat{min-width:0;display:grid;align-content:start;gap:8px}
+#tab-menu .menuMods>b,#tab-menu .menuSat>b{font-size:11px;color:var(--ink-2)}
+#tab-menu .menuSat>b small{font-weight:500;color:var(--ink-3)}
+#tab-menu .menuModList{display:flex;gap:6px;flex-wrap:wrap}
+#tab-menu .menuModOption{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:6px 9px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink-2);font-size:10px;cursor:pointer}
+#tab-menu .menuModOption.si{border-color:#8eb49a;background:#e8f2e7;color:#275c3c}
+#tab-menu .menuModOption input{width:13px;height:13px;margin:0;accent-color:#34734f}
+#tab-menu .menuNoMods,#tab-menu .menuSatHint{color:var(--ink-3);font-size:10px}
+#tab-menu .menuSatFields{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(140px,.8fr);gap:8px}
+#tab-menu .menuSatFields input,#tab-menu .menuSatFields select{width:100%;min-width:0}
+#tab-menu .menuEmpty{padding:26px 16px;border:1px dashed var(--line);border-radius:14px;text-align:center;color:var(--ink-3);background:var(--surface)}
+#tab-menu .menuAdvanced>summary{display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;list-style:none}
+#tab-menu .menuAdvanced>summary>span{display:grid;gap:3px}
+#tab-menu .menuAdvanced>summary b{font-size:13px;color:var(--ink-2)}
+#tab-menu .menuAdvanced>summary small{font-size:10px;color:var(--ink-3)}
+#tab-menu .menuAdvanced>summary .btn{margin-left:auto}
+#tab-menu .menuGroupCard{margin:0 0 10px;box-shadow:none}
+.coverageDate{display:flex;align-items:center;gap:8px;margin-left:auto;color:var(--ink-3);font-size:11px;font-weight:700}
+.coverageDate input{width:auto;min-width:145px;padding:7px 9px}
+.coverageStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:12px}
+.coverageStat{min-width:0;padding:11px 13px;border:1px solid var(--line-soft);border-radius:12px;background:var(--surface-2)}
+.coverageStat small{display:block;color:var(--ink-3);font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}
+.coverageStat b{display:block;margin-top:3px;color:var(--ink);font-size:21px;line-height:1.2}
+.coverageGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.coverageRow{display:flex;align-items:center;gap:10px;min-width:0;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:13px;background:var(--surface);color:var(--ink);text-align:left;cursor:pointer;transition:transform .18s,border-color .18s,box-shadow .18s}
+.coverageRow:hover{transform:translateY(-2px);border-color:#9fbaa8;box-shadow:0 7px 16px rgba(37,70,51,.08)}
+.coveragePerson{display:grid;gap:2px;min-width:0;flex:1}
+.coveragePerson b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.coveragePerson small{color:var(--ink-3);font-size:10.5px}
+.coverageState{flex:none;padding:5px 8px;border-radius:99px;background:#edf2e8;color:#46664e;font-size:10px;font-weight:800}
+.coverageRow.live .coverageState{background:#e4f3e8;color:#287246}
+.coverageRow.soon .coverageState{background:#eef4f2;color:#38727a}
+.coverageRow.attention .coverageState{background:#fff0df;color:#9b641f}
+.coverageRow.done .coverageState{background:#f0efe9;color:#6a756a}
+.coverageEmpty{grid-column:1/-1;padding:17px;border:1px dashed var(--line);border-radius:12px;color:var(--ink-3);text-align:center}
+.plat{padding-top:70px!important}.plat:before,.plat:after{display:none!important}
+.platPhoto{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:48px;height:48px;display:grid;place-items:center;overflow:hidden;border-radius:13px;background:#edf2e6;color:#557454;font-size:27px}
+.platPhoto img{width:100%;height:100%;object-fit:cover}
+.platTax{display:block!important;margin-top:2px;color:#728076!important;font-size:9px!important;font-weight:700}
+@media(max-width:680px){#tab-menu .menuTools{flex-wrap:wrap}#tab-menu .menuSearch{flex-basis:100%}#tab-menu #menuFiltroCategoria{width:auto;flex:1}#tab-menu .menuItemMain{grid-template-columns:62px minmax(0,1fr);gap:10px}#tab-menu .menuPhotoPick{width:62px;height:62px}#tab-menu .menuItemNumbers{grid-template-columns:1fr 1fr}#tab-menu .menuItemNumbers label:first-child,#tab-menu .menuItemNumbers label:last-child{grid-column:1/-1}#tab-menu .menuItemAdvancedBody{grid-template-columns:1fr}#tab-menu .menuSatFields{grid-template-columns:1fr}}
+@media(max-width:420px){#tab-menu .menuItemCard{padding:10px}#tab-menu .menuItemMain{grid-template-columns:52px minmax(0,1fr);gap:8px}#tab-menu .menuPhotoPick{width:52px;height:52px}#tab-menu .menuItemNumbers{gap:6px}#tab-menu .menuMoney input{font-size:12px}}
+@media(max-width:620px){.coverageStats{grid-template-columns:repeat(2,minmax(0,1fr))}.coverageGrid{grid-template-columns:1fr}.coverageDate{font-size:10px}.coverageDate input{min-width:125px}}
 </style>
 </head>
 <body>
@@ -955,6 +1196,7 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
         <circle cx="12" cy="15.4" r="1.1" fill="currentColor" stroke="none"/>
       </svg>
     </button>
+    <button class="contextPOS" id="btnContextoPOS" type="button" aria-label="Abrir módulo de eventos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16h2l2-6h8l3 6h2v3H3z"/><path d="M7 10V6h6l3 4"/><circle cx="7" cy="19" r="1.7"/><circle cx="17" cy="19" r="1.7"/></svg><span id="contextPOSText">Eventos y punto móvil</span></button>
     <button class="btn sm pwaInstall" id="pwaInstall" type="button" hidden style="white-space:nowrap;margin-left:auto">Instalar app</button>
     <span class="turnoChip cerrado" id="turnoChip">Caja <b>cerrada</b></span>
   </div>
@@ -978,6 +1220,11 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
         <span class="androidApkCopy"><b>Descargar APK para Android</b><small>Instalaci&oacute;n de prueba</small></span>
         <span class="androidApkArrow" aria-hidden="true">↓</span>
       </a>
+      <button id="androidUpdateButton" class="androidApkLink androidUpdateButton" type="button" hidden aria-label="Buscar actualizaciones de Makers Restaurant">
+        <span class="androidApkIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5"/><path d="M4.9 9a7.5 7.5 0 0 1 12.4-2L20 12M4 17v-5h5"/><path d="M19.1 15a7.5 7.5 0 0 1-12.4 2L4 12"/></svg></span>
+        <span class="androidApkCopy"><b id="androidUpdateTitle">Buscar actualizaciones</b><small id="androidUpdateHint">Revisar la versión instalada</small></span>
+        <span class="androidApkArrow" aria-hidden="true">↻</span>
+      </button>
     </div>
     <div class="heroRActions" aria-label="Acciones rápidas">
       <button class="heroAction" id="inicioVerMesas" type="button">
@@ -994,20 +1241,52 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
       </button>
     </div>
   </div>
+  <section class="eventPosGuide" id="eventPosGuide" hidden aria-labelledby="eventGuideTitle">
+    <div class="eventPosGuideTop"><div><span class="eventPosGuideEyebrow">TU PUNTO MÓVIL · SOLO ESTE EVENTO</span><h2 id="eventGuideTitle">Operar en el evento</h2><p id="eventGuideLocation">La caja del restaurante queda guardada y abierta mientras usas este punto.</p></div><span class="eventPosState" id="eventGuideCashState">Caja cerrada</span></div>
+    <div class="eventGuideSteps">
+      <article class="eventGuideStep"><span class="eventGuideNum">1</span><div><b>Abre la caja para cobrar</b><small>Puedes tomar pedidos antes. Para cobrar, registra aquí el fondo inicial de cambio; es independiente de la caja del restaurante.</small><div class="eventGuideControls"><button class="btn primary sm" id="eventGuideCaja" type="button">Abrir caja del evento</button></div></div></article>
+      <article class="eventGuideStep"><span class="eventGuideNum">2</span><div><b>Pedidos para llevar</b><small>Es el flujo recomendado para ferias y festivales. No necesitas crear mesas para vender.</small><div class="eventGuideControls"><button class="btn primary sm" id="eventGuideVenta" type="button">Nueva venta para llevar</button></div></div></article>
+      <article class="eventGuideStep"><span class="eventGuideNum">3</span><div><b>Mesas opcionales · consumo en sitio</b><small>Agrega mesas solo si habrá personas sentadas. El acomodo no es requisito; los pedidos se envían a cocina y se cobran en la caja móvil.</small><div class="eventGuideControls"><button class="btn sm" id="eventGuideMesasSetup" type="button">Agregar mesas (opcional)</button><button class="btn sm" id="eventGuideMesas" type="button">Ver mesas</button></div></div></article>
+    </div>
+    <div class="eventGuideBottom"><span>Para finalizar, termina las comandas abiertas y cierra la caja móvil. Las ventas y el corte se conservan; podrás reabrirlo desde la agenda.</span><div class="eventGuideEndActions"><button class="btn sm acento" id="eventGuideFinish" type="button">Finalizar evento</button><button class="btn sm ghost" id="eventGuideLocal" type="button">Volver al restaurante</button></div></div>
+  </section>
+  <button class="eventBanner" id="inicioEventos" type="button" style="width:100%;text-align:left;color:inherit">
+    <span><small>EL RESTAURANTE SIGUE ABIERTO</small><h2>Lleva tu punto de venta a otro lugar</h2><p>Organiza ferias, expos y eventos con una operación independiente y su propia caja.</p><span class="btn primary sm" style="margin-top:13px">Planear una salida <b aria-hidden="true">↗</b></span></span>
+    <span class="eventBannerArt" aria-hidden="true"><svg viewBox="0 0 260 112" fill="none"><path d="M15 86h230" stroke="#4d6672" stroke-width="2" stroke-dasharray="6 7"/><path d="M37 72c23-2 23-29 47-27 20 2 21 30 43 29 21 0 22-31 47-30 16 0 20 19 43 16" stroke="#35d3d9" stroke-width="2" stroke-dasharray="5 5"/><path d="M37 70h29l8-14h23l11 14h5v12H37z" fill="#22D3EE" stroke="#c4fbf8" stroke-width="2"/><path d="M78 58v12h25L94 58z" fill="#183d4a"/><circle cx="56" cy="84" r="7" fill="#0d1225" stroke="#f8cf65" stroke-width="3"/><circle cx="101" cy="84" r="7" fill="#0d1225" stroke="#f8cf65" stroke-width="3"/><path d="M205 16v30m-10-20h20" stroke="#F472B6" stroke-width="3" stroke-linecap="round"/><circle cx="205" cy="31" r="19" stroke="#F472B6" stroke-opacity=".3"/><path d="M173 22h9m-4-4v9" stroke="#FBBF24" stroke-width="2" stroke-linecap="round"/></svg></span>
+  </button>
   <div class="dashboardHeading"><div><span>OPERACIÓN</span><h2>Resumen del servicio</h2></div><small>Indicadores de hoy</small></div>
   <div class="tiles" id="inTiles"></div>
   <div class="grid g2">
-    <div class="card"><header><h2>Mesas abiertas</h2><span class="hint" id="inMesasHint"></span></header>
+    <div class="card"><header><h2 id="inMesasTitle">Mesas abiertas</h2><span class="hint" id="inMesasHint"></span></header>
       <div class="body"><div id="inMesas"></div></div></div>
     <div class="card"><header><h2>Lo que vendiste hoy</h2><span class="hint">por categoría</span></header>
       <div class="body"><div id="inCat"></div></div></div>
   </div>
 </section>
 
+<!-- ============ EVENTOS Y PUNTO MÓVIL ============ -->
+<section id="tab-eventos" hidden>
+  <div class="pageHeading"><div><span>OPERACIÓN PARALELA</span><h1>Eventos y punto móvil</h1><p>Agenda ferias, expos y salidas sin interrumpir el restaurante.</p></div></div>
+  <div class="eventPageHead"><div><h2>Tu próxima salida</h2><p>Cada evento tiene sus propias comandas y caja. El restaurante conserva su operación y dinero por separado.</p><small class="hint">Las mesas son opcionales: agrégalas solo si habrá consumo en sitio. Para festivales puedes trabajar únicamente con pedidos para llevar.</small></div></div>
+  <div class="eventGrid">
+    <div class="card"><header><h2>Agendar un evento</h2><span class="hint">feria · expo · catering</span></header><div class="body">
+      <form class="eventForm" id="eventForm">
+        <div><label class="f" for="evNombre">Nombre del evento</label><input id="evNombre" name="nombre" required maxlength="90" placeholder="Ej. Expo Sabores 2026"></div>
+        <div class="grid g2"><div><label class="f" for="evTipo">Tipo</label><select id="evTipo" name="tipo"><option>Feria</option><option>Expo</option><option>Festival</option><option>Evento privado</option><option>Pop-up</option><option>Otro</option></select></div><div><label class="f" for="evLugar">Sede o destino</label><input id="evLugar" name="lugar" required maxlength="100" placeholder="Centro de convenciones"></div></div>
+        <div class="grid g2"><div><label class="f" for="evDesde">Fecha de inicio</label><input id="evDesde" name="desde" type="date" required></div><div><label class="f" for="evHasta">Fecha de cierre</label><input id="evHasta" name="hasta" type="date" required></div></div>
+        <div><label class="f" for="evDireccion">Dirección o referencia</label><input id="evDireccion" name="direccion" maxlength="180" placeholder="Domicilio, ciudad o ubicación"></div>
+        <div><label class="f" for="evNotas">Notas de operación</label><textarea id="evNotas" name="notas" rows="3" maxlength="500" placeholder="Horario, montaje, contacto en sitio…"></textarea></div>
+        <button class="btn primary ancho" type="submit">＋ Agendar y preparar salida</button>
+      </form>
+    </div></div>
+    <div><div class="fila" style="margin-bottom:10px"><h2 style="font-size:17px">Agenda de eventos</h2><span class="hint" id="eventCount" style="margin-left:auto"></span></div><div class="eventList" id="eventList"></div></div>
+  </div>
+</section>
+
 <!-- ============ MESAS ============ -->
 <section id="tab-mesas" hidden>
   <div class="fila" style="margin-bottom:14px">
-    <h2 style="font-size:19px">Mesas</h2>
+    <h2 id="mesasTitulo" style="font-size:19px">Mesas</h2>
     <span class="hint" id="mesasResumen" style="color:var(--ink-3);font-size:12.5px"></span>
     <button class="btn sm" id="mesaRapida" style="margin-left:auto">Venta para llevar</button>
   </div>
@@ -1048,6 +1327,12 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
 <!-- ============ PERSONAL ============ -->
 <section id="tab-personal" hidden>
   <div class="pageHeading"><div><span>EQUIPO</span><h1>Personas y turnos</h1><p>Asistencia, horarios y control del equipo de servicio.</p></div></div>
+  <div class="card" id="cardCoberturaPersonal">
+    <header><h2>Cobertura de turnos</h2><label class="coverageDate">Fecha <input id="personalFecha" type="date" aria-label="Fecha de la cobertura"></label></header>
+    <div class="body"><div class="coverageStats" id="personalCoberturaStats"></div><div class="coverageGrid" id="personalCobertura"></div>
+      <p class="note" style="margin:12px 0 0">Toca un nombre para consultar o ajustar su horario. La asistencia se compara con el horario registrado.</p>
+    </div>
+  </div>
   <div class="card">
     <header><h2>Reloj checador</h2><span class="hint" id="chHoy"></span></header>
     <div class="body">
@@ -1223,35 +1508,36 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
       <p class="satAviso"><b>Datos para facturar:</b> asigna a cada platillo su clave SAT y unidad. Las sugerencias ayudan a buscar; valida la clave antes de emitir el CFDI.
         <a href="https://wwwmat.sat.gob.mx/consultas/53693/catalogo-de-productos-y-servicios" target="_blank" rel="noopener noreferrer">Abrir buscador oficial del SAT ↗</a></p>
       <datalist id="satProdCatalogo"></datalist>
-      <div class="tbl-wrap"><table id="t_plats"></table></div>
+      <div class="menuTools"><label class="menuSearch"><span aria-hidden="true">⌕</span><input id="menuBuscar" type="search" placeholder="Buscar platillo…" autocomplete="off"></label><select id="menuFiltroCategoria" aria-label="Filtrar por categoría"><option value="">Todas las categorías</option></select><span id="menuConteo" class="menuCount"></span></div>
+      <div id="t_plats" class="menuItemList"></div>
     </div>
   </div>
-  <div class="card">
-    <header><h2>Grupos de modificadores</h2><button class="btn sm ghost" id="modNuevo" style="margin-left:auto">+ Grupo</button></header>
-    <div class="body">
-      <p class="note" style="margin:0 0 14px">Un grupo es una pregunta que se le hace al mesero: «¿Término?», «¿Qué le quito?», «¿Extras?».
-        Cada opción puede costar de más. Se le asignan al platillo en su renglón.</p>
-      <div id="modLista"></div>
-    </div>
-  </div>
+  <details class="card menuAdvanced" id="menuGruposAdvanced">
+    <summary><span><b>Preguntas y opciones</b><small>Configura términos, extras y cambios de ingredientes</small></span><button class="btn sm ghost" id="modNuevo" type="button">+ Grupo</button></summary>
+    <div class="body"><p class="note" style="margin:0 0 14px">Cada grupo es una pregunta para el mesero, por ejemplo «¿Término?», «¿Qué le quito?» o «¿Extras?». Puedes asignarlo a los platillos que lo necesiten.</p><div id="modLista"></div></div>
+  </details>
 </section>
 
 <!-- ============ CAJA ============ -->
 <section id="tab-caja" hidden>
-  <div class="pageHeading"><div><span>OPERACIÓN</span><h1>Caja y turnos</h1><p>Registra aperturas, movimientos y cierres con claridad.</p></div><span class="pageHeadingMark cajaMark" aria-hidden="true">$</span></div>
+  <div class="pageHeading"><div><span>OPERACIÓN</span><h1 id="cajaPageTitle">Caja y turnos</h1><p id="cajaPageDescription">Registra aperturas, movimientos y cierres con claridad.</p></div><span class="pageHeadingMark cajaMark" aria-hidden="true">$</span></div>
   <div class="card">
-    <header><h2>Turno de caja</h2><span class="hint" id="cajaHint"></span></header>
+    <header><h2 id="cajaTurnoTitle">Turno de caja</h2><span class="hint" id="cajaHint"></span></header>
     <div class="body" id="cajaCuerpo"></div>
   </div>
   <div class="card">
     <header><h2>Movimientos del turno</h2></header>
     <div class="body"><div class="tbl-wrap"><table id="t_movs"></table></div></div>
   </div>
+  <div class="card" id="cajaEventosCard" hidden>
+    <header><h2>Cajas de eventos</h2><span class="hint">separadas de la caja física</span></header>
+    <div class="body"><p class="note" style="margin:0 0 12px">Cada evento tiene su propio fondo, cobros y corte. Estas cantidades no se suman al efectivo del restaurante.</p><div id="cajaEventosBody"></div></div>
+  </div>
 </section>
 
 <!-- ============ VENTAS ============ -->
 <section id="tab-ventas" hidden>
-  <div class="pageHeading"><div><span>ANÁLISIS</span><h1>Ventas del restaurante</h1><p>Consulta tickets, cancelaciones y cortes para entender el día.</p></div></div>
+  <div class="pageHeading"><div><span>ANÁLISIS</span><h1 id="ventasTitulo">Ventas del restaurante</h1><p id="ventasDescripcion">Consulta tickets, cancelaciones y cortes para entender el día.</p></div></div>
   <div class="tiles" id="venTiles"></div>
   <div class="card">
     <header><h2>Tickets cobrados</h2><span class="hint" id="venHint"></span></header>
@@ -1279,6 +1565,10 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
       <div class="tbl-wrap"><table id="t_cancela"></table></div>
     </div>
   </div>
+  <div class="card" id="venEventosCard">
+    <header><h2>Reportes de eventos</h2><span class="hint" id="venEventosHint"></span></header>
+    <div class="body"><p class="note" style="margin:0 0 12px">Ventas y cortes de cada punto móvil. Se muestran por separado y no se mezclan con los totales del restaurante.</p><div id="venEventosBody"></div></div>
+  </div>
   <div class="card">
     <header><h2>Turnos cerrados</h2></header>
     <div class="body"><div class="tbl-wrap"><table id="t_turnos"></table></div></div>
@@ -1287,7 +1577,7 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
 
 <!-- ============ AJUSTES ============ -->
 <section id="tab-set" hidden>
-  <div class="pageHeading"><div><span>CONFIGURACIÓN</span><h1>Tu restaurante</h1><p>Personaliza la operación, las mesas, el equipo y los tickets.</p></div></div>
+  <div class="pageHeading"><div><span>CONFIGURACIÓN</span><h1 id="configTitle">Tu restaurante</h1><p id="configDescription">Personaliza la operación, las mesas, el equipo y los tickets.</p></div></div>
   <div class="card">
     <header><h2>Tu negocio</h2></header>
     <div class="body">
@@ -1347,6 +1637,33 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
     </div>
   </div>
   <div class="card">
+    <header><h2>Impresora de esta pantalla</h2><span class="hint" id="btPrinterHint">Bluetooth del APK</span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Elige conexión directa para térmicas Bluetooth ESC/POS de 58 u 80 mm. Para impresoras USB, Wi-Fi o de otro protocolo, usa los servicios de impresión de Android; ese modo muestra una confirmación en cada trabajo y puede requerir el complemento del fabricante.</p>
+      <div id="btPrinterWebHint" class="note" style="margin:0;border-left-color:var(--warn)">La conexión Bluetooth directa estará disponible en la versión Android con el puente nativo de impresión.</div>
+      <div id="btPrinterControls" hidden>
+        <div class="grid g2">
+          <div><label class="f" for="btPrinterMode">Método de conexión</label>
+            <select id="btPrinterMode"><option value="bluetooth">Bluetooth directo · ESC/POS</option><option value="android">Servicios de impresión Android</option></select></div>
+          <div><label class="f" for="btPrinterWidth">Ancho del papel</label>
+            <select id="btPrinterWidth"><option value="58">58 mm</option><option value="80">80 mm</option></select></div>
+        </div>
+        <div id="btPrinterBluetoothOptions" class="grid g2" style="margin-top:10px">
+          <div><label class="f" for="btPrinterSelect">Impresora emparejada</label>
+            <select id="btPrinterSelect"><option value="">Busca impresoras emparejadas</option></select></div>
+          <div style="display:flex;align-items:end;gap:8px;flex-wrap:wrap">
+            <button class="btn sm" id="btPrinterFind" type="button">Buscar emparejadas</button>
+          </div>
+        </div>
+        <div class="fila" style="margin-top:12px">
+          <button class="btn sm primary" id="btPrinterSave" type="button">Guardar conexión</button>
+          <button class="btn sm" id="btPrinterTest" type="button">Imprimir prueba</button>
+          <span class="hint" id="btPrinterStatus" aria-live="polite">Sin impresora seleccionada.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
     <header><h2>Respaldo</h2><span class="hint" id="respHint"></span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px;border-left-color:var(--warn)">Todo tu negocio vive <b>en este
@@ -1366,10 +1683,7 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
   <div class="card">
     <header><h2>Esta pantalla</h2><span class="hint" id="estHint"></span></header>
     <div class="body">
-      <p class="note" style="margin:0 0 14px">Una página web <b>no puede escoger impresora</b>: siempre manda a la
-        predeterminada de la computadora donde está abierta. Por eso esto se configura <b>por pantalla</b> y no por
-        cuenta. Pon en la compu de la caja la impresora de la caja como predeterminada de Windows, y en la de la
-        cocina la suya: cada una imprime lo que le toca y ya no vuelves a escoger.</p>
+      <p class="note" style="margin:0 0 14px">Esta pantalla se configura por dispositivo. En Android puedes elegir una térmica Bluetooth emparejada para mandar cuentas o comandas directamente; en navegador se usa la impresora predeterminada o el diálogo de impresión del sistema.</p>
       <div class="grid g3">
         <div><label class="f" for="est_donde">Esta pantalla es la de</label>
           <select id="est_donde"></select></div>
@@ -1398,8 +1712,8 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
     </div>
   </div>
   <div class="card">
-    <header><h2>Mesas y zonas</h2><button class="btn sm ghost" id="mesaNueva" style="margin-left:auto">+ Mesa</button></header>
-    <div class="body"><div class="tbl-wrap"><table id="t_mesas"></table></div></div>
+    <header><h2 id="mesasSetTitle">Mesas y zonas</h2><button class="btn sm ghost" id="mesaNueva" style="margin-left:auto">+ Mesa</button></header>
+    <div class="body"><p class="note" id="mesasScopeNote" hidden style="margin:0 0 12px">Esta lista solo pertenece a este evento. Agregar, mover o quitar mesas aquí no cambia las del restaurante ni las de otros eventos.</p><div class="tbl-wrap"><table id="t_mesas"></table></div></div>
   </div>
   <div class="card">
     <header><h2>Equipo y claves</h2><button class="btn sm ghost" id="userNuevo" style="margin-left:auto">+ Persona</button></header>
@@ -1620,6 +1934,21 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
   </div>
 </div>
 
+<div class="eventRoute" id="eventRoute" hidden role="dialog" aria-modal="true" aria-labelledby="eventRouteTitle">
+  <div class="eventRoutePanel"><span class="eventRouteEyebrow" id="eventRouteEyebrow">PUNTO DE VENTA EN CAMINO</span><h2 id="eventRouteTitle">Preparando la salida</h2><p id="eventRouteDestination">—</p>
+    <div class="eventRouteMap" aria-label="Animación del carrito recorriendo una ruta hasta el evento"><svg viewBox="0 0 800 300" role="img" aria-hidden="true">
+      <defs><linearGradient id="routeSky" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#102d3b"/><stop offset="1" stop-color="#25213c"/></linearGradient><linearGradient id="routeRoadGrad" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3b5063"/><stop offset="1" stop-color="#29374d"/></linearGradient></defs>
+      <rect width="800" height="300" fill="url(#routeSky)"/><g class="routeTrees" fill="#1b514c"><path d="m82 173 31-82 31 82h-19v35h-24v-35zM225 142l24-64 24 64h-14v28h-20v-28zM651 161l29-77 29 77h-17v31h-23v-31z"/><path d="m542 124 20-51 20 51h-12v23h-16v-23z"/></g>
+      <path class="routeRoad" d="M35 258 C185 272 192 190 315 207 S450 262 526 184 S653 74 765 62" stroke="url(#routeRoadGrad)"/><path class="routeCenter" d="M35 258 C185 272 192 190 315 207 S450 262 526 184 S653 74 765 62"/>
+      <g class="routeDestination"><circle cx="751" cy="58" r="27" fill="#d6127f" fill-opacity=".18" stroke="#f472b6" stroke-width="2"/><path d="M751 41c-9 0-15 7-15 15 0 11 15 25 15 25s15-14 15-25c0-8-6-15-15-15Z" fill="#F472B6"/><circle cx="751" cy="56" r="5" fill="#271936"/></g>
+      <g class="routeRestaurant" transform="translate(0 -48)" aria-label="Restaurante"><circle cx="48" cy="246" r="25" fill="#143f36" stroke="#e9ad4e" stroke-width="3"/><path d="M34 238h28v20H34zm-3-2 17-11 17 11H31zm10 5v8m8-8v8" fill="#fff7e5" stroke="#fff7e5" stroke-width="1.5" stroke-linejoin="round"/></g>
+      <g class="routeCartMotion"><animateMotion begin="indefinite" dur="4.2s" fill="freeze" rotate="auto" path="M 64 246 C 185 260 192 190 315 207 S 450 254 526 184 S 653 74 744 66"/><g class="routeCart" transform="translate(-32 -25)"><path d="M0 12h44l13 17h9v20H0z" fill="#22D3EE" stroke="#d7fffa" stroke-width="2"/><path d="M9 16h18v12H5zm23 0h9l10 12H32z" fill="#173344"/><path d="M5 9h31" stroke="#FBBF24" stroke-width="3" stroke-linecap="round"/><g class="routeWheel"><circle cx="14" cy="49" r="7" fill="#0d1225" stroke="#f8d66d" stroke-width="3"/><path d="M14 44.5v9m-4.5-4.5h9" fill="none" stroke="#f8d66d" stroke-width="1.3" stroke-linecap="round"/></g><g class="routeWheel"><circle cx="51" cy="49" r="7" fill="#0d1225" stroke="#f8d66d" stroke-width="3"/><path d="M51 44.5v9m-4.5-4.5h9" fill="none" stroke="#f8d66d" stroke-width="1.3" stroke-linecap="round"/></g><path d="m19 7 5-6 7 8" fill="none" stroke="#F472B6" stroke-width="2" stroke-linecap="round"/></g></g>
+      <text id="routeStartLabel" x="30" y="286" fill="#a8b0d0" font-size="12" font-family="sans-serif">RESTAURANTE</text><text id="routeDestinationLabel" x="685" y="106" fill="#f7b6dc" font-size="12" font-family="sans-serif">DESTINO</text>
+    </svg></div>
+    <div class="eventRouteStatus"><span id="eventRouteStatus">Cargando menú, caja y operación móvil…</span><strong id="eventRouteProgress">EN RUTA · 0%</strong></div>
+    <div class="eventRouteActions"><button class="btn ghost" type="button" id="eventRouteCancel">Cancelar</button><button class="btn primary" type="button" id="eventRouteOpen" hidden>Abrir punto de venta →</button></div>
+  </div>
+</div>
 <div id="toast" hidden></div>
 
 <script>
@@ -1658,7 +1987,118 @@ function toast(txt){
 /* ---------------- guardado ----------------
    Primero el navegador, siempre. Un punto de venta que se cae cuando se cae
    el internet no sirve: se cobra local y, si hay nube, se sube después. */
-const LS = "makersrest_pwa_v1";
+const LS_BASE = "makersrest_pwa_v1";
+const EVENTOS_KEY = LS_BASE + "_eventos";
+const POS_CONTEXT_KEY = LS_BASE + "_active_context";
+const EVENTO_REPORT_PREFIX = LS_BASE + "_event_report_";
+function leeEventos(){ try{ const v=JSON.parse(localStorage.getItem(EVENTOS_KEY)||"[]"); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
+let EVENTOS = leeEventos();
+function leeContextoPOS(){
+  try{
+    const c=JSON.parse(localStorage.getItem(POS_CONTEXT_KEY)||"null");
+    return c && c.tipo==="evento" && EVENTOS.some(e=>e.id===c.id) ? c : null;
+  }catch(e){ return null; }
+}
+const POS_CONTEXT = leeContextoPOS();
+const POS_EVENTO = POS_CONTEXT ? EVENTOS.find(e=>e.id===POS_CONTEXT.id) || null : null;
+document.body.classList.toggle("modoEvento",!!POS_EVENTO);
+const LS = POS_CONTEXT ? LS_BASE + "_evento_" + String(POS_CONTEXT.id).replace(/[^a-zA-Z0-9_-]/g, "") : LS_BASE;
+function guardaEventos(){ try{ localStorage.setItem(EVENTOS_KEY,JSON.stringify(EVENTOS)); return true; }catch(e){ toast("No se pudo guardar la agenda en este dispositivo."); return false; } }
+function prefijoEvento(id){ return LS_BASE + "_evento_" + String(id).replace(/[^a-zA-Z0-9_-]/g, ""); }
+function leerDatosEvento(id, clave, defecto){
+  try{ const raw=localStorage.getItem(prefijoEvento(id)+"_"+clave); return raw===null?defecto:JSON.parse(raw); }
+  catch(e){ return defecto; }
+}
+function claveReporteEvento(id){ return EVENTO_REPORT_PREFIX+String(id).replace(/[^a-zA-Z0-9_-]/g, ""); }
+function leeReporteEvento(id){
+  try{ const raw=localStorage.getItem(claveReporteEvento(id)); return raw?JSON.parse(raw):null; }
+  catch(e){ return null; }
+}
+function resumenVentasEvento(comandas){
+  const cerradas=(comandas||[]).filter(c=>c.estado==="cerrada"), vendidas=cerradas.filter(c=>!c.cancelada);
+  const pagos={}; let total=0, propinas=0;
+  vendidas.forEach(c=>{
+    total+=num(c.total); propinas+=num(c.propina);
+    (c.pagos||[]).forEach(p=>{ const tipo=String(p.tipo||"Otro"); pagos[tipo]=num(pagos[tipo])+num(p.monto); });
+  });
+  return {cuentas:vendidas.length,total,propinas,canceladas:cerradas.filter(c=>c.cancelada).length,pagos};
+}
+function armaReporteEvento(ev, comandas, turnos, finalizadoEn){
+  const ventas=(comandas||[]).filter(c=>c.estado==="cerrada");
+  const cortes=(turnos||[]).filter(t=>!t.abierto);
+  return {version:1,eventId:ev.id,nombre:ev.nombre,lugar:ev.lugar,direccion:ev.direccion||"",notas:ev.notas||"",tipo:ev.tipo,desde:ev.desde,hasta:ev.hasta,citas:JSON.parse(JSON.stringify(ev.citas||[])),mesas:JSON.parse(JSON.stringify(leerDatosEvento(ev.id,"mesas",[]))),finalizadoEn:finalizadoEn||new Date().toISOString(),resumen:resumenVentasEvento(ventas),ventas:JSON.parse(JSON.stringify(ventas)),turnos:JSON.parse(JSON.stringify(cortes))};
+}
+function guardaReporteEvento(ev, comandas, turnos, finalizadoEn){
+  try{ localStorage.setItem(claveReporteEvento(ev.id),JSON.stringify(armaReporteEvento(ev,comandas,turnos,finalizadoEn))); return true; }
+  catch(e){ toast("No hubo espacio para guardar el reporte completo; el evento sigue abierto."); return false; }
+}
+function reportesEventos(){
+  const reportes=[];
+  EVENTOS.filter(ev=>ev.finalizado).forEach(ev=>{
+    let r=leeReporteEvento(ev.id);
+    if(!r){
+      r=armaReporteEvento(ev,leerDatosEvento(ev.id,"comandas",[]),leerDatosEvento(ev.id,"turnos",[]),ev.finalizadoEn||ev.creado);
+      try{ localStorage.setItem(claveReporteEvento(ev.id),JSON.stringify(r)); }catch(e){}
+    }
+    if(r) reportes.push(r);
+  });
+  return reportes;
+}
+function inicializaPOSEvento(ev){
+  const pref=prefijoEvento(ev.id);
+  try{
+    /* Los eventos ya preparados también deben permitir entrar de nuevo:
+       devolver undefined hacía que cambiaContextoPOS los rechazara. */
+    if(localStorage.getItem(pref+"_iniciado")) return true;
+    ["menu","P","equipo","decor"].forEach(k=>{
+      const v=localStorage.getItem(LS_BASE+"_"+k);
+      if(v!==null) localStorage.setItem(pref+"_"+k,v);
+    });
+    if(localStorage.getItem(pref+"_mesas")===null) localStorage.setItem(pref+"_mesas","[]");
+    const raw=localStorage.getItem(pref+"_P");
+    if(raw){
+      const cfg=JSON.parse(raw); cfg.negocio=Object.assign({},cfg.negocio||{});
+      /* Los eventos reciben una copia de la operación, pero comienzan sin
+         mesas físicas: cada salida configura su propio salón. */
+      cfg.croquis={};
+      const restaurant=cfg.negocio.nombre||"Mi restaurante";
+      cfg.negocio.nombre=restaurant+" · "+ev.nombre;
+      if(ev.direccion) cfg.negocio.dir=ev.direccion;
+      localStorage.setItem(pref+"_P",JSON.stringify(cfg));
+    }
+    localStorage.setItem(pref+"_iniciado","1");
+    return true;
+  }catch(e){ toast("No se pudo preparar el espacio del evento."); return false; }
+}
+function cambiaContextoPOS(evento){
+  guardaYa();
+  if(evento){
+    if(!inicializaPOSEvento(evento)) return;
+    try{ localStorage.setItem(POS_CONTEXT_KEY,JSON.stringify({tipo:"evento",id:evento.id,nombre:evento.nombre})); }
+    catch(e){ toast("No se pudo abrir el punto móvil."); return; }
+  }else{
+    try{ localStorage.removeItem(POS_CONTEXT_KEY); }catch(e){}
+  }
+  location.reload();
+}
+function fechaEventoTxt(iso){
+  if(!iso) return "Fecha por definir";
+  const d=new Date(iso+"T12:00:00");
+  return d.toLocaleDateString("es-MX",{day:"numeric",month:"short",year:"numeric"});
+}
+function contextoPOSUI(){
+  const b=$("#btnContextoPOS"), t=$("#contextPOSText"); if(!b||!t) return;
+  const movil=window.matchMedia&&window.matchMedia("(max-width: 620px)").matches;
+  t.textContent=POS_EVENTO ? (movil?"Volver al local":"Evento · "+POS_EVENTO.nombre+" · Volver al restaurante") : (movil?"Eventos":"Eventos y punto móvil");
+  b.title=POS_EVENTO ? "Volver al punto de venta del restaurante" : "Agendar eventos y abrir el punto móvil";
+  b.setAttribute("aria-label",b.title);
+  b.hidden=!POS_EVENTO && !puedeVer("eventos");
+}
+window.addEventListener("resize",contextoPOSUI,{passive:true});
+$("#btnContextoPOS").addEventListener("click",()=>{
+  if(POS_EVENTO) cambiaContextoPOS(null);
+  else vaA("eventos");
+});
 function lsGet(k, f){ try{ const v = localStorage.getItem(LS+"_"+k); return v ? JSON.parse(v) : f; }catch(e){ return f; } }
 function lsSet(k, v){ try{ localStorage.setItem(LS+"_"+k, JSON.stringify(v)); }catch(e){} }
 
@@ -1692,7 +2132,7 @@ function persist(){
 window.addEventListener("pagehide", guardaYa);
 document.addEventListener("visibilitychange", ()=>{ if(document.hidden) guardaYa(); });
 async function subeNube(){
-  if(!DB) return;
+  if(!DB || POS_CONTEXT) return;
   try{
     await DB.doc("config/menu").set({menu: MENU});
     await DB.doc("config/mesas").set({mesas: MESAS});
@@ -1831,7 +2271,10 @@ const ESTACIONES = {
   barra:   {et:"Barra",   cuenta:false, cocina:true,  cancela:true},
   ninguna: {et:"No imprime nada", cuenta:false, cocina:false, cancela:false}
 };
-let ESTACION = lsGet("estacion", null) || Object.assign({donde:"caja"}, ESTACIONES.caja);
+const estacionGuardada = lsGet("estacion", null) || {};
+let ESTACION = Object.assign({donde:"caja", impresoraBt:"", impresoraNombre:"", anchoPapelBt:0, modoImpresion:"android"},
+  estacionGuardada);
+if(!estacionGuardada.modoImpresion && estacionGuardada.impresoraBt) ESTACION.modoImpresion = "bluetooth";
 function guardaEstacion(){ lsSet("estacion", ESTACION); }
 let COMPRAS     = lsGet("compras", []);
 let RECETAS     = lsGet("recetas", {});   /* platId -> {ings:[], minutos:0} */
@@ -1846,8 +2289,8 @@ P.gastos  = Object.assign({renta:0, luz:0, gas:0, agua:0, sueldos:0, otros:0}, P
 
 /* ---------------- roles ---------------- */
 const ROLES = {
-  gerente: {nombre:"Gerente", ve:["inicio","mesas","comanda","cocina","menu","caja","ventas","personal","costos","set"]},
-  cajero:  {nombre:"Cajero",  ve:["inicio","mesas","comanda","cocina","caja","personal"]},
+  gerente: {nombre:"Gerente", ve:["inicio","eventos","mesas","comanda","cocina","menu","caja","ventas","personal","costos","set"]},
+  cajero:  {nombre:"Cajero",  ve:["inicio","eventos","mesas","comanda","cocina","caja","personal"]},
   mesero:  {nombre:"Mesero",  ve:["mesas","comanda","cocina","personal"]},
   cocina:  {nombre:"Cocina",  ve:["cocina","personal"]}
 };
@@ -1868,30 +2311,58 @@ const ICO = {
   set:   '<path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="17" r="2"/>',
   cocina:'<path d="M7 3v7"/><path d="M11 3v7"/><path d="M9 10v11"/><path d="M17 3c-1.5 2-2 4-2 6.5 0 1.5.7 2.5 2 2.5v9"/>',
   personal:'<circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6"/>',
-  costos:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 11h3"/><path d="M13 11h3"/><path d="M8 15h3"/><path d="M13 15h3"/>'
+  costos:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 11h3"/><path d="M13 11h3"/><path d="M8 15h3"/><path d="M13 15h3"/>',
+  eventos:'<path d="M3 16h2l2-6h8l3 6h2v3H3z"/><path d="M7 10V6h6l3 4"/><circle cx="7" cy="19" r="1.7"/><circle cx="17" cy="19" r="1.7"/>'
 };
 const PESTANAS = [
-  {k:"inicio", t:"Inicio"}, {k:"mesas", t:"Mesas"}, {k:"cocina", t:"Cocina"},
-  {k:"menu", t:"El menú"}, {k:"caja", t:"Caja"}, {k:"ventas", t:"Ventas"},
+  {k:"inicio", t:"Inicio"}, {k:"mesas", t:"Mesas"}, {k:"caja", t:"Caja"}, {k:"eventos", t:"Eventos y punto móvil"},
+  {k:"cocina", t:"Cocina"}, {k:"menu", t:"El menú"}, {k:"ventas", t:"Ventas"},
   {k:"personal", t:"Personal"}, {k:"costos", t:"Costos"}, {k:"set", t:"Ajustes"}
 ];
 function pintaTabs(){
   $("#tabs").innerHTML = PESTANAS.filter(p=>puedeVer(p.k)).map(p=>{
-    const n = p.k === "mesas" ? abiertas().length : p.k === "cocina" ? porHacer().length : 0;
-    return '<button role="menuitem" data-tab="'+p.k+'" aria-selected="false">'+
+    const n = p.k === "mesas" ? abiertas().length : p.k === "cocina" ? porHacer().length : p.k === "eventos" ? EVENTOS.filter(e=>!e.finalizado&&e.hasta>=hoyISO()).length : 0;
+    const etiqueta = POS_EVENTO && p.k === "caja" ? "Caja móvil" : p.t;
+    return '<button role="menuitem" title="'+esc(etiqueta)+'" aria-label="'+esc(etiqueta)+'" data-tab="'+p.k+'" aria-selected="false">'+
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+
-      ICO[p.k]+'</svg>'+esc(p.t)+
+      ICO[p.k]+'</svg><span class="tab-label">'+esc(etiqueta)+'</span>'+
       (n ? '<span class="mbadge">'+n+'</span>' : '')+'</button>';
   }).join("");
 }
+let vistaEnTransicion = null, temporizadorTransicionVista = 0;
+function animaCambioVista(k, anterior){
+  const vista = $("#tab-"+k); if(!vista) return;
+  if(vistaEnTransicion) vistaEnTransicion.classList.remove("module-entering");
+  if(temporizadorTransicionVista) clearTimeout(temporizadorTransicionVista);
+  $$("#tabs button.section-selected-pulse").forEach(b=>b.classList.remove("section-selected-pulse"));
+  const indice = key => PESTANAS.findIndex(p=>p.k === (key === "comanda" ? "mesas" : key));
+  const avance = anterior == null || indice(k) >= indice(anterior);
+  vista.style.setProperty("--module-shift", avance ? "78px" : "-78px");
+  vista.style.setProperty("--module-angle", avance ? "-6deg" : "6deg");
+  vista.classList.remove("module-entering");
+  void vista.offsetWidth;
+  vista.classList.add("module-entering");
+  vistaEnTransicion = vista;
+  const navKey = k === "comanda" ? "mesas" : k;
+  const boton = $("#tabs [data-tab='"+navKey+"']");
+  if(boton){ boton.classList.remove("section-selected-pulse"); void boton.offsetWidth; boton.classList.add("section-selected-pulse"); }
+  temporizadorTransicionVista = setTimeout(()=>{
+    if(vistaEnTransicion){ vistaEnTransicion.classList.remove("module-entering"); vistaEnTransicion.style.removeProperty("--module-shift"); vistaEnTransicion.style.removeProperty("--module-angle"); }
+    if(boton) boton.classList.remove("section-selected-pulse");
+    vistaEnTransicion = null; temporizadorTransicionVista = 0;
+  }, 1320);
+}
 function vaA(k){
   if(!puedeVer(k) && k !== "comanda") k = PESTANAS.filter(p=>puedeVer(p.k))[0].k;
+  const anterior = PESTANAS.concat([{k:"comanda"}]).find(p=>{ const s=$("#tab-"+p.k); return s && !s.hidden; });
+  const cambioVista = !anterior || anterior.k !== k;
   if(k !== "comanda") comandaId = comandaId;   /* la comanda abierta se conserva */
   PESTANAS.concat([{k:"comanda"}]).forEach(p=>{
     const s = $("#tab-"+p.k); if(s) s.hidden = (p.k !== k);
   });
   $$("#tabs button").forEach(b=> b.setAttribute("aria-selected", String(b.dataset.tab === k)));
   if(k === "inicio")   renderInicio();
+  if(k === "eventos")  renderEventos();
   if(k === "mesas")    renderMesas();
   if(k === "cocina")   renderCocina();
   if(k === "menu")     renderMenu();
@@ -1900,6 +2371,7 @@ function vaA(k){
   if(k === "personal") renderPersonal();
   if(k === "costos")   renderCostos();
   if(k === "set")      renderSet();
+  if(cambioVista) animaCambioVista(k, anterior ? anterior.k : null);
   window.scrollTo(0,0);
 }
 $("#tabs").addEventListener("click", e=>{
@@ -1956,7 +2428,18 @@ const zonas = () => [...new Set(MESAS.filter(m=>m.activa!==false).map(m=>m.zona|
 let zonaVista = "";
 
 const vivas = c => (c.lineas||[]).filter(l=>!l.cancelada);
-const importeLinea = l => (num(l.precio) + (l.mods||[]).reduce((x,m)=>x+num(m.extra),0)) * num(l.cant,1);
+const modoIvaLinea = l => ["incluido","mas","exento"].includes(l.ivaModo) ? l.ivaModo : "incluido";
+const baseLinea = l => (num(l.precio) + (l.mods||[]).reduce((x,m)=>x+num(m.extra),0)) * num(l.cant,1);
+const ivaLinea = l => {
+  const tasa = Math.max(0,num(P.iva))/100, base = baseLinea(l), modo = modoIvaLinea(l);
+  if(!tasa || modo === "exento") return 0;
+  return modo === "mas" ? base*tasa : base - base/(1+tasa);
+};
+const importeLinea = l => baseLinea(l) + (modoIvaLinea(l) === "mas" ? ivaLinea(l) : 0);
+const precioFinalPlatillo = p => {
+  const base = num(p.precio), modo = modoIvaLinea(p);
+  return base + (modo === "mas" ? base*Math.max(0,num(P.iva))/100 : 0);
+};
 function totalLineas(c){ return vivas(c).reduce((s,l)=> s + importeLinea(l), 0); }
 
 /* Lo que una persona consumió. Lo de "compartir" (comensal 0) se reparte
@@ -1977,8 +2460,9 @@ function porComensal(c){
 }
 function sumaComanda(c){
   const sub = totalLineas(c);
+  const iva = vivas(c).reduce((s,l)=>s+ivaLinea(l),0);
   const serv = sub * num(P.servicio)/100;
-  return {sub, serv, total: sub + serv};
+  return {sub, iva, serv, total: sub + serv};
 }
 
 /* ---------------- el croquis ----------------
@@ -2488,6 +2972,8 @@ $("#mesaVista").addEventListener("click", e=>{
 });
 
 function renderMesas(){
+  const title=$("#mesasTitulo");
+  if(title) title.textContent=POS_EVENTO?"Mesas · "+POS_EVENTO.nombre:"Mesas";
   /* En teléfono, la lista usa el ancho completo y evita que las mesas y sillas se encimen.
      En tablets y escritorio se conserva el croquis visual. */
   if(!vistaMesaPhoneInicializada && window.matchMedia && window.matchMedia("(max-width: 620px)").matches){
@@ -2558,7 +3044,7 @@ let comandaId = null, catVista = "", comensalVista = 1;
 function comandaActual(){ return COMANDAS.find(c=>c.id === comandaId); }
 
 function abreMesa(mesaId){
-  if(!turnoAbierto()){
+  if(!turnoAbierto() && !POS_EVENTO){
     if(!confirm("La caja está cerrada.\n\n¿Abrir el turno ahora? Sin turno no se puede cobrar.")) return;
     vaA("caja"); abreTurno(); return;
   }
@@ -2574,6 +3060,7 @@ function abreMesa(mesaId){
   catVista = "";
   vaA("comanda");
   renderComanda();
+  if(POS_EVENTO && !turnoAbierto()) toast("Comanda abierta. Abre la caja del evento antes de cobrar.");
 }
 function nuevaComanda(m){
   const c = {
@@ -2611,8 +3098,8 @@ function renderComanda(){
   const plats = (MENU.plats||[]).filter(p=>p.catId === catVista);
   $("#comPlatillos").innerHTML = plats.map(p=>
     '<button class="plat'+(p.activo===false?" agotado":"")+'" data-plat="'+esc(p.id)+'"'+
-    (p.activo===false?" disabled":"")+'><b>'+esc(p.nombre)+'</b>'+
-    '<span>'+mx(p.precio)+'</span></button>').join("") ||
+    (p.activo===false?" disabled":"")+'><div class="platPhoto">'+(p.foto?'<img src="'+esc(p.foto)+'" alt="">':'<span aria-hidden="true">🍽️</span>')+'</div><b>'+esc(p.nombre)+'</b>'+
+     '<span>'+mx(precioFinalPlatillo(p))+'</span><small class="platTax">'+(modoIvaLinea(p)==="mas"?"IVA +"+num(P.iva)+"%":modoIvaLinea(p)==="exento"?"Exento":"IVA incluido")+'</small></button>').join("") ||
     '<div class="empty">Esta categoría no tiene platillos.</div>';
 
   pintaLineas();
@@ -2661,6 +3148,7 @@ function pintaLineas(){
   const s = sumaComanda(c);
   $("#comSuma").innerHTML =
     '<div class="sumaLin"><span>Consumo</span><span class="mono">'+mx(s.sub)+'</span></div>' +
+    (s.iva ? '<div class="sumaLin"><span>IVA incluido en consumo</span><span class="mono">'+mx(s.iva)+'</span></div>' : '') +
     (num(P.servicio) ? '<div class="sumaLin"><span>Servicio '+num(P.servicio)+'%</span><span class="mono">'+mx(s.serv)+'</span></div>' : '') +
     '<div class="sumaLin total"><span>Total</span><span>'+mx(s.total)+'</span></div>';
 
@@ -2756,7 +3244,7 @@ function anotaCancelacion(c, l, cant, motivo, nota, merma, autorizo){
   c.cancelaciones = c.cancelaciones || [];
   c.cancelaciones.push({
     id: uid(), linId: l.id, nombre: l.nombre, cant: cant,
-    importe: (num(l.precio) + (l.mods||[]).reduce((x,m)=>x+num(m.extra),0)) * cant,
+    importe: importeLinea(Object.assign({},l,{cant:cant})),
     motivo: motivo, nota: nota||"", merma: !!merma,
     quien: usuarioActual().nombre||"", hora: horaAhora(), estadoAlCancelar: l.estado||"pedido",
     autorizo: autorizo || null
@@ -2928,7 +3416,7 @@ $("#modsOk").addEventListener("click", ()=>{
 });
 function agregaLinea(p, mods, nota, cant){
   const c = comandaActual(); if(!c) return;
-  c.lineas.push({id:uid(), platId:p.id, nombre:p.nombre, precio:num(p.precio),
+  c.lineas.push({id:uid(), platId:p.id, nombre:p.nombre, precio:num(p.precio), ivaModo:p.ivaModo||"incluido",
                  cant: Math.max(1, num(cant,1)), mods: mods||[], nota: nota||"",
                  satClave:p.satClave||"", satNombre:p.satNombre||"", satUnidad:p.satUnidad||"",
                  comensal: comensalVista, enviada:"", estado:"", ts: Date.now()});
@@ -3059,7 +3547,7 @@ let cobroPropPct = null, cobroPagos = [];
 
 $("#comCobrar").addEventListener("click", ()=>{
   const c = comandaActual(); if(!c || !(c.lineas||[]).length) return;
-  if(!turnoAbierto()){ toast("Abre el turno de caja antes de cobrar"); return; }
+  if(!turnoAbierto()){ toast(POS_EVENTO ? "Abre la caja del evento antes de cobrar" : "Abre el turno de caja antes de cobrar"); return; }
   c.estado = "cuenta"; persist();
   cobroPropPct = num(P.propina) || 0;
   cobroPagos = [];
@@ -3094,7 +3582,7 @@ function actualizaBalanceCobro(){
   const total = s.total + prop;
   $("#cobroTotal").textContent = mx(total);
   $("#cobroDesglose").textContent = "Consumo " + mx(s.sub) +
-    (s.serv ? " · servicio " + mx(s.serv) : "") + (prop ? " · propina " + mx(prop) : "");
+    (s.iva ? " · IVA incluido en consumo " + mx(s.iva) : "") + (s.serv ? " · servicio " + mx(s.serv) : "") + (prop ? " · propina " + mx(prop) : "");
 
   const partes = Math.max(1, Math.floor(num($("#cobroPartes").value,1)));
   const nota = $("#cobroParteNota");
@@ -3248,15 +3736,22 @@ function sumaTurno(t){
 }
 
 function renderCaja(){
+  const eventosCard=$("#cajaEventosCard");
+  if(eventosCard) eventosCard.hidden=!!POS_EVENTO || !puedeVer("caja");
+  if(!POS_EVENTO && puedeVer("caja")) renderCajaEventos();
+  $("#cajaPageTitle").textContent = POS_EVENTO ? "Caja del evento" : "Caja y turnos";
+  $("#cajaPageDescription").textContent = POS_EVENTO
+    ? "Turno, fondo y movimientos de «" + POS_EVENTO.nombre + "». La caja del restaurante se conserva aparte."
+    : "Registra aperturas, movimientos y cierres con claridad.";
+  $("#cajaTurnoTitle").textContent = POS_EVENTO ? "Turno · " + POS_EVENTO.nombre : "Turno de caja";
   const t = turnoAbierto();
   const w = $("#cajaCuerpo");
   if(!t){
     $("#cajaHint").textContent = "sin turno abierto";
     const ult = TURNOS.find(x=>!x.abierto);
     w.innerHTML = '<div class="empty" style="padding:14px 0">' +
-      '<p style="margin:0 0 14px">La caja está cerrada. Sin turno abierto no se puede cobrar: ' +
-      'así se sabe <b>quién</b> tenía el dinero cuando faltó.</p>' +
-      '<button class="btn primary lg" id="cajaAbrir">Abrir turno</button></div>' +
+      '<p style="margin:0 0 14px">' + (POS_EVENTO ? 'La caja de este evento está cerrada. Abre un turno para registrar su fondo y poder cobrar.' : 'La caja está cerrada. Sin turno abierto no se puede cobrar: así se sabe quién tenía el dinero cuando faltó.') + '</p>' +
+      '<button class="btn primary lg" id="cajaAbrir">' + (POS_EVENTO ? 'Abrir caja del evento' : 'Abrir turno') + '</button></div>' +
       (ult ? '<p class="note" style="margin-top:16px">El último turno lo cerró <b>' + esc(ult.cajero||"—") +
         '</b> a las ' + esc(ult.cierra||"—") + ' con ' + mx(ult.contado) +
         ' contados' + (num(ult.diferencia) ? ' y una diferencia de <b>' + mx(ult.diferencia) + '</b>' : ' y sin diferencia') +
@@ -3300,6 +3795,31 @@ function renderCaja(){
       'Aquí van los retiros parciales y el dinero que entra que no es una venta.</div></td></tr></tbody>';
   pintaTurnoChip();
 }
+function renderCajaEventos(){
+  const host=$("#cajaEventosBody"); if(!host) return;
+  const eventos=EVENTOS.slice().sort((a,b)=>(b.finalizadoEn||b.desde||"").localeCompare(a.finalizadoEn||a.desde||""));
+  if(!eventos.length){ host.innerHTML='<div class="empty">Todavía no hay eventos. Cuando agendes uno, su caja independiente aparecerá aquí.</div>'; return; }
+  host.innerHTML='<div class="eventReportList">'+eventos.map(ev=>{
+    const reporte=ev.finalizado?leeReporteEvento(ev.id):null;
+    const comandas=reporte?reporte.ventas:leerDatosEvento(ev.id,"comandas",[]);
+    const turnos=reporte?reporte.turnos:leerDatosEvento(ev.id,"turnos",[]);
+    const suma=reporte?reporte.resumen:resumenVentasEvento(comandas);
+    const abierto=(turnos||[]).find(t=>t.abierto);
+    const ultimo=(turnos||[]).slice().sort((a,b)=>(b.cierra||b.abre||"").localeCompare(a.cierra||a.abre||""))[0];
+    const estado=ev.finalizado?"Evento cerrado":abierto?"Caja abierta · "+(abierto.cajero||"en turno"):ultimo?"Último turno cerrado":"Caja sin abrir";
+    const fondo=abierto?num(abierto.fondo):ultimo?num(ultimo.fondo):0;
+    const counted=ultimo&&!ultimo.abierto?num(ultimo.contado):null;
+    return '<article class="eventReport"><div class="eventReportBody" style="padding-top:14px"><div class="eventCardTop"><div><span class="pill '+(abierto?'good':ev.finalizado?'':'warn')+'">'+esc(ev.finalizado?'Finalizado':abierto?'En operación':'Agendado')+'</span><h3 style="margin:7px 0 2px">'+esc(ev.nombre)+'</h3><small>'+esc(ev.lugar||"Lugar por definir")+' · '+esc(fechaEventoTxt(ev.desde))+'</small></div><b class="mono" style="font-size:20px;color:var(--green)">'+mx(suma.total)+'</b></div>'+
+      '<div class="tiles" style="margin:12px 0 0"><div class="tile"><span class="et">Estado de caja</span><span class="sub">'+esc(estado)+'</span></div><div class="tile"><span class="et">Cobros</span><span class="v">'+suma.cuentas+'</span></div><div class="tile"><span class="et">Fondo de caja</span><span class="v">'+mx(fondo)+'</span></div><div class="tile"><span class="et">Último conteo</span><span class="v">'+(counted===null?'—':mx(counted))+'</span></div></div>'+
+      '<div class="fila" style="margin-top:12px">'+(!ev.finalizado?'<button class="btn sm primary" type="button" data-abrir-caja-evento="'+esc(ev.id)+'">Ir al punto móvil</button>':'<button class="btn sm" type="button" data-ver-reporte-evento="'+esc(ev.id)+'">Ver reporte de venta</button>')+'</div></div></article>';
+  }).join('')+'</div>';
+}
+$("#cajaEventosBody").addEventListener("click",e=>{
+  const abrir=e.target.closest("[data-abrir-caja-evento]");
+  if(abrir){ const ev=EVENTOS.find(x=>x.id===abrir.dataset.abrirCajaEvento); if(ev) abreRutaEvento(ev.id); return; }
+  const ver=e.target.closest("[data-ver-reporte-evento]");
+  if(ver){ vaA("ventas"); const card=$("#venEventosCard"); if(card) card.scrollIntoView({behavior:"smooth",block:"start"}); }
+});
 /* El dinero lo ve quien responde por el: el que puede entrar a Caja. Para
    los demas la caja esta abierta o cerrada, que es lo unico que necesitan
    saber para levantar una comanda. */
@@ -3307,15 +3827,16 @@ const veDinero = () => puedeVer("caja");
 function pintaTurnoChip(){
   const t = turnoAbierto(), ch = $("#turnoChip");
   if(!ch) return;
+  const cajaLabel = POS_EVENTO ? "Caja móvil" : "Caja";
   if(t){
     const s = sumaTurno(t);
     ch.className = "turnoChip";
     ch.innerHTML = veDinero()
-      ? "Caja <b>abierta</b> · " + esc(t.cajero||"") + " · " + mx(s.enCaja)
-      : "Caja <b>abierta</b>";
+      ? cajaLabel + " <b>abierta</b> · " + esc(t.cajero||"") + " · " + mx(s.enCaja)
+      : cajaLabel + " <b>abierta</b>";
   }else{
     ch.className = "turnoChip cerrado";
-    ch.innerHTML = "Caja <b>cerrada</b>";
+    ch.innerHTML = cajaLabel + " <b>cerrada</b>";
   }
 }
 $("#cajaCuerpo").addEventListener("click", e=>{
@@ -3370,7 +3891,7 @@ function cierraTurno(){
   const t = turnoAbierto(); if(!t) return;
   const ab = abiertas();
   if(ab.length){
-    toast("Hay " + ab.length + " mesa(s) abierta(s). Ciérralas antes de cerrar el turno.");
+    toast("Hay " + ab.length + " comanda(s) abierta(s). Ciérralas antes de cerrar " + (POS_EVENTO ? "la caja móvil." : "el turno de caja."));
     vaA("mesas"); return;
   }
   $("#turnoTitulo").textContent = "Cerrar turno " + t.folio;
@@ -3431,18 +3952,43 @@ function renderInicio(){
     {weekday:"long", day:"numeric", month:"long"}) + " · " + horaAhora();
   $("#inHola").textContent = saludo + ", " + (u.nombre||"");
   const t = turnoAbierto();
-  $("#inSub").textContent = t
-    ? "Caja abierta por " + (t.cajero||"") + " desde las " + t.abre
-    : "La caja está cerrada: ábrela para empezar a cobrar.";
+  $("#inSub").textContent = POS_EVENTO
+    ? "Punto móvil: " + POS_EVENTO.nombre + (t ? " · Caja abierta desde las " + t.abre : " · Abre la caja del evento para empezar a cobrar.")
+    : t ? "Caja abierta por " + (t.cajero||"") + " desde las " + t.abre
+        : "La caja está cerrada: ábrela para empezar a cobrar.";
 
   const ab = abiertas();
   const porPreparar = porHacer().length;
   const cajasVisible = puedeVer("caja");
   const mesasVisible = puedeVer("mesas");
+  $("#eventPosGuide").hidden = !POS_EVENTO;
+  $("#inicioEventos").hidden = !!POS_EVENTO || !puedeVer("eventos");
+  if(POS_EVENTO){
+    $("#eventGuideTitle").textContent = "Punto móvil: " + POS_EVENTO.nombre;
+    $("#eventGuideLocation").textContent = POS_EVENTO.lugar + " · " + fechaEventoTxt(POS_EVENTO.desde) +
+      ". La caja del restaurante permanece abierta y sus ventas se guardan por separado.";
+    $("#eventGuideCaja").hidden = !puedeVer("caja");
+    $("#eventGuideMesasSetup").hidden = !puedeVer("set");
+    $("#eventGuideCashState").textContent = t ? "Caja del evento abierta · " + (t.cajero||"en turno") : "Caja del evento cerrada";
+    $("#eventGuideCashState").classList.toggle("abierta", !!t);
+    $("#eventGuideCaja").textContent = t ? "Ver caja del evento" : "Abrir caja del evento";
+  }
+  const proximoEvento = EVENTOS.filter(e=>e.hasta>=hoyISO()).sort((a,b)=>a.desde.localeCompare(b.desde))[0];
+  const eventoEyebrow = $("#inicioEventos").querySelector("small");
+  if(eventoEyebrow) eventoEyebrow.textContent = proximoEvento ? "PRÓXIMA SALIDA · "+fechaEventoTxt(proximoEvento.desde) : "EL RESTAURANTE SIGUE ABIERTO";
   $("#inicioCaja").hidden = !cajasVisible;
   $("#inicioVerMesas").hidden = !mesasVisible;
   $("#inicioVentaRapida").hidden = !mesasVisible;
-  $("#inCajaBadge").textContent = t ? "Caja abierta · " + (t.cajero||"en turno") : "Caja cerrada";
+  $("#inicioCaja").querySelector(".heroActionCopy b").textContent = POS_EVENTO ? "Caja del evento" : "Control de caja";
+  $("#inicioCaja").querySelector(".heroActionCopy small").textContent = POS_EVENTO ? "Fondo y cobros móviles" : "Corte y movimientos";
+  $("#inicioVerMesas").querySelector(".heroActionCopy b").textContent = POS_EVENTO ? "Mesas opcionales" : "Ver el salón";
+  $("#inicioVerMesas").querySelector(".heroActionCopy small").textContent = POS_EVENTO ? "Solo si habrá consumo en sitio" : "Mesas y servicio";
+  $("#inicioVentaRapida").querySelector(".heroActionCopy b").textContent = POS_EVENTO ? "Nueva venta para llevar" : "Nueva venta";
+  $("#inicioVentaRapida").querySelector(".heroActionCopy small").textContent = POS_EVENTO ? "No requiere crear mesas" : "Pedido para llevar";
+  $("#inMesasTitle").textContent = POS_EVENTO ? "Pedidos abiertos" : "Mesas abiertas";
+  $("#inCajaBadge").textContent = POS_EVENTO
+    ? (t ? "Caja del evento abierta" : "Caja del evento cerrada")
+    : (t ? "Caja abierta · " + (t.cajero||"en turno") : "Caja cerrada");
   $("#inCajaBadge").classList.toggle("abierta", !!t);
   $("#inPrepBadge").textContent = porPreparar
     ? porPreparar + (porPreparar === 1 ? " pedido en cocina" : " pedidos en cocina")
@@ -3451,15 +3997,15 @@ function renderInicio(){
   $("#inTiles").innerHTML =
     '<div class="tile destacada"><span class="et">Vendido hoy</span><span class="v">' + mx(total) + '</span>' +
       '<span class="sub">' + (hoy.length ? hoy.length + " cuenta(s)" : "todavía nada") + '</span></div>' +
-    '<div class="tile"><span class="et">En el piso</span><span class="v">' + ab.length + '</span>' +
-      '<span class="sub">' + (ab.length ? mx(ab.reduce((s,c)=>s+sumaComanda(c).total,0)) + " sin cobrar" : "todas libres") + '</span></div>' +
+    '<div class="tile"><span class="et">' + (POS_EVENTO ? "Pedidos activos" : "En el piso") + '</span><span class="v">' + ab.length + '</span>' +
+      '<span class="sub">' + (ab.length ? mx(ab.reduce((s,c)=>s+sumaComanda(c).total,0)) + " sin cobrar" : POS_EVENTO ? "sin pedidos abiertos" : "todas libres") + '</span></div>' +
     '<div class="tile"><span class="et">Ticket promedio</span><span class="v">' +
       (hoy.length ? mx(total/hoy.length) : "—") + '</span>' +
       '<span class="sub">' + (hoy.length ? "por cuenta" : "sin cuentas hoy") + '</span></div>' +
     '<div class="tile"><span class="et">Propinas de hoy</span><span class="v">' +
       mx(hoy.reduce((s,c)=>s+num(c.propina),0)) + '</span><span class="sub">para repartir</span></div>';
 
-  $("#inMesasHint").textContent = ab.length ? ab.length + " abierta(s)" : "ninguna";
+  $("#inMesasHint").textContent = ab.length ? ab.length + (POS_EVENTO ? " activa(s)" : " abierta(s)") : POS_EVENTO ? "sin pedidos" : "ninguna";
   $("#inMesas").innerHTML = ab.length
     ? '<div class="tbl-wrap"><table><thead><tr><th>Mesa</th><th>Mesero</th><th>Abrió</th><th class="der">Va en</th></tr></thead><tbody>' +
       ab.slice().sort((a,b)=>minutosDe(a.abre)-minutosDe(b.abre)).map(c=>
@@ -3474,7 +4020,7 @@ function renderInicio(){
   hoy.forEach(c=>(c.lineas||[]).forEach(l=>{
     const p = (MENU.plats||[]).find(x=>x.id === l.platId);
     const cat = p ? ((MENU.cats||[]).find(x=>x.id===p.catId)||{}).nombre || "Otros" : "Otros";
-    porCat[cat] = num(porCat[cat]) + num(l.precio)*num(l.cant,1);
+    if(!l.cancelada) porCat[cat] = num(porCat[cat]) + importeLinea(l);
   }));
   const cats = Object.keys(porCat).sort((a,b)=>porCat[b]-porCat[a]);
   const mayor = cats.length ? porCat[cats[0]] : 0;
@@ -3485,6 +4031,161 @@ function renderInicio(){
         '<i style="display:block;height:100%;width:'+Math.round(porCat[k]/mayor*100)+'%;background:var(--cyan)"></i></div></div>').join("")
     : '<div class="empty">Sin ventas hoy.</div>';
 }
+let eventCitaId = "", eventRouteTimer = null, eventRouteInterval = null, eventRouteSelected = null, eventRouteMode = "salida";
+function htmlCitaForm(ev){
+  return '<form class="eventForm" data-event-appt-form="'+esc(ev.id)+'" style="margin-top:12px;padding:13px;border:1px solid var(--line-soft);border-radius:12px;background:var(--surface-2)">'+
+    '<b style="font-size:12px">Nueva cita · '+esc(ev.nombre)+'</b><div class="grid g2" style="margin-top:9px">'+
+    '<div><label class="f">Persona o empresa</label><input name="contacto" required maxlength="90" placeholder="Nombre del contacto"></div>'+
+    '<div><label class="f">Teléfono o correo</label><input name="tel" maxlength="100" placeholder="Datos de contacto"></div>'+
+    '<div><label class="f">Fecha</label><input name="fecha" type="date" required></div>'+
+    '<div><label class="f">Hora</label><input name="hora" type="time" required></div></div>'+
+    '<div style="margin-top:9px"><label class="f">Motivo o acuerdo</label><input name="nota" maxlength="240" placeholder="Montaje, reunión, entrega…"></div>'+
+    '<div class="fila" style="justify-content:flex-end;margin-top:10px"><button type="button" class="btn sm ghost" data-event-action="close-appointment" data-id="'+esc(ev.id)+'">Cancelar</button><button class="btn sm primary" type="submit">Guardar cita</button></div></form>';
+}
+function renderEventos(){
+  EVENTOS=leeEventos();
+  const lista=$("#eventList"); if(!lista) return;
+  const hoy=hoyISO(), proximos=EVENTOS.filter(e=>!e.finalizado&&e.hasta>=hoy).length;
+  $("#eventCount").textContent=proximos+" próximos · "+EVENTOS.length+" en agenda";
+  const orden=EVENTOS.slice().sort((a,b)=>a.desde.localeCompare(b.desde));
+  if(!orden.length){ lista.innerHTML='<div class="eventEmpty">Aún no hay salidas agendadas.<br>Registra una feria, expo o evento para preparar el punto móvil.</div>'; return; }
+  lista.innerHTML=orden.map(ev=>{
+    const citas=Array.isArray(ev.citas)?ev.citas:[], finalizado=ev.finalizado===true, terminado=ev.hasta<hoy;
+    const estado=finalizado?'Finalizado':terminado?'Concluido':ev.desde<=hoy?'En curso':'Agendado';
+    const abrirLabel=finalizado?'Reabrir punto de venta':'Llevar punto de venta';
+    const agenda=citas.length?'<details class="eventAppts"><summary>'+citas.length+' cita(s) programada(s)</summary>'+citas.slice().sort((a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora)).map(c=>
+      '<div class="eventApptLine"><b>'+esc(fechaEventoTxt(c.fecha))+' · '+esc(c.hora)+'</b> — '+esc(c.contacto)+' '+(c.tel?'· '+esc(c.tel):'')+(c.nota?'<br>'+esc(c.nota):'')+'</div>').join('')+'</details>':'<div class="eventAppts"><span class="hint">Sin citas programadas todavía</span></div>';
+    const form=eventCitaId===ev.id?htmlCitaForm(ev):'';
+    return '<article class="eventCard"><div class="eventCardTop"><div><span class="pill '+(finalizado||terminado?'':'good')+'">'+estado+'</span><h3 style="margin-top:7px">'+esc(ev.nombre)+'</h3></div><span class="eventDates">'+esc(fechaEventoTxt(ev.desde))+(ev.hasta!==ev.desde?' – '+esc(fechaEventoTxt(ev.hasta)):'')+'</span></div>'+
+      '<div class="eventMeta"><span>Lugar: '+esc(ev.lugar)+' · '+esc(ev.tipo)+'</span>'+(ev.direccion?'<span>'+esc(ev.direccion)+'</span>':'')+(ev.notas?'<span>'+esc(ev.notas)+'</span>':'')+'</div>'+
+      '<div class="eventActions"><button class="btn primary sm" type="button" data-event-action="launch" data-id="'+esc(ev.id)+'">🚚 '+abrirLabel+'</button><button class="btn sm" type="button" data-event-action="appointment" data-id="'+esc(ev.id)+'">＋ Agendar cita</button></div>'+agenda+form+'</article>';
+  }).join('');
+}
+function finalizarEventoActual(){
+  if(!POS_EVENTO) return;
+  const pendientes=abiertas();
+  if(pendientes.length){
+    toast("Quedan "+pendientes.length+" comanda(s) abiertas. Termínalas antes de finalizar el evento.");
+    vaA("mesas");
+    return;
+  }
+  if(turnoAbierto()){
+    toast("Cierra la caja móvil y registra el dinero contado para finalizar.");
+    vaA("caja");
+    return;
+  }
+  if(!confirm("¿Finalizar «"+POS_EVENTO.nombre+"» y volver al restaurante? Las ventas y el corte se conservarán; podrás reabrir el punto desde la agenda.")) return;
+  guardaYa();
+  const eventosGuardados=leeEventos(), ev=eventosGuardados.find(x=>x.id===POS_EVENTO.id);
+  if(!ev){ toast("No encontré el evento en la agenda; no se cerró."); return; }
+  const finalizadoEn=new Date().toISOString();
+  if(!guardaReporteEvento(POS_EVENTO,COMANDAS,TURNOS,finalizadoEn)) return;
+  ev.finalizado=true;
+  ev.finalizadoEn=finalizadoEn;
+  EVENTOS=eventosGuardados;
+  if(!guardaEventos()) return;
+  try{ localStorage.removeItem(POS_CONTEXT_KEY); }catch(e){}
+  animaRutaEvento(ev,"regreso");
+}
+$("#eventForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const f=e.currentTarget, desde=f.elements.namedItem("desde").value, hasta=f.elements.namedItem("hasta").value;
+  if(hasta<desde){ toast("La fecha de cierre debe ser igual o posterior al inicio."); return; }
+  const ev={id:uid(),nombre:f.elements.namedItem("nombre").value.trim(),tipo:f.elements.namedItem("tipo").value,lugar:f.elements.namedItem("lugar").value.trim(),desde,hasta,direccion:f.elements.namedItem("direccion").value.trim(),notas:f.elements.namedItem("notas").value.trim(),citas:[],finalizado:false,creado:new Date().toISOString()};
+  EVENTOS.push(ev); guardaEventos(); f.reset(); renderEventos(); pintaTabs();
+  toast("Evento agendado. El restaurante sigue operando por separado.");
+});
+$("#eventList").addEventListener("click",e=>{
+  const b=e.target.closest("[data-event-action]"); if(!b) return;
+  const ev=EVENTOS.find(x=>x.id===b.dataset.id); if(!ev) return;
+  if(b.dataset.eventAction==="launch"){
+    if(ev.finalizado){
+      if(!confirm("Este evento ya está finalizado. ¿Quieres reabrir su punto de venta? Sus ventas y cortes anteriores se conservarán.")) return;
+      ev.finalizado=false; ev.finalizadoEn=""; if(!guardaEventos()) return; renderEventos();
+    }
+    abreRutaEvento(ev.id); return;
+  }
+  if(b.dataset.eventAction==="appointment"){
+    eventCitaId=ev.id; renderEventos();
+    const input=$("[data-event-appt-form='"+ev.id+"'] input[name='contacto']"); if(input) input.focus();
+    return;
+  }
+  if(b.dataset.eventAction==="close-appointment"){ eventCitaId=""; renderEventos(); }
+});
+$("#eventList").addEventListener("submit",e=>{
+  const form=e.target.closest("[data-event-appt-form]"); if(!form) return;
+  e.preventDefault();
+  const ev=EVENTOS.find(x=>x.id===form.dataset.eventApptForm); if(!ev) return;
+  const fd=new FormData(form), contacto=String(fd.get("contacto")||"").trim();
+  if(!contacto) return;
+  ev.citas=Array.isArray(ev.citas)?ev.citas:[];
+  ev.citas.push({id:uid(),contacto,tel:String(fd.get("tel")||"").trim(),fecha:String(fd.get("fecha")||""),hora:String(fd.get("hora")||""),nota:String(fd.get("nota")||"").trim(),creado:new Date().toISOString()});
+  guardaEventos(); eventCitaId=""; renderEventos();
+  toast("Cita guardada en la agenda del evento.");
+});
+function cierraRutaEvento(){
+  clearTimeout(eventRouteTimer); clearInterval(eventRouteInterval);
+  eventRouteTimer=null; eventRouteInterval=null; eventRouteSelected=null;
+  eventRouteMode="salida";
+  $("#eventRoute").hidden=true; $("#eventRoute").classList.remove("returning");
+  $("#eventRouteOpen").hidden=true; $("#eventRouteCancel").hidden=false;
+}
+function animaRutaEvento(ev, modo="salida"){
+  if(!ev) return;
+  cierraRutaEvento(); eventRouteSelected=ev.id; eventRouteMode=modo;
+  const regreso=modo==="regreso", route=$("#eventRoute");
+  route.classList.toggle("returning",regreso);
+  $("#eventRouteEyebrow").textContent=regreso?"RUTA DE REGRESO":"PUNTO DE VENTA EN CAMINO";
+  $("#eventRouteTitle").textContent=regreso?"Regresando al restaurante":"¡Nos vamos a "+ev.nombre+"!";
+  $("#eventRouteDestination").textContent=regreso
+    ? "Desde "+ev.lugar+" · "+ev.nombre+" → Restaurante"
+    : ev.lugar+" · "+fechaEventoTxt(ev.desde)+(ev.direccion?" · "+ev.direccion:"");
+  $("#eventRouteStatus").textContent=regreso?"Preparando el regreso al restaurante…":"Preparando menú, caja y operación móvil…";
+  $("#eventRouteProgress").textContent=regreso?"REGRESANDO · 0%":"EN RUTA · 0%";
+  $("#eventRouteOpen").hidden=true; $("#eventRouteCancel").hidden=regreso; route.hidden=false;
+  const labelInicio=$("#routeStartLabel"), labelDestino=$("#routeDestinationLabel");
+  labelInicio.textContent="RESTAURANTE";
+  labelDestino.textContent=regreso?"EVENTO":"DESTINO";
+  labelInicio.setAttribute("fill","#ccebd2");
+  labelDestino.setAttribute("fill",regreso?"#f4d7a1":"#f7b6dc");
+  const motion=$(".routeCartMotion animateMotion");
+  const reducida=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const duracion=reducida?900:4200;
+  if(motion){ try{
+    motion.setAttribute("path",regreso
+      ? "M 744 66 C 653 74 602 110 526 184 S 450 254 315 207 S 185 260 64 246"
+      : "M 64 246 C 185 260 192 190 315 207 S 450 254 526 184 S 653 74 744 66");
+    motion.setAttribute("dur",(duracion/1000)+"s"); motion.beginElement();
+  }catch(e){} }
+  const inicio=Date.now();
+  eventRouteInterval=setInterval(()=>{
+    const p=Math.min(100,Math.round((Date.now()-inicio)/duracion*100));
+    $("#eventRouteProgress").textContent=p<100?(regreso?"REGRESANDO · "+p+"%":"EN RUTA · "+p+"%"):(regreso?"RESTAURANTE ALCANZADO":"DESTINO ALCANZADO");
+    $("#eventRouteStatus").textContent=regreso
+      ? p<38?"Saliendo de "+ev.lugar+"…":p<72?"Volviendo al restaurante; el evento se guarda por separado…":"Ya casi estamos en el restaurante…"
+      : p<38?"Saliendo del restaurante…":p<72?"La ruta continúa; preparando tu punto de venta…":"Ya casi llegamos a "+ev.lugar+"…";
+  },90);
+  eventRouteTimer=setTimeout(()=>{
+    clearInterval(eventRouteInterval); eventRouteInterval=null;
+    if(regreso){
+      $("#eventRouteProgress").textContent="RESTAURANTE ALCANZADO";
+      $("#eventRouteStatus").textContent=ev.finalizado?"¡Llegamos! El evento y su corte quedaron guardados.":"¡Llegamos! El evento sigue disponible en la agenda.";
+      eventRouteTimer=setTimeout(()=>{ cierraRutaEvento(); cambiaContextoPOS(null); },650);
+      return;
+    }
+    $("#eventRouteProgress").textContent="DESTINO ALCANZADO";
+    $("#eventRouteStatus").textContent="¡Llegamos! La caja y los pedidos del restaurante siguen guardados. Puedes volver desde la barra superior.";
+    $("#eventRouteOpen").hidden=false;
+  },duracion);
+}
+function abreRutaEvento(id){ const ev=EVENTOS.find(x=>x.id===id); if(ev) animaRutaEvento(ev,"salida"); }
+$("#eventRouteCancel").addEventListener("click",cierraRutaEvento);
+$("#eventRoute").addEventListener("click",e=>{ if(e.target.id==="eventRoute"&&eventRouteMode!=="regreso") cierraRutaEvento(); });
+$("#eventRouteOpen").addEventListener("click",()=>{
+  const ev=EVENTOS.find(x=>x.id===eventRouteSelected); if(!ev) return;
+  cierraRutaEvento(); cambiaContextoPOS(ev);
+});
+$("#inicioEventos").addEventListener("click",()=>vaA("eventos"));
 $("#inMesas").addEventListener("click", e=>{
   const tr = e.target.closest("[data-irmesa]"); if(!tr) return;
   const c = COMANDAS.find(x=>x.id === tr.dataset.irmesa); if(!c) return;
@@ -3493,8 +4194,20 @@ $("#inMesas").addEventListener("click", e=>{
 $("#inicioVerMesas").addEventListener("click", ()=>vaA("mesas"));
 $("#inicioVentaRapida").addEventListener("click", ()=>abreMesa("llevar"));
 $("#inicioCaja").addEventListener("click", ()=>vaA("caja"));
+$("#eventGuideCaja").addEventListener("click", ()=>vaA("caja"));
+$("#eventGuideMesas").addEventListener("click", ()=>vaA("mesas"));
+$("#eventGuideMesasSetup").addEventListener("click", ()=>vaA("set"));
+$("#eventGuideVenta").addEventListener("click", ()=>abreMesa("llevar"));
+$("#eventGuideFinish").addEventListener("click", finalizarEventoActual);
+$("#eventGuideLocal").addEventListener("click", ()=>{ try{ localStorage.removeItem(POS_CONTEXT_KEY); }catch(e){} animaRutaEvento(POS_EVENTO,"regreso"); });
 
 function renderVentas(){
+  const eventosCard=$("#venEventosCard");
+  if(eventosCard) eventosCard.hidden=!!POS_EVENTO;
+  $("#ventasTitulo").textContent=POS_EVENTO?"Ventas del evento":"Ventas del restaurante";
+  $("#ventasDescripcion").textContent=POS_EVENTO
+    ?"Consulta únicamente las ventas y cortes de «"+POS_EVENTO.nombre+"»; el restaurante conserva sus propios totales."
+    :"Consulta los tickets y cortes del restaurante. Los puntos móviles aparecen aparte en Reportes de eventos.";
   const hoy = cerradasDe(hoyISO());
   const total = hoy.reduce((s,c)=>s+num(c.total),0);
   const todas = COMANDAS.filter(c=>c.estado==="cerrada" && !c.cancelada);
@@ -3529,6 +4242,7 @@ function renderVentas(){
               (re ? '<span class="pill tarde" title="reimpresiones">'+re+'↺</span>' : '')+'</td></tr>';
     }).join("") : '<tr><td colspan="9"><div class="empty">Nada con ese filtro.</div></td></tr>') + '</tbody>';
   renderCancelaciones();
+  renderReportesEventos();
 
   const cerrados = TURNOS.filter(t=>!t.abierto);
   $("#t_turnos").innerHTML = '<thead><tr><th>Turno</th><th>Cajero</th><th>Fecha</th><th>Horario</th>' +
@@ -3540,6 +4254,25 @@ function renderVentas(){
       '<td class="der mono" style="color:'+(Math.abs(num(t.diferencia))<0.01?"var(--good)":num(t.diferencia)<0?"var(--mal)":"var(--warn)")+'">' +
       (num(t.diferencia)>0?"+":"")+mx(t.diferencia)+'</td></tr>').join("") + '</tbody>';
   if(!cerrados.length) $("#t_turnos").innerHTML += '<tbody><tr><td colspan="6"><div class="empty">Sin turnos cerrados.</div></td></tr></tbody>';
+}
+
+function renderReportesEventos(){
+  const host=$("#venEventosBody"), hint=$("#venEventosHint"); if(!host) return;
+  const reportes=reportesEventos().sort((a,b)=>(b.finalizadoEn||"").localeCompare(a.finalizadoEn||""));
+  if(hint) hint.textContent=reportes.length?reportes.length+" evento(s) cerrado(s)":"historial independiente";
+  if(!reportes.length){ host.innerHTML='<div class="empty">Los reportes de eventos aparecerán aquí al finalizar una salida.</div>'; return; }
+  host.innerHTML='<div class="eventReportList">'+reportes.map(r=>{
+    const s=r.resumen||resumenVentasEvento(r.ventas||[]), ventas=r.ventas||[], turnos=r.turnos||[];
+    const por=Object.entries(s.pagos||{}).map(([tipo,monto])=>'<tr><td>'+esc(tipo)+'</td><td class="der mono">'+mx(monto)+'</td></tr>').join('');
+    const tablaTurnos=turnos.length?'<div class="tbl-wrap"><table class="eventCashTable"><thead><tr><th>Caja / cajero</th><th>Abrió</th><th>Cerró</th><th class="der">Fondo</th><th class="der">Vendido</th><th class="der">Contado</th><th class="der">Diferencia</th></tr></thead><tbody>'+turnos.map(t=>'<tr><td>'+esc(t.folio||"Turno")+' · '+esc(t.cajero||"—")+'</td><td>'+esc(t.abre||"—")+'</td><td>'+esc(t.cierra||"—")+'</td><td class="der mono">'+mx(t.fondo)+'</td><td class="der mono">'+mx((t.resumen||{}).total)+'</td><td class="der mono">'+mx(t.contado)+'</td><td class="der mono">'+mx(t.diferencia)+'</td></tr>').join('')+'</tbody></table></div>':'<p class="note">Este evento se cerró sin turnos de caja registrados.</p>';
+    const listaVentas=ventas.length?'<div class="eventReportTickets">'+ventas.map(c=>{
+      const detalle=(c.lineas||[]).filter(l=>!l.cancelada).map(l=>'<span>'+num(l.cant,1)+' × '+esc(l.nombre||l.platNombre||"Producto")+' · '+mx(importeLinea(l))+'</span>').join('');
+      const pagos=(c.pagos||[]).map(p=>esc(p.tipo||"Otro")+': '+mx(p.monto)).join(' · ')||"Sin desglose de pago";
+      return '<details class="eventReportTicket"><summary><span><b>'+esc(c.folio||"Cuenta")+' · '+esc(c.mesaNombre||"Venta")+'</b><br><small>'+esc(c.fecha||"")+' · '+esc(c.cierra||"")+' · '+esc(c.cobro||"")+'</small></span><b class="mono">'+(c.cancelada?'<span class="pill mal">cancelada</span>':mx(c.total))+'</b></summary><div class="eventReportLines">'+detalle+'<small>Pago: '+pagos+'</small>'+(c.cancelada?'<small>Cancelada; no se suma a la venta.</small>':'')+'</div></details>';
+    }).join('')+'</div>':'<p class="note">No hubo tickets cerrados en este evento.</p>';
+    const finalizado=r.finalizadoEn?new Date(r.finalizadoEn).toLocaleString("es-MX",{dateStyle:"medium",timeStyle:"short"}):"";
+    return '<details class="eventReport"><summary><span><b>'+esc(r.nombre||"Evento")+'</b><small>'+esc(r.lugar||"")+' · '+esc(fechaEventoTxt(r.desde))+(finalizado?' · Cerrado '+esc(finalizado):'')+'</small></span><strong>'+mx(s.total)+'</strong></summary><div class="eventReportBody"><p class="note">'+(r.mesas||[]).length+' mesa(s) configurada(s) · '+(r.citas||[]).length+' cita(s) en agenda'+(r.direccion?' · '+esc(r.direccion):'')+(r.notas?' · '+esc(r.notas):'')+'</p><div class="tiles" style="margin:0 0 12px"><div class="tile destacada"><span class="et">Venta neta</span><span class="v">'+mx(s.total)+'</span><span class="sub">'+s.cuentas+' ticket(s) · '+s.canceladas+' cancelado(s)</span></div><div class="tile"><span class="et">Propinas</span><span class="v">'+mx(s.propinas)+'</span></div><div class="tile"><span class="et">Efectivo</span><span class="v">'+mx((s.pagos||{}).efectivo)+'</span></div><div class="tile"><span class="et">Tarjeta y otros</span><span class="v">'+mx(s.total-num((s.pagos||{}).efectivo))+'</span></div></div><h3>Pagos registrados</h3><div class="tbl-wrap"><table><tbody>'+(por||'<tr><td>Sin desglose disponible</td><td></td></tr>')+'</tbody></table></div><h3 style="margin-top:16px">Cortes de caja del evento</h3>'+tablaTurnos+'<h3 style="margin-top:16px">Tickets del evento</h3>'+listaVentas+'</div></details>';
+  }).join('')+'</div>';
 }
 
 
@@ -3625,7 +4358,7 @@ function abreTicket(id){
       (n > 1 ? ' · ' + n + ' comensales' : '') + '</p>';
 
   (c.lineas||[]).forEach(l=>{
-    const imp = (num(l.precio) + (l.mods||[]).reduce((x,m)=>x+num(m.extra),0)) * num(l.cant,1);
+    const imp = importeLinea(l);
     h += '<div class="tkLin'+(l.cancelada?" cancel":"")+'">' +
       '<span class="mono">'+num(l.cant,1)+'×</span>' +
       '<span><span class="nom">'+esc(l.nombre)+'</span>' +
@@ -3638,6 +4371,7 @@ function abreTicket(id){
   });
   h += '<div style="margin-top:12px">' +
     '<div class="tkTot"><span>Consumo</span><span class="mono">'+mx(s.sub)+'</span></div>' +
+    (s.iva ? '<div class="tkTot"><span>IVA incluido en consumo</span><span class="mono">'+mx(s.iva)+'</span></div>' : '') +
     (s.serv ? '<div class="tkTot"><span>Servicio</span><span class="mono">'+mx(s.serv)+'</span></div>' : '') +
     (prop ? '<div class="tkTot"><span>Propina</span><span class="mono">'+mx(prop)+'</span></div>' : '') +
     '<div class="tkTot grande"><span>Total</span><span class="mono">'+mx(total)+'</span></div></div>';
@@ -3808,57 +4542,39 @@ const SAT_UNIDADES = [
   {clave:"LTR", nombre:"Litro"}, {clave:"MLT", nombre:"Mililitro"},
   {clave:"XPK", nombre:"Paquete"}, {clave:"XBX", nombre:"Caja"}
 ];
+function fotoMenu(file){
+  return new Promise((resolve,reject)=>{
+    if(!file||!file.type.startsWith("image/")) return reject(new Error("Elige un archivo de imagen."));
+    if(file.size>12*1024*1024) return reject(new Error("La imagen debe pesar menos de 12 MB."));
+    const url=URL.createObjectURL(file),img=new Image();
+    img.onload=()=>{try{const max=360,k=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement("canvas");
+      c.width=Math.max(1,Math.round(img.naturalWidth*k));c.height=Math.max(1,Math.round(img.naturalHeight*k));c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      let data=c.toDataURL("image/jpeg",.5);if(data.length>100000){const small=document.createElement("canvas");small.width=Math.max(1,Math.round(c.width*.78));small.height=Math.max(1,Math.round(c.height*.78));small.getContext("2d").drawImage(c,0,0,small.width,small.height);data=small.toDataURL("image/jpeg",.36)}URL.revokeObjectURL(url);resolve(data);
+    }catch(err){URL.revokeObjectURL(url);reject(err)}};
+    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error("No se pudo leer la imagen."))};img.src=url;
+  });
+}
 function renderMenu(){
-  const cats = (MENU.cats||[]).slice().sort((a,b)=>num(a.orden)-num(b.orden));
-  $("#satProdCatalogo").innerHTML = SAT_PRODUCTOS.map(s=>'<option value="'+esc(s.nombre+' — '+s.clave)+'"></option>').join("");
-  $("#t_cats").innerHTML = '<thead><tr><th>Categoría</th><th style="width:110px">Orden</th>' +
-    '<th style="width:110px">Platillos</th><th style="width:60px"></th></tr></thead><tbody>' +
-    cats.map(c=>'<tr data-cat="'+esc(c.id)+'">' +
-      '<td><input data-ck="nombre" value="'+esc(c.nombre)+'"></td>' +
-      '<td><input data-ck="orden" type="number" value="'+num(c.orden)+'"></td>' +
-      '<td class="mono">'+(MENU.plats||[]).filter(p=>p.catId===c.id).length+'</td>' +
-      '<td><button class="btn sm ghost" data-delcat="'+esc(c.id)+'">✕</button></td></tr>').join("") +
-    '</tbody>';
-
-  const gruposOps = (MENU.grupos||[]).map(g=>({id:g.id, nombre:g.nombre}));
-  $("#t_plats").innerHTML = '<thead><tr><th>Platillo</th><th style="width:150px">Categoría</th>' +
-    '<th style="width:110px">Precio</th><th style="width:110px">Costo</th><th>Preguntas</th>' +
-      '<th style="width:275px">Buscar clave SAT</th><th style="width:155px">Unidad SAT</th>' +
-      '<th style="width:80px">Activo</th><th style="width:60px"></th></tr></thead><tbody>' +
-    (MENU.plats||[]).map(p=>'<tr data-plat="'+esc(p.id)+'">' +
-      '<td><input data-pk="nombre" value="'+esc(p.nombre)+'"></td>' +
-      '<td><select data-pk="catId">'+cats.map(c=>'<option value="'+esc(c.id)+'"'+(c.id===p.catId?" selected":"")+'>'+esc(c.nombre)+'</option>').join("")+'</select></td>' +
-      '<td><input data-pk="precio" type="number" min="0" step="0.5" value="'+num(p.precio)+'"></td>' +
-      '<td><input data-pk="costo" type="number" min="0" step="0.5" value="'+num(p.costo)+'"></td>' +
-      '<td><div class="modChips">'+gruposOps.map(g=>
-        '<label class="modChip'+((p.mods||[]).indexOf(g.id)>=0?" si":"")+'" data-pmod="'+esc(g.id)+'">' +
-        '<input type="checkbox">'+esc(g.nombre)+'</label>').join("")+'</div></td>' +
-      '<td><div class="satProducto"><input type="search" data-pk="satBusqueda" list="satProdCatalogo" ' +
-        'value="'+esc(p.satNombre ? p.satNombre+' — '+p.satClave : (p.satClave||""))+'" placeholder="Busca nombre o clave SAT">' +
-        '<small>'+(p.satClave ? 'Clave '+esc(p.satClave)+(p.satNombre?' · '+esc(p.satNombre):' · capturada manualmente') : 'Sin clave asignada')+'</small></div></td>' +
-      '<td><select data-pk="satUnidad"><option value="">Elegir unidad</option>'+SAT_UNIDADES.map(u=>
-        '<option value="'+u.clave+'"'+(u.clave===p.satUnidad?' selected':'')+'>'+u.clave+' · '+esc(u.nombre)+'</option>').join("")+'</select></td>' +
-      '<td style="text-align:center"><input type="checkbox" data-pk="activo" style="width:auto"'+(p.activo!==false?" checked":"")+'></td>' +
-      '<td><button class="btn sm ghost" data-delplat="'+esc(p.id)+'">✕</button></td></tr>').join("") +
-    '</tbody>';
-
-  $("#modLista").innerHTML = (MENU.grupos||[]).map(g=>
-    '<div class="card" style="margin-bottom:12px" data-grupo="'+esc(g.id)+'"><div class="body">' +
-      '<div class="grid g4">' +
-        '<div><label class="f">Pregunta</label><input data-gk="nombre" value="'+esc(g.nombre)+'"></div>' +
-        '<div><label class="f">Mínimo</label><input data-gk="min" type="number" min="0" value="'+num(g.min)+'"></div>' +
-        '<div><label class="f">Máximo</label><input data-gk="max" type="number" min="1" value="'+num(g.max,1)+'"></div>' +
-        '<div style="align-self:end"><button class="btn sm ghost" data-delgrupo="'+esc(g.id)+'">Quitar grupo</button></div>' +
-      '</div>' +
-      '<div class="tbl-wrap" style="margin-top:12px"><table><thead><tr><th>Opción</th>' +
-        '<th style="width:130px">Cuesta de más</th><th style="width:60px"></th></tr></thead><tbody>' +
-        (g.ops||[]).map(o=>'<tr data-op="'+esc(o.id)+'">' +
-          '<td><input data-ok="nombre" value="'+esc(o.nombre)+'"></td>' +
-          '<td><input data-ok="extra" type="number" min="0" step="0.5" value="'+num(o.extra)+'"></td>' +
-          '<td><button class="btn sm ghost" data-delop="'+esc(o.id)+'">✕</button></td></tr>').join("") +
-      '</tbody></table></div>' +
-      '<button class="btn sm" style="margin-top:10px" data-addop="'+esc(g.id)+'">+ Opción</button>' +
-    '</div></div>').join("") || '<div class="empty">Sin grupos. Agrega uno para preguntar término, extras o qué quitar.</div>';
+  const cats=(MENU.cats||[]).slice().sort((a,b)=>num(a.orden)-num(b.orden));
+  const search=($("#menuBuscar")?.value||"").trim().toLocaleLowerCase(),sel=$("#menuFiltroCategoria")?.value||"";
+  $("#menuFiltroCategoria").innerHTML='<option value="">Todas las categorías</option>'+cats.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.nombre)+'</option>').join("");
+  $("#menuFiltroCategoria").value=cats.some(c=>c.id===sel)?sel:"";
+  $("#satProdCatalogo").innerHTML=SAT_PRODUCTOS.map(s=>'<option value="'+esc(s.nombre+' — '+s.clave)+'"></option>').join("");
+  $("#t_cats").innerHTML='<thead><tr><th>Categoría</th><th style="width:110px">Orden</th><th style="width:110px">Platillos</th><th style="width:60px"></th></tr></thead><tbody>'+
+    cats.map(c=>'<tr data-cat="'+esc(c.id)+'"><td><input data-ck="nombre" value="'+esc(c.nombre)+'"></td><td><input data-ck="orden" type="number" value="'+num(c.orden)+'"></td><td class="mono">'+(MENU.plats||[]).filter(p=>p.catId===c.id).length+'</td><td><button class="btn sm ghost" data-delcat="'+esc(c.id)+'">✕</button></td></tr>').join("")+'</tbody>';
+  const all=MENU.plats||[],visible=all.filter(p=>{const cat=cats.find(c=>c.id===p.catId);return(!sel||p.catId===sel)&&(!search||(p.nombre||"").toLocaleLowerCase().includes(search)||(cat?.nombre||"").toLocaleLowerCase().includes(search))});
+  $("#menuConteo").textContent=visible.length+" de "+all.length+" platillo"+(all.length===1?"":"s");
+  $("#t_plats").innerHTML=visible.map(p=>{
+    const mods=(MENU.grupos||[]).map(g=>'<label class="menuModOption'+((p.mods||[]).includes(g.id)?" si":"")+'" data-pmod="'+esc(g.id)+'"><input type="checkbox"'+((p.mods||[]).includes(g.id)?" checked":"")+'><span>'+esc(g.nombre)+'</span></label>').join("");
+    const photo=p.foto?'<img src="'+esc(p.foto)+'" alt="Foto de '+esc(p.nombre)+'">':'<span class="menuPhotoPlaceholder" aria-hidden="true">＋</span>';
+    return '<article class="menuItemCard" data-plat="'+esc(p.id)+'"><div class="menuItemMain"><label class="menuPhotoPick" title="Agregar o cambiar foto">'+photo+'<input type="file" accept="image/*" data-menu-photo aria-label="Foto de '+esc(p.nombre)+'"><span class="menuPhotoHint">Foto</span></label><div class="menuItemFields">'+
+      '<div class="menuItemTitle"><label><span>Platillo</span><input data-pk="nombre" value="'+esc(p.nombre)+'" placeholder="Nombre del platillo"></label><button class="btn sm ghost menuDelete" data-delplat="'+esc(p.id)+'" aria-label="Eliminar platillo">✕</button></div>'+
+      '<div class="menuItemNumbers"><label><span>Categoría</span><select data-pk="catId">'+cats.map(c=>'<option value="'+esc(c.id)+'"'+(c.id===p.catId?" selected":"")+'>'+esc(c.nombre)+'</option>').join("")+'</select></label><label><span>Precio registrado</span><div class="menuMoney"><b>$</b><input data-pk="precio" type="number" min="0" step="0.5" value="'+num(p.precio)+'"></div></label><label><span>Costo</span><div class="menuMoney"><b>$</b><input data-pk="costo" type="number" min="0" step="0.5" value="'+num(p.costo)+'"></div></label><label><span>IVA del precio</span><select data-pk="ivaModo"><option value="incluido"'+(modoIvaLinea(p)==="incluido"?" selected":"")+'>Precio incluye IVA</option><option value="mas"'+(modoIvaLinea(p)==="mas"?" selected":"")+'>Sumar IVA al cobrar</option><option value="exento"'+(modoIvaLinea(p)==="exento"?" selected":"")+'>Exento de IVA</option></select></label></div>'+
+      '<label class="menuActive"><input type="checkbox" data-pk="activo"'+(p.activo!==false?" checked":"")+'><span>'+(p.activo!==false?"Disponible":"Pausado")+'</span></label></div></div>'+
+      '<details class="menuItemAdvanced"><summary>Preguntas y facturación <small>'+(p.mods||[]).length+" preguntas · "+(p.satClave?"SAT "+esc(p.satClave):"SAT opcional")+'</small></summary><div class="menuItemAdvancedBody"><div class="menuMods"><b>Preguntas para el mesero</b><div class="menuModList">'+(mods||'<span class="menuNoMods">Aún no hay grupos. Agrégalos en «Preguntas y opciones».</span>')+'</div></div>'+
+      '<div class="menuSat"><b>Datos de facturación SAT <small>opcionales</small></b><div class="menuSatFields"><label><span>Buscar nombre o clave SAT</span><input type="search" data-pk="satBusqueda" list="satProdCatalogo" value="'+esc(p.satNombre?p.satNombre+' — '+p.satClave:(p.satClave||""))+'" placeholder="Ej. alimento preparado o clave de 8 dígitos"></label><label><span>Unidad SAT</span><select data-pk="satUnidad"><option value="">Sin asignar</option>'+SAT_UNIDADES.map(u=>'<option value="'+u.clave+'"'+(u.clave===p.satUnidad?" selected":"")+'>'+u.clave+' · '+esc(u.nombre)+'</option>').join("")+'</select></label></div><small class="menuSatHint">'+(p.satClave?'Clave '+esc(p.satClave)+(p.satNombre?' · '+esc(p.satNombre):' · capturada manualmente'):'Sin clave SAT asignada')+'</small></div></div></details></article>';
+  }).join("")||'<div class="menuEmpty">'+(search||sel?"No hay platillos que coincidan con la búsqueda.":"Aún no hay platillos. Usa «+ Platillo» para agregar el primero.")+'</div>';
+  $("#modLista").innerHTML=(MENU.grupos||[]).map(g=>'<div class="card menuGroupCard" data-grupo="'+esc(g.id)+'"><div class="body"><div class="grid g4"><div><label class="f">Pregunta</label><input data-gk="nombre" value="'+esc(g.nombre)+'"></div><div><label class="f">Mínimo</label><input data-gk="min" type="number" min="0" value="'+num(g.min)+'"></div><div><label class="f">Máximo</label><input data-gk="max" type="number" min="1" value="'+num(g.max,1)+'"></div><div style="align-self:end"><button class="btn sm ghost" data-delgrupo="'+esc(g.id)+'">Quitar grupo</button></div></div><div class="tbl-wrap" style="margin-top:12px"><table><thead><tr><th>Opción</th><th style="width:130px">Cuesta de más</th><th style="width:60px"></th></tr></thead><tbody>'+(g.ops||[]).map(o=>'<tr data-op="'+esc(o.id)+'"><td><input data-ok="nombre" value="'+esc(o.nombre)+'"></td><td><input data-ok="extra" type="number" min="0" step="0.5" value="'+num(o.extra)+'"></td><td><button class="btn sm ghost" data-delop="'+esc(o.id)+'">✕</button></td></tr>').join("")+'</tbody></table></div><button class="btn sm" style="margin-top:10px" data-addop="'+esc(g.id)+'">+ Opción</button></div></div>').join("")||'<div class="empty">Sin preguntas configuradas. Agrega una para términos, extras o cambios.</div>';
 }
 $("#catNueva").addEventListener("click", ()=>{
   MENU.cats.push({id:uid(), nombre:"Nueva categoría", orden:(MENU.cats.length+1)*10});
@@ -3867,12 +4583,14 @@ $("#catNueva").addEventListener("click", ()=>{
 $("#platNuevo").addEventListener("click", ()=>{
   if(!(MENU.cats||[]).length){ toast("Primero crea una categoría"); return; }
   MENU.plats.unshift({id:uid(), catId:MENU.cats[0].id, nombre:"Nuevo platillo",
-                      precio:0, costo:0, mods:[], activo:true});
+                       precio:0, costo:0, mods:[], activo:true, foto:"", ivaModo:"incluido"});
   persist(); renderMenu();
 });
+$("#menuBuscar").addEventListener("input", renderMenu);
+$("#menuFiltroCategoria").addEventListener("change", renderMenu);
 $("#modNuevo").addEventListener("click", ()=>{
   MENU.grupos.push({id:uid(), nombre:"Nueva pregunta", min:0, max:1, ops:[{id:uid(), nombre:"Opción", extra:0}]});
-  persist(); renderMenu();
+  persist(); renderMenu(); $("#menuGruposAdvanced").open=true;
 });
 $("#tab-menu").addEventListener("input", e=>{
   const t = e.target;
@@ -3900,7 +4618,10 @@ $("#tab-menu").addEventListener("input", e=>{
     if(p){ p[t.dataset.pk] = (t.dataset.pk === "precio" || t.dataset.pk === "costo") ? num(t.value) : t.value; persist(); }
   }
 });
-$("#tab-menu").addEventListener("change", e=>{
+$("#tab-menu").addEventListener("change", async e=>{
+  const fotoInput=e.target.closest("[data-menu-photo]");
+  if(fotoInput){const card=fotoInput.closest("[data-plat]"),p=card&&MENU.plats.find(x=>x.id===card.dataset.plat),file=fotoInput.files&&fotoInput.files[0];if(!p||!file)return;
+    try{p.foto=await fotoMenu(file);persist();renderMenu();toast("Foto guardada")}catch(err){toast(err.message||"No se pudo guardar la foto");fotoInput.value=""}return}
   const trp = e.target.closest("[data-plat]");
   if(trp && e.target.dataset.pk === "satBusqueda"){
     const p = MENU.plats.find(x=>x.id === trp.dataset.plat); if(!p) return;
@@ -3922,13 +4643,18 @@ $("#tab-menu").addEventListener("change", e=>{
     if(p){ p.satUnidad = e.target.value; persist(); }
     return;
   }
+  if(trp && e.target.dataset.pk === "ivaModo"){
+    const p = MENU.plats.find(x=>x.id === trp.dataset.plat);
+    if(p){ p.ivaModo = ["incluido","mas","exento"].includes(e.target.value) ? e.target.value : "incluido"; persist(); renderMenu(); }
+    return;
+  }
   if(trp && e.target.dataset.pk === "activo"){
     const p = MENU.plats.find(x=>x.id === trp.dataset.plat);
-    if(p){ p.activo = e.target.checked; persist(); }
+    if(p){ p.activo = e.target.checked; persist(); renderMenu(); }
   }
   if(trp && e.target.dataset.pk === "catId"){
     const p = MENU.plats.find(x=>x.id === trp.dataset.plat);
-    if(p){ p.catId = e.target.value; persist(); }
+    if(p){ p.catId = e.target.value; persist(); renderMenu(); }
   }
 });
 $("#tab-menu").addEventListener("click", e=>{
@@ -3940,6 +4666,7 @@ $("#tab-menu").addEventListener("click", e=>{
     p.mods = p.mods || [];
     const i = p.mods.indexOf(mod.dataset.pmod);
     if(i >= 0) p.mods.splice(i,1); else p.mods.push(mod.dataset.pmod);
+    const check=mod.querySelector('input[type="checkbox"]'); if(check) check.checked=i<0;
     mod.classList.toggle("si");
     persist(); return;
   }
@@ -4000,7 +4727,58 @@ function hojaTicket(){
     '.sang{padding-left:9px}' +
     '.caja{border:1.5px solid #000;padding:3px 5px;margin:4px 0;text-align:center}';
 }
+function ticketHtmlATexto(titulo, cuerpo, anchoMm){
+  const columnas = num(anchoMm,80) === 58 ? 32 : 48;
+  const doc = new DOMParser().parseFromString(String(cuerpo||""), "text/html");
+  const lineas = [];
+  const texto = n => String(n && n.textContent || "").replace(/\u00a0/g," ").replace(/[\t\r\n ]+/g," ").trim();
+  const envolver = (s, limite) => {
+    const palabras = String(s||"").split(/\s+/).filter(Boolean), salida=[];
+    let linea="";
+    palabras.forEach(p=>{
+      while(p.length > limite){ if(linea) { salida.push(linea); linea=""; } salida.push(p.slice(0,limite)); p=p.slice(limite); }
+      if(!linea) linea=p; else if(linea.length+1+p.length<=limite) linea+=" "+p;
+      else { salida.push(linea); linea=p; }
+    });
+    if(linea) salida.push(linea);
+    return salida;
+  };
+  const filaTabla = tr => {
+    const celdas = Array.from(tr.children).filter(x=>x.tagName==="TD"||x.tagName==="TH");
+    const izq=texto(celdas[0]), der=texto(celdas[1]);
+    if(!der) return envolver(izq,columnas);
+    const anchoIzq=Math.max(1,columnas-der.length-1);
+    const izqs=envolver(izq,anchoIzq);
+    izqs[izqs.length-1]=(izqs[izqs.length-1]||"").padEnd(anchoIzq," ")+" "+der;
+    return izqs;
+  };
+  const recorrer = n => {
+    if(n.nodeType===Node.TEXT_NODE) return n.nodeValue||"";
+    if(n.nodeType!==Node.ELEMENT_NODE) return "";
+    if(n.tagName==="BR") return "\n";
+    if(n.tagName==="HR") return "\n"+"-".repeat(columnas)+"\n";
+    if(n.tagName==="IMG") return "";
+    if(n.tagName==="TABLE"){
+      const filas=Array.from(n.querySelectorAll("tr")).filter(tr=>tr.closest("table")===n);
+      return filas.map(tr=>filaTabla(tr).join("\n")).join("\n")+"\n";
+    }
+    const contenido=Array.from(n.childNodes).map(recorrer).join("");
+    return /^(DIV|P|SECTION|HEADER|FOOTER|H[1-6]|LI)$/.test(n.tagName) ? contenido+"\n" : contenido;
+  };
+  const contenido=Array.from(doc.body.childNodes).map(recorrer).join("");
+  const limpias=contenido.split("\n").map(x=>x.replace(/[\t ]+/g," ").trim()).filter(Boolean);
+  return [titulo, ...limpias.flatMap(x=>envolver(x,columnas))].join("\n")+"\n\n";
+}
 function imprimeHoja(titulo, cuerpo){
+  if(window.MakersPrinter){
+    const mm=num(ESTACION.anchoPapelBt,0)||num(P.ticket.ancho,80);
+    if(ESTACION.modoImpresion !== "android" && ESTACION.impresoraBt){
+      window.MakersPrinter.printText(uid(), ESTACION.impresoraBt, mm, ticketHtmlATexto(titulo,cuerpo,mm));
+    }else{
+      window.MakersPrinter.printHtmlSystem("sys-"+uid(), titulo, mm, cuerpo, hojaTicket());
+    }
+    return;
+  }
   const w = window.open("", "_blank", "width=420,height=620");
   if(!w){ toast("El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes."); return; }
   w.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">' +
@@ -4060,8 +4838,8 @@ function imprimeCuenta(c, pagos, propina){
   cuerpo += '<hr>';
   cuerpo += lineaPar("Consumo", mx(s.sub));
   if(s.serv) cuerpo += lineaPar("Servicio "+num(P.servicio)+"%", mx(s.serv));
-  if(tk.mostrarIva !== false && num(P.iva))
-    cuerpo += lineaPar("IVA incluido "+num(P.iva)+"%", mx(s.total - s.total/(1+num(P.iva)/100)));
+  if(tk.mostrarIva !== false && s.iva)
+    cuerpo += lineaPar("IVA incluido en consumo", mx(s.iva));
   if(prop) cuerpo += lineaPar("Propina", mx(prop));
   cuerpo += '<hr>';
   cuerpo += '<table><tr><td class="g">TOTAL</td><td class="d g">'+mx(total)+'</td></tr></table>';
@@ -4446,6 +5224,53 @@ function desdeHace(id){
   return Math.max(0, minutosDe(horaAhora()) - minutosDe(x[x.length-1].entrada.hora));
 }
 
+function horarioProgramado(u, fecha){
+  const h = horarioDe(u)[diaDe(fecha)];
+  return h && !h.libre && h.e && h.s ? h : null;
+}
+function estadoCobertura(u, fecha, h){
+  const ts = turnosDe(u.id, fecha), abierta = ts.find(x=>!x.salida);
+  const pasada = fecha < hoyISO(), futura = fecha > hoyISO();
+  if(abierta){
+    const despues = !futura && minutosDe(horaAhora()) > minutosDe(h.s) + num(P.tolerancia,10);
+    return {clase:despues?"attention":"live", estado:despues?"Después del horario":"En turno",
+      detalle:"Entrada "+abierta.entrada.hora+(despues?" · registra salida":"")};
+  }
+  if(ts.length){
+    const ultima = ts[ts.length-1];
+    return {clase:"done", estado:"Salida registrada", detalle:ultima.entrada.hora+"–"+(ultima.salida?ultima.salida.hora:"—")};
+  }
+  if(futura) return {clase:"", estado:"Programado", detalle:h.e+"–"+h.s};
+  if(pasada) return {clase:"attention", estado:"Sin checada", detalle:"Horario "+h.e+"–"+h.s};
+  const diferencia = minutosDe(horaAhora()) - minutosDe(h.e);
+  if(diferencia > num(P.tolerancia,10)) return {clase:"attention", estado:"Entrada pendiente", detalle:"Horario "+h.e+"–"+h.s};
+  if(diferencia >= -60) return {clase:"soon", estado:"Por iniciar", detalle:"Horario "+h.e+"–"+h.s};
+  return {clase:"", estado:"Próximo", detalle:"Horario "+h.e+"–"+h.s};
+}
+function renderCoberturaPersonal(){
+  const input=$("#personalFecha"); if(!input) return;
+  if(!input.value) input.value=hoyISO();
+  const fecha=input.value, equipo=EQUIPO.filter(u=>u.activo!==false);
+  const turnos=equipo.map(u=>({u,h:horarioProgramado(u,fecha)})).filter(x=>x.h);
+  const filas=turnos.map(x=>({u:x.u,h:x.h,st:estadoCobertura(x.u,fecha,x.h)}));
+  const sinTurno=equipo.filter(u=>!horarioProgramado(u,fecha)&&fecha===hoyISO()&&estaDentro(u.id))
+    .map(u=>({u,h:null,st:{clase:"attention",estado:"Sin turno",detalle:"Entrada "+turnosDe(u.id,fecha).slice(-1)[0].entrada.hora}}));
+  const futuro=fecha>hoyISO();
+  const porIniciar=futuro?filas.length:filas.filter(x=>x.st.clase==="soon"||x.st.estado==="Próximo").length;
+  const revisar=filas.filter(x=>x.st.clase==="attention").length+sinTurno.length;
+  $("#personalCoberturaStats").innerHTML=[
+    [filas.length,"Programados"],
+    [filas.filter(x=>x.st.clase==="live").length,"En turno"],
+    [porIniciar,"Por iniciar"],
+    [revisar,"Revisar"]
+  ].map(x=>'<div class="coverageStat"><small>'+x[1]+'</small><b>'+x[0]+'</b></div>').join("");
+  const inicial=u=>esc((u.nombre||"?").trim().charAt(0).toUpperCase());
+  const renderFila=x=>'<button type="button" class="coverageRow '+x.st.clase+'" data-exp="'+esc(x.u.id)+'">'+
+    '<span class="av">'+inicial(x.u)+'</span><span class="coveragePerson"><b>'+esc(x.u.nombre||"Sin nombre")+'</b><small>'+
+    (x.h?x.h.e+"–"+x.h.s+" · ":"")+esc(x.st.detalle)+'</small></span><span class="coverageState">'+esc(x.st.estado)+'</span></button>';
+  $("#personalCobertura").innerHTML=filas.concat(sinTurno).map(renderFila).join("")||
+    '<div class="coverageEmpty">No hay turnos asignados para esta fecha. Abre el expediente de una persona para configurar sus días y horarios.</div>';
+}
 function renderPersonal(){
   const gente = EQUIPO.filter(u=>u.activo !== false);
   const dentro = gente.filter(u=>estaDentro(u.id)).length;
@@ -4474,7 +5299,7 @@ function renderPersonal(){
           : '<span class="pill">fuera</span>')+'</td>' +
         '<td>'+pintaRetardoHoy(u)+'</td></tr>';
     }).join("") + '</tbody>';
-  renderRetardos(); renderExpedientes(); renderRecibos();
+  renderCoberturaPersonal(); renderRetardos(); renderExpedientes(); renderRecibos();
 }
 function pintaRetardoHoy(u){
   const ev = primerEntrada(u.id, hoyISO());
@@ -4643,6 +5468,7 @@ function renderRetardos(){
     '</tbody>';
 }
 $("#tab-personal").addEventListener("change", e=>{
+  if(e.target.id === "personalFecha"){ renderCoberturaPersonal(); return; }
   if(e.target.id === "retDesde" || e.target.id === "retHasta"){ renderRetardos(); return; }
   if(e.target.id === "p_tolerancia"){ P.tolerancia = num(e.target.value); persist(); renderRetardos(); return; }
   if(e.target.id === "recQuien" || e.target.id === "recDesde" || e.target.id === "recHasta"){ pintaRecibo(); return; }
@@ -5079,6 +5905,12 @@ function registraCheca(){
    AJUSTES
    =================================================================== */
 function renderSet(){
+  $("#configTitle").textContent=POS_EVENTO?"Configuración del evento":"Tu restaurante";
+  $("#configDescription").textContent=POS_EVENTO
+    ?"Ajusta las mesas y el salón de «"+POS_EVENTO.nombre+"». Estos cambios solo afectan este evento."
+    :"Personaliza la operación, las mesas, el equipo y los tickets.";
+  $("#mesasSetTitle").textContent=POS_EVENTO?"Mesas de «"+POS_EVENTO.nombre+"»":"Mesas y zonas";
+  $("#mesasScopeNote").hidden=!POS_EVENTO;
   $("#e_nombre").value = P.negocio.nombre||""; $("#e_tel").value = P.negocio.tel||"";
   $("#e_dir").value = P.negocio.dir||"";
   $("#p_iva").value = num(P.iva,16); $("#p_propina").value = num(P.propina,10);
@@ -5152,11 +5984,164 @@ function renderEstacion(){
   const hace = [ESTACION.cuenta && "cuentas", ESTACION.cocina && "comandas",
                 ESTACION.cancela && "cancelaciones"].filter(Boolean);
   $("#estHint").textContent = hace.length ? "imprime " + hace.join(", ") : "no imprime nada";
+  const bt = !!(ESTACION.modoImpresion !== "android" && ESTACION.impresoraBt && window.MakersPrinter);
+  const destinoImpresion = bt
+    ? 'directamente en <b>'+esc(ESTACION.impresoraNombre||"la impresora Bluetooth")+'</b>. '
+    : (window.MakersPrinter
+      ? 'con los servicios de impresión de Android; confirmarás cada trabajo. '
+      : 'con la impresora predeterminada del navegador o su diálogo del sistema. ');
   $("#estNota").innerHTML = hace.length
-    ? 'Esta pantalla imprime <b>' + hace.join("</b>, <b>") + '</b> en la impresora predeterminada de esta computadora. ' +
-      'Lo que configures aquí <b>no</b> le pasa a las otras pantallas: cada una trae lo suyo.'
-    : 'Esta pantalla no imprime nada sola. Los botones de imprimir siguen funcionando a mano.';
+    ? 'Esta pantalla imprime <b>' + hace.join("</b>, <b>") + '</b> ' +
+      destinoImpresion +
+      'La configuración pertenece a este dispositivo.'
+    : 'Esta pantalla no imprime automáticamente. Los botones de impresión siguen disponibles.';
+  pintaImpresoraBluetooth();
 }
+let impresorasBluetooth = [];
+function pintaImpresoraBluetooth(){
+  const controles = $("#btPrinterControls"), webHint = $("#btPrinterWebHint");
+  if(!controles || !webHint) return;
+  const nativa = !!window.MakersPrinter;
+  controles.hidden = !nativa; webHint.hidden = nativa;
+  $("#btPrinterHint").textContent = nativa ? "Conexión de este Android" : "Disponible en el APK Android";
+  if(!nativa) return;
+  const select = $("#btPrinterSelect");
+  const mode = ESTACION.modoImpresion === "bluetooth" ? "bluetooth" : "android";
+  $("#btPrinterMode").value = mode;
+  $("#btPrinterBluetoothOptions").hidden = mode !== "bluetooth";
+  const guardada = String(ESTACION.impresoraBt||"");
+  const conocidos = impresorasBluetooth.slice();
+  if(guardada && !conocidos.some(d=>d.address===guardada))
+    conocidos.unshift({address:guardada,name:ESTACION.impresoraNombre||"Impresora guardada"});
+  select.innerHTML = '<option value="">Selecciona una impresora emparejada</option>' + conocidos.map(d=>
+    '<option value="'+esc(d.address)+'"'+(d.address===guardada?' selected':'')+'>'+esc(d.name||"Impresora Bluetooth")+
+      (d.address?' · '+esc(String(d.address).slice(-5)):'')+'</option>').join("");
+  const mm = num(ESTACION.anchoPapelBt,0) || num(P.ticket.ancho,80);
+  $("#btPrinterWidth").value = mm === 58 ? "58" : "80";
+  $("#btPrinterStatus").textContent = mode === "android"
+    ? 'Modo de impresión Android. “Imprimir prueba” abre la lista de servicios disponibles.'
+    : (guardada ? 'Guardada: '+(ESTACION.impresoraNombre||guardada)+'. Pulsa “Imprimir prueba” para confirmar.'
+      : 'Empareja la impresora en Android y pulsa “Buscar emparejadas”.');
+}
+function buscaImpresorasBluetooth(){
+  if(!window.MakersPrinter){ toast("La conexión Bluetooth directa requiere el APK Android."); return; }
+  let respuesta;
+  try{ respuesta = JSON.parse(window.MakersPrinter.listPairedDevices() || "{}"); }
+  catch(e){ $("#btPrinterStatus").textContent = "No se pudo consultar Bluetooth. Revisa los permisos del APK."; return; }
+  if(respuesta.error === "permission_required"){
+    $("#btPrinterStatus").textContent = "Android te pedirá permiso para ver dispositivos emparejados.";
+    window.MakersPrinter.requestBluetoothPermission(); return;
+  }
+  if(respuesta.error === "bluetooth_off"){
+    impresorasBluetooth = []; pintaImpresoraBluetooth();
+    $("#btPrinterStatus").textContent = "Enciende Bluetooth en Android y vuelve a buscar."; return;
+  }
+  if(respuesta.error === "bluetooth_unavailable"){
+    impresorasBluetooth = []; pintaImpresoraBluetooth();
+    $("#btPrinterStatus").textContent = "Este dispositivo no tiene Bluetooth disponible."; return;
+  }
+  impresorasBluetooth = Array.isArray(respuesta.devices) ? respuesta.devices : [];
+  pintaImpresoraBluetooth();
+  if(!impresorasBluetooth.length)
+    $("#btPrinterStatus").textContent = "No hay impresoras emparejadas. Empareja una en Ajustes de Android y vuelve a buscar.";
+  else $("#btPrinterStatus").textContent = "Encontré "+impresorasBluetooth.length+" dispositivo(s) Bluetooth emparejado(s).";
+}
+window.onMakersPrinterPermissionResult = function(concedido){
+  if(concedido) buscaImpresorasBluetooth();
+  else if($("#btPrinterStatus")) $("#btPrinterStatus").textContent = "Sin permiso Bluetooth. Puedes habilitarlo en Ajustes de Android.";
+};
+window.onMakersPrinterResult = function(id, ok, mensaje){
+  if(id === "bt-test" && $("#btPrinterStatus")){
+    $("#btPrinterStatus").textContent = ok ? "Prueba enviada a la impresora." : (mensaje||"No se pudo conectar. Revisa que esté encendida y emparejada.");
+  }else if(String(id||"").indexOf("sys-")===0){
+    if(!ok) toast(mensaje||"No se pudo abrir la impresión del sistema.");
+    else toast("Elige la impresora y confirma la impresión en Android.");
+  }else if(!ok){
+    toast("No se pudo enviar a la impresora: "+(mensaje||"revisa la conexión Bluetooth"));
+  }else if(id && id !== "") toast("Impresión enviada a la impresora.");
+};
+let actualizacionDisponible = false;
+window.onMakersAppUpdateResult = function(json){
+  const boton = $("#androidUpdateButton");
+  if(!boton) return;
+  let respuesta;
+  try{ respuesta = JSON.parse(String(json||"{}")); }
+  catch(e){ respuesta = {status:"error",message:"Respuesta de actualización inválida."}; }
+  boton.disabled = false;
+  if(respuesta.status === "available"){
+    actualizacionDisponible = true;
+    $("#androidUpdateTitle").textContent = "Descargar actualización " + String(respuesta.versionName||"");
+    $("#androidUpdateHint").textContent = "Toca para descargar e instalar desde Android";
+    toast("Hay una actualización disponible.");
+  }else if(respuesta.status === "download_started"){
+    actualizacionDisponible = false;
+    $("#androidUpdateTitle").textContent = "Buscar actualizaciones";
+    $("#androidUpdateHint").textContent = "Abre la descarga y confirma la instalación";
+    toast("Se abrió la descarga. Android te pedirá confirmar la instalación.");
+  }else if(respuesta.status === "current"){
+    actualizacionDisponible = false;
+    $("#androidUpdateTitle").textContent = "Buscar actualizaciones";
+    $("#androidUpdateHint").textContent = "Revisar la versión instalada";
+    toast("Makers Restaurant ya está actualizado.");
+  }else{
+    actualizacionDisponible = false;
+    $("#androidUpdateTitle").textContent = "Buscar actualizaciones";
+    $("#androidUpdateHint").textContent = respuesta.message||"No se pudo consultar. Revisa tu conexión.";
+    toast(respuesta.message||"No se pudo consultar la actualización.");
+  }
+};
+$("#androidUpdateButton").addEventListener("click", ()=>{
+  if(!window.MakersPrinter) return;
+  const boton = $("#androidUpdateButton");
+  boton.disabled = true;
+  if(actualizacionDisponible){
+    $("#androidUpdateTitle").textContent = "Abriendo descarga…";
+    window.MakersPrinter.openAppUpdate();
+  }else{
+    $("#androidUpdateTitle").textContent = "Buscando…";
+    $("#androidUpdateHint").textContent = "Consultando la versión publicada";
+    window.MakersPrinter.checkForAppUpdate();
+  }
+});
+$("#btPrinterFind").addEventListener("click", buscaImpresorasBluetooth);
+$("#btPrinterMode").addEventListener("change", ()=>{
+  ESTACION.modoImpresion = $("#btPrinterMode").value;
+  pintaImpresoraBluetooth();
+});
+$("#btPrinterSelect").addEventListener("change", ()=>{
+  const device=impresorasBluetooth.find(d=>d.address===$("#btPrinterSelect").value);
+  const name=String(device && device.name||"").toLowerCase();
+  if(/5890|pos-58/.test(name)) $("#btPrinterWidth").value="58";
+  else if(/my-a1|gomita/.test(name)) $("#btPrinterWidth").value="80";
+});
+$("#btPrinterSave").addEventListener("click", ()=>{
+  ESTACION.modoImpresion = $("#btPrinterMode").value;
+  if(ESTACION.modoImpresion === "bluetooth"){
+    const address = $("#btPrinterSelect").value;
+    if(!address){ toast("Primero busca y elige una impresora emparejada"); return; }
+    const found = impresorasBluetooth.find(d=>d.address===address);
+    ESTACION.impresoraBt = address;
+    ESTACION.impresoraNombre = found ? (found.name||"") : (ESTACION.impresoraNombre||"");
+  }
+  ESTACION.anchoPapelBt = num($("#btPrinterWidth").value,80);
+  guardaEstacion(); renderEstacion();
+  toast(ESTACION.modoImpresion === "bluetooth" ? "Impresora guardada para esta pantalla" : "Servicio Android guardado para esta pantalla");
+});
+$("#btPrinterTest").addEventListener("click", ()=>{
+  const mm = num($("#btPrinterWidth").value,80);
+  if($("#btPrinterMode").value === "android"){
+    const nombre = esc(P.negocio.nombre||"Makers Restaurant");
+    window.MakersPrinter.printHtmlSystem("sys-bt-test", "Prueba de impresora", mm,
+      '<div class="c g">'+nombre+'</div><hr><div>PRUEBA DE IMPRESION</div><div>Papel '+mm+' mm</div><div>Servicio de impresión Android</div><hr><div class="c">Listo</div>', hojaTicket());
+    $("#btPrinterStatus").textContent = "Elige una impresora y confirma la prueba en Android.";
+    return;
+  }
+  const address = $("#btPrinterSelect").value || ESTACION.impresoraBt;
+  if(!address || !window.MakersPrinter){ toast("Busca y selecciona una impresora primero"); return; }
+  $("#btPrinterStatus").textContent = "Conectando e imprimiendo prueba…";
+  window.MakersPrinter.printText("bt-test", address, mm,
+    (P.negocio.nombre||"Makers Restaurant")+"\nPRUEBA DE IMPRESION\nPapel "+mm+" mm\nBluetooth ESC/POS\n");
+});
 function pintaNotaFolio(){
   const n = $("#folNota"); if(!n) return;
   n.innerHTML = letrasFolio()
@@ -5231,7 +6216,10 @@ $("#tab-set").addEventListener("change", e=>{
     return;
   }
   if(t.id === "est_donde"){
-    ESTACION = Object.assign({donde:t.value}, ESTACIONES[t.value] || ESTACIONES.caja);
+    ESTACION = Object.assign({impresoraBt:ESTACION.impresoraBt||"",
+      impresoraNombre:ESTACION.impresoraNombre||"", anchoPapelBt:num(ESTACION.anchoPapelBt,0),
+      modoImpresion:ESTACION.modoImpresion||"android",
+      donde:t.value}, ESTACIONES[t.value] || ESTACIONES.caja);
     guardaEstacion(); renderEstacion();
     toast("Esta pantalla es la de " + (ESTACIONES[t.value]||{}).et);
     return;
@@ -5358,6 +6346,7 @@ function aplicaRol(){
   $("#userNombre").textContent = u.nombre || "Sin nombre";
   $("#userRol").textContent = (ROLES[r]||ROLES.gerente).nombre;
   $("#userAv").textContent = (u.nombre||"?").trim().charAt(0).toUpperCase();
+  contextoPOSUI();
   pintaTabs();
   /* Todo lo que dependa del rol se vuelve a pintar AQUI. Es el unico lugar
      por donde pasa un cambio de persona, y lo que no se repinte aqui se
@@ -5589,6 +6578,7 @@ function start(){
   $("#barra").hidden = false;
   aplicaMarca();
   arrancaEquipo();
+  contextoPOSUI();
   pintaTabs();
   vaA(puedeVer("inicio") ? "inicio" : "mesas");
   pintaTurnoChip();
@@ -5601,6 +6591,7 @@ function start(){
   /* Dos pestañas abiertas en la misma tableta —la comanda y la cocina— se
      enteran una de otra sin red: localStorage avisa a las demás pestañas. */
   window.addEventListener("storage", e=>{
+    if(e.key === EVENTOS_KEY){ EVENTOS=leeEventos(); pintaTabs(); if(!$("#tab-eventos").hidden) renderEventos(); return; }
     if(!e.key || e.key.indexOf(LS) !== 0) return;
     COMANDAS = lsGet("comandas", COMANDAS);
     MESAS    = lsGet("mesas", MESAS);
@@ -5617,6 +6608,7 @@ start();
    el punto de venta funciona igual — que es justo lo que tiene que pasar
    cuando se cae el internet a media comida. */
 (async function(){
+  if(POS_CONTEXT){ cargaAnuncios(); return; }
   try{
     DB = await (window.claude && window.claude.use ? window.claude.use("db") : null);
   }catch(e){ DB = null; }
@@ -5643,7 +6635,7 @@ start();
   const button=document.getElementById("pwaInstall");
   if(!button||location.protocol==="file:") return;
   const standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;
-  if(standalone){button.hidden=true;return;}
+  if(standalone||window.MakersPrinter){button.hidden=true;return;}
   let installEvent=null;
   button.hidden=false;
   window.addEventListener("beforeinstallprompt",event=>{
