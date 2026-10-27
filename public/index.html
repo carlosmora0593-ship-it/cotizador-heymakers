@@ -1964,6 +1964,13 @@ body.sinDetalleCostos .soloAdminCostos{display:none!important}
 .comTotal{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:14px;
   padding-top:11px;border-top:1px solid var(--line);font-size:13px}
 .comTotal b{font-family:"IBM Plex Mono",monospace;font-size:17px;color:var(--good)}
+/* Cuando no hay nada que cobrar, la tarjeta explica por que. Una tarjeta en
+   blanco se lee como "esto no sirve", y casi nunca es eso lo que pasa. */
+.comVacio{font-size:13px;line-height:1.6;color:var(--ink-2)}
+.comVacio b{color:var(--ink)}
+.comVacio ul{margin:9px 0 0;padding-left:18px;color:var(--ink-3);font-size:12px}
+.comVacio li{margin:3px 0}
+.comVacio .comBoton{margin-top:14px}
 @media (max-width:560px){
   .comFila{grid-template-columns:1fr auto;gap:5px 10px}
   .comQuien{grid-column:1;grid-row:1}
@@ -8977,7 +8984,10 @@ registraLanzador("ven", [
    alAbrir:()=>{ if(typeof renderCobranza === "function") renderCobranza(); }},
   {id:"comis", nombre:"Comisiones", sub:"quién vendió y cuánto se le debe", color:"#8B5CF6",
    icono:'<circle cx="9" cy="8" r="3.4"/><path d="M3 20v-1.4A3.6 3.6 0 0 1 6.6 15h4.8a3.6 3.6 0 0 1 3.6 3.6V20"/><path d="M18 8v8M15 11h6"/>',
-   card:'[data-ven="comis"]', destapa:true, soloAdmin:true},
+   card:'[data-ven="comis"]', destapa:true, soloAdmin:true,
+   /* Sin esto la tarjeta ensena lo ultimo que se dibujo, que puede ser nada
+      si cuando se cargo la seccion no habia comisiones. */
+   alAbrir:()=>{ try{ renderVentas(); }catch(e){} }},
   {id:"detalle", nombre:"Detalle de ventas", sub:"venta por venta", color:"#64748B",
    icono:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/>',
    card:'[data-ven="detalle"]', cuenta:()=>(ventas||[]).length},
@@ -12738,6 +12748,10 @@ async function cobraMostrador(conTicket){
     cambio: mosForma === "Efectivo" && recibido > 0 ? Math.round((recibido - t.total)*100)/100 : 0,
     pagoCon: mosForma === "Efectivo" ? recibido : 0,
     vendedor: u ? {id:u.id, nombre:u.nombre} : null,
+    /* El porcentaje se congela aquí igual que en el cobro de una cotización.
+       Sin esta línea el mostrador guardaba al vendedor pero no su comisión,
+       y ninguna venta rápida comisionaba nunca. */
+    comisionPct: pctDe(u),
     /* Cada renglón se guarda con lo que de verdad se cobró y con la
        promoción que se le aplicó: una reimpresión del ticket seis meses
        después tiene que decir lo mismo, aunque la promoción ya no exista. */
@@ -13494,11 +13508,57 @@ function comisionesDe(lista){
   });
   return Object.keys(bolsa).map(k=>bolsa[k]).sort((a,b)=> b.comision - a.comision);
 }
+/* Por que no hay nada que mostrar. Son cuatro razones distintas y cada una
+   se arregla en un lugar distinto; decir "no hay datos" no ayuda a nadie. */
+function porQueNoHayComisiones(enRango){
+  const gente = (equipo||[]).filter(u=>pctDe(u)>0);
+  if(!enRango.length){
+    return {texto:"<b>No hay ventas en este periodo.</b> Cambia el periodo arriba (día / semana / mes) "+
+                  "o la fecha, y vuelve a mirar.", reparar:false};
+  }
+  if(!gente.length){
+    return {texto:"<b>Nadie tiene comisión puesta todavía.</b> El porcentaje se pone persona por persona "+
+                  "en <b>Ajustes → Equipo</b>, columna <b>Comisión %</b>. Vacío quiere decir que esa "+
+                  "persona no comisiona, que es lo normal.", reparar:false};
+  }
+  /* Hay quien comisiona, pero ninguna venta del periodo trae porcentaje
+     guardado: casi siempre porque la comisión se puso después de vender. */
+  const conVendedor = enRango.filter(v=> (v.vendedor||{}).id && pctDe((equipo||[]).find(u=>u.id === v.vendedor.id)) > 0);
+  return {
+    texto: "<b>"+gente.length+" persona(s) tienen comisión, pero ninguna de las "+enRango.length+
+           " venta(s) de este periodo trae porcentaje guardado.</b>"+
+           "<ul>"+
+             "<li>El porcentaje se congela <b>cuando se cobra la venta</b>: subirle la comisión a alguien "+
+               "en marzo no debe repintar lo que vendió en febrero.</li>"+
+             "<li>Así que lo que se cobró <b>antes</b> de ponerle la comisión no comisiona, aunque hoy "+
+               "esa persona tenga su porcentaje.</li>"+
+             (conVendedor.length
+               ? "<li>En este periodo hay <b>"+conVendedor.length+"</b> venta(s) cuyo vendedor sí comisiona hoy. "+
+                 "El botón de abajo les pone el porcentaje de hoy.</li>"
+               : "<li>Además, ninguna venta de este periodo tiene vendedor con comisión: revisa que las "+
+                 "cotizaciones traigan <b>Elaborada por</b> y que esa persona tenga su porcentaje.</li>")+
+           "</ul>",
+    reparar: conVendedor.length > 0
+  };
+}
+
 function renderComisiones(enRango){
   const w = $("#venComis"); if(!w) return;
   const filas = comisionesDe(enRango);
-  const card = $("#cardComis"); if(card) card.hidden = !filas.length;
-  if(!filas.length){ w.innerHTML = ""; return; }
+  const card = $("#cardComis");
+  /* La tarjeta se sigue ocultando en la lista de Ventas cuando no hay nada,
+     pero su azulejo la destapa a la fuerza: por eso el texto se escribe
+     siempre, para que ahí adentro haya algo que leer. */
+  if(card) card.hidden = !filas.length;
+  if(!filas.length){
+    const d = porQueNoHayComisiones(enRango);
+    w.innerHTML = '<div class="comVacio">'+d.texto+
+      (d.reparar && (typeof rolActual !== "function" || rolActual() === "admin")
+        ? '<div class="comBoton"><button class="btn" id="comAplica">Aplicar el porcentaje de hoy a este periodo</button></div>'
+        : '')+
+      '</div>';
+    return;
+  }
   const total = filas.reduce((s,f)=>s+f.comision, 0);
   const tope  = Math.max(1, ...filas.map(f=>f.comision));
   const pico  = filas[0];
@@ -13514,8 +13574,54 @@ function renderComisiones(enRango){
         '<span class="comMx'+(f===pico?" pico":"")+'">'+mx(f.comision)+'</span>'+
       '</div>').join("")+
     '</div>'+
-    '<div class="comTotal"><span>'+filas.length+' persona(s) comisionan</span><b>'+mx(total)+'</b></div>';
+    '<div class="comTotal"><span>'+filas.length+' persona(s) comisionan</span><b>'+mx(total)+'</b></div>'+
+    /* Comisionar sobre lo cobrado y no haber cobrado nada da puros ceros, y
+       un reporte de ceros parece descompuesto. Se dice por qué. */
+    (total === 0 && baseComision() === "cobrado"
+      ? '<p class="comNota" style="margin:12px 0 0">Todo en cero porque la comisión va sobre <b>lo cobrado</b> '+
+        'y de estas ventas todavía no entra dinero. La comisión sube sola con cada abono. Si prefieres pagar '+
+        'sobre lo vendido, se cambia en Ajustes.</p>'
+      : '');
 }
+
+/* Ponerle el porcentaje de hoy a lo que ya se vendió. Va contra la regla de
+   congelar —a propósito—, por eso es un botón que se pide a mano, avisa qué
+   va a tocar y no existe para quien no es administrador. */
+async function aplicaComisionAlPeriodo(){
+  if(typeof rolActual === "function" && rolActual() !== "admin"){
+    toast("Solo un administrador puede cambiar comisiones"); return;
+  }
+  const R = rango(venPer, venRef);
+  const enRango = ventas.filter(v=>v.fecha>=R.ini && v.fecha<=R.fin);
+  const toca = [];
+  enRango.forEach(v=>{
+    if(num(v.comisionPct)) return;                 // ya trae porcentaje: no se toca
+    const u = (equipo||[]).find(x=>x.id === ((v.vendedor||{}).id));
+    const pct = pctDe(u);
+    if(pct) toca.push({venta:v, pct:pct, quien:(u.nombre||"sin nombre")});
+  });
+  if(!toca.length){ toast("No hay ventas a las que aplicarles un porcentaje"); return; }
+
+  const porQuien = {};
+  toca.forEach(t=>{ porQuien[t.quien] = (porQuien[t.quien]||0) + 1; });
+  const resumen = Object.keys(porQuien).map(k=>"  · "+k+": "+porQuien[k]+" venta(s)").join("\n");
+  if(!confirm("Se le va a poner el porcentaje de hoy a "+toca.length+" venta(s) de este periodo:\n\n"+
+              resumen+"\n\nEsto cambia comisiones que ya estaban guardadas en cero. Las ventas que ya "+
+              "traían porcentaje no se tocan.\n\n¿Lo aplico?")) return;
+
+  toca.forEach(t=>{ t.venta.comisionPct = t.pct; });
+  if(DB){
+    for(const t of toca){
+      try{ await DB.collection("ventas").doc(t.venta.folio).set({venta:t.venta, fecha:t.venta.fecha, total:t.venta.total}); }
+      catch(e){ toast("No se pudo guardar "+t.venta.folio+" en la nube"); }
+    }
+  }else lsSet("ventas", ventas);
+  toast(toca.length+" venta(s) actualizada(s)");
+  renderVentas();
+}
+document.addEventListener("click", e=>{
+  if(e.target && e.target.id === "comAplica") aplicaComisionAlPeriodo();
+});
 
 /* Las dos columnas nuevas del equipo. */
 function celdaCotiza(u){
@@ -22418,7 +22524,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261025-1835"></script>
-<script src="diagnostico.js?v=20261025-1835"></script>
+<script src="cuenta.js?v=20261026-1830"></script>
+<script src="diagnostico.js?v=20261026-1830"></script>
 </body>
 </html>

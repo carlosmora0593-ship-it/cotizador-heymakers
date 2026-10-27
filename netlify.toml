@@ -2,6 +2,24 @@
   publish = "public"
   functions = "netlify/functions"
 
+  # ------------------------------------------------------------------
+  #  Por que Netlify casi nunca debe construir
+  # ------------------------------------------------------------------
+  #  El 23 de octubre de 2026 Netlify dejo de publicar. No fue un error
+  #  del codigo: el plan gratis da 300 creditos al mes y cada publicacion
+  #  cuesta 15, o sea VEINTE publicaciones al mes. Publicando cinco veces
+  #  al dia, el mes se acaba en cuatro dias.
+  #
+  #  El sitio lo publica GitHub Pages, que no tiene ese tope, y las tres
+  #  funciones de servidor se mudaron a Supabase. Netlify ya no tiene nada
+  #  que hacer en el dia a dia, asi que aqui se le dice que NO construya
+  #  salvo que cambie algo suyo: este archivo o la carpeta netlify/.
+  #
+  #  Como funciona: si el comando termina bien (sin diferencias), Netlify
+  #  se salta la construccion. Si encuentra diferencias, falla, y entonces
+  #  si construye. Suena al reves y lo es: asi lo pide Netlify.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- netlify.toml netlify/"
+
   # Los archivos de sql/ y las guias no forman parte del sitio: son las
   # instrucciones que corres una vez en Supabase. No se publican en la web,
   # pero el revisor de secretos de Netlify tambien los lee, y ahi hay

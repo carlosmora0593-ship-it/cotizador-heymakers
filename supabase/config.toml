@@ -1,0 +1,19 @@
+# Las tres funciones de borde revisan ellas mismas quien llama: le preguntan
+# a Supabase por el token de sesion antes de hacer nada (y el webhook de
+# Mercado Pago se protege con la clave que va en su direccion). Por eso el
+# "Verify JWT" de la puerta de entrada va APAGADO en las tres: si estuviera
+# prendido, el navegador no podria ni pedir permiso (la peticion OPTIONS
+# viaja sin token y seria rechazada antes de llegar al codigo).
+#
+# Esto es lo mismo que la casilla "Verify JWT" del tablero. El archivo esta
+# aqui para que quede escrito por que, y para que un dia que se suban con la
+# consola salgan iguales.
+
+[functions.crear-suscripcion]
+verify_jwt = false
+
+[functions.invitar-usuario]
+verify_jwt = false
+
+[functions.webhook-mercadopago]
+verify_jwt = false

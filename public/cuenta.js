@@ -54,10 +54,18 @@ function revisaConfig(){
    de servicio en secreto: crear el cobro en Mercado Pago, recibir el aviso
    de pago, y dar de alta a alguien del equipo.
 
-   En Netlify existen. En GitHub Pages no, porque ahí solo se sirven
-   archivos. En vez de dejar que el botón truene con un error incomprensible,
-   lo preguntamos una vez y lo decimos con todas sus letras. */
-const FUNCIONES = "/.netlify/functions/";
+   Esas tres viven en Supabase, al lado de la base, como funciones de
+   borde. Antes vivían en Netlify y eso ataba el cotizador a un plan que
+   daba veinte publicaciones al mes: el 23 de octubre de 2026 se acabaron
+   y las suscripciones se quedaron sin servidor. Desde que están en
+   Supabase da igual de dónde se sirva la página —GitHub Pages, Netlify o
+   una carpeta en tu máquina—: siempre llama al mismo lugar.
+
+   La dirección sale de la misma que ya está en config.js, así que no hay
+   un dato más que mantener. Si las funciones todavía no se han subido,
+   abajo se detecta y se dice con todas sus letras en vez de tronar. */
+const FUNCIONES = String((window.CONFIG && CONFIG.SUPABASE_URL) || "")
+  .trim().replace(/\/+$/, "") + "/functions/v1/";
 const SIN_SERVIDOR = "SIN_SERVIDOR";
 
 /* Preguntar de antemano "¿hay servidor?" sale mal: cada hosting contesta
@@ -70,8 +78,16 @@ async function leeJson(r){
   if(tipo.indexOf("json") < 0){
     const e = new Error(SIN_SERVIDOR); e.code = SIN_SERVIDOR; throw e;
   }
-  try{ return await r.json(); }
+  let d;
+  try{ d = await r.json(); }
   catch(err){ const e = new Error(SIN_SERVIDOR); e.code = SIN_SERVIDOR; throw e; }
+  /* Supabase contesta en JSON aunque la función no exista todavía, así que
+     el truco del content-type no alcanza: un "no encontrada" también es
+     "no hay servidor", y se avisa igual de claro. */
+  if(r.status === 404 && /not found|no encontrad/i.test(String((d && (d.message || d.msg)) || ""))){
+    const e = new Error(SIN_SERVIDOR); e.code = SIN_SERVIDOR; throw e;
+  }
+  return d;
 }
 
 const PROBLEMA_CONFIG = revisaConfig();
