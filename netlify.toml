@@ -55,6 +55,26 @@
     Cache-Control = "no-cache"
 
 [[headers]]
+  for = "/acceso.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/taller.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/acceso.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/acceso.css"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
   for = "/lab.html"
   [headers.values]
     Cache-Control = "no-cache"
@@ -66,6 +86,11 @@
 
 [[headers]]
   for = "/tiendita/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/productos/*"
   [headers.values]
     Cache-Control = "no-cache"
 
@@ -90,6 +115,16 @@
   from = "/lab"
   to = "/lab.html"
   status = 200
+
+[[redirects]]
+  from = "/productos"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/productos/"
+  to = "/"
+  status = 301
 
 [[redirects]]
   from = "/*"

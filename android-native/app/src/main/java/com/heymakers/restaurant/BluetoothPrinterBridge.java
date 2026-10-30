@@ -151,7 +151,7 @@ public final class BluetoothPrinterBridge {
                 }
                 JSONObject published = new JSONObject(body.toString());
                 if (!"com.heymakers.restaurant".equals(published.optString("packageName")))
-                    throw new IOException("La versión publicada no corresponde a Makers Restaurant.");
+                    throw new IOException("La versión publicada no corresponde a Nuvor Restaurant.");
 
                 long latestVersion = published.getLong("versionCode");
                 long installedVersion = installedVersionCode();
@@ -236,7 +236,7 @@ public final class BluetoothPrinterBridge {
                 public void onPageFinished(WebView view, String url) {
                     try {
                         PrintManager manager = (PrintManager) activity.getSystemService(Activity.PRINT_SERVICE);
-                        String safeTitle = title == null || title.trim().isEmpty() ? "Makers Restaurant" : title;
+                        String safeTitle = title == null || title.trim().isEmpty() ? "Nuvor Restaurant" : title;
                         PrintAttributes.MediaSize roll = paperWidthMm <= 58
                                 ? new PrintAttributes.MediaSize("MAKERS_58", "Rollo 58 mm", 2283, 40000)
                                 : new PrintAttributes.MediaSize("MAKERS_80", "Rollo 80 mm", 3150, 40000);

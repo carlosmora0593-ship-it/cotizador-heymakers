@@ -113,6 +113,18 @@ const PRECIOS: Record<string, any> = {
   maker: { mensual: 449, anual: 4490, nombre: "Maker" },
   pro: { mensual: 899, anual: 8990, nombre: "Pro" },
 };
+const PRODUCTOS_VALIDOS = ["taller", "restaurant", "tiendita"];
+const NOMBRES_PRODUCTO: Record<string, string> = {
+  taller: "Taller Makers",
+  restaurant: "Makers Restaurant",
+  tiendita: "Tiendita Makers",
+};
+
+function limpiaProductos(valor: unknown): string[] {
+  if (!Array.isArray(valor)) return [];
+  return [...new Set(valor.filter((p): p is string =>
+    typeof p === "string" && PRODUCTOS_VALIDOS.includes(p)))];
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
@@ -127,7 +139,6 @@ Deno.serve(async (req) => {
     const { plan, ciclo } = datos;
     if (!PRECIOS[plan]) return resp(400, { error: "Plan desconocido" });
     const periodo = ciclo === "anual" ? "anual" : "mensual";
-    const monto = PRECIOS[plan][periodo];
 
     const user = await quienEres(token);
     if (!user) return resp(401, { error: "Sesión no válida" });
@@ -141,12 +152,52 @@ Deno.serve(async (req) => {
     const cuentaId = perfil.cuenta_activa || perfil.cuenta_id;
     if (!cuentaId) return resp(404, { error: "La cuenta no existe todavía" });
 
+    const cuenta = await una("cuentas?select=producto,productos,mp_preapproval_id&id=eq." + esc(cuentaId));
+    if (!cuenta) return resp(404, { error: "La cuenta no existe todavía" });
+    const productosActuales = limpiaProductos(cuenta.productos);
+    if (!productosActuales.length && PRODUCTOS_VALIDOS.includes(cuenta.producto)) productosActuales.push(cuenta.producto);
+    const productos = limpiaProductos(datos.productos);
+    const seleccionados = productos.length ? productos : productosActuales;
+    if (!seleccionados.length) return resp(400, { error: "Selecciona al menos un producto" });
+    if (seleccionados.includes("taller") && seleccionados.length > 1) {
+      return resp(400, { error: "Taller Makers se licencia por separado de Restaurant y Tiendita" });
+    }
+    if (!seleccionados.includes("taller")) {
+      if (plan === "pro") return resp(400, { error: "Pro es un plan exclusivo de Taller Makers" });
+      if (seleccionados.length > 1 && plan !== "maker") {
+        return resp(400, { error: "La licencia Multiempresa para Restaurant y Tiendita cuesta $449 MXN al mes" });
+      }
+    }
+    const precio = PRECIOS[plan];
+    const monto = precio[periodo];
+    const nombrePlan = !seleccionados.includes("taller") && plan === "maker" ? "Multiempresa" : precio.nombre;
+    const nombreProductos = seleccionados.map(p => NOMBRES_PRODUCTO[p]).join(" + ");
+
     /* Y contratar no es cualquier cosa: solo el administrador de ESA empresa.
        Quien entró como ventas o producción no le cambia el plan a nadie. */
     const mem = await una("membresias?select=rol&usuario_id=eq." + esc(user.id) + "&cuenta_id=eq." + esc(cuentaId));
     const miRol = (mem && mem.rol) || perfil.rol || "admin";
     if (miRol !== "admin" && miRol !== "dueno") {
       return resp(403, { error: "Solo un administrador puede contratar o cambiar el plan" });
+    }
+
+    // No creamos un segundo cargo recurrente. Si la cuenta ya tiene uno,
+    // primero debe cancelarse desde Mercado Pago antes de reemplazarlo.
+    if (cuenta.mp_preapproval_id) {
+      const anterior = await fetch("https://api.mercadopago.com/preapproval/" + encodeURIComponent(cuenta.mp_preapproval_id), {
+        headers: { Authorization: "Bearer " + (Deno.env.get("MP_ACCESS_TOKEN") || "") },
+      });
+      if (!anterior.ok) {
+        console.error("No se pudo verificar la suscripción previa", anterior.status, await anterior.text());
+        return resp(502, { error: "No pudimos verificar el cobro recurrente actual. Intenta de nuevo más tarde para evitar una suscripción duplicada." });
+      }
+      const detalle = await anterior.json().catch(() => ({}));
+      if (!detalle.status) {
+        return resp(502, { error: "Mercado Pago no confirmó el estado de la suscripción actual. Intenta de nuevo más tarde." });
+      }
+      if (detalle.status !== "cancelled") {
+        return resp(409, { error: "Esta cuenta ya tiene un cobro recurrente. Cancélalo desde Mercado Pago antes de cambiar la licencia para evitar un doble cobro." });
+      }
     }
 
     /* A dónde regresa la gente después de pagar. Antes se sacaba del
@@ -164,10 +215,10 @@ Deno.serve(async (req) => {
     // Referencia: API de suscripciones (preapproval) de Mercado Pago.
     // Si Mercado Pago cambia algún nombre de campo, se ajusta SOLO aquí.
     const cuerpo = {
-      reason: "Cotizador " + PRECIOS[plan].nombre,
-      external_reference: [cuentaId, plan, periodo].join("|"),
+      reason: nombreProductos + " · " + nombrePlan,
+      external_reference: [cuentaId, plan, periodo, seleccionados.join(",")].join("|"),
       payer_email: user.email,
-      back_url: sitio + "/?pago=ok",
+      back_url: sitio + "/acceso.html?pago=ok",
       /* Sin esto, Mercado Pago no tiene a dónde avisar que ya cobró, y la
          cuenta se queda en "pendiente" para siempre aunque el dinero haya
          entrado. La clave va en la dirección porque el webhook no tiene otra

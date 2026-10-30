@@ -525,11 +525,11 @@ body.sin-sesion .telon{display:none!important}
     <div class="lanza">
       <span class="et">Abrir un producto</span>
       <a href="index.html" target="_blank" rel="noopener">
-        <span class="pt" style="background:#22D3EE"></span>Taller Makers<small>cotizador</small></a>
+        <span class="pt" style="background:#22D3EE"></span>Nuvor Taller<small>cotizador</small></a>
       <a href="restaurant.html" target="_blank" rel="noopener">
-        <span class="pt" style="background:#D6127F"></span>Makers Restaurant<small>punto de venta</small></a>
+        <span class="pt" style="background:#D6127F"></span>Nuvor Restaurant<small>punto de venta</small></a>
       <a href="tiendita/" target="_blank" rel="noopener">
-        <span class="pt" style="background:#77A945"></span>Tiendita Makers<small>abarrotes · punto de venta</small></a>
+        <span class="pt" style="background:#77A945"></span>Nuvor Tiendita<small>abarrotes · punto de venta</small></a>
     </div>
     <div class="sidepie">
       <button class="btn sm" id="btnExporta">Exportar cuentas</button>
@@ -1320,9 +1320,9 @@ const CHIP_AN = {"al aire":"bien", "programado":"info", "vencido":"aviso", "apag
    pertenece a una sola: un restaurante nunca ve lo de una imprenta porque
    nunca comparten cuenta, no porque vivan en otro servidor. */
 const PRODUCTOS = {
-  taller:     {nombre:"Taller Makers",     corto:"Taller",     giro:"Imprenta y serigrafía"},
-  restaurant: {nombre:"Makers Restaurant", corto:"Restaurante",giro:"Restaurante y cafetería"},
-  tiendita:   {nombre:"Tiendita Makers",   corto:"Tiendita",   giro:"Abarrotes"}
+  taller:     {nombre:"Nuvor Taller",     corto:"Taller",     giro:"Imprenta y serigrafía"},
+  restaurant: {nombre:"Nuvor Restaurant", corto:"Restaurante",giro:"Restaurante y cafetería"},
+  tiendita:   {nombre:"Nuvor Tiendita",   corto:"Tiendita",   giro:"Abarrotes"}
 };
 const productoDe = c => (c && c.producto) || "taller";
 const nombreProducto = c => (PRODUCTOS[productoDe(c)] || {}).corto || productoDe(c);
@@ -1333,9 +1333,9 @@ const LUGAR_AN = {cotizador:"Pie de cotizar", bloqueo:"Pantalla bloqueada", ambo
 /* A quién le toca. Lista vacía = a todos: un anuncio que nadie segmentó se ve
    en todas partes, igual que los que ya existían antes de esto. */
 const GIROS_AN = {
-  taller:     "Imprenta · Taller Makers",
-  restaurant: "Restaurante · Makers Restaurant",
-  tiendita:   "Abarrotes · Tiendita Makers"
+  taller:     "Imprenta · Nuvor Taller",
+  restaurant: "Restaurante · Nuvor Restaurant",
+  tiendita:   "Abarrotes · Nuvor Tiendita"
 };
 const ESTADOS_AN = {
   AGS:"Aguascalientes", BC:"Baja California", BCS:"Baja California Sur", CAM:"Campeche",

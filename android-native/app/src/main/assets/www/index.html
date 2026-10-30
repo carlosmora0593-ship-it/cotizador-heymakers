@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Makers Restaurant</title>
+<title>Nuvor Restaurant</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -1065,7 +1065,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
   <div class="barraCmyk"><i></i><i></i><i></i><i></i></div>
   <div class="barraTop">
     <span class="plaque" id="brandIni">M</span>
-    <span><b id="brandNombre">Makers Restaurant</b><small id="brandGiro">Restaurante</small></span>
+    <span><b id="brandNombre">Nuvor Restaurant</b><small id="brandGiro">Restaurante</small></span>
   </div>
   <div class="barraNav">
     <div class="barraGrupo">Servicio</div>
@@ -1104,12 +1104,12 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
         <span class="heroRBadge" id="inCajaBadge">Caja cerrada</span>
         <span class="heroRBadge tenue" id="inPrepBadge">Cocina en calma</span>
       </div>
-      <a class="androidApkLink" href="./Makers-Restaurant.apk" download aria-label="Descargar APK de Makers Restaurant para Android">
+      <a class="androidApkLink" href="./Makers-Restaurant.apk" download aria-label="Descargar APK de Nuvor Restaurant para Android">
         <span class="androidApkIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9a5 5 0 0 1 10 0v1H7V9Z"/><path d="M8 5 6.8 3.7M16 5l1.2-1.3M7 10v6a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-6M5 10v5M19 10v5M10 13h.01M14 13h.01"/><path d="M12 17v4m-2-2 2 2 2-2"/></svg></span>
         <span class="androidApkCopy"><b>Descargar APK para Android</b><small>Instalaci&oacute;n de prueba</small></span>
         <span class="androidApkArrow" aria-hidden="true">↓</span>
       </a>
-      <button id="androidUpdateButton" class="androidApkLink androidUpdateButton" type="button" hidden aria-label="Buscar actualizaciones de Makers Restaurant">
+      <button id="androidUpdateButton" class="androidApkLink androidUpdateButton" type="button" hidden aria-label="Buscar actualizaciones de Nuvor Restaurant">
         <span class="androidApkIcon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5"/><path d="M4.9 9a7.5 7.5 0 0 1 12.4-2L20 12M4 17v-5h5"/><path d="M19.1 15a7.5 7.5 0 0 1-12.4 2L4 12"/></svg></span>
         <span class="androidApkCopy"><b id="androidUpdateTitle">Buscar actualizaciones</b><small id="androidUpdateHint">Revisar la versión instalada</small></span>
         <span class="androidApkArrow" aria-hidden="true">↻</span>
@@ -1838,7 +1838,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 
 <script>
 /* ===================================================================
-   MAKERS RESTAURANT · mesas, comandas y cobro
+   NUVOR RESTAURANT · mesas, comandas y cobro
    Edición de Makers OS. Comparte plataforma con Taller Makers —cuentas,
    roles, planes, el Lab— pero no comparte datos: cada cuenta es de un
    producto y nunca se cruzan.
@@ -5591,7 +5591,7 @@ function imprimeCarta(titulo, cuerpo){
     'img{max-width:100%}';
   w.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>'+esc(titulo)+
     '</title><style>'+css+'
-/* Figma: https://www.figma.com/design/A1y6gLpYCqLEKSVfGwApY7 · tokens de Makers Restaurant */
+/* Figma: https://www.figma.com/design/A1y6gLpYCqLEKSVfGwApY7 · tokens de Nuvor Restaurant */
 :root{
   --forest:#204a3b;--forest-deep:#1b4134;--forest-soft:#e5efe7;
   --gold:#d6ac69;--clay:#bd674d;--event-bg:#eef5f7;--event-surface:#fff;
@@ -5807,7 +5807,7 @@ function restauraRespaldo(texto){
   let d = null;
   try{ d = JSON.parse(texto); }catch(e){ toast("Ese archivo no se puede leer. ¿Es el respaldo?"); return; }
   if(!d || d._app !== "makers-restaurant" || !d.datos){
-    toast("Ese archivo no es un respaldo de Makers Restaurant."); return;
+    toast("Ese archivo no es un respaldo de Nuvor Restaurant."); return;
   }
   const f = String(d._fecha||"").slice(0,10);
   const cu = (d.datos.comandas||[]).length;
@@ -5930,7 +5930,7 @@ window.onMakersAppUpdateResult = function(json){
     actualizacionDisponible = false;
     $("#androidUpdateTitle").textContent = "Buscar actualizaciones";
     $("#androidUpdateHint").textContent = "Revisar la versión instalada";
-    toast("Makers Restaurant ya está actualizado.");
+    toast("Nuvor Restaurant ya está actualizado.");
   }else{
     actualizacionDisponible = false;
     $("#androidUpdateTitle").textContent = "Buscar actualizaciones";
@@ -5978,7 +5978,7 @@ $("#btPrinterSave").addEventListener("click", ()=>{
 $("#btPrinterTest").addEventListener("click", ()=>{
   const mm = num($("#btPrinterWidth").value,80);
   if($("#btPrinterMode").value === "android"){
-    const nombre = esc(P.negocio.nombre||"Makers Restaurant");
+    const nombre = esc(P.negocio.nombre||"Nuvor Restaurant");
     window.MakersPrinter.printHtmlSystem("sys-bt-test", "Prueba de impresora", mm,
       '<div class="c g">'+nombre+'</div><hr><div>PRUEBA DE IMPRESION</div><div>Papel '+mm+' mm</div><div>Servicio de impresión Android</div><hr><div class="c">Listo</div>', hojaTicket());
     $("#btPrinterStatus").textContent = "Elige una impresora y confirma la prueba en Android.";
@@ -5988,7 +5988,7 @@ $("#btPrinterTest").addEventListener("click", ()=>{
   if(!address || !window.MakersPrinter){ toast("Busca y selecciona una impresora primero"); return; }
   $("#btPrinterStatus").textContent = "Conectando e imprimiendo prueba…";
   window.MakersPrinter.printText("bt-test", address, mm,
-    (P.negocio.nombre||"Makers Restaurant")+"\nPRUEBA DE IMPRESION\nPapel "+mm+" mm\nBluetooth ESC/POS\n");
+    (P.negocio.nombre||"Nuvor Restaurant")+"\nPRUEBA DE IMPRESION\nPapel "+mm+" mm\nBluetooth ESC/POS\n");
 });
 function pintaNotaFolio(){
   const n = $("#folNota"); if(!n) return;
@@ -6187,7 +6187,7 @@ function aplicaMarca(){
   $("#brandIni").textContent = n.trim().charAt(0).toUpperCase() || "M";
   $("#accesoIni").textContent = n.trim().charAt(0).toUpperCase() || "M";
   $("#barraVer").textContent = "Makers OS";
-  try{ document.title = "Makers Restaurant"; }catch(e){}
+  try{ document.title = "Nuvor Restaurant"; }catch(e){}
 }
 function aplicaRol(){
   const u = usuarioActual(), r = rolActual();

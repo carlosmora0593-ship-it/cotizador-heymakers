@@ -185,6 +185,15 @@ Deno.serve(async (req) => {
       // Un día de gracia para que un cobro que tarde no tumbe la cuenta.
       siguiente.setDate(siguiente.getDate() + 1);
       cambios = { plan, ciclo, estado: "activa", vence: siguiente.toISOString(), mp_preapproval_id: preapprovalId };
+      const productos = (ref[3] || "").split(",").filter((p: string) =>
+        ["taller", "restaurant", "tiendita"].includes(p));
+      if (productos.length) {
+        const unicos = [...new Set(productos)];
+        if (!(unicos.includes("taller") && unicos.length > 1)) {
+          cambios.productos = unicos;
+          cambios.producto = unicos[0];
+        }
+      }
     } else if (s.status === "paused") {
       cambios = { estado: "vencida", mp_preapproval_id: preapprovalId };
     } else if (s.status === "cancelled") {

@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#F51B95">
 <script src="config.js?v=20261016-1350"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Taller Makers</title>
+<title>Nuvor Taller</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -2325,6 +2325,10 @@ nav.tabs .barraGrupo.conPortada:focus-visible::after{opacity:.75}
 
 
 /* ---- fichas de cotización ---- */
+.savCab{flex-wrap:wrap;row-gap:8px}
+.savOrden{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:var(--ink-3);white-space:nowrap}
+.savOrden select{width:auto;font-size:12.5px;font-weight:600;padding:6px 30px 6px 12px;border-radius:999px;cursor:pointer}
+@media (max-width:560px){ .savOrden{order:5;width:100%} .savOrden select{flex:1} }
 .cotFicha{display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;
   padding:15px 17px;border:1px solid var(--line);border-radius:var(--radio-sm,13px);
   background:var(--surface);margin-bottom:10px;position:relative;
@@ -3129,7 +3133,22 @@ body.rol-produccion #btnPrint{display:none!important}
   body #hoja .op-grid{grid-template-columns:repeat(3,1fr);gap:8px}
   body #hoja img.pv{max-width:80px;max-height:80px}
   body #hoja .op-card{padding:6px;font-size:10px}
-  @page{margin:12mm}
+  /* Sin margen de página el navegador no tiene dónde poner la liga del
+     cotizador, la fecha ni el título: se quedan fuera del PDF. El aire se
+     devuelve por dentro: a los lados con padding y arriba y abajo con el
+     encabezado y el pie vacíos de .hojaMarco, que se repiten en cada hoja. */
+  @page{margin:0}
+  body > #hoja{padding:0 12mm!important}
+  #hoja .hojaMarco{width:100%;border-collapse:collapse;min-width:0}
+  #hoja .hojaMarco > thead{display:table-header-group}
+  #hoja .hojaMarco > tfoot{display:table-footer-group}
+  #hoja .hojaMarco > thead > tr > td,
+  #hoja .hojaMarco > tbody > tr > td,
+  #hoja .hojaMarco > tfoot > tr > td{border:0!important;padding:0!important;vertical-align:top}
+  #hoja .hojaMarco > tbody > tr{break-inside:auto!important;page-break-inside:auto!important}
+  #hoja .hojaAire{height:12mm}
+  #hoja.ticket .hojaAire{height:4mm}
+  body > #hoja.ticket{padding:0 4mm!important}
 }
 #hoja .hoja-head,.paper .hoja-head{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:14px}
 #hoja .tot,.paper .tot{margin-left:auto;width:min(320px,100%)}
@@ -3158,7 +3177,7 @@ body.rol-produccion #btnPrint{display:none!important}
   <div class="top-in">
     <div class="brand">
       <span class="plaque"><img id="brandLogo" src="" alt="Hey Makers"></span>
-      <span class="who"><b id="brandProducto">Taller Makers</b><span id="brandSlogan">Cursos y talleres</span></span>
+      <span class="who"><b id="brandProducto">Nuvor Taller</b><span id="brandSlogan">Cursos y talleres</span></span>
     </div>
     <div class="menuWrap">
       <button class="menuBtn" id="menuBtn" aria-expanded="false" aria-haspopup="true">
@@ -3802,10 +3821,15 @@ body.rol-produccion #btnPrint{display:none!important}
 
 <!-- ============ GUARDADAS ============ -->
 <section id="tab-sav" hidden>
+  <div class="card" id="nexusCotPanel" style="margin-top:20px">
+    <header><h2>Solicitudes Nexus</h2><button class="btn sm" id="refreshNexusCot" type="button" style="margin-left:auto">Actualizar solicitudes</button></header>
+    <div class="body"><p id="nexusCotStatus" role="status" aria-live="polite">Conecta y actualiza la cuenta para consultar solicitudes.</p><p class="hint">Crear borrador usa el cálculo de Cotizador. Revisa técnicas, medidas y personalización antes de enviar o confirmar; no genera órdenes, reservas ni pagos.</p><div id="nexusCotRows"></div></div>
+  </div>
+
   <div class="secBarra" id="bar_sav" hidden><button class="secVolver" data-secvolver="sav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Volver</button><span class="secMigas">Cotizaciones</span></div>
   <div class="lanzador secLz" id="lz_sav"></div>
   <div class="card secOculta" data-sav="lista" style="margin-top:20px">
-    <header><h2 id="savTitulo">Cotizaciones y pedidos</h2><span class="hint" id="savCount" style="margin-left:auto"></span><button class="btn sm" data-reporte="cotizaciones">Reporte Excel</button></header>
+    <header class="savCab"><h2 id="savTitulo">Cotizaciones y pedidos</h2><span class="hint" id="savCount" style="margin-left:auto"></span><label class="savOrden"><span>Ordenar</span><select id="savOrden" aria-label="Ordenar cotizaciones"><option value="reciente">Más recientes primero</option><option value="antigua">Más antiguas primero</option><option value="cliente">Por cliente (A–Z)</option></select></label><button class="btn sm" data-reporte="cotizaciones">Reporte Excel</button></header>
     <div class="body"><div class="saved" id="savedList"></div></div>
   </div>
 </section>
@@ -4496,7 +4520,7 @@ body.rol-produccion #btnPrint{display:none!important}
   </div>
 
   <div class="card secOculta" data-set="giro" id="cardGiro">
-    <header><h2>Giro del negocio</h2><span class="hint">qué edición de Makers OS usas</span></header>
+    <header><h2>Giro del negocio</h2><span class="hint">qué edición de Nuvor usas</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">
         Es el mismo programa. Lo que cambia es qué secciones se ven y cómo se llaman:
@@ -4701,7 +4725,7 @@ body.rol-produccion #btnPrint{display:none!important}
     <div class="cmyk"><i></i><i></i><i></i><i></i></div>
     <div class="authBody">
       <span class="plaque" style="align-self:flex-start"><img id="authLogo" src="" alt=""></span>
-      <h1 id="authTitulo">Taller Makers</h1>
+      <h1 id="authTitulo">Nuvor Taller</h1>
       <p class="authSub">Entra a tu cuenta para cotizar, producir y llevar tus ventas.</p>
       <div class="seg" id="authTabs" style="align-self:flex-start">
         <button type="button" data-modo="entrar" aria-pressed="true">Ya tengo cuenta</button>
@@ -9265,7 +9289,7 @@ function pintaArranque(){
     cuerpo.innerHTML =
       '<div class="grid g2">' +
         '<div><label class="f" for="arrNombre">¿Cómo se llama tu taller?</label>' +
-        '<input id="arrNombre" placeholder="Taller Makers" value="' +
+        '<input id="arrNombre" placeholder="Nuvor Taller" value="' +
           esc(arrEstado.nombre || (P.empresa && P.empresa.nombre === "Hey Makers" ? "" : (P.empresa||{}).nombre) || "") + '"></div>' +
         '<div><label class="f" for="arrTel">Teléfono o WhatsApp</label>' +
         '<input id="arrTel" placeholder="443 000 0000" value="' + esc(arrEstado.tel || (P.empresa||{}).tel || "") + '"></div>' +
@@ -9760,6 +9784,24 @@ $("#btnLlenarPrecios").addEventListener("click", ()=>{
 
 /* ---------- cotizaciones, pedidos, facturas y cobranza ---------- */
 let savFiltro = "todas";
+/* Cómo se ordena la lista. Es gusto de quien la mira, así que se recuerda en
+   esta computadora y no viaja a la nube. */
+let savOrden = lsGet("savOrden", "reciente");
+if(["reciente","antigua","cliente"].indexOf(savOrden) < 0) savOrden = "reciente";
+/* El folio desempata dos del mismo día: COT-CAM000007 va después de la 6. */
+function savComparaFecha(a, b){
+  const f = String(a.fecha||"").localeCompare(String(b.fecha||""));
+  return f || String(a.folio||"").localeCompare(String(b.folio||""), "es", {numeric:true});
+}
+function savOrdena(lista){
+  if(savOrden === "antigua") return lista.sort(savComparaFecha);
+  if(savOrden === "cliente") return lista.sort((a,b)=>{
+    const ca = String(a.cliente||"").trim(), cb = String(b.cliente||"").trim();
+    if(!ca !== !cb) return ca ? -1 : 1;              // las que no tienen cliente, al final
+    return ca.localeCompare(cb, "es", {sensitivity:"base"}) || savComparaFecha(b, a);
+  });
+  return lista.sort((a,b)=> savComparaFecha(b, a));
+}
 const SAV_ET = {todas:"Todas", cot:"Cotizaciones", ped:"Pedidos",
                 fac:"Facturas", cxc:"Por cobrar"};
 
@@ -9795,7 +9837,8 @@ function accionPrincipal(g){
 }
 
 function renderSaved(){
-  const lista = guardadas.slice().reverse().filter(g=>savPasa(g, savFiltro));
+  const lista = savOrdena(guardadas.filter(g=>savPasa(g, savFiltro)));
+  const so = $("#savOrden"); if(so && so.value !== savOrden) so.value = savOrden;
   const c = $("#savCount");
   if(c) c.textContent = lista.length + " de " + guardadas.length;
   const t = $("#savTitulo");
@@ -9814,6 +9857,7 @@ function renderSaved(){
     const e = estadoCot(g);
     const r = calcDe(g);
     const chips =
+      (g.nexusPricingStatus === "pending" ? '<span class="cotChip">Nexus · personalización por revisar</span>' : '') +
       (e.esPedido  ? '<span class="cotChip pedido">Pedido '+esc(g.op.folio)+'</span>' : '') +
       (e.vendida   ? '<span class="cotChip vendida">Vendida</span>' : '') +
       (e.facturada ? '<span class="cotChip facturada">Facturada</span>' :
@@ -9824,8 +9868,9 @@ function renderSaved(){
         '<small>'+esc(g.folio)+' · '+esc(g.fecha)+(g.ref? ' · '+esc(g.ref) : '')+' · ' +
           r.qty+' pzas'+(r.varios ? ' · '+r.partes.length+' artículos' : '')+'</small>' +
         (chips ? '<div class="cotChips">'+chips+'</div>' : '') + '</div>' +
-      '<div class="cotMonto">'+mx(g._total||0)+'<i>total</i></div>' +
+      '<div class="cotMonto">'+(g.nexusPricingStatus==="pending"?"Por revisar":mx(g._total||0))+'<i>total</i></div>' +
       '<div class="cotAcc">' +
+        (g.nexusPricingStatus==="pending"?'<button class="btn sm" data-nexus-cot-review="'+esc(g.folio)+'">Revisar importe guardado</button>':'') +
         '<button class="btn sm" data-load="'+esc(g.folio)+'">Abrir</button>' +
         '<button class="btn sm primary" '+a.attr+(a.ti?' title="'+esc(a.ti)+'"':'')+'>'+esc(a.et)+'</button>' +
         '<span class="cotMas"><button class="cotMasBtn" data-cotmas="'+esc(g.folio)+'" ' +
@@ -9833,6 +9878,9 @@ function renderSaved(){
       '</div></div>';
   }).join("");
 }
+
+{ const so = $("#savOrden");
+  if(so) so.addEventListener("change", ()=>{ savOrden = so.value; lsSet("savOrden", savOrden); renderSaved(); }); }
 
 /* El menú de los tres puntos. Se arma al abrirlo y no antes: así nunca
    ofrece «Ver orden» de un pedido que todavía no existe. */
@@ -9887,7 +9935,7 @@ function renderSet(){
   /* En el pie va la plataforma, no el negocio del cliente: es la firma del
      producto, como el «Windows» de abajo a la derecha. */
   if(bv) bv.textContent = (window.PRODUCTO && window.PRODUCTO.plataforma) ||
-                          (P.empresa && P.empresa.nombre) || "Makers OS";
+                          (P.empresa && P.empresa.nombre) || "Nuvor";
   $("#p_margen").value=P.margen; $("#p_modo").value=P.modo; $("#p_merma").value=P.merma; $("#p_mo").value=P.manoObra;
   $("#p_nesting").checked = P.nesting !== false;
   const pgu = $("#p_guiado"); if(pgu) pgu.checked = (P.guiado !== false);
@@ -16280,22 +16328,22 @@ $("#ayudaCuerpo").addEventListener("click", e=>{
 });
 
 /* ---------- el nombre del producto, en un solo lugar ---------- */
-/* Makers OS es la plataforma; cada giro es una edición encima. Cambiar de
+/* Nuvor es la plataforma; cada giro es una edición encima. Cambiar de
    edición es cambiar estas tres líneas, no ocho lugares del archivo. */
 /* ============ EL GIRO ============
-   Las ediciones de Makers OS. La diferencia entre una y otra no es el
+   Las ediciones de Nuvor. La diferencia entre una y otra no es el
    programa: es qué secciones se ven, cómo se llaman y qué trae el
    catálogo. Lo caro —cuentas, permisos, planes, respaldo, el Lab— es
    el mismo para todas. */
 const GIROS = {
   taller: {
-    edicion:"Taller Makers", clave:"taller",
+    edicion:"Nuvor Taller", clave:"taller",
     giro:"Imprenta, serigrafía y artículos personalizados",
     /* nada escondido: el taller es el que ya existía */
     sin:[], nombres:{}, tarjetas:[]
   },
   tiendita: {
-    edicion:"Tiendita Makers", clave:"tiendita",
+    edicion:"Nuvor Tiendita", clave:"tiendita",
     giro:"Abarrotes, misceláneas y tiendas de barrio",
     /* Cotizar, diseño, producción y archivo no son de una tiendita, y
        la calculadora de costos de impresión menos. */
@@ -16318,8 +16366,8 @@ const esTiendita = () => giroActual() === "tiendita";
 const cfgGiro = () => GIROS[giroActual()];
 
 const PRODUCTO = window.PRODUCTO = {
-  plataforma: "Makers OS",
-  edicion:    "Taller Makers",
+  plataforma: "Nuvor",
+  edicion:    "Nuvor Taller",
   /* La clave de la edición. "giro", más abajo, ya estaba ocupado por la
      descripción que se lee; ésta es la que compara la publicidad. Las otras
      ediciones cambiarán esta línea y nada más. */
@@ -16647,6 +16695,7 @@ function renderEstado(){
   $("#btnOrden").style.opacity = confirmada ? "" : ".5";
 }
 $("#btnConfirmar").addEventListener("click", async ()=>{
+  if(cot.nexusPricingStatus === "pending"){ toast("Revisa el importe guardado de esta solicitud Nexus antes de confirmar el pedido."); return; }
   if(cot.estado === "confirmada"){
     if(!confirm("¿Cancelar la confirmación? La orden "+cot.op.folio+" deja de ser válida.")) return;
     cot.estado = "borrador"; cot.op = null;
@@ -21604,6 +21653,30 @@ function muestraDoc(titulo, html){
   document.body.style.overflow = "hidden";
 }
 
+/* Justo antes de imprimir, la hoja se mete en un marco que repite su aire
+   arriba y abajo en cada página; al terminar se saca, para que quien lea
+   #hoja (el zip del expediente) la encuentre como siempre. Se mueven los
+   nodos, no el HTML, para no volver a cargar las imágenes. */
+window.addEventListener("beforeprint", ()=>{
+  const h = document.getElementById("hoja");
+  if(!h || h.querySelector(":scope > .hojaMarco")) return;
+  const t = document.createElement("table");
+  t.className = "hojaMarco";
+  t.innerHTML = '<thead><tr><td><div class="hojaAire"></div></td></tr></thead>' +
+                '<tbody><tr><td class="hojaCuerpo"></td></tr></tbody>' +
+                '<tfoot><tr><td><div class="hojaAire"></div></td></tr></tfoot>';
+  const c = t.querySelector(".hojaCuerpo");
+  while(h.firstChild) c.appendChild(h.firstChild);
+  h.appendChild(t);
+});
+window.addEventListener("afterprint", ()=>{
+  const h = document.getElementById("hoja");
+  const t = h && h.querySelector(":scope > .hojaMarco"); if(!t) return;
+  const c = t.querySelector(".hojaCuerpo");
+  while(c.firstChild) h.insertBefore(c.firstChild, t);
+  t.remove();
+});
+
 /* ---------- el documento ---------- */
 function docReq(r){
   const pv = provDe(r.provId) || {};
@@ -22491,6 +22564,131 @@ async function accionAyuda(e) {
     await guardaTicket(t); pintaAyuda(); return;
   }
 }
+
+// BEGIN Nexus Cotizador connector.
+let nexusCotRequests=[],nexusCotAccount=null,nexusCotBusy=false,nexusCotLoading=false;
+function nexusCotValid(row){
+ const r=row&&row.cuerpo;
+ return !!(r&&r.id===row.doc_id&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(r.id)&&r.source==='nexus-cotizador'&&r.schemaVersion===1&&r.customer&&typeof r.customer.name==='string'&&r.customer.name.trim()&&typeof r.customer.phone==='string'&&/^\+[1-9]\d{7,14}$/.test(r.customer.phone)&&Array.isArray(r.items)&&r.items.length>0&&r.items.length<=50&&r.items.every(i=>i&&typeof i.productId==='string'&&i.productId.length<=160&&Number.isSafeInteger(i.quantity)&&i.quantity>0&&i.quantity<=100000)&&typeof r.brief==='string'&&r.brief.length<=3000);
+}
+async function nexusCotVerify(c,id){
+ const [a,r]=await Promise.all([c.rpc('mi_cuenta'),c.rpc('mi_rol')]);
+ if(a.error||r.error)throw new Error('No se pudieron comprobar los permisos de Cotizador.');
+ if(a.data!==id||typeof CUENTA==='undefined'||!CUENTA||CUENTA.id!==id)throw new Error('La cuenta activa cambió. Vuelve a conectar y actualiza las solicitudes.');
+ if(r.data!=='admin')throw new Error('Esta conexión requiere un administrador de la empresa. Ser superadministrador de Makers Lab no sustituye la membresía de esa empresa.');
+ const {data,error}=await c.from('cuentas').select('*').eq('id',id).maybeSingle();
+ if(error||!data||data.id!==id||data.estado!=='activa'||!Number.isFinite(Date.parse(data.vence))||Date.parse(data.vence)<=Date.now())throw new Error('La cuenta de Cotizador debe estar activa y vigente.');
+ const products=Array.isArray(data.productos)?data.productos:[data.producto||'taller'];
+ if(!products.includes('taller'))throw new Error('La cuenta no tiene habilitado Cotizador / Taller.');
+ if(!CUENTA||CUENTA.id!==id)throw new Error('La cuenta cambió. Actualiza las solicitudes.');
+}
+function nexusCotRender(){
+ const el=document.querySelector('#nexusCotRows');if(!el)return;
+ if(!nexusCotAccount||typeof CUENTA==='undefined'||!CUENTA||CUENTA.id!==nexusCotAccount){el.innerHTML='<div class="empty">Conecta una cuenta y actualiza sus solicitudes.</div>';return;}
+ el.innerHTML=nexusCotRequests.length?nexusCotRequests.map(r=>{
+  const known=guardadas.find(g=>g.nexusRequestId===r.id);
+  return '<article style="padding:15px 0;border-top:1px solid var(--line)"><b>NX-'+esc(r.id.slice(0,8).toUpperCase())+' · '+esc(r.customer.name)+'</b><p>'+esc(r.customer.phone)+' · '+esc(r.createdAt||'')+'</p><p>'+r.items.map(i=>esc(i.quantity)+' × '+esc(i.name||i.productId)).join(' · ')+'</p><p style="white-space:pre-wrap">'+esc(r.brief)+'</p><small>'+(known?'Borrador o pedido existente: '+esc(known.folio):'Solicitud pendiente · precio por revisar · sin reserva ni pago')+'</small><div style="margin-top:10px"><button class="btn sm" data-nexus-cot-create="'+esc(r.id)+'"'+(nexusCotBusy?' disabled':'')+'>'+(known?'Comprobar borrador existente':'Crear borrador en Cotizador')+'</button></div></article>';
+ }).join(''):'<div class="empty">No hay solicitudes Nexus para esta cuenta.</div>';
+}
+async function nexusCotRefresh(){
+ if(nexusCotLoading)return;const msg=document.querySelector('#nexusCotStatus');
+ if(typeof SB==='undefined'||!SB||typeof CUENTA==='undefined'||!CUENTA){nexusCotRequests=[];nexusCotAccount=null;nexusCotRender();msg.textContent='Inicia sesión en la cuenta de Cotizador.';return;}
+ const c=SB,id=CUENTA.id;nexusCotLoading=true;msg.textContent='Consultando solicitudes de '+CUENTA.nombre+'…';
+ try{await nexusCotVerify(c,id);const {data,error}=await c.from('documentos').select('doc_id,cuerpo').eq('cuenta_id',id).eq('coleccion','solicitudes-cotizador-nexus').order('actualizado',{ascending:false}).limit(100);if(error)throw new Error('No se pudieron leer las solicitudes. Revisa permisos de la cuenta.');if(!CUENTA||CUENTA.id!==id)return;nexusCotRequests=(data||[]).filter(nexusCotValid).map(x=>x.cuerpo);nexusCotAccount=id;nexusCotRender();msg.textContent='Solicitudes de '+CUENTA.nombre+' · última consulta '+new Date().toLocaleTimeString('es-MX')+'.';}
+ catch(e){if(CUENTA&&CUENTA.id===id){nexusCotRequests=[];nexusCotAccount=id;nexusCotRender();msg.textContent=e.message||'No se pudieron consultar solicitudes.';}}
+ finally{nexusCotLoading=false;}
+}
+async function nexusCotExisting(c,id,folio,requestId){
+ const {data,error}=await c.from('documentos').select('cuerpo').eq('cuenta_id',id).eq('coleccion','cotizaciones').eq('doc_id',folio).maybeSingle();
+ if(error)throw new Error('No se pudo comprobar si el borrador ya existe.');
+ if(!data)return null;
+ if(!data.cuerpo||!data.cuerpo.cot||data.cuerpo.cot.nexusRequestId!==requestId)throw new Error('El folio ya está ocupado por otro documento.');
+ return data.cuerpo.cot;
+}
+function nexusCotBuild(request,remoteCat,remoteParams){
+ if(!remoteCat||!Array.isArray(remoteCat.articulos)||!remoteParams)throw new Error('Sincroniza el catálogo y los parámetros de Cotizador antes de crear un borrador.');
+ const beforeCat=cat,beforeParams=P;
+ try{
+  cat=remoteCat;P=remoteParams;
+  const rec=nuevaCot(false);rec.folio='NX-'+request.id.toLowerCase();rec.fecha=hoyISO();rec.cliente=request.customer.name.trim();rec.contacto=request.customer.phone;rec.ref='Solicitud Nexus '+request.id;rec.estado='borrador';rec.op=null;rec.nexusRequestId=request.id;rec.nexusPricingStatus='pending';
+  const warning='Solicitud Nexus: revisar técnicas, medidas, tallas y personalización antes de enviar o confirmar. El importe calculado inicialmente incluye los artículos sin personalización.\n'+request.brief;
+  const grouped=new Map();for(const i of request.items)grouped.set(i.productId,(grouped.get(i.productId)||0)+i.quantity);
+  rec.items=[...grouped].map(([productId,quantity])=>{
+   if(quantity>100000)throw new Error('La cantidad de un artículo supera el límite permitido.');
+   const a=remoteCat.articulos.find(x=>x.id===productId&&!x.deleted&&!x.sample);
+   if(!a)throw new Error('Un artículo ya no está disponible en el catálogo.');
+   if(!Number.isFinite(Number(a.costo))||Number(a.costo)<0||!Number.isFinite(Number(a.precio))||Number(a.precio)<0)throw new Error('Revisa el costo y precio del artículo antes de cotizar.');
+   const item=itemEnBlanco();item.articuloId=a.id;item.costoArt=Number(a.costo);item.precioArt=Number(a.precio);item.desc=String(a.nombre||'Artículo');item.cantidad=quantity;item.cantManual=true;item.apps=[];item.armado=[];item.tallas=[];item.notas=warning;return item;
+  });
+  rec.iAct=0;rec.itemId=rec.items[0].id;CAMPOS_ITEM.forEach(k=>{rec[k]=rec.items[0][k];});rec.notas=warning;
+  const result=calcDe(rec);
+  if(!Number.isFinite(result.total)||result.total<0)throw new Error('El motor de Cotizador no produjo un total válido.');
+  rec._total=result.total;rec._unit=result.precioUnit;
+  return {cot:rec,fecha:rec.fecha,cliente:rec.cliente,total:result.total};
+ }finally{cat=beforeCat;P=beforeParams;}
+}
+async function nexusCotCreate(requestId){
+ if(nexusCotBusy)return;if(typeof SB==='undefined'||!SB||typeof CUENTA==='undefined'||!CUENTA){toast('Inicia sesión en Cotizador.');return;}
+ const c=SB,id=CUENTA.id;let result;nexusCotBusy=true;nexusCotRender();
+ try{
+  await nexusCotVerify(c,id);
+  const {data:row,error}=await c.from('documentos').select('doc_id,cuerpo').eq('cuenta_id',id).eq('coleccion','solicitudes-cotizador-nexus').eq('doc_id',requestId).maybeSingle();
+  if(error||!nexusCotValid(row))throw new Error('La solicitud no está disponible o tiene datos inválidos.');
+  const request=row.cuerpo;if(request.status!=='pending'||request.pricingStatus!=='pending'||request.paymentStatus!=='pending')throw new Error('La solicitud requiere revisión manual.');
+  const folio='NX-'+request.id.toLowerCase();result=await nexusCotExisting(c,id,folio,request.id);
+  if(!result){
+   const {data:config,error:cfgError}=await c.from('documentos').select('doc_id,cuerpo').eq('cuenta_id',id).eq('coleccion','config').in('doc_id',['catalogo','parametros']);
+   if(cfgError)throw new Error('No se pudieron cargar catálogo y parámetros actuales.');
+   await nexusCotVerify(c,id);
+   const raw=nexusCotBuild(request,(config||[]).find(x=>x.doc_id==='catalogo')?.cuerpo?.cat,(config||[]).find(x=>x.doc_id==='parametros')?.cuerpo?.P);
+   const inserted=await c.from('documentos').insert({cuenta_id:id,coleccion:'cotizaciones',doc_id:folio,cuerpo:raw,fecha:raw.fecha,total:raw.total});
+   if(inserted.error){if(inserted.error.code!=='23505')throw new Error('No se pudo guardar el borrador; revisa permisos y límites del plan.');result=await nexusCotExisting(c,id,folio,request.id);if(!result)throw new Error('Actualiza para comprobar el resultado del guardado.');}
+   else result=raw.cot;
+  }
+  if(!CUENTA||CUENTA.id!==id)return;
+  const index=guardadas.findIndex(g=>g.folio===result.folio);if(index>=0)guardadas[index]=result;else guardadas.push(result);
+  renderSaved();nexusCotRender();toast('Borrador '+result.folio+' listo. Ábrelo en Cotizaciones y revisa la personalización. Tu editor actual conserva sus cambios.');
+ }catch(e){toast(e.message||'No se pudo crear el borrador. Actualiza antes de reintentar.');}
+ finally{nexusCotBusy=false;nexusCotRender();}
+}
+async function nexusCotReview(folio){
+ if(nexusCotBusy||typeof SB==='undefined'||!SB||typeof CUENTA==='undefined'||!CUENTA)return;
+ const c=SB,id=CUENTA.id;nexusCotBusy=true;
+ try{
+  await nexusCotVerify(c,id);
+  const {data:row,error}=await c.from('documentos').select('cuerpo,actualizado').eq('cuenta_id',id).eq('coleccion','cotizaciones').eq('doc_id',folio).maybeSingle();
+  if(error||!row||!row.cuerpo||!row.cuerpo.cot)throw new Error('No se pudo leer la versión guardada.');
+  const rec=JSON.parse(JSON.stringify(row.cuerpo.cot));
+  if(!rec.nexusRequestId||folio!=='NX-'+rec.nexusRequestId||rec.estado!=='borrador'||!row.actualizado)throw new Error('Revisa un borrador Nexus vigente.');
+  const {data:configs,error:cfgError}=await c.from('documentos').select('doc_id,cuerpo').eq('cuenta_id',id).eq('coleccion','config').in('doc_id',['catalogo','parametros']);
+  if(cfgError)throw new Error('No se pudo consultar la configuración actual.');
+  const currentCat=(configs||[]).find(x=>x.doc_id==='catalogo')?.cuerpo?.cat,params=(configs||[]).find(x=>x.doc_id==='parametros')?.cuerpo?.P;
+  if(!currentCat||!Array.isArray(currentCat.articulos)||!params)throw new Error('Completa catálogo y parámetros antes de revisar.');
+  const beforeCat=cat,beforeParams=P;let result;
+  try{
+   cat=currentCat;P=params;
+   for(const item of itemsDe(rec)){
+    if(!currentCat.articulos.some(a=>a.id===item.articuloId&&!a.deleted)||!Number.isFinite(Number(item.cantidad))||Number(item.cantidad)<=0)throw new Error('Revisa los artículos y las cantidades del borrador.');
+    for(const app of item.apps||[])if(!currentCat.tecnicas.some(t=>t.id===app.tecnicaId))throw new Error('Una técnica ya no está en el catálogo. Revisa el borrador.');
+   }
+   result=calcDe(rec);
+  }finally{cat=beforeCat;P=beforeParams;}
+  if(!result||!Number.isFinite(result.total)||result.total<0)throw new Error('El cálculo no produjo un importe válido.');
+  if(!window.confirm('Revisar la versión GUARDADA de '+folio+' por '+mx(result.total)+'. Guarda primero cualquier cambio del editor. ¿Confirmas que revisaste artículos, técnicas, medidas y personalización? No confirma el pedido ni registra pago.'))return;
+  await nexusCotVerify(c,id);
+  rec.nexusPricingStatus='reviewed';rec._total=result.total;rec._unit=result.precioUnit;
+  const saved=await c.from('documentos').update({cuerpo:{...row.cuerpo,cot:rec,total:result.total},total:result.total}).eq('cuenta_id',id).eq('coleccion','cotizaciones').eq('doc_id',folio).eq('actualizado',row.actualizado).select('doc_id');
+  if(saved.error)throw new Error('No se pudo guardar la revisión.');
+  if(!saved.data||saved.data.length!==1)throw new Error('La cotización cambió durante la revisión. Actualiza antes de reintentar.');
+  if(!CUENTA||CUENTA.id!==id)return;
+  const index=guardadas.findIndex(g=>g.folio===folio);if(index>=0)guardadas[index]=rec;else guardadas.push(rec);
+  renderSaved();toast('Importe revisado. Vuelve a abrir el borrador guardado antes de confirmar el pedido.');
+ }catch(e){toast(e.message||'No se pudo revisar el importe.');}finally{nexusCotBusy=false;}
+}
+document.addEventListener('click',e=>{const refresh=e.target.closest('#refreshNexusCot');if(refresh)nexusCotRefresh();const create=e.target.closest('[data-nexus-cot-create]');if(create)nexusCotCreate(create.dataset.nexusCotCreate);const review=e.target.closest('[data-nexus-cot-review]');if(review)nexusCotReview(review.dataset.nexusCotReview);});
+setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel.hidden&&!document.hidden&&typeof CUENTA!=='undefined'&&CUENTA)nexusCotRefresh();},30000);
+// END Nexus Cotizador connector.
+
 </script>
 
 <script>window.BUILD="20261016-1350";</script>
@@ -22524,7 +22722,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261026-1830"></script>
-<script src="diagnostico.js?v=20261026-1830"></script>
+<script src="cuenta.js?v=20261026-2139"></script>
+<script src="diagnostico.js?v=20261026-2139"></script>
 </body>
 </html>

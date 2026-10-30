@@ -343,10 +343,25 @@ window.__tips = async function(){
 };
 
 /* Contar es lo ÚNICO que el navegador puede hacerle a un anuncio: del otro
-   lado hay una función que sólo sabe sumar de uno en uno. */
+   lado hay una función que sólo sabe sumar de uno en uno.
+
+   El .then() de abajo NO es adorno. Las consultas de Supabase son perezosas:
+   arman la petición y no la mandan hasta que alguien pide el resultado —el
+   fetch vive dentro de then()—. Sin él, esta llamada se construía y se iba a
+   la basura, y por eso el Lab enseñaba 0 vistas y 0 clics aunque la gente sí
+   estuviera viendo y picando los anuncios.
+
+   Se encadena en vez de esperarse porque a quien está cotizando no le importa
+   si el contador subió: que no se note, pero que llegue. Y si falla —sin red,
+   función todavía sin crear— se traga el error a propósito. */
 window.__anuncioMarca = function(id, tipo){
   if(!SB || !id) return;
-  try{ SB.rpc("anuncio_marca", {p_id: id, p_tipo: tipo}); }catch(e){}
+  try{
+    SB.rpc("anuncio_marca", {p_id: id, p_tipo: tipo}).then(
+      r => { if(r && r.error) console.warn("No se pudo contar el anuncio", id, r.error.message); },
+      e => { console.warn("No se pudo contar el anuncio", id, e && e.message); }
+    );
+  }catch(e){}
 };
 
 /* El cotizador reparte sus pestañas por rol y no sabe de planes. Le

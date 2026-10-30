@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "Makers Restaurant",
-  "short_name": "Makers Rest",
+  "name": "Nuvor Restaurant",
+  "short_name": "Nuvor Rest",
   "description": "Mesas, comandas, caja y servicio para tu restaurante.",
   "start_url": "./",
   "scope": "./",

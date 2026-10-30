@@ -15,3 +15,17 @@ CORRER-*.sql
 # Las pruebas de SQL tambien llevan tu correo. Misma regla que CORRER-*.
 REVISAR-*.sql
 PROBAR-*.sql
+
+# El paquete de fuentes lleva tu correo adentro, en dos archivos. Se queda
+# en la carpeta, pero no sube: el repositorio es publico.
+makers-fuentes.tar.gz
+*.tar.gz
+
+# ------------------------------------------------------------------
+#  El archivero
+# ------------------------------------------------------------------
+#  _archivo\ es donde viven las copias viejas del cotizador, las capturas
+#  de pantalla y los borradores. Nada de eso es parte del sitio ni hace
+#  falta para publicar, asi que no sube al repositorio. Sigue en tu disco:
+#  si un dia quieres el espacio, borras la carpeta y ya.
+_archivo/

@@ -40,6 +40,14 @@ exports.handler = async (event) => {
     const cuentaId = perfil.cuenta_activa || perfil.cuenta_id;
     if (!cuentaId) return resp(404, { error: "La cuenta no existe todavía" });
 
+    const { data: cuenta } = await admin.from("cuentas")
+      .select("producto").eq("id", cuentaId).maybeSingle();
+    const producto = cuenta && ["restaurant", "tiendita"].includes(cuenta.producto)
+      ? cuenta.producto
+      : "taller";
+    const nombreProducto = producto === "restaurant" ? "Makers Restaurant"
+      : producto === "tiendita" ? "Tiendita Makers" : "Taller Heymakers";
+
     /* Y contratar no es cualquier cosa: solo el administrador de ESA empresa.
        Quien entró como ventas o producción no le cambia el plan a nadie. */
     const { data: mem } = await admin.from("membresias")
@@ -55,10 +63,10 @@ exports.handler = async (event) => {
     // Referencia: API de suscripciones (preapproval) de Mercado Pago.
     // Si Mercado Pago cambia algún nombre de campo, se ajusta SOLO aquí.
     const cuerpo = {
-      reason: "Cotizador " + PRECIOS[plan].nombre,
+      reason: nombreProducto + " · " + PRECIOS[plan].nombre,
       external_reference: [cuentaId, plan, periodo].join("|"),
       payer_email: user.email,
-      back_url: sitio + "/?pago=ok",
+      back_url: sitio + "/productos/?pago=ok&producto=" + encodeURIComponent(producto),
       /* Sin esto, Mercado Pago no tiene a dónde avisar que ya cobró, y la
          cuenta se queda en "pendiente" para siempre aunque el dinero haya
          entrado. La clave va en la dirección porque el webhook no tiene otra

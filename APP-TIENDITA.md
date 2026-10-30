@@ -8,7 +8,8 @@ La aplicación de abarrotes está en `public/tiendita/` y aparece en Makers Lab 
 - Venta rápida para artículos con inventario y servicios sin inventario; pagos en efectivo, tarjeta o transferencia, cambio y ticket.
 - Catálogo con imágenes, categorías, precio, costo, unidad, existencias, mínimos, caducidad, clave de barras y sugerencias SAT.
 - Compras a proveedores con pedidos pendientes, contacto por WhatsApp y recepción que aumenta existencias y actualiza costos.
-- Agenda opcional para barbería, estética y servicios; se activa desde Ajustes e incluye calendario mensual interactivo, responsable, duración, estado y acceso de confirmación por WhatsApp.
+- Agenda opcional para barberías, estudios de tatuajes y servicios; se activa desde Ajustes. Incluye calendario mensual, profesional, duración, control de horarios superpuestos y estados (pendiente, confirmada, atendida, cancelada y no asistió).
+- Página pública de solicitud de citas para compartir por WhatsApp o Instagram. El cliente elige servicio, profesional, fecha y hora preferida; el negocio confirma la disponibilidad por WhatsApp. En tatuajes solicita también detalles del diseño.
 - Reloj checador para marcar entrada y salida por usuario.
 - Caja por turno, fondo inicial, entradas/salidas, efectivo esperado y cierre con diferencia.
 - Ventas como historial de tickets; Reportes como análisis de periodo, promedio, unidades, utilidad estimada, artículos principales, formas de pago y tendencia semanal.
@@ -18,7 +19,7 @@ La aplicación de abarrotes está en `public/tiendita/` y aparece en Makers Lab 
 
 ## Datos y periféricos
 
-Inventario, ventas y caja conservan la sincronización de cuenta ya existente, sujeta al plan y permisos de Makers. Compras, agenda, asistencia, preferencias y bloqueo se guardan en el almacenamiento local de cada dispositivo en esta entrega; todavía no se comparten entre dispositivos. Los anuncios se consultan desde Makers Lab en modo de solo lectura.
+Inventario, ventas y caja conservan la sincronización de cuenta ya existente, sujeta al plan y permisos de Makers. Compras, agenda, asistencia, preferencias y bloqueo se guardan en el almacenamiento local de cada dispositivo en esta entrega; todavía no se comparten entre dispositivos. El enlace público manda una solicitud por WhatsApp y no confirma ni bloquea automáticamente el horario; una vez acordada, el negocio registra la cita en la agenda. Los anuncios se consultan desde Makers Lab en modo de solo lectura.
 
 Los lectores USB/Bluetooth que escriben como teclado funcionan en el campo de búsqueda. El escaneo con cámara depende de que el navegador ofrezca `BarcodeDetector`. En navegador, los tickets usan el diálogo de impresión del dispositivo. La impresión directa ESC/POS Bluetooth requiere que el APK de Tiendita exponga el puente Android; la página detecta ese puente cuando está presente y, si no, conserva la impresión del sistema. Esto no garantiza compatibilidad directa con cualquier impresora o protocolo.
 
@@ -30,7 +31,7 @@ Los lectores USB/Bluetooth que escriben como teclado funcionan en el campo de b�
 4. Agrega artículos o servicios y cobra. Para cobro en efectivo captura lo recibido y la app calcula el cambio.
 5. Cierra el turno contando el efectivo real. La app muestra la diferencia contra el monto esperado.
 6. Para un pedido, ve a Compras, elige proveedor, producto y cantidad; puedes abrir WhatsApp con el mensaje preparado. Marca el pedido como recibido cuando llegue para sumar existencias.
-7. Agrega servicios en Catálogo, activa Agenda en Ajustes y selecciona un día del calendario para consultar o crear citas. Ajusta el PIN y el tiempo de bloqueo ahí mismo.
+7. Agrega servicios y sus duraciones en Catálogo. En Ajustes activa Agenda, configura WhatsApp, profesionales, horario y días; desde Agenda comparte el enlace público. Las solicitudes se confirman por WhatsApp y después se registran en el calendario para evitar cruces.
 8. Conecta una cuenta Tiendita Makers para usar el equipo y sincronizar inventario, ventas y caja cuando el plan lo permite.
 
 Las sugerencias SAT son un punto de partida: quien emite la factura es responsable de seleccionar la clave correcta.

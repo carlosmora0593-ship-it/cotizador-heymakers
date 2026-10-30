@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f5f7"><title>Acceso · Nuvor</title>
+<link rel="stylesheet" href="./acceso.css?v=20261026-3">
+</head>
+<body>
+<header class="top"><a class="brand" href="./MakersOS.html"><span class="mark">N</span><span>Nuvor</span></a><a href="./MakersOS.html">Volver a Nuvor</a></header>
+<main>
+  <div class="wrap">
+    <section class="intro"><div class="eyebrow">Un acceso para tu negocio</div><h1>Entra. Elige tu POS. Sigue trabajando.</h1><p>Usa tu correo para abrir el punto de venta que tienes contratado o crea una cuenta y prueba el sistema gratis durante 15 días.</p><div class="introNote"><span class="dot"></span><span>La prueba no pide tarjeta.</span></div></section>
+    <section class="card" id="authPanel" hidden>
+      <h2 id="authTitle">Entra a Nuvor</h2><p class="sub" id="authSub">Accede a los productos de tu cuenta Nuvor.</p>
+      <div class="tabs"><button type="button" data-mode="entrar" aria-pressed="true">Iniciar sesión</button><button type="button" data-mode="alta" aria-pressed="false">Crear cuenta gratis</button></div>
+      <form id="authForm" autocomplete="on">
+        <div id="signupFields" hidden>
+          <div class="two"><div class="field"><label for="personName">Tu nombre</label><input id="personName" autocomplete="name"></div><div class="field"><label for="businessName">Negocio</label><input id="businessName" autocomplete="organization"></div></div>
+          <div class="pickProducts"><span class="groupTitle">¿Qué quieres probar?</span><div class="choices">
+            <label class="choice"><input type="checkbox" name="producto" value="taller"><span><i>✂</i>Nuvor Taller</span></label>
+            <label class="choice"><input type="checkbox" name="producto" value="restaurant"><span><i>♨</i>Nuvor Restaurant</span></label>
+            <label class="choice"><input type="checkbox" name="producto" value="tiendita"><span><i>▤</i>Nuvor Tiendita</span></label>
+          </div><p class="help" id="multiHint">Puedes probar Restaurant y Tiendita con la misma cuenta. Taller tiene sus propios planes.</p></div>
+        </div>
+        <div class="field"><label for="email">Correo electrónico</label><input id="email" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="password">Contraseña</label><input id="password" type="password" autocomplete="current-password" minlength="6" required></div>
+        <p class="msg" id="msg" role="status" aria-live="polite"></p><button class="btn" id="submit" type="submit">Iniciar sesión</button>
+        <p class="footnote">Tus datos de acceso se protegen con Supabase.</p>
+      </form>
+    </section>
+    <section class="card" id="accountPanel" hidden><div class="accountTop"><div><h2 id="accountTitle">Tu cuenta Makers</h2><p class="sub" id="accountEmail"></p></div><button class="logout" id="logout" type="button">Cerrar sesión</button></div>
+      <div class="status" id="accountStatus"></div><div id="productOptions"></div>
+      <div class="actions"><button class="btn" id="manageBtn" type="button">Ver licencias</button></div>
+      <section class="license" id="licensePanel" hidden><h3>Licencias de tu cuenta</h3><p id="licenseIntro">Selecciona los productos que quieres mantener y el plan.</p><div class="licProducts" id="licenseProducts"></div><div class="licGrid" id="licenseCards"></div><div class="notice" id="paymentNotice" hidden></div></section>
+      <a class="backLink" href="./MakersOS.html">Ver todos los productos de Nuvor</a>
+    </section>
+    <section class="card" id="loadingPanel"><div class="spinner" aria-label="Cargando"></div></section>
+  </div>
+</main>
+<footer>Nuvor · Nuvor Taller · Nuvor Restaurant · Nuvor Tiendita</footer>
+<script src="./config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
+<script src="./acceso.js?v=20261026-3"></script>
+</body></html>
