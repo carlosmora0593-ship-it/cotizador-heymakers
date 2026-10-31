@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "Nuvoor Tiendita",
-  "short_name": "Nuvoor Tiendita",
+  "name": "Nuvoor Store",
+  "short_name": "Nuvoor Store",
   "description": "Punto de venta, inventario y caja para tu tiendita.",
   "start_url": "./",
   "scope": "./",

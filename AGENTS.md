@@ -1,36 +1,38 @@
 # AGENTS.md: Nuvoor
 
 Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este repositorio.
-Última actualización: 31 de octubre de 2026, al pasar el trabajo de Claude a Codex.
+Última actualización: 31 de octubre de 2026 (nombres nuevos: Imprenta, Restaurant, Store).
 
 ## Qué es esto
 
 **Nuvoor** es una plataforma de puntos de venta hecha en Morelia. Antes se llamó Hey Makers, Makers OS y «Nuvor». Hoy tiene cuatro piezas:
 
-- **Nuvoor Taller**: cotizador y POS para imprentas, serigrafía, sublimación y artículos personalizados.
+- **Nuvoor Imprenta** (antes «Nuvoor Taller»): cotizador y POS para imprentas, serigrafía, sublimación y artículos personalizados.
 - **Nuvoor Restaurant**: mesas, comandas, cocina y caja.
-- **Nuvoor Tiendita**: venta rápida con lector, inventario y caja.
+- **Nuvoor Store** (antes «Nuvoor Tiendita»): venta rápida con lector, inventario y caja.
 - **El Lab**: la consola del dueño de la plataforma. Maneja cuentas, planes, publicidad y la base de datos.
+
+**Nombres vs. claves internas.** Lo que ve el usuario dice **Imprenta / Restaurant / Store**. Las claves internas NO cambiaron y no se cambian: archivos `index.html`/`taller.html`, carpetas `tiendita/` y `restaurante/`, `?producto=taller|restaurant|tiendita` y sus claves en `acceso.js`, y las clases o funciones con «taller»/«tienda». Renombrarlas rompe cuentas y ligas que ya existen.
 
 El dueño es **Carlos**. Todo el texto de la interfaz va en **español de México**, con lenguaje sencillo: quienes lo usan son dueños de negocio, no programadores.
 
 **Dónde vive cada cosa:**
 
 - `https://app.nuvoor.mx` publica **este repo**, con GitHub Pages por Actions.
-- `https://nuvoor.mx` es la landing de ventas. Va en un **repo aparte**, `nuvoor-web`, que todavía no se publica.
-- **Supabase** guarda las cuentas, la autenticación, los datos del Taller y la Tiendita y las Edge Functions.
+- `https://nuvoor.mx` es la landing de ventas. Va en un **repo aparte**, `nuvoo-web` (sin la «r»), ya publicado.
+- **Supabase** guarda las cuentas, la autenticación, los datos de Imprenta y Store y las Edge Functions.
 
 ## Mapa del repo
 
 ```
 public/                 ← lo ÚNICO que se publica (.github/workflows/static.yml → path: public)
-  index.html            Nuvoor Taller: app de un solo archivo (~1.4 MB, CSS y JS adentro). Fin de línea CRLF.
-  taller.html           Copia casi idéntica de index.html (LF). TODO cambio al Taller va en LOS DOS.
+  index.html            Nuvoor Imprenta: app de un solo archivo (~1.4 MB, CSS y JS adentro). Fin de línea CRLF.
+  taller.html           Copia casi idéntica de index.html (LF). TODO cambio a Imprenta va en LOS DOS.
   acceso.html/.js/.css  Entrar y crear cuenta (Supabase Auth). Acepta ?alta=1&producto=taller|restaurant|tiendita
   lab.html + lab.js     El Lab (consola del dueño de la plataforma)
   restaurante/          Nuvoor Restaurant como PWA (+ APK TWA, manifest, sw.js)
   restaurant.html       Versión anterior del Restaurant en la raíz
-  tiendita/             Nuvoor Tiendita como PWA (+ reservar.html para citas)
+  tiendita/             Nuvoor Store como PWA (+ reservar.html para citas)
   MakersOS.html, productos/   Página de ventas vieja dentro de la app (la sustituye nuvoor.mx)
   cuenta.js             Puente con Supabase: sesión, datos, storage (window.claude.use("assets") → storage)
   diagnostico.js
@@ -64,9 +66,9 @@ La rama local es `docs/estructura-carpeta`. `PUBLICAR.bat` empuja con `git push 
 
 ## Cómo publicar un cambio
 
-1. Edita en `public/`. Si tocas el Taller, aplícalo a **`index.html` y `taller.html`**.
+1. Edita en `public/`. Si tocas Imprenta, aplícalo a **`index.html` y `taller.html`**.
 2. **Sube el sello de versión** con el formato `AAAAMMDD-HHMM`, en hora de Ciudad de México:
-   - El Taller lee `version.json` → `"cotizador"`. En las dos páginas cambia `window.BUILD="…"` y `var mio = "…"` al mismo valor.
+   - Imprenta lee `version.json` → `"cotizador"`. En las dos páginas cambia `window.BUILD="…"` y `var mio = "…"` al mismo valor.
    - `lab.html` → `"lab"`. `restaurant.html` → `"restaurant"`.
    - Si `version.json` es más nuevo que el `mio` de la página, la página se recarga sola una vez.
 3. Carlos corre `PUBLICAR.bat`, o `git add -A && git commit && git push origin HEAD:main`.
@@ -82,7 +84,7 @@ La rama local es `docs/estructura-carpeta`. `PUBLICAR.bat` empuja con `git push 
 - Para algo que use `mask-image` o `fetch`, sirve por http (`python -m http.server`), no por `file://`.
 - Antes de nombrar una clase o una función en un archivo de 1.4 MB, **búscala**: ya ha habido cuatro choques de nombres (`.tbCol`, `sinAcentos`, `PRODUCTO.giro`, `.croqBarra`).
 
-## El Taller por dentro (lo mínimo)
+## Imprenta por dentro (lo mínimo)
 
 - `cot` es la cotización abierta.
   - `cot.items` son los **conceptos** y `cot.iAct` es el activo; `CAMPOS_ITEM` dice qué se guarda por concepto.
@@ -102,19 +104,23 @@ La rama local es `docs/estructura-carpeta`. `PUBLICAR.bat` empuja con `git push 
   - `CNAME app → carlosmora0593-ship-it.github.io`
   - `TXT _github-pages-challenge-carlosmora0593-ship-it`
 - **Supabase** ya apunta a la dirección nueva: Auth → Site URL `https://app.nuvoor.mx` y Redirect URLs `https://app.nuvoor.mx/**`. Secreto `SITIO_URL = https://app.nuvoor.mx`.
-- **La marca ya dice «Nuvoor»** en todos los POS: sello `20261031-0029`. El cotizar nuevo y el pago al confirmar están publicados.
-- **La landing está lista** en `Claude outputs/nuvoor-landing/sitio/` (`index.html` + `img/`), sin publicar.
+- **La marca ya dice «Nuvoor»** en todos los POS. **Nombres nuevos** (Imprenta / Restaurant / Store) desde el sello `20261031-0706`, también en la landing y en `img/compartir.png`. El cotizar nuevo y el pago al confirmar están publicados.
+- **La landing YA ESTÁ PUBLICADA en `https://nuvoor.mx`** (31 oct 2026). Datos:
+  - Repo **`carlosmora0593-ship-it/nuvoo-web`**. Así quedó el nombre, sin la «r», y no importa.
+  - Pages desde la rama `main`, carpeta raíz. El archivo `CNAME` dice `nuvoor.mx`.
+  - DNS en GoDaddy: 4 registros A `@` → `185.199.108.153`, `.109.153`, `.110.153`, `.111.153`, y CNAME `www` → `carlosmora0593-ship-it.github.io`. El sitio de Website Builder de GoDaddy ya se borró.
+  - La fuente está en `Claude outputs/nuvoor-landing/`. Para cambiarla, sube `index.html` o `img/` nuevos a ese repo.
 - **ALTAS CERRADAS (decisión de Carlos, 31 oct): por ahora nadie nuevo puede crear cuenta.** Está cerrado en cuatro lugares:
   1. **Supabase** → Authentication → Sign In / Providers → «Allow new users to sign up» **apagado**. Ése es el candado de verdad.
   2. **`acceso.html`:** el botón «Crear cuenta gratis» tiene `hidden` y hay un aviso `#altaPronto`. En `acceso.js`, `modo="entrar"` está fijo y `setMode` convierte `"alta"` en `"entrar"`.
-  3. **Taller (`index.html` y `taller.html`):** el botón `data-modo="alta"` tiene `hidden`.
-  4. **Tiendita:** el botón `data-authmode="alta"` tiene `hidden`.
+  3. **Imprenta (`index.html` y `taller.html`):** el botón `data-modo="alta"` tiene `hidden`.
+  4. **Store (`tiendita/index.html`):** el botón `data-authmode="alta"` tiene `hidden`.
   - **La landing** tiene `ALTAS_ABIERTAS = False` en `build.py`: los 14 botones de prueba abren el aviso «Las cuentas nuevas abren muy pronto». Sólo «Entrar» lleva a la app.
   - **Para reabrir, sólo cuando Carlos lo diga:** deshacer los cuatro puntos, poner `ALTAS_ABIERTAS = True` y reconstruir la landing. Antes deben estar configurados los cobros (pendiente 3).
 
 ## Pendientes, en orden
 
-1. **Publicar la landing en `nuvoor.mx`.** Ver `Claude outputs/nuvoor-landing/sitio/README.md`.
+1. ~~Publicar la landing en `nuvoor.mx`~~ **HECHO el 31 oct.** Falta palomear **Enforce HTTPS** en Settings → Pages de `nuvoo-web`, si no lo está. Ver `Claude outputs/nuvoor-landing/sitio/README.md`.
    - Crea un repo **nuevo** `nuvoor-web`: Pages sólo permite un dominio por repo, y éste ya usa `app.nuvoor.mx`.
    - Pages desde la rama `main`, carpeta raíz. Dominio `nuvoor.mx`.
    - DNS en GoDaddy: Carlos lo hace en la web. Está en el README.
