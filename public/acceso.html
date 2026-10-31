@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f5f7"><title>Acceso · Nuvoor</title>
-<link rel="stylesheet" href="./acceso.css?v=20261026-3">
+<link rel="stylesheet" href="./acceso.css?v=20261031-1004">
 </head>
 <body>
 <header class="top"><a class="brand" href="./MakersOS.html"><span class="mark">N</span><span>Nuvoor</span></a><a href="./MakersOS.html">Volver a Nuvoor</a></header>
 <main>
   <div class="wrap">
-    <section class="intro"><div class="eyebrow">Un acceso para tu negocio</div><h1>Entra. Elige tu POS. Sigue trabajando.</h1><p>Usa tu correo para abrir el punto de venta que tienes contratado o crea una cuenta y prueba el sistema gratis durante 15 días.</p><div class="introNote"><span class="dot"></span><span>La prueba no pide tarjeta.</span></div></section>
+    <section class="intro"><div class="eyebrow">Un acceso para tu negocio</div><h1>Entra. Elige tu POS. Sigue trabajando.</h1><p>Usa tu correo para abrir el punto de venta que tienes contratado.</p><div class="introNote" hidden><span class="dot"></span><span>La prueba no pide tarjeta.</span></div><!-- ALTAS: al reabrir, regresar el texto de la prueba --></section>
     <section class="card" id="authPanel" hidden>
       <h2 id="authTitle">Entra a Nuvoor</h2><p class="sub" id="authSub">Accede a los productos de tu cuenta Nuvoor.</p>
-      <div class="tabs"><button type="button" data-mode="entrar" aria-pressed="true">Iniciar sesión</button><button type="button" data-mode="alta" aria-pressed="false" hidden>Crear cuenta gratis</button></div><p class="sub" id="altaPronto" style="margin-top:10px">Las cuentas nuevas abren muy pronto. Si ya tienes cuenta, entra con tu correo.</p>
+      <div class="tabs" hidden><button type="button" data-mode="entrar" aria-pressed="true">Iniciar sesión</button><button type="button" data-mode="alta" aria-pressed="false" hidden>Crear cuenta gratis</button></div><p class="sub" id="altaPronto" style="margin-top:10px">Las cuentas nuevas abren muy pronto. Si ya tienes cuenta, entra con tu correo.</p>
       <form id="authForm" autocomplete="on">
         <div id="signupFields" hidden>
           <div class="two"><div class="field"><label for="personName">Tu nombre</label><input id="personName" autocomplete="name"></div><div class="field"><label for="businessName">Negocio</label><input id="businessName" autocomplete="organization"></div></div>
@@ -39,5 +39,5 @@
 </main>
 <footer>Nuvoor · Nuvoor Imprenta · Nuvoor Restaurant · Nuvoor Store</footer>
 <script src="./config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="./acceso.js?v=20261026-3"></script>
+<script src="./acceso.js?v=20261031-1004"></script>
 </body></html>

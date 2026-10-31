@@ -1,4 +1,4 @@
-const CACHE_NAME = "makers-tiendita-v5-nexus";
+const CACHE_NAME = "makers-tiendita-v6-nexus";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,

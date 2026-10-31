@@ -29,3 +29,21 @@ makers-fuentes.tar.gz
 #  falta para publicar, asi que no sube al repositorio. Sigue en tu disco:
 #  si un dia quieres el espacio, borras la carpeta y ya.
 _archivo/
+
+# ------------------------------------------------------------------
+#  Historial de Codex: lo que hizo cada sesion. Se queda en tu disco;
+#  no sube porque el repositorio es publico.
+# ------------------------------------------------------------------
+HISTORIAL-CODEX/
+
+# ------------------------------------------------------------------
+#  App Android: llaves de firma y lo que sale de compilar NUNCA suben.
+# ------------------------------------------------------------------
+*.jks
+*.keystore
+keystore.properties
+local.properties
+.gradle/
+**/build/
+app-nuvoor/salida/
+*.aab

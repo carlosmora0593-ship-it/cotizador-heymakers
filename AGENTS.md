@@ -1,7 +1,14 @@
 # AGENTS.md: Nuvoor
 
 Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este repositorio.
-Última actualización: 31 de octubre de 2026 (nombres nuevos: Imprenta, Restaurant, Store).
+
+## Antes de empezar (siempre)
+
+1. **Lee el historial:** `HISTORIAL-CODEX/INDICE.md` y el último archivo de esa carpeta. Ahí está lo último que se hizo y lo que sigue.
+2. **Tarea activa: la app Nuvoor para Android** → `TAREA-APP-NUVOOR.md`. Va por fases; no te saltes ninguna.
+3. **Lleva tu propio historial** en `HISTORIAL-CODEX/` mientras trabajas: un archivo por sesión con `PLANTILLA.md` y una línea arriba en `INDICE.md`. Nada de contraseñas, llaves ni el correo de Carlos. La carpeta está en `.gitignore` porque el repo es público.
+
+Última actualización: 31 de octubre de 2026, 09:25 (tarea de la app e historial).
 
 ## Qué es esto
 
@@ -110,13 +117,14 @@ La rama local es `docs/estructura-carpeta`. `PUBLICAR.bat` empuja con `git push 
   - Pages desde la rama `main`, carpeta raíz. El archivo `CNAME` dice `nuvoor.mx`.
   - DNS en GoDaddy: 4 registros A `@` → `185.199.108.153`, `.109.153`, `.110.153`, `.111.153`, y CNAME `www` → `carlosmora0593-ship-it.github.io`. El sitio de Website Builder de GoDaddy ya se borró.
   - La fuente está en `Claude outputs/nuvoor-landing/`. Para cambiarla, sube `index.html` o `img/` nuevos a ese repo.
-- **ALTAS CERRADAS (decisión de Carlos, 31 oct): por ahora nadie nuevo puede crear cuenta.** Está cerrado en cuatro lugares:
+- **ALTAS CERRADAS (decisión de Carlos, 31 oct): por ahora nadie nuevo puede crear cuenta.** Está cerrado en cuatro lugares (más la app, punto 5):
   1. **Supabase** → Authentication → Sign In / Providers → «Allow new users to sign up» **apagado**. Ése es el candado de verdad.
   2. **`acceso.html`:** el botón «Crear cuenta gratis» tiene `hidden` y hay un aviso `#altaPronto`. En `acceso.js`, `modo="entrar"` está fijo y `setMode` convierte `"alta"` en `"entrar"`.
   3. **Imprenta (`index.html` y `taller.html`):** el botón `data-modo="alta"` tiene `hidden`.
   4. **Store (`tiendita/index.html`):** el botón `data-authmode="alta"` tiene `hidden`.
+  5. **La app Android** (cuando exista) esconde «Contratar» y «Probar gratis» con `.soloWeb`; eso se queda aunque se reabran las altas en la web. Ver `TAREA-APP-NUVOOR.md` sección 3.
   - **La landing** tiene `ALTAS_ABIERTAS = False` en `build.py`: los 14 botones de prueba abren el aviso «Las cuentas nuevas abren muy pronto». Sólo «Entrar» lleva a la app.
-  - **Para reabrir, sólo cuando Carlos lo diga:** deshacer los cuatro puntos, poner `ALTAS_ABIERTAS = True` y reconstruir la landing. Antes deben estar configurados los cobros (pendiente 3).
+  - **Para reabrir, sólo cuando Carlos lo diga:** deshacer los cuatro puntos, poner `ALTAS_ABIERTAS = True` y reconstruir la landing. En `acceso.html`, regresar el texto de la prueba y volver a mostrar nota y pestañas quitando `hidden` de `.introNote` y `.tabs` (ver comentario ALTAS). Antes deben estar configurados los cobros (pendiente 3).
 
 ## Pendientes, en orden
 
@@ -133,7 +141,7 @@ La rama local es `docs/estructura-carpeta`. `PUBLICAR.bat` empuja con `git push 
    - `n-64.png`, `n-192.png`, `n-512.png`: la N con su estrella.
    - `palabra-96.png`: la palabra NUVOOR en negro. En modo oscuro se pinta con `mask` sobre `background: var(--ink)`.
    - Colores del logo: morado `#4c4780`, índigo `#4458a4`, cielo `#49a6de`, agua `#79cce0`, tinta `#0a0e1a`.
-6. **App de Android del Restaurant (TWA):** reconstruirla para `app.nuvoor.mx` (`preparar-app-restaurante.ps1`) y poner `assetlinks.json` en `public/.well-known/`, la raíz del dominio.
+6. **App de Android → ahora es la app general Nuvoor:** ver `TAREA-APP-NUVOOR.md`. Las apps viejas del Restaurant (`android-release/` TWA y `android-native/` WebView, paquete `com.heymakers.restaurant`) se quedan como están.
 7. **Netlify:** Carlos decide si se borra el sitio. Se recomienda borrarlo.
 8. **Borrar** `CONECTAR-DOMINIO.bat`, que en su Windows abría y cerraba sin hacer nada, y `public/PRUEBA-commit.html`.
 9. **Rotar la llave `service_role`** de Supabase: se vio en un Notepad y en una captura.
@@ -155,5 +163,5 @@ La rama local es `docs/estructura-carpeta`. `PUBLICAR.bat` empuja con `git push 
 ## Cómo trabajar con Carlos
 
 - Explica en pocas palabras y en español. Si él tiene que hacer algo en un panel (GoDaddy, GitHub, Supabase), dale **la liga directa y el texto exacto** de cada casilla. Le ayudan mucho las capturas marcadas.
-- Le gusta lo que se corre con doble clic. Pero `CONECTAR-DOMINIO.bat` no le corrió, así que antes de darle otro `.bat`, prueba que su Windows lo deje correr.
+- Le gusta lo que se corre con doble clic. Pero `CONECTAR-DOMINIO.bat` no le corrió, así que antes de darle otro `.bat`, prueba que su Windows lo deje correr (termínalos con `pause`).
 - Revisa que todo quede alineado antes de enseñarle una pantalla, y que el cotizador siga siendo simple aunque eso signifique no agregar algo.

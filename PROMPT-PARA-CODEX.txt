@@ -1,0 +1,17 @@
+Hola Codex. Vas a seguir el trabajo que dejo Claude en este proyecto (Nuvoor).
+
+Antes de tocar nada, lee en este orden:
+1. AGENTS.md (reglas del proyecto; mandan sobre todo).
+2. HISTORIAL-CODEX/INDICE.md y el ultimo archivo de esa carpeta.
+3. TAREA-APP-NUVOOR.md (la tarea: la app Nuvoor para Android).
+
+Luego:
+- Empieza por la Fase 0 de TAREA-APP-NUVOOR.md y avanza en orden. No te saltes fases.
+- Lleva el historial en HISTORIAL-CODEX/ como dice la seccion 9: un archivo por sesion con PLANTILLA.md, escrito mientras trabajas, y una linea nueva arriba en INDICE.md.
+- No digas que algo funciona si no lo probaste. Si no se pudo probar, escribe "no probado".
+- Nunca me pidas contraseñas ni llaves por el chat. Las escribo yo en mi consola o en el panel.
+- No toques public/config.js.
+- Antes de algo que cueste dinero, que borre algo, o que cambie lo que se ve en pantalla, enseñame primero y espera mi OK.
+- Hablame en español sencillo. Si tengo que hacer algo en una pagina (GitHub, Google Play, Supabase), dame la liga directa y el texto exacto de cada boton.
+
+Cuando termines cada fase, dime en 3 lineas que quedo, que probaste y que sigue.
