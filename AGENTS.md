@@ -5,10 +5,13 @@ Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este r
 ## Antes de empezar (siempre)
 
 1. **Lee el historial:** `HISTORIAL-CODEX/INDICE.md` y el último archivo de esa carpeta. Ahí está lo último que se hizo y lo que sigue.
-2. **Tarea activa: la app Nuvoor para Android** → `TAREA-APP-NUVOOR.md`. Va por fases; no te saltes ninguna.
+2. **Tareas activas, en este orden:**
+   1. `TAREA-APP-NUVOOR.md`: la app Nuvoor como **APK de prueba**, sin Play Store, y probarla en las tablets con impresora. Lee primero su sección 0, que cambió las prioridades.
+   2. `TAREA-MESEROS.md`: los meseros mandan pedidos a cocina desde su celular.
+   - **Ojo:** la fuente del Restaurant es `public/restaurante/index.html`. **No** uses `PRUEBA-restaurant.html` ni `PREPARAR-APP-RESTAURANTE.bat`: están viejos y lo regenerarían encima.
 3. **Lleva tu propio historial** en `HISTORIAL-CODEX/` mientras trabajas: un archivo por sesión con `PLANTILLA.md` y una línea arriba en `INDICE.md`. Nada de contraseñas, llaves ni el correo de Carlos. La carpeta está en `.gitignore` porque el repo es público.
 
-Última actualización: 31 de octubre de 2026, 09:25 (tarea de la app e historial).
+Última actualización: 31 de octubre de 2026, 10:30 (APK de prueba sin Play Store y meseros desde el celular).
 
 ## Qué es esto
 
@@ -84,11 +87,12 @@ La rama local es `docs/estructura-carpeta`. `PUBLICAR.bat` empuja con `git push 
 
 ## Cómo probar
 
+- Guarda en `tmp/` las copias de prueba y los archivos temporales. `tmp/` está ignorada por Git y no se publica. Si ya estaba rastreada, `git rm -r --cached tmp` la quita del índice sin borrar la carpeta ni su contenido local.
 - Las apps son archivos sueltos. Se prueban con **Playwright** sobre una copia de vista previa sin red:
   - Quita `<script src="config.js">`, el CDN de supabase, `cuenta.js` y `diagnostico.js`.
   - Antes del **último** `</body>` (hay `</body>` dentro de strings de JS) inserta una llamada a `window.__arranca`.
 - Marca el tutorial como visto **antes** de cargar: `localStorage.setItem("cotizador_tour","1")`. No lo borres del DOM: una prueba que borra la puerta no prueba la puerta.
-- Para algo que use `mask-image` o `fetch`, sirve por http (`python -m http.server`), no por `file://`.
+- Para probar una copia en navegador, entra a su carpeta dentro de `tmp/` y ejecuta `python -m http.server 8000`; abre `http://127.0.0.1:8000/` en el navegador y detén el servidor con `Ctrl+C`. Para algo que use `mask-image` o `fetch`, usa este servidor HTTP, no `file://`.
 - Antes de nombrar una clase o una función en un archivo de 1.4 MB, **búscala**: ya ha habido cuatro choques de nombres (`.tbCol`, `sinAcentos`, `PRODUCTO.giro`, `.croqBarra`).
 
 ## Imprenta por dentro (lo mínimo)

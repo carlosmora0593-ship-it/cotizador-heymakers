@@ -6,6 +6,31 @@ Y lleva el historial en `HISTORIAL-CODEX/`, como dice la sección 9.
 
 ---
 
+## 0. CAMBIO DE PRIORIDADES (Carlos, 31 oct, tarde): esto manda sobre el resto
+
+> «No pienso pagar por ahora en fase de pruebas, qué tal un APK. Me interesa mucho que en mis tablets tengo ya vinculadas las impresoras y que salgan ticket de cada comanda.»
+
+1. **Nada de Play Store por ahora.** La Fase 4 queda congelada. La app se reparte como **archivo APK** y se instala a mano. Cuesta $0.
+2. **El orden nuevo:**
+   1. Lo de `tmp/` en `.gitignore`, si no está hecho.
+   2. Fase 1, sólo lo que use la app: `app-shell.js` y esconder pagos.
+   3. Fase 2: el APK.
+   4. Probarlo en **sus tablets con sus impresoras**, con el Restaurant primero.
+   5. Después, **`TAREA-MESEROS.md`**: los meseros mandan a cocina desde su celular.
+3. **La llave de firma se crea desde el primer APK**, aunque sea de prueba. Es gratis: `keytool`, con contraseñas que teclea Carlos.
+   - Un APK *debug* y uno *release* tienen firmas distintas, así que para cambiar de uno a otro hay que **desinstalar**.
+   - **Desinstalar borra lo que el Restaurant guardó dentro de la app.** Con la llave desde el principio, cada APK nuevo se instala encima sin perder nada.
+4. **Cómo llega el APK a las tablets:**
+   - Propón a Carlos publicarlo en `public/descargas/Nuvoor.apk`, para bajarlo desde `https://app.nuvoor.mx/descargas/Nuvoor.apk` en cada tablet. **Pregúntale antes.**
+   - Dale los pasos para permitir «Instalar apps desconocidas» en Chrome de Android, con el texto exacto de cada pantalla.
+5. **El Restaurant ya trae un botón para bajar `Makers-Restaurant.apk` y otro de «Buscar actualizaciones»** (`.androidApkLink`).
+   - Dentro de la app Nuvoor, escóndelos.
+   - En la web se quedan hasta que Carlos diga que la app nueva sustituye a la vieja.
+6. **La fuente del Restaurant es `public/restaurante/index.html`.** **No uses** `PRUEBA-restaurant.html` ni `PREPARAR-APP-RESTAURANTE.bat`: están viejos y regenerarían la página encima, con los nombres viejos.
+7. **Las impresoras:** el puente `MakersPrinter` ya existe y el Restaurant ya imprime la comanda al «Mandar a cocina» si la pantalla es `ESTACION.cocina` con impresora Bluetooth elegida. Lo que falta es **probarlo en la app nueva, en sus tablets**. Anota en el historial la marca de cada impresora y si salió.
+
+Claude va a revisar tu trabajo cuando regrese: deja en el historial **qué archivos tocaste, qué comandos corriste y cómo se prueba**.
+
 ## 1. Qué quiere Carlos
 
 Una sola app que se llame **Nuvoor**. Se instala en teléfonos y tablets Android y abre el punto de venta que cada usuario contrató:
@@ -163,7 +188,7 @@ Dale esta lista **con casillas**, sin tecnicismos. Pon en el historial qué pas�
 
 **Ojo con el Restaurant:** guarda en el almacenamiento del navegador, y la app nueva tiene el suyo propio. Quien ya lo usa en Chrome o en la app vieja debe **bajar su respaldo antes** y restaurarlo en la app nueva. Díselo a Carlos con estas palabras.
 
-## 8. Fase 4: Play Store (SÓLO cuando Carlos diga «súbela»)
+## 8. Fase 4: Play Store (CONGELADA: Carlos no quiere pagar en pruebas; sólo cuando diga «súbela»)
 
 - **La cuenta de Google Play Console la abre Carlos.** Cuesta 25 dólares, una sola vez, y pide verificar identidad. Tú no metes pagos ni contraseñas.
 - **Las cuentas personales nuevas deben hacer una prueba cerrada** con al menos 12 personas durante 14 días antes de salir a producción. Confírmalo en support.google.com/googleplay/android-developer/answer/14151465.

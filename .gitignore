@@ -35,6 +35,7 @@ _archivo/
 #  no sube porque el repositorio es publico.
 # ------------------------------------------------------------------
 HISTORIAL-CODEX/
+tmp/
 
 # ------------------------------------------------------------------
 #  App Android: llaves de firma y lo que sale de compilar NUNCA suben.
