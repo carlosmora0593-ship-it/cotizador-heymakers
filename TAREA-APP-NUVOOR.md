@@ -116,6 +116,8 @@ Estos cambios son en `public/`. Cada uno sube el sello de versión como dice `AG
 
 ### 6.2 El WebView: lista exacta de lo que debe funcionar
 
+**Alcance de la primera APK de prueba 0.1.0 (Carlos, 31 oct 2026):** se usa el Restaurant publicado en vivo para probar la impresora; no se modifica `public/`. Esta versión cubre navegación del dominio `app.nuvoor.mx`, ajustes básicos del WebView, Atrás, selector de archivos, descarga de respaldos Blob y el puente `MakersPrinter`. Lo demás de esta lista queda para la siguiente versión: `window.print()` con impresión Android, ventanas `window.open()`, cámara, compartir, pantalla y prueba sin conexión, y comprobar persistencia de sesión. Las descargas que no sean Blob y la prueba física en cada tablet también siguen pendientes.
+
 Las páginas usan estas cosas. Revisa cada una con `grep` antes de dar por terminada la fase. Entre paréntesis va cuántas hay en cada página al 31 oct 2026.
 
 1. **Sólo `app.nuvoor.mx` se abre dentro del WebView.** En `shouldOverrideUrlLoading`, cualquier otro host se abre fuera con un `Intent`: `wa.me`, `mailto:`, `tel:`, Mercado Pago, Stripe, nuvoor.mx.
