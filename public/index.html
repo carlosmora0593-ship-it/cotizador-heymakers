@@ -3161,6 +3161,225 @@ body.rol-produccion #btnPrint{display:none!important}
 #hoja .op-art,.paper .op-art{border-left:3px solid #000;padding-left:12px;margin:14px 0 18px;break-inside:avoid}
 #hoja h3,.paper h3{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;margin:12px 0 6px}
 #hoja h2,.paper h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #000;padding-bottom:3px;margin:16px 0 8px}
+
+/* ======================= COTIZAR v2 ======================= */
+/* ¿Qué vamos a cotizar? — la barra deslizable y el Mostrador */
+.cv2Que .body{padding:14px 16px 16px}
+.cv2QueFila{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:stretch}
+@media (max-width:760px){ .cv2QueFila{grid-template-columns:minmax(0,1fr)} }
+.cv2Desliza{position:relative;display:grid;grid-template-columns:1fr 1fr;padding:5px;border-radius:999px;
+  background:var(--surface-2);border:1px solid var(--line);isolation:isolate}
+.cv2Perilla{position:absolute;top:5px;bottom:5px;left:5px;width:calc(50% - 5px);border-radius:999px;z-index:0;
+  background:var(--accent);box-shadow:0 10px 22px -12px var(--accent);transition:transform .42s cubic-bezier(.2,.9,.25,1.12)}
+.cv2Desliza[data-lado="svc"] .cv2Perilla{transform:translateX(100%)}
+.cv2Desliza button{position:relative;z-index:1;border:0;background:transparent;cursor:pointer;border-radius:999px;font:inherit;
+  padding:9px 14px;display:flex;align-items:center;gap:10px;text-align:left;color:var(--ink-2);min-width:0;transition:color .25s}
+.cv2Desliza button[aria-checked="true"]{color:var(--accent-ink)}
+.cv2Desliza button .svIco{width:36px;height:36px;flex:none;transition:transform .35s cubic-bezier(.2,.9,.25,1.2)}
+.cv2Desliza button[aria-checked="true"] .svIco{transform:scale(1.08) rotate(-4deg)}
+.cv2Desliza b{display:block;font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:15px;line-height:1.2}
+.cv2Desliza small{display:block;font-size:11.5px;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cv2Desliza span{min-width:0}
+@media (max-width:560px){
+  .cv2Desliza{border-radius:20px} .cv2Perilla{border-radius:16px}
+  .cv2Desliza button{flex-direction:column;text-align:center;gap:4px;padding:9px 6px;border-radius:16px}
+  .cv2Desliza small{white-space:normal}
+}
+.cv2Mostrador{display:flex;align-items:center;gap:10px;border:1.5px dashed var(--line);background:var(--surface-2);border-radius:999px;font:inherit;
+  padding:7px 16px 7px 9px;cursor:pointer;text-align:left;color:var(--ink-2);transition:border-color .15s,color .15s,transform .15s}
+.cv2Mostrador:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.cv2Mostrador .svIco{width:32px;height:32px;flex:none}
+.cv2Mostrador b{display:block;font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:14px;color:var(--ink)}
+.cv2Mostrador small{display:block;font-size:11px}
+.cv2Mostrador .flecha{margin-left:auto;font-size:15px}
+@media (max-width:560px){ .cv2Mostrador{border-radius:16px} }
+
+/* La cantidad primero */
+.cv2Cant{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--line-soft)}
+.cv2Cant > label{font-family:"Fredoka",system-ui,sans-serif;font-size:16px;font-weight:500;margin:0;text-transform:none;letter-spacing:0;color:var(--ink)}
+.svStep{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;background:var(--surface);overflow:hidden}
+.svStep button{border:0;background:transparent;width:36px;height:38px;font-size:18px;cursor:pointer;color:var(--ink-2);font:inherit}
+.svStep button:hover{background:var(--surface-2)}
+.svStep input{border:0;border-radius:0;width:84px;text-align:center;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:16px;font-weight:600;padding:7px 4px;box-shadow:none}
+.svStep.chico button{width:30px;height:32px;font-size:15px}
+.svStep.chico input{width:64px;font-size:13.5px;padding:5px 2px}
+.svRap{display:flex;gap:6px;flex-wrap:wrap}
+.svRap button{border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:4px 11px;cursor:pointer;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;font-weight:600;color:var(--ink-2)}
+.svRap button:hover{border-color:var(--accent);color:var(--accent)}
+.cv2CantNota{font-size:12px;color:var(--ink-3)}
+[data-paso="articulo"].cv2SinCant .body > :not(#cantPrimero):not(.guiaPie){display:none!important}
+
+/* La tarjeta de servicios */
+.svRej{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:900px){ .svRej{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (max-width:520px){ .svRej{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.svTile{position:relative;border:1px solid var(--line);background:var(--surface);border-radius:16px;cursor:pointer;font:inherit;color:var(--ink);
+  padding:14px 8px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;min-width:0;
+  transition:transform .22s cubic-bezier(.2,.8,.3,1),box-shadow .22s,border-color .22s}
+.svTile:hover{transform:translateY(-4px);border-color:rgba(47,127,255,.55);box-shadow:0 0 0 1px rgba(47,127,255,.22),0 14px 32px -14px rgba(47,127,255,.55)}
+.svTile .svIco{width:60px;height:60px;margin-bottom:6px;transition:transform .3s cubic-bezier(.2,.9,.25,1.25)}
+.svTile:hover .svIco{transform:scale(1.08) translateY(-2px)}
+.svTile b{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:14px;line-height:1.2}
+.svTile small{font-size:11px;color:var(--ink-3);line-height:1.3}
+.svTile.bloq{cursor:default;background:var(--surface-2);border-style:dashed}
+.svTile.bloq .svIco{filter:grayscale(.85);opacity:.55}
+.svTile.bloq b,.svTile.bloq small{opacity:.6}
+.svTile.bloq:hover{transform:none;box-shadow:none;border-color:var(--line)}
+.svCandado{position:absolute;top:8px;right:8px;font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink-3);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:2px 7px}
+.svAvisoBloq{margin:12px 0 0;font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border-radius:12px;padding:10px 13px}
+.svActual{display:grid;grid-template-columns:52px minmax(0,1fr) auto auto;gap:12px;align-items:center;border:1px solid var(--accent);
+  background:var(--accent-soft);border-radius:14px;padding:10px 12px;margin-bottom:14px}
+.svMini{width:52px;height:42px;border-radius:10px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
+.svMini img{width:100%;height:100%;object-fit:cover}
+.svMini .svIco{width:34px;height:34px}
+.svActTxt b{display:block;font-size:14px}
+.svActTxt small{display:block;font-size:11.5px;color:var(--ink-2)}
+.svActMx{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600}
+.svTitRej{font-size:12px;color:var(--ink-3);margin:0 0 10px}
+@media (max-width:560px){ .svActual{grid-template-columns:44px minmax(0,1fr) auto} .svActual .btn{grid-column:2 / -1;justify-self:end} }
+.svIco .svPiso{fill:rgba(0,0,0,.14)}
+
+/* Las ubicaciones del artículo */
+.cv2Ubis{display:flex;flex-direction:column;gap:8px}
+.cv2Ubi{display:grid;grid-template-columns:46px minmax(0,1fr) auto auto;gap:12px;align-items:center;border:1px solid var(--line);
+  border-radius:14px;padding:9px 12px;background:var(--surface-2)}
+.cv2Ubi .svMini{width:46px;height:38px}
+.cv2Ubi .svMini svg{width:24px;height:24px}
+.cv2UbiTxt{min-width:0}
+.cv2UbiTxt b{display:block;font-size:13.5px}
+.cv2UbiTxt small{display:block;font-size:11.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cv2UbiMx{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;font-size:13px;text-align:right;white-space:nowrap}
+.cv2UbiMx small{display:block;font-family:inherit;font-size:10.5px;font-weight:600;color:var(--ink-3)}
+.cv2UbiAcc{display:flex;gap:4px}
+@media (max-width:560px){ .cv2Ubi{grid-template-columns:40px minmax(0,1fr) auto} .cv2UbiAcc{grid-column:2 / -1;justify-content:flex-end} }
+.cv2UbiVacio{border:1.5px dashed var(--line);border-radius:14px;padding:14px;font-size:13px;color:var(--ink-2);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.cv2Pago{font-size:12px;color:var(--ink-2)}
+
+/* La ventana */
+.svVelo{position:fixed;inset:0;z-index:60;background:rgba(10,12,24,.5);display:flex;align-items:center;justify-content:center;
+  padding:max(18px,env(safe-area-inset-top,0px)) max(18px,env(safe-area-inset-right,0px)) max(18px,env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));
+  backdrop-filter:blur(3px);animation:cv2Aparece .2s ease-out}
+@keyframes cv2Aparece{from{opacity:0}to{opacity:1}}
+.svVentana{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:22px;box-shadow:0 30px 80px -24px rgba(0,0,0,.55);
+  width:min(1040px,100%);max-height:min(860px,100%);display:flex;flex-direction:column;overflow:hidden;animation:cv2Sube .32s cubic-bezier(.2,.9,.25,1.1)}
+.svVentana.angosta{width:min(660px,100%)}
+@keyframes cv2Sube{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+.svVCab{display:flex;align-items:center;gap:14px;padding:13px 18px;border-bottom:1px solid var(--line-soft);background:var(--surface-2)}
+.svVCab .svIco{width:50px;height:50px;flex:none}
+.svVCab h2{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:19px;margin:0}
+.svVCab p{margin:0;font-size:12.5px;color:var(--ink-3)}
+.svVCab .der{margin-left:auto;display:flex;gap:8px;align-items:center}
+.svVCab .der .btn{white-space:nowrap}
+.svVCuerpo{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:0;flex:1}
+.svVCuerpo.solo{grid-template-columns:minmax(0,1fr)}
+.svVProds{border-right:1px solid var(--line-soft);padding:12px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;background:var(--surface-2)}
+.svVProds .k{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:4px 6px}
+.svProd{border:1px solid transparent;background:transparent;border-radius:12px;padding:8px 11px;text-align:left;cursor:pointer;font:inherit;color:var(--ink)}
+.svProd b{display:block;font-size:13.5px;font-weight:700}
+.svProd small{display:block;font-size:11px;color:var(--ink-3)}
+.svProd:hover{background:var(--surface)}
+.svProd[aria-current="true"]{background:var(--surface);border-color:var(--accent);box-shadow:var(--shadow)}
+.svProd[disabled]{opacity:.45;cursor:not-allowed}
+.svVForm{overflow-y:auto;padding:16px 20px 20px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.svFila{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end}
+.svMedidas{display:flex;align-items:center;gap:8px}
+.svMedidas input{width:92px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;text-align:center}
+.svMedidas span{color:var(--ink-3);font-weight:700}
+.svNumFila{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.svGrp h3{font-family:inherit;font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:0 0 8px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.svGrp h3 .gn,.svNumFila .gn{font-weight:600;letter-spacing:0;text-transform:none;font-size:11.5px;color:var(--ink-3)}
+.svChips{display:flex;gap:7px;flex-wrap:wrap}
+.svChip{border:1px solid var(--line);background:var(--surface);border-radius:13px;padding:7px 12px;cursor:pointer;text-align:left;font:inherit;color:var(--ink);
+  display:flex;flex-direction:column;gap:1px;min-width:0;transition:border-color .15s,background .15s}
+.svChip:hover{border-color:var(--accent)}
+.svChip span{font-size:13px;font-weight:700}
+.svChip small{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;color:var(--ink-3)}
+.svChip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.svChip[aria-pressed="true"] small{color:var(--accent)}
+.svChip[disabled]{opacity:.45;cursor:not-allowed}
+.svChip .mejor{font-family:inherit;font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--good)}
+.svRollo{margin-top:10px;border:1px solid var(--line-soft);border-radius:14px;padding:12px;background:var(--surface-2);overflow-x:auto}
+.svRollo svg{width:100%;height:auto;display:block;max-height:170px;min-width:280px}
+.svRollo p{margin:8px 0 0;font-size:12px;color:var(--ink-2)}
+.svRollo:empty{display:none}
+.rRollo{fill:var(--surface);stroke:var(--line)}
+.rPieza{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.2}
+.rOrilla{fill:var(--line-soft)}
+.rTxt{fill:var(--ink-3);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px}
+.svSubeRef{display:flex;gap:14px;align-items:center;border:1.5px dashed var(--line);border-radius:16px;padding:12px;background:var(--surface-2);flex-wrap:wrap}
+.svSubeRef .mini{width:96px;height:66px;border-radius:11px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;overflow:hidden;color:var(--ink-3);font-size:20px;flex:none}
+.svSubeRef .mini img{width:100%;height:100%;object-fit:cover}
+.svSubeRef .txt{flex:1;min-width:180px;font-size:12.5px;color:var(--ink-2)}
+.svSubeRef .txt b{display:block;font-size:13.5px;color:var(--ink)}
+.svRefBtns{display:flex;gap:6px;flex-wrap:wrap}
+.svDondeVa{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.svDondeVa span{font-size:10.5px;font-weight:800;border-radius:999px;padding:2px 8px}
+.svDondeVa .si{background:var(--good-soft);color:var(--good)}
+.svDondeVa .no{background:var(--surface);color:var(--ink-3);text-decoration:line-through}
+.svAvisoFoto{font-size:12px;color:var(--warn);margin:6px 0 0}
+.svDesg{border:1px solid var(--line-soft);border-radius:14px;padding:11px 14px;background:var(--surface-2)}
+.svDesg h3{font-family:inherit;font-weight:800;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:0 0 6px}
+.svDesg ol{margin:0;padding:0;list-style:none}
+.svDesg li{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;padding:5px 0;border-bottom:1px dashed var(--line-soft)}
+.svDesg li:last-child{border-bottom:0}
+.svDesg li.t{font-weight:800}
+.svDesg li span{color:var(--ink-2);min-width:0}
+.svDesg li b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;white-space:nowrap}
+.svAviso{font-size:12px;color:var(--warn);background:var(--warn-soft);border-radius:10px;padding:7px 10px;margin:8px 0 0}
+.svNotaPie{font-size:11.5px;color:var(--ink-3);margin:8px 0 0}
+.svVPie{display:flex;align-items:center;gap:16px;padding:12px 20px;border-top:1px solid var(--line-soft);background:var(--surface-2);flex-wrap:wrap}
+.svVTot{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;min-width:0}
+.svVTot .k{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.svVTot b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:25px;font-weight:600}
+.svVTot .pp{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;color:var(--ink-2)}
+.svVTot .ut{font-size:11.5px;color:var(--good);font-weight:700}
+.svVPie .btn.primary{margin-left:auto}
+.svFijo{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);background:var(--surface-2);border-radius:999px;padding:7px 14px;align-self:flex-start}
+.svFijo b{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.svPrecios{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px}
+.svPrecios th{text-align:left;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);padding:4px 6px;font-weight:800}
+.svPrecios td{padding:4px 6px;border-top:1px dashed var(--line-soft)}
+.svPrecios input{width:86px;padding:5px 8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px}
+.svPrecios .u{font-size:11px;color:var(--ink-3);margin-left:4px;white-space:nowrap}
+.svVForm.editando .svGrp{background:var(--surface-2);border:1px solid var(--line-soft);border-radius:14px;padding:12px}
+@media (max-width:760px){
+  .svVelo{padding:0;align-items:stretch}
+  .svVentana,.svVentana.angosta{border-radius:0;max-height:none;height:100%;width:100%;border:0}
+  .svVCab{padding-top:max(13px,env(safe-area-inset-top,0px));gap:10px}
+  .svVCab .svIco{width:38px;height:38px}
+  .svVCab h2{font-size:16.5px}
+  .svVCuerpo{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+  .svVProds{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line-soft);padding:8px 12px}
+  .svVProds .k{display:none}
+  .svProd{flex:none}
+  .svVPie{padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
+  .svVPie .btn.primary{width:100%;justify-content:center}
+}
+
+/* Confirmar con pago */
+.pgOps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:560px){ .pgOps{grid-template-columns:minmax(0,1fr)} }
+.pgOp{border:1.5px solid var(--line);border-radius:16px;padding:11px 13px;background:var(--surface);cursor:pointer;text-align:left;font:inherit;color:var(--ink);display:flex;flex-direction:column;gap:3px}
+.pgOp b{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:15px}
+.pgOp small{font-size:11.5px;color:var(--ink-3)}
+.pgOp[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.pgOp[data-apagada]{opacity:.6;background:var(--surface-2)}
+.pgMonto{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.pgMonto input{width:150px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600}
+.pgCred{border:1px solid var(--line-soft);border-radius:14px;padding:12px;background:var(--surface-2);font-size:12.5px}
+.pgBarra{height:8px;border-radius:999px;background:var(--surface);overflow:hidden;margin:8px 0 6px;border:1px solid var(--line-soft)}
+.pgBarra i{display:block;height:100%;background:var(--good);border-radius:999px}
+.pgBarra i.lleno{background:var(--warn)}
+.pgCred dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0}
+.pgCred dt{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.pgCred dd{margin:0;font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600}
+.pgMotivo{font-size:12.5px;color:var(--warn);margin:8px 0 0}
+.pgFisc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+@media (max-width:560px){ .pgFisc{grid-template-columns:minmax(0,1fr)} }
+.pgNota{font-size:12px;color:var(--ink-3);margin:8px 0 0}
+@media (prefers-reduced-motion:reduce){ .cv2Perilla,.svTile,.svVentana,.svVelo{transition:none!important;animation:none!important} }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
@@ -3396,6 +3615,18 @@ body.rol-produccion #btnPrint{display:none!important}
 <section id="tab-cot" hidden>
   <div class="cols">
     <div>
+      <div class="card cv2Que" id="queCot">
+        <header><h2>¿Qué vamos a cotizar?</h2><span class="hint">puedes mezclar los dos en la misma cotización</span></header>
+        <div class="body"><div class="cv2QueFila">
+          <div class="cv2Desliza" id="cv2Desliza" data-lado="art" role="radiogroup" aria-label="¿Qué vamos a cotizar?">
+            <span class="cv2Perilla" aria-hidden="true"></span>
+            <button type="button" role="radio" data-lado="art" id="cv2Art" aria-checked="true"><svg class="svIco" viewBox="0 0 64 64" aria-hidden="true"><use href="#cv2IcoArt"/></svg><span><b>Artículos personalizados</b><small>Playeras, gorras, tazas, termos</small></span></button>
+            <button type="button" role="radio" data-lado="svc" id="cv2Svc" aria-checked="false"><svg class="svIco" viewBox="0 0 64 64" aria-hidden="true"><use href="#cv2IcoSvc"/></svg><span><b>Servicio de impresión</b><small>Lonas, copias, tarjetas, sublimación</small></span></button>
+          </div>
+          <button type="button" class="cv2Mostrador" id="cv2Mos"><svg class="svIco" viewBox="0 0 64 64" aria-hidden="true"><use href="#cv2IcoMos"/></svg><span><b>Mostrador</b><small>Venta sin impresión</small></span><span class="flecha" aria-hidden="true">↗</span></button>
+        </div></div>
+      </div>
+
       <div class="card plegable" data-paso="cliente">
         <header><span class="step">1</span><h2>Cliente y pedido</h2><span class="hint" id="folioHint"></span><span class="resumenPaso" data-res="cliente"></span><span class="chev">▾</span></header><div class="plegado"><div>
         <div class="body grid g3">
@@ -3421,6 +3652,12 @@ body.rol-produccion #btnPrint{display:none!important}
 
       <div class="card plegable" data-paso="articulo">
         <header><span class="step">2</span><h2>Artículo o servicio</h2><span class="hint" data-solo="articulo">el costo sale del catálogo</span><span class="hint" data-solo="servicio" hidden>se cobra por medida</span><button class="btn sm ghost" id="btnAddArt" style="margin-left:auto">+ Otro artículo</button><span class="resumenPaso" data-res="articulo"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body">
+        <div class="cv2Cant" id="cantPrimero">
+          <label for="cpQty">¿Cuántas piezas son?</label>
+          <div class="svStep"><button type="button" data-cpq="-1" aria-label="Una menos">−</button><input id="cpQty" type="number" min="1" step="1" inputmode="numeric" placeholder="0"><button type="button" data-cpq="1" aria-label="Una más">+</button></div>
+          <div class="svRap"><button type="button" data-cpv="12">12</button><button type="button" data-cpv="24">24</button><button type="button" data-cpv="50">50</button><button type="button" data-cpv="100">100</button></div>
+          <span class="cv2CantNota" id="cpNota"></span>
+        </div>
         <div class="modoSwitch" id="modoSwitch">
           <button type="button" data-modo="articulo" aria-selected="true">Artículo compuesto o personalizado</button>
           <button type="button" data-modo="servicio" aria-selected="false">Servicio por medida</button>
@@ -3464,6 +3701,12 @@ body.rol-produccion #btnPrint{display:none!important}
         </div>
       </div></div></div>
 
+      <div class="card plegable" data-paso="impresion" hidden>
+        <header><span class="step">2</span><h2>Servicio de impresión</h2><span class="hint">cada servicio abre su ventana con sus opciones</span><span class="resumenPaso" data-res="impresion"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body">
+          <div id="svCard"></div>
+        </div>
+      </div></div></div>
+
       <div class="card plegable" data-paso="apps">
         <header><span class="step">4</span><h2>Aplicaciones, técnicas y archivos</h2><button class="btn sm ghost" data-abrearmado="1" style="margin-left:auto">Armado del material</button><button class="btn sm ghost" id="addApp">+ Agregar ubicación</button><span class="resumenPaso" data-res="apps"></span><span class="chev">▾</span></header><div class="plegado"><div><div class="body"><div id="apps"></div></div>
       </div></div></div>
@@ -3497,8 +3740,7 @@ body.rol-produccion #btnPrint{display:none!important}
             <div><label class="f" for="c_resp">Responsable de producción</label><input id="c_resp" placeholder="Nombre"></div>
           </div>
           <div style="margin-top:12px"><label class="f" for="c_notas">Notas de producción</label><textarea id="c_notas" rows="3" placeholder="Posición exacta, temperatura de prensa, cuidados especiales…"></textarea></div>
-          <label class="f" style="margin-top:14px">Checklist de proceso</label>
-          <div class="check" id="checklist"></div>
+          <div class="check" id="checklist" hidden></div>
           <div id="bitaCot"></div>
         </div>
       </div></div></div>
@@ -3535,6 +3777,43 @@ body.rol-produccion #btnPrint{display:none!important}
       </div>
     </div>
   </div>
+
+
+<!-- ====== cotizar v2: la ventana de servicios y ubicaciones, y confirmar con pago ====== -->
+<div class="svVelo" id="svVelo" hidden>
+  <div class="svVentana" role="dialog" aria-modal="true" aria-labelledby="svVTit">
+    <header class="svVCab">
+      <span id="svVIco"></span>
+      <div style="min-width:0"><h2 id="svVTit"></h2><p id="svVSub"></p></div>
+      <div class="der">
+        <button class="btn sm" type="button" id="svVPrecios" aria-pressed="false">Editar precios</button>
+        <button class="btn icon sm" type="button" id="svVCerrar" aria-label="Cerrar">✕</button>
+      </div>
+    </header>
+    <div class="svVCuerpo" id="svVCuerpo">
+      <nav class="svVProds" id="svVProds" aria-label="Productos"></nav>
+      <div class="svVForm" id="svVForm"></div>
+    </div>
+    <footer class="svVPie">
+      <div class="svVTot"><span class="k">Total</span><b id="svVTotal">$0.00</b><span class="pp" id="svVPorPieza"></span><span class="ut" id="svVUtil"></span></div>
+      <button class="btn primary" type="button" id="svVAgregar">Agregar a la cotización</button>
+    </footer>
+  </div>
+</div>
+<input type="file" id="svVFoto" accept="image/png,image/jpeg,image/webp" hidden>
+<div class="svVelo" id="pgVelo" hidden>
+  <div class="svVentana angosta" role="dialog" aria-modal="true" aria-labelledby="pgTit">
+    <header class="svVCab">
+      <div style="min-width:0"><h2 id="pgTit">Confirmar pedido</h2><p>Para mandarlo a producción, registra cómo paga el cliente.</p></div>
+      <div class="der"><button class="btn icon sm" type="button" id="pgCerrar" aria-label="Cerrar">✕</button></div>
+    </header>
+    <div class="svVForm" id="pgForm"></div>
+    <footer class="svVPie">
+      <div class="svVTot"><span class="k" id="pgHoyK">Recibes hoy</span><b id="pgHoy">$0.00</b><span class="pp" id="pgFalta"></span></div>
+      <button class="btn primary" type="button" id="pgOk">Confirmar pedido</button>
+    </footer>
+  </div>
+</div>
 
 <!-- ====== el armado vive aquí, en un cajón que no empuja la página ====== -->
 <button class="armadoTab" id="armadoTab" hidden title="Abrir el armado del material"><span>Armado</span><b></b></button>
@@ -6782,6 +7061,7 @@ function aplicaModo(){
     if(svc && cot.apps.length){ cot._apps = cot.apps; cot.apps = []; }
     if(!svc && !cot.apps.length && cot._apps && cot._apps.length){ cot.apps = cot._apps; delete cot._apps; }
   }
+  if(typeof cv2AplicaModo === "function") cv2AplicaModo();
 }
 function renderServicio(){
   if(!$("#c_svc")) return;
@@ -6805,6 +7085,7 @@ function escalaDe(q){
   return v || {desde:1,hasta:1,desc:0};
 }
 function calc(){
+  if(cot.modo === "impresion") return calcImpresion();
   const qty = Math.max(1, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,1)));
   const costoArt = num(cot.costoArt);
   const mk = num(P.margen)/100;
@@ -6969,41 +7250,39 @@ function renderCot(){
   if(typeof pintaSelectClientes==="function") pintaSelectClientes();
   if(typeof renderEstado==="function") renderEstado();
   if(typeof resumenPasos==="function") resumenPasos();
+  if(typeof cv2Pinta === "function") cv2Pinta();
 }
 function renderApps(){
   sincronizaArmado();
   const w = $("#apps");
-  if(!cot.apps.length){ w.innerHTML = '<div class="empty">Sin aplicaciones. Agrega al menos una ubicación (frente, espalda, manga, taza…) con su técnica.</div>'; return; }
+  if(!cot.apps.length){
+    w.innerHTML = '<div class="cv2UbiVacio"><span>Un artículo personalizado lleva al menos una impresión. Agrega dónde va: frente, espalda, manga… Si sólo vas a vender el artículo, usa el Mostrador.</span>'+
+      '<button type="button" class="btn primary sm" data-eapp="">Agregar la primera ubicación</button></div>';
+    return;
+  }
   const r = calc();
-  w.innerHTML = cot.apps.map((a,i)=>{
+  w.innerHTML = '<div class="cv2Ubis">' + cot.apps.map((a,i)=>{
     const t = cat.tecnicas.find(t=>t.id===a.tecnicaId) || (cat.tecnicas||[])[0];
     const d = r.detalle.find(d=>d.id===a.id);
-    const modo = t? t.modo : "area";
-    return '<div class="app-row" data-app="'+a.id+'">'+
-      '<div class="app-head"><span class="tag">Ubicación '+(i+1)+'</span>'+
-        (d && d.pierde ? '<span class="pill warn" title="Esta ubicación se está vendiendo por debajo de lo que cuesta. Sube la mano de obra en Ajustes → Cómo se cobra la impresión.">precio bajo el costo</span>' : '')+
-        (tieneMaterial(a.tecnicaId) ? '<label class="sw swMini" title="Calcular el material de esta aplicación en el armado">'+
-            '<input type="checkbox" data-armapp="'+a.id+'"'+(a.sinArmado?"":" checked")+'> Material en el armado</label>' : '')+
-        '<span class="cost">'+(d? "costo "+mx(d.costoConMaterial!=null? d.costoConMaterial : d.costo)+
-            " · precio "+mx(d.precioConMaterial!=null? d.precioConMaterial : d.precio)+(d.min?" · mínimo":"") : "")+'</span>'+
-        '<button class="btn icon sm" data-del-app="'+a.id+'" title="Quitar">✕</button></div>'+
-      '<div class="grid g4">'+
-        '<div><label class="f">Ubicación</label><input data-k="ubic" value="'+esc(a.ubic)+'" placeholder="Frente"></div>'+
-        '<div><label class="f">Técnica</label><select data-k="tecnicaId">'+cat.tecnicas.map(t2=>'<option value="'+t2.id+'"'+(t2.id===a.tecnicaId?" selected":"")+'>'+esc(t2.nombre)+'</option>').join("")+'</select></div>'+
-        (modo==="area" ?
-          '<div><label class="f">Tamaño</label><select data-k="tamanoId"><option value="">Personalizado</option>'+cat.tamanos.map(s=>'<option value="'+s.id+'"'+(s.id===a.tamanoId?" selected":"")+'>'+esc(s.nombre)+' ('+s.ancho+'×'+s.alto+')</option>').join("")+'</select></div>'+
-          '<div><label class="f">Medidas (cm)</label><div class="dims"><input type="number" min="0" step="0.5" data-k="ancho" value="'+a.ancho+'"><span>×</span><input type="number" min="0" step="0.5" data-k="alto" value="'+a.alto+'"></div></div>'
-         : modo==="tintas" ?
-          '<div><label class="f">N.º de tintas</label><input type="number" min="1" step="1" data-k="tintas" value="'+(a.tintas||1)+'"></div>'+
-          '<div><label class="f">Setup</label><input readonly class="num" value="'+mx((d&&d.setup)||0)+' único"></div>'
-         : modo==="tiempo" ?
-          '<div><label class="f">Minutos por pieza</label><input type="number" min="0" step="0.5" data-k="minutos" value="'+(a.minutos||0)+'"></div>'+
-          '<div><label class="f">Minutos de preparación</label><input type="number" min="0" step="1" data-k="minutosSetup" value="'+(a.minutosSetup||0)+'"></div>'
-         :
-          '<div><label class="f">Puntadas</label><input type="number" min="0" step="500" data-k="puntadas" value="'+(a.puntadas||0)+'"></div>'+
-          '<div><label class="f">Ponchado</label><input readonly class="num" value="'+mx((d&&d.setup)||0)+' único"></div>')+
-      '</div>'+ selectorRollo(a) + artBox(a) +'</div>';
-  }).join("");
+    const modo = t ? t.modo : "area";
+    const med = modo==="area" ? num(a.ancho)+" × "+num(a.alto)+" cm"
+              : modo==="tintas" ? Math.max(1,num(a.tintas,1))+" tinta(s)"
+              : modo==="tiempo" ? num(a.minutos)+" min por pieza"
+              : num(a.puntadas).toLocaleString("es-MX")+" puntadas";
+    const sv = (typeof svcDeApp==="function") ? svcDeApp(a) : null;
+    const rollo = sv && !a.sinArmado ? " · "+sv.nombre : "";
+    const img = a.art && (a.art.tipo||"").indexOf("image")===0
+      ? '<img src="'+esc(a.art.url)+'" alt="Diseño de '+esc(a.ubic||"")+'" class="clic" data-baja="'+esc(a.id)+'">'
+      : azIco(azDibujoTec(t));
+    const pz = d ? (d.precioConMaterial!=null ? d.precioConMaterial : d.precio) : 0;
+    return '<div class="cv2Ubi" data-appv2="'+esc(a.id)+'"><span class="svMini">'+img+'</span>'+
+      '<div class="cv2UbiTxt"><b>'+esc(a.ubic||("Ubicación "+(i+1)))+' · '+esc(t?t.nombre:"—")+'</b>'+
+      '<small>'+esc(med+rollo)+(a.art?' · con diseño':' · sin diseño')+'</small>'+
+      (d && d.pierde ? '<span class="pill warn" title="Esta ubicación se vende por debajo de lo que cuesta">precio bajo el costo</span>' : '')+'</div>'+
+      '<span class="cv2UbiMx">'+mx(pz)+'<small>por pieza</small></span>'+
+      '<span class="cv2UbiAcc"><button type="button" class="btn icon sm" data-eapp="'+esc(a.id)+'" title="Editar">✎</button>'+
+      '<button type="button" class="btn icon sm" data-del-app="'+esc(a.id)+'" title="Quitar">✕</button></span></div>';
+  }).join("") + '</div>';
   /* renderApps se vuelve a dibujar entero cada vez que cambias algo, así
      que los azulejos hay que volver a ponerlos o desaparecen al primer clic. */
   if(typeof azAplicaciones === "function" && typeof guiado === "function" && guiado()) azAplicaciones();
@@ -7688,7 +7967,14 @@ function renderResumen(){
     (veCostos()  ? " · costo "+mx(cPza) : "")+
     (veDetalle() ? " · utilidad "+mPza.toFixed(0)+"%" : "");
   sub.classList.toggle("pierde", veDetalle() && mPza < 0);
+  const kPrecio = document.querySelector("#tab-cot .summary .price .k");
+  if(kPrecio) kPrecio.textContent = (cot.modo === "impresion" && r.svc) ? "Precio por " + r.svc.U.uno : "Precio por pieza";
+  if(cot.modo === "impresion"){ sub.textContent = cantConUnidad(r) + (veCostos() && r.total > 0 ? " · costo " + mx(r.costoTotal) + (veDetalle() ? " · utilidad " + Math.round(r.margenReal) + "%" : "") : ""); sub.classList.remove("pierde"); }
   const L = [];
+  const det = [];
+  let apCosto = 0, apPrecio = 0;
+  if(cot.modo === "impresion") cv2LlenaResumen(r, L);
+  else {
   /* Sin permiso queda el precio de lista; si el precio no sale de una lista
      sino de la utilidad, el renglón no tiene nada que decir y no se pone. */
   if(cot.modo!=="servicio" && (veCostos() || r.porLista))
@@ -7697,8 +7983,6 @@ function renderResumen(){
       : mx(r.precioArtLista), true]);
   /* Las aplicaciones, en un renglón. Seis líneas para tres estampados eran
      un acta, no un resumen; el detalle vive abajo, plegado. */
-  const det = [];
-  let apCosto = 0, apPrecio = 0;
   r.detalle.forEach(d=>{
     apCosto  += num(d.costo) + num(d.materialCostoPieza);
     apPrecio += num(d.precio) + num(d.materialPieza);
@@ -7732,6 +8016,7 @@ function renderResumen(){
     unidadTxt(a.unidad, a.unidades)+" · "+mx(a.precio)+" (ya cobrado en las piezas)"]));
   if(r.descExtra>0) L.push(["Descuento"+(cot.descTipo==="mxn" ? "" : " "+num(cot.descVal)+"%")+
     (cot.descNota ? " · "+cot.descNota : ""), "−"+mx(r.descExtra), false]);
+  }
   L.push(["Subtotal", mx(r.subtotal+r.urgencia), false]);
   if(r.iva>0) L.push(["IVA "+P.iva+"%", mx(r.iva), false]);
   let h = L.map(x=>'<div'+(x[2]?' class="muted"':'')+'><dt>'+esc(x[0])+'</dt><dd>'+x[1]+'</dd></div>').join("");
@@ -10304,9 +10589,10 @@ function azClientesPinta(){
 function azArticulos(){ azConFoco(()=>azArticulosPinta()); }
 function azArticulosPinta(){
   /* En modo servicio no hay artículo que escoger: ahí manda el material. */
-  if(cot.modo === "servicio"){ azQuita("azArt"); return; }
+  if(cot.modo === "servicio" || cot.modo === "impresion"){ azQuita("azArt"); return; }
   const c = azCaja("azArt", '[data-paso="articulo"] .body', "afterbegin");
   if(!c) return;
+  { const cp = document.getElementById("cantPrimero"); if(cp && cp.nextElementSibling !== c) cp.after(c); }
   const q = (AZ.artBusca||"").trim().toLowerCase();
   let ls = (cat.articulos||[]).slice();
   if(AZ.artCat) ls = ls.filter(a=>(a.cat||"Otros") === AZ.artCat);
@@ -10470,8 +10756,8 @@ document.addEventListener("input", e=>{
    Los mismos campos de siempre, de uno en uno. El interruptor vive en
    Ajustes y se guarda con los demás parámetros, así que vale para toda la
    cuenta: si el dueño lo prende, el vendedor nuevo lo encuentra prendido. */
-const GUIA_ORDEN = ["cliente","articulo","apps","tallas","extras","prod"];
-const GUIA_NOMBRE = {cliente:"Cliente", articulo:"Artículo", apps:"Decorado",
+const GUIA_ORDEN = ["cliente","articulo","impresion","apps","tallas","extras","prod"];
+const GUIA_NOMBRE = {cliente:"Cliente", articulo:"Artículo", impresion:"Servicio", apps:"Impresión",
                      tallas:"Desglose", extras:"Extras", prod:"Entrega"};
 let GUIA = {actual:"cliente"};
 /* Prendido salvo que lo apaguen a mano. Una cuenta que ya existía no trae
@@ -10491,6 +10777,9 @@ function guiaPasos(){
   });
 }
 function guiaFalta(k){
+  if(k === "impresion") return cot.svc ? "" : "Escoge el servicio de impresión";
+  if(k === "articulo" && cot.modo !== "servicio" && !cot.qtyListo && !cot.articuloId && !usaTallas(cot) && !(cot.desc||"").trim()) return "Primero, ¿cuántas piezas son?";
+  if(k === "apps" && cot.modo === "articulo" && !(cot.apps||[]).length) return "Agrega al menos una ubicación con su impresión";
   const q = Math.max(0, usaTallas(cot) ? sumaTallas(cot) : Math.round(num(cot.cantidad,0)));
   if(k === "cliente")  return (cot.cliente||"").trim() ? "" : "Escribe para quién es la cotización";
   if(k === "articulo"){
@@ -10531,7 +10820,9 @@ function guiaPinta(){
   const i = ps.indexOf(GUIA.actual);
   /* La tira se vuelve a escribir entera: son seis botones, no cuesta nada,
      y así nunca se queda una palomita donde ya no va. */
-  if(!tira) col.insertAdjacentHTML("afterbegin", guiaTira());
+  if(!tira){ const qc = document.getElementById("queCot");
+    if(qc && qc.parentElement === col) qc.insertAdjacentHTML("afterend", guiaTira());
+    else col.insertAdjacentHTML("afterbegin", guiaTira()); }
   else      tira.outerHTML = guiaTira();
 
   sec.querySelectorAll("[data-paso]").forEach(c=>{
@@ -10806,7 +11097,8 @@ async function subirArchivo(appId, file){
     toast(c==="not_granted" ? "Falta permiso para guardar archivos" : c==="quota_exceeded" ? "Ya no hay espacio de archivos" : "No se pudo subir el archivo");
   }
 }
-$("#addApp").addEventListener("click", ()=>{
+$("#addApp").addEventListener("click", e=>{
+  if(typeof cv2AbreApp === "function"){ cv2AbreApp(null, e.currentTarget); return; }
   const s = cat.tamanos[2] || {ancho:20,alto:20,id:""};
   if(!(cat.tecnicas||[]).length){ toast("Primero da de alta una técnica en Catálogo"); return; }
   cot.apps.push({id:uid(),ubic:cot.apps.length?"Espalda":"Frente",tecnicaId:cat.tecnicas[0].id,tamanoId:s.id,ancho:s.ancho,alto:s.alto,tintas:1,puntadas:8000});
@@ -11888,7 +12180,7 @@ document.addEventListener("change", async e=>{
 /* ---------- varios artículos en una cotización ----------
    Lo que es del artículo y no del pedido. Todo lo demás —cliente, folio,
    entrega, responsable, la orden de producción— es de la cotización entera. */
-const CAMPOS_ITEM = ["articuloId","costoArt","precioArt","desc","cantidad","cantManual","modo",
+const CAMPOS_ITEM = ["articuloId","costoArt","precioArt","desc","cantidad","cantManual","modo","svc","qtyListo",
                      "apps","_apps","armado","extras","tallas",
                      "descOn","descTipo","descVal","descNota","notas"];
 
@@ -11896,7 +12188,7 @@ function itemEnBlanco(){
   const o = {id:uid()};
   CAMPOS_ITEM.forEach(k=>{ o[k] = undefined; });
   o.articuloId=""; o.costoArt=0; o.precioArt=0; o.desc=""; o.cantidad=1; o.cantManual=false;
-  o.modo="articulo"; o.apps=[]; o.armado=[]; o.tallas=[];
+  o.modo="articulo"; o.apps=[]; o.armado=[]; o.tallas=[]; o.svc=null; o.qtyListo=false;
   o.extras=(cat.extras||[]).map(e=>({id:e.id,on:false}));
   o.descOn=true; o.descTipo="pct"; o.descVal=0; o.descNota=""; o.notas="";
   return o;
@@ -12028,7 +12320,7 @@ function calcDe(q){
 /* El nombre corto de un artículo, para la tira y para los documentos. */
 function nombreItem(it, n){
   const a = (cat.articulos||[]).find(a=>a.id===it.articuloId);
-  return (it.desc||"").trim() || (a ? a.nombre : "") || ("Artículo " + n);
+  return (it.desc||"").trim() || (a ? a.nombre : "") || ((it.modo === "impresion" ? "Servicio " : "Artículo ") + n);
 }
 function descripcionCot(q){
   const its = itemsDe(q);
@@ -12042,22 +12334,22 @@ function renderTiraItems(){
   guardaItemActivo(cot);
   const its = cot.items, varios = its.length > 1;
   const cuenta = $("#tiraCuenta");
-  if(cuenta) cuenta.textContent = varios ? its.length + " artículos" : "";
+  if(cuenta) cuenta.textContent = varios ? its.length + " conceptos" : "";
   const paso = $("#pasoArtQue");
   if(paso) paso.textContent = varios
-    ? "Estás editando el artículo " + (cot.iAct+1) + " de " + its.length
-    : "Un solo artículo en esta cotización";
+    ? "Estás editando el concepto " + (cot.iAct+1) + " de " + its.length
+    : "Un solo concepto en esta cotización";
 
   if(!varios){
     const it = its[0], r = calcUno(cotDeItem(cot, it));
     w.innerHTML = '<button type="button" class="tiraArt act" data-itm="0" aria-current="true">'+
       '<span class="tiraNum">1</span>'+
       '<span class="tiraTxt"><b>'+esc(nombreItem(it, 1))+'</b>'+
-        '<small>'+r.qty+' pza(s) · '+mx(r.total)+'</small></span></button>'+
-      '<button type="button" class="tiraMas" id="tiraMas">+ Agregar artículo</button>';
+        '<small>'+cantConUnidad(r)+' · '+mx(r.total)+'</small></span></button>'+
+      '<button type="button" class="tiraMas" id="tiraMas">+ Agregar concepto</button>';
     const p1 = $("#tiraPie");
-    if(p1) p1.innerHTML = 'Puedes meter <b>varios artículos en la misma cotización</b> — playeras, '+
-      'gorras y tazas en un solo folio. Cada uno lleva su cantidad, sus aplicaciones y su armado.';
+    if(p1) p1.innerHTML = 'Puedes mezclar <b>artículos personalizados y servicios de impresión</b> en el mismo folio. '+
+      'Cada concepto lleva su cantidad y sus opciones.';
     return;
   }
 
@@ -12071,14 +12363,15 @@ function renderTiraItems(){
       (act?' aria-current="true"':'')+'>'+
       '<span class="tiraNum">'+(i+1)+'</span>'+
       '<span class="tiraTxt"><b>'+esc(nombreItem(it, i+1))+'</b>'+
-        '<small>'+r.qty+' pza(s) · '+mx(r.total)+'</small></span>'+
-      '<span class="tiraX" data-quitaitm="'+i+'" role="button" tabindex="0" title="Quitar este artículo">✕</span>'+
+        '<small>'+cantConUnidad(r)+' · '+mx(r.total)+'</small></span>'+
+      '<span class="tiraX" data-quitaitm="'+i+'" role="button" tabindex="0" title="Quitar este concepto">✕</span>'+
     '</button>';
   }).join("") +
-  '<button type="button" class="tiraMas" id="tiraMas">+ Agregar artículo</button>';
+  '<button type="button" class="tiraMas" id="tiraMas">+ Agregar concepto</button>';
 
   const p = $("#tiraPie");
-  if(p) p.innerHTML = '<b>'+its.length+' artículos</b> · '+piezasPedido+' pieza(s) en total · '+
+  const conSvc = its.some((it,i)=>(i === cot.iAct ? cot.modo : it.modo) === "impresion");
+  if(p) p.innerHTML = '<b>'+its.length+' conceptos</b> · '+(conSvc ? '' : piezasPedido+' pieza(s) en total · ')+
     '<b>'+mx(totalPedido)+'</b> la cotización completa. El descuento por volumen de cada artículo ' +
     'se calcula con sus propias piezas.';
 }
@@ -12093,7 +12386,7 @@ function renderTotalVarios(){
   w.innerHTML = '<div class="rvTit">Total de la cotización</div>'+
     r.partes.map((p,i)=>'<div class="rvFila'+(i===cot.iAct?" act":"")+'" data-itm="'+i+'">'+
       '<span class="rvN">'+(i+1)+'</span>'+
-      '<span class="rvNom">'+esc(nombreItem(p.it, i+1))+'<small>'+p.r.qty+' × '+mx(p.r.precioUnit)+'</small></span>'+
+      '<span class="rvNom">'+esc(nombreItem(p.it, i+1))+'<small>'+cantConUnidad(p.r)+' × '+mx(p.r.precioUnit)+'</small></span>'+
       '<span class="rvMx">'+mx(p.r.total)+'</span></div>').join("")+
     '<div class="rvTotal"><span>'+r.qty+' pieza(s) · '+r.partes.length+' artículos</span><span>'+mx(r.total)+'</span></div>'+
     '<div class="rvNota">Abajo está el detalle del artículo que tienes abierto.</div>';
@@ -12102,6 +12395,7 @@ function renderTotalVarios(){
 /* Un artículo de la orden de producción: lo que hay que hacer, con qué
    medidas y con cuánto material. Se repite tal cual por cada artículo. */
 function bloqueArticuloOrden(p, n, varios, cuantos){
+  if(p.r && p.r.impresion) return cv2BloqueOrdenSvc(p, n, varios, cuantos);
   const q = p.q, r = p.r;
   const art = (cat.articulos||[]).find(a=>a.id===q.articuloId);
   const tal = (q.tallas||[]).filter(t=>num(t.cant)>0);
@@ -16683,7 +16977,7 @@ function renderEstado(){
     e.innerHTML = '<span class="pill good">Pedido confirmado</span>'+
       '<b class="num" style="font-size:13px">'+esc(cot.op.folio)+'</b>'+
       '<span class="estatus '+claseEstatus(cot.op.estatus)+'">'+esc(cot.op.estatus||"Pendiente")+'</span>'+
-      '<span style="color:var(--ink-3);font-size:12px">confirmado el '+esc(cot.op.fecha)+'</span>';
+      '<span style="color:var(--ink-3);font-size:12px">confirmado el '+esc(cot.op.fecha)+'</span>'+(typeof cv2EstadoPago === "function" ? cv2EstadoPago() : "");
   } else {
     e.innerHTML = '<span class="pill pend">Borrador</span>'+
       '<span style="color:var(--ink-2);font-size:12px">La orden de producción se genera al confirmar el pedido.</span>';
@@ -16702,8 +16996,10 @@ $("#btnConfirmar").addEventListener("click", async ()=>{
     renderEstado(); await guardaCot(); toast("El pedido volvió a borrador");
     return;
   }
-  if(!cot.apps.length){ toast("Agrega al menos una ubicación antes de confirmar"); return; }
-  if(!(cot.cliente||"").trim()){ toast("Escribe el nombre del cliente antes de confirmar"); return; }
+  const faltaConf = (typeof cv2FaltaConfirmar === "function") ? cv2FaltaConfirmar() : "";
+  if(faltaConf){ toast(faltaConf); return; }
+  if(typeof pgAbre === "function" && !cot._pagoListo){ pgAbre(); return; }
+  delete cot._pagoListo;
   cot.estado = "confirmada";
   cot.op = {folio: folioOP(), fecha: hoyISO(), cotizacion: cot.folio, estatus:"Pendiente",
             historial:[{estatus:"Pendiente", fecha:hoyISO(), hora:horaAhora()}]};
@@ -16719,6 +17015,7 @@ $("#btnConfirmar").addEventListener("click", async ()=>{
   if(cons.lista.length) renderInvInsumos();
   const art = cat.articulos.find(a=>a.id===cot.articuloId);
   renderEstado(); await guardaCot(); renderSaved();
+  if(cot.pago && !cot.pago.registrado && typeof cv2RegistraPago === "function"){ await cv2RegistraPago(cot); await guardaCot(); renderEstado(); }
   toast("Pedido confirmado · orden "+cot.op.folio +
     (art && num(art.existencia)<0 ? " · ojo: existencia en negativo" : "") +
     (cons.cortos.length ? " · sin material: " + cons.cortos.join(", ") : ""));
@@ -19944,7 +20241,13 @@ $("#cb_ok").addEventListener("click", async ()=>{
   renderVentas();
   if(typeof ofreceProduccion === "function") ofreceProduccion(q);
 });
-$("#btnCobrar").addEventListener("click", ()=> abrirCobro(cot));
+$("#btnCobrar").addEventListener("click", ()=>{
+  /* Si ya hay venta de este folio (el anticipo al confirmar), lo que sigue
+     es un abono: otra venta encima borraría el anticipo y lo contaría dos veces. */
+  const v = (ventas||[]).find(x=>x.folio === cot.folio);
+  if(v){ if(saldoDe(v) > 0.004){ abreAbono(v.folio); return; } toast("Este pedido ya está pagado completo"); return; }
+  abrirCobro(cot);
+});
 
 
 /* ---------- cuentas por cobrar ---------- */
@@ -21062,8 +21365,9 @@ function conceptosCFDI(v){
     const it = p.it, r = p.r;
     const a = (cat.articulos||[]).find(x=>x.id===it.articuloId) || null;
     const nom = nombreItem(it, i+1);
-    const clave = (a && a.claveSat) || (a ? claveSatSugerida(a) : "01010101");
-    const unidad = (a && a.claveUnidad) || unidadSugerida(clave);
+    const svp = (it.modo === "impresion" && it.svc) ? svProd(it.svc.pid) : null;
+    const clave = svp ? (svp.sat || "82121500") : ((a && a.claveSat) || (a ? claveSatSugerida(a) : "01010101"));
+    const unidad = svp ? "E48" : ((a && a.claveUnidad) || unidadSugerida(clave));
     const sku = (a && a.sku) || "";
     if(a && !a.claveSat) faltan.push(nom);
     const qty = Math.max(1, num(r.qty));
@@ -21285,6 +21589,7 @@ function ordenHoja(g){
    '<div class="op-grid"><div class="op-card"><b>Cliente</b><br>'+esc(g.cliente||"—")+(g.contacto?"<br>"+esc(g.contacto):"")+'</div>'+
    '<div class="op-card"><b>Trabajo</b><br>'+esc(g.ref||"—")+'<br>Responsable: '+esc(g.resp||"—")+
      (nombreVendedor(g) ? '<br>Elaborada por: '+esc(nombreVendedor(g)) : '')+'</div></div>'+
+   cv2PagoOrden(g)+
    r.partes.map((p, n)=> bloqueArticuloOrden(p, n, r.varios, r.partes.length)).join("")+
    (adm(g).alerta ? '<div style="border:2px solid #000;padding:8px;margin:10px 0"><b>REQUIERE ATENCIÓN:</b> '+esc(adm(g).alerta)+'</div>' : '')+
    (g.notas && !r.varios ? '<h2>Notas de producción</h2><p style="white-space:pre-line">'+esc(g.notas)+'</p>' : '')+
@@ -21292,8 +21597,6 @@ function ordenHoja(g){
      ? '<h2>Bitácora</h2><table><thead><tr><th>Fecha</th><th>Quién</th><th>Nota</th></tr></thead><tbody>'+
        g.op.bitacora.slice(-12).map(n=>'<tr><td>'+esc(n.fecha)+' '+esc(n.hora)+'</td><td>'+esc(n.autor||"")+'</td><td>'+esc(n.texto)+'</td></tr>').join("")+
        '</tbody></table>' : '')+
-   '<h2>Checklist de proceso</h2><div class="op-grid op-chk">'+
-   CHECKS.map((c,i)=>'<div><span></span>'+esc(c)+(g.checklist&&g.checklist[i]?" ✔":"")+'</div>').join("")+'</div>'+
    '<p style="margin-top:26px;font-size:11px">Produjo: ____________________&nbsp;&nbsp;&nbsp;Revisó: ____________________&nbsp;&nbsp;&nbsp;Fecha: ____________</p>';
 }
 function hoja(g){
@@ -21303,6 +21606,7 @@ function hoja(g){
   const filas = [];
   r.partes.forEach((p, n)=>{
     const pr = p.r, it = p.it;
+    if(pr.impresion){ filas.push([String(filas.length+1)].concat(cv2FilaSvc(pr, it, n))); return; }
     filas.push([String(filas.length+1),
       esc(nombreItem(it, n+1))+"<br><small>"+pr.detalle.map(d=>esc(d.ubic)+": "+esc(d.tecnica)+(d.sinMaterial ? "" : " ("+d.base+")")).join(" · ")+
       ((pr.armado||[]).length ? "<br>Incluye el material: "+pr.armado.map(a=>esc(a.nombre)+" "+red3(a.unidades)+" "+abrevUnidad(a.unidad)).join(", ") : "")+"</small>",
@@ -21327,17 +21631,1431 @@ function hoja(g){
    (r.urgencia>0?'<div><span>Recargo '+r.pctExtra+'%</span><span>'+mx(r.urgencia)+'</span></div>':'')+
    (r.iva>0?'<div><span>IVA '+P.iva+'%</span><span>'+mx(r.iva)+'</span></div>':'')+
    '<div class="t"><span>Total</span><span>'+mx(r.total)+'</span></div></div>'+
-   (r.partes.some(p=>(p.q.apps||[]).some(a=>a.art)) ? '<h2>Diseños incluidos</h2><div class="op-grid">'+
-      r.partes.reduce((h,p,n)=> h + (p.q.apps||[]).filter(a=>a.art).map(a=>
-        '<div class="op-card"><b>'+esc(a.ubic||"Aplicación")+'</b>'+
-        (r.varios ? '<br><small>'+esc(nombreItem(p.it, n+1))+'</small>' : '')+
-        '<br>'+miniatura(a.art)+'</div>').join(""), "")+'</div>' : '')+
+   cv2DisenosDoc(r)+
    '<p style="margin-top:18px;font-size:11px;white-space:pre-line">'+esc(P.empresa.cond)+'</p>';
 }
 
 let tT;
 function toast(m){ let el=document.querySelector(".toast"); if(!el){ el=document.createElement("div"); el.className="toast"; document.body.appendChild(el); }
   el.textContent=m; clearTimeout(tT); tT=setTimeout(()=>el.remove(),2600); }
+
+
+/* ======================================================================
+   COTIZAR v2 · 30 oct 2026
+   Tres cosas que pidió Carlos y que viven juntas porque se tocan:
+   1. La barra «¿Qué vamos a cotizar?»: artículo personalizado o servicio
+      de impresión, más el botón al Mostrador para vender sin impresión.
+   2. Los servicios de impresión como renglón propio de la cotización
+      (modo "impresion"), con su catálogo de productos y opciones que
+      mueven el precio, su ventana y su imagen de referencia.
+   3. Confirmar un pedido exige su pago: anticipo, pago total o crédito.
+   Las ubicaciones de un artículo usan la misma ventana, pero el precio y
+   el armado siguen saliendo del motor de siempre: técnicas, tamaños,
+   rollos y armado del catálogo.
+   ====================================================================== */
+const SV_ICONOS = (function(){
+  const PISO = (cx,rx) => '<ellipse class="svPiso" cx="'+cx+'" cy="58" rx="'+rx+'" ry="3"/>';
+  const PLAYERA = g => PISO(32,20) +
+    '<path d="M23 9 10 15 4 28l8 4 4-5v27h32V27l4 5 8-4-6-13-13-6c-1.5 4-5 6-9 6s-7.5-2-9-6z" fill="url(#'+g+')"/>' +
+    '<path d="M23 9c1.5 4 5 6 9 6s7.5-2 9-6" fill="none" stroke="#000" stroke-opacity=".22" stroke-width="2"/>' +
+    '<path d="M19 28v22" stroke="#fff" stroke-opacity=".35" stroke-width="4" stroke-linecap="round"/>';
+  return {
+    gran: PISO(32,25) +
+      '<rect x="12" y="30" width="4" height="25" rx="1.5" fill="url(#svgGrisO)"/><rect x="48" y="30" width="4" height="25" rx="1.5" fill="url(#svgGrisO)"/>' +
+      '<rect x="8" y="53" width="12" height="3" rx="1.5" fill="url(#svgGrisO)"/><rect x="44" y="53" width="12" height="3" rx="1.5" fill="url(#svgGrisO)"/>' +
+      '<path d="M13 26h38v15c-6 3.5-32 3.5-38 0z" fill="url(#svgCMY)"/><path d="M13 26h38v4H13z" fill="#000" opacity=".12"/>' +
+      '<rect x="5" y="11" width="54" height="19" rx="7" fill="url(#svgAzul)"/><rect x="8" y="13" width="48" height="6" rx="3" fill="url(#svgBrillo)"/>' +
+      '<rect x="11" y="24" width="42" height="3" rx="1.5" fill="url(#svgAzulO)"/><circle cx="51" cy="18" r="2.2" fill="#FDE047"/>',
+    digital: PISO(32,22) +
+      '<rect x="12" y="24" width="40" height="31" rx="5" fill="url(#svgBlanco)" stroke="#C5CEDA"/>' +
+      '<rect x="12" y="44" width="40" height="11" rx="4" fill="url(#svgGris)" stroke="#C5CEDA"/><rect x="26" y="48" width="12" height="2.4" rx="1.2" fill="#94A3B8"/>' +
+      '<path d="M10 17h44l-2 8H12z" fill="url(#svgGris)" stroke="#C5CEDA"/><rect x="9" y="13" width="46" height="6" rx="3" fill="url(#svgBlanco)" stroke="#C5CEDA"/>' +
+      '<rect x="37" y="28" width="11" height="7" rx="2" fill="url(#svgAzulO)"/><rect x="38.5" y="29.5" width="8" height="2" rx="1" fill="#7CC0FF" opacity=".85"/>' +
+      '<circle cx="18" cy="31" r="1.8" fill="#22C55E"/><path d="M15 37h22l3 5H12z" fill="#fff" stroke="#D5DBE3"/>' +
+      '<rect x="17" y="38.3" width="14" height="1.6" rx=".8" fill="url(#svgCMY)"/>',
+    subli: PISO(30,20) +
+      '<path d="M44 25h3.5a7.5 7.5 0 0 1 0 15H44" fill="none" stroke="#8B5CF6" stroke-width="5.5" stroke-linecap="round"/>' +
+      '<path d="M14 17h30v28a9 9 0 0 1-9 9H23a9 9 0 0 1-9-9z" fill="url(#svgMorado)"/>' +
+      '<ellipse cx="29" cy="17" rx="15" ry="4" fill="#E4D2FF"/><ellipse cx="29" cy="17.6" rx="12.4" ry="2.7" fill="#5B21B6"/>' +
+      '<rect x="18" y="23" width="5" height="24" rx="2.5" fill="url(#svgBrillo)"/>',
+    seri: PLAYERA("svgVerde") + '<rect x="25" y="25" width="14" height="10" rx="2" fill="#fff" opacity=".92"/><rect x="27" y="27.2" width="10" height="2.2" rx="1.1" fill="url(#svgCMY)"/><rect x="27" y="31" width="6" height="2" rx="1" fill="#15803D" opacity=".55"/>',
+    dtf: PISO(32,24) +
+      '<path d="M12 28h38l6 22H18z" fill="#F8FAFC" stroke="#CBD5E1"/><circle cx="27" cy="38" r="5" fill="url(#svgRosa)"/>' +
+      '<path d="M37 33l3.5 7h-7z" fill="url(#svgAzul)"/><rect x="42" y="40" width="7" height="6" rx="1.5" fill="#FDE047"/>' +
+      '<rect x="8" y="14" width="44" height="16" rx="8" fill="url(#svgGris)"/><rect x="11" y="16" width="38" height="4" rx="2" fill="url(#svgBrillo)"/>' +
+      '<ellipse cx="52" cy="22" rx="5" ry="8" fill="url(#svgGrisO)"/><ellipse cx="52" cy="22" rx="2" ry="3.2" fill="#3F4756"/>',
+    uv: PISO(32,24) +
+      '<path d="M8 38 32 48 56 38v4L32 52 8 42z" fill="#475569"/><path d="M32 28 56 38 32 48 8 38z" fill="url(#svgGrisO)"/>' +
+      '<path d="M8 29 32 39 56 29v4L32 43 8 33z" fill="#1E40AF"/><path d="M32 19 56 29 32 39 8 29z" fill="url(#svgAzul)"/>' +
+      '<path d="M8 20 32 30 56 20v4L32 34 8 24z" fill="#9D174D"/><path d="M32 10 56 20 32 30 8 20z" fill="url(#svgRosa)"/>' +
+      '<path d="M32 12 50 20 32 27 15 20z" fill="url(#svgBrillo)" opacity=".55"/>',
+    vinil: PISO(34,24) +
+      '<g transform="rotate(-8 40 38)"><rect x="22" y="24" width="34" height="26" rx="3" fill="#fff" stroke="#CBD5E1"/>' +
+      '<path d="M39 28l2.6 5.4 5.9.8-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" fill="url(#svgNaranja)" stroke="#9A3412" stroke-dasharray="2 1.6" stroke-width=".8"/></g>' +
+      '<rect x="6" y="14" width="14" height="40" rx="7" fill="url(#svgNaranja)"/><rect x="8.5" y="18" width="3.5" height="32" rx="1.75" fill="url(#svgBrillo)"/>' +
+      '<ellipse cx="13" cy="14" rx="7" ry="3" fill="#FED7AA"/><ellipse cx="13" cy="14" rx="2.6" ry="1.1" fill="#9A3412"/>' +
+      '<path d="M50 6l7 4-9 14-4-2z" fill="url(#svgGrisO)"/><path d="M44 22l4 2-3 3z" fill="#E2E8F0"/>',
+    laser: PISO(33,24) +
+      '<path d="M9 43l23 11 24-11-23-10z" fill="url(#svgMadera)"/><path d="M9 43v3l23 11v-3z" fill="#9A6234"/><path d="M32 54v3l24-11v-3z" fill="#B07A47"/>' +
+      '<path d="M22 43l9 4M26 41l11 5M30 39l8 3.6" stroke="#7C4A20" stroke-width="1.2" stroke-linecap="round"/>' +
+      '<rect x="23" y="5" width="18" height="13" rx="3.5" fill="url(#svgGrisO)"/><rect x="25" y="7" width="14" height="3" rx="1.5" fill="url(#svgBrillo)"/>' +
+      '<path d="M28 18h8l-2 4h-4z" fill="#3F4756"/><path d="M32 22v19" stroke="#EF4444" stroke-width="2.4" stroke-linecap="round"/>' +
+      '<circle cx="32" cy="42" r="3.6" fill="#FF6B6B" opacity=".45"/><circle cx="32" cy="42" r="1.4" fill="#FFF1F1"/>',
+    rotul: PISO(32,27) +
+      '<path d="M5 42V25a7 7 0 0 1 7-7h28l11 10h5a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" fill="url(#svgBlanco)" stroke="#C5CEDA"/>' +
+      '<path d="M41 21l8 8h-9z" fill="url(#svgAzul)"/><rect x="10" y="21" width="12" height="7" rx="2" fill="url(#svgAzul)" opacity=".85"/>' +
+      '<rect x="6" y="31" width="53" height="4" fill="url(#svgCMY)"/>' +
+      '<circle cx="17" cy="45" r="5.5" fill="#1F2937"/><circle cx="17" cy="45" r="2.2" fill="#9CA3AF"/>' +
+      '<circle cx="48" cy="45" r="5.5" fill="#1F2937"/><circle cx="48" cy="45" r="2.2" fill="#9CA3AF"/>',
+    letras: PISO(32,22) +
+      '<path d="M17 54 30 12h9l13 42H42l-2.6-9H29.6L27 54zM31.8 37h7.4L35.5 23z" fill="#1E3A8A" fill-rule="evenodd"/>' +
+      '<path d="M14 52 27 10h9l13 42H39l-2.6-9H26.6L24 52zM28.8 35h7.4L32.5 21z" fill="url(#svgAzul)" fill-rule="evenodd"/>' +
+      '<path d="M27 10h9l1.4 4.5H25.6z" fill="url(#svgBrillo)"/>',
+    router: PISO(32,24) +
+      '<path d="M8 46l24 10 24-10-24-9z" fill="#BFDBFE"/><path d="M8 46v3l24 10v-3z" fill="#93C5FD"/><path d="M32 56v3l24-10v-3z" fill="#60A5FA"/>' +
+      '<path d="M20 46l12 5 12-5" fill="none" stroke="#1D4ED8" stroke-width="1.3" stroke-dasharray="2.5 2"/>' +
+      '<rect x="22" y="4" width="20" height="20" rx="5" fill="url(#svgNaranja)"/><rect x="25" y="6" width="5" height="16" rx="2.5" fill="url(#svgBrillo)"/>' +
+      '<path d="M26 24h12l-2 6h-8z" fill="url(#svgGrisO)"/><path d="M30 30h4v12l-2 4-2-4z" fill="url(#svgGris)" stroke="#94A3B8" stroke-width=".8"/>' +
+      '<path d="M30 33l4 2M30 37l4 2" stroke="#94A3B8" stroke-width="1"/>',
+    caja: PISO(32,24) +
+      '<path d="M10 22l22 10v24L10 46z" fill="url(#svgCaja)"/><path d="M32 32l22-10v24L32 56z" fill="#A9682F"/>' +
+      '<path d="M10 22l22-10 22 10-22 10z" fill="#F2CB9B"/><path d="M19 18l4-2 22 10-4 2z" fill="#E9D7BC"/><path d="M41 28l4-2v7l-4 2z" fill="#D9BE9A"/>',
+    playera: PLAYERA("svgVerde"),
+    carrito: PISO(32,22) +
+      '<path d="M6 12h7l6 28h28l6-20H17" fill="none" stroke="#64748B" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path d="M18 22h34l-5 16H21z" fill="url(#svgVerde)"/><rect x="24" y="16" width="10" height="9" rx="2" fill="url(#svgNaranja)"/>' +
+      '<rect x="35" y="13" width="10" height="12" rx="2" fill="url(#svgAzul)"/>' +
+      '<circle cx="23" cy="48" r="4" fill="#334155"/><circle cx="44" cy="48" r="4" fill="#334155"/>'
+  };
+})();
+const svIco = id => '<svg class="svIco" viewBox="0 0 64 64" aria-hidden="true">' + (SV_ICONOS[id] || SV_ICONOS.gran) + '</svg>';
+/* Los degradados viven una sola vez, en un <svg> que no se ve pero sí se
+   pinta: uno con display:none los dejaría sin color en Chrome. */
+function svDefs(){
+  if(document.getElementById("svgDefs")) return;
+  const d = (id, a, b, h) => '<linearGradient id="'+id+'" x1="0" y1="0" x2="'+(h?1:0)+'" y2="'+(h?0:1)+'"><stop offset="0" stop-color="'+a+'"/><stop offset="1" stop-color="'+b+'"/></linearGradient>';
+  const dd = (id, a, b) => '<linearGradient id="'+id+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+a+'"/><stop offset="1" stop-color="'+b+'"/></linearGradient>';
+  document.body.insertAdjacentHTML("afterbegin",
+    '<svg id="svgDefs" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>' +
+    d("svgAzul","#7CC0FF","#2563EB") + d("svgAzulO","#3B82F6","#1E3A8A") + d("svgGris","#F8FAFC","#C5CEDA") + d("svgGrisO","#A3AEBD","#566072") +
+    dd("svgMorado","#C9A3FF","#7C3AED") + dd("svgVerde","#7EE8A8","#16A34A") + dd("svgNaranja","#FDC28A","#EA6A1E") + dd("svgCaja","#E9B57A","#B9773A") +
+    dd("svgRosa","#FBB6DA","#DB2777") + dd("svgMadera","#EBC9A0","#B98249") + d("svgBlanco","#FFFFFF","#DCE3EC") +
+    '<linearGradient id="svgCMY" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22D3EE"/><stop offset=".5" stop-color="#E879F9"/><stop offset="1" stop-color="#FDE047"/></linearGradient>' +
+    '<linearGradient id="svgBrillo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".75"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>' +
+    '<symbol id="cv2IcoArt" viewBox="0 0 64 64">' + SV_ICONOS.playera + '</symbol>' +
+    '<symbol id="cv2IcoSvc" viewBox="0 0 64 64">' + SV_ICONOS.gran + '</symbol>' +
+    '<symbol id="cv2IcoMos" viewBox="0 0 64 64">' + SV_ICONOS.carrito + '</symbol>' +
+    '</defs></svg>');
+}
+
+/* ------------------------------------------------------------------
+   El catálogo de servicios. Vive en cat.svcCat, así que se guarda y viaja
+   con el catálogo de siempre. Las secciones con «bloq» salen con candado:
+   las prende MakersOS desde el Lab (window.__seccionSvc).
+   Cada grupo de opciones dice cómo mueve el precio:
+     base · x · porM2 · perim · porUnidad · pedido · nada · rollo
+   y los grupos «num» piden un número (ojillos, piezas a planchar).
+   ------------------------------------------------------------------ */
+const SV_LAM_CARAS = {id:"lamCaras", nom:"Laminado por", modo:"nada", res:"a {v}", si:{g:"lam", no:"sin"}, ops:[
+  {id:"una", nom:"Una cara", n:1}, {id:"dos", nom:"Las dos caras", n:2}]};
+const SV_DEF = {
+  version: 1,
+  archivo: {id:"arch", nom:"Archivo", modo:"pedido", res:"{v}", ops:[
+    {id:"listo", nom:"Lo trae listo", p:0, c:0}, {id:"ajuste", nom:"Ajustar su archivo", p:80, c:25}, {id:"diseno", nom:"Diseño desde cero", p:250, c:80}]},
+  secciones: [
+    {id:"gran",    nom:"Impresión gran formato", sub:"Lonas, vinil, roll up",       det:"Plóter de rollo · se cobra por m² de la pieza", prods:["lona","vinil","rollup"]},
+    {id:"digital", nom:"Impresión digital",      sub:"Copias, tabloides, tarjetas", det:"Impresoras multifuncionales · por hoja o por pieza", prods:["copias","tabloide","tarjetas","volantes","etiquetas"]},
+    {id:"subli",   nom:"Sublimación",            sub:"Impresión, plancha y calandra", det:"En impresora o en plóter, con prensa si el cliente trae sus piezas", prods:["subImp","subPieza"]},
+    {id:"seri",    nom:"Serigrafía",             sub:"Tinta en prenda del cliente", det:"Marcos, tintas y tiraje", prods:["seriPrenda"]},
+    {id:"dtf",     nom:"DTF",                    sub:"Película por metro",          det:"Maquila por metro lineal", prods:["dtfMetro"]},
+    {id:"uv",      nom:"Impresión UV",           sub:"Rígidos y especiales",        det:"DTF UV para termos, madera y acrílico", prods:["uvMetro"]},
+    {id:"vinil",   nom:"Corte de vinil",         sub:"Textil y adhesivo",           det:"Plóter de corte · se cobra por m²", prods:["vinCorte"]},
+    {id:"laser",   nom:"Grabado láser",          sub:"Madera, acrílico, metal",     det:"Por minuto de máquina", prods:["laserPieza"]},
+    {id:"rotul",   nom:"Rotulación vehicular",   sub:"Cobertura y materiales", bloq:true},
+    {id:"letras",  nom:"Letras 3D",              sub:"Volumen y anuncios",     bloq:true},
+    {id:"router",  nom:"Corte y router",         sub:"Acrílico, MDF, PVC",     bloq:true},
+    {id:"caja",    nom:"Caja y empaque",         sub:"Troquel y armado",       bloq:true}
+  ],
+  productos: {
+    lona:{nom:"Lona", cobro:"m2", medida:"m", rollos:[1.0,1.5,2.2,3.2], orilla:0.025, sep:0.02, minPieza:1, sat:"82121505",
+      def:{w:3, h:1, q:1, sel:{bast:"todo"}, num:{ojillos:16}},
+      grupos:[
+        {id:"tipo", nom:"Tipo de lona", modo:"base", ops:[
+          {id:"f13", nom:"Front 13 oz", p:95, c:42}, {id:"f15", nom:"Front 15 oz", p:115, c:52},
+          {id:"mate", nom:"Front mate", p:120, c:55}, {id:"mesh", nom:"Mesh microperforada", p:150, c:68},
+          {id:"back", nom:"Translúcida (backlight)", p:185, c:85}, {id:"black", nom:"Blackout dos caras", p:160, c:74}]},
+        {id:"rollo", nom:"Ancho de rollo", modo:"rollo", nota:"cambia lo que gastas, no lo que cobras"},
+        {id:"bast", nom:"Bastilla", modo:"perim", ops:[
+          {id:"no", nom:"Sin bastilla", p:0, c:0}, {id:"todo", nom:"Todo el contorno", p:14, c:4, lados:"todo"},
+          {id:"ab", nom:"Arriba y abajo", p:14, c:4, lados:"ab"}]},
+        {id:"ojillos", nom:"Ojillos", tipo:"num", por:"unidad", p:4, c:1.2, uni:"ojillos", sugiere:0.5, nota:"por pieza"}
+      ]},
+    vinil:{nom:"Vinil impreso", cobro:"m2", medida:"m", rollos:[1.06,1.27,1.37,1.52], orilla:0.02, sep:0.01, minPieza:0.25, sat:"82121505",
+      def:{w:1.2, h:0.6, q:1, sel:{lam:"mate"}},
+      grupos:[
+        {id:"tipo", nom:"Tipo de vinil", modo:"base", ops:[
+          {id:"bri", nom:"Brillante", p:175, c:80}, {id:"mate", nom:"Mate", p:175, c:80},
+          {id:"trans", nom:"Transparente", p:195, c:90}, {id:"micro", nom:"Microperforado", p:220, c:105},
+          {id:"refl", nom:"Reflejante", p:340, c:165}]},
+        {id:"rollo", nom:"Ancho de rollo", modo:"rollo", nota:"cambia lo que gastas, no lo que cobras"},
+        {id:"lam", nom:"Laminado", modo:"porM2", ops:[
+          {id:"sin", nom:"Sin laminado", p:0, c:0}, {id:"bri", nom:"Brillante", p:65, c:26},
+          {id:"mate", nom:"Mate", p:65, c:26}, {id:"anti", nom:"Antigrafiti", p:95, c:45}]},
+        {id:"corte", nom:"Corte", modo:"porM2", ops:[
+          {id:"rect", nom:"Recto, a escuadra", p:0, c:0}, {id:"cont", nom:"A contorno (plóter)", p:45, c:8}]}
+      ]},
+    rollup:{nom:"Roll up y araña", cobro:"pieza", sat:"82121505", def:{q:1},
+      grupos:[
+        {id:"est", nom:"Estructura", modo:"base", ops:[
+          {id:"r80", nom:"Roll up 80 × 200 cm", p:850, c:430}, {id:"r100", nom:"Roll up 100 × 200 cm", p:990, c:510},
+          {id:"x60", nom:"Araña X 60 × 160 cm", p:540, c:250}]},
+        {id:"lona", nom:"Lona", modo:"porUnidad", ops:[
+          {id:"mate", nom:"Front mate", p:0, c:0}, {id:"black", nom:"Blackout", p:140, c:70}]}
+      ]},
+    copias:{nom:"Copias e impresiones", cobro:"hoja", rapidos:[10,50,100,500], sat:"82121500", def:{q:100},
+      grupos:[
+        {id:"tam", nom:"Tamaño", modo:"base", ops:[
+          {id:"carta", nom:"Carta", p:1.5, c:0.45}, {id:"oficio", nom:"Oficio", p:2, c:0.6}, {id:"doble", nom:"Doble carta", p:4, c:1.2}]},
+        {id:"color", nom:"Tinta", modo:"x", ops:[{id:"bn", nom:"Blanco y negro", p:1}, {id:"color", nom:"A color", p:3.5, cx:4}]},
+        {id:"caras", nom:"Caras", modo:"x", ops:[{id:"una", nom:"Una cara", p:1}, {id:"dos", nom:"Las dos caras", p:1.8, cx:1.9}]},
+        {id:"papel", nom:"Papel", modo:"porUnidad", ops:[
+          {id:"b75", nom:"Bond 75 g", p:0, c:0}, {id:"b90", nom:"Bond 90 g", p:0.4, c:0.18},
+          {id:"opal", nom:"Opalina 225 g", p:2.5, c:1.1}, {id:"c150", nom:"Couché 150 g", p:3, c:1.3}]}
+      ]},
+    tabloide:{nom:"Tabloides", cobro:"hoja", rapidos:[10,25,50,100], sat:"82121500", def:{q:50, sel:{papel:"c250", lam:"bri"}},
+      grupos:[
+        {id:"tam", nom:"Tamaño del tabloide", modo:"base", ops:[
+          {id:"t1117", nom:"28 × 43 cm (11 × 17″)", p:16, c:5.5}, {id:"t1218", nom:"30 × 45 cm (12 × 18″)", p:18, c:6.2},
+          {id:"t1319", nom:"33 × 48 cm (13 × 19″)", p:22, c:7.5}]},
+        {id:"caras", nom:"Caras", modo:"x", ops:[{id:"una", nom:"Una cara", p:1}, {id:"dos", nom:"Las dos caras", p:1.6, cx:1.7}]},
+        {id:"papel", nom:"Papel", modo:"porUnidad", ops:[
+          {id:"b90", nom:"Bond 90 g", p:0, c:0}, {id:"c150", nom:"Couché 150 g", p:3, c:1.3},
+          {id:"c250", nom:"Couché 250 g", p:5, c:2.2}, {id:"c300", nom:"Couché 300 g", p:6, c:2.7}, {id:"adh", nom:"Adhesivo", p:9, c:4.2}]},
+        {id:"lam", nom:"Laminado", modo:"porUnidad", porN:"lamCaras", porNuno:"cara", porNtxt:"caras", ops:[
+          {id:"sin", nom:"Sin laminado", p:0, c:0}, {id:"bri", nom:"Brillante", p:9, c:3},
+          {id:"mate", nom:"Mate", p:9, c:3}, {id:"soft", nom:"Soft touch", p:15, c:6}]},
+        SV_LAM_CARAS
+      ]},
+    tarjetas:{nom:"Tarjetas de presentación", cobro:"pieza", minQ:100, rapidos:[100,250,500,1000], sat:"82121500", def:{q:500, sel:{caras:"dos", lam:"mate"}},
+      grupos:[
+        {id:"caras", nom:"Caras", modo:"base", nota:"cada una tiene su precio", ops:[
+          {id:"una", nom:"Una cara", p:1.2, c:0.38}, {id:"dos", nom:"Las dos caras", p:1.8, c:0.62}]},
+        {id:"papel", nom:"Papel", modo:"porUnidad", ops:[
+          {id:"c300", nom:"Couché 300 g", p:0, c:0}, {id:"opal", nom:"Opalina 250 g", p:0.1, c:0.04},
+          {id:"lino", nom:"Lino", p:0.35, c:0.15}, {id:"kraft", nom:"Kraft", p:0.3, c:0.12}, {id:"sint", nom:"Sintético (PVC)", p:1.5, c:0.7}]},
+        {id:"lam", nom:"Laminado", modo:"porUnidad", porN:"lamCaras", porNuno:"cara", porNtxt:"caras", ops:[
+          {id:"sin", nom:"Sin laminado", p:0, c:0}, {id:"mate", nom:"Mate", p:0.3, c:0.1},
+          {id:"bri", nom:"Brillante", p:0.3, c:0.1}, {id:"soft", nom:"Soft touch", p:0.6, c:0.24}]},
+        SV_LAM_CARAS,
+        {id:"esq", nom:"Esquinas", modo:"porUnidad", ops:[{id:"rectas", nom:"Rectas", p:0, c:0}, {id:"redondas", nom:"Redondeadas", p:0.15, c:0.03}]}
+      ]},
+    volantes:{nom:"Volantes", cobro:"pieza", minQ:50, rapidos:[100,500,1000,2000], sat:"82121500", def:{q:1000},
+      grupos:[
+        {id:"tam", nom:"Tamaño", modo:"base", ops:[
+          {id:"c4", nom:"¼ de carta", p:0.8, c:0.22}, {id:"c2", nom:"Media carta", p:1.3, c:0.38}, {id:"c1", nom:"Carta", p:2.2, c:0.7}]},
+        {id:"caras", nom:"Caras", modo:"x", ops:[{id:"una", nom:"Una cara", p:1}, {id:"dos", nom:"Las dos caras", p:1.6, cx:1.7}]},
+        {id:"papel", nom:"Papel", modo:"porUnidad", ops:[
+          {id:"b90", nom:"Bond 90 g", p:0, c:0}, {id:"c130", nom:"Couché 130 g", p:0.3, c:0.12}, {id:"c150", nom:"Couché 150 g", p:0.45, c:0.18}]}
+      ]},
+    etiquetas:{nom:"Etiquetas en hoja", cobro:"hoja", rapidos:[5,10,20,50], sat:"82121500", def:{q:20},
+      grupos:[
+        {id:"mat", nom:"Material", modo:"base", ops:[
+          {id:"pbri", nom:"Papel adhesivo brillante", p:14, c:4.5}, {id:"pmate", nom:"Papel adhesivo mate", p:14, c:4.5},
+          {id:"vbla", nom:"Vinil adhesivo blanco", p:28, c:10}, {id:"vtra", nom:"Vinil transparente", p:32, c:12}]},
+        {id:"corte", nom:"Corte", modo:"porUnidad", ops:[{id:"sin", nom:"Sin corte", p:0, c:0}, {id:"medio", nom:"Medio corte a contorno", p:12, c:2}]},
+        {id:"lam", nom:"Laminado", modo:"porUnidad", ops:[{id:"sin", nom:"Sin laminado", p:0, c:0}, {id:"bri", nom:"Brillante", p:6, c:2}]}
+      ]},
+    subImp:{nom:"Impresión para sublimar", cobro:"hoja", sat:"82121510", def:{q:5, sel:{formato:"plo", medida:"p111", prensa:"cal"}},
+      grupos:[
+        {id:"formato", nom:"¿En qué se imprime?", modo:"nada", ops:[{id:"imp", nom:"Impresora (hojas)"}, {id:"plo", nom:"Plóter (rollo)"}]},
+        {id:"modelo", nom:"Modelo de impresora", modo:"base", si:{g:"formato", es:"imp"}, ops:[
+          {id:"f170", nom:"Epson F170 · carta", p:18, c:6, cobro:"hoja"}, {id:"sg500", nom:"Sawgrass SG500 · carta", p:20, c:7, cobro:"hoja"},
+          {id:"sg1000", nom:"Sawgrass SG1000 · tabloide", p:32, c:11, cobro:"hoja"}]},
+        {id:"medida", nom:"Medida del plóter", modo:"base", si:{g:"formato", es:"plo"}, ops:[
+          {id:"p61", nom:"61 cm (24″)", p:70, c:26, cobro:"ml"}, {id:"p111", nom:"1.11 m (44″)", p:95, c:38, cobro:"ml"},
+          {id:"p162", nom:"1.62 m (64″)", p:135, c:55, cobro:"ml"}]},
+        {id:"prensa", nom:"¿Lleva servicio de prensa?", modo:"nada", nota:"para cuando el cliente trae sus prendas o artículos", ops:[
+          {id:"no", nom:"Sólo la impresión"}, {id:"plancha", nom:"Planchado por pieza"},
+          {id:"cal", nom:"Calandrado por metro", si:{g:"formato", es:"plo"}, m:"porUnidad", p:45, c:12}]},
+        {id:"piezasPl", nom:"Piezas a planchar", tipo:"num", por:"pedido", p:15, c:4, uni:"piezas", def:10, si:{g:"prensa", es:"plancha"}}
+      ]},
+    subPieza:{nom:"Sublimar pieza del cliente", cobro:"pieza", rapidos:[10,20,50,100], sat:"82121510", def:{q:20},
+      grupos:[
+        {id:"tam", nom:"Tamaño de la impresión", modo:"base", ops:[
+          {id:"chico", nom:"Hasta 20 × 15 cm", p:25, c:6}, {id:"carta", nom:"Carta", p:35, c:9},
+          {id:"tab", nom:"Tabloide", p:55, c:15}, {id:"frente", nom:"Frente completo", p:75, c:22}]},
+        {id:"pieza", nom:"¿Qué trae el cliente?", modo:"porUnidad", ops:[
+          {id:"prenda", nom:"Prenda", p:0, c:0}, {id:"taza", nom:"Taza o termo", p:5, c:2}, {id:"rigido", nom:"Rígido o placa", p:0, c:0}]}
+      ]},
+    seriPrenda:{nom:"Estampado en prenda del cliente", cobro:"pieza", minQ:12, rapidos:[24,50,100,250], sat:"82121504", def:{q:50},
+      grupos:[
+        {id:"tintas", nom:"Tintas", modo:"base", ops:[
+          {id:"t1", nom:"1 tinta", p:8, c:3.5, n:1}, {id:"t2", nom:"2 tintas", p:12, c:5.5, n:2},
+          {id:"t3", nom:"3 tintas", p:16, c:7.5, n:3}, {id:"t4", nom:"4 tintas", p:20, c:9.5, n:4}]},
+        {id:"tam", nom:"Tamaño", modo:"porUnidad", ops:[
+          {id:"bolsa", nom:"Bolsillo", p:0, c:0}, {id:"med", nom:"Mediano", p:2, c:0.8},
+          {id:"frente", nom:"Frente completo", p:4, c:1.6}, {id:"espalda", nom:"Espalda completa", p:6, c:2.4}]},
+        {id:"prenda", nom:"Color de la prenda", modo:"porUnidad", res:"prenda {v}", ops:[
+          {id:"clara", nom:"Clara", p:0, c:0}, {id:"oscura", nom:"Oscura (lleva base blanca)", p:3.5, c:1.5}]},
+        {id:"marcos", nom:"Marcos", modo:"pedido", res:"{v}", porN:"tintas", porNuno:"tinta", porNtxt:"tintas", ops:[
+          {id:"nuevos", nom:"Marcos nuevos", p:120, c:45}, {id:"taller", nom:"Reusar marcos del taller", p:40, c:10},
+          {id:"cliente", nom:"El cliente trae los suyos", p:0, c:0}]}
+      ]},
+    dtfMetro:{nom:"DTF por metro", cobro:"ml", minQ:0.5, rapidos:[1,3,5,10], sat:"82121510", def:{q:3},
+      grupos:[
+        {id:"ancho", nom:"Ancho de la película", modo:"base", ops:[{id:"a30", nom:"30 cm", p:36, c:21}, {id:"a60", nom:"60 cm", p:62, c:38}]},
+        {id:"plancha", nom:"Piezas a planchar", tipo:"num", por:"pedido", p:12, c:3, uni:"piezas", nota:"si el cliente trae sus prendas"}
+      ]},
+    uvMetro:{nom:"DTF UV por metro", cobro:"ml", minQ:0.3, rapidos:[0.5,1,2,5], sat:"82121500", def:{q:1},
+      grupos:[
+        {id:"ancho", nom:"Ancho", modo:"base", ops:[{id:"a30", nom:"30 cm", p:58, c:34}, {id:"a60", nom:"60 cm", p:105, c:62}]},
+        {id:"aplica", nom:"Piezas a aplicar", tipo:"num", por:"pedido", p:10, c:2, uni:"piezas", nota:"termos, fundas o placas del cliente"}
+      ]},
+    vinCorte:{nom:"Vinil de corte", cobro:"m2", medida:"cm", rollos:[0.5,0.61], orilla:0.01, sep:0.005, minPieza:0, minPedido:60, sat:"82121505",
+      def:{w:25, h:20, q:30},
+      grupos:[
+        {id:"vin", nom:"Vinil", modo:"base", ops:[
+          {id:"pu", nom:"Textil PU", p:220, c:120}, {id:"glit", nom:"Textil glitter", p:340, c:190},
+          {id:"flock", nom:"Textil flock", p:300, c:170}, {id:"adh", nom:"Adhesivo de color", p:140, c:70},
+          {id:"refl", nom:"Adhesivo reflejante", p:380, c:200}]},
+        {id:"rollo", nom:"Ancho de rollo", modo:"rollo", nota:"cambia lo que gastas, no lo que cobras"},
+        {id:"dep", nom:"Depilado", modo:"porM2", ops:[{id:"sen", nom:"Sencillo", p:0, c:0}, {id:"det", nom:"Detallado (letra chica)", p:60, c:20}]},
+        {id:"transfer", nom:"Transfer", modo:"porM2", ops:[{id:"sin", nom:"Sin transfer", p:0, c:0}, {id:"con", nom:"Con transfer", p:30, c:12}]},
+        {id:"aplica", nom:"Aplicación", modo:"porUnidad", ops:[{id:"no", nom:"Sólo el corte", p:0, c:0}, {id:"si", nom:"Planchado o aplicado", p:12, c:3}]}
+      ]},
+    laserPieza:{nom:"Grabado en pieza del cliente", cobro:"pieza", rapidos:[10,25,50,100], sat:"82121500", def:{q:25},
+      grupos:[
+        {id:"maq", nom:"Máquina", modo:"base", ops:[
+          {id:"co2", nom:"CO₂ 100 W", p:3.5, c:0.92, uni:"min"}, {id:"fibra", nom:"Fibra 30 W", p:2.8, c:0.24, uni:"min"}]},
+        {id:"min", nom:"Minutos por pieza", tipo:"num", por:"base", uni:"min", paso:0.5, def:3},
+        {id:"mont", nom:"Montaje", modo:"pedido", ops:[{id:"normal", nom:"Normal", p:40, c:12}, {id:"plantilla", nom:"Plantilla para muchas piezas", p:120, c:40}]}
+      ]}
+  }
+};
+/* Se siembra la primera vez y, si el catálogo de fábrica crece, se le
+   agregan los productos nuevos sin tocar los precios que el taller ya puso. */
+function svCat(){
+  if(typeof cat !== "object" || !cat) return JSON.parse(JSON.stringify(SV_DEF));
+  if(!cat.svcCat || typeof cat.svcCat !== "object" || !cat.svcCat.productos){
+    cat.svcCat = JSON.parse(JSON.stringify(SV_DEF));
+  } else {
+    const c = cat.svcCat;
+    if(!c.archivo) c.archivo = JSON.parse(JSON.stringify(SV_DEF.archivo));
+    if(!Array.isArray(c.secciones)) c.secciones = JSON.parse(JSON.stringify(SV_DEF.secciones));
+    SV_DEF.secciones.forEach(s=>{ if(!c.secciones.some(x=>x.id === s.id)) c.secciones.push(JSON.parse(JSON.stringify(s))); });
+    Object.keys(SV_DEF.productos).forEach(k=>{ if(!c.productos[k]) c.productos[k] = JSON.parse(JSON.stringify(SV_DEF.productos[k])); });
+  }
+  return cat.svcCat;
+}
+const svProd = id => { const p = svCat().productos[id]; if(p && !p.id) p.id = id; return p || null; };
+const svSecDe = pid => (svCat().secciones.find(s=>(s.prods||[]).indexOf(pid) >= 0) || {}).id || "gran";
+const svSeccionAbierta = s => !s.bloq || (typeof window.__seccionSvc === "function" && !!window.__seccionSvc(s.id));
+const SV_UNI = {m2:{uno:"pieza", pl:"piezas", corto:"pza"}, hoja:{uno:"hoja", pl:"hojas", corto:"hoja"},
+                pieza:{uno:"pieza", pl:"piezas", corto:"pza"}, ml:{uno:"metro", pl:"metros", corto:"m"}};
+const SV_QLBL = {m2:"¿Cuántas piezas?", hoja:"¿Cuántas hojas?", pieza:"¿Cuántas piezas?", ml:"¿Cuántos metros?"};
+const svN2 = n => (Math.round((+n||0)*100)/100).toLocaleString("es-MX",{minimumFractionDigits:2,maximumFractionDigits:2});
+const svN0 = n => (Math.round((+n||0)*100)/100).toLocaleString("es-MX",{maximumFractionDigits:2});
+
+/* ---------------- el motor de los servicios ---------------- */
+const svGrupos = pr => (pr.grupos || []).concat([svCat().archivo]);
+const svFmtRollo = r => r >= 1 ? svN2(r) + " m" : Math.round(r*100) + " cm";
+const svOpsDe = (g, pr) => g.modo === "rollo" ? (pr.rollos||[]).map(r=>({id:String(r), nom:svFmtRollo(r)})) : (g.ops || []);
+function svCumple(si, st, pr){
+  if(!si) return true;
+  const g = svGrupos(pr).find(x=>x.id === si.g);
+  if(!g || !svCumple(g.si, st, pr)) return false;
+  const v = st.sel[si.g];
+  return si.es ? v === si.es : v !== si.no;
+}
+const svGruposVis = (pr, st) => svGrupos(pr).filter(g=> svCumple(g.si, st, pr));
+const svOpsVis = (g, st, pr) => svOpsDe(g, pr).filter(o=> svCumple(o.si, st, pr));
+
+/* Acomoda las piezas a lo ancho del rollo. Prueba las dos orientaciones y
+   se queda con la que gasta menos; si no cabe ni girada, va en tramos. */
+function svAcomoda(w, h, q, rollo, orilla, sep, arranque){
+  if(arranque == null) arranque = 0.1;
+  if(!(w>0 && h>0 && q>0 && rollo>0)) return null;
+  const util = rollo - 2*orilla;
+  let mejor = null;
+  [[w,h],[h,w]].forEach(([a0,l])=>{
+    let a = a0, tramos = 1;
+    if(a0 > util + 1e-9){ tramos = Math.ceil(a0/util); a = a0/tramos; }
+    const piezas = Math.ceil(q)*tramos;
+    const fila = tramos > 1 ? 1 : Math.max(1, Math.floor((util + sep)/(a + sep)));
+    const filas = Math.ceil(piezas/fila);
+    const largo = filas*l + (filas-1)*sep + arranque;
+    const r = {a, l, tramos, piezas, fila, filas, largo, consumo: rollo*largo, rollo, orilla, sep};
+    if(!mejor || r.consumo < mejor.consumo - 1e-9) mejor = r;
+  });
+  mejor.aprovecha = (w*h*q)/mejor.consumo;
+  return mejor;
+}
+function svMedidas(pr, st){ const k = pr.medida === "cm" ? 0.01 : 1; return [Math.max(0,num(st.w))*k, Math.max(0,num(st.h))*k]; }
+function svMejorRollo(pr, st){
+  const [w,h] = svMedidas(pr, st), q = num(st.q);
+  let mejor = null, mc = Infinity;
+  (pr.rollos||[]).forEach(r=>{ const a = svAcomoda(w, h, q, r, pr.orilla, pr.sep); if(a && a.consumo < mc - 1e-9){ mc = a.consumo; mejor = r; } });
+  return mejor == null ? (pr.rollos||[])[ (pr.rollos||[]).length-1 ] : mejor;
+}
+function svNormaliza(pr, st){
+  svGruposVis(pr, st).forEach(g=>{
+    if(g.tipo === "num" || g.modo === "rollo") return;
+    const ops = svOpsVis(g, st, pr);
+    if(!ops.some(o=>o.id === st.sel[g.id])) st.sel[g.id] = ops[0] ? ops[0].id : null;
+  });
+}
+function svStDefault(pid){
+  const pr = svProd(pid), d = pr.def || {};
+  const st = {sel:{}, num:{}, w:d.w||0, h:d.h||0, q:d.q||1, notas:""};
+  svGrupos(pr).forEach(g=>{
+    if(g.tipo === "num") st.num[g.id] = (d.num && d.num[g.id] != null) ? d.num[g.id] : (g.def || 0);
+    else if(g.modo === "rollo") st.sel[g.id] = null;
+    else st.sel[g.id] = (d.sel && d.sel[g.id]) || (g.ops[0] && g.ops[0].id);
+  });
+  svNormaliza(pr, st);
+  if(pr.rollos) st.sel.rollo = String(svMejorRollo(pr, st));
+  return st;
+}
+function svCalc(pid, st){
+  const pr = svProd(pid);
+  if(!pr || !st) return {total:0, costo:0, q:0, cobro:"pieza", U:SV_UNI.pieza, ren:[], avisos:[], acomodo:null, w:0, h:0, A:0, per:0, porPieza:0};
+  const G = svGruposVis(pr, st);
+  const opt = g => svOpsVis(g, st, pr).find(o=>o.id === st.sel[g.id]) || null;
+  const nDe = gid => { const g = G.find(x=>x.id === gid); const o = g ? opt(g) : null; return o && o.n ? o.n : 1; };
+  let cobro = pr.cobro, base = null;
+  G.forEach(g=>{ if(g.modo === "base"){ const o = opt(g); if(o){ base = o; if(o.cobro) cobro = o.cobro; } } });
+  if(!base) base = {nom:pr.nom, p:0, c:0};
+  let xp = 1, xc = 1; const xs = [], numBase = [];
+  G.forEach(g=>{
+    if(g.modo === "x"){ const o = opt(g); if(o && num(o.p) !== 1){ xp *= num(o.p); xc *= (o.cx != null ? num(o.cx) : num(o.p)); xs.push(o.nom.toLowerCase()); } }
+    if(g.tipo === "num" && g.por === "base"){ const v = Math.max(0, num(st.num[g.id])); xp *= v; xc *= v; numBase.push([g, v]); }
+  });
+  const q = Math.max(0, num(st.q));
+  const [w, h] = svMedidas(pr, st);
+  const A = w*h, Acob = Math.max(A, pr.minPieza || 0), per = 2*(w + h);
+  const up = num(base.p)*xp, uc = num(base.c)*xc, U = SV_UNI[cobro];
+  const ren = [], avisos = [];
+  let pU = 0, cU = 0, pF = 0, cF = 0, cMat = 0, acomodo = null;
+  let etq = [base.nom].concat(xs).join(" · ");
+  numBase.forEach(([g,v])=>{ etq += " · " + svN0(v) + " " + g.uni + " × " + mx(base.p) + "/" + g.uni; });
+  if(cobro === "m2"){
+    pU += up*Acob;
+    if(pr.rollos && st.sel.rollo) acomodo = svAcomoda(w, h, q, num(st.sel.rollo), pr.orilla, pr.sep);
+    cMat = acomodo ? uc*acomodo.consumo : uc*A*q;
+    const minTxt = (A > 0 && A < (pr.minPieza||0)) ? " (se cobra el mínimo de " + svN0(pr.minPieza) + " m²)" : "";
+    ren.push({t: etq + " · " + svN2(Acob) + " m² c/u × " + mx(up) + "/m²" + minTxt, m: up*Acob*q});
+  } else {
+    pU += up; cMat = uc*q;
+    ren.push({t: etq + " · " + svN0(q) + " " + U.pl + " × " + mx(up), m: up*q});
+  }
+  G.forEach(g=>{
+    if(g.tipo === "num"){
+      if(g.por === "base") return;
+      const v = Math.max(0, num(st.num[g.id])); if(!v) return;
+      if(g.por === "unidad"){ pU += num(g.p)*v; cU += num(g.c)*v; ren.push({t: g.nom + " · " + svN0(v) + " por " + U.uno + " × " + mx(g.p), m: num(g.p)*v*q}); }
+      else { pF += num(g.p)*v; cF += num(g.c)*v; ren.push({t: g.nom + " · " + svN0(v) + " × " + mx(g.p), m: num(g.p)*v}); }
+      return;
+    }
+    if(g.modo === "base" || g.modo === "x" || g.modo === "rollo") return;
+    const o = opt(g); if(!o) return;
+    const m = o.m || g.modo;
+    if(m === "nada" || (!num(o.p) && !num(o.c))) return;
+    const n = g.porN ? nDe(g.porN) : 1;
+    const nT = (g.porN && n > 1) ? " × " + n + " " + (g.porNtxt || "") : "";
+    const que = g.nom + ": " + o.nom.toLowerCase();
+    const p = num(o.p), c = num(o.c);
+    if(m === "porM2"){ pU += p*Acob*n; cU += c*A*n; ren.push({t: que + nT + " · " + svN2(Acob) + " m² c/u × " + mx(p) + "/m²", m: p*Acob*n*q}); }
+    else if(m === "perim"){ const L = o.lados === "ab" ? 2*w : per; pU += p*L; cU += c*L; ren.push({t: que + " · " + svN2(L) + " m c/u × " + mx(p) + "/m", m: p*L*q}); }
+    else if(m === "porUnidad"){ pU += p*n; cU += c*n; ren.push({t: que + nT + " · " + mx(p*n) + " por " + U.uno, m: p*n*q}); }
+    else if(m === "pedido"){ pF += p*n; cF += c*n; ren.push({t: que + nT + " · una sola vez", m: p*n}); }
+  });
+  let total = pU*q + pF;
+  const costo = cMat + cU*q + cF;
+  if(!(q > 0)) avisos.push("Escribe la cantidad.");
+  if(cobro === "m2" && !(A > 0)) avisos.push("Escribe el ancho y el alto de la pieza.");
+  if(pr.minQ && q > 0 && q < pr.minQ) avisos.push("El mínimo para " + pr.nom.toLowerCase() + " es " + svN0(pr.minQ) + " " + U.pl + ".");
+  if(pr.minPedido && q > 0 && total > 0 && total < pr.minPedido){ ren.push({t:"Ajuste al mínimo de pedido de " + mx(pr.minPedido), m: pr.minPedido - total}); total = pr.minPedido; }
+  if(acomodo && acomodo.tramos > 1) avisos.push("La pieza no cabe en el rollo de " + svFmtRollo(acomodo.rollo) + ": sale en " + acomodo.tramos + " tramos que se empalman.");
+  return {total, costo, q, cobro, U, ren, avisos, acomodo, w, h, A, per, porPieza: q > 0 ? total/q : 0};
+}
+function svResTxt(g, o){
+  if(g.res) return g.res.replace("{v}", o.nom.toLowerCase());
+  if(g.modo === "base" || g.modo === "nada") return o.nom;
+  if(g.modo === "x") return o.nom.toLowerCase();
+  return g.nom.toLowerCase() + " " + o.nom.toLowerCase();
+}
+/* Lo que se lee del concepto. «interna» no va en la cotización del cliente
+   pero sí en la orden: el rollo, o que el archivo ya venía listo. */
+function svDetalle(pid, st){
+  const pr = svProd(pid), r = svCalc(pid, st), d = [];
+  if(!pr) return d;
+  if(pr.medida) d.push({k:"Medida", v: svN0(num(st.w)) + " × " + svN0(num(st.h)) + " " + pr.medida});
+  svGruposVis(pr, st).forEach(g=>{
+    if(g.tipo === "num"){ const v = num(st.num[g.id]); if(v){ const t = svN0(v) + " " + (g.uni||"") + (g.por === "unidad" ? " por " + r.U.uno : ""); d.push({k:g.nom, v:t, r:t}); } return; }
+    if(g.modo === "rollo"){ if(st.sel.rollo) d.push({k:"Rollo", v: svFmtRollo(num(st.sel.rollo)), interna:true}); return; }
+    const o = svOpsVis(g, st, pr).find(x=>x.id === st.sel[g.id]); if(!o) return;
+    d.push({k:g.nom, v:o.nom, r: svResTxt(g, o), interna: g.id === "arch" && o.id === "listo"});
+  });
+  return d;
+}
+function svCantTxt(pid, st){
+  const pr = svProd(pid), r = svCalc(pid, st);
+  if(!pr) return "";
+  if(r.cobro === "m2") return svN0(r.q) + " " + (r.q === 1 ? "pieza" : "piezas") + " de " + svN0(num(st.w)) + " × " + svN0(num(st.h)) + " " + pr.medida;
+  return svN0(r.q) + " " + (r.q === 1 ? r.U.uno : r.U.pl);
+}
+function svResumen(pid, st){
+  return svDetalle(pid, st).filter(x=>!x.interna && x.k !== "Medida").slice(0,4).map(x=>x.r || x.v).join(" · ");
+}
+/* El nombre que lleva el renglón en la cotización, la orden y la venta. */
+function svDesc(pid, st){
+  const pr = svProd(pid); if(!pr) return "Servicio de impresión";
+  const r = svCalc(pid, st);
+  return pr.nom + (r.cobro === "m2" ? " " + svN0(num(st.w)) + " × " + svN0(num(st.h)) + " " + pr.medida : "") +
+         (svResumen(pid, st) ? " · " + svResumen(pid, st) : "");
+}
+
+/* calc() de un renglón de servicio: el mismo objeto que entrega calc() para
+   un artículo, para que la tira, el resumen, guardar, cobrar y los papeles
+   lo entiendan sin saber de dónde salió. */
+function calcImpresion(){
+  const s = cot.svc;
+  const R = (s && svProd(s.pid)) ? svCalc(s.pid, s.st) : null;
+  const qty = R ? Math.max(0, R.q) : 0;
+  const sub = R ? Math.round(R.total*100)/100 : 0, costo = R ? R.costo : 0;
+  const iva = P.ivaOn ? sub*num(P.iva)/100 : 0;
+  const pu = qty > 0 ? sub/qty : 0;
+  return {qty, costoArt:0, costoApps:0, costoDirecto: qty > 0 ? costo/qty : 0, detalle:[], esc:{desde:1,hasta:1,desc:0},
+          descVolPct:0, descExtra:0, unitario:pu, matPiezaPrecio:0, matPiezaCosto:0, armadoBruto:0,
+          armado:[], armadoCosto:0, armadoVenta:0, precioBase:pu, precioUnit:pu, subtotalPiezas:sub,
+          setupCosto:0, setupVenta:0, porLista:true, precioArtLista:0, precioApps:0,
+          extrasPieza:0, extrasUnicos:0, pctExtra:0, urgencia:0, subtotal:sub, iva, total:sub+iva,
+          costoTotal:costo, utilidad:sub-costo, margenReal: sub > 0 ? (sub-costo)/sub*100 : 0,
+          impresion:true, svc:R, svcPid: s ? s.pid : ""};
+}
+/* La cantidad con su unidad, para la tira, el resumen y los papeles. */
+function cantConUnidad(r){
+  if(r && r.impresion && r.svc){ const u = r.svc.U; return svN0(r.qty) + " " + (r.qty === 1 ? u.uno : u.pl); }
+  return (r ? r.qty : 0) + " pza(s)";
+}
+
+/* ---------------- la barra, las tarjetas y su visibilidad ---------------- */
+const cv2Blanco = q => !q.articuloId && !(q.desc||"").trim() && !(q.apps||[]).length && !q.svc;
+/* Se llama desde aplicaModo(): así la renumeración de pasos y la guía ya
+   saben qué tarjetas quedaron a la vista. */
+function cv2AplicaModo(){
+  const imp = cot.modo === "impresion";
+  ["articulo","apps","extras"].forEach(k=>{
+    const c = document.querySelector('#tab-cot [data-paso="'+k+'"]');
+    if(c && imp) c.hidden = true;
+    if(c && !imp && k !== "apps") c.hidden = false;
+  });
+  const ci = document.querySelector('#tab-cot [data-paso="impresion"]'); if(ci) ci.hidden = !imp;
+  /* El «servicio por medida» de antes queda para las cotizaciones que ya lo
+     traían; los nuevos servicios entran por la barra de arriba. */
+  const ms = $("#modoSwitch"); if(ms) ms.hidden = cot.modo !== "servicio";
+}
+function cv2Pinta(){
+  svDefs();
+  const imp = cot.modo === "impresion";
+  const d = $("#cv2Desliza");
+  if(d){
+    d.dataset.lado = imp ? "svc" : "art";
+    $("#cv2Art").setAttribute("aria-checked", !imp);
+    $("#cv2Svc").setAttribute("aria-checked", imp);
+  }
+  const mb = $("#cv2Mos");
+  if(mb){ const t = document.querySelector('#tabs button[data-tab="mos"]'); mb.hidden = !t || t.hidden; }
+  const tt = document.querySelector("#tiraArts .tiraTop h2"); if(tt) tt.textContent = "Conceptos de la cotización";
+  svPintaCard();
+  cv2PintaCant();
+  if(typeof pon === "function") pon("impresion", cot.svc ? svDesc(cot.svc.pid, cot.svc.st) : "sin servicio");
+}
+function cv2CambiaLado(lado){
+  const quiere = lado === "svc" ? "impresion" : "articulo";
+  if((cot.modo === "impresion") === (quiere === "impresion")) return;
+  guardaItemActivo(cot);
+  if(cv2Blanco(cot)){
+    cot.modo = quiere;
+    if(quiere === "impresion"){ cot.svc = null; cot.apps = []; cot.tallas = []; }
+    guardaItemActivo(cot);
+    renderCot();
+  } else {
+    const it = itemEnBlanco(); it.modo = quiere;
+    cot.items.push(it);
+    cargaItem(cot.items.length - 1);
+    toast(quiere === "impresion" ? "Concepto " + cot.items.length + " · escoge el servicio" : "Concepto " + cot.items.length + " · ¿cuántas piezas son?");
+  }
+  if(typeof guiado === "function" && guiado()) guiaVaA(quiere === "impresion" ? "impresion" : "articulo");
+}
+document.addEventListener("click", e=>{
+  const b = e.target.closest("#cv2Desliza [data-lado]");
+  if(b){ cv2CambiaLado(b.dataset.lado); return; }
+  if(e.target.closest("#cv2Mos")){
+    const t = document.querySelector('#tabs button[data-tab="mos"]');
+    if(t && !t.hidden) t.click(); else toast("El Mostrador no está en tu perfil");
+  }
+});
+document.addEventListener("keydown", e=>{
+  if(!e.target.closest || !e.target.closest("#cv2Desliza")) return;
+  if(e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+  e.preventDefault();
+  const lado = e.key === "ArrowRight" ? "svc" : "art";
+  cv2CambiaLado(lado);
+  const f = document.getElementById(lado === "svc" ? "cv2Svc" : "cv2Art"); if(f) f.focus();
+});
+
+/* ---------------- la cantidad primero ---------------- */
+function cv2PintaCant(){
+  const card = document.querySelector('#tab-cot [data-paso="articulo"]'); if(!card) return;
+  const caja = $("#cantPrimero"); if(!caja) return;
+  const body = card.querySelector(".body"); if(body && body.firstElementChild !== caja) body.prepend(caja);
+  const conTallas = usaTallas(cot);
+  const lista = !!(cot.qtyListo || cot.articuloId || conTallas || (cot.desc||"").trim());
+  card.classList.toggle("cv2SinCant", !lista && cot.modo !== "servicio");
+  const inp = $("#cpQty");
+  if(inp && document.activeElement !== inp){
+    inp.value = conTallas ? sumaTallas(cot) : (lista ? Math.max(1, Math.round(num(cot.cantidad,1))) : "");
+  }
+  if(inp) inp.readOnly = conTallas;
+  const n = $("#cpNota");
+  if(n) n.textContent = conTallas ? "La cantidad sale del desglose de tallas." : lista ? "" : "Pon la cantidad y aparecen los artículos.";
+  const q = $("#c_qty"); if(q){ const c = q.closest("div"); if(c) c.hidden = true; }
+}
+function cv2PonCant(v){
+  if(usaTallas(cot)) return;
+  const n = Math.max(1, Math.round(num(v, 1)));
+  cot.cantidad = n; cot.cantManual = true; cot.qtyListo = true;
+  const q = $("#c_qty"); if(q) q.value = n;
+  pintaSumaTallas(); refrescaCostos(); cv2PintaCant();
+  if(typeof azArticulos === "function" && typeof guiado === "function" && guiado()) azArticulos();
+  if(typeof guiaRevisa === "function") guiaRevisa();
+}
+document.addEventListener("input", e=>{
+  if(e.target.id !== "cpQty") return;
+  if(String(e.target.value).trim() === "") return;
+  cv2PonCant(e.target.value);
+});
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-cpq]");
+  if(b){ cv2PonCant(Math.max(1, Math.round(num(cot.cantidad,1)) + num(b.dataset.cpq))); return; }
+  const v = e.target.closest("[data-cpv]");
+  if(v) cv2PonCant(v.dataset.cpv);
+});
+
+/* ---------------- la tarjeta de servicios ---------------- */
+function svPintaCard(){
+  const w = $("#svCard"); if(!w) return;
+  const sec = svCat().secciones;
+  const s = cot.svc, R = s && svProd(s.pid) ? svCalc(s.pid, s.st) : null;
+  let h = '';
+  if(R){
+    const img = s.art && (s.art.tipo||"").indexOf("image") === 0 ? '<img src="'+esc(s.art.url)+'" alt="Referencia">' : svIco(svSecDe(s.pid));
+    h += '<div class="svActual"><span class="svMini">'+img+'</span>' +
+      '<div class="svActTxt"><b>'+esc(svProd(s.pid).nom)+'</b><small>'+esc(svCantTxt(s.pid, s.st) + (svResumen(s.pid, s.st) ? " · " + svResumen(s.pid, s.st) : ""))+'</small></div>' +
+      '<span class="svActMx">'+mx(R.total)+'</span>' +
+      '<button type="button" class="btn sm" data-svedita="1">Editar</button></div>' +
+      '<p class="svTitRej">¿Otro servicio? Se agrega como otro concepto de la misma cotización.</p>';
+  }
+  h += '<div class="svRej">' + sec.map(x=>{
+    const abierta = svSeccionAbierta(x);
+    return '<button type="button" class="svTile'+(abierta?'':' bloq')+'" data-svsec="'+esc(x.id)+'">' +
+      (abierta ? '' : '<span class="svCandado">Próximamente</span>') + svIco(x.id) +
+      '<b>'+esc(x.nom)+'</b><small>'+esc(x.sub||"")+'</small></button>';
+  }).join("") + '</div><p class="svAvisoBloq" id="svAvisoBloq" hidden></p>';
+  w.innerHTML = h;
+}
+document.addEventListener("click", e=>{
+  const t = e.target.closest("[data-svsec]");
+  if(t){
+    const x = svCat().secciones.find(s=>s.id === t.dataset.svsec); if(!x) return;
+    const av = $("#svAvisoBloq");
+    if(!svSeccionAbierta(x)){
+      if(av){ av.hidden = false; av.innerHTML = "<b>" + esc(x.nom) + "</b> todavía no está en tu cuenta. Cuando MakersOS la habilite, aparece aquí sola, con sus opciones y sus precios sugeridos."; }
+      return;
+    }
+    if(av) av.hidden = true;
+    svAbre(x.id, null, (cot.modo === "impresion" && !cot.svc) ? "activo" : "nuevo", t);
+    return;
+  }
+  if(e.target.closest("[data-svedita]") && cot.svc){
+    svAbre(svSecDe(cot.svc.pid), cot.svc.pid, "edita", e.target.closest("[data-svedita]"));
+  }
+});
+
+/* ======================= la ventana ======================= */
+/* Una sola ventana para dos cosas: un servicio de impresión (con su motor
+   de opciones) y una ubicación de un artículo (con el motor de siempre:
+   técnica, tamaño, rollo y armado del catálogo). */
+let SVV = null, svPrecios = false, svOrigen = null;
+const svVer = () => typeof veCostos === "function" ? veCostos() : true;
+const svAdmin = () => typeof veDetalle === "function" ? veDetalle() : true;
+function svMuestra(){
+  $("#svVelo").hidden = false;
+  document.body.style.overflow = "hidden";
+  setTimeout(()=>{ const c = $("#svVCerrar"); if(c) c.focus(); }, 40);
+}
+function svCierra(){
+  $("#svVelo").hidden = true; SVV = null; svPrecios = false;
+  $("#svVPrecios").setAttribute("aria-pressed","false"); $("#svVPrecios").textContent = "Editar precios";
+  document.body.style.overflow = "";
+  if(svOrigen && document.body.contains(svOrigen)) svOrigen.focus();
+}
+function svAbre(secId, pid, accion, origen){
+  const s = svCat().secciones.find(x=>x.id === secId); if(!s) return;
+  svOrigen = origen || null;
+  pid = pid || s.prods[0];
+  const edita = accion === "edita" && cot.svc;
+  SVV = {modo:"svc", sec:secId, pid, accion,
+         st: edita ? JSON.parse(JSON.stringify(cot.svc.st)) : svStDefault(pid),
+         art: edita ? (cot.svc.art || null) : null, rolloManual: !!edita};
+  $("#svVIco").innerHTML = svIco(secId);
+  $("#svVTit").textContent = s.nom;
+  $("#svVSub").textContent = s.det || "";
+  $("#svVAgregar").textContent = edita ? "Guardar cambios" : "Agregar a la cotización";
+  $("#svVPrecios").hidden = !svAdmin();
+  svPintaProds(); svPintaForm(); svMuestra();
+}
+function svPintaProds(){
+  const nav = $("#svVProds"), cu = $("#svVCuerpo");
+  if(SVV.modo === "app"){
+    cu.classList.remove("solo"); nav.hidden = false;
+    const sub = {area:"por medida", tintas:"por tinta", puntadas:"por puntadas", tiempo:"por minuto"};
+    nav.innerHTML = '<span class="k">Técnica</span>' + (cat.tecnicas||[]).map(t=>
+      '<button type="button" class="svProd" data-svprod="'+esc(t.id)+'"'+(t.id===SVV.app.tecnicaId?' aria-current="true"':'')+'>' +
+      '<b>'+esc(t.nombre)+'</b><small>'+(sub[t.modo]||"")+'</small></button>').join("");
+    return;
+  }
+  const s = svCat().secciones.find(x=>x.id === SVV.sec);
+  const solo = s.prods.length === 1;
+  cu.classList.toggle("solo", solo); nav.hidden = solo;
+  nav.innerHTML = '<span class="k">Productos</span>' + s.prods.map(id=>{
+    const pr = svProd(id); if(!pr) return "";
+    const como = {m2:"por m²", hoja:"por hoja", pieza:"por pieza", ml:"por metro"}[pr.cobro];
+    const sub = id === "subImp" ? "por hoja o por metro" : id === "laserPieza" ? "por minuto" : como;
+    return '<button type="button" class="svProd" data-svprod="'+id+'"'+(id===SVV.pid?' aria-current="true"':'')+
+      (SVV.accion === "edita" && id !== SVV.pid ? ' disabled' : '')+'><b>'+esc(pr.nom)+'</b><small>'+sub+'</small></button>';
+  }).join("");
+}
+function svUnidadPrecio(pr, g, o, cobro){
+  const m = (o && o.m) || g.modo;
+  if(g.tipo === "num") return "c/u";
+  if(m === "base"){ const c = (o && o.cobro) || cobro; return "/" + ((o && o.uni) || (c === "m2" ? "m²" : SV_UNI[c].corto)); }
+  if(m === "x") return "×";
+  if(m === "porM2") return "/m²";
+  if(m === "perim") return "/m";
+  if(m === "porUnidad") return "/" + SV_UNI[cobro].corto + (g.porN ? " por " + g.porNuno : "");
+  if(m === "pedido") return g.porN ? "por " + g.porNuno : "una vez";
+  return "";
+}
+function svPista(pr, g, o, cobro){
+  const m = o.m || g.modo;
+  if(g.modo === "rollo" || m === "nada") return "";
+  if(m === "base") return mx(o.p) + svUnidadPrecio(pr, g, o, cobro);
+  if(m === "x") return num(o.p) === 1 ? "precio base" : "× " + svN0(o.p);
+  if(!num(o.p)) return "sin costo";
+  const u = svUnidadPrecio(pr, g, o, cobro);
+  return "+" + mx(o.p) + (u.charAt(0) === "/" ? "" : " ") + u;
+}
+function svTablaPrecios(pr, g, cobro){
+  const filas = g.tipo === "num"
+    ? [{nom:g.nom, ref:g.id+"::", p:g.p, c:g.c, u:"c/u"}]
+    : (g.ops||[]).filter(o=> g.modo !== "nada" || o.m).map(o=>({nom:o.nom, ref:g.id+":"+o.id, p:o.p, c:(g.modo==="x" && o.cx!=null ? o.cx : (o.c||0)), u:svUnidadPrecio(pr, g, o, cobro)}));
+  if(!filas.length) return "";
+  return '<table class="svPrecios"><thead><tr><th>Opción</th><th>Precio</th><th>Costo</th></tr></thead><tbody>' +
+    filas.map(f=>'<tr><td>'+esc(f.nom)+'</td>' +
+      '<td><input type="number" step="0.01" min="0" data-svep="'+esc(f.ref)+':p" value="'+num(f.p)+'" aria-label="Precio de '+esc(f.nom)+'"><span class="u">'+esc(f.u)+'</span></td>' +
+      '<td><input type="number" step="0.01" min="0" data-svep="'+esc(f.ref)+':c" value="'+num(f.c)+'" aria-label="Costo de '+esc(f.nom)+'"></td></tr>').join("") +
+    '</tbody></table>';
+}
+function svGrupoHTML(pr, g, st, cobro){
+  let h = '<section class="svGrp" data-grp="'+g.id+'"><h3>'+esc(g.nom) + (g.nota ? ' <span class="gn">· '+esc(g.nota)+'</span>' : '') +
+          ' <span class="gn" id="svgn_'+g.id+'"></span></h3>';
+  if(g.tipo === "num"){
+    h += '<div class="svNumFila"><div class="svStep chico"><button type="button" data-svnm="'+g.id+'" data-d="-1" aria-label="Menos">−</button>' +
+         '<input type="number" min="0" step="'+(g.paso||1)+'" data-svnum="'+g.id+'" value="'+num(st.num[g.id])+'" aria-label="'+esc(g.nom)+'">' +
+         '<button type="button" data-svnm="'+g.id+'" data-d="1" aria-label="Más">+</button></div>' +
+         (g.sugiere ? '<button class="btn sm" type="button" data-svsug="'+g.id+'" id="svsug_'+g.id+'"></button>' : '') +
+         (g.por !== "base" ? '<span class="gn" data-svhn="'+g.id+'">'+mx(g.p)+' c/u</span>' : '') + '</div>';
+    if(svPrecios && g.por !== "base") h += svTablaPrecios(pr, g, cobro);
+    return h + '</section>';
+  }
+  h += '<div class="svChips">' + svOpsVis(g, st, pr).map(o=>
+    '<button type="button" class="svChip" data-svg="'+g.id+'" data-svo="'+esc(o.id)+'" aria-pressed="'+(st.sel[g.id]===o.id)+'">' +
+      '<span>'+esc(o.nom)+'</span><small data-svh="'+g.id+':'+esc(o.id)+'">'+esc(svPista(pr, g, o, cobro))+'</small></button>').join("") + '</div>';
+  if(g.modo === "rollo") h += '<div class="svRollo" id="svRollo"></div>';
+  if(svPrecios && g.modo !== "rollo") h += svTablaPrecios(pr, g, cobro);
+  return h + '</section>';
+}
+function svRefHTML(art, etq){
+  const img = art && (art.tipo||"").indexOf("image") === 0;
+  return '<div><label class="f">'+etq+'</label><div class="svSubeRef">' +
+    '<div class="mini">'+(img ? '<img src="'+esc(art.url)+'" alt="Referencia">' : (art ? esc((art.nombre||"").split(".").pop().toUpperCase()) : '＋'))+'</div>' +
+    '<div class="txt"><b>'+(art ? esc(art.nombre||"Imagen de referencia") : "Sube una foto o un boceto")+'</b>Así producción ve exactamente qué se imprime.' +
+      '<div class="svDondeVa"><span class="si">Cotización</span><span class="si">Orden de producción</span><span class="no">Factura</span></div></div>' +
+    '<div class="svRefBtns"><button class="btn sm" type="button" data-svsubir="1">'+(art ? "Cambiar" : "Subir imagen")+'</button>' +
+      (art ? '<button class="btn sm" type="button" data-svquitaref="1">Quitar</button>' : '') + '</div>' +
+    '</div><p class="svAvisoFoto" id="svAvisoFoto" hidden></p></div>';
+}
+function svPintaForm(){
+  if(SVV.modo === "app") return cv2PintaFormApp();
+  const pr = svProd(SVV.pid), st = SVV.st, r = svCalc(SVV.pid, st);
+  let h = '<div class="svFila">';
+  if(pr.medida){
+    const paso = pr.medida === "cm" ? 1 : 0.05;
+    h += '<div><label class="f" for="svW">Ancho × alto de la pieza ('+pr.medida+')</label><div class="svMedidas">' +
+         '<input id="svW" type="number" min="0" step="'+paso+'" value="'+num(st.w)+'" aria-label="Ancho"><span>×</span>' +
+         '<input id="svH" type="number" min="0" step="'+paso+'" value="'+num(st.h)+'" aria-label="Alto"></div></div>';
+  }
+  h += '<div><label class="f" for="svQ" id="svQlbl">'+SV_QLBL[r.cobro]+'</label><div class="svNumFila">' +
+       '<div class="svStep"><button type="button" data-svq="-1" aria-label="Menos">−</button>' +
+       '<input id="svQ" type="number" min="0" step="'+(r.cobro==="ml"?0.5:1)+'" value="'+num(st.q)+'">' +
+       '<button type="button" data-svq="1" aria-label="Más">+</button></div>' +
+       (pr.rapidos ? '<div class="svRap">'+pr.rapidos.map(v=>'<button type="button" data-svqv="'+v+'">'+svN0(v)+'</button>').join("")+'</div>' : '') +
+       '</div></div></div>';
+  svGruposVis(pr, st).forEach(g=> h += svGrupoHTML(pr, g, st, r.cobro));
+  h += svRefHTML(SVV.art, "Imagen de referencia");
+  h += '<div><label class="f" for="svNotas">Notas para producción</label><textarea id="svNotas" rows="2" placeholder="Ej. ojillos reforzados en las esquinas">'+esc(st.notas||"")+'</textarea></div>';
+  h += '<section class="svDesg"><h3>De dónde sale el precio</h3><ol id="svRen"></ol><div id="svAvisos"></div></section>';
+  const f = $("#svVForm"), y = f.scrollTop;
+  f.innerHTML = h; f.scrollTop = y;
+  f.classList.toggle("editando", svPrecios);
+  svRefresca();
+}
+function svSugerido(g, r){ return r.per > 0 ? Math.max(4, Math.ceil(r.per / g.sugiere)) : 0; }
+function svDibujaRollo(a){
+  const W = 560, Hmax = 120;
+  const s = Math.min(W / a.largo, Hmax / a.rollo);
+  const ww = a.largo*s, hh = a.rollo*s, o = a.orilla*s;
+  let r = '<svg viewBox="0 0 '+(ww+74).toFixed(1)+' '+(hh+22).toFixed(1)+'" role="img" aria-label="Cómo se acomodan las piezas en el rollo">' +
+    '<rect class="rRollo" x="1" y="1" width="'+ww.toFixed(1)+'" height="'+hh.toFixed(1)+'" rx="3"/>' +
+    '<rect class="rOrilla" x="1" y="1" width="'+ww.toFixed(1)+'" height="'+o.toFixed(1)+'"/>' +
+    '<rect class="rOrilla" x="1" y="'+(1+hh-o).toFixed(1)+'" width="'+ww.toFixed(1)+'" height="'+o.toFixed(1)+'"/>' +
+    '<text class="rTxt" x="'+(ww+8).toFixed(1)+'" y="'+(hh/2+4).toFixed(1)+'">↕ '+svFmtRollo(a.rollo)+'</text>' +
+    '<text class="rTxt" x="1" y="'+(hh+17).toFixed(1)+'">↔ '+svN2(a.largo)+' m</text>';
+  const tope = Math.min(a.piezas, 160); let n = 0;
+  const x0 = 1 + Math.max(0, a.largo - (a.filas*a.l + (a.filas-1)*a.sep))/2*s;
+  for(let f = 0; f < a.filas && n < tope; f++){
+    for(let c = 0; c < a.fila && n < tope; c++, n++){
+      const x = x0 + f*(a.l + a.sep)*s, y = 1 + o + c*(a.a + a.sep)*s;
+      r += '<rect class="rPieza" x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+Math.max(1,a.l*s).toFixed(1)+'" height="'+Math.max(1,a.a*s).toFixed(1)+'" rx="1.5"/>';
+    }
+  }
+  return r + '</svg>';
+}
+function svRefresca(){
+  if(!SVV) return;
+  if(SVV.modo === "app") return cv2RefrescaApp();
+  const pr = svProd(SVV.pid), st = SVV.st, r = svCalc(SVV.pid, st);
+  const vis = r.ren.filter(x=> Math.abs(x.m) > 0.004);
+  $("#svRen").innerHTML = vis.length ? vis.map(x=>'<li><span>'+esc(x.t)+'</span><b>'+mx(x.m)+'</b></li>').join("") +
+      '<li class="t"><span>Total</span><b>'+mx(r.total)+'</b></li>'
+    : '<li><span>Escribe la cantidad para ver el precio.</span><b>—</b></li>';
+  $("#svAvisos").innerHTML = r.avisos.map(a=>'<p class="svAviso">'+esc(a)+'</p>').join("");
+  $("#svVTotal").textContent = mx(r.total);
+  $("#svVPorPieza").textContent = r.q > 0 ? mx(r.porPieza) + " por " + r.U.uno : "";
+  $("#svVUtil").textContent = (r.total > 0 && svVer()) ? "costo " + mx(r.costo) + " · utilidad " + Math.round((r.total - r.costo)/r.total*100) + "%" : "";
+  $("#svVAgregar").disabled = !(r.q > 0) || (r.cobro === "m2" && !(r.A > 0));
+  const ql = $("#svQlbl"); if(ql) ql.textContent = SV_QLBL[r.cobro];
+  if(pr.rollos){
+    const best = svMejorRollo(pr, st);
+    pr.rollos.forEach(ro=>{
+      const a = svAcomoda(r.w, r.h, r.q, ro, pr.orilla, pr.sep);
+      const el = document.querySelector('[data-svh="rollo:'+ro+'"]');
+      if(el) el.innerHTML = a ? "gasta " + svN2(a.consumo) + " m²" + (ro === best ? ' <span class="mejor">· el que menos</span>' : '') : '';
+    });
+    document.querySelectorAll('.svChip[data-svg="rollo"]').forEach(c=> c.setAttribute("aria-pressed", c.dataset.svo === st.sel.rollo));
+    const d = $("#svRollo");
+    if(d) d.innerHTML = r.acomodo
+      ? svDibujaRollo(r.acomodo) + '<p>Rollo de ' + svFmtRollo(r.acomodo.rollo) + ' · se gastan <b>' + svN2(r.acomodo.largo) + ' m lineales</b> (' +
+        svN2(r.acomodo.consumo) + ' m²) · aprovechas ' + Math.round(r.acomodo.aprovecha*100) + '%' +
+        (r.acomodo.tramos > 1 ? ' · ' + r.acomodo.tramos + ' tramos por pieza' : '') + '</p>'
+      : '<p>Escribe la medida y la cantidad para ver cómo se acomoda.</p>';
+  }
+  svGrupos(pr).forEach(g=>{
+    if(!g.sugiere) return;
+    const b = document.getElementById("svsug_" + g.id); if(!b) return;
+    const n = svSugerido(g, r); b.dataset.n = n; b.disabled = !n;
+    b.textContent = n ? "Sugerir " + n + " (uno cada " + Math.round(g.sugiere*100) + " cm)" : "Sugerir";
+  });
+  const gb = document.getElementById("svgn_bast");
+  if(gb) gb.textContent = r.per > 0 ? "· contorno de " + svN2(r.per) + " m por pieza" : "";
+}
+function svAutoRollo(){
+  if(SVV.modo === "svc"){ const pr = svProd(SVV.pid); if(pr.rollos && !SVV.rolloManual) SVV.st.sel.rollo = String(svMejorRollo(pr, SVV.st)); }
+  svRefresca();
+}
+let svGuardaT = null;
+function svEditaPrecio(ref, val){
+  const [gid, oid, campo] = ref.split(":");
+  const pr = svProd(SVV.pid);
+  const g = svGrupos(pr).find(x=>x.id === gid); if(!g) return;
+  const v = Math.max(0, num(val));
+  if(!oid){ g[campo] = v; const hn = document.querySelector('[data-svhn="'+gid+'"]'); if(hn) hn.textContent = mx(g.p) + " c/u"; }
+  else {
+    const o = (g.ops||[]).find(x=>x.id === oid); if(!o) return;
+    if(campo === "c" && g.modo === "x") o.cx = v; else o[campo] = v;
+    const el = document.querySelector('[data-svh="'+gid+':'+oid+'"]');
+    if(el) el.textContent = svPista(pr, g, o, svCalc(SVV.pid, SVV.st).cobro);
+  }
+  clearTimeout(svGuardaT); svGuardaT = setTimeout(()=>{ if(typeof persist === "function") persist(); }, 700);
+}
+
+/* ---------- la imagen de referencia: al almacén si lo hay; si no, achicada ---------- */
+async function svLeeFoto(file){
+  const aviso = $("#svAvisoFoto");
+  const di = t => { if(aviso){ aviso.textContent = t; aviso.hidden = !t; } };
+  if(!file) return null;
+  if(!/^image\//.test(file.type||"")){ di("Eso no es una imagen. Sube un JPG, PNG o WEBP."); return null; }
+  if(typeof revisaArchivo === "function" && !revisaArchivo(file, "diseno")) return null;
+  if(typeof ASSETS !== "undefined" && ASSETS){
+    try{
+      const f2 = (typeof aligera === "function") ? await aligera(file) : file;
+      const res = await ASSETS.upload(f2);
+      return {id:res.id, url:res.url, nombre:file.name, tipo:file.type||res.contentType||"image/jpeg", kb:Math.round(f2.size/1024)};
+    }catch(err){ di("No se pudo subir la imagen. Intenta otra vez."); return null; }
+  }
+  return await new Promise(res=>{
+    const lee = new FileReader();
+    lee.onload = ()=>{
+      const im = new Image();
+      im.onload = ()=>{
+        const k = Math.min(1, 1000 / Math.max(im.width, im.height));
+        const cv = document.createElement("canvas"); cv.width = Math.round(im.width*k); cv.height = Math.round(im.height*k);
+        cv.getContext("2d").drawImage(im, 0, 0, cv.width, cv.height);
+        let url; try{ url = cv.toDataURL("image/jpeg", .82); }catch(e){ url = lee.result; }
+        res({id:uid(), url, nombre:file.name, tipo:"image/jpeg", kb:Math.round(url.length*0.75/1024)});
+      };
+      im.onerror = ()=>{ di("No se pudo leer esa imagen."); res(null); };
+      im.src = lee.result;
+    };
+    lee.readAsDataURL(file);
+  });
+}
+
+/* ---------- los clics y lo que se escribe ---------- */
+document.addEventListener("click", e=>{
+  if(!SVV || !e.target.closest("#svVelo")) return;
+  if(e.target.id === "svVelo"){ svCierra(); return; }
+  if(e.target.closest("#svVCerrar")){ svCierra(); return; }
+  if(e.target.closest("#svVPrecios")){
+    svPrecios = !svPrecios;
+    $("#svVPrecios").setAttribute("aria-pressed", svPrecios);
+    $("#svVPrecios").textContent = svPrecios ? "Listo con los precios" : "Editar precios";
+    svPintaForm(); return;
+  }
+  const pb = e.target.closest("[data-svprod]");
+  if(pb){
+    if(pb.disabled) return;
+    if(SVV.modo === "app"){ cv2CambiaTecnica(pb.dataset.svprod); return; }
+    if(pb.dataset.svprod === SVV.pid) return;
+    const notas = SVV.st.notas;
+    SVV.pid = pb.dataset.svprod; SVV.st = svStDefault(SVV.pid); SVV.st.notas = notas; SVV.rolloManual = false;
+    svPintaProds(); svPintaForm(); $("#svVForm").scrollTop = 0; return;
+  }
+  if(e.target.closest("[data-svsubir]")){ $("#svVFoto").click(); return; }
+  if(e.target.closest("[data-svquitaref]")){
+    if(SVV.modo === "app") SVV.app.art = null; else SVV.art = null;
+    svPintaForm(); return;
+  }
+  if(e.target.closest("#svVAgregar")){ svAgrega(); return; }
+  if(SVV.modo === "app"){ cv2ClicApp(e); return; }
+  const ch = e.target.closest(".svChip[data-svg]");
+  if(ch){
+    if(ch.dataset.svg === "rollo") SVV.rolloManual = true;
+    SVV.st.sel[ch.dataset.svg] = ch.dataset.svo; svNormaliza(svProd(SVV.pid), SVV.st); svPintaForm(); return;
+  }
+  const nm = e.target.closest("[data-svnm]");
+  if(nm){
+    const g = svGrupos(svProd(SVV.pid)).find(x=>x.id === nm.dataset.svnm);
+    SVV.st.num[g.id] = Math.max(0, num(SVV.st.num[g.id]) + (g.paso||1)*num(nm.dataset.d));
+    const inp = document.querySelector('[data-svnum="'+g.id+'"]'); if(inp) inp.value = SVV.st.num[g.id];
+    svRefresca(); return;
+  }
+  const sg = e.target.closest("[data-svsug]");
+  if(sg){ SVV.st.num[sg.dataset.svsug] = num(sg.dataset.n); const inp = document.querySelector('[data-svnum="'+sg.dataset.svsug+'"]'); if(inp) inp.value = SVV.st.num[sg.dataset.svsug]; svRefresca(); return; }
+  const vq = e.target.closest("[data-svq]");
+  if(vq){ const paso = svCalc(SVV.pid, SVV.st).cobro === "ml" ? 0.5 : 1; SVV.st.q = Math.max(0, num(SVV.st.q) + paso*num(vq.dataset.svq)); $("#svQ").value = SVV.st.q; svAutoRollo(); return; }
+  const vqv = e.target.closest("[data-svqv]");
+  if(vqv){ SVV.st.q = num(vqv.dataset.svqv); $("#svQ").value = SVV.st.q; svAutoRollo(); }
+});
+document.addEventListener("input", e=>{
+  if(!SVV || !e.target.closest("#svVForm")) return;
+  const t = e.target;
+  if(SVV.modo === "app"){ cv2InputApp(t); return; }
+  if(t.id === "svW"){ SVV.st.w = t.value; svAutoRollo(); return; }
+  if(t.id === "svH"){ SVV.st.h = t.value; svAutoRollo(); return; }
+  if(t.id === "svQ"){ SVV.st.q = t.value; svAutoRollo(); return; }
+  if(t.dataset.svnum){ SVV.st.num[t.dataset.svnum] = t.value; svRefresca(); return; }
+  if(t.id === "svNotas"){ SVV.st.notas = t.value; return; }
+  if(t.dataset.svep){ svEditaPrecio(t.dataset.svep, t.value); svRefresca(); }
+});
+document.addEventListener("change", async e=>{
+  if(e.target.id === "svVFoto"){
+    const f = e.target.files && e.target.files[0]; e.target.value = "";
+    if(!f || !SVV) return;
+    const btn = document.querySelector("[data-svsubir]"); if(btn){ btn.disabled = true; btn.textContent = "Subiendo…"; }
+    const art = await svLeeFoto(f);
+    if(!SVV) return;
+    if(art){ if(SVV.modo === "app") SVV.app.art = art; else SVV.art = art; }
+    svPintaForm();
+    return;
+  }
+  if(SVV && SVV.modo === "app" && e.target.closest("#svVForm")) cv2ChangeApp(e.target);
+});
+document.addEventListener("keydown", e=>{
+  if(e.key !== "Escape") return;
+  if(!$("#pgVelo").hidden){ pgCierra(); return; }
+  if(SVV && !$("#svVelo").hidden) svCierra();
+});
+
+/* ---------- agregar o guardar ---------- */
+function svAgrega(){
+  if(SVV.modo === "app") return cv2GuardaApp();
+  const r = svCalc(SVV.pid, SVV.st); if(!(r.q > 0)) return;
+  const accion = SVV.accion;
+  const svc = {pid:SVV.pid, st:JSON.parse(JSON.stringify(SVV.st)), art:SVV.art || null};
+  const desc = svDesc(svc.pid, svc.st), nombre = svProd(svc.pid).nom;
+  if(SVV.accion === "nuevo" && !(cot.modo === "impresion" && !cot.svc) && !cv2Blanco(cot)){
+    guardaItemActivo(cot);
+    const it = itemEnBlanco(); it.modo = "impresion"; it.svc = svc; it.desc = desc; it.descAuto = true;
+    cot.items.push(it);
+    svCierra();
+    cargaItem(cot.items.length - 1);
+  } else {
+    cot.modo = "impresion"; cot.svc = svc; cot.desc = desc; cot.descAuto = true;
+    cot.apps = []; cot.tallas = [];
+    svCierra();
+    guardaItemActivo(cot); renderCot();
+  }
+  if(typeof guiaRevisa === "function") guiaRevisa();
+  toast(accion === "edita" ? "Guardaste los cambios de " + nombre.toLowerCase() : nombre + " en la cotización");
+}
+
+/* ======================= una ubicación del artículo, en la ventana ======================= */
+/* El precio sale del motor de siempre: se arma una copia de la cotización
+   con esta ubicación, se acomoda su armado y se corre calc(). Nada se toca
+   hasta que se pulsa «Agregar». */
+function cv2Ubicaciones(){
+  const a = (cat.articulos||[]).find(x=>x.id === cot.articuloId);
+  const t = ((a && a.nombre) || "") + " " + ((a && a.cat) || "") + " " + (cot.desc || "");
+  if(/gorra|cachuch|visera/i.test(t)) return ["Frente","Lado izquierdo","Lado derecho","Atrás"];
+  if(/taza|tarro|mug|termo|vaso|botella/i.test(t)) return ["Envolvente","Un lado","Dos lados"];
+  return ["Frente","Espalda","Pecho izquierdo","Manga izquierda","Manga derecha","Nuca"];
+}
+function cv2TamPorUbi(ubi){
+  const T = cat.tamanos || [];
+  const pref = [[/pecho|bolsillo|nuca/i, /pecho|bolsillo/i], [/manga/i, /manga/i], [/espalda/i, /espalda/i],
+                [/gorra|lado|atr/i, /gorra/i], [/envolvente|taza/i, /taza|banda/i]];
+  for(const [u, tt] of pref){ if(u.test(ubi)){ const s = T.find(x=>tt.test(x.nombre||"")); if(s) return s; } }
+  return T.find(x=>/mediano/i.test(x.nombre||"")) || T[2] || T[0] || null;
+}
+function cv2AbreApp(id, origen){
+  if(!(cat.tecnicas||[]).length){ toast("Primero da de alta una técnica en Catálogo"); return; }
+  svOrigen = origen || null;
+  let app, nuevo = false;
+  const a = id ? cot.apps.find(x=>x.id === id) : null;
+  if(a) app = JSON.parse(JSON.stringify(a));
+  else {
+    nuevo = true;
+    const usadas = cot.apps.map(x=>x.ubic);
+    const ubic = cv2Ubicaciones().find(x=>usadas.indexOf(x) < 0) || "Otra ubicación";
+    const s = cv2TamPorUbi(ubic) || {ancho:20, alto:20, id:""};
+    app = {id:uid(), ubic, tecnicaId:cat.tecnicas[0].id, tamanoId:s.id||"", ancho:num(s.ancho), alto:num(s.alto), tintas:1, puntadas:8000, art:null};
+  }
+  SVV = {modo:"app", app, nuevo};
+  const art = (cat.articulos||[]).find(x=>x.id === cot.articuloId);
+  $("#svVIco").innerHTML = svIco("playera");
+  $("#svVTit").textContent = "Personalizar · " + ((cot.desc||"").trim() || (art ? art.nombre : "el artículo"));
+  $("#svVSub").textContent = qtyPedido() + " pieza(s) · el lugar, la técnica y la medida del diseño";
+  $("#svVAgregar").textContent = nuevo ? "Agregar esta ubicación" : "Guardar cambios";
+  $("#svVPrecios").hidden = true;
+  svPintaProds(); cv2PintaFormApp(); svMuestra();
+}
+function cv2Previa(app){
+  const prev = cot;
+  const q = JSON.parse(JSON.stringify(cot));
+  const i = q.apps.findIndex(x=>x.id === app.id);
+  if(i >= 0) q.apps[i] = JSON.parse(JSON.stringify(app)); else q.apps.push(JSON.parse(JSON.stringify(app)));
+  cot = q;
+  try{
+    sincronizaArmado();
+    const r = calc();
+    const d = (r.detalle||[]).find(x=>x.id === app.id) || null;
+    const arm = (r.armado||[]).filter(x=>(x.grupos||[]).some(g=>g.appId === app.id));
+    const planos = arm.map(x=> (typeof planoDeFila === "function") ? planoDeFila(q, x.id) : "").filter(Boolean);
+    return {r, d, arm, planos, qty:r.qty};
+  }catch(err){ return {r:null, d:null, arm:[], planos:[], qty:qtyPedido()}; }
+  finally{ cot = prev; }
+}
+function cv2PintaFormApp(){
+  const a = SVV.app;
+  const t = (cat.tecnicas||[]).find(x=>x.id === a.tecnicaId) || cat.tecnicas[0];
+  const ubis = cv2Ubicaciones(), usadas = cot.apps.filter(x=>x.id !== a.id).map(x=>x.ubic);
+  const extra = a.ubic && ubis.indexOf(a.ubic) < 0 ? [a.ubic] : [];
+  let h = '<section class="svGrp"><h3>¿Dónde va?</h3><div class="svChips">' +
+    ubis.concat(extra).map(u=>{ const ya = usadas.indexOf(u) >= 0;
+      return '<button type="button" class="svChip" data-apubi="'+esc(u)+'" aria-pressed="'+(a.ubic===u)+'"'+(ya?' disabled':'')+'><span>'+esc(u)+'</span>'+(ya?'<small>ya tiene</small>':'')+'</button>'; }).join("") +
+    '</div><div class="svFila" style="margin-top:8px"><input id="apUbiOtra" placeholder="Otra: cuello, pierna, bolsa…" value="'+(extra.length?esc(a.ubic):"")+'" style="max-width:280px"></div></section>';
+  if(t.modo === "area"){
+    h += '<section class="svGrp"><h3>Medida del diseño <span class="gn">· en centímetros</span></h3><div class="svChips">' +
+      (cat.tamanos||[]).map(s=>'<button type="button" class="svChip" data-aptam="'+esc(s.id)+'" aria-pressed="'+(a.tamanoId===s.id)+'"><span>'+esc(s.nombre)+'</span><small>'+num(s.ancho)+' × '+num(s.alto)+'</small></button>').join("") +
+      '<button type="button" class="svChip" data-aptam="" aria-pressed="'+(!a.tamanoId)+'"><span>A la medida</span><small>escríbela</small></button></div>' +
+      '<div class="svFila" style="margin-top:10px"><div class="svMedidas"><input id="apW" type="number" min="0" step="0.5" value="'+num(a.ancho)+'" aria-label="Ancho en cm"><span>×</span>' +
+      '<input id="apH" type="number" min="0" step="0.5" value="'+num(a.alto)+'" aria-label="Alto en cm"><span>cm</span></div>' +
+      '<span class="svFijo">Piezas <b>'+qtyPedido()+'</b> · las del artículo</span></div></section>';
+    const rollos = (typeof svcsParaTecnica === "function") ? svcsParaTecnica(t.id) : [];
+    if(rollos.length){
+      const sel = (typeof svcDeApp === "function" ? svcDeApp(a) : null) || rollos[0];
+      h += '<section class="svGrp"><h3>Material y ancho <span class="gn">· se acomoda en el armado con las demás ubicaciones</span></h3><div class="svChips">' +
+        rollos.map(s=>'<button type="button" class="svChip" data-aprollo="'+esc(s.id)+'" aria-pressed="'+(sel && sel.id===s.id)+'"><span>'+esc(s.nombre)+'</span><small>'+num(s.ancho)+' cm · '+mx(num(s.precio))+'/'+abrevUnidad(s.unidad)+'</small></button>').join("") +
+        '</div><label class="sw" style="margin-top:10px"><input type="checkbox" id="apArmado"'+(a.sinArmado?'':' checked')+'> Calcular el material en el armado</label>' +
+        '<div class="svRollo" id="apPlano"></div></section>';
+    }
+  } else if(t.modo === "tintas"){
+    h += '<section class="svGrp"><h3>Tintas</h3><div class="svChips">' + [1,2,3,4,5,6].map(n=>
+      '<button type="button" class="svChip" data-aptintas="'+n+'" aria-pressed="'+(Math.max(1,num(a.tintas,1))===n)+'"><span>'+n+' tinta'+(n>1?'s':'')+'</span></button>').join("") + '</div></section>';
+  } else if(t.modo === "tiempo"){
+    h += '<section class="svGrp"><h3>Tiempo de máquina</h3><div class="svFila">' +
+      '<div><label class="f" for="apMin">Minutos por pieza</label><input id="apMin" type="number" min="0" step="0.5" value="'+num(a.minutos)+'" style="width:120px"></div>' +
+      '<div><label class="f" for="apMinSet">Minutos de preparación</label><input id="apMinSet" type="number" min="0" step="1" value="'+num(a.minutosSetup)+'" style="width:120px"></div></div></section>';
+  } else {
+    h += '<section class="svGrp"><h3>Puntadas</h3><div class="svChips">' + [3000,5000,8000,12000,20000].map(n=>
+      '<button type="button" class="svChip" data-appunt="'+n+'" aria-pressed="'+(num(a.puntadas)===n)+'"><span>'+n.toLocaleString("es-MX")+'</span></button>').join("") +
+      '</div><div class="svFila" style="margin-top:8px"><input id="apPunt" type="number" min="0" step="500" value="'+num(a.puntadas)+'" style="width:140px" aria-label="Puntadas"></div></section>';
+  }
+  h += svRefHTML(a.art, "Diseño o imagen de referencia");
+  h += '<section class="svDesg"><h3>De dónde sale el precio</h3><ol id="svRen"></ol><div id="svAvisos"></div></section>';
+  const f = $("#svVForm"), y = f.scrollTop;
+  f.innerHTML = h; f.scrollTop = y;
+  f.classList.remove("editando");
+  cv2RefrescaApp();
+}
+function cv2RefrescaApp(){
+  const a = SVV.app, P2 = cv2Previa(a), d = P2.d, qty = P2.qty;
+  const t = (cat.tecnicas||[]).find(x=>x.id === a.tecnicaId);
+  const L = [];
+  let porPieza = 0, total = 0;
+  if(d){
+    const mano = num(d.precio), mat = num(d.materialPieza);
+    porPieza = mano + mat; total = porPieza*qty + num(d.setupPrecio);
+    L.push([(t ? t.nombre : "Técnica") + (d.base ? " · " + d.base : "") + " · por pieza", mx(mano)]);
+    if(mat > 0) P2.arm.forEach(x=> L.push(["Material · " + x.nombre + " · " + unidadTxt(x.unidad, x.unidades) + " para el pedido", mx(mat) + " por pieza"]));
+    if(num(d.setupPrecio) > 0) L.push(["Preparación (una sola vez)", mx(d.setupPrecio)]);
+    L.push(["Esta ubicación en las " + qty + " pieza(s)", mx(total)]);
+  }
+  $("#svRen").innerHTML = L.length ? L.map((x,i)=>'<li'+(i===L.length-1?' class="t"':'')+'><span>'+esc(x[0])+'</span><b>'+x[1]+'</b></li>').join("")
+    : '<li><span>Escoge la técnica y la medida.</span><b>—</b></li>';
+  const av = [];
+  if(d && d.pierde) av.push("Esta ubicación se está vendiendo por debajo de lo que cuesta. Revisa la mano de obra en Ajustes.");
+  if(d && d.min) av.push("Se cobra el mínimo de la técnica.");
+  $("#svAvisos").innerHTML = av.map(x=>'<p class="svAviso">'+esc(x)+'</p>').join("") +
+    '<p class="svNotaPie">El precio final de la pieza, con el artículo y el descuento por volumen, sale en el resumen de la derecha.</p>';
+  const pl = $("#apPlano");
+  if(pl) pl.innerHTML = P2.planos.length ? P2.planos.join("") +
+      P2.arm.map(x=>'<p>'+esc(x.nombre)+' · <b>'+unidadTxt(x.unidad, x.compradas)+'</b> para todo el pedido · merma '+num(x.mermaPct).toFixed(0)+'%</p>').join("")
+    : (a.sinArmado ? '<p>El material de esta ubicación no entra al armado: se cobra por centímetro cuadrado.</p>' : '');
+  $("#svVTotal").textContent = mx(total);
+  $("#svVPorPieza").textContent = d ? mx(porPieza) + " por pieza" : "";
+  $("#svVUtil").textContent = (d && svVer()) ? "costo " + mx(num(d.costoConMaterial != null ? d.costoConMaterial : d.costo)) + " por pieza" : "";
+  const medOk = !t || t.modo !== "area" || (num(a.ancho) > 0 && num(a.alto) > 0);
+  $("#svVAgregar").disabled = !(a.ubic||"").trim() || !medOk;
+}
+function cv2CambiaTecnica(id){
+  const a = SVV.app; if(a.tecnicaId === id) return;
+  a.tecnicaId = id; a.matId = "";
+  const t = (cat.tecnicas||[]).find(x=>x.id === id);
+  if(t && t.modo === "area" && !(num(a.ancho) > 0)){ const s = cv2TamPorUbi(a.ubic); if(s){ a.tamanoId = s.id; a.ancho = num(s.ancho); a.alto = num(s.alto); } }
+  svPintaProds(); cv2PintaFormApp();
+}
+function cv2ClicApp(e){
+  const a = SVV.app;
+  const u = e.target.closest("[data-apubi]");
+  if(u && !u.disabled){
+    a.ubic = u.dataset.apubi;
+    const t = (cat.tecnicas||[]).find(x=>x.id === a.tecnicaId);
+    if(t && t.modo === "area" && a.tamanoId){ const s = cv2TamPorUbi(a.ubic); if(s){ a.tamanoId = s.id; a.ancho = num(s.ancho); a.alto = num(s.alto); } }
+    cv2PintaFormApp(); return;
+  }
+  const tm = e.target.closest("[data-aptam]");
+  if(tm){
+    a.tamanoId = tm.dataset.aptam;
+    const s = (cat.tamanos||[]).find(x=>x.id === a.tamanoId);
+    if(s){ a.ancho = num(s.ancho); a.alto = num(s.alto); }
+    cv2PintaFormApp(); if(!a.tamanoId){ const w = $("#apW"); if(w) w.focus(); } return;
+  }
+  const ro = e.target.closest("[data-aprollo]");
+  if(ro){ a.matId = ro.dataset.aprollo; cv2PintaFormApp(); return; }
+  const ti = e.target.closest("[data-aptintas]");
+  if(ti){ a.tintas = num(ti.dataset.aptintas); cv2PintaFormApp(); return; }
+  const pu = e.target.closest("[data-appunt]");
+  if(pu){ a.puntadas = num(pu.dataset.appunt); cv2PintaFormApp(); }
+}
+function cv2InputApp(t){
+  const a = SVV.app;
+  if(t.id === "apUbiOtra"){ if(t.value.trim()){ a.ubic = t.value.trim(); document.querySelectorAll("[data-apubi]").forEach(c=> c.setAttribute("aria-pressed","false")); } cv2RefrescaApp(); return; }
+  if(t.id === "apW" || t.id === "apH"){
+    a[t.id === "apW" ? "ancho" : "alto"] = num(t.value);
+    if(a.tamanoId){ a.tamanoId = ""; document.querySelectorAll("[data-aptam]").forEach(c=> c.setAttribute("aria-pressed", c.dataset.aptam === "")); }
+    cv2RefrescaApp(); return;
+  }
+  if(t.id === "apMin"){ a.minutos = num(t.value); cv2RefrescaApp(); return; }
+  if(t.id === "apMinSet"){ a.minutosSetup = num(t.value); cv2RefrescaApp(); return; }
+  if(t.id === "apPunt"){ a.puntadas = num(t.value); document.querySelectorAll("[data-appunt]").forEach(c=> c.setAttribute("aria-pressed", num(c.dataset.appunt) === a.puntadas)); cv2RefrescaApp(); }
+}
+function cv2ChangeApp(t){
+  if(t.id === "apArmado"){ SVV.app.sinArmado = !t.checked; cv2RefrescaApp(); }
+}
+function cv2GuardaApp(){
+  const a = JSON.parse(JSON.stringify(SVV.app));
+  const nuevo = SVV.nuevo;
+  const i = cot.apps.findIndex(x=>x.id === a.id);
+  if(i >= 0) cot.apps[i] = a; else cot.apps.push(a);
+  svCierra();
+  sincronizaArmado(); renderApps(); renderResumen();
+  if(typeof armadoAbierto === "function" && armadoAbierto()) renderArmado();
+  if(typeof guiaRevisa === "function") guiaRevisa();
+  toast((nuevo ? "Agregaste " : "Guardaste ") + (a.ubic||"la ubicación").toLowerCase());
+}
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-eapp]");
+  if(b) cv2AbreApp(b.dataset.eapp || null, b);
+});
+
+/* ======================= confirmar el pedido con su pago ======================= */
+/* De aquí en adelante un pedido no se confirma sin dinero o sin crédito:
+   anticipo, pago total (los dos se pueden facturar) o a crédito si la
+   línea del cliente alcanza. El crédito pasa por la misma puerta de las
+   líneas de crédito, y lo cobrado entra a Ventas como siempre. */
+const PG_FORMAS = ["Efectivo","Transferencia","Tarjeta","Depósito"];
+let PG = null;
+function cv2FaltaConfirmar(){
+  guardaItemActivo(cot);
+  if(!(cot.cliente||"").trim()) return "Escribe el nombre del cliente antes de confirmar";
+  const its = itemsDe(cot);
+  for(let i = 0; i < its.length; i++){
+    const it = its[i];
+    if(it.modo === "impresion"){ if(!it.svc) return "El concepto " + (i+1) + " todavía no tiene su servicio de impresión"; continue; }
+    if(it.modo === "servicio") continue;
+    if(!(it.apps||[]).length) return (its.length > 1 ? "«" + nombreItem(it, i+1) + "» no tiene" : "Agrega al menos una") + " ubicación con su impresión antes de confirmar";
+  }
+  return "";
+}
+const pgPlanFactura = () => !(window.__enElPlan && !window.__enElPlan("fac"));
+function pgCredito(total){
+  const c = (typeof clienteDe === "function") ? clienteDe(cot.clienteId) : null;
+  if(!c) return {ok:false, motivo:"Sólo un cliente guardado puede llevar a crédito. Usa «Guardar como cliente» y ponle su línea en su ficha."};
+  const cr = creditoDe(c);
+  if(!(cr.limite > 0)) return {ok:false, c, cr, motivo:(c.nombre||"Este cliente") + " es de contado: no tiene línea de crédito en su ficha."};
+  const pf = puedeFacturar(c, total, cot.folio);
+  if(!pf.ok) return {ok:false, c, cr, motivo:pf.motivo};
+  return {ok:true, c, cr};
+}
+function pgAbre(){
+  const r = calcDe(cot), c = (typeof clienteDe === "function") ? clienteDe(cot.clienteId) : null;
+  PG = {tipo:"anticipo", pct:60, monto:null, forma:"", factura:false, total:Math.round(r.total*100)/100,
+        rfc:(c && c.rfc) || "", razon:(c && (c.razon || c.nombre)) || (cot.cliente||""), cp:(c && c.cp) || "",
+        regimen:(c && c.regimen) || "612", uso:(c && c.uso) || "G03"};
+  pgPinta();
+  $("#pgVelo").hidden = false; document.body.style.overflow = "hidden";
+  setTimeout(()=>{ const x = $("#pgCerrar"); if(x) x.focus(); }, 40);
+}
+function pgCierra(){ $("#pgVelo").hidden = true; PG = null; document.body.style.overflow = ""; const b = $("#btnConfirmar"); if(b) b.focus(); }
+const pgHoy = () => PG.tipo === "total" ? PG.total : PG.tipo === "credito" ? 0 : (PG.monto != null ? PG.monto : Math.round(PG.total*PG.pct)/100);
+function pgPinta(){
+  const tot = PG.total, cr = pgCredito(tot);
+  const op = (id, t, s, apagada) => '<button type="button" class="pgOp" role="radio" data-pgtp="'+id+'" aria-checked="'+(PG.tipo===id)+'"'+(apagada?' data-apagada="1"':'')+'><b>'+t+'</b><small>'+s+'</small></button>';
+  let h = '<span class="svFijo">Total del pedido <b>'+mx(tot)+'</b>'+(P.ivaOn ? ' · con IVA' : '')+'</span>' +
+    '<div class="pgOps" role="radiogroup" aria-label="¿Cómo paga?">' +
+      op("anticipo","Anticipo","Una parte hoy, el resto al entregar") +
+      op("total","Pago total","Lo paga completo hoy") +
+      op("credito","A crédito", cr.ok ? "Le quedan " + mx(cr.cr.disponible) + " de línea" : "No le alcanza o no tiene", !cr.ok) +
+    '</div>';
+  if(PG.tipo === "anticipo"){
+    const m = pgHoy();
+    h += '<section class="svGrp"><h3>¿Cuánto deja de anticipo?</h3><div class="pgMonto"><div class="svChips">' +
+      [30,50,60].map(p=>'<button type="button" class="svChip" data-pgpct="'+p+'" aria-pressed="'+(PG.monto==null && PG.pct===p)+'"><span>'+p+'%</span><small>'+mx(tot*p/100)+'</small></button>').join("") +
+      '</div><input id="pgMonto" type="number" min="0" step="0.01" value="'+(Math.round(m*100)/100)+'" aria-label="Monto del anticipo"></div></section>';
+  }
+  if(PG.tipo === "credito"){
+    if(cr.cr && cr.cr.limite > 0){
+      const uso = Math.min(100, (cr.cr.deuda + (cr.ok ? tot : 0))/cr.cr.limite*100);
+      h += '<div class="pgCred"><b>'+esc(cr.c.nombre||"")+'</b> · '+cr.cr.plazo+' días de crédito' +
+        '<div class="pgBarra"><i'+(uso > 85 ? ' class="lleno"' : '')+' style="width:'+uso.toFixed(0)+'%"></i></div>' +
+        '<dl><div><dt>Línea</dt><dd>'+mx(cr.cr.limite)+'</dd></div><div><dt>Debe hoy</dt><dd>'+mx(cr.cr.deuda)+'</dd></div><div><dt>Le queda</dt><dd>'+mx(cr.cr.disponible)+'</dd></div></dl></div>';
+    }
+    if(!cr.ok) h += '<p class="pgMotivo">'+esc(cr.motivo)+'</p>';
+  } else {
+    h += '<section class="svGrp"><h3>Forma de pago</h3><div class="svChips">' +
+      PG_FORMAS.map(f=>'<button type="button" class="svChip" data-pgforma="'+f+'" aria-pressed="'+(PG.forma===f)+'"><span>'+f+'</span></button>').join("") + '</div></section>';
+  }
+  if(pgPlanFactura()){
+    const et = PG.tipo === "credito" ? "Facturar el pedido (lo paga después)" : PG.tipo === "anticipo" ? "Facturar este anticipo" : "Facturar este pago";
+    h += '<section class="svGrp"><label class="sw" style="margin:0"><input type="checkbox" id="pgFactura"'+(PG.factura ? ' checked' : '')+'> '+et+'</label>';
+    if(PG.factura){
+      h += '<div class="pgFisc">' +
+        '<div><label class="f" for="pgRfc">RFC</label><input id="pgRfc" value="'+esc(PG.rfc)+'" placeholder="12 o 13 caracteres" autocomplete="off"></div>' +
+        '<div><label class="f" for="pgRazon">Razón social</label><input id="pgRazon" value="'+esc(PG.razon)+'"></div>' +
+        '<div><label class="f" for="pgCp">Código postal</label><input id="pgCp" value="'+esc(PG.cp)+'" inputmode="numeric"></div>' +
+        '<div><label class="f" for="pgReg">Régimen fiscal</label><select id="pgReg">'+opcionesSelect(REGIMENES, PG.regimen)+'</select></div>' +
+        '<div><label class="f" for="pgUso">Uso del CFDI</label><select id="pgUso">'+opcionesSelect(USOS_CFDI, PG.uso)+'</select></div>' +
+        '</div><p class="pgNota">' + (PG.tipo === "anticipo" ? "Queda por facturar con el anticipo anotado. Al entregar, la factura final debe descontar lo que ya pagó."
+          : PG.tipo === "total" ? "Queda por facturar como pagada en una sola exhibición (PUE)."
+          : "Queda por facturar en parcialidades o diferido (PPD); cada pago lleva su complemento.") + ' Los datos salen de la ficha del cliente.</p>';
+    }
+    h += '</section>';
+  }
+  h += '<p class="pgMotivo" id="pgMotivo" hidden></p>';
+  $("#pgForm").innerHTML = h;
+  pgRevisa();
+}
+function pgRevisa(){
+  const tot = PG.total, cr = pgCredito(tot), hoy = pgHoy();
+  let motivo = "";
+  if(PG.tipo === "credito" && !cr.ok) motivo = "x";
+  else if(PG.tipo === "anticipo" && !(hoy > 0)) motivo = "Escribe cuánto deja de anticipo.";
+  else if(PG.tipo === "anticipo" && hoy > tot + 0.004) motivo = "El anticipo no puede ser mayor que el total. Si lo paga todo, escoge «Pago total».";
+  else if(PG.tipo !== "credito" && !PG.forma) motivo = "Escoge la forma de pago.";
+  else if(PG.factura && !/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/.test(PG.rfc)) motivo = "Para facturar falta el RFC del cliente (12 o 13 caracteres).";
+  const el = $("#pgMotivo"); el.hidden = !motivo || motivo === "x"; el.textContent = motivo === "x" ? "" : motivo;
+  $("#pgOk").disabled = !!motivo;
+  $("#pgHoyK").textContent = PG.tipo === "credito" ? "Se carga a su cuenta" : "Recibes hoy";
+  $("#pgHoy").textContent = mx(PG.tipo === "credito" ? tot : hoy);
+  $("#pgFalta").textContent = PG.tipo === "anticipo" && hoy > 0 && hoy < tot ? "faltan " + mx(tot - hoy) + " al entregar" : "";
+  $("#pgOk").textContent = PG.tipo === "credito" ? "Confirmar a crédito" : PG.tipo === "total" ? "Confirmar con pago total" : "Confirmar con anticipo";
+}
+document.addEventListener("click", e=>{
+  if(!PG || !e.target.closest("#pgVelo")) return;
+  if(e.target.id === "pgVelo" || e.target.closest("#pgCerrar")){ pgCierra(); return; }
+  const tp = e.target.closest("[data-pgtp]"); if(tp){ PG.tipo = tp.dataset.pgtp; pgPinta(); return; }
+  const pc = e.target.closest("[data-pgpct]"); if(pc){ PG.pct = num(pc.dataset.pgpct); PG.monto = null; pgPinta(); return; }
+  const fo = e.target.closest("[data-pgforma]"); if(fo){ PG.forma = fo.dataset.pgforma; pgPinta(); return; }
+  if(e.target.closest("#pgOk")){
+    if($("#pgOk").disabled) return;
+    const hoy = pgHoy();
+    cot.pago = {tipo:PG.tipo, monto: PG.tipo === "credito" ? 0 : Math.round(hoy*100)/100, forma: PG.tipo === "credito" ? "Crédito" : PG.forma,
+                factura: PG.factura ? {rfc:PG.rfc, razon:(PG.razon||"").trim(), cp:(PG.cp||"").trim(), regimen:PG.regimen, uso:PG.uso} : null,
+                fecha: hoyISO(), hora: horaAhora(), registrado:false};
+    cot._pagoListo = true;
+    pgCierra();
+    $("#btnConfirmar").click();
+  }
+});
+document.addEventListener("input", e=>{
+  if(!PG || !e.target.closest("#pgForm")) return;
+  const t = e.target;
+  if(t.id === "pgMonto"){ PG.monto = Math.max(0, num(t.value)); document.querySelectorAll("[data-pgpct]").forEach(c=> c.setAttribute("aria-pressed","false")); pgRevisa(); }
+  if(t.id === "pgRfc"){ PG.rfc = t.value.toUpperCase().replace(/\s/g,""); pgRevisa(); }
+  if(t.id === "pgRazon") PG.razon = t.value;
+  if(t.id === "pgCp") PG.cp = t.value;
+});
+document.addEventListener("change", e=>{
+  if(!PG || !e.target.closest("#pgForm")) return;
+  if(e.target.id === "pgFactura"){ PG.factura = e.target.checked; pgPinta(); }
+  if(e.target.id === "pgReg") PG.regimen = e.target.value;
+  if(e.target.id === "pgUso") PG.uso = e.target.value;
+});
+/* Lo que se cobró al confirmar entra a Ventas: es la misma venta que
+   haría «Cobrar», con su anticipo como primer abono. Si ya había venta de
+   ese folio (se canceló y se volvió a confirmar), se suma como abono. */
+async function cv2RegistraPago(q){
+  const pg = q.pago; if(!pg || pg.registrado) return;
+  const r = calcDe(q);
+  if(typeof selloVendedor === "function") selloVendedor(q);
+  const vdor = (typeof equipo !== "undefined" ? equipo : []).find(u=>u.id === ((q.vendedor||{}).id)) || null;
+  const monto = num(pg.monto);
+  const total = Math.round(r.total*100)/100;
+  const fac = pg.factura ? {requiere:true, estado:"pendiente", rfc:(pg.factura.rfc||"").toUpperCase().trim(), razon:pg.factura.razon||"",
+    cp:pg.factura.cp||"", regimen:pg.factura.regimen, uso:pg.factura.uso, formaSAT: FORMAS_SAT[pg.forma] || "99",
+    metodoPago: pg.tipo === "total" ? "PUE" : "PPD", anticipo: pg.tipo === "anticipo" ? monto : 0} : {requiere:false};
+  let v = (ventas||[]).find(x=>x.folio === q.folio);
+  if(v){
+    if(monto > 0){
+      v.recibido = Math.round((num(v.recibido) + monto)*100)/100;
+      v.abonos = (v.abonos||[]).concat([{fecha:pg.fecha, monto, pago:pg.forma, nota:"Al confirmar"}]);
+    }
+    v.total = total;
+    v.estado = saldoDe(v) <= 0 ? "pagado" : (num(v.recibido) > 0 ? "anticipo" : "pendiente");
+    if(pg.factura) v.factura = fac;
+  } else {
+    v = {folio:q.folio, fecha:pg.fecha, cliente:q.cliente||"", ref:q.ref||"", articulo:descripcionCot(q),
+         piezas:r.qty, total, costo:Math.round(r.costoTotal*100)/100, utilidad:Math.round(r.utilidad*100)/100,
+         pago:pg.forma, estado: pg.tipo === "total" ? "pagado" : pg.tipo === "anticipo" ? "anticipo" : "pendiente",
+         recibido: monto, clienteId:q.clienteId||"", vendedor:q.vendedor||null, comisionPct: vdor && typeof pctDe === "function" ? pctDe(vdor) : 0,
+         factura: fac, abonos: monto > 0 ? [{fecha:pg.fecha, monto, pago:pg.forma, nota: pg.tipo === "anticipo" ? "Anticipo al confirmar" : "Pago al confirmar"}] : [],
+         origen:"confirmacion"};
+    ventas.push(v);
+  }
+  if(DB){ try{ await DB.collection("ventas").doc(v.folio).set({venta:v, fecha:v.fecha, total:v.total}); }catch(e){ toast("No se pudo guardar el pago en la nube"); } }
+  else lsSet("ventas", ventas);
+  if(pg.forma === "Efectivo" && monto > 0 && typeof cajaDe === "function"){
+    const c = cajaDe(pg.fecha);
+    if(c.abierta){
+      c.movs.push({id:uid(), hora:horaAhora(), tipo:"venta", concepto:(pg.tipo === "anticipo" ? "Anticipo de " : "Pago de ") + (q.cliente||"cliente"), folio:q.folio, monto});
+      await guardaCaja(c);
+      if(!$("#tab-caj").hidden) renderCaja();
+    }
+  }
+  pg.registrado = true;
+  if(typeof renderCobranza === "function") try{ renderCobranza(); }catch(e){}
+  if(typeof renderVentas === "function" && !$("#tab-ven").hidden) try{ renderVentas(); }catch(e){}
+}
+/* El renglón del estado del pedido dice cuánto pagó y cuánto falta. */
+function cv2EstadoPago(){
+  if(!(cot.estado === "confirmada" && cot.op)) return "";
+  const v = (ventas||[]).find(x=>x.folio === cot.folio);
+  if(!v) return "";
+  const s = saldoDe(v);
+  const pago = (v.pago === "Crédito" && !num(v.recibido)) ? "a crédito" : "pagó " + mx(num(v.recibido));
+  return '<span class="cv2Pago">' + pago + (s > 0.004 ? ' · <b>faltan ' + mx(s) + '</b>' : ' · <b>pagado completo</b>') + '</span>';
+}
+
+/* ---------------- los papeles y el resumen ---------------- */
+function cv2LlenaResumen(r, L){
+  if(!r.svc){ L.push(["Servicio de impresión", "escoge uno en la tarjeta", true]); return; }
+  r.svc.ren.filter(x=>Math.abs(x.m) > 0.004).forEach(x=> L.push([x.t, mx(x.m), true]));
+}
+function cv2DisenosDoc(r){
+  const L = [];
+  r.partes.forEach((p,n)=>{
+    (p.q.apps||[]).filter(a=>a.art).forEach(a=> L.push({t:a.ubic||"Aplicación", s: r.varios ? nombreItem(p.it, n+1) : "", art:a.art}));
+    if(p.q.modo === "impresion" && p.q.svc && p.q.svc.art){
+      const pr = svProd(p.q.svc.pid);
+      L.push({t: pr ? pr.nom : "Servicio", s:"imagen de referencia", art:p.q.svc.art});
+    }
+  });
+  if(!L.length) return "";
+  return '<h2>Diseños incluidos</h2><div class="op-grid">' +
+    L.map(x=>'<div class="op-card"><b>'+esc(x.t)+'</b>'+(x.s ? '<br><small>'+esc(x.s)+'</small>' : '')+'<br>'+miniatura(x.art)+'</div>').join("") + '</div>';
+}
+function cv2FilaSvc(pr, it, n){
+  const s = it.svc, prod = s ? svProd(s.pid) : null;
+  const det = s ? svDetalle(s.pid, s.st).filter(x=>!x.interna).map(x=>esc(x.k)+": "+esc(x.v)).join(" · ") : "";
+  return [esc(prod ? prod.nom : nombreItem(it, n+1)) + (det ? "<br><small>"+det+"</small>" : ""), cantConUnidad(pr), mx(pr.precioUnit), mx(pr.subtotalPiezas)];
+}
+function cv2BloqueOrdenSvc(p, n, varios, cuantos){
+  const s = p.q.svc, pr = s ? svProd(s.pid) : null;
+  const det = s ? svDetalle(s.pid, s.st) : [];
+  return (varios ? '<div class="op-art">' : '') +
+    '<h2>'+(varios ? 'Concepto '+(n+1)+' de '+cuantos : 'Servicio de impresión')+'</h2>' +
+    '<p><b>'+esc(pr ? pr.nom : "Servicio")+'</b> · <b>'+esc(s ? svCantTxt(s.pid, s.st) : "")+'</b></p>' +
+    (det.length ? '<table><tbody>' + det.map(x=>'<tr><th style="width:34%">'+esc(x.k)+'</th><td>'+esc(x.v)+'</td></tr>').join("") + '</tbody></table>' : '') +
+    (s && s.art ? '<h3>Imagen de referencia</h3>'+miniatura(s.art) : '') +
+    (s && (s.st.notas||"").trim() ? '<h3>Notas</h3><p style="white-space:pre-line">'+esc(s.st.notas)+'</p>' : '') +
+    (varios ? '</div>' : '');
+}
+/* La orden dice cómo quedó el pago, sin cantidades: producción no ve precios. */
+function cv2PagoOrden(g){
+  const v = (ventas||[]).find(x=>x.folio === g.folio);
+  let t = "sin pago registrado";
+  if(v){
+    const s = saldoDe(v);
+    t = (v.pago === "Crédito" && !num(v.recibido)) ? "a crédito" : s <= 0.004 ? "pagado completo" : "anticipo registrado";
+  } else if(g.pago){
+    t = g.pago.tipo === "credito" ? "a crédito" : g.pago.tipo === "total" ? "pagado completo" : "anticipo registrado";
+  }
+  return '<p style="margin:10px 0 0"><b>Pago:</b> '+t+'</p>';
+}
 
 /* ---------- arranque ---------- */
 function arrancaEquipo(){
@@ -22691,10 +24409,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261016-1350";</script>
+<script>window.BUILD="20261030-1818";</script>
 <script>
 (function(){
-  var mio = "20261016-1350";
+  var mio = "20261030-1818";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
