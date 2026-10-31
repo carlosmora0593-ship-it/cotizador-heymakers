@@ -1,9 +1,10 @@
-const CACHE_NAME = "makers-restaurant-phone-layout-v14";
+const CACHE_NAME = "makers-restaurant-account-v15";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,
   new URL("index.html", APP_SCOPE).href,
   new URL("manifest.webmanifest", APP_SCOPE).href,
+  new URL("../config.js", APP_SCOPE).href,
   new URL("icons/icon-192.png", APP_SCOPE).href,
   new URL("icons/icon-512.png", APP_SCOPE).href,
   new URL("icons/icon-180.png", APP_SCOPE).href
@@ -23,7 +24,8 @@ self.addEventListener("fetch", event => {
   const request = event.request;
   if (request.method !== "GET") return;
   const url = new URL(request.url);
-  if (url.origin !== APP_SCOPE.origin || !url.pathname.startsWith(APP_SCOPE.pathname)) return;
+  const configPath = new URL("../config.js", APP_SCOPE).pathname;
+  if (url.origin !== APP_SCOPE.origin || (!url.pathname.startsWith(APP_SCOPE.pathname) && url.pathname !== configPath)) return;
   if (url.pathname.endsWith("/Makers-Restaurant.apk")) return;
 
   if (request.mode === "navigate") {

@@ -6,6 +6,9 @@ Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este r
 
 1. **Lee el historial:** `HISTORIAL-CODEX/INDICE.md` y el último archivo de esa carpeta. Ahí está lo último que se hizo y lo que sigue.
 2. **Tareas activas, en este orden:**
+   0. ✅ `TAREA-CUENTAS.md`. Arreglar la puerta: el logo va a `nuvoor.mx` y la cuenta se resuelve con `mi_cuenta()`. El Restaurant debe pedir correo, guardar los datos separados por cuenta y tener «Cerrar sesión»; el APK 0.1.2 arranca en `acceso.html`. **Va antes que todo lo de abajo.** **HECHO y revisado por Claude (31 oct, 14:40)**; se publica con la autorización de abajo.
+   0b. **`TAREA-UN-RESTAURANT.md`:** juntar `restaurant.html` (apps de reparto, facturación) con `restaurante/index.html` (cuentas, impresoras, eventos). `restaurant.html` y el Lab deben llevar a `restaurante/`.
+      - Estado al 31 oct 2026: código y APK 0.1.2 listos; las pruebas con Supabase falso pasaron. Falta publicación por Carlos y validar su cuenta real en iPhone/tablet e impresoras.
    1. `TAREA-APP-NUVOOR.md`: la app Nuvoor como **APK de prueba**, sin Play Store, y probarla en las tablets con impresora. Lee primero su sección 0, que cambió las prioridades.
    2. `TAREA-IMPRESORAS.md`: varias impresoras por tablet como Loyverse (caja, cocina o por categoría), que impriman solas sin la ventana de Android; quitar las instrucciones de accesos directos; el logo en el APK. **Va antes de meseros.**
    3. `TAREA-MESEROS.md`: los meseros mandan pedidos a cocina desde su celular.
@@ -14,9 +17,10 @@ Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este r
       - **Store:** no tiene nada.
       - **La versión oscura:** sirve de referencia la maqueta de impresoras de Codex (`tmp/maqueta-impresoras.png`), que a Carlos le gustó.
    - **Ojo:** la fuente del Restaurant es `public/restaurante/index.html`. **No** uses `PRUEBA-restaurant.html` ni `PREPARAR-APP-RESTAURANTE.bat`: están viejos y lo regenerarían encima.
+2b. **Publicar.** Carlos autorizó el 31 oct que **Codex corra `PUBLICAR.bat` SÓLO cuando Claude escriba «aprobado, publica»**, después de revisar. Sin esa aprobación no se publica nada. Si el `.bat` espera una tecla, corre sus mismos comandos git. Al terminar, confirma el commit y el push en el historial.
 3. **Lleva tu propio historial** en `HISTORIAL-CODEX/` mientras trabajas: un archivo por sesión con `PLANTILLA.md` y una línea arriba en `INDICE.md`. Nada de contraseñas, llaves ni el correo de Carlos. La carpeta está en `.gitignore` porque el repo es público.
 
-Última actualización: 31 de octubre de 2026, 13:11 (pantalla de impresoras y APK 0.1.1; pendiente prueba física en tablet).
+Última actualización: 31 de octubre de 2026, 14:28 (cuentas por negocio y APK 0.1.2; pendiente publicación y validación real en los dispositivos de Carlos).
 
 ## Qué es esto
 

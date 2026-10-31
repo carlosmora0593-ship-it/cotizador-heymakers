@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.Window;
 import android.webkit.JavascriptInterface;
+import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -26,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public final class MainActivity extends Activity {
+    static final String APP_START_URL = "https://app.nuvoor.mx/acceso.html?app=android";
     static final String APP_URL = "https://app.nuvoor.mx/restaurante/";
     private static final String APP_HOST = "app.nuvoor.mx";
     private static final int FILE_PICKER_REQUEST = 4201;
@@ -84,6 +86,7 @@ public final class MainActivity extends Activity {
         settings.setJavaScriptCanOpenWindowsAutomatically(false);
         settings.setSupportMultipleWindows(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        CookieManager.getInstance().setAcceptCookie(true);
 
         printerBridge = new BluetoothPrinterBridge(this, webView);
         webView.addJavascriptInterface(printerBridge, "MakersPrinter");
@@ -125,7 +128,7 @@ public final class MainActivity extends Activity {
                 return routeNavigation(Uri.parse(url));
             }
         });
-        webView.loadUrl(APP_URL);
+        webView.loadUrl(APP_START_URL);
     }
 
     private boolean isNuvoorPage(Uri uri) {
@@ -288,6 +291,25 @@ public final class MainActivity extends Activity {
     public void onBackPressed() {
         if (webView != null && webView.canGoBack()) webView.goBack();
         else super.onBackPressed();
+    }
+
+    @Override
+    protected void onPause() {
+        if (webView != null) webView.onPause();
+        CookieManager.getInstance().flush();
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (webView != null) webView.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        CookieManager.getInstance().flush();
+        super.onStop();
     }
 
     @Override

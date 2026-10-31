@@ -6,7 +6,7 @@ Esta app de prueba abre **en vivo** `https://app.nuvoor.mx/restaurante/` en un W
 
 - `applicationId` y `namespace`: `mx.nuvoor.app`.
 - Nombre visible: `Nuvoor`.
-- Versión actual: `versionCode 2`, `versionName 0.1.1`.
+- Versión actual: `versionCode 3`, `versionName 0.1.2`.
 - Android API 37.0 (compilar y destino) y Build Tools 36.0.0.
 - JBR de Android Studio: Java 25. El proyecto usa AGP 9.1.1 y Gradle 9.3.1 para admitir ese JBR y API 37.
 - APK: `app/build/outputs/apk/debug/app-debug.apk`.
