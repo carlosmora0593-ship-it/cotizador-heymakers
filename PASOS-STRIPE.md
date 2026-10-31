@@ -122,6 +122,25 @@ Corre `sql/18-stripe.sql` en Supabase → SQL Editor. Agrega cuatro columnas a
 
 ---
 
+## Precios nuevos y promoción de apertura
+
+Los cobros todavía no están configurados. Al habilitarlos, la promoción para
+Imprenta Básico, Restaurant y Store debe cobrar **$98 MXN al mes durante los
+primeros 3 meses y después $199 MXN al mes**. Los 15 días de prueba gratuita
+van antes de la promoción. Configúrala en el procesador como cupón recurrente
+por 3 meses o como precio introductorio; no cambies el monto confiable del
+servidor para aceptar el precio que mande el navegador.
+
+En Imprenta, **Pro cuesta $899 MXN al mes e incluye hasta 4 sucursales**; no hay
+una licencia Multiempresa aparte. En Restaurant y Store, Multiempresa cuesta
+**$899 MXN al mes por hasta 4 sucursales del mismo sistema**. Imprenta Maker
+conserva $449. Restaurant y Store se contratan por separado; no hay un combo
+Restaurant + Store. Antes de habilitar estos planes hay que actualizar el
+mapeo de planes y las funciones de pago para distinguir el sistema y la
+promoción.
+
+---
+
 ## 7. Probar antes de cobrarle a nadie
 
 Con Stripe en modo de prueba:

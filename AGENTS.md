@@ -9,6 +9,7 @@ Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este r
    0. ✅ `TAREA-CUENTAS.md`. Arreglar la puerta: el logo va a `nuvoor.mx` y la cuenta se resuelve con `mi_cuenta()`. El Restaurant debe pedir correo, guardar los datos separados por cuenta y tener «Cerrar sesión»; el APK 0.1.2 arranca en `acceso.html`. **Va antes que todo lo de abajo.** **HECHO y revisado por Claude (31 oct, 14:40)**; se publica con la autorización de abajo.
    0b. **`TAREA-UN-RESTAURANT.md`:** juntar `restaurant.html` (apps de reparto, facturación) con `restaurante/index.html` (cuentas, impresoras, eventos). `restaurant.html` y el Lab deben llevar a `restaurante/`.
       - Estado al 31 oct 2026: código y APK 0.1.2 listos; las pruebas con Supabase falso pasaron. Falta publicación por Carlos y validar su cuenta real en iPhone/tablet e impresoras.
+   0c. **`TAREA-PRECIOS.md`:** la promoción de apertura ($98 los primeros 3 meses en Imprenta Básico, Restaurant y Store) y **Multiempresa = sucursales** ($899, hasta 4, por sistema). Se quita el combo Restaurant + Store.
    1. `TAREA-APP-NUVOOR.md`: la app Nuvoor como **APK de prueba**, sin Play Store, y probarla en las tablets con impresora. Lee primero su sección 0, que cambió las prioridades.
    2. `TAREA-IMPRESORAS.md`: varias impresoras por tablet como Loyverse (caja, cocina o por categoría), que impriman solas sin la ventana de Android; quitar las instrucciones de accesos directos; el logo en el APK. **Va antes de meseros.**
    3. `TAREA-MESEROS.md`: los meseros mandan pedidos a cocina desde su celular.

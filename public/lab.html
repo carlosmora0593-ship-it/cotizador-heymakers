@@ -568,8 +568,8 @@ const PLANES = {
   ninguno: { nombre: "Sin plan",     mes: 0,   anio: 0 },
   prueba:  { nombre: "Prueba Maker", mes: 0,   anio: 0 },
   basico: { nombre: "Básico", mes: 199, anio: 1990 },
-  maker:  { nombre: "Maker",  mes: 449, anio: 4490 },
-  pro:    { nombre: "Pro",    mes: 899, anio: 8990 }
+  maker:  { nombre: "Maker · Imprenta", mes: 449, anio: 4490 },
+  pro:    { nombre: "Pro", mes: 899, anio: 8990 }
 };
 const ESTADOS = {
   prueba:  { nombre: "En prueba", chip: "aviso" },
@@ -692,7 +692,18 @@ const COLS = ["cuentas", "tickets", "errores", "equipo", "alianzas", "citas", "c
 let vista = "tablero", abierta = null, esEjemplo = false, listo = false;
 let filtro = { texto: "", estado: "", plan: "" };
 
-const planDe = c => PLANES[(c && c.plan) || "ninguno"] || PLANES.ninguno;
+const planDe = c => {
+  const clave = (c && c.plan) || "ninguno";
+  const plan = PLANES[clave] || PLANES.ninguno;
+  if (c && (c.producto === "restaurant" || c.producto === "tiendita")) {
+    if (clave === "basico") return Object.assign({}, plan, { nombre: "Estándar" });
+    if (clave === "maker") return Object.assign({}, plan, { nombre: "Multiempresa anterior" });
+    if (clave === "pro") return Object.assign({}, plan, { nombre: "Pro anterior" });
+  }
+  if (c && c.producto === "taller" && clave === "pro")
+    return Object.assign({}, plan, { nombre: "Pro · hasta 4 sucursales" });
+  return plan;
+};
 const cobroMes = c => c.periodo === "anual" ? planDe(c).anio / 12 : planDe(c).mes;  // lo que le cargas
 const cobroCiclo = c => c.periodo === "anual" ? planDe(c).anio : planDe(c).mes;      // lo que se cobra cada vez
 const mensual = c => baseDe(cobroMes(c));   // lo tuyo, ya sin IVA
@@ -761,21 +772,21 @@ function jugadaBase(c) {
     guion: abre + "vi que llevas " + dias(sin) + " sin entrar al cotizador y sí estás pagando. ¿Algo se atoró? " +
       "Si quieres te marco y lo vemos, no me gusta que pagues algo que no estás usando." };
 
-  if (c.plan === "basico" && (c.cotizaciones >= 60 || c.usuarios > 1)) return {
+  if (c.producto === "taller" && c.plan === "basico" && (c.cotizaciones >= 60 || c.usuarios > 1)) return {
     clave: "maker", urg: "pronto", cita: "video", titulo: "Ya le toca Maker",
     porque: "Lleva " + c.cotizaciones + " cotizaciones en Básico" + (c.usuarios > 1 ? " y ya son varios en el taller" : "") +
       ". Subirlo son " + $$$(PLANES.maker.mes - PLANES.basico.mes) + " más al mes.",
-    guion: abre + c.taller + " ya lleva " + c.cotizaciones + " cotizaciones en Básico. A ese ritmo te sirve Maker: " +
+      guion: abre + c.taller + " ya lleva " + c.cotizaciones + " cotizaciones en Básico. A ese ritmo te sirve Maker de Imprenta: " +
       "das de alta a tu diseñador y a producción, cada quien ve solo lo suyo y te queda la bitácora de cada pedido. " +
-      "Son $449 al mes. ¿Te lo enseño en 10 minutos?" };
+      "Maker de Imprenta cuesta $449 al mes. ¿Te lo enseño en 10 minutos?" };
 
-  if (c.plan === "maker" && c.cotizaciones >= 120) return {
+  if (c.producto === "taller" && c.plan === "maker" && c.cotizaciones >= 120) return {
     clave: "pro", urg: "info", cita: "video", titulo: "Prospecto de Pro",
     porque: "Lleva " + c.cotizaciones + " cotizaciones en Maker. Este sí amerita cita formal.",
     guion: abre + "con el volumen que trae " + c.taller + " creo que ya te toca ver el plan Pro: corte de caja, " +
-      "utilidad real por periodo y reportes por área. ¿Agendamos una videollamada de 20 minutos para verlo con tus propios números?" };
+      "utilidad real por periodo, reportes por área y hasta 4 sucursales de Imprenta. ¿Agendamos una videollamada de 20 minutos para verlo con tus propios números?" };
 
-  if (c.plan === "basico") return {
+  if (c.producto === "taller" && c.plan === "basico") return {
     clave: "maker-suave", urg: "info", cita: "llamada", titulo: "Sembrar Maker",
     porque: "Va bien en Básico. Todavía no tiene volumen para Maker, pero conviene que sepa que existe.",
     guion: abre + "qué tal va " + c.taller + ". Cuando entre alguien más al taller avísame: con Maker cada quien ve " +
@@ -2449,7 +2460,7 @@ function abreFicha(id) {
     '<div class="bloque"><h3>Suscripción</h3>' +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
         '<div class="campo"><label class="f" for="fPlan">Plan</label><select id="fPlan">' +
-          Object.keys(PLANES).map(p => '<option value="' + p + '"' + (c.plan === p ? " selected" : "") + '>' + PLANES[p].nombre + ' · ' + $$$(PLANES[p].mes) + '</option>').join("") + '</select></div>' +
+          Object.keys(PLANES).map(p => '<option value="' + p + '"' + (c.plan === p ? " selected" : "") + '>' + planDe({ producto: c.producto, plan: p }).nombre + ' · ' + $$$(PLANES[p].mes) + '</option>').join("") + '</select></div>' +
         '<div class="campo"><label class="f" for="fPeriodo">Periodo</label><select id="fPeriodo">' +
           '<option value="mensual"' + (c.periodo === "mensual" ? " selected" : "") + '>Mensual</option>' +
           '<option value="anual"' + (c.periodo === "anual" ? " selected" : "") + '>Anual</option></select></div></div>' +
@@ -3840,10 +3851,10 @@ function vDiagnosticos() {
 
 </script>
 
-<script>window.BUILD="20261031-1636";</script>
+<script>window.BUILD="20261031-1745";</script>
 <script>
 (function(){
-  var mio = "20261031-1636";
+  var mio = "20261031-1745";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
