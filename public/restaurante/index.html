@@ -1332,6 +1332,56 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 .av img{position:absolute;inset:0;display:block;width:100%;height:100%;min-width:0;min-height:0;max-width:none;max-height:none;object-fit:cover;border-radius:inherit}
 @media(max-width:540px){.businessLogoSetting{align-items:flex-start}.businessLogoControls{min-width:0}.fotoUsuarioControl{min-width:120px}}
 </style>
+<style>
+.impPrinterLayout{display:grid;grid-template-columns:minmax(270px,.82fr) minmax(0,1.45fr);gap:14px;align-items:start}
+.impPrinterColumn{min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:var(--radio);padding:14px}
+.impPrinterColumn>header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:0 0 12px;border-bottom:1px solid var(--line-soft)}
+.impPrinterColumn>header h3{font-size:16px;color:var(--ink)}
+.impPrinterList{display:grid;gap:10px}
+.impPrinterChoice{display:block;width:100%;text-align:left;padding:13px;border:1px solid var(--line);border-radius:var(--radio-sm);background:var(--surface);color:var(--ink);cursor:pointer;transition:border-color .16s,background .16s,transform .16s}
+.impPrinterChoice:hover{border-color:var(--cyan);transform:translateY(-1px)}
+.impPrinterChoice[aria-pressed="true"]{border:2px solid var(--accent);background:var(--accent-soft);padding:12px}
+.impPrinterChoiceTop{display:flex;align-items:center;gap:9px}
+.impPrinterGlyph{width:36px;height:36px;display:grid;place-items:center;flex:none;border-radius:11px;background:var(--surface-2);color:var(--cyan);font-size:18px}
+.impPrinterChoice strong{font-size:14px;color:var(--ink)}
+.impPrinterState{margin-left:auto;font-size:10px;color:var(--good);white-space:nowrap}
+.impPrinterMeta{margin:7px 0 0 45px;font-size:11px;color:var(--ink-2);overflow-wrap:anywhere}
+.impPrinterTags{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0 45px}
+.impPrinterTag{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border:1px solid var(--line-soft);border-radius:var(--radio-pill);background:var(--surface-2);color:var(--ink-2);font-size:10px;line-height:1.35}
+.impPrinterHint{margin-top:12px;padding:11px 12px;border:1px solid var(--line-soft);border-radius:var(--radio-sm);background:var(--surface-2);color:var(--ink-2);font-size:11px}
+.impPrinterEditor{display:grid;gap:13px}
+.impPrinterFields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.impPrinterField{min-width:0}
+.impPrinterField input,.impPrinterField select{background:var(--surface);border-color:var(--line);color:var(--ink);box-shadow:none}
+.impPrinterField input:focus,.impPrinterField select:focus{border-color:var(--cyan);box-shadow:0 0 0 3px var(--cyan-soft)}
+.impPrinterConnection{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:end}
+.impPrinterPaper{display:flex;gap:6px;padding:4px;border:1px solid var(--line);border-radius:var(--radio-sm);background:var(--surface-2)}
+.impPrinterPaper button{flex:1;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--ink-2);padding:8px 12px;cursor:pointer}
+.impPrinterPaper button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.impPrinterSwitches{display:grid;gap:2px;border-top:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft);padding:5px 0}
+.impPrinterSwitch{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:10px;align-items:center;padding:7px 0;color:var(--ink)}
+.impPrinterSwitch span{display:block;font-size:12px;font-weight:700}
+.impPrinterSwitch small{display:block;margin-top:2px;color:var(--ink-2);font-size:10.5px;font-weight:400}
+.impPrinterSwitch input[type="checkbox"]{appearance:none;position:relative;width:42px;height:24px;margin:0;padding:0;border:1px solid var(--line);border-radius:var(--radio-pill);background:var(--surface-2);cursor:pointer;transition:background .16s,border-color .16s}
+.impPrinterSwitch input[type="checkbox"]::before{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--surface);box-shadow:var(--sombra);transition:transform .16s}
+.impPrinterSwitch input[type="checkbox"]:checked{background:var(--accent);border-color:var(--accent)}
+.impPrinterSwitch input[type="checkbox"]:checked::before{transform:translateX(18px);background:var(--accent-ink)}
+.impPrinterSwitch input[type="checkbox"]:disabled{opacity:.55;cursor:not-allowed}
+.impPrinterCategory{padding:11px 0;border-bottom:1px solid var(--line-soft)}
+.impPrinterCategoryList{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:7px;margin-top:9px}
+.impPrinterCategoryList label{display:flex;align-items:center;gap:7px;padding:7px 9px;border:1px solid var(--line);border-radius:var(--radio-sm);background:var(--surface);color:var(--ink-2);font-size:11px}
+.impPrinterCategoryList input{width:auto;margin:0;accent-color:var(--accent)}
+.impPrinterActions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.impPrinterActions .impSave{margin-left:auto;background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.impPrinterRemove{color:var(--mal)}
+.impPrinterErrors{position:fixed;right:18px;bottom:84px;z-index:9790;display:grid;gap:8px;width:min(390px,calc(100vw - 24px))}
+.impPrinterError{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 13px;border:1px solid var(--mal);border-radius:var(--radio-sm);background:var(--surface);color:var(--ink);box-shadow:var(--sombra)}
+.impPrinterError strong{display:block;font-size:12px}
+.impPrinterError small{display:block;margin-top:2px;color:var(--ink-2);font-size:10.5px}
+.impPrinterError button{border:1px solid var(--accent);border-radius:var(--radio-sm);background:var(--accent);color:var(--accent-ink);padding:7px 10px;font:inherit;font-size:11px;font-weight:700;cursor:pointer}
+@media(max-width:900px){.impPrinterLayout{grid-template-columns:1fr}}
+@media(max-width:540px){.impPrinterFields{grid-template-columns:1fr}.impPrinterConnection{grid-template-columns:1fr}.impPrinterActions .impSave{margin-left:0}.impPrinterError{grid-template-columns:1fr auto}}
+</style>
 </head>
 <body>
 
@@ -1800,41 +1850,25 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
         <label class="sw"><input type="checkbox" id="tk_iva"> Desglosar el IVA</label>
         <label class="sw"><input type="checkbox" id="tk_propina"> Poner la leyenda de propina</label>
       </div>
-      <div class="fila" style="margin-top:16px">
-        <button class="btn" id="tk_prueba">Probar la cuenta</button>
-        <button class="btn" id="tk_pruebaCocina">Probar la comanda de cocina</button>
-        <span class="hint" style="color:var(--ink-3);font-size:12px">salen de ejemplo, para estrenar la impresora</span>
-      </div>
+      <p class="note" style="margin-top:14px">Configura cada impresora en el apartado siguiente y usa su botón de prueba para comprobarla.</p>
       <p class="note" style="margin-top:14px"><b>El ticket de cocina no lleva precios</b> — en la cocina estorban.
         Lleva mesa o PARA LLEVAR, el folio en grande (el mismo del recibo, para que cuadren), el comensal de cada
         platillo y lo que le quitan, en letra grande.</p>
     </div>
   </div>
-  <div class="card">
-    <header><h2>Impresora de esta pantalla</h2><span class="hint" id="btPrinterHint">Bluetooth del APK</span></header>
+  <div class="card" id="impresorasCard">
+    <header><h2>Impresoras de esta tablet</h2><button class="btn sm primary" id="impAgregar" type="button">+ Agregar impresora</button></header>
     <div class="body">
-      <p class="note" style="margin:0 0 14px">Elige conexión directa para térmicas Bluetooth ESC/POS de 58 u 80 mm. Para impresoras USB, Wi-Fi o de otro protocolo, usa los servicios de impresión de Android; ese modo muestra una confirmación en cada trabajo y puede requerir el complemento del fabricante.</p>
-      <div id="btPrinterWebHint" class="note" style="margin:0;border-left-color:var(--warn)">La conexión Bluetooth directa estará disponible en la versión Android con el puente nativo de impresión.</div>
-      <div id="btPrinterControls" hidden>
-        <div class="grid g2">
-          <div><label class="f" for="btPrinterMode">Método de conexión</label>
-            <select id="btPrinterMode"><option value="bluetooth">Bluetooth directo · ESC/POS</option><option value="android">Servicios de impresión Android</option></select></div>
-          <div><label class="f" for="btPrinterWidth">Ancho del papel</label>
-            <select id="btPrinterWidth"><option value="58">58 mm</option><option value="80">80 mm</option></select></div>
-        </div>
-        <div id="btPrinterBluetoothOptions" class="grid g2" style="margin-top:10px">
-          <div><label class="f" for="btPrinterSelect">Impresora emparejada</label>
-            <select id="btPrinterSelect"><option value="">Busca impresoras emparejadas</option></select></div>
-          <div style="display:flex;align-items:end;gap:8px;flex-wrap:wrap">
-            <button class="btn sm" id="btPrinterFind" type="button">Buscar emparejadas</button>
-          </div>
-        </div>
-        <div class="fila" style="margin-top:12px">
-          <button class="btn sm primary" id="btPrinterSave" type="button">Guardar conexión</button>
-          <button class="btn sm" id="btPrinterTest" type="button">Imprimir prueba</button>
-          <span class="hint" id="btPrinterStatus" aria-live="polite">Sin impresora seleccionada.</span>
-        </div>
+      <p class="note" style="margin:0 0 14px">Elige qué imprime cada impresora. Las Bluetooth trabajan en segundo plano y cada una conserva su configuración en este dispositivo.</p>
+      <div class="impPrinterLayout">
+        <section class="impPrinterColumn" aria-label="Lista de impresoras">
+          <header><h3>Lista</h3><span class="hint" id="impConteo"></span></header>
+          <div class="impPrinterList" id="impLista"></div>
+          <div class="impPrinterHint" id="impHint">Si falla una impresora, verás su nombre y podrás reintentar. El cobro continúa.</div>
+        </section>
+        <section class="impPrinterColumn" aria-label="Editar impresora" id="impEditor"></section>
       </div>
+      <p class="note" id="impAvisoWeb" hidden style="margin-top:12px">En este navegador, la impresión pide confirmación. Para usar impresoras Bluetooth directamente, abre Nuvoor en la app de Android.</p>
     </div>
   </div>
   <div class="card">
@@ -1852,37 +1886,6 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <p class="note" style="margin-top:14px">El respaldo trae el menú, las mesas, el croquis, las comandas, los
         turnos, el equipo con sus expedientes y horarios, las asistencias, las compras y las recetas. Restaurar
         <b>reemplaza todo</b> lo que haya en esta pantalla — por eso pregunta dos veces.</p>
-    </div>
-  </div>
-  <div class="card">
-    <header><h2>Esta pantalla</h2><span class="hint" id="estHint"></span></header>
-    <div class="body">
-      <p class="note" style="margin:0 0 14px">Esta pantalla se configura por dispositivo. En Android puedes elegir una térmica Bluetooth emparejada para mandar cuentas o comandas directamente; en navegador se usa la impresora predeterminada o el diálogo de impresión del sistema.</p>
-      <div class="grid g3">
-        <div><label class="f" for="est_donde">Esta pantalla es la de</label>
-          <select id="est_donde"></select></div>
-      </div>
-      <div class="grid g2" style="margin-top:14px">
-        <label class="sw"><input type="checkbox" id="est_cuenta"> Imprimir la cuenta al cobrar</label>
-        <label class="sw"><input type="checkbox" id="est_cocina"> Imprimir la comanda al mandar a cocina</label>
-        <label class="sw"><input type="checkbox" id="est_cancela"> Imprimir las cancelaciones</label>
-      </div>
-      <p class="note" id="estNota" style="margin-top:14px"></p>
-      <details style="margin-top:12px">
-        <summary style="cursor:pointer;font-size:12.5px;color:var(--cyan)">Quitar la ventana de «Imprimir» (Chrome en Windows)</summary>
-        <div class="note" style="margin-top:10px">
-          <p style="margin:0 0 8px">Para que el ticket salga solo, sin que nadie confirme:</p>
-          <ol style="margin:0;padding-left:18px;line-height:1.75">
-            <li>Pon la impresora de ticket como <b>predeterminada</b> en Windows.</li>
-            <li>Copia el acceso directo de Chrome al escritorio, clic derecho → <b>Propiedades</b>.</li>
-            <li>Al final de <b>Destino</b>, después de las comillas, agrega un espacio y
-              <code style="font-family:'IBM Plex Mono',monospace">--kiosk-printing</code>.</li>
-            <li>Abre el punto de venta con <b>ese</b> acceso directo.</li>
-          </ol>
-          <p style="margin:8px 0 0">Es una bandera de Chrome, no un truco: vale para esa ventana nada más.
-            Lo de dos impresoras en una sola computadora sí necesita la app envuelta — esa viene después.</p>
-        </div>
-      </details>
     </div>
   </div>
   <div class="card">
@@ -2144,6 +2147,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
   </div>
 </div>
 <div id="toast" hidden></div>
+<div id="impPrinterErrors" class="impPrinterErrors" aria-live="polite"></div>
 
 <script>
 /* ===================================================================
@@ -2460,19 +2464,42 @@ let TURNOS   = lsGet("turnos", []);
 let P        = Object.assign(paramsPorDefecto(), lsGet("P", {}));
 let EQUIPO      = lsGet("equipo", null) || equipoPorDefecto();
 let ASISTENCIAS = lsGet("asistencias", []);
-/* Esto NO va en P: no es de la cuenta, es de ESTA pantalla. La compu de la
-   caja y la de la cocina son la misma cuenta con distinto trabajo. */
-const ESTACIONES = {
-  caja:    {et:"Caja",    cuenta:true,  cocina:false, cancela:false},
-  cocina:  {et:"Cocina",  cuenta:false, cocina:true,  cancela:true},
-  barra:   {et:"Barra",   cuenta:false, cocina:true,  cancela:true},
-  ninguna: {et:"No imprime nada", cuenta:false, cocina:false, cancela:false}
-};
+/* La lista de impresoras pertenece a ESTE dispositivo, no a la cuenta. */
 const estacionGuardada = lsGet("estacion", null) || {};
-let ESTACION = Object.assign({donde:"caja", impresoraBt:"", impresoraNombre:"", anchoPapelBt:0, modoImpresion:"android"},
-  estacionGuardada);
-if(!estacionGuardada.modoImpresion && estacionGuardada.impresoraBt) ESTACION.modoImpresion = "bluetooth";
-function guardaEstacion(){ lsSet("estacion", ESTACION); }
+let IMPRESORAS = lsGet("impresoras", null);
+if(!Array.isArray(IMPRESORAS)){
+  const teniaAjustes = !!(estacionGuardada.impresoraBt || estacionGuardada.cuenta ||
+    estacionGuardada.cocina || estacionGuardada.cancela);
+  if(teniaAjustes){
+    const nombreEstacion = {caja:"Caja", cocina:"Cocina", barra:"Barra", ninguna:"Impresora"}[estacionGuardada.donde] || "Caja";
+    IMPRESORAS = [{
+      id:"legado-"+uid(), nombre:nombreEstacion, conexion:estacionGuardada.impresoraBt ? "bluetooth" : "sistema",
+      impresoraBt:estacionGuardada.impresoraBt||"", impresoraNombre:estacionGuardada.impresoraNombre||"",
+      anchoPapelBt:num(estacionGuardada.anchoPapelBt,80)||80,
+      cuenta:!!estacionGuardada.cuenta, cuentaAuto:!!estacionGuardada.cuenta,
+      cocina:!!estacionGuardada.cocina, cancela:!!estacionGuardada.cancela,
+      categorias:[], corteAutomatico:!!estacionGuardada.corteAutomatico
+    }];
+    lsSet("impresoras", IMPRESORAS);
+  }else IMPRESORAS = [];
+}
+IMPRESORAS = IMPRESORAS.map(p=>Object.assign({
+  id:uid(), nombre:"Impresora", conexion:"bluetooth", impresoraBt:"", impresoraNombre:"",
+  anchoPapelBt:80, cuenta:false, cuentaAuto:false, cocina:false, cancela:false,
+  categorias:[], corteAutomatico:false
+},p||{}, {categorias:Array.isArray((p||{}).categorias)?p.categorias:[]}));
+if(!window.MakersPrinter && IMPRESORAS.some(p=>p.conexion==="bluetooth")){
+  IMPRESORAS = IMPRESORAS.map(p=>Object.assign({},p,{conexion:"sistema"}));
+  lsSet("impresoras", IMPRESORAS);
+}
+function guardaImpresorasPOS(){ lsSet("impresoras", IMPRESORAS); }
+let impresorasEmparejadasPOS = [];
+let impresoraEnEdicionPOS = "";
+let borradorImpresoraPOS = null;
+const colaImpresionPOS = [];
+const esperasImpresionPOS = new Map();
+const erroresImpresionPOS = [];
+let procesandoColaImpresionPOS = false;
 let COMPRAS     = lsGet("compras", []);
 let RECETAS     = lsGet("recetas", {});   /* platId -> {ings:[], minutos:0} */
 let DECOR       = lsGet("decor", null) || decorPorDefecto();
@@ -3504,7 +3531,7 @@ function abreCorrige(linId){
 function anotaCancelacion(c, l, cant, motivo, nota, merma, autorizo){
   /* A la cocina se le avisa en papel solo si ya estaba preparandolo: una
      linea que nunca salio de la comanda no le interesa a nadie alla. */
-  if(merma && ESTACION.cancela)
+  if(merma && IMPRESORAS.some(p=>p.cancela))
     setTimeout(()=> imprimeCancelacion(c, {cant:cant, nombre:l.nombre, motivo:motivo,
       nota:nota||"", quien: usuarioActual().nombre||""}), 60);
   c.cancelaciones = c.cancelaciones || [];
@@ -3585,9 +3612,12 @@ $("#comEnviar").addEventListener("click", ()=>{
   persist(); pintaLineas(); pintaTabs();
   /* Sólo lo que se acaba de mandar: reimprimir la comanda entera hace que la
      cocina prepare dos veces lo mismo. */
-  if(ESTACION.cocina && nuevas.length) imprimeComandaCocina(c, nuevas);
-  toast(n + " platillo(s) a cocina" + (ESTACION.cocina && nuevas.length ? " · se imprimió la comanda" : "") +
-        ". Para cambiarlos ahora se usa Corregir.");
+  const hayImpresoraComandas = IMPRESORAS.some(p=>p.cocina);
+  if(nuevas.length && hayImpresoraComandas) imprimeComandaCocina(c, nuevas);
+  toast(n + " platillo(s) a cocina" + (nuevas.length && hayImpresoraComandas
+    ? " · comanda en cola de impresión"
+    : nuevas.length ? " · agrega una impresora de comandas en Configuración para imprimir"
+    : "") + ". Para cambiarlos ahora se usa Corregir.");
 });
 $("#comCancelar").addEventListener("click", ()=>{
   const c = comandaActual(); if(!c) return;
@@ -3958,7 +3988,7 @@ $("#modalCobro").addEventListener("click", e=>{
   const c = comandaActual(); if(!c) return;
   const s = sumaComanda(c);
   const prop = cobroPropPct === null ? num($("#cobroPropMonto").value) : s.sub * cobroPropPct/100;
-  imprimeCuenta(c, cobroPagos, prop);
+  imprimeCuenta(c, cobroPagos, prop, false);
 });
 $("#cobroOk").addEventListener("click", ()=>{
   const c = comandaActual(); if(!c) return;
@@ -3979,7 +4009,7 @@ $("#cobroOk").addEventListener("click", ()=>{
   c.cobro = usuarioActual().nombre || "";
   persist();
 
-  if(ESTACION.cuenta) imprimeCuenta(c, c.pagos, prop);
+  if(IMPRESORAS.some(p=>p.cuenta && p.cuentaAuto)) imprimeCuenta(c, c.pagos, prop, true);
   $("#modalCobro").hidden = true;
   comandaId = null;
   vaA("mesas");
@@ -4751,7 +4781,7 @@ $("#tkCuerpo").addEventListener("click", e=>{
     c.reimpresiones = c.reimpresiones || [];
     c.reimpresiones.push({quien: usuarioActual().nombre||"", hora: horaAhora(), fecha: hoyISO()});
     persist();
-    imprimeCuenta(c, c.pagos || [], num(c.propina));
+     imprimeCuenta(c, c.pagos || [], num(c.propina), false);
     abreTicket(c.id); renderVentas();
     return;
   }
@@ -5135,9 +5165,8 @@ $("#tab-menu").addEventListener("click", e=>{
    cualquier cocina. Las dos cosas conviven: la pantalla manda y el ticket
    se imprime igual.
 
-   Se imprime con la ventana del navegador, no hablando ESC/POS directo: una
-   página web no puede abrir el puerto de una térmica sin permisos que iOS no
-   da. El driver de la impresora sí sabe hacerlo, y toda térmica trae uno.
+   En Android, las térmicas Bluetooth reciben ESC/POS desde la app. En web y
+   con impresoras de sistema se conserva la confirmación del dispositivo.
    =================================================================== */
 const anchoTicket = () => num((P.ticket||{}).ancho, 80) === 58 ? 58 : 80;
 
@@ -5198,24 +5227,104 @@ function ticketHtmlATexto(titulo, cuerpo, anchoMm){
   const limpias=contenido.split("\n").map(x=>x.replace(/[\t ]+/g," ").trim()).filter(Boolean);
   return [titulo, ...limpias.flatMap(x=>envolver(x,columnas))].join("\n")+"\n\n";
 }
-function imprimeHoja(titulo, cuerpo){
-  if(window.MakersPrinter){
-    const mm=num(ESTACION.anchoPapelBt,0)||num(P.ticket.ancho,80);
-    if(ESTACION.modoImpresion !== "android" && ESTACION.impresoraBt){
-      window.MakersPrinter.printText(uid(), ESTACION.impresoraBt, mm, ticketHtmlATexto(titulo,cuerpo,mm));
-    }else{
-      window.MakersPrinter.printHtmlSystem("sys-"+uid(), titulo, mm, cuerpo, hojaTicket());
-    }
-    return;
+function esperaResultadoImpresoraPOS(id, tiempo){
+  return new Promise(resolve=>{
+    let terminada=false;
+    const cerrar=(ok,mensaje)=>{
+      if(terminada) return;
+      terminada=true; clearTimeout(reloj); esperasImpresionPOS.delete(id);
+      resolve({ok:!!ok,mensaje:String(mensaje||"")});
+    };
+    const reloj=setTimeout(()=>cerrar(false,"La impresora no respondió a tiempo."),tiempo);
+    esperasImpresionPOS.set(id,cerrar);
+  });
+}
+function resuelveResultadoImpresoraPOS(id,ok,mensaje){
+  const cerrar=esperasImpresionPOS.get(String(id||""));
+  if(!cerrar) return false;
+  cerrar(ok,mensaje); return true;
+}
+function muestraErroresImpresoraPOS(){
+  const contenedor=$("#impPrinterErrors"); if(!contenedor) return;
+  contenedor.innerHTML=erroresImpresionPOS.map((f,i)=>
+    '<div class="impPrinterError"><div><strong>'+esc(f.trabajo.impresora.nombre||"Impresora")+' no imprimió</strong>'+
+    '<small>'+esc(f.mensaje||"Revisa que esté encendida y cerca.")+'</small></div>'+
+    '<button type="button" data-imp-reintentar="'+i+'">Reintentar</button></div>').join("");
+}
+function reportaFalloImpresoraPOS(trabajo,mensaje){
+  erroresImpresionPOS.push({trabajo:trabajo,mensaje:mensaje||"No se pudo conectar."});
+  muestraErroresImpresoraPOS();
+  if(trabajo.esPrueba && $("#impTestEstado")) $("#impTestEstado").textContent="No se pudo imprimir. Puedes reintentar abajo.";
+}
+async function ejecutaTrabajoImpresoraPOS(trabajo){
+  const p=trabajo.impresora, puente=window.MakersPrinter;
+  if(p.conexion==="bluetooth"){
+    if(!puente || !p.impresoraBt) return {ok:false,mensaje:"No está disponible la impresora Bluetooth guardada."};
+    if(typeof puente.printTicket!=="function"&&typeof puente.printText!=="function")
+      return {ok:false,mensaje:"La app necesita actualizarse para imprimir por Bluetooth."};
+    if(p.corteAutomatico&&typeof puente.printTicket!=="function")
+      return {ok:false,mensaje:"Actualiza la app para usar el cortador automático."};
+    const id="imp-bt-"+uid(), esperando=esperaResultadoImpresoraPOS(id,35000), mm=num(p.anchoPapelBt,80)===58?58:80;
+    try{
+      const texto=ticketHtmlATexto(trabajo.titulo,trabajo.cuerpo,mm);
+      if(typeof puente.printTicket==="function"){
+        const opciones={corte:!!p.corteAutomatico,avance:p.corteAutomatico?3:8};
+        puente.printTicket(id,p.impresoraBt,mm,texto,JSON.stringify(opciones));
+      }else if(typeof puente.printText==="function") puente.printText(id,p.impresoraBt,mm,texto);
+    }catch(e){ resuelveResultadoImpresoraPOS(id,false,e&&e.message||"No se pudo iniciar la impresión."); }
+    return await esperando;
   }
-  const w = window.open("", "_blank", "width=420,height=620");
-  if(!w){ toast("El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes."); return; }
-  w.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">' +
-    '<title>'+esc(titulo)+'</title><style>'+hojaTicket()+'</style></head><body>' +
-    cuerpo + '</body></html>');
-  w.document.close();
-  w.focus();
-  setTimeout(()=>{ try{ w.print(); }catch(e){} }, 350);
+  if(puente && typeof puente.printHtmlSystem==="function"){
+    const id="imp-sys-"+uid(), esperando=esperaResultadoImpresoraPOS(id,120000);
+    try{ puente.printHtmlSystem(id,trabajo.titulo,num(p.anchoPapelBt,80),trabajo.cuerpo,hojaTicket()); }
+    catch(e){ resuelveResultadoImpresoraPOS(id,false,e&&e.message||"No se pudo abrir la impresión."); }
+    return await esperando;
+  }
+  const w=window.open("","_blank","width=420,height=620");
+  if(!w) return {ok:false,mensaje:"No se pudo abrir la ventana para elegir una impresora."};
+  try{
+    w.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>'+esc(trabajo.titulo)+
+      '</title><style>'+hojaTicket()+'</style></head><body>'+trabajo.cuerpo+'</body></html>');
+    w.document.close(); w.focus(); w.print();
+    return {ok:true,mensaje:""};
+  }catch(e){ try{w.close();}catch(_){} return {ok:false,mensaje:"No se pudo abrir la impresión."}; }
+}
+async function procesaColaImpresionPOS(){
+  if(procesandoColaImpresionPOS) return;
+  procesandoColaImpresionPOS=true;
+  try{
+    while(colaImpresionPOS.length){
+      const trabajo=colaImpresionPOS.shift();
+      const respuesta=await ejecutaTrabajoImpresoraPOS(trabajo);
+      if(!respuesta.ok) reportaFalloImpresoraPOS(trabajo,respuesta.mensaje);
+      else if(trabajo.esPrueba && $("#impTestEstado")) $("#impTestEstado").textContent="Prueba enviada.";
+    }
+  }finally{
+    procesandoColaImpresionPOS=false;
+    if(colaImpresionPOS.length) setTimeout(procesaColaImpresionPOS,0);
+  }
+}
+function encolaTrabajoImpresoraPOS(trabajo){
+  colaImpresionPOS.push(trabajo); procesaColaImpresionPOS();
+}
+function reintentaTrabajoImpresoraPOS(indice){
+  const fallido=erroresImpresionPOS.splice(num(indice,-1),1)[0];
+  if(!fallido) return;
+  colaImpresionPOS.unshift(fallido.trabajo); muestraErroresImpresoraPOS(); procesaColaImpresionPOS();
+}
+function impresorasParaTicketPOS(tipo,automatico){
+  return IMPRESORAS.filter(p=> tipo==="cuenta" ? p.cuenta && (!automatico || p.cuentaAuto)
+    : tipo==="comanda" ? p.cocina : tipo==="cancelacion" ? p.cancela : false);
+}
+function imprimeHoja(titulo,cuerpo,opciones={}){
+  const destinos=opciones.impresora ? [opciones.impresora] : opciones.impresoraId
+    ? IMPRESORAS.filter(p=>p.id===opciones.impresoraId)
+    : impresorasParaTicketPOS(opciones.tipo||"",!!opciones.automatico);
+  destinos.forEach(p=>encolaTrabajoImpresoraPOS({
+    impresora:Object.assign({},p,{categorias:(p.categorias||[]).slice()}),
+    titulo:titulo,cuerpo:cuerpo,esPrueba:!!opciones.esPrueba
+  }));
+  if(!destinos.length && opciones.esPrueba) toast("Activa lo que imprime esta impresora y vuelve a probar.");
 }
 const lineaPar = (izq, der, cl) =>
   '<table><tr><td'+(cl?' class="'+cl+'"':'')+'>'+izq+'</td>' +
@@ -5233,7 +5342,7 @@ function encabezadoTicket(){
 }
 
 /* ---------------- el ticket de la cuenta ---------------- */
-function imprimeCuenta(c, pagos, propina){
+function imprimeCuenta(c, pagos, propina, automatico=false){
   if(!c) return;
   const s = sumaComanda(c);
   const prop = num(propina);
@@ -5286,15 +5395,22 @@ function imprimeCuenta(c, pagos, propina){
     cuerpo += '<hr><div class="c">'+esc(tk.leyenda)+'</div>';
   if(tk.pie) cuerpo += '<hr><div class="c">'+esc(tk.pie).replace(/\n/g,"<br>")+'</div>';
   cuerpo += '<div class="c" style="margin-top:6px;font-size:9px">'+esc(c.folio)+'</div>';
-  imprimeHoja("Cuenta " + c.folio, cuerpo);
+  imprimeHoja("Cuenta " + c.folio, cuerpo, {tipo:"cuenta",automatico:!!automatico});
 }
 
 /* ---------------- el ticket de cocina ----------------
    Sin un solo precio. En cocina el precio no sirve para nada y estorba;
    lo que sirve es qué mesa, qué comensal, cuántos y qué le quitan. El folio
    va grande para que cuadre con el recibo cuando es para llevar. */
-function imprimeComandaCocina(c, lineas){
-  if(!c || !lineas || !lineas.length) return;
+function categoriaLineaImpresionPOS(linea){
+  const platillo=(MENU.plats||[]).find(p=>p.id===linea.platId);
+  return platillo ? platillo.catId : "";
+}
+function lineasParaImpresoraPOS(lineas,impresora){
+  const categorias=Array.isArray(impresora.categorias)?impresora.categorias:[];
+  return !categorias.length ? lineas.slice() : lineas.filter(l=>categorias.includes(categoriaLineaImpresionPOS(l)));
+}
+function cuerpoComandaCocinaPOS(c,lineas){
   const esLlevar = c.mesaId === "llevar";
   const n = Math.max(1, num(c.personas,1));
   let cuerpo = '<div class="c xl">'+(esLlevar ? "PARA LLEVAR" : esc(c.mesaNombre).toUpperCase())+'</div>';
@@ -5320,7 +5436,14 @@ function imprimeComandaCocina(c, lineas){
     });
   });
   cuerpo += '<hr><div class="c" style="font-size:9px">'+esc(c.folio)+' · '+esc(c.fecha)+'</div>';
-  imprimeHoja("Cocina " + c.folio, cuerpo);
+  return cuerpo;
+}
+function imprimeComandaCocina(c,lineas){
+  if(!c || !lineas || !lineas.length) return;
+  IMPRESORAS.filter(p=>p.cocina).forEach(p=>{
+    const filtradas=lineasParaImpresoraPOS(lineas,p);
+    if(filtradas.length) imprimeHoja("Cocina " + c.folio,cuerpoComandaCocinaPOS(c,filtradas),{tipo:"comanda",impresoraId:p.id});
+  });
 }
 
 /* Lo cancelado también se imprime: si la cocina no tiene pantalla, el papel
@@ -5333,7 +5456,7 @@ function imprimeCancelacion(c, x){
   cuerpo += '<div class="caja">'+esc(x.motivo).toUpperCase()+'</div>';
   if(x.nota) cuerpo += '<div class="c">'+esc(x.nota)+'</div>';
   cuerpo += '<div class="c">Pidió: '+esc(x.quien||"")+'</div>';
-  imprimeHoja("Cancelación " + c.folio, cuerpo);
+  imprimeHoja("Cancelación " + c.folio, cuerpo, {tipo:"cancelacion"});
 }
 
 /* ===================================================================
@@ -6354,7 +6477,11 @@ function renderSet(){
   const lg = $("#e_logoPrev"), fallbackLogo = $("#e_logoFallback");
   if(P.negocio.logo){ lg.src = P.negocio.logo; lg.hidden = false; fallbackLogo.hidden = true; $("#e_logoQuita").hidden = false; }
   else { lg.hidden = true; fallbackLogo.hidden = false; $("#e_logoQuita").hidden = true; }
-  renderEstacion(); pintaNotaRespaldo();
+  if(!borradorImpresoraPOS && IMPRESORAS.length){
+    impresoraEnEdicionPOS=IMPRESORAS[0].id;
+    borradorImpresoraPOS=JSON.parse(JSON.stringify(IMPRESORAS[0]));
+  }
+  renderImpresorasPOS(); pintaNotaRespaldo();
   pintaNotaBloqueo(); pintaNotaFolio(); renderMesasSet(); renderEquipo(); aplicaMarca();
 }
 /* ---------------- respaldo ---------------- */
@@ -6402,91 +6529,201 @@ function restauraRespaldo(texto){
   toast("Restaurado. Recargando…");
   setTimeout(()=> location.reload(), 700);
 }
-function renderEstacion(){
-  const s = $("#est_donde"); if(!s) return;
-  s.innerHTML = Object.keys(ESTACIONES).map(k=>
-    '<option value="'+k+'"'+(ESTACION.donde===k?" selected":"")+'>'+ESTACIONES[k].et+'</option>').join("");
-  $("#est_cuenta").checked  = !!ESTACION.cuenta;
-  $("#est_cocina").checked  = !!ESTACION.cocina;
-  $("#est_cancela").checked = !!ESTACION.cancela;
-  const hace = [ESTACION.cuenta && "cuentas", ESTACION.cocina && "comandas",
-                ESTACION.cancela && "cancelaciones"].filter(Boolean);
-  $("#estHint").textContent = hace.length ? "imprime " + hace.join(", ") : "no imprime nada";
-  const bt = !!(ESTACION.modoImpresion !== "android" && ESTACION.impresoraBt && window.MakersPrinter);
-  const destinoImpresion = bt
-    ? 'directamente en <b>'+esc(ESTACION.impresoraNombre||"la impresora Bluetooth")+'</b>. '
-    : (window.MakersPrinter
-      ? 'con los servicios de impresión de Android; confirmarás cada trabajo. '
-      : 'con la impresora predeterminada del navegador o su diálogo del sistema. ');
-  $("#estNota").innerHTML = hace.length
-    ? 'Esta pantalla imprime <b>' + hace.join("</b>, <b>") + '</b> ' +
-      destinoImpresion +
-      'La configuración pertenece a este dispositivo.'
-    : 'Esta pantalla no imprime automáticamente. Los botones de impresión siguen disponibles.';
-  pintaImpresoraBluetooth();
+function etiquetaImpresoraBluetoothPOS(nombre,direccion){
+  const etiqueta=String(nombre||"Impresora Bluetooth").trim()||"Impresora Bluetooth";
+  const dir=String(direccion||"").trim();
+  const clave=etiqueta.toLocaleLowerCase();
+  const duplicada=impresorasEmparejadasPOS.filter(d=>String(d.name||"Impresora Bluetooth").trim().toLocaleLowerCase()===clave).length>1 ||
+    IMPRESORAS.some(p=>String(p.impresoraNombre||"").trim().toLocaleLowerCase()===clave && p.impresoraBt && p.impresoraBt!==dir);
+  return duplicada && dir ? etiqueta+" · "+dir.slice(-5) : etiqueta;
 }
-let impresorasBluetooth = [];
-function pintaImpresoraBluetooth(){
-  const controles = $("#btPrinterControls"), webHint = $("#btPrinterWebHint");
-  if(!controles || !webHint) return;
-  const nativa = !!window.MakersPrinter;
-  controles.hidden = !nativa; webHint.hidden = nativa;
-  $("#btPrinterHint").textContent = nativa ? "Conexión de este Android" : "Disponible en el APK Android";
-  if(!nativa) return;
-  const select = $("#btPrinterSelect");
-  const mode = ESTACION.modoImpresion === "bluetooth" ? "bluetooth" : "android";
-  $("#btPrinterMode").value = mode;
-  $("#btPrinterBluetoothOptions").hidden = mode !== "bluetooth";
-  const guardada = String(ESTACION.impresoraBt||"");
-  const conocidos = impresorasBluetooth.slice();
-  if(guardada && !conocidos.some(d=>d.address===guardada))
-    conocidos.unshift({address:guardada,name:ESTACION.impresoraNombre||"Impresora guardada"});
-  select.innerHTML = '<option value="">Selecciona una impresora emparejada</option>' + conocidos.map(d=>
-    '<option value="'+esc(d.address)+'"'+(d.address===guardada?' selected':'')+'>'+esc(d.name||"Impresora Bluetooth")+
-      (d.address?' · '+esc(String(d.address).slice(-5)):'')+'</option>').join("");
-  const mm = num(ESTACION.anchoPapelBt,0) || num(P.ticket.ancho,80);
-  $("#btPrinterWidth").value = mm === 58 ? "58" : "80";
-  $("#btPrinterStatus").textContent = mode === "android"
-    ? 'Modo de impresión Android. “Imprimir prueba” abre la lista de servicios disponibles.'
-    : (guardada ? 'Guardada: '+(ESTACION.impresoraNombre||guardada)+'. Pulsa “Imprimir prueba” para confirmar.'
-      : 'Empareja la impresora en Android y pulsa “Buscar emparejadas”.');
+function resumenImpresoraPOS(p){
+  const partes=[];
+  if(p.cuenta) partes.push("Cuentas y recibos"+(p.cuentaAuto?" · automático":""));
+  if(p.cocina){
+    const nombres=(p.categorias||[]).map(id=>(MENU.cats||[]).find(c=>c.id===id)).filter(Boolean).map(c=>c.nombre);
+    partes.push(nombres.length?"Comandas · "+nombres.join(", "):"Comandas · todas las categorías");
+  }
+  if(p.cancela) partes.push("Cancelaciones");
+  partes.push(p.corteAutomatico?"Corte automático":"Corte manual");
+  return partes;
 }
-function buscaImpresorasBluetooth(){
-  if(!window.MakersPrinter){ toast("La conexión Bluetooth directa requiere el APK Android."); return; }
+function renderListaImpresorasPOS(){
+  const lista=$("#impLista"); if(!lista) return;
+  $("#impConteo").textContent=IMPRESORAS.length+" configurada(s)";
+  if(!IMPRESORAS.length){
+    lista.innerHTML='<div class="impPrinterHint">Todavía no hay impresoras. Agrégala para decidir qué tickets saca.</div>';
+    return;
+  }
+  lista.innerHTML=IMPRESORAS.map(p=>{
+    const emparejada=etiquetaImpresoraBluetoothPOS(p.impresoraNombre,p.impresoraBt);
+    const conexion=p.conexion==="bluetooth"?emparejada:"Otra impresora · pide confirmar";
+    return '<button class="impPrinterChoice" type="button" data-imp-editar="'+esc(p.id)+'" aria-pressed="'+(p.id===impresoraEnEdicionPOS)+'">'+
+      '<span class="impPrinterChoiceTop"><span class="impPrinterGlyph" aria-hidden="true">▤</span><strong>'+esc(p.nombre||"Impresora")+'</strong><span class="impPrinterState">Configurada</span></span>'+
+      '<span class="impPrinterMeta">'+esc(conexion)+' · '+num(p.anchoPapelBt,80)+' mm</span>'+
+      '<span class="impPrinterTags">'+resumenImpresoraPOS(p).map(t=>'<span class="impPrinterTag">'+esc(t)+'</span>').join("")+'</span></button>';
+  }).join("");
+}
+function renderEditorImpresoraPOS(){
+  const editor=$("#impEditor"); if(!editor) return;
+  const p=borradorImpresoraPOS;
+  if(!p){ editor.innerHTML='<header><h3>Editar impresora</h3></header><div class="impPrinterHint">Selecciona una impresora de la lista o agrega una nueva.</div>'; return; }
+  const nativa=!!window.MakersPrinter, conexion=nativa?(p.conexion||"bluetooth"):"sistema";
+  const soportaCorte=nativa&&typeof window.MakersPrinter.printTicket==="function";
+  const dispositivoGuardado=p.impresoraBt?{address:p.impresoraBt,name:p.impresoraNombre||"Impresora guardada"}:null;
+  const dispositivos=impresorasEmparejadasPOS.slice();
+  if(dispositivoGuardado&&!dispositivos.some(d=>d.address===dispositivoGuardado.address)) dispositivos.unshift(dispositivoGuardado);
+  const opciones=dispositivos.map(d=>'<option value="'+esc(d.address)+'"'+(d.address===p.impresoraBt?' selected':'')+'>'+esc(etiquetaImpresoraBluetoothPOS(d.name,d.address))+'</option>').join("");
+  const cats=MENU.cats||[], elegidas=Array.isArray(p.categorias)?p.categorias:[], todas=!elegidas.length;
+  editor.innerHTML='<header><h3>'+(p.id&&IMPRESORAS.some(x=>x.id===p.id)?"Editar impresora":"Agregar impresora")+'</h3>'+
+    '<span class="hint">'+esc(p.nombre||"Nueva")+'</span></header><div class="impPrinterEditor">'+
+    '<div class="impPrinterFields"><div class="impPrinterField"><label class="f" for="impNombre">Nombre de la impresora</label><input id="impNombre" data-imp-campo="nombre" value="'+esc(p.nombre||"")+'" maxlength="40" placeholder="Caja, Taqueros, Barra…"></div>'+
+    '<div class="impPrinterField"><label class="f" for="impConexion">Conexión</label><select id="impConexion" data-imp-campo="conexion">'+
+      (nativa?'<option value="bluetooth"'+(conexion==="bluetooth"?' selected':'')+'>Bluetooth</option><option value="sistema"'+(conexion==="sistema"?' selected':'')+'>Otra impresora (pide confirmar)</option>':'<option value="sistema" selected>Otra impresora (pide confirmar)</option>')+
+    '</select>'+(nativa?'':'<small class="hint">Esta opción pide confirmar cada impresión.</small>')+'</div></div>'+
+    (nativa&&conexion==="bluetooth"?'<div class="impPrinterField"><label class="f" for="impEmparejada">Impresora Bluetooth emparejada</label><div class="impPrinterConnection"><select id="impEmparejada" data-imp-campo="impresoraBt"><option value="">Busca impresoras emparejadas</option>'+opciones+'</select><button class="btn sm" type="button" id="impBuscar">Buscar emparejadas</button></div></div>':'')+
+    '<div class="impPrinterFields"><div class="impPrinterField"><span class="f">Ancho de papel</span><div class="impPrinterPaper" role="group" aria-label="Ancho de papel">'+
+      '<button type="button" data-imp-ancho="58" aria-pressed="'+(num(p.anchoPapelBt,80)===58)+'">58 mm</button><button type="button" data-imp-ancho="80" aria-pressed="'+(num(p.anchoPapelBt,80)!==58)+'">80 mm</button></div></div>'+
+      '<div class="impPrinterField"><span class="f">Impresora seleccionada</span><div class="impPrinterHint">'+esc(conexion==="bluetooth"?etiquetaImpresoraBluetoothPOS(p.impresoraNombre,p.impresoraBt):"Otra impresora · confirmación al imprimir")+'</div></div></div>'+
+    '<div class="impPrinterSwitches"><label class="impPrinterSwitch"><span>Cuentas y recibos<small>Imprime la cuenta final.</small></span><input type="checkbox" data-imp-check="cuenta"'+(p.cuenta?' checked':'')+'></label>'+
+    (p.cuenta?'<label class="impPrinterSwitch"><span>Imprimir la cuenta automáticamente al cobrar<small>Se manda a esta impresora al terminar el cobro.</small></span><input type="checkbox" data-imp-check="cuentaAuto"'+(p.cuentaAuto?' checked':'')+'></label>':'')+
+    '<label class="impPrinterSwitch"><span>Comandas de cocina<small>Imprime los pedidos nuevos que se mandan a cocina.</small></span><input type="checkbox" data-imp-check="cocina"'+(p.cocina?' checked':'')+'></label>'+
+    '<label class="impPrinterSwitch"><span>Cancelaciones<small>Avisa a cocina de lo que se cancela después de enviarlo.</small></span><input type="checkbox" data-imp-check="cancela"'+(p.cancela?' checked':'')+'></label>'+
+     '<label class="impPrinterSwitch"><span>Corta el papel sola (cortador automático)<small>'+(conexion!=="bluetooth"?"Disponible con impresora Bluetooth en la app de Android.":!soportaCorte?"Actualiza Nuvoor para controlar el cortador.":p.corteAutomatico?"Avanza unas líneas y corta cada ticket por separado.":"No manda el corte y deja más papel para cortar a mano.")+'</small></span><input type="checkbox" data-imp-check="corteAutomatico"'+(p.corteAutomatico?' checked':'')+((conexion!=="bluetooth"||!soportaCorte)?' disabled':'')+'></label></div>'+
+    (p.cocina?'<div class="impPrinterCategory"><label class="impPrinterSwitch"><span>Imprime todas las categorías<small>Desactívalo para elegir qué platillos salen aquí.</small></span><input type="checkbox" data-imp-todas-cats'+(todas?' checked':'')+'></label>'+
+      (!todas?'<div class="impPrinterCategoryList">'+cats.map(c=>'<label><input type="checkbox" data-imp-cat="'+esc(c.id)+'"'+(elegidas.includes(c.id)?' checked':'')+'> '+esc(c.nombre)+'</label>').join("")+'</div>':'')+'</div>':'')+
+    '<div class="impPrinterActions"><button class="btn sm" type="button" id="impPrueba">Impresión de prueba</button>'+
+    (p.id&&IMPRESORAS.some(x=>x.id===p.id)?'<button class="btn sm ghost impPrinterRemove" type="button" id="impEliminar">Eliminar impresora</button>':'')+
+    '<span class="hint" id="impTestEstado" aria-live="polite"></span><button class="btn sm impSave" type="button" id="impGuardar">Guardar</button></div></div>';
+}
+function renderImpresorasPOS(){
+  renderListaImpresorasPOS(); renderEditorImpresoraPOS();
+  const aviso=$("#impAvisoWeb"); if(aviso) aviso.hidden=!!window.MakersPrinter;
+  muestraErroresImpresoraPOS();
+}
+function nuevoBorradorImpresoraPOS(){
+  const primera=IMPRESORAS.length===0, native=!!window.MakersPrinter;
+  impresoraEnEdicionPOS="";
+  borradorImpresoraPOS={id:"nueva-"+uid(),nombre:primera?"Caja":"Nueva impresora",
+    conexion:native?"bluetooth":"sistema",impresoraBt:"",impresoraNombre:"",
+    anchoPapelBt:num(P.ticket.ancho,80),cuenta:primera,cuentaAuto:primera,
+    cocina:!primera,cancela:!primera,categorias:[],corteAutomatico:false};
+  renderImpresorasPOS();
+}
+function buscaEmparejadasImpresorasPOS(){
+  const estado=$("#impTestEstado");
+  if(!window.MakersPrinter||typeof window.MakersPrinter.listPairedDevices!=="function"){
+    if(estado) estado.textContent="En este dispositivo usa Otra impresora."; return;
+  }
   let respuesta;
-  try{ respuesta = JSON.parse(window.MakersPrinter.listPairedDevices() || "{}"); }
-  catch(e){ $("#btPrinterStatus").textContent = "No se pudo consultar Bluetooth. Revisa los permisos del APK."; return; }
-  if(respuesta.error === "permission_required"){
-    $("#btPrinterStatus").textContent = "Android te pedirá permiso para ver dispositivos emparejados.";
+  try{respuesta=JSON.parse(window.MakersPrinter.listPairedDevices()||"{}");}
+  catch(e){if(estado)estado.textContent="No se pudo buscar. Inténtalo de nuevo.";return;}
+  if(respuesta.error==="permission_required"){
+    if(estado)estado.textContent="Android pedirá permiso para ver las impresoras emparejadas.";
     window.MakersPrinter.requestBluetoothPermission(); return;
   }
-  if(respuesta.error === "bluetooth_off"){
-    impresorasBluetooth = []; pintaImpresoraBluetooth();
-    $("#btPrinterStatus").textContent = "Enciende Bluetooth en Android y vuelve a buscar."; return;
+  if(respuesta.error){
+    impresorasEmparejadasPOS=[]; renderImpresorasPOS();
+    if(estado)estado.textContent=respuesta.error==="bluetooth_off"?"Enciende Bluetooth y vuelve a buscar.":"No hay Bluetooth disponible en este dispositivo.";
+    return;
   }
-  if(respuesta.error === "bluetooth_unavailable"){
-    impresorasBluetooth = []; pintaImpresoraBluetooth();
-    $("#btPrinterStatus").textContent = "Este dispositivo no tiene Bluetooth disponible."; return;
-  }
-  impresorasBluetooth = Array.isArray(respuesta.devices) ? respuesta.devices : [];
-  pintaImpresoraBluetooth();
-  if(!impresorasBluetooth.length)
-    $("#btPrinterStatus").textContent = "No hay impresoras emparejadas. Empareja una en Ajustes de Android y vuelve a buscar.";
-  else $("#btPrinterStatus").textContent = "Encontré "+impresorasBluetooth.length+" dispositivo(s) Bluetooth emparejado(s).";
+  impresorasEmparejadasPOS=Array.isArray(respuesta.devices)?respuesta.devices:[];
+  renderImpresorasPOS();
+  const status=$("#impTestEstado");
+  if(status) status.textContent=impresorasEmparejadasPOS.length?"Elige la impresora correcta de la lista.":"No hay impresoras emparejadas. Vincúlala en Ajustes de Android y vuelve a buscar.";
 }
-window.onMakersPrinterPermissionResult = function(concedido){
-  if(concedido) buscaImpresorasBluetooth();
-  else if($("#btPrinterStatus")) $("#btPrinterStatus").textContent = "Sin permiso Bluetooth. Puedes habilitarlo en Ajustes de Android.";
+function guardaBorradorImpresoraPOS(){
+  if(!borradorImpresoraPOS) return;
+  const p=Object.assign({},borradorImpresoraPOS,{nombre:String(borradorImpresoraPOS.nombre||"").trim()});
+  if(!p.nombre){toast("Escribe un nombre para la impresora.");$("#impNombre")?.focus();return;}
+  if(!window.MakersPrinter) p.conexion="sistema";
+  if(p.conexion==="bluetooth"&&!p.impresoraBt){toast("Busca y elige una impresora Bluetooth emparejada.");return;}
+  if(!p.cuenta) p.cuentaAuto=false;
+  if(!p.cocina) p.categorias=[];
+  p.anchoPapelBt=num(p.anchoPapelBt,80)===58?58:80;
+  if(impresoraEnEdicionPOS){
+    const ix=IMPRESORAS.findIndex(x=>x.id===impresoraEnEdicionPOS);
+    if(ix>=0) IMPRESORAS[ix]=p; else IMPRESORAS.push(p);
+  }else{ p.id=uid(); IMPRESORAS.push(p); impresoraEnEdicionPOS=p.id; }
+  guardaImpresorasPOS(); borradorImpresoraPOS=JSON.parse(JSON.stringify(p));
+  renderImpresorasPOS(); toast("Impresora guardada en esta tablet.");
+}
+function imprimePruebaImpresoraPOS(){
+  const p=borradorImpresoraPOS; if(!p) return;
+  if(p.conexion==="bluetooth"&&!p.impresoraBt){toast("Busca y selecciona la impresora primero.");return;}
+  const cuerpo=encabezadoTicket()+'<div class="c g">PRUEBA DE IMPRESIÓN</div><div class="c">'+esc(p.nombre)+
+    '</div><div class="c">Papel '+num(p.anchoPapelBt,80)+' mm</div><hr><div class="c">Listo</div>';
+  const destino=Object.assign({},p,{categorias:(p.categorias||[]).slice()});
+  const status=$("#impTestEstado"); if(status) status.textContent="Enviando prueba…";
+  imprimeHoja("Prueba · "+p.nombre,cuerpo,{impresora:destino,esPrueba:true});
+}
+function borraImpresoraPOS(){
+  if(!impresoraEnEdicionPOS) return;
+  const p=IMPRESORAS.find(x=>x.id===impresoraEnEdicionPOS); if(!p) return;
+  if(!confirm("¿Eliminar la impresora «"+(p.nombre||"Impresora")+"» de esta tablet?")) return;
+  IMPRESORAS=IMPRESORAS.filter(x=>x.id!==p.id); guardaImpresorasPOS();
+  impresoraEnEdicionPOS=IMPRESORAS[0]?.id||"";
+  borradorImpresoraPOS=IMPRESORAS[0]?JSON.parse(JSON.stringify(IMPRESORAS[0])):null;
+  renderImpresorasPOS(); toast("Impresora eliminada.");
+}
+function actualizaBorradorPorCampoPOS(target){
+  if(!borradorImpresoraPOS) return;
+  if(target.dataset.impCampo) borradorImpresoraPOS[target.dataset.impCampo]=target.value;
+  if(target.dataset.impCheck) borradorImpresoraPOS[target.dataset.impCheck]=target.checked;
+}
+$("#impAgregar").addEventListener("click",nuevoBorradorImpresoraPOS);
+$("#impresorasCard").addEventListener("input",e=>{
+  const campo=e.target.closest("[data-imp-campo]"); if(campo) actualizaBorradorPorCampoPOS(campo);
+});
+$("#impresorasCard").addEventListener("change",e=>{
+  const t=e.target;
+  if(t.matches("[data-imp-campo]")){
+    actualizaBorradorPorCampoPOS(t);
+    if(t.id==="impEmparejada"){
+      const d=impresorasEmparejadasPOS.find(x=>x.address===t.value);
+      borradorImpresoraPOS.impresoraNombre=d&&d.name||"";
+      const nombre=String(d&&d.name||"").toLowerCase();
+      if(/5890|pos-58/.test(nombre)) borradorImpresoraPOS.anchoPapelBt=58;
+      else if(/my-a1|gomita/.test(nombre)) borradorImpresoraPOS.anchoPapelBt=80;
+    }
+    renderImpresorasPOS(); return;
+  }
+  if(t.dataset.impCheck){
+    actualizaBorradorPorCampoPOS(t);
+    if(t.dataset.impCheck==="cuenta"&&!t.checked) borradorImpresoraPOS.cuentaAuto=false;
+    renderImpresorasPOS(); return;
+  }
+  if(t.hasAttribute("data-imp-todas-cats")){
+    borradorImpresoraPOS.categorias=t.checked?[]:(MENU.cats||[]).map(c=>c.id);
+    renderImpresorasPOS(); return;
+  }
+  if(t.dataset.impCat){
+    const actuales=Array.isArray(borradorImpresoraPOS.categorias)?borradorImpresoraPOS.categorias.slice():[];
+    const cats=t.checked?Array.from(new Set(actuales.concat(t.dataset.impCat))):actuales.filter(id=>id!==t.dataset.impCat);
+    borradorImpresoraPOS.categorias=cats.length===(MENU.cats||[]).length?[]:cats;
+    renderImpresorasPOS();
+  }
+});
+$("#impresorasCard").addEventListener("click",e=>{
+  const editar=e.target.closest("[data-imp-editar]");
+  if(editar){const p=IMPRESORAS.find(x=>x.id===editar.dataset.impEditar);if(p){impresoraEnEdicionPOS=p.id;borradorImpresoraPOS=JSON.parse(JSON.stringify(p));renderImpresorasPOS();}return;}
+  const ancho=e.target.closest("[data-imp-ancho]");
+  if(ancho&&borradorImpresoraPOS){borradorImpresoraPOS.anchoPapelBt=num(ancho.dataset.impAncho,80);renderImpresorasPOS();return;}
+  if(e.target.closest("#impBuscar")){buscaEmparejadasImpresorasPOS();return;}
+  if(e.target.closest("#impGuardar")){guardaBorradorImpresoraPOS();return;}
+  if(e.target.closest("#impPrueba")){imprimePruebaImpresoraPOS();return;}
+  if(e.target.closest("#impEliminar")){borraImpresoraPOS();return;}
+});
+document.addEventListener("click",e=>{
+  const reintentar=e.target.closest("[data-imp-reintentar]");
+  if(reintentar) reintentaTrabajoImpresoraPOS(reintentar.dataset.impReintentar);
+});
+window.onMakersPrinterPermissionResult=function(concedido){
+  if(concedido) buscaEmparejadasImpresorasPOS();
+  else if($("#impTestEstado")) $("#impTestEstado").textContent="No se dio permiso para ver las impresoras.";
 };
-window.onMakersPrinterResult = function(id, ok, mensaje){
-  if(id === "bt-test" && $("#btPrinterStatus")){
-    $("#btPrinterStatus").textContent = ok ? "Prueba enviada a la impresora." : (mensaje||"No se pudo conectar. Revisa que esté encendida y emparejada.");
-  }else if(String(id||"").indexOf("sys-")===0){
-    if(!ok) toast(mensaje||"No se pudo abrir la impresión del sistema.");
-    else toast("Elige la impresora y confirma la impresión en Android.");
-  }else if(!ok){
-    toast("No se pudo enviar a la impresora: "+(mensaje||"revisa la conexión Bluetooth"));
-  }else if(id && id !== "") toast("Impresión enviada a la impresora.");
+window.onMakersPrinterResult=function(id,ok,mensaje){
+  resuelveResultadoImpresoraPOS(id,ok,mensaje);
 };
 let actualizacionDisponible = false;
 window.onMakersAppUpdateResult = function(json){
@@ -6530,45 +6767,6 @@ $("#androidUpdateButton").addEventListener("click", ()=>{
     $("#androidUpdateHint").textContent = "Consultando la versión publicada";
     window.MakersPrinter.checkForAppUpdate();
   }
-});
-$("#btPrinterFind").addEventListener("click", buscaImpresorasBluetooth);
-$("#btPrinterMode").addEventListener("change", ()=>{
-  ESTACION.modoImpresion = $("#btPrinterMode").value;
-  pintaImpresoraBluetooth();
-});
-$("#btPrinterSelect").addEventListener("change", ()=>{
-  const device=impresorasBluetooth.find(d=>d.address===$("#btPrinterSelect").value);
-  const name=String(device && device.name||"").toLowerCase();
-  if(/5890|pos-58/.test(name)) $("#btPrinterWidth").value="58";
-  else if(/my-a1|gomita/.test(name)) $("#btPrinterWidth").value="80";
-});
-$("#btPrinterSave").addEventListener("click", ()=>{
-  ESTACION.modoImpresion = $("#btPrinterMode").value;
-  if(ESTACION.modoImpresion === "bluetooth"){
-    const address = $("#btPrinterSelect").value;
-    if(!address){ toast("Primero busca y elige una impresora emparejada"); return; }
-    const found = impresorasBluetooth.find(d=>d.address===address);
-    ESTACION.impresoraBt = address;
-    ESTACION.impresoraNombre = found ? (found.name||"") : (ESTACION.impresoraNombre||"");
-  }
-  ESTACION.anchoPapelBt = num($("#btPrinterWidth").value,80);
-  guardaEstacion(); renderEstacion();
-  toast(ESTACION.modoImpresion === "bluetooth" ? "Impresora guardada para esta pantalla" : "Servicio Android guardado para esta pantalla");
-});
-$("#btPrinterTest").addEventListener("click", ()=>{
-  const mm = num($("#btPrinterWidth").value,80);
-  if($("#btPrinterMode").value === "android"){
-    const nombre = esc(P.negocio.nombre||"Nuvoor Restaurant");
-    window.MakersPrinter.printHtmlSystem("sys-bt-test", "Prueba de impresora", mm,
-      '<div class="c g">'+nombre+'</div><hr><div>PRUEBA DE IMPRESION</div><div>Papel '+mm+' mm</div><div>Servicio de impresión Android</div><hr><div class="c">Listo</div>', hojaTicket());
-    $("#btPrinterStatus").textContent = "Elige una impresora y confirma la prueba en Android.";
-    return;
-  }
-  const address = $("#btPrinterSelect").value || ESTACION.impresoraBt;
-  if(!address || !window.MakersPrinter){ toast("Busca y selecciona una impresora primero"); return; }
-  $("#btPrinterStatus").textContent = "Conectando e imprimiendo prueba…";
-  window.MakersPrinter.printText("bt-test", address, mm,
-    (P.negocio.nombre||"Nuvoor Restaurant")+"\nPRUEBA DE IMPRESION\nPapel "+mm+" mm\nBluetooth ESC/POS\n");
 });
 function pintaNotaFolio(){
   const n = $("#folNota"); if(!n) return;
@@ -6665,18 +6863,6 @@ $("#tab-set").addEventListener("change", e=>{
     r.readAsText(f);
     return;
   }
-  if(t.id === "est_donde"){
-    ESTACION = Object.assign({impresoraBt:ESTACION.impresoraBt||"",
-      impresoraNombre:ESTACION.impresoraNombre||"", anchoPapelBt:num(ESTACION.anchoPapelBt,0),
-      modoImpresion:ESTACION.modoImpresion||"android",
-      donde:t.value}, ESTACIONES[t.value] || ESTACIONES.caja);
-    guardaEstacion(); renderEstacion();
-    toast("Esta pantalla es la de " + (ESTACIONES[t.value]||{}).et);
-    return;
-  }
-  if(t.id === "est_cuenta" || t.id === "est_cocina" || t.id === "est_cancela"){
-    ESTACION[t.id.slice(4)] = t.checked; guardaEstacion(); renderEstacion(); return;
-  }
   if(t.id === "tk_iva"){ P.ticket.mostrarIva = t.checked; persist(); return; }
   if(t.id === "tk_propina"){ P.ticket.mostrarPropina = t.checked; persist(); return; }
   if(t.id === "p_bloqueo"){
@@ -6729,8 +6915,6 @@ $("#tab-set").addEventListener("click", e=>{
   if(e.target.closest("#e_logoQuita")){ P.negocio.logo = ""; persist(); renderSet(); toast("Logo quitado"); return; }
   if(e.target.closest("#respBaja")){ bajaRespaldo(); return; }
   if(e.target.closest("#respSube")){ $("#respFile").click(); return; }
-  if(e.target.closest("#tk_prueba")){ imprimePrueba(); return; }
-  if(e.target.closest("#tk_pruebaCocina")){ imprimePruebaCocina(); return; }
 });
 $("#mesaNueva").addEventListener("click", ()=>{
   const z = zonas()[0] || "Salón";

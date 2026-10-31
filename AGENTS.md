@@ -7,11 +7,16 @@ Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este r
 1. **Lee el historial:** `HISTORIAL-CODEX/INDICE.md` y el último archivo de esa carpeta. Ahí está lo último que se hizo y lo que sigue.
 2. **Tareas activas, en este orden:**
    1. `TAREA-APP-NUVOOR.md`: la app Nuvoor como **APK de prueba**, sin Play Store, y probarla en las tablets con impresora. Lee primero su sección 0, que cambió las prioridades.
-   2. `TAREA-MESEROS.md`: los meseros mandan pedidos a cocina desde su celular.
+   2. `TAREA-IMPRESORAS.md`: varias impresoras por tablet como Loyverse (caja, cocina o por categoría), que impriman solas sin la ventana de Android; quitar las instrucciones de accesos directos; el logo en el APK. **Va antes de meseros.**
+   3. `TAREA-MESEROS.md`: los meseros mandan pedidos a cocina desde su celular.
+   4. **Modo día y modo oscuro en Restaurant y Store**, igual que Imprenta (`data-tema` + `prefers-color-scheme` + botón para cambiar). Carlos da por hecho que todos los POS lo tienen; hoy **sólo Imprenta** lo tiene.
+      - **Restaurant:** trae un `:root` oscuro («Paleta Tecnología», línea ~22) que el `:root` claro («bistro cálido», línea ~591) tapa siempre.
+      - **Store:** no tiene nada.
+      - **La versión oscura:** sirve de referencia la maqueta de impresoras de Codex (`tmp/maqueta-impresoras.png`), que a Carlos le gustó.
    - **Ojo:** la fuente del Restaurant es `public/restaurante/index.html`. **No** uses `PRUEBA-restaurant.html` ni `PREPARAR-APP-RESTAURANTE.bat`: están viejos y lo regenerarían encima.
 3. **Lleva tu propio historial** en `HISTORIAL-CODEX/` mientras trabajas: un archivo por sesión con `PLANTILLA.md` y una línea arriba en `INDICE.md`. Nada de contraseñas, llaves ni el correo de Carlos. La carpeta está en `.gitignore` porque el repo es público.
 
-Última actualización: 31 de octubre de 2026, 10:30 (APK de prueba sin Play Store y meseros desde el celular).
+Última actualización: 31 de octubre de 2026, 13:11 (pantalla de impresoras y APK 0.1.1; pendiente prueba física en tablet).
 
 ## Qué es esto
 

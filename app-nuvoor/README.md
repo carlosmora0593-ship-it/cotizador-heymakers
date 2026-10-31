@@ -6,7 +6,7 @@ Esta app de prueba abre **en vivo** `https://app.nuvoor.mx/restaurante/` en un W
 
 - `applicationId` y `namespace`: `mx.nuvoor.app`.
 - Nombre visible: `Nuvoor`.
-- Versión: `versionCode 1`, `versionName 0.1.0`.
+- Versión actual: `versionCode 2`, `versionName 0.1.1`.
 - Android API 37.0 (compilar y destino) y Build Tools 36.0.0.
 - JBR de Android Studio: Java 25. El proyecto usa AGP 9.1.1 y Gradle 9.3.1 para admitir ese JBR y API 37.
 - APK: `app/build/outputs/apk/debug/app-debug.apk`.
@@ -30,6 +30,7 @@ El APK debug usa la firma de depuración automática de Android. No se creó una
 - El selector del sistema permite elegir un respaldo para restaurarlo.
 - «Bajar respaldo» entrega el archivo Blob a Android y lo guarda en Descargas (o pide elegir dónde guardarlo en versiones antiguas de Android).
 - Oculta la instalación y actualización del APK viejo de Restaurant dentro de esta app.
+- Configura varias impresoras Bluetooth por tablet, rutas para cuentas/comandas/cancelaciones, filtro por categoría, cola de impresión, reintento y corte ESC/POS opcional.
 
 ## Pendiente para la siguiente versión
 
@@ -43,6 +44,7 @@ Todavía no se implementa ni prueba:
 - Persistencia de sesión tras cerrar y volver a abrir.
 - Descargas de enlaces que no sean Blob.
 - Instalación en tablet y prueba física de cada impresora Bluetooth.
+- El control de corte automático requiere `printTicket` de la versión 0.1.1; `printText` conserva el formato anterior.
 
 El puente Bluetooth está en la app, pero sólo la prueba en las tablets de Carlos confirma que cada impresora recibe las comandas.
 

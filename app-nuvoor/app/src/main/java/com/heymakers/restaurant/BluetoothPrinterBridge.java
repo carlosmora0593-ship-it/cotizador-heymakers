@@ -121,6 +121,23 @@ public final class BluetoothPrinterBridge {
     }
 
     @JavascriptInterface
+    public void printTicket(String jobId, String address, int paperWidthMm, String text, String optionsJson) {
+        printQueue.execute(() -> {
+            String error = null;
+            try {
+                JSONObject options = new JSONObject(optionsJson == null ? "{}" : optionsJson);
+                boolean cut = options.optBoolean("corte", false);
+                int defaultAdvance = cut ? 3 : 8;
+                int advance = Math.max(0, Math.min(30, options.optInt("avance", defaultAdvance)));
+                sendBluetooth(address, paperWidthMm, text, cut, advance);
+            } catch (Exception e) {
+                error = friendlyError(e);
+            }
+            report(jobId, error == null, error == null ? "sent" : error);
+        });
+    }
+
+    @JavascriptInterface
     public void printHtmlSystem(String jobId, String title, int paperWidthMm, String bodyHtml, String ticketCss) {
         activity.runOnUiThread(() -> openSystemPrint(jobId, title, paperWidthMm, bodyHtml, ticketCss));
     }
@@ -259,6 +276,12 @@ public final class BluetoothPrinterBridge {
     }
 
     private void sendBluetooth(String address, int paperWidthMm, String text) throws Exception {
+        // Conserva la salida exacta de printText: tres avances y sin comando de corte.
+        sendBluetooth(address, paperWidthMm, text, false, 3);
+    }
+
+    private void sendBluetooth(String address, int paperWidthMm, String text,
+                               boolean cut, int advanceLines) throws Exception {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
                 && activity.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -292,7 +315,8 @@ public final class BluetoothPrinterBridge {
                 output.write(lines[i].getBytes(StandardCharsets.US_ASCII));
                 output.write(0x0A);
             }
-            output.write(new byte[]{0x0A, 0x0A, 0x0A});
+            for (int i = 0; i < advanceLines; i++) output.write(0x0A);
+            if (cut) output.write(new byte[]{0x1D, 0x56, 0x01}); // GS V 1: corte parcial ESC/POS
             connected.getOutputStream().write(output.toByteArray());
             connected.getOutputStream().flush();
         }

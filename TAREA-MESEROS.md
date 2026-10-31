@@ -1,5 +1,7 @@
 # Tarea para Codex: meseros que mandan a cocina desde su celular
 
+> **Antes de esta tarea va `TAREA-IMPRESORAS.md`.** Los pedidos de los meseros se imprimen con la lista de impresoras nueva (comandas y sus categorías), no con `ESTACION.cocina`.
+
 Escrito por Claude el 31 oct 2026 por pedido de Carlos. Va **después** de tener el APK de prueba (ver `TAREA-APP-NUVOOR.md`, sección 0). Las reglas de `AGENTS.md` mandan sobre todo, y el historial va en `HISTORIAL-CODEX/`.
 
 ## 1. Lo que pidió Carlos (sus palabras)
