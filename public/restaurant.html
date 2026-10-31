@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Nuvor Restaurant: mesas, comandas, cuenta dividida, propinas y corte de caja. Punto de venta para restaurantes, cafeterías y fondas.">
+<meta name="description" content="Nuvoor Restaurant: mesas, comandas, cuenta dividida, propinas y corte de caja. Punto de venta para restaurantes, cafeterías y fondas.">
 <meta name="theme-color" content="#0E1226">
 <script src="config.js?v=20261016-2149"></script>
-<script>window.PRODUCTO={plataforma:"Nuvor",edicion:"Nuvor Restaurant",clave:"restaurant",giro:"Restaurante, cafetería y fonda"};</script>
+<script>window.PRODUCTO={plataforma:"Nuvoor",edicion:"Nuvoor Restaurant",clave:"restaurant",giro:"Restaurante, cafetería y fonda"};</script>
 <style>:root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Nuvor Restaurant</title>
+<title>Nuvoor Restaurant</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -16,7 +16,7 @@
 [hidden]{display:none!important}
 
 :root{
-  /* Paleta Tecnología, la misma familia que Nuvor Taller */
+  /* Paleta Tecnología, la misma familia que Nuvoor Taller */
   --bg:#0E1226; --surface:#171C35; --surface-2:#1E2442;
   --line:#2F3660; --line-soft:#252B4C;
   --ink:#E8ECFB; --ink-2:#A8B0D0; --ink-3:#7C85A8;
@@ -578,13 +578,13 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
   <div class="barraCmyk"><i></i><i></i><i></i><i></i></div>
   <div class="barraTop">
     <span class="plaque" id="brandIni">M</span>
-    <span><b id="brandNombre">Nuvor Restaurant</b><small id="brandGiro">Restaurante</small></span>
+    <span><b id="brandNombre">Nuvoor Restaurant</b><small id="brandGiro">Restaurante</small></span>
   </div>
   <div class="barraNav">
     <div class="barraGrupo">Servicio</div>
     <nav class="tabs" id="tabs" role="menu"></nav>
   </div>
-  <div class="barraPie"><span id="barraVer">Nuvor</span></div>
+  <div class="barraPie"><span id="barraVer">Nuvoor</span></div>
 </aside>
 
 <header class="top">
@@ -1376,7 +1376,7 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
 <script>
 /* ===================================================================
    NUVOR RESTAURANT · mesas, comandas y cobro
-   Edición de Nuvor. Comparte plataforma con Nuvor Taller —cuentas,
+   Edición de Nuvoor. Comparte plataforma con Nuvoor Taller —cuentas,
    roles, planes, el Lab— pero no comparte datos: cada cuenta es de un
    producto y nunca se cruzan.
    =================================================================== */
@@ -5482,7 +5482,7 @@ function restauraRespaldo(texto){
   let d = null;
   try{ d = JSON.parse(texto); }catch(e){ toast("Ese archivo no se puede leer. ¿Es el respaldo?"); return; }
   if(!d || d._app !== "makers-restaurant" || !d.datos){
-    toast("Ese archivo no es un respaldo de Nuvor Restaurant."); return;
+    toast("Ese archivo no es un respaldo de Nuvoor Restaurant."); return;
   }
   const f = String(d._fecha||"").slice(0,10);
   const cu = (d.datos.comandas||[]).length;
@@ -5706,8 +5706,8 @@ function aplicaMarca(){
   $("#brandNombre").textContent = n;
   $("#brandIni").textContent = n.trim().charAt(0).toUpperCase() || "M";
   $("#accesoIni").textContent = n.trim().charAt(0).toUpperCase() || "M";
-  $("#barraVer").textContent = "Nuvor";
-  try{ document.title = "Nuvor Restaurant"; }catch(e){}
+  $("#barraVer").textContent = "Nuvoor";
+  try{ document.title = "Nuvoor Restaurant"; }catch(e){}
 }
 function aplicaRol(){
   const u = usuarioActual(), r = rolActual();
@@ -5994,10 +5994,10 @@ start();
 })();
 </script>
 
-<script>window.BUILD="20261016-2149";</script>
+<script>window.BUILD="20261031-0029";</script>
 <script>
 (function(){
-  var mio = "20261016-2149";
+  var mio = "20261031-0029";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }

@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#F51B95">
 <script src="config.js?v=20261016-1350"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<title>Nuvor Taller</title>
+<title>Nuvoor Taller</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -3396,7 +3396,7 @@ body.rol-produccion #btnPrint{display:none!important}
   <div class="top-in">
     <div class="brand">
       <span class="plaque"><img id="brandLogo" src="" alt="Hey Makers"></span>
-      <span class="who"><b id="brandProducto">Nuvor Taller</b><span id="brandSlogan">Cursos y talleres</span></span>
+      <span class="who"><b id="brandProducto">Nuvoor Taller</b><span id="brandSlogan">Cursos y talleres</span></span>
     </div>
     <div class="menuWrap">
       <button class="menuBtn" id="menuBtn" aria-expanded="false" aria-haspopup="true">
@@ -4799,7 +4799,7 @@ body.rol-produccion #btnPrint{display:none!important}
   </div>
 
   <div class="card secOculta" data-set="giro" id="cardGiro">
-    <header><h2>Giro del negocio</h2><span class="hint">qué edición de Nuvor usas</span></header>
+    <header><h2>Giro del negocio</h2><span class="hint">qué edición de Nuvoor usas</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">
         Es el mismo programa. Lo que cambia es qué secciones se ven y cómo se llaman:
@@ -5004,11 +5004,11 @@ body.rol-produccion #btnPrint{display:none!important}
     <div class="cmyk"><i></i><i></i><i></i><i></i></div>
     <div class="authBody">
       <span class="plaque" style="align-self:flex-start"><img id="authLogo" src="" alt=""></span>
-      <h1 id="authTitulo">Nuvor Taller</h1>
+      <h1 id="authTitulo">Nuvoor Taller</h1>
       <p class="authSub">Entra a tu cuenta para cotizar, producir y llevar tus ventas.</p>
       <div class="seg" id="authTabs" style="align-self:flex-start">
         <button type="button" data-modo="entrar" aria-pressed="true">Ya tengo cuenta</button>
-        <button type="button" data-modo="alta" aria-pressed="false">Crear cuenta</button>
+        <button type="button" data-modo="alta" aria-pressed="false" hidden>Crear cuenta</button>
       </div>
       <form id="authForm" autocomplete="on">
         <div id="authAlta" hidden>
@@ -9574,7 +9574,7 @@ function pintaArranque(){
     cuerpo.innerHTML =
       '<div class="grid g2">' +
         '<div><label class="f" for="arrNombre">¿Cómo se llama tu taller?</label>' +
-        '<input id="arrNombre" placeholder="Nuvor Taller" value="' +
+        '<input id="arrNombre" placeholder="Nuvoor Taller" value="' +
           esc(arrEstado.nombre || (P.empresa && P.empresa.nombre === "Hey Makers" ? "" : (P.empresa||{}).nombre) || "") + '"></div>' +
         '<div><label class="f" for="arrTel">Teléfono o WhatsApp</label>' +
         '<input id="arrTel" placeholder="443 000 0000" value="' + esc(arrEstado.tel || (P.empresa||{}).tel || "") + '"></div>' +
@@ -10220,7 +10220,7 @@ function renderSet(){
   /* En el pie va la plataforma, no el negocio del cliente: es la firma del
      producto, como el «Windows» de abajo a la derecha. */
   if(bv) bv.textContent = (window.PRODUCTO && window.PRODUCTO.plataforma) ||
-                          (P.empresa && P.empresa.nombre) || "Nuvor";
+                          (P.empresa && P.empresa.nombre) || "Nuvoor";
   $("#p_margen").value=P.margen; $("#p_modo").value=P.modo; $("#p_merma").value=P.merma; $("#p_mo").value=P.manoObra;
   $("#p_nesting").checked = P.nesting !== false;
   const pgu = $("#p_guiado"); if(pgu) pgu.checked = (P.guiado !== false);
@@ -12388,8 +12388,8 @@ function renderTotalVarios(){
       '<span class="rvN">'+(i+1)+'</span>'+
       '<span class="rvNom">'+esc(nombreItem(p.it, i+1))+'<small>'+cantConUnidad(p.r)+' × '+mx(p.r.precioUnit)+'</small></span>'+
       '<span class="rvMx">'+mx(p.r.total)+'</span></div>').join("")+
-    '<div class="rvTotal"><span>'+r.qty+' pieza(s) · '+r.partes.length+' artículos</span><span>'+mx(r.total)+'</span></div>'+
-    '<div class="rvNota">Abajo está el detalle del artículo que tienes abierto.</div>';
+    '<div class="rvTotal"><span>'+(cot.items.some(it=>it.modo==="impresion") ? '' : r.qty+' pieza(s) · ')+r.partes.length+' conceptos</span><span>'+mx(r.total)+'</span></div>'+
+    '<div class="rvNota">Abajo está el detalle del concepto que tienes abierto.</div>';
 }
 
 /* Un artículo de la orden de producción: lo que hay que hacer, con qué
@@ -16622,22 +16622,22 @@ $("#ayudaCuerpo").addEventListener("click", e=>{
 });
 
 /* ---------- el nombre del producto, en un solo lugar ---------- */
-/* Nuvor es la plataforma; cada giro es una edición encima. Cambiar de
+/* Nuvoor es la plataforma; cada giro es una edición encima. Cambiar de
    edición es cambiar estas tres líneas, no ocho lugares del archivo. */
 /* ============ EL GIRO ============
-   Las ediciones de Nuvor. La diferencia entre una y otra no es el
+   Las ediciones de Nuvoor. La diferencia entre una y otra no es el
    programa: es qué secciones se ven, cómo se llaman y qué trae el
    catálogo. Lo caro —cuentas, permisos, planes, respaldo, el Lab— es
    el mismo para todas. */
 const GIROS = {
   taller: {
-    edicion:"Nuvor Taller", clave:"taller",
+    edicion:"Nuvoor Taller", clave:"taller",
     giro:"Imprenta, serigrafía y artículos personalizados",
     /* nada escondido: el taller es el que ya existía */
     sin:[], nombres:{}, tarjetas:[]
   },
   tiendita: {
-    edicion:"Nuvor Tiendita", clave:"tiendita",
+    edicion:"Nuvoor Tiendita", clave:"tiendita",
     giro:"Abarrotes, misceláneas y tiendas de barrio",
     /* Cotizar, diseño, producción y archivo no son de una tiendita, y
        la calculadora de costos de impresión menos. */
@@ -16660,8 +16660,8 @@ const esTiendita = () => giroActual() === "tiendita";
 const cfgGiro = () => GIROS[giroActual()];
 
 const PRODUCTO = window.PRODUCTO = {
-  plataforma: "Nuvor",
-  edicion:    "Nuvor Taller",
+  plataforma: "Nuvoor",
+  edicion:    "Nuvoor Taller",
   /* La clave de la edición. "giro", más abajo, ya estaba ocupado por la
      descripción que se lee; ésta es la que compara la publicidad. Las otras
      ediciones cambiarán esta línea y nada más. */
@@ -24409,10 +24409,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261030-1818";</script>
+<script>window.BUILD="20261031-0039";</script>
 <script>
 (function(){
-  var mio = "20261030-1818";
+  var mio = "20261031-0039";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
