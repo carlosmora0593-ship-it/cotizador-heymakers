@@ -14,6 +14,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.PermissionRequest;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,6 +35,7 @@ public final class MainActivity extends Activity {
     private static final int FILE_PICKER_REQUEST = 4201;
     static final int BLUETOOTH_PERMISSION_REQUEST = 4202;
     private static final int SAVE_FILE_REQUEST = 4203;
+    private static final int CAMERA_PERMISSION_REQUEST = 4204;
 
     private static final String APP_PAGE_SETUP = "(function(){"
             + "document.documentElement.dataset.app='android';"
@@ -62,6 +65,8 @@ public final class MainActivity extends Activity {
     private byte[] pendingFileBytes;
     private String pendingFileName;
     private String pendingFileMime;
+    private final ArrayList<PermissionRequest> pendingCameraRequests = new ArrayList<>();
+    private boolean cameraPermissionRequestInFlight;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -85,6 +90,7 @@ public final class MainActivity extends Activity {
         settings.setAllowContentAccess(true);
         settings.setJavaScriptCanOpenWindowsAutomatically(false);
         settings.setSupportMultipleWindows(false);
+        settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         CookieManager.getInstance().setAcceptCookie(true);
 
@@ -92,6 +98,16 @@ public final class MainActivity extends Activity {
         webView.addJavascriptInterface(printerBridge, "MakersPrinter");
         webView.addJavascriptInterface(new NuvoorDownloadBridge(), "NuvoorDownload");
         webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onPermissionRequest(PermissionRequest request) {
+                runOnUiThread(() -> handleWebPermissionRequest(request));
+            }
+
+            @Override
+            public void onPermissionRequestCanceled(PermissionRequest request) {
+                runOnUiThread(() -> pendingCameraRequests.remove(request));
+            }
+
             @Override
             public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback,
                                              FileChooserParams params) {
@@ -129,6 +145,43 @@ public final class MainActivity extends Activity {
             }
         });
         webView.loadUrl(APP_START_URL);
+    }
+
+    private boolean isAllowedCameraRequest(PermissionRequest request) {
+        if (request == null || !isNuvoorPage(request.getOrigin())) return false;
+        String[] resources = request.getResources();
+        return resources != null && resources.length == 1
+                && PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resources[0]);
+    }
+
+    private void handleWebPermissionRequest(PermissionRequest request) {
+        if (!isAllowedCameraRequest(request)) {
+            if (request != null) request.deny();
+            return;
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
+                || checkSelfPermission(android.Manifest.permission.CAMERA)
+                == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            request.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
+            return;
+        }
+        if (!pendingCameraRequests.contains(request)) pendingCameraRequests.add(request);
+        if (cameraPermissionRequestInFlight) return;
+        cameraPermissionRequestInFlight = true;
+        requestPermissions(new String[]{android.Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
+    }
+
+    private void finishCameraPermissionRequest(boolean granted) {
+        cameraPermissionRequestInFlight = false;
+        ArrayList<PermissionRequest> requests = new ArrayList<>(pendingCameraRequests);
+        pendingCameraRequests.clear();
+        for (PermissionRequest request : requests) {
+            try {
+                if (granted && isAllowedCameraRequest(request))
+                    request.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
+                else request.deny();
+            } catch (Exception ignored) { }
+        }
     }
 
     private boolean isNuvoorPage(Uri uri) {
@@ -256,6 +309,12 @@ public final class MainActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] results) {
         super.onRequestPermissionsResult(requestCode, permissions, results);
+        if (requestCode == CAMERA_PERMISSION_REQUEST) {
+            boolean granted = results.length > 0
+                    && results[0] == android.content.pm.PackageManager.PERMISSION_GRANTED;
+            finishCameraPermissionRequest(granted);
+            return;
+        }
         if (requestCode == BLUETOOTH_PERMISSION_REQUEST && printerBridge != null) {
             boolean granted = results.length > 0 && results[0] == android.content.pm.PackageManager.PERMISSION_GRANTED;
             printerBridge.permissionResult(granted);
@@ -314,6 +373,7 @@ public final class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        finishCameraPermissionRequest(false);
         if (printerBridge != null) printerBridge.close();
         fileQueue.shutdownNow();
         if (webView != null) {

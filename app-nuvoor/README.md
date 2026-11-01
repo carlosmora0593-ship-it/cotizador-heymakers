@@ -6,7 +6,7 @@ Esta app de prueba abre **en vivo** `https://app.nuvoor.mx/restaurante/` en un W
 
 - `applicationId` y `namespace`: `mx.nuvoor.app`.
 - Nombre visible: `Nuvoor`.
-- Versión actual: `versionCode 3`, `versionName 0.1.2`.
+- Versión actual: `versionCode 4`, `versionName 0.1.3`.
 - Android API 37.0 (compilar y destino) y Build Tools 36.0.0.
 - JBR de Android Studio: Java 25. El proyecto usa AGP 9.1.1 y Gradle 9.3.1 para admitir ese JBR y API 37.
 - APK: `app/build/outputs/apk/debug/app-debug.apk`.
@@ -31,6 +31,8 @@ El APK debug usa la firma de depuración automática de Android. No se creó una
 - «Bajar respaldo» entrega el archivo Blob a Android y lo guarda en Descargas (o pide elegir dónde guardarlo en versiones antiguas de Android).
 - Oculta la instalación y actualización del APK viejo de Restaurant dentro de esta app.
 - Configura varias impresoras Bluetooth por tablet, rutas para cuentas/comandas/cancelaciones, filtro por categoría, cola de impresión, reintento y corte ESC/POS opcional.
+- El puente `MakersPrinter.printImage` recibe tickets raster PNG de 384 px (58 mm) o 576 px (80 mm) y los imprime como blanco y negro ESC/POS; `printText` y `printTicket` siguen disponibles para compatibilidad.
+- La página puede pedir permiso de cámara al checar asistencia. Android sólo concede captura de video a `https://app.nuvoor.mx`; las demás páginas quedan denegadas.
 
 ## Pendiente para la siguiente versión
 
@@ -38,7 +40,7 @@ Todavía no se implementa ni prueba:
 
 - `window.print()` con el diálogo de impresión Android.
 - Ventanas `window.open()` y enlaces con `target="_blank"`.
-- Permisos de cámara y `getUserMedia`.
+- Prueba física de cámara y `getUserMedia` en la tablet de Carlos.
 - Compartir con `navigator.share`.
 - Pantalla sin conexión y uso en modo avión.
 - Persistencia de sesión tras cerrar y volver a abrir.

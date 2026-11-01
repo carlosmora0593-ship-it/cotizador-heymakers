@@ -8,10 +8,13 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.print.PrintAttributes;
 import android.print.PrintManager;
+import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -23,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -132,6 +136,39 @@ public final class BluetoothPrinterBridge {
                 sendBluetooth(address, paperWidthMm, text, cut, advance);
             } catch (Exception e) {
                 error = friendlyError(e);
+            }
+            report(jobId, error == null, error == null ? "sent" : error);
+        });
+    }
+
+    @JavascriptInterface
+    public void printImage(String jobId, String address, int paperWidthMm,
+                           String pngBase64, String optionsJson) {
+        printQueue.execute(() -> {
+            String error = null;
+            Bitmap bitmap = null;
+            try {
+                JSONObject options = new JSONObject(optionsJson == null ? "{}" : optionsJson);
+                boolean cut = options.optBoolean("corte", false);
+                int defaultAdvance = cut ? 3 : 8;
+                int advance = Math.max(0, Math.min(30, options.optInt("avance", defaultAdvance)));
+                int threshold = Math.max(16, Math.min(240, options.optInt("umbral", 190)));
+                if (pngBase64 == null || pngBase64.length() > 8 * 1024 * 1024)
+                    throw new IllegalArgumentException("La imagen del ticket está vacía o es demasiado grande.");
+                byte[] png = Base64.decode(pngBase64, Base64.DEFAULT);
+                BitmapFactory.Options bounds = new BitmapFactory.Options();
+                bounds.inJustDecodeBounds = true;
+                BitmapFactory.decodeByteArray(png, 0, png.length, bounds);
+                int expectedWidth = paperWidthMm <= 58 ? 384 : 576;
+                if (bounds.outWidth != expectedWidth || bounds.outHeight < 1 || bounds.outHeight > 16000)
+                    throw new IllegalArgumentException("El ancho o alto de la imagen no coincide con el rollo.");
+                bitmap = BitmapFactory.decodeByteArray(png, 0, png.length);
+                if (bitmap == null) throw new IllegalArgumentException("No se pudo leer la imagen del ticket.");
+                sendBluetoothImage(address, bitmap, threshold, cut, advance);
+            } catch (Exception e) {
+                error = friendlyError(e);
+            } finally {
+                if (bitmap != null && !bitmap.isRecycled()) bitmap.recycle();
             }
             report(jobId, error == null, error == null ? "sent" : error);
         });
@@ -322,6 +359,67 @@ public final class BluetoothPrinterBridge {
         }
     }
 
+    private void sendBluetoothImage(String address, Bitmap bitmap, int threshold,
+                                    boolean cut, int advanceLines) throws Exception {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                && activity.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)
+                != PackageManager.PERMISSION_GRANTED) {
+            throw new IOException("Falta permiso Bluetooth. Abre Ajustes de impresión y vuelve a buscar.");
+        }
+        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
+        if (adapter == null || !adapter.isEnabled()) throw new IOException("Activa Bluetooth en Android.");
+        BluetoothDevice device = adapter.getRemoteDevice(address);
+        boolean paired = false;
+        for (BluetoothDevice item : adapter.getBondedDevices()) {
+            if (address.equalsIgnoreCase(item.getAddress())) { paired = true; break; }
+        }
+        if (!paired) throw new IOException("La impresora ya no aparece emparejada. Vuelve a vincularla en Android.");
+
+        BluetoothSocket socket = null;
+        try {
+            socket = device.createRfcommSocketToServiceRecord(SPP_UUID);
+            socket.connect();
+        } catch (IOException secureFailure) {
+            if (socket != null) try { socket.close(); } catch (IOException ignored) { }
+            socket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
+            socket.connect();
+        }
+        final int width = bitmap.getWidth();
+        final int bytesPerRow = (width + 7) / 8;
+        final int blockHeight = 128;
+        final int[] pixels = new int[width];
+        try (BluetoothSocket connected = socket; OutputStream output = connected.getOutputStream()) {
+            output.write(new byte[]{0x1B, 0x40});       // ESC @: iniciar impresora
+            output.write(new byte[]{0x1B, 0x61, 0x00}); // alineación izquierda
+            for (int top = 0; top < bitmap.getHeight(); top += blockHeight) {
+                int rows = Math.min(blockHeight, bitmap.getHeight() - top);
+                byte[] raster = new byte[bytesPerRow * rows];
+                for (int row = 0; row < rows; row++) {
+                    bitmap.getPixels(pixels, 0, width, 0, top + row, width, 1);
+                    int offset = row * bytesPerRow;
+                    for (int x = 0; x < width; x++) {
+                        int color = pixels[x];
+                        int alpha = (color >>> 24) & 0xFF;
+                        int red = (color >>> 16) & 0xFF;
+                        int green = (color >>> 8) & 0xFF;
+                        int blue = color & 0xFF;
+                        int luminance = (red * 299 + green * 587 + blue * 114) / 1000;
+                        luminance = (luminance * alpha + 255 * (255 - alpha)) / 255;
+                        if (luminance < threshold)
+                            raster[offset + (x / 8)] |= (byte) (0x80 >>> (x % 8));
+                    }
+                }
+                output.write(new byte[]{0x1D, 0x76, 0x30, 0x00,
+                        (byte) (bytesPerRow & 0xFF), (byte) ((bytesPerRow >> 8) & 0xFF),
+                        (byte) (rows & 0xFF), (byte) ((rows >> 8) & 0xFF)});
+                output.write(raster);
+            }
+            for (int i = 0; i < advanceLines; i++) output.write(0x0A);
+            if (cut) output.write(new byte[]{0x1D, 0x56, 0x01}); // GS V 1: corte parcial ESC/POS
+            output.flush();
+        }
+    }
+
     private String[] normalizeAndWrap(String input, int columns) {
         String normalized = Normalizer.normalize(input == null ? "" : input, Normalizer.Form.NFD)
                 .replaceAll("\\p{M}+", "")
@@ -378,6 +476,7 @@ public final class BluetoothPrinterBridge {
     private String friendlyError(Exception error) {
         String message = error.getMessage() == null ? "" : error.getMessage();
         if (message.contains("permission")) return message;
+        if (error instanceof IllegalArgumentException && !message.isEmpty()) return message;
         if (message.toLowerCase().contains("connect") || error instanceof IOException)
             return "No conectó. Confirma que esté encendida, cerca y sin conexión a otro teléfono.";
         return "No se pudo imprimir. Comprueba el emparejamiento y el protocolo ESC/POS.";

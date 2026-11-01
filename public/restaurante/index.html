@@ -1729,6 +1729,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
   <div class="fila" style="margin-bottom:14px">
     <button class="btn sm" id="comVolver">‹ Mesas</button>
     <h2 style="font-size:19px" id="comTitulo">Mesa</h2>
+    <button class="btn sm ghost" id="comClienteEditar" type="button" hidden>Editar nombre</button>
     <span id="comPersonas" style="color:var(--ink-3);font-size:12.5px"></span>
     <button class="btn sm ghost" id="comGente" style="margin-left:auto">Comensales</button>
   </div>
@@ -2144,6 +2145,18 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <div class="guestPickerActions"><button class="btn" id="mesaComensalesCancelar" type="button">Volver</button><button class="btn primary" id="mesaComensalesAbrir" type="button" disabled>Elegir comensales</button></div>
     </div>
   </div>
+</div>
+
+<div class="modal" id="modalLlevarNombre" hidden role="dialog" aria-modal="true" aria-labelledby="llevarNombreTitulo">
+  <form class="card" id="llevarNombreForm" style="width:min(460px,100%)">
+    <header><h2 id="llevarNombreTitulo">¿A nombre de quién?</h2><button class="btn sm" id="llevarNombreCerrar" type="button" style="margin-left:auto">Cancelar</button></header>
+    <div class="body">
+      <label class="f" for="llevarNombreInput">Nombre del cliente</label>
+      <input id="llevarNombreInput" name="cliente" type="text" maxlength="70" autocomplete="name" required placeholder="Ej. Juan Pérez">
+      <p class="note" style="margin-top:10px">El nombre aparecerá en la lista de pedidos, la comanda de cocina y la cuenta. Si lo dejas vacío, se sugiere un nombre de cliente.</p>
+      <div class="fila" style="margin-top:16px"><button class="btn" id="llevarNombreVolver" type="button">Volver</button><button class="btn primary" id="llevarNombreGuardar" type="submit" style="margin-left:auto">Iniciar pedido</button></div>
+    </div>
+  </form>
 </div>
 
 <div class="modal ancho" id="modalCobro" hidden>
@@ -2699,7 +2712,7 @@ async function proyectaRestaurant(){
     nubePut(out,"rest_comandas",nubeId("comanda",c.id),head);
   (c.lineas||[]).forEach(l=>{const item=Object.assign({},nubeClona(l),{id:l.id,comandaId:c.id,eventoId:ev,categoria:l.categoria||((MENU.plats||[]).find(p=>p.id===l.platId)||{}).catId||""});delete item.foto;delete item.imagen;delete item.base64;nubePut(out,"rest_lineas",nubeId("linea",l.id),item);});
     (c.cancelaciones||[]).forEach(x=>nubePut(out,"rest_lineas",nubeId("cancelacion",x.id),Object.assign({tipo:"cancelacion",comandaId:c.id,eventoId:ev},nubeClona(x))));
-    if(c.estado==="cerrada"&&!c.cancelada){const ticket={id:c.id,folio:c.folio,fecha:c.fecha||hoyISO(),cierra:c.cierra||"",mesaId:c.mesaId,mesaNombre:c.mesaNombre,personas:c.personas,mesero:c.mesero,meseroId:c.meseroId,subtotal:num(c.subtotal),servicio:num(c.servicio),propina:num(c.propina),total:num(c.total),pagos:nubeClona(c.pagos||[]),cambio:num(c.cambio),appId:c.appId||"",appNombre:c.appNombre||"",comisionPct:num(c.comisionPct),comision:num(c.comision),neto:num(c.neto),turnoId:c.turnoId||"",cobro:c.cobro||"",eventoId:ev};nubePut(out,"rest_tickets",nubeId("ticket",c.id),ticket);}
+    if(c.estado==="cerrada"&&!c.cancelada){const ticket={id:c.id,folio:c.folio,fecha:c.fecha||hoyISO(),cierra:c.cierra||"",mesaId:c.mesaId,mesaNombre:c.mesaNombre,cliente:c.cliente||"",personas:c.personas,mesero:c.mesero,meseroId:c.meseroId,subtotal:num(c.subtotal),servicio:num(c.servicio),propina:num(c.propina),total:num(c.total),pagos:nubeClona(c.pagos||[]),cambio:num(c.cambio),appId:c.appId||"",appNombre:c.appNombre||"",comisionPct:num(c.comisionPct),comision:num(c.comision),neto:num(c.neto),turnoId:c.turnoId||"",cobro:c.cobro||"",eventoId:ev};nubePut(out,"rest_tickets",nubeId("ticket",c.id),ticket);}
   });
   for(const u of EQUIPO||[]){const pin=String(u.pin||"").trim(),hash=u.pin_hash||u.pinHash|| (pin?nubeSha256(nubePinSalt()+pin):null);const pin_hash=hash&&typeof hash.then==="function"?await hash:hash;nubePut(out,"rest_equipo",nubeId("persona",u.id),{id:u.id,nombre:u.nombre||"",rol:u.rol||"mesero",pin_hash:pin_hash||null,activo:u.activo!==false,eventoId:ev});}
   (EVENTOS||[]).forEach(x=>nubePut(out,"rest_eventos",String(x.id),Object.assign({},nubeClona(x),{eventoId:""})));
@@ -3191,15 +3204,27 @@ $("#tabs").addEventListener("click", e=>{
 /* ---------------- folios ---------------- */
 const letrasFolio = () => String(P.folios.letras||"").toUpperCase().replace(/[^A-Z]/g,"").slice(0,3);
 const serieFolio  = () => letrasFolio() + String(P.folios.extra||"");
+const prefijoFolio = tipo => tipo === "cta" ? "CTA" : "TUR";
+function folioVisualPOS(folio){return String(folio||"").replace(/^(CTA|TUR)-\1-?(?=\d)/i,"$1-");}
+const serieFolioUnica = tipo => {
+  const serie=serieFolio(), prefijo=prefijoFolio(tipo);
+  return serie.toUpperCase().startsWith(prefijo) ? serie.slice(prefijo.length) : serie;
+};
 const digitosFolio = () => Math.min(8, Math.max(3, num(P.folios.digitos, 5)));
 const topeFolio = () => Math.pow(10, digitosFolio()) - 1;
 function ultimoFolio(tipo){
-  const pre = (tipo === "cta" ? "CTA-" : "TUR-") + serieFolio();
+  const prefijo=prefijoFolio(tipo)+"-", serie=serieFolio(), serieUnica=serieFolioUnica(tipo);
+  const prefijos=[prefijo+serie];
+  if(serieUnica!==serie)prefijos.push(prefijo+serieUnica);
   const lista = tipo === "cta" ? COMANDAS.map(c=>c.folio) : TURNOS.map(t=>t.folio);
   let alto = 0;
   lista.forEach(f=>{
-    if(!f || String(f).indexOf(pre) !== 0) return;
-    const n = parseInt(String(f).slice(pre.length).replace(/\D/g,""), 10);
+    if(!f) return;
+    const valor=String(f), pre=prefijos.find(x=>valor.indexOf(x)===0);
+    if(!pre) return;
+    const resto=valor.slice(pre.length);
+    if(!/^\d+$/.test(resto)) return;
+    const n = parseInt(resto, 10);
     if(isFinite(n) && n > alto) alto = n;
   });
   return alto;
@@ -3232,9 +3257,9 @@ function folioNuevo(tipo){
     toast("Se agotaron los números: la serie ahora es " + serieFolio());
     n = 1;
   }
-  return (tipo === "cta" ? "CTA-" : "TUR-") + serieFolio() + String(n).padStart(digitosFolio(), "0");
+  return prefijoFolio(tipo)+"-"+serieFolioUnica(tipo)+String(n).padStart(digitosFolio(), "0");
 }
-function folioTicketFinal(n){return letrasFolio()?"CTA-"+serieFolio()+String(n).padStart(digitosFolio(),"0"):"CTA-"+hoyISO().replace(/-/g,"")+"-"+String(n).padStart(2,"0");}
+function folioTicketFinal(n){return letrasFolio()?"CTA-"+serieFolioUnica("cta")+String(n).padStart(digitosFolio(),"0"):"CTA-"+hoyISO().replace(/-/g,"")+"-"+String(n).padStart(2,"0");}
 async function reservaFolioNube(c,esApp){if(!c||!REST_NUBE.enabled||!navigator.onLine)return false;const fecha=c.fecha||hoyISO();if(c.folioPendiente){const n=await asignaFolioNube("cta","ticket:"+fecha+":"+serieFolio());if(n!=null){c.folio=folioTicketFinal(Number(n));c.folioPendiente=false;}}if(esApp&&c.appFolioPendiente){const n=await asignaFolioNube("cta","app:"+fecha+":"+String(c.appId||"app"));if(n!=null){c.appOrderNo=Number(n);c.mesaNombre=(c.appNombre||"Pedido")+" "+n;c.appFolioPendiente=false;}}if(c.folioPendiente===false||c.appFolioPendiente===false){persist();return true;}return false;}
 
 /* ===================================================================
@@ -3496,7 +3521,7 @@ function renderLlevar(){
   const ls = llevarAbiertas();
   $("#llevarFila").innerHTML = ls.map(c=>
     '<button class="llevarCard" data-llevar="'+esc(c.id)+'">' +
-    '<b>'+esc(c.mesaNombre)+'</b>' +
+    '<b>'+esc(nombreVisibleComandaPOS(c))+'</b>' +
     '<small>'+esc(c.folio)+' · '+esc(c.abre)+' · '+esc(c.mesero||"")+'</small>' +
     '<span class="mnt">'+mx(sumaComanda(c).total)+'</span></button>').join("");
 }
@@ -3882,8 +3907,25 @@ $("#mesaRapida").addEventListener("click", ()=> abreMesa("llevar"));
    COMANDA
    =================================================================== */
 let comandaId = null, catVista = "", comensalVista = 1;
+let modoNombreLlevar="nuevo", comandaNombreLlevarId="";
 
 function comandaActual(){ return COMANDAS.find(c=>c.id === comandaId); }
+function clienteLlevar(c){
+  const guardado=String(c&&c.cliente||"").trim();if(guardado)return guardado;
+  const m=String(c&&c.mesaNombre||"").match(/para\s+llevar\s*(?:·|#)?\s*(\d+)/i);
+  return m?"Cliente "+m[1]:"Cliente";
+}
+function nombreVisibleComandaPOS(c){return c&&c.mesaId==="llevar"?"Para llevar · "+clienteLlevar(c):String(c&&c.mesaNombre||"");}
+function nombreClienteSugeridoLlevar(){return "Cliente "+(COMANDAS.filter(c=>c.mesaId==="llevar"&&c.fecha===hoyISO()).length+1);}
+function abreModalNombreLlevar(modo,c){
+  modoNombreLlevar=modo||"nuevo";comandaNombreLlevarId=c&&c.id||"";
+  const input=$("#llevarNombreInput");
+  $("#llevarNombreTitulo").textContent=modoNombreLlevar==="editar"?"Editar nombre del pedido":"¿A nombre de quién?";
+  $("#llevarNombreGuardar").textContent=modoNombreLlevar==="editar"?"Guardar nombre":"Iniciar pedido";
+  input.value=modoNombreLlevar==="editar"?clienteLlevar(c):nombreClienteSugeridoLlevar();
+  $("#modalLlevarNombre").hidden=false;input.focus();input.select();
+}
+function cierraModalNombreLlevar(){ $("#modalLlevarNombre").hidden=true;comandaNombreLlevarId=""; }
 
 async function abreMesa(mesaId){
   if(!turnoAbierto() && !POS_EVENTO && rolActual()!=="mesero"){
@@ -3892,8 +3934,7 @@ async function abreMesa(mesaId){
   }
   let c;
   if(mesaId === "llevar"){
-    const n = COMANDAS.filter(x=>x.mesaId === "llevar" && x.fecha === hoyISO()).length + 1;
-    c = await nuevaComanda({id:"llevar", nombre:"Para llevar " + n, lugares:1}, 1);
+    abreModalNombreLlevar("nuevo",null);return;
   }else{
     const m = MESAS.find(x=>x.id === mesaId); if(!m) return;
     c = comandaDe(mesaId);
@@ -3901,6 +3942,23 @@ async function abreMesa(mesaId){
   }
   entraAComanda(c);
 }
+$("#llevarNombreCerrar").addEventListener("click",cierraModalNombreLlevar);
+$("#llevarNombreVolver").addEventListener("click",cierraModalNombreLlevar);
+$("#modalLlevarNombre").addEventListener("click",e=>{if(e.target===$("#modalLlevarNombre"))cierraModalNombreLlevar();});
+$("#modalLlevarNombre").addEventListener("keydown",e=>{if(e.key==="Escape")cierraModalNombreLlevar();});
+$("#comClienteEditar").addEventListener("click",()=>{const c=comandaActual();if(c&&c.mesaId==="llevar")abreModalNombreLlevar("editar",c);});
+$("#llevarNombreForm").addEventListener("submit",async e=>{
+  e.preventDefault();let nombre=String($("#llevarNombreInput").value||"").trim();
+  if(!nombre){nombre=modoNombreLlevar==="editar"?clienteLlevar(comandaActual()):nombreClienteSugeridoLlevar();$("#llevarNombreInput").value=nombre;}
+  nombre=nombre.slice(0,70);
+  if(modoNombreLlevar==="editar"){
+    const c=COMANDAS.find(x=>x.id===comandaNombreLlevarId);if(!c)return;
+    c.cliente=nombre;c.mesaNombre="Para llevar · "+nombre;persist();cierraModalNombreLlevar();renderComanda();toast("Nombre del pedido actualizado");return;
+  }
+  cierraModalNombreLlevar();
+  const c=await nuevaComanda({id:"llevar",nombre:"Para llevar · "+nombre,cliente:nombre,lugares:1},1);
+  entraAComanda(c);
+});
 function entraAComanda(c){
   comandaId = c.id;
   catVista = "";
@@ -3965,6 +4023,7 @@ async function comandaReservadaDesdeNube(docId,draft){
 async function nuevaComanda(m, personas, appId){
   const c = {
     id: uid(), folio: folioNuevo("cta"), mesaId: m.id, mesaNombre: m.nombre,
+    cliente:m.id==="llevar"?String(m.cliente||"").trim():"",
     personas: Math.max(1, num(personas, m.lugares || 2)), abre: horaAhora(), fecha: hoyISO(),
     mesero: usuarioActual().nombre || "", meseroId: usuarioActual().id || "",
     lineas: [], estado: "abierta", pagos: [], propina: 0, ts: Date.now()
@@ -4030,9 +4089,10 @@ async function abreApp(appId){
 
 function renderComanda(){
   const c = comandaActual(); if(!c){ vaA("mesas"); return; }
-  $("#comTitulo").textContent = c.mesaNombre;
-  $("#comFolio").textContent = c.folio;
-  $("#comPersonas").textContent = c.personas + " comensal(es) · abrió " + c.abre + " · " + (c.mesero||"");
+  $("#comTitulo").textContent = nombreVisibleComandaPOS(c);
+  $("#comClienteEditar").hidden = c.mesaId!=="llevar";
+  $("#comFolio").textContent = folioVisualPOS(c.folio);
+  $("#comPersonas").textContent = (c.mesaId==="llevar"?"Pedido para llevar":""+c.personas+" comensal(es)") + " · abrió " + c.abre + " · " + (c.mesero||"");
 
   /* A quién se le anota lo que se toque. Es lo que hace que el ticket de
      cocina salga por persona y que la cuenta se pueda dividir por consumo. */
@@ -5328,7 +5388,7 @@ function renderVentas(){
     (lista.length ? lista.slice(0,200).map(c=>{
       const cans = (c.cancelaciones||[]).length, re = (c.reimpresiones||[]).length;
       const canal=c.appId?'<span class="appPill"><i style="background:'+esc(c.appColor||"#7A8A99")+'"></i>'+esc(c.appNombre||"App")+' '+pct1(c.comisionPct)+'</span>':'<span style="color:var(--ink-3)">Propia</span>';
-      return '<tr data-tk="'+esc(c.id)+'"><td class="mono">'+esc(c.folio)+'</td><td>'+esc(c.mesaNombre)+'</td>' +
+      return '<tr data-tk="'+esc(c.id)+'"><td class="mono">'+esc(folioVisualPOS(c.folio))+'</td><td>'+esc(nombreVisibleComandaPOS(c))+'</td>' +
         '<td>'+canal+'</td>'+
         '<td class="mono">'+esc(c.fecha)+'</td><td class="mono">'+esc(c.cierra||"")+'</td>' +
         '<td>'+esc(c.mesero||"")+'</td><td>'+esc(c.cobro||"")+'</td>' +
@@ -5969,10 +6029,10 @@ function hojaTicket(){
   const mm = anchoTicket();
   return '@page{size:'+mm+'mm auto;margin:0}' +
     'body{margin:0;padding:4mm 3mm;width:'+mm+'mm;background:#fff;color:#000;' +
-      'font-family:"Courier New",ui-monospace,monospace;font-size:'+(mm===58?10:11.5)+'px;line-height:1.35}' +
+      'font-family:Arial,Roboto,sans-serif;font-size:'+(mm===58?12:14)+'px;line-height:1.35}' +
     '.c{text-align:center}.d{text-align:right}.b{font-weight:bold}' +
-    '.g{font-size:'+(mm===58?14:17)+'px;font-weight:bold;letter-spacing:.04em}' +
-    '.xl{font-size:'+(mm===58?20:26)+'px;font-weight:bold;line-height:1.1}' +
+    '.g{font-size:'+(mm===58?17:20)+'px;font-weight:bold;letter-spacing:.02em}' +
+    '.xl{font-size:'+(mm===58?24:30)+'px;font-weight:bold;line-height:1.1}' +
     'hr{border:0;border-top:1px dashed #000;margin:5px 0}' +
     'table{width:100%;border-collapse:collapse}' +
     'td{padding:1px 0;vertical-align:top}' +
@@ -6020,7 +6080,8 @@ function ticketHtmlATexto(titulo, cuerpo, anchoMm){
   };
   const contenido=Array.from(doc.body.childNodes).map(recorrer).join("");
   const limpias=contenido.split("\n").map(x=>x.replace(/[\t ]+/g," ").trim()).filter(Boolean);
-  return [titulo, ...limpias.flatMap(x=>envolver(x,columnas))].join("\n")+"\n\n";
+  /* El título del diálogo suele repetir el folio que ya está dentro del ticket. */
+  return limpias.flatMap(x=>envolver(x,columnas)).join("\n")+"\n\n";
 }
 function esperaResultadoImpresoraPOS(id, tiempo){
   return new Promise(resolve=>{
@@ -6057,17 +6118,23 @@ async function ejecutaTrabajoImpresoraPOS(trabajo){
   const p=trabajo.impresora, puente=window.MakersPrinter;
   if(p.conexion==="bluetooth"){
     if(!puente || !p.impresoraBt) return {ok:false,mensaje:"No está disponible la impresora Bluetooth guardada."};
-    if(typeof puente.printTicket!=="function"&&typeof puente.printText!=="function")
+    if(typeof puente.printImage!=="function"&&typeof puente.printTicket!=="function"&&typeof puente.printText!=="function")
       return {ok:false,mensaje:"La app necesita actualizarse para imprimir por Bluetooth."};
-    if(p.corteAutomatico&&typeof puente.printTicket!=="function")
+    if(p.corteAutomatico&&typeof puente.printTicket!=="function"&&typeof puente.printImage!=="function")
       return {ok:false,mensaje:"Actualiza la app para usar el cortador automático."};
     const id="imp-bt-"+uid(), esperando=esperaResultadoImpresoraPOS(id,35000), mm=num(p.anchoPapelBt,80)===58?58:80;
     try{
-      const texto=ticketHtmlATexto(trabajo.titulo,trabajo.cuerpo,mm);
-      if(typeof puente.printTicket==="function"){
+      if(trabajo.rasterModel&&typeof puente.printImage==="function"){
+        const png=await rasterImagenTicketPOS(trabajo.rasterModel,mm),opciones={corte:!!p.corteAutomatico,avance:p.corteAutomatico?3:8,umbral:190};
+        puente.printImage(id,p.impresoraBt,mm,png,JSON.stringify(opciones));
+      }else if(typeof puente.printTicket==="function"){
+        const texto=ticketHtmlATexto(trabajo.titulo,trabajo.cuerpo,mm);
         const opciones={corte:!!p.corteAutomatico,avance:p.corteAutomatico?3:8};
         puente.printTicket(id,p.impresoraBt,mm,texto,JSON.stringify(opciones));
-      }else if(typeof puente.printText==="function") puente.printText(id,p.impresoraBt,mm,texto);
+      }else if(typeof puente.printText==="function"){
+        const texto=ticketHtmlATexto(trabajo.titulo,trabajo.cuerpo,mm);
+        puente.printText(id,p.impresoraBt,mm,texto);
+      }
     }catch(e){ resuelveResultadoImpresoraPOS(id,false,e&&e.message||"No se pudo iniciar la impresión."); }
     return await esperando;
   }
@@ -6121,7 +6188,7 @@ function imprimeHoja(titulo,cuerpo,opciones={}){
     : impresorasParaTicketPOS(opciones.tipo||"",!!opciones.automatico);
   const trabajos=destinos.map(p=>encolaTrabajoImpresoraPOS(Object.assign({
     impresora:Object.assign({},p,{categorias:(p.categorias||[]).slice()}),
-    titulo:titulo,cuerpo:cuerpo,esPrueba:!!opciones.esPrueba
+    titulo:titulo,cuerpo:cuerpo,esPrueba:!!opciones.esPrueba,rasterModel:opciones.rasterModel||null
   },opciones.nubeLineas?{nubeLineas:opciones.nubeLineas,nubeRuta:opciones.nubeRuta,nubeTipo:opciones.nubeTipo,reintentaNube:opciones.reintentaNube}:{})));
   if(!destinos.length && opciones.esPrueba) toast("Activa lo que imprime esta impresora y vuelve a probar.");
   return Promise.all(trabajos);
@@ -6129,6 +6196,76 @@ function imprimeHoja(titulo,cuerpo,opciones={}){
 const lineaPar = (izq, der, cl) =>
   '<table><tr><td'+(cl?' class="'+cl+'"':'')+'>'+izq+'</td>' +
   '<td class="d'+(cl?' '+cl:'')+'" style="width:38%">'+der+'</td></tr></table>';
+
+function datosComandaRasterPOS(c,lineas,tipo="comanda",cancelacion=null){
+  const esLlevar=c.mesaId==="llevar", n=Math.max(1,num(c.personas,1));
+  const heading=c.appId?String(c.mesaNombre||c.appNombre||"Pedido"):esLlevar?"LLEVAR · "+clienteLlevar(c):String(c.mesaNombre||"Mesa");
+  if(tipo==="cancelacion")return {tipo:"cocina",folio:folioVisualPOS(c.folio),heading:heading.toUpperCase(),fecha:c.fecha||hoyISO(),hora:horaAhora(),mesero:cancelacion&&cancelacion.quien||c.mesero||"",pedido:c.appId?"Pedido por app · "+(c.appNombre||"Plataforma"):esLlevar?"Para llevar":"Comer dentro",cancelacion:true,items:[{cantidad:num(cancelacion&&cancelacion.cant,1),nombre:cancelacion&&cancelacion.nombre||"Platillo",mods:[],nota:cancelacion&&cancelacion.motivo||cancelacion&&cancelacion.nota||""}]};
+  const grupos=[];
+  if(esLlevar||c.appId){
+    grupos.push({titulo:"",items:lineas.map(l=>({cantidad:num(l.cant,1),nombre:l.nombre||"Platillo",mods:(l.mods||[]).map(m=>m.nombre||m),nota:l.nota||""}))});
+  }else{
+    for(let i=1;i<=n;i++){
+      const ls=lineas.filter(l=>num(l.comensal,0)===i);if(ls.length)grupos.push({titulo:n>1?"COMENSAL "+i:"",items:ls.map(l=>({cantidad:num(l.cant,1),nombre:l.nombre||"Platillo",mods:(l.mods||[]).map(m=>m.nombre||m),nota:l.nota||""}))});
+    }
+    const compartidos=lineas.filter(l=>num(l.comensal,0)===0);if(compartidos.length)grupos.push({titulo:n>1?"PARA COMPARTIR":"",items:compartidos.map(l=>({cantidad:num(l.cant,1),nombre:l.nombre||"Platillo",mods:(l.mods||[]).map(m=>m.nombre||m),nota:l.nota||""}))});
+  }
+  return {tipo:"cocina",folio:folioVisualPOS(c.folio),heading:heading.toUpperCase(),fecha:c.fecha||hoyISO(),hora:horaAhora(),mesero:c.mesero||"",personas:!esLlevar&&!c.appId&&n>1?n:null,pedido:c.appId?"Pedido por app · "+(c.appNombre||"Plataforma"):esLlevar?"Para llevar":"Comer dentro",grupos};
+}
+function datosCancelacionRasterPOS(c,x){return datosComandaRasterPOS(c,[x],"cancelacion",x);}
+function datosCuentaRasterPOS(c,pagos,propina){
+  const s=sumaComanda(c),prop=num(propina),n=Math.max(1,num(c.personas,1)),grupos=[];
+  if(c.mesaId==="llevar"){
+    const items=vivas(c).map(l=>({nombre:l.nombre||"Platillo",cantidad:num(l.cant,1),importe:mx(importeLinea(l)),mods:(l.mods||[]).map(m=>({nombre:m.nombre||"Opción",extra:num(m.extra)})),nota:l.nota||""}));
+    if(items.length)grupos.push({k:null,titulo:"",items});
+  }else{
+    for(let i=1;i<=n;i++)grupos.push({k:i,titulo:"Comensal "+i});grupos.push({k:0,titulo:"Para compartir"});
+  }
+  if(c.mesaId!=="llevar")grupos.forEach(g=>{const ls=vivas(c).filter(l=>{const k=num(l.comensal,0);return (k>=1&&k<=n?k:0)===g.k;});if(!ls.length)return;g.items=ls.map(l=>({nombre:l.nombre||"Platillo",cantidad:num(l.cant,1),importe:mx(importeLinea(l)),mods:(l.mods||[]).map(m=>({nombre:m.nombre||"Opción",extra:num(m.extra)})),nota:l.nota||""}));if(n<=1&&g.k!==0)g.titulo="";});
+  return {tipo:"cuenta",negocio:(P.negocio||{}).nombre||"",logo:(P.ticket||{}).mostrarLogo!==false?(P.negocio||{}).logo||"":"",direccion:(P.negocio||{}).dir||"",telefono:(P.negocio||{}).tel||"",encabezado:(P.ticket||{}).encabezado||"",nombre:c.appId?String(c.mesaNombre||c.appNombre||"Pedido por app"):nombreVisibleComandaPOS(c),folio:folioVisualPOS(c.folio),fecha:(c.fecha||hoyISO())+" "+String(c.abre||""),cierre:String(c.cierra||horaAhora()),mesero:c.mesero||"",grupos:grupos.filter(g=>g.items&&g.items.length),consumo:mx(s.sub),servicio:s.serv?mx(s.serv):"",iva:(P.ticket||{}).mostrarIva!==false&&s.iva?mx(s.iva):"",propina:prop?mx(prop):"",total:mx(s.total+prop),pagos:(pagos||c.pagos||[]).map(p=>({nombre:p.tipo||"Pago",importe:mx(p.monto)})),cambio:num(c.cambio)?mx(c.cambio):"",division:n>1?porComensal(c).lista.map(x=>({nombre:"Comensal "+x.comensal,importe:mx(x.total+prop/n)})):[],leyenda:(P.ticket||{}).mostrarPropina!==false?(P.ticket||{}).leyenda||"":"",pie:(P.ticket||{}).pie||""};
+}
+function rasterEnvuelvePOS(ctx,texto,maxWidth,size,weight){
+  ctx.font=weight+" "+size+"px Arial, Roboto, sans-serif";const words=String(texto||"").split(/\s+/).filter(Boolean),lines=[];let current="";
+  words.forEach(word=>{const next=current?current+" "+word:word;if(current&&ctx.measureText(next).width>maxWidth){lines.push(current);current=word;}else current=next;});if(current)lines.push(current);return lines;
+}
+async function rasterImagenTicketPOS(model,mm){
+  const width=mm<=58?384:576,margin=width===384?22:30,inside=width-margin*2,measure=document.createElement("canvas").getContext("2d"),ops=[];
+  let logo=null,logoSize=null,y=20;
+  if(model.logo&&/^data:image\//i.test(model.logo))logo=await new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>resolve(null);image.src=model.logo;});
+  if(logo){const scale=Math.min(inside/logo.width,82/logo.height,1);logoSize={width:Math.max(1,Math.round(logo.width*scale)),height:Math.max(1,Math.round(logo.height*scale))};y+=logoSize.height+14;}
+  const text=(value,size,bold=false,align="left",indent=0,fit=false)=>{
+    const maxWidth=inside-indent,weight=bold?"700":"400",str=String(value||"");if(!str)return;
+    if(fit){measure.font=weight+" "+size+"px Arial, Roboto, sans-serif";const measured=measure.measureText(str).width,actual=measured>maxWidth?Math.max(size*.62,size*maxWidth/measured):size;ops.push({kind:"text",value:str,x:width/2,y:y+actual*.82,size:actual,weight,align:"center",maxWidth});y+=actual*1.16;return;}
+    const lines=rasterEnvuelvePOS(measure,str,maxWidth,size,weight),lineHeight=size*1.18;
+    lines.forEach(line=>{ops.push({kind:"text",value:line,x:margin+indent,y:y+size*.88,size,weight,align:"left",maxWidth});y+=lineHeight;});
+  };
+  const split=(left,right,size=22,bold=false)=>{
+    const weight=bold?"700":"400",leftWidth=inside*.68,rightWidth=inside*.29,lines=rasterEnvuelvePOS(measure,left,leftWidth,size,weight),lineHeight=size*1.2;
+    lines.forEach((line,index)=>{ops.push({kind:"text",value:line,x:margin,y:y+size*.88,size,weight,align:"left",maxWidth:leftWidth});if(index===0&&right)ops.push({kind:"text",value:String(right),x:width-margin,y:y+size*.88,size:Math.min(size,21),weight:"400",align:"right",maxWidth:rightWidth});y+=lineHeight;});
+  };
+  const rule=()=>{y+=8;ops.push({kind:"rule",y});y+=17;};
+  const centered=(value,size,bold=false,fit=true)=>text(value,size,bold,"center",0,fit);
+  if(model.tipo==="cocina"){
+    centered("COCINA",22,true);y+=14;centered(model.folio,48,true);centered(model.cancelacion?"CANCELAR":model.heading,model.cancelacion?52:48,true);
+    if(model.cancelacion)centered(model.heading,43,true);
+    text(model.fecha+" "+model.hora,22,false);if(model.mesero)text((model.cancelacion?"Solicitó: ":"Atiende: ")+model.mesero,22,false);if(model.personas)text(model.personas+" comensales",22,false);
+    rule();centered(model.pedido||"Comer dentro",32,true);rule();
+    (model.grupos||[]).forEach(group=>{if(group.titulo)text(group.titulo,22,true);(group.items||[]).forEach((item,index)=>{text(num(item.cantidad,1)+" x "+item.nombre,34,true);(item.mods||[]).forEach(mod=>text("› "+mod,26,false,"left",18));if(item.nota)text("Nota: "+item.nota,26,true,"left",18);if(index<group.items.length-1)rule();});});
+    if(model.cancelacion){(model.items||[]).forEach(item=>{text(num(item.cantidad,1)+" x "+item.nombre,34,true);if(item.nota)text("Motivo: "+item.nota,26,true,"left",18);});}
+  }else{
+    centered(model.negocio,28,true);if(model.direccion)centered(model.direccion,18,false);if(model.telefono)centered("Tel. "+model.telefono,18,false);if(model.encabezado)String(model.encabezado).split(/\n/).forEach(line=>centered(line,19,false));
+    centered(model.nombre,34,true);centered(model.folio,22,true);text(model.fecha,20,false);if(model.mesero)text("Atendió: "+model.mesero,20,false);if(model.cierre)text("Cerró: "+model.cierre,20,false);rule();
+    (model.grupos||[]).forEach(group=>{if(group.titulo)text(group.titulo,20,true);(group.items||[]).forEach(item=>{split(num(item.cantidad,1)+" x "+item.nombre,item.importe,23,true);(item.mods||[]).forEach(mod=>{if(mod.extra)split("  + "+mod.nombre,"",19,false);else text("  · "+mod.nombre,19,false);});if(item.nota)text("  · "+item.nota,19,false);});});
+    rule();split("Consumo",model.consumo,23,false);if(model.servicio)split("Servicio",model.servicio,20,false);if(model.iva)split("IVA incluido",model.iva,20,false);if(model.propina)split("Propina",model.propina,20,false);rule();split("TOTAL",model.total,42,true);(model.pagos||[]).forEach(p=>split(p.nombre,p.importe,20,false));if(model.cambio)split("Cambio",model.cambio,20,false);
+    if(model.division&&model.division.length){rule();text("Si se divide",20,true);model.division.forEach(row=>split(row.nombre,row.importe,19,false));}
+    if(model.leyenda){rule();centered(model.leyenda,18,false);}if(model.pie){rule();String(model.pie).split(/\n/).forEach(line=>centered(line,18,false));}
+  }
+  y+=18;if(y>12000)throw new Error("El ticket excede el largo máximo de impresión.");
+  const canvas=document.createElement("canvas");canvas.width=width;canvas.height=Math.max(100,Math.ceil(y));const ctx=canvas.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,width,canvas.height);if(logo&&logoSize)ctx.drawImage(logo,(width-logoSize.width)/2,12,logoSize.width,logoSize.height);ctx.fillStyle="#000";ctx.strokeStyle="#000";ctx.lineWidth=1;
+  ops.forEach(op=>{if(op.kind==="rule"){ctx.save();ctx.setLineDash([2,4]);ctx.beginPath();ctx.moveTo(margin,op.y);ctx.lineTo(width-margin,op.y);ctx.stroke();ctx.restore();return;}ctx.font=op.weight+" "+op.size+"px Arial, Roboto, sans-serif";ctx.textAlign=op.align;ctx.textBaseline="alphabetic";ctx.fillText(op.value,op.x,op.y,op.maxWidth);});
+  const image=ctx.getImageData(0,0,width,canvas.height);for(let i=0;i<image.data.length;i+=4){const v=(image.data[i]*299+image.data[i+1]*587+image.data[i+2]*114)/1000<190?0:255;image.data[i]=image.data[i+1]=image.data[i+2]=v;image.data[i+3]=255;}ctx.putImageData(image,0,0);
+  return canvas.toDataURL("image/png").split(",")[1];
+}
 
 function encabezadoTicket(){
   const n = P.negocio || {}, tk = P.ticket || {};
@@ -6151,8 +6288,8 @@ function imprimeCuenta(c, pagos, propina, automatico=false){
   const n = Math.max(1, num(c.personas,1));
 
   let cuerpo = encabezadoTicket();
-  const nombreTicket=c.appId?'<span class="b">'+esc(c.appNombre||"Pedido por app").toUpperCase()+'</span><small> · '+esc(c.mesaNombre)+'</small>':'<span class="b">'+esc(c.mesaNombre)+'</span>';
-  cuerpo += lineaPar(nombreTicket, esc(c.folio), "b");
+  const nombreTicket='<span class="b">'+esc(nombreVisibleComandaPOS(c))+'</span>';
+  cuerpo += lineaPar(nombreTicket, esc(folioVisualPOS(c.folio)), "b");
   cuerpo += lineaPar(esc(c.fecha)+' '+esc(c.abre), esc(c.cierra||horaAhora()));
   if(c.mesero) cuerpo += '<div>Atendió: '+esc(c.mesero)+'</div>';
   cuerpo += '<hr>';
@@ -6195,8 +6332,7 @@ function imprimeCuenta(c, pagos, propina, automatico=false){
   if(tk.mostrarPropina !== false && tk.leyenda)
     cuerpo += '<hr><div class="c">'+esc(tk.leyenda)+'</div>';
   if(tk.pie) cuerpo += '<hr><div class="c">'+esc(tk.pie).replace(/\n/g,"<br>")+'</div>';
-  cuerpo += '<div class="c" style="margin-top:6px;font-size:9px">'+esc(c.folio)+'</div>';
-  imprimeHoja("Cuenta " + c.folio, cuerpo, {tipo:"cuenta",automatico:!!automatico});
+  imprimeHoja("Cuenta " + folioVisualPOS(c.folio), cuerpo, {tipo:"cuenta",automatico:!!automatico,rasterModel:datosCuentaRasterPOS(c,pagos,prop)});
 }
 
 /* ---------------- el ticket de cocina ----------------
@@ -6214,9 +6350,8 @@ function lineasParaImpresoraPOS(lineas,impresora){
 function cuerpoComandaCocinaPOS(c,lineas){
   const esLlevar = c.mesaId === "llevar";
   const n = Math.max(1, num(c.personas,1));
-  let cuerpo = '<div class="c xl">'+(c.appId ? esc(c.appNombre||c.mesaNombre).toUpperCase() : esLlevar ? "PARA LLEVAR" : esc(c.mesaNombre).toUpperCase())+'</div>';
-  if(c.appId) cuerpo += '<div class="c g">'+esc(c.mesaNombre)+'</div>';
-  cuerpo += '<div class="c g">'+esc(c.folio)+'</div>';
+  let cuerpo = '<div class="c xl">'+esc(c.appId ? (c.mesaNombre||c.appNombre||"Pedido") : esLlevar ? "LLEVAR · "+clienteLlevar(c) : c.mesaNombre).toUpperCase()+'</div>';
+  cuerpo += '<div class="c g">'+esc(folioVisualPOS(c.folio))+'</div>';
   cuerpo += '<div class="c">'+esc(horaAhora())+' · '+esc(c.mesero||"")+'</div>';
   if(!esLlevar && n > 1) cuerpo += '<div class="c">'+n+' comensales</div>';
   cuerpo += '<hr>';
@@ -6237,7 +6372,7 @@ function cuerpoComandaCocinaPOS(c,lineas){
       if(l.nota) cuerpo += '<div class="caja">'+esc(l.nota).toUpperCase()+'</div>';
     });
   });
-  cuerpo += '<hr><div class="c" style="font-size:9px">'+esc(c.folio)+' · '+esc(c.fecha)+'</div>';
+  cuerpo += '<hr><div class="c">'+esc(c.fecha)+'</div>';
   return cuerpo;
 }
 async function imprimeComandaRutaNube(c,p,lineas,tipo,contenido,forzado,reclamoYaTomado){
@@ -6254,7 +6389,8 @@ async function imprimeComandaRutaNube(c,p,lineas,tipo,contenido,forzado,reclamoY
   }
   const titulo=(tipo==="cancelacion"?"Cancelación ":"Cocina ")+c.folio;
   const html=tipo==="cancelacion"?(contenido||""):cuerpoComandaCocinaPOS(c,propias);
-  const resultado=await imprimeHoja(titulo,html,{tipo:tipo==="cancelacion"?"cancelacion":"comanda",impresoraId:p.id,...(REST_NUBE.enabled?{nubeLineas:propias,nubeRuta:route,nubeTipo:tipo,reintentaNube:reintenta}:{})});
+  const rasterModel=tipo==="cancelacion"?datosCancelacionRasterPOS(c,propias[0]||null):datosComandaRasterPOS(c,propias);
+  const resultado=await imprimeHoja(titulo,html,{tipo:tipo==="cancelacion"?"cancelacion":"comanda",impresoraId:p.id,rasterModel,...(REST_NUBE.enabled?{nubeLineas:propias,nubeRuta:route,nubeTipo:tipo,reintentaNube:reintenta}:{})});
   if(REST_NUBE.enabled&&resultado.some(r=>r.ok)){
     if(sinRed){propias.forEach(linea=>marcaImpresionOffline(c,linea,route,tipo));}
     else{try{await confirmaLineasNube(propias,route,tipo);propias.forEach(linea=>{linea.impreso=linea.impreso||{};linea.impreso[route]={por:REST_NUBE.deviceId,en:new Date().toISOString(),ok:true};});}
@@ -6282,8 +6418,8 @@ function procesaLineasEntrantes(){
    es la única forma de que se entere. */
 async function imprimeCancelacion(c, x){
   let cuerpo = '<div class="c xl">CANCELAR</div>';
-  cuerpo += '<div class="c g">'+(c.appId ? esc(c.appNombre||c.mesaNombre).toUpperCase() : c.mesaId === "llevar" ? "PARA LLEVAR" : esc(c.mesaNombre).toUpperCase())+'</div>';
-  cuerpo += '<div class="c">'+esc(c.folio)+' · '+esc(horaAhora())+'</div><hr>';
+  cuerpo += '<div class="c g">'+esc(c.appId ? (c.mesaNombre||c.appNombre||"Pedido") : c.mesaId === "llevar" ? "LLEVAR · "+clienteLlevar(c) : c.mesaNombre).toUpperCase()+'</div>';
+  cuerpo += '<div class="c">'+esc(folioVisualPOS(c.folio))+' · '+esc(horaAhora())+'</div><hr>';
   cuerpo += '<div class="xl">'+num(x.cant,1)+'  '+esc(x.nombre).toUpperCase()+'</div>';
   cuerpo += '<div class="caja">'+esc(x.motivo).toUpperCase()+'</div>';
   if(x.nota) cuerpo += '<div class="c">'+esc(x.nota)+'</div>';
@@ -7216,7 +7352,10 @@ async function abreCamara(){
        preferible un registro sin foto que una persona que no puede checar. */
     chCamara = null;
     $("#chVideo").hidden = true; $("#chTomar").hidden = true;
-    toast("Sin cámara: se va a registrar sin foto");
+    const permisoDenegado=e&&(e.name==="NotAllowedError"||e.name==="PermissionDeniedError");
+    toast(permisoDenegado
+      ? "La app no tiene permiso de cámara: actívalo en Ajustes de Android → Apps → Nuvoor → Permisos. Se registrará sin foto."
+      : "No se pudo abrir la cámara. Se registrará sin foto.");
     revisaChOk();
   }
 }
@@ -7669,9 +7808,11 @@ $("#androidUpdateButton").addEventListener("click", ()=>{
 });
 function pintaNotaFolio(){
   const n = $("#folNota"); if(!n) return;
+  const serieCta=serieFolioUnica("cta"), serieTur=serieFolioUnica("tur");
   n.innerHTML = letrasFolio()
-    ? 'Tus cuentas van a salir como <b>CTA-' + esc(serieFolio()) + String(1).padStart(digitosFolio(),"0") +
-      '</b> y los turnos como <b>TUR-' + esc(serieFolio()) + String(1).padStart(digitosFolio(),"0") + '</b>. ' +
+    ? 'Tus cuentas van a salir como <b>CTA-' + esc(serieCta) + String(1).padStart(digitosFolio(),"0") +
+      '</b> y los turnos como <b>TUR-' + esc(serieTur) + String(1).padStart(digitosFolio(),"0") + '</b>. ' +
+      (serieCta!==serieFolio()?'CTA ya es el prefijo de cuenta y no se agrega dos veces. ':'') +
       'Los folios que ya existen no se tocan.'
     : 'Sin letras, los folios llevan la fecha. Escribe tres letras para ponerles las de tu negocio.';
 }

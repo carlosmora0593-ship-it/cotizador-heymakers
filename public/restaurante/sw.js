@@ -1,4 +1,4 @@
-const CACHE_NAME = "makers-restaurant-account-v22-colas-antiguas";
+const CACHE_NAME = "makers-restaurant-account-v23-tickets-raster-camera";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,
