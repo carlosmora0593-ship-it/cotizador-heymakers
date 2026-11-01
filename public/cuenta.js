@@ -539,28 +539,54 @@ document.addEventListener("change", async e=>{
 });
 
 /* ---------- Sesión ---------- */
+function productosEmpresa(e){const xs=Array.isArray(e&&e.productos)?e.productos:[];return xs.length?xs:(e&&e.producto?[e.producto]:[]);}
 async function cargaCuenta(){
-  const {data: perfil} = await SB.from("perfiles").select("*").eq("id", SESION.user.id).maybeSingle();
-  if(!perfil) return false;
-  PERFIL = perfil;
+  const res = await SB.from("mis_empresas").select("*");
+  let filas = res.error ? [] : (res.data || []);
+  EMPRESAS = filas.map(e=>Object.assign({},e));
 
-  /* mis_empresas ya sabe cuál está activa y con qué rol entro en cada una.
-     Si la base todavía no tiene la parte de varias empresas (06-superadmin.sql
-     sin correr), esto viene vacío y seguimos con la de siempre. */
-  const {data: empresas} = await SB.from("mis_empresas").select("*");
-  EMPRESAS = empresas || [];
-  const activa = EMPRESAS.find(e=> e.activa) || EMPRESAS[0] || null;
-
-  if(activa){
-    const {data: cuenta} = await SB.from("cuentas").select("*").eq("id", activa.id).maybeSingle();
-    CUENTA = cuenta;
-    PERFIL = Object.assign({}, perfil, {rol: activa.rol});   // el rol es de ESTA empresa
-  } else {
-    const {data: cuenta} = await SB.from("cuentas").select("*").eq("id", perfil.cuenta_id).maybeSingle();
-    CUENTA = cuenta;
+  // En SQL 19, mis_empresas ya incluye el sistema. En bases anteriores
+  // intentamos completar la fila por su id explícito; la RLS vieja puede
+  // dejar disponible sólo el negocio activo y entonces mostramos el aviso.
+  for(const empresa of EMPRESAS){
+    if(productosEmpresa(empresa).length) continue;
+    try{
+      const r = await SB.from("cuentas").select("*").eq("id",empresa.id).maybeSingle();
+      if(!r.error && r.data) Object.assign(empresa,r.data);
+    }catch(_){}
   }
+
+  if(!EMPRESAS.length){
+    const {data: perfil} = await SB.from("perfiles").select("id,cuenta_id,cuenta_activa,nombre,correo,rol").eq("id",SESION.user.id).maybeSingle();
+    if(perfil){
+      const id=perfil.cuenta_activa||perfil.cuenta_id;
+      const {data: cuenta} = await SB.from("cuentas").select("*").eq("id",id).maybeSingle();
+      if(cuenta) EMPRESAS=[Object.assign({},cuenta,{activa:true,rol:perfil.rol})];
+    }
+  }
+
+  const imprentas=EMPRESAS.filter(e=>productosEmpresa(e).includes("taller"));
+  if(!imprentas.length){
+    location.replace("acceso.html?producto=taller");
+    return false;
+  }
+  const activa=EMPRESAS.find(e=>e.activa)||null;
+  const elegida=imprentas.find(e=>activa&&e.id===activa.id)||imprentas[0];
+  if(!elegida.activa){
+    const {error}=await SB.rpc("cambiar_empresa",{destino:elegida.id});
+    if(error) throw new Error("No se pudo abrir Nuvoor Imprenta: "+error.message);
+    location.reload();
+    return false;
+  }
+
+  const {data: perfil} = await SB.from("perfiles").select("*").eq("id",SESION.user.id).maybeSingle();
+  const {data: cuenta, error} = await SB.from("cuentas").select("*").eq("id",elegida.id).maybeSingle();
+  if(error) throw error;
+  CUENTA = cuenta || elegida;
+  PERFIL = Object.assign({},perfil||{id:SESION.user.id,cuenta_id:elegida.id,nombre:SESION.user.user_metadata&&SESION.user.user_metadata.nombre,correo:SESION.user.email}, {rol:elegida.rol||"admin"});
   return !!CUENTA;
 }
+
 
 /* ---------- ¿Eres de Hey Makers? ----------
    La puerta de Makers Lab no es una dirección secreta: quien la adivinara
@@ -590,36 +616,32 @@ async function revisaStaff(){
 
 /* ---------- El selector de empresa ---------- */
 function pintaEmpresas(){
-  const sel = q("#empresaSel"), caja = q("#perfilEmpresas");
+  const sel=q("#empresaSel"), caja=q("#perfilEmpresas"), link=q("#otrosNegocios");
   if(!sel) return;
-  const varias = EMPRESAS.length > 1;
-  if(caja) caja.hidden = !varias && !SOY_STAFF;   // con una sola empresa no estorba, salvo que seas tú
-  if(caja && caja.hidden) return;
-
-  sel.innerHTML = EMPRESAS.map(e=>
-      '<option value="'+e.id+'"'+(e.activa?" selected":"")+'>'+escTxt(e.nombre||"Sin nombre")+'</option>'
-    ).join("") + '<option value="__nueva">+ Abrir otra empresa…</option>';
+  const imprentas=EMPRESAS.filter(e=>productosEmpresa(e).includes("taller"));
+  const otros=EMPRESAS.some(e=>productosEmpresa(e).some(p=>p!=="taller"));
+  const mostrar=(imprentas.length>1)||otros||SOY_STAFF;
+  if(caja) caja.hidden=!mostrar;
+  if(link) link.hidden=!otros;
+  if(!mostrar) return;
+  sel.innerHTML=imprentas.map(e=>'<option value="'+escTxt(e.id)+'"'+(e.activa?' selected':'')+'>'+escTxt(e.nombre||"Sin nombre")+'</option>').join("");
 }
 
 async function cambiaEmpresa(destino){
-  const sel = q("#empresaSel");
-  if(destino === "__nueva"){
-    const nombre = prompt("¿Cómo se llama la nueva empresa?\n\nVa completamente aparte: su propio catálogo, sus clientes y sus números. Nada se mezcla con la que ya tienes.");
-    if(!nombre){ pintaEmpresas(); return; }
-    if(sel) sel.disabled = true;
-    const {error} = await SB.rpc("crear_empresa", {nombre});
-    if(error){ alert("No se pudo crear: "+error.message); if(sel) sel.disabled = false; pintaEmpresas(); return; }
-    location.reload();
+  const sel=q("#empresaSel");
+  if(!EMPRESAS.some(e=>e.id===destino&&productosEmpresa(e).includes("taller"))){
+    if(sel) pintaEmpresas();
     return;
   }
-  if(sel) sel.disabled = true;
-  const {error} = await SB.rpc("cambiar_empresa", {destino});
+  if(sel) sel.disabled=true;
+  const {error}=await SB.rpc("cambiar_empresa",{destino});
   if(error){
-    alert(String(error.message).indexOf("NO_ERES_DE_ESA_EMPRESA") >= 0
-      ? "No perteneces a esa empresa." : error.message);
-    if(sel) sel.disabled = false; pintaEmpresas(); return;
+    alert(String(error.message).indexOf("NO_ERES_DE_ESA_EMPRESA")>=0?"No perteneces a ese negocio de Imprenta.":error.message);
+    if(sel) sel.disabled=false;
+    pintaEmpresas();
+    return;
   }
-  location.reload();   // se recarga entera: el catálogo y todo lo demás son otros
+  location.reload();
 }
 
 async function arrancaSesion(){

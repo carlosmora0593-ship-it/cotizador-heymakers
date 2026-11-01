@@ -1,4 +1,4 @@
-const CACHE_NAME = "makers-tiendita-v7-cuentas";
+const CACHE_NAME = "makers-tiendita-v9-negocios";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f5f5f7"><title>Acceso · Nuvoor</title>
-<link rel="stylesheet" href="./acceso.css?v=20261031-1720">
+<link rel="stylesheet" href="./acceso.css?v=20261031-1913">
 </head>
 <body>
 <header class="top"><a class="brand" href="https://nuvoor.mx"><span class="mark">N</span><span>Nuvoor</span></a><a href="https://nuvoor.mx">Volver a Nuvoor</a></header>
@@ -30,8 +30,8 @@
     </section>
     <section class="card" id="accountPanel" hidden><div class="accountTop"><div><h2 id="accountTitle">Tu cuenta Makers</h2><p class="sub" id="accountEmail"></p></div><button class="logout" id="logout" type="button">Cerrar sesión</button></div>
       <div class="status" id="accountStatus"></div><small id="accountErrorDetail" class="help" hidden></small><div id="productOptions"></div>
-      <div class="actions"><button class="btn" id="manageBtn" type="button">Ver licencias</button></div>
-      <section class="license" id="licensePanel" hidden><h3>Licencias de tu cuenta</h3><p id="licenseIntro">Cada licencia cubre un sistema.</p><div class="licProducts" id="licenseProducts"></div><div class="licGrid" id="licenseCards"></div><div class="notice" id="paymentNotice" hidden></div></section>
+      <section class="addBusiness" id="addBusinessPanel" hidden><h3>Agregar un negocio</h3><p>Elige su sistema y asígnale un nombre. Tendrá su propia cuenta y sus propios datos.</p><form id="addBusinessForm"><div class="field"><label for="newBusinessProduct">Sistema</label><select id="newBusinessProduct"><option value="taller">Nuvoor Imprenta</option><option value="restaurant">Nuvoor Restaurant</option><option value="tiendita">Nuvoor Store</option></select></div><div class="field"><label for="newBusinessName">Nombre del negocio</label><input id="newBusinessName" maxlength="100" required placeholder="Mi nuevo negocio"></div><button class="btn" id="createBusiness" type="submit">Crear negocio</button><p class="msg" id="newBusinessMessage" role="status" aria-live="polite"></p></form></section>
+      <section class="license" id="licensePanel" hidden><h3>Licencias del negocio</h3><p id="licenseIntro">Cada licencia cubre un sistema.</p><div class="licProducts" id="licenseProducts"></div><div class="licGrid" id="licenseCards"></div><div class="notice" id="paymentNotice" hidden></div></section>
       <a class="backLink" href="https://nuvoor.mx">Ver todos los productos de Nuvoor</a>
     </section>
     <section class="card" id="loadingPanel"><div class="spinner" aria-label="Cargando"></div></section>
@@ -39,5 +39,5 @@
 </main>
 <footer>Nuvoor · Nuvoor Imprenta · Nuvoor Restaurant · Nuvoor Store</footer>
 <script src="./config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="./acceso.js?v=20261031-1745"></script>
+<script src="./acceso.js?v=20261031-1913"></script>
 </body></html>

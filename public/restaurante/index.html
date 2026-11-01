@@ -2310,46 +2310,75 @@ function restaurantGate(title,message,detail){
   document.getElementById("restaurantAuthTitle").textContent=title;
   document.getElementById("restaurantAuthMessage").textContent=message;
   document.getElementById("restaurantAuthDetail").textContent=detail||"";
-  const license=document.getElementById("restaurantAuthLicenses");license.hidden=!RESTAURANT_SESSION;
+  const license=document.getElementById("restaurantAuthLicenses"),access=document.getElementById("restaurantAuthAccess");license.hidden=!RESTAURANT_SESSION;access.href="../acceso.html?producto=restaurant";access.textContent="Tus negocios · agregar Restaurant";
   document.getElementById("restaurantAuthSwitch").addEventListener("click",async()=>{try{if(RESTAURANT_SB)await RESTAURANT_SB.auth.signOut();}catch(_){}finally{restaurantClearCachedSession();location.replace("../acceso.html?producto=restaurant");}});
   return null;
 }
 function restaurantCachedSupabaseSession(){
   try{const project=new URL(window.CONFIG.SUPABASE_URL).hostname.split(".")[0],raw=localStorage.getItem("sb-"+project+"-auth-token"),state=JSON.parse(raw||"null"),sess=state&&(state.currentSession||state);return sess&&sess.user&&sess.user.id?sess:null;}catch(_){return null;}
 }
+function restaurantLastAccountKey(userId){return "nuvoor_restaurant_last_v1_"+restaurantSafeId(userId);}
+function restaurantAccountCacheKey(userId){return "nuvoor_restaurant_account_v1_"+restaurantSafeId(userId);}
 function restaurantCachedAccount(userId){
-  try{const info=JSON.parse(localStorage.getItem(RESTAURANT_ACCOUNT_CACHE_KEY)||"null");return info&&info.userId===userId&&info.accountId?info:null;}catch(_){return null;}
+  try{const info=JSON.parse(localStorage.getItem(restaurantAccountCacheKey(userId))||localStorage.getItem(RESTAURANT_ACCOUNT_CACHE_KEY)||"null");return info&&info.userId===userId&&info.accountId?info:null;}catch(_){return null;}
 }
 function restaurantEsErrorRed(e){return !navigator.onLine||/failed to fetch|network|load failed|timeout|timed out/i.test(String(e&&e.message||e||""));}
 async function restaurantWithTimeout(promise,ms){let timer;try{return await Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error("La conexión tardó demasiado.")),ms);})]);}finally{clearTimeout(timer);}}
 async function restaurantResolveAccount(client,session){
-  const errores=[];let cuenta=null,perfil=null;
-  async function porId(id){if(!id)return null;let r=await client.from("cuentas").select("id,nombre,producto,productos").eq("id",id).maybeSingle();if(r.error&&/productos/i.test(r.error.message||""))r=await client.from("cuentas").select("id,nombre,producto").eq("id",id).maybeSingle();if(r.error){errores.push(r.error);return null;}return r.data||null;}
-  try{const r=await client.rpc("mi_cuenta");if(r.error)errores.push(r.error);else cuenta=await porId(Array.isArray(r.data)?r.data[0]:r.data);}catch(e){errores.push(e);}
-  if(!cuenta){try{const r=await client.from("mis_empresas").select("*");if(r.error)errores.push(r.error);else{const rows=r.data||[],activa=rows.find(x=>x.activa)||rows[0];if(activa)cuenta=await porId(activa.id);}}catch(e){errores.push(e);}}
-  if(!cuenta){try{const r=await client.from("membresias").select("cuenta_id,creado").eq("usuario_id",session.user.id).order("creado");if(r.error)errores.push(r.error);else if(r.data&&r.data[0])cuenta=await porId(r.data[0].cuenta_id);}catch(e){errores.push(e);}}
-  try{const r=await client.from("perfiles").select("id,cuenta_id,cuenta_activa,nombre,correo,rol").eq("id",session.user.id).maybeSingle();if(r.error)errores.push(r.error);else perfil=r.data||null;}catch(e){errores.push(e);}
-  if(!cuenta&&perfil)cuenta=await porId(perfil.cuenta_activa||perfil.cuenta_id);
-  if(!cuenta){const cause=errores.find(Boolean),err=new Error("No pudimos identificar la cuenta de este negocio.");err.code=cause&&cause.code;err.detail=[err.code,cause&&cause.message].filter(Boolean).join(" · ").slice(0,240)||"La base no devolvió una cuenta para esta sesión.";throw err;}
-  return cuenta;
+  const errors=[],params=new URLSearchParams(location.search),requested=params.get("cuenta"),lastId=localStorage.getItem(restaurantLastAccountKey(session.user.id));
+  let rows=[],negociosDisponible=false;
+  try{const check=await client.rpc("nuvoor_negocios_disponible");negociosDisponible=!check.error&&check.data===true;}catch(_){}
+  const list=await client.from("mis_empresas").select("*");
+  if(list.error){const e=new Error("No pudimos revisar tus negocios.");e.code=list.error.code;e.detail=[list.error.code,list.error.message].filter(Boolean).join(" · ").slice(0,240);throw e;}
+  rows=list.data||[];
+  const businesses=[];
+  for(const row of rows){
+    if(!row||!row.id)continue;
+    let detail=null;
+    try{const r=await client.from("cuentas").select("*").eq("id",row.id).maybeSingle();if(r.error)errors.push(r.error);else detail=r.data||null;}catch(e){errors.push(e);}
+    const products=Array.isArray(row.productos)&&row.productos.length?row.productos:Array.isArray(detail&&detail.productos)&&detail.productos.length?detail.productos:[(row.producto||detail&&detail.producto)].filter(Boolean);
+    businesses.push(Object.assign({},detail||{},row,{id:row.id,nombre:(detail&&detail.nombre)||row.nombre||"Mi Restaurant",producto:(detail&&detail.producto)||row.producto||products[0]||"",productos:products,activa:!!row.activa}));
+  }
+  let choice=null;
+  if(requested){
+    choice=businesses.find(x=>x.id===requested);
+    if(!choice)throw new Error("No perteneces a la cuenta solicitada. Abre Restaurant desde Tus negocios.");
+    if(!choice.productos.length&&!negociosDisponible)return {faltaMigracion:true};
+    if(!choice.productos.includes("restaurant"))throw new Error("Esta cuenta no tiene Nuvoor Restaurant.");
+  }else if(lastId){
+    choice=businesses.find(x=>x.id===lastId&&x.productos.includes("restaurant"));
+  }
+  if(!choice)choice=businesses.find(x=>x.activa&&x.productos.includes("restaurant"));
+  const restaurants=businesses.filter(x=>x.productos.includes("restaurant"));
+  if(!choice&&restaurants.length===1)choice=restaurants[0];
+  if(!choice&&restaurants.length>1){location.replace("../acceso.html?producto=restaurant");return null;}
+  if(!choice&&!restaurants.length){if(!negociosDisponible&&businesses.some(x=>!x.productos.length))return {faltaMigracion:true};return {sinRestaurant:true,negocioActivo:businesses.find(x=>x.activa)||null};}
+  if(!choice)throw new Error("No pudimos elegir una cuenta de Nuvoor Restaurant.");
+  return choice;
 }
 async function preparaCuentaRestaurant(){
   if(!window.CONFIG||!CONFIG.SUPABASE_URL)return restaurantGate("No se pudo cargar la conexión","Nuvoor Restaurant necesita la configuración de Supabase para abrir una cuenta.","Revisa que ../config.js cargue en esta publicación.");
-  const cachedSession=restaurantCachedSupabaseSession(),cachedAccount=cachedSession&&restaurantCachedAccount(cachedSession.user.id);
-  if(!navigator.onLine){if(cachedSession&&cachedAccount&&Array.isArray(cachedAccount.productos)&&cachedAccount.productos.includes("restaurant")){RESTAURANT_SESSION=cachedSession;return cachedAccount;}return restaurantGate("Necesitas internet para entrar la primera vez","Conéctate a internet para identificar tu cuenta Nuvoor. Después, Restaurant podrá abrir con la sesión guardada y los datos de este dispositivo.");}
-  if(!window.supabase){if(cachedSession&&cachedAccount&&Array.isArray(cachedAccount.productos)&&cachedAccount.productos.includes("restaurant")){RESTAURANT_SESSION=cachedSession;return cachedAccount;}return restaurantGate("No se pudo abrir la sesión","Nuvoor no pudo cargar su conexión de acceso. Conéctate a internet y vuelve a intentarlo.");}
+  const cachedSession=restaurantCachedSupabaseSession(),cachedAccount=cachedSession&&restaurantCachedAccount(cachedSession.user.id),requested=new URLSearchParams(location.search).get("cuenta");
+  if(!navigator.onLine){if(cachedSession&&cachedAccount&&Array.isArray(cachedAccount.productos)&&cachedAccount.productos.includes("restaurant")&&(!requested||requested===cachedAccount.accountId)){RESTAURANT_SESSION=cachedSession;return cachedAccount;}return restaurantGate("Necesitas internet para elegir el negocio","Conéctate a internet para identificar tu cuenta Nuvoor. Restaurant podrá abrir sin conexión después de verificar el negocio en este dispositivo.");}
+  if(!window.supabase){if(cachedSession&&cachedAccount&&restaurantEsErrorRed(new Error("network"))&&Array.isArray(cachedAccount.productos)&&cachedAccount.productos.includes("restaurant")&&(!requested||requested===cachedAccount.accountId)){RESTAURANT_SESSION=cachedSession;return cachedAccount;}return restaurantGate("No se pudo abrir la sesión","Nuvoor no pudo cargar su conexión de acceso. Conéctate a internet y vuelve a intentarlo.");}
   RESTAURANT_SB=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
   try{
     const {data,error}=await restaurantWithTimeout(RESTAURANT_SB.auth.getSession(),5000);if(error)throw error;
     RESTAURANT_SESSION=data&&data.session||null;
-  }catch(e){if(cachedSession&&cachedAccount&&restaurantEsErrorRed(e)&&Array.isArray(cachedAccount.productos)&&cachedAccount.productos.includes("restaurant")){RESTAURANT_SESSION=cachedSession;return cachedAccount;}return restaurantGate("No se pudo revisar la sesión","No pudimos confirmar el acceso a Nuvoor Restaurant. Revisa tu conexión e inténtalo otra vez.",String(e&&e.code?e.code+" · ":"")+(e&&e.message||""));}
+  }catch(e){if(cachedSession&&cachedAccount&&restaurantEsErrorRed(e)&&Array.isArray(cachedAccount.productos)&&cachedAccount.productos.includes("restaurant")&&(!requested||requested===cachedAccount.accountId)){RESTAURANT_SESSION=cachedSession;return cachedAccount;}return restaurantGate("No se pudo revisar la sesión","No pudimos confirmar el acceso a Nuvoor Restaurant. Revisa tu conexión e inténtalo otra vez.",String(e&&e.code?e.code+" · ":"")+(e&&e.message||""));}
   if(!RESTAURANT_SESSION){location.replace("../acceso.html?producto=restaurant");return null;}
   try{
-    const cuenta=await restaurantWithTimeout(restaurantResolveAccount(RESTAURANT_SB,RESTAURANT_SESSION),7000),productos=Array.isArray(cuenta.productos)?cuenta.productos:[cuenta.producto].filter(Boolean);
-    const info={accountId:cuenta.id,accountName:cuenta.nombre||"Mi negocio",userId:RESTAURANT_SESSION.user.id,productos,actualizado:new Date().toISOString()};localStorage.setItem(RESTAURANT_ACCOUNT_CACHE_KEY,JSON.stringify(info));
-    if(!productos.includes("restaurant"))return restaurantGate("Esta cuenta no tiene Restaurant","La cuenta "+info.accountName+" no incluye Nuvoor Restaurant. Revisa sus licencias o entra con otra cuenta.");
+    const cuenta=await restaurantWithTimeout(restaurantResolveAccount(RESTAURANT_SB,RESTAURANT_SESSION),7000);
+    if(!cuenta)return null;
+    if(cuenta.faltaMigracion)return restaurantGate("Falta preparar los negocios separados","No podemos identificar el negocio de Restaurant en esta cuenta todavía.","Desde el Lab → Base de datos, ejecuta sql/19-negocios-por-correo.sql y vuelve a entrar.");
+    if(cuenta.sinRestaurant){const gate=restaurantGate("Esta cuenta no tiene Restaurant","No encontramos un negocio Nuvoor Restaurant para esta sesión.","Agrega un Restaurant desde Tus negocios. El nuevo negocio tendrá su propia cuenta y sus datos separados.");const access=document.getElementById("restaurantAuthAccess");access.textContent="Agregar un Restaurant";return gate;}
+    const products=Array.isArray(cuenta.productos)?cuenta.productos:[cuenta.producto].filter(Boolean);
+    if(!products.includes("restaurant"))return restaurantGate("Esta cuenta no tiene Restaurant","El negocio "+(cuenta.nombre||"seleccionado")+" no tiene Nuvoor Restaurant.","Elige otro negocio o agrega Restaurant desde Tus negocios.");
+    const info={accountId:cuenta.id,accountName:cuenta.nombre||"Mi negocio",userId:RESTAURANT_SESSION.user.id,productos:products,producto:cuenta.producto,activa:cuenta.activa,actualizado:new Date().toISOString()};
+    localStorage.setItem(restaurantLastAccountKey(info.userId),info.accountId);
+    localStorage.setItem(restaurantAccountCacheKey(info.userId),JSON.stringify(info));
     return info;
-  }catch(e){if(restaurantEsErrorRed(e)&&cachedAccount&&Array.isArray(cachedAccount.productos)&&cachedAccount.productos.includes("restaurant")){RESTAURANT_SESSION=RESTAURANT_SESSION||cachedSession;return cachedAccount;}return restaurantGate("No pudimos abrir la cuenta","Restaurant no pudo identificar la cuenta conectada.",e.detail||[e.code,e.message].filter(Boolean).join(" · ").slice(0,240));}
+  }catch(e){if(restaurantEsErrorRed(e)&&cachedAccount&&Array.isArray(cachedAccount.productos)&&cachedAccount.productos.includes("restaurant")&&(!requested||requested===cachedAccount.accountId)){RESTAURANT_SESSION=RESTAURANT_SESSION||cachedSession;return cachedAccount;}return restaurantGate("No pudimos abrir la cuenta","Restaurant no pudo identificar la cuenta conectada.",e.detail||[e.code,e.message].filter(Boolean).join(" · ").slice(0,240));}
 }
 function restaurantLegacyData(){
   const read=name=>{try{return JSON.parse(localStorage.getItem(RESTAURANT_LEGACY_BASE+"_"+name)||"null");}catch(_){return null;}};
@@ -7730,7 +7759,7 @@ function arrancaEquipo(){
 function start(){
   const nombreCuenta=RESTAURANT_ACCOUNT.accountName||"Mi negocio";
   ["restaurantAccountName","restaurantAccountNameSettings"].forEach(id=>{const n=document.getElementById(id);if(n)n.textContent=nombreCuenta;});
-  function cambiarDePOS(){location.replace("../acceso.html"+(new URLSearchParams(location.search).get("app")==="android"?"?app=android":""));}
+  function cambiarDePOS(){const query=new URLSearchParams({producto:"restaurant"});if(new URLSearchParams(location.search).get("app")==="android")query.set("app","android");location.replace("../acceso.html?"+query.toString());}
   async function cerrarSesionRestaurant(){
     try{guardaYa();}catch(_){}
     try{if(RESTAURANT_SB)await RESTAURANT_SB.auth.signOut();}catch(_){}
