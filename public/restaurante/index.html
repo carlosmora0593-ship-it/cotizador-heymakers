@@ -344,6 +344,7 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
 .edo.preparando{background:var(--warn-soft);color:var(--warn)}
 .edo.listo{background:var(--good-soft);color:var(--good)}
 .edo.entregada{background:var(--cyan-soft);color:var(--cyan)}
+.lin .impresoEstado{color:var(--good);font-weight:700}
 .lin.cancelada{opacity:.5;text-decoration:line-through}
 
 /* ---------- cocina ---------- */
@@ -1354,6 +1355,12 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 .av{position:relative;overflow:hidden;box-sizing:border-box;min-width:0;min-height:0}
 .av img{position:absolute;inset:0;display:block;width:100%;height:100%;min-width:0;min-height:0;max-width:none;max-height:none;object-fit:cover;border-radius:inherit}
 .restaurantSessionActions{display:flex;align-items:center;gap:6px;min-width:0}.restaurantSessionActions>span{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-2);font-size:11px;font-weight:700}.restaurantSessionActions button{white-space:nowrap}@media(max-width:620px){.restaurantSessionActions{order:3;flex:1 0 100%;width:100%;gap:6px}.restaurantSessionActions>span{display:none}.restaurantSessionActions button{flex:1 1 auto;min-width:0;padding:7px 8px;font-size:10px}#btnContextoPOS{order:4}#pwaInstall{order:5}#turnoChip{order:6}}
+.restaurantSyncIndicator{display:inline-flex;align-items:center;gap:6px;max-width:230px;min-width:0;color:var(--ink-2);font-size:10px;font-weight:750;line-height:1.2}
+.restaurantSyncIndicator i{width:8px;height:8px;flex:none;border-radius:50%;background:var(--ink-3)}
+.restaurantSyncIndicator span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.restaurantSyncIndicator.enlinea i{background:var(--good)}.restaurantSyncIndicator.pendiente i{background:var(--warn)}
+.restaurantSyncIndicator.error i{background:var(--mal)}.restaurantSyncIndicator.local i{background:var(--ink-3)}
+@media(max-width:620px){.restaurantSyncIndicator{order:7;flex:1 0 100%;max-width:none;font-size:10.5px}.restaurantSyncIndicator span{white-space:normal}}
 @media(max-width:540px){.businessLogoSetting{align-items:flex-start}.businessLogoControls{min-width:0}.fotoUsuarioControl{min-width:120px}}
 </style>
 <style>
@@ -1403,8 +1410,11 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 .impPrinterError strong{display:block;font-size:12px}
 .impPrinterError small{display:block;margin-top:2px;color:var(--ink-2);font-size:10.5px}
 .impPrinterError button{border:1px solid var(--accent);border-radius:var(--radio-sm);background:var(--accent);color:var(--accent-ink);padding:7px 10px;font:inherit;font-size:11px;font-weight:700;cursor:pointer}
+.meseroOculto{display:none!important}
 @media(max-width:900px){.impPrinterLayout{grid-template-columns:1fr}}
 @media(max-width:540px){.impPrinterFields{grid-template-columns:1fr}.impPrinterConnection{grid-template-columns:1fr}.impPrinterActions .impSave{margin-left:0}.impPrinterError{grid-template-columns:1fr auto}}
+#comAcciones .btn,#comCancelar{min-height:44px;touch-action:manipulation}
+@media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 </head>
 <body>
@@ -1434,6 +1444,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <button class="btn sm ghost" id="restaurantChangePOS" type="button">Cambiar de POS</button>
       <button class="btn sm ghost" id="restaurantSignOut" type="button">Cerrar sesión</button>
     </div>
+    <span class="restaurantSyncIndicator local" id="restaurantSync" role="status" aria-live="polite"><i aria-hidden="true"></i><span id="restaurantSyncText">Guardando en este aparato</span></span>
     <button class="btn sm pwaInstall" id="pwaInstall" type="button" hidden style="white-space:nowrap;margin-left:auto">Instalar app</button>
     <button class="candadoBtn" id="btnBloquea" type="button" title="Bloquear la pantalla" aria-label="Bloquear la pantalla">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1729,7 +1740,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <header><h2>La cuenta</h2><span class="hint" id="comFolio" style="margin-left:auto;font-size:11px;color:var(--ink-3)"></span></header>
       <div class="ticketCuerpo" id="comLineas"></div>
       <div class="ticketPie" id="comSuma"></div>
-      <div style="padding:0 15px 15px;display:flex;gap:8px;flex-wrap:wrap">
+      <div id="comAcciones" style="padding:0 15px 15px;display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn primary" id="comEnviar" style="flex:1">Mandar a cocina</button>
         <button class="btn acento" id="comCobrar" style="flex:1">Cobrar</button>
       </div>
@@ -2184,6 +2195,37 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
   </div>
 </div>
 
+<div class="modal" id="restaurantNubeConflicto" hidden role="dialog" aria-modal="true" aria-labelledby="restaurantNubeTitulo">
+  <div class="card" style="width:min(520px,100%)">
+    <header><h2 id="restaurantNubeTitulo">Hay datos en este aparato y en la nube</h2></header>
+    <div class="body">
+      <p id="restaurantNubeDetalle" class="note" style="margin:0 0 14px">Para no mezclar comandas, elige qué datos abrir.</p>
+      <p id="restaurantNubeRespaldoAviso" class="hint" aria-live="polite" hidden></p>
+      <div class="grid" style="gap:9px">
+        <button class="btn" id="restaurantNubeBajar" type="button">Bajar respaldo y usar la nube</button>
+        <button class="btn primary" id="restaurantNubeUsar" type="button">Usar los de la nube</button>
+        <button class="btn ghost" id="restaurantNubeLocal" type="button">Seguir con los de este aparato</button>
+      </div>
+      <small class="hint" style="display:block;margin-top:12px">Si eliges «Bajar respaldo y usar la nube», descarga una copia antes de reemplazar los datos de trabajo de este aparato. Si sigues con lo local, sus datos se quedan aquí.</small>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="restaurantNubeMigracion" hidden role="dialog" aria-modal="true" aria-labelledby="restaurantNubeMigracionTitulo">
+  <div class="card" style="width:min(520px,100%)">
+    <header><h2 id="restaurantNubeMigracionTitulo">Subir los datos de esta tablet</h2></header>
+    <div class="body">
+      <p id="restaurantNubeMigracionDetalle" class="note" style="margin:0 0 14px"></p>
+      <div class="grid" style="gap:9px">
+        <button class="btn primary" id="restaurantNubeMigracionSi" type="button">Sí, subir a la nube</button>
+        <button class="btn" id="restaurantNubeMigracionLocal" type="button">Sólo este aparato</button>
+        <button class="btn ghost" id="restaurantNubeMigracionCancelar" type="button">Decidir después</button>
+      </div>
+      <small class="hint" style="display:block;margin-top:12px">Los datos originales de esta tablet no se borran.</small>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="modalTurno" hidden>
   <div class="card">
     <header><h2 id="turnoTitulo">Abrir turno</h2><button class="btn sm" id="turnoCerrarX" style="margin-left:auto">Cerrar</button></header>
@@ -2329,7 +2371,23 @@ async function restaurantResolveAccount(client,session){
   let rows=[],negociosDisponible=false;
   try{const check=await client.rpc("nuvoor_negocios_disponible");negociosDisponible=!check.error&&check.data===true;}catch(_){}
   const list=await client.from("mis_empresas").select("*");
-  if(list.error){const e=new Error("No pudimos revisar tus negocios.");e.code=list.error.code;e.detail=[list.error.code,list.error.message].filter(Boolean).join(" · ").slice(0,240);throw e;}
+  if(list.error){
+    const cached=restaurantCachedAccount(session.user.id);
+    if(!negociosDisponible){
+      if(cached&&(!requested||requested===cached.accountId))return Object.assign({},cached,{producto:"restaurant",productos:["restaurant"],localOnly:true});
+      let legacyId=null;
+      try{const legacy=await client.rpc("mi_cuenta");if(!legacy.error)legacyId=Array.isArray(legacy.data)?legacy.data[0]:legacy.data;}catch(e){errors.push(e);}
+      if(legacyId&&(!requested||requested===legacyId)){
+        try{
+          const legacyAccount=await client.from("cuentas").select("*").eq("id",legacyId).maybeSingle();
+          const row=legacyAccount.data,products=Array.isArray(row&&row.productos)?row.productos:[row&&row.producto].filter(Boolean);
+          if(!legacyAccount.error&&row&&products.includes("restaurant"))return Object.assign({},row,{id:legacyId,productos:["restaurant"],localOnly:true});
+          if(legacyAccount.error)errors.push(legacyAccount.error);
+        }catch(e){errors.push(e);}
+      }
+    }
+    const e=new Error("No pudimos revisar tus negocios.");e.code=list.error.code;e.detail=[list.error.code,list.error.message].filter(Boolean).join(" · ").slice(0,240);throw e;
+  }
   rows=list.data||[];
   const businesses=[];
   for(const row of rows){
@@ -2339,16 +2397,24 @@ async function restaurantResolveAccount(client,session){
     const products=Array.isArray(row.productos)&&row.productos.length?row.productos:Array.isArray(detail&&detail.productos)&&detail.productos.length?detail.productos:[(row.producto||detail&&detail.producto)].filter(Boolean);
     businesses.push(Object.assign({},detail||{},row,{id:row.id,nombre:(detail&&detail.nombre)||row.nombre||"Mi Restaurant",producto:(detail&&detail.producto)||row.producto||products[0]||"",productos:products,activa:!!row.activa}));
   }
+  const cached=restaurantCachedAccount(session.user.id);
+  const localRestaurant=row=>{
+    if(!row||row.productos.length||negociosDisponible)return row;
+    const yaElegido=requested===row.id||!!(cached&&cached.accountId===row.id)||
+      (lastId===row.id&&cached&&cached.accountId===row.id)||businesses.length===1;
+    if(!yaElegido)return row;
+    row.producto="restaurant";row.productos=["restaurant"];row.localOnly=true;
+    return row;
+  };
   let choice=null;
   if(requested){
-    choice=businesses.find(x=>x.id===requested);
+    choice=localRestaurant(businesses.find(x=>x.id===requested));
     if(!choice)throw new Error("No perteneces a la cuenta solicitada. Abre Restaurant desde Tus negocios.");
-    if(!choice.productos.length&&!negociosDisponible)return {faltaMigracion:true};
     if(!choice.productos.includes("restaurant"))throw new Error("Esta cuenta no tiene Nuvoor Restaurant.");
   }else if(lastId){
-    choice=businesses.find(x=>x.id===lastId&&x.productos.includes("restaurant"));
+    choice=localRestaurant(businesses.find(x=>x.id===lastId&&(x.productos.includes("restaurant")||!negociosDisponible)));
   }
-  if(!choice)choice=businesses.find(x=>x.activa&&x.productos.includes("restaurant"));
+  if(!choice)choice=localRestaurant(businesses.find(x=>x.activa&&(x.productos.includes("restaurant")||!negociosDisponible)));
   const restaurants=businesses.filter(x=>x.productos.includes("restaurant"));
   if(!choice&&restaurants.length===1)choice=restaurants[0];
   if(!choice&&restaurants.length>1){location.replace("../acceso.html?producto=restaurant");return null;}
@@ -2374,7 +2440,7 @@ async function preparaCuentaRestaurant(){
     if(cuenta.sinRestaurant){const gate=restaurantGate("Esta cuenta no tiene Restaurant","No encontramos un negocio Nuvoor Restaurant para esta sesión.","Agrega un Restaurant desde Tus negocios. El nuevo negocio tendrá su propia cuenta y sus datos separados.");const access=document.getElementById("restaurantAuthAccess");access.textContent="Agregar un Restaurant";return gate;}
     const products=Array.isArray(cuenta.productos)?cuenta.productos:[cuenta.producto].filter(Boolean);
     if(!products.includes("restaurant"))return restaurantGate("Esta cuenta no tiene Restaurant","El negocio "+(cuenta.nombre||"seleccionado")+" no tiene Nuvoor Restaurant.","Elige otro negocio o agrega Restaurant desde Tus negocios.");
-    const info={accountId:cuenta.id,accountName:cuenta.nombre||"Mi negocio",userId:RESTAURANT_SESSION.user.id,productos:products,producto:cuenta.producto,activa:cuenta.activa,actualizado:new Date().toISOString()};
+    const info={accountId:cuenta.id,accountName:cuenta.nombre||"Mi negocio",userId:RESTAURANT_SESSION.user.id,productos:products,producto:cuenta.producto,activa:cuenta.activa,localOnly:!!cuenta.localOnly,actualizado:new Date().toISOString()};
     localStorage.setItem(restaurantLastAccountKey(info.userId),info.accountId);
     localStorage.setItem(restaurantAccountCacheKey(info.userId),JSON.stringify(info));
     return info;
@@ -2415,7 +2481,7 @@ const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c =>
   ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const mx = n => "$" + (Math.round(num(n)*100)/100).toLocaleString("es-MX",
   {minimumFractionDigits:2, maximumFractionDigits:2});
-const uid = () => Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4);
+const uid = () => { try{ if(window.crypto&&crypto.randomUUID) return crypto.randomUUID(); }catch(e){} return Math.random().toString(36).slice(2,10) + Date.now().toString(36).slice(-4); };
 const dos = n => String(n).padStart(2,"0");
 const hoyISO = () => { const d=new Date(); return d.getFullYear()+"-"+dos(d.getMonth()+1)+"-"+dos(d.getDate()); };
 const horaAhora = () => { const d=new Date(); return dos(d.getHours())+":"+dos(d.getMinutes()); };
@@ -2448,11 +2514,12 @@ function leeContextoPOS(){
     return c && c.tipo==="evento" && EVENTOS.some(e=>e.id===c.id) ? c : null;
   }catch(e){ return null; }
 }
-const POS_CONTEXT = leeContextoPOS();
-const POS_EVENTO = POS_CONTEXT ? EVENTOS.find(e=>e.id===POS_CONTEXT.id) || null : null;
+let POS_CONTEXT = leeContextoPOS();
+let POS_EVENTO = POS_CONTEXT ? EVENTOS.find(e=>e.id===POS_CONTEXT.id) || null : null;
 document.body.classList.toggle("modoEvento",!!POS_EVENTO);
-const LS = POS_CONTEXT ? LS_BASE + "_evento_" + String(POS_CONTEXT.id).replace(/[^a-zA-Z0-9_-]/g, "") : LS_BASE;
-function guardaEventos(){ try{ localStorage.setItem(EVENTOS_KEY,JSON.stringify(EVENTOS)); return true; }catch(e){ toast("No se pudo guardar la agenda en este dispositivo."); return false; } }
+let LS = POS_CONTEXT ? LS_BASE + "_evento_" + String(POS_CONTEXT.id).replace(/[^a-zA-Z0-9_-]/g, "") : LS_BASE;
+const REST_LOCAL_START_KEYS = new Set(["menu","mesas","comandas","P","equipo","decor"].filter(k=>localStorage.getItem(LS+"_"+k)!==null));
+function guardaEventos(){ try{ localStorage.setItem(EVENTOS_KEY,JSON.stringify(EVENTOS));if(!restaurando&&REST_NUBE.enabled)sincronizaNubeEnSerie(true); return true; }catch(e){ toast("No se pudo guardar la agenda en este dispositivo."); return false; } }
 function prefijoEvento(id){ return LS_BASE + "_evento_" + String(id).replace(/[^a-zA-Z0-9_-]/g, ""); }
 function leerDatosEvento(id, clave, defecto){
   try{ const raw=localStorage.getItem(prefijoEvento(id)+"_"+clave); return raw===null?defecto:JSON.parse(raw); }
@@ -2554,45 +2621,190 @@ $("#btnContextoPOS").addEventListener("click",()=>{ if(POS_EVENTO) volverAlResta
 function lsGet(k, f){ try{ const v = localStorage.getItem(LS+"_"+k); return v ? JSON.parse(v) : f; }catch(e){ return f; } }
 function lsSet(k, v){ try{ localStorage.setItem(LS+"_"+k, JSON.stringify(v)); }catch(e){} }
 
+const REST_NUBE_QUEUE_KEY=LS_BASE+"_nube_salida_v1";
+const REST_NUBE_DEVICE_KEY=LS_BASE+"_nube_aparato_v1";
+const REST_NUBE_PROJECTION_KEY=LS_BASE+"_nube_proyeccion_v1";
 let DB = null, laNube = false;
 let guardaT = null;
 let restaurando = false;
-function guardaYa(){
-  clearTimeout(guardaT);
-  if(restaurando) return;
+const REST_NUBE={enabled:false,localOnly:false,ready:false,verified:false,deviceId:"",queue:[],serverDocs:{},projection:{},cursor:"1970-01-01T00:00:00.000Z",channel:null,poll:null,realtimeTimer:null,flushPromise:null,localDirty:false,applyPending:false,pinSalt:"",error:"",retryTimer:null,claimedLines:new Set(),failedPrints:new Set(),ticketIds:new Set(),incomingLines:new Set(),claimAlerts:[],claimBusy:new Set()};
+function nubeLee(key,defecto){try{const value=localStorage.getItem(key);return value?JSON.parse(value):defecto;}catch(_){return defecto;}}
+function nubeGuarda(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true;}catch(_){return false;}}
+function nubeDeviceId(){let id="";try{id=localStorage.getItem(REST_NUBE_DEVICE_KEY)||"";if(!id){id=uid();localStorage.setItem(REST_NUBE_DEVICE_KEY,id);}}catch(_){id=uid();}return id;}
+REST_NUBE.deviceId=nubeDeviceId();
+REST_NUBE.queue=nubeLee(REST_NUBE_QUEUE_KEY,[]);
+REST_NUBE.projection=nubeLee(REST_NUBE_PROJECTION_KEY,{});
+function estadoNube(tipo,texto){const el=$("#restaurantSync"),label=$("#restaurantSyncText");if(!el||!label)return;el.className="restaurantSyncIndicator "+tipo;label.textContent=texto;}
+function cantidadCambiosNube(queue){const grupos=new Set();(queue||[]).filter(q=>String(q&&q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)).forEach(q=>{const c=q&&q.cuerpo||{},id=q&&q.coleccion==="rest_comandas"?c.id:q&&q.coleccion==="rest_lineas"?c.comandaId:null;grupos.add(id?"comanda:"+id:(q&&q.key)||"");});return grupos.size;}
+function actualizaEstadoNube(){
+  const pendientes=cantidadCambiosNube(REST_NUBE.queue);
+  if(REST_NUBE.localOnly||!REST_NUBE.enabled){estadoNube("local","Sólo este aparato"+(REST_NUBE.error?" · "+REST_NUBE.error:""));return;}
+  if(!navigator.onLine){estadoNube("pendiente","Sin conexión · "+pendientes+" cambio"+(pendientes===1?"":"s")+" por subir");return;}
+  if(REST_NUBE.error){estadoNube("error","No se pudo sincronizar · "+(REST_NUBE.error||"revisa conexión"));return;}
+  if(pendientes){estadoNube("pendiente","Sincronizando · "+pendientes+" cambio"+(pendientes===1?"":"s"));return;}
+  estadoNube("enlinea","En línea");
+}
+function guardaEstadoLocal(){
+  if(restaurando)return;
+  lsSet("menu",MENU);lsSet("mesas",MESAS);lsSet("comandas",COMANDAS);
+  lsSet("turnos",TURNOS);lsSet("P",P);lsSet("equipo",EQUIPO);
+  lsSet("asistencias",ASISTENCIAS);lsSet("compras",COMPRAS);lsSet("recetas",RECETAS);lsSet("decor",DECOR);
+  try{localStorage.setItem(LS+"_latido",String(Date.now()));}catch(_){}
+}
+function guardaYa(){clearTimeout(guardaT);if(restaurando)return;guardaEstadoLocal();if(REST_NUBE.enabled)sincronizaNubeEnSerie(true);}
+function persist(){clearTimeout(guardaT);if(restaurando)return;REST_NUBE.localDirty=true;guardaT=setTimeout(()=>{guardaEstadoLocal();REST_NUBE.localDirty=false;if(REST_NUBE.enabled)sincronizaNubeEnSerie(false);},500);}
+window.addEventListener("pagehide",guardaYa);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)guardaYa();});
+window.addEventListener("online",async()=>{actualizaEstadoNube();if(REST_NUBE.enabled){const pendientes=COMANDAS.filter(c=>c.folioPendiente||c.appFolioPendiente);await Promise.all(pendientes.map(c=>reservaFolioNube(c,!!c.appId)));await sincronizaNubeEnSerie(true);}else if(!RESTAURANT_ACCOUNT.localOnly)iniciaNubeRestaurant();});
+window.addEventListener("offline",actualizaEstadoNube);
+function nubeClave(col,doc){return col+"|"+doc;}
+function nubePut(out,col,id,body){const docId=String(id);out[nubeClave(col,docId)]={cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:col,doc_id:docId,cuerpo:body};}
+function nubeEventoId(){return POS_EVENTO?String(POS_EVENTO.id):"";}
+function nubeId(tipo,id){const base=String(id||"general");return POS_EVENTO?"ev_"+restaurantSafeId(POS_EVENTO.id)+"_"+tipo+"_"+restaurantSafeId(base):tipo+"_"+restaurantSafeId(base);}
+function nubeClona(v){return v==null?v:JSON.parse(JSON.stringify(v));}
+function nubeFotoLocal(list,id,key){const found=(list||[]).find(x=>x&&x.id===id);return found&&found[key]||"";}
+async function nubeSha256(texto){const bytes=new TextEncoder().encode(texto);const hash=await crypto.subtle.digest("SHA-256",bytes);return Array.from(new Uint8Array(hash),b=>b.toString(16).padStart(2,"0")).join("");}
+function nubePinSalt(){if(REST_NUBE.pinSalt)return REST_NUBE.pinSalt;try{REST_NUBE.pinSalt=localStorage.getItem(LS_BASE+"_nube_pin_salt_v1")||"";}catch(_){}if(!REST_NUBE.pinSalt){const bytes=new Uint8Array(24);crypto.getRandomValues(bytes);REST_NUBE.pinSalt=Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");try{localStorage.setItem(LS_BASE+"_nube_pin_salt_v1",REST_NUBE.pinSalt);}catch(_){}}return REST_NUBE.pinSalt;}
+async function proyectaRestaurant(){
+  const out={},ev=nubeEventoId();
+  const f=P.fiscal||{},allowedConfig={nombre:P.negocio&&P.negocio.nombre||"Mi restaurante",tel:P.negocio&&P.negocio.tel||"",dir:P.negocio&&P.negocio.dir||"",iva:num(P.iva),propina:num(P.propina),servicio:num(P.servicio),apps:(P.apps||[]).map(a=>({id:a.id,nombre:a.nombre,comision:num(a.comision),color:a.color,activa:a.activa!==false})),fiscal:{razon:f.razon||"",rfc:f.rfc||"",regimen:f.regimen||"612",cpFiscal:f.cpFiscal||"",pac:f.pac||"",serie:f.serie||"A",folioFactura:num(f.folioFactura,1),sellosAlta:!!f.sellosAlta},ticket:{ancho:num(P.ticket&&P.ticket.ancho,80),encabezado:P.ticket&&P.ticket.encabezado||"",pie:P.ticket&&P.ticket.pie||"¡Gracias por su visita!",mostrarIva:P.ticket&&P.ticket.mostrarIva!==false,mostrarPropina:P.ticket&&P.ticket.mostrarPropina!==false,imprimeCocina:P.ticket&&P.ticket.imprimeCocina!==false,imprimeCuenta:P.ticket&&P.ticket.imprimeCuenta!==false,leyenda:P.ticket&&P.ticket.leyenda||""},folios:nubeClona(P.folios||{}),pinSalt:nubePinSalt()};
+  nubePut(out,"rest_config",nubeId("config","general"),Object.assign({eventoId:ev},allowedConfig));
+  (MENU.cats||[]).forEach(x=>nubePut(out,"rest_carta",nubeId("cat",x.id),Object.assign({tipo:"categoria",eventoId:ev},nubeClona(x))));
+  (MENU.grupos||[]).forEach(x=>nubePut(out,"rest_carta",nubeId("grupo",x.id),Object.assign({tipo:"grupo",eventoId:ev},nubeClona(x))));
+  (MENU.plats||[]).forEach(x=>{const safe=Object.assign({},x);delete safe.foto;delete safe.imagen;delete safe.base64;nubePut(out,"rest_carta",nubeId("plat",x.id),Object.assign({tipo:"platillo",eventoId:ev},safe));});
+  (MESAS||[]).forEach(x=>nubePut(out,"rest_mesas",nubeId("mesa",x.id),Object.assign({tipo:"mesa",eventoId:ev,croquis:P.croquis&&P.croquis[x.zona||"Salón"]?{fondo:P.croquis[x.zona||"Salón"].fondo||"cuadricula"}:null},nubeClona(x))));
+  (DECOR||[]).forEach(x=>nubePut(out,"rest_mesas",nubeId("decor",x.id),Object.assign({tipo:"decor",eventoId:ev},nubeClona(x))));
+  Object.keys(P.croquis||{}).forEach(z=>nubePut(out,"rest_mesas",nubeId("croquis",z),{tipo:"croquis",eventoId:ev,zona:z,fondo:P.croquis[z].fondo||"cuadricula"}));
+  (COMANDAS||[]).forEach(c=>{
+    const head=nubeClona(c);delete head.lineas;delete head.cancelaciones;delete head.reimpresiones;delete head.folioPendiente;delete head.appFolioPendiente;
+    head.eventoId=ev;head.estado=c.cancelada?"cancelada":c.estado==="cerrada"?"cobrada":"abierta";
+    nubePut(out,"rest_comandas",nubeId("comanda",c.id),head);
+  (c.lineas||[]).forEach(l=>{const item=Object.assign({},nubeClona(l),{id:l.id,comandaId:c.id,eventoId:ev,categoria:l.categoria||((MENU.plats||[]).find(p=>p.id===l.platId)||{}).catId||""});delete item.foto;delete item.imagen;delete item.base64;nubePut(out,"rest_lineas",nubeId("linea",l.id),item);});
+    (c.cancelaciones||[]).forEach(x=>nubePut(out,"rest_lineas",nubeId("cancelacion",x.id),Object.assign({tipo:"cancelacion",comandaId:c.id,eventoId:ev},nubeClona(x))));
+    if(c.estado==="cerrada"&&!c.cancelada){const ticket={id:c.id,folio:c.folio,fecha:c.fecha||hoyISO(),cierra:c.cierra||"",mesaId:c.mesaId,mesaNombre:c.mesaNombre,personas:c.personas,mesero:c.mesero,meseroId:c.meseroId,subtotal:num(c.subtotal),servicio:num(c.servicio),propina:num(c.propina),total:num(c.total),pagos:nubeClona(c.pagos||[]),cambio:num(c.cambio),appId:c.appId||"",appNombre:c.appNombre||"",comisionPct:num(c.comisionPct),comision:num(c.comision),neto:num(c.neto),turnoId:c.turnoId||"",cobro:c.cobro||"",eventoId:ev};nubePut(out,"rest_tickets",nubeId("ticket",c.id),ticket);}
+  });
+  for(const u of EQUIPO||[]){const pin=String(u.pin||"").trim(),hash=u.pin_hash||u.pinHash|| (pin?nubeSha256(nubePinSalt()+pin):null);const pin_hash=hash&&typeof hash.then==="function"?await hash:hash;nubePut(out,"rest_equipo",nubeId("persona",u.id),{id:u.id,nombre:u.nombre||"",rol:u.rol||"mesero",pin_hash:pin_hash||null,activo:u.activo!==false,eventoId:ev});}
+  (EVENTOS||[]).forEach(x=>nubePut(out,"rest_eventos",String(x.id),Object.assign({},nubeClona(x),{eventoId:""})));
+  return out;
+}
+function nubeQueueDoc(doc){const key=nubeClave(doc.coleccion,doc.doc_id),idx=REST_NUBE.queue.findIndex(x=>x.key===key),old=idx>=0?REST_NUBE.queue[idx]:{},entry=Object.assign({key,creado:new Date().toISOString(),intentos:0},doc);if(idx>=0){entry.creado=old.creado;entry.intentos=old.intentos||0;if(!Object.prototype.hasOwnProperty.call(doc,"impresionOffline")&&old.impresionOffline)entry.impresionOffline=old.impresionOffline;if(!Object.prototype.hasOwnProperty.call(doc,"confirmarImpresion")&&old.confirmarImpresion)entry.confirmarImpresion=old.confirmarImpresion;REST_NUBE.queue[idx]=entry;}else REST_NUBE.queue.push(entry);nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);}
+function nubeCanon(v){if(v===null||typeof v!=="object")return JSON.stringify(v);if(Array.isArray(v))return "["+v.map(nubeCanon).join(",")+"]";return "{"+Object.keys(v).sort().map(k=>JSON.stringify(k)+":"+nubeCanon(v[k])).join(",")+"}";}
+function nubeDocsDesdeServidor(){return Object.fromEntries(Object.entries(REST_NUBE.serverDocs).map(([k,v])=>[k,{cuenta_id:v.cuenta_id,coleccion:v.coleccion,doc_id:v.doc_id,cuerpo:v.cuerpo}]));}
+function nubeRebaseMap(){const out=nubeDocsDesdeServidor();REST_NUBE.queue.filter(q=>String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)).forEach(q=>out[q.key]={cuenta_id:q.cuenta_id,coleccion:q.coleccion,doc_id:q.doc_id,cuerpo:q.cuerpo});return out;}
+function nubeDocsDeContexto(docs){const ev=nubeEventoId();return Object.fromEntries(Object.entries(docs).filter(([,d])=>d&&d.coleccion!=="rest_contadores"&&d.coleccion!=="rest_locks"&&(d.coleccion==="rest_eventos"||(d.cuerpo&&String(d.cuerpo.eventoId||"")===ev))));}
+async function sincronizaNubeLocal(){
+  if(!REST_NUBE.enabled||REST_NUBE.localOnly||REST_NUBE.localDirty||restaurando)return;
+  const current=await proyectaRestaurant(),previous=REST_NUBE.projection||{};
+  Object.keys(current).forEach(key=>{const old=previous[key];if(!old||nubeCanon(old.cuerpo)!==nubeCanon(current[key].cuerpo)){if(current[key].coleccion==="rest_tickets"&&(REST_NUBE.ticketIds.has(current[key].doc_id)||REST_NUBE.queue.some(q=>q.key===key)))return;nubeQueueDoc(current[key]);}});
+  Object.keys(previous).forEach(key=>{if(current[key])return;const old=previous[key];if(!old||old.cuerpo&&old.cuerpo._eliminado)return;nubeQueueDoc({cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:old.coleccion,doc_id:old.doc_id,cuerpo:{_eliminado:true,eventoId:nubeEventoId(),borradoEn:new Date().toISOString()}});});
+  REST_NUBE.projection=current;nubeGuarda(REST_NUBE_PROJECTION_KEY,current);actualizaEstadoNube();
+  if(REST_NUBE.applyPending){REST_NUBE.applyPending=false;aplicaDocumentosRestaurant(nubeRebaseMap());}
+  await vaciaColaNube();
+}
+function sincronizaNubeEnSerie(inmediato){
+  if(!REST_NUBE.enabled||REST_NUBE.localOnly)return Promise.resolve();
+  const run=()=>{if(inmediato){clearTimeout(guardaT);guardaEstadoLocal();REST_NUBE.localDirty=false;}return sincronizaNubeLocal();};
+  REST_NUBE.flushPromise=(REST_NUBE.flushPromise||Promise.resolve()).catch(()=>{}).then(run);return REST_NUBE.flushPromise;
+}
+function vaciaColaNube(){
+  if(REST_NUBE.uploadPromise)return REST_NUBE.uploadPromise;
+  REST_NUBE.uploadPromise=(async()=>{
+    if(!REST_NUBE.enabled||!navigator.onLine||!RESTAURANT_SB||!REST_NUBE.queue.length){actualizaEstadoNube();return;}
+    actualizaEstadoNube();
+    while(REST_NUBE.queue.length&&navigator.onLine){
+      const cuentaActiva=String(RESTAURANT_ACCOUNT.accountId),idx=REST_NUBE.queue.findIndex(q=>String(q.cuenta_id)===cuentaActiva);if(idx<0)break;
+      const q=REST_NUBE.queue[idx],payload={cuenta_id:q.cuenta_id,coleccion:q.coleccion,doc_id:q.doc_id,cuerpo:q.cuerpo};
+      try{
+        let result;
+        if(q.impresionOffline){result=await RESTAURANT_SB.rpc("rest_subir_impresion_offline",{p_cuenta:q.cuenta_id,p_doc_id:q.doc_id,p_cuerpo:q.cuerpo,p_ruta:q.impresionOffline.ruta,p_aparato:q.impresionOffline.aparato});if(result.error)throw result.error;}
+        else if(q.confirmarImpresion){result=await RESTAURANT_SB.rpc("rest_confirma_impresion",{p_cuenta:q.cuenta_id,p_lineas:[q.doc_id],p_ruta:q.confirmarImpresion.ruta,p_aparato:q.confirmarImpresion.aparato});if(result.error)throw result.error;if(!(result.data||[]).includes(q.doc_id)){REST_NUBE.error="No se pudo confirmar el reclamo de impresión";actualizaEstadoNube();break;}}
+        else{result=await RESTAURANT_SB.from("documentos").upsert([payload],{onConflict:"cuenta_id,coleccion,doc_id"});if(result.error)throw result.error;}
+        const actualizado=new Date().toISOString();
+        const body=q.impresionOffline?Object.assign({},q.cuerpo,{impreso:Object.assign({},q.cuerpo.impreso,{[q.impresionOffline.ruta]:{por:q.impresionOffline.aparato,en:actualizado,ok:true,confirmado:actualizado,sinRed:true}})}):q.cuerpo;
+        REST_NUBE.serverDocs[q.key]={cuenta_id:q.cuenta_id,coleccion:q.coleccion,doc_id:q.doc_id,cuerpo:body,actualizado};if(q.coleccion==="rest_tickets")REST_NUBE.ticketIds.add(q.doc_id);if(!q.impresionOffline&&!q.confirmarImpresion&&q.coleccion==="rest_lineas"&&q.cuerpo&&q.cuerpo.enviada)REST_NUBE.incomingLines.add(q.cuerpo.id||q.doc_id.replace(/^linea_/,""));
+        REST_NUBE.queue.splice(idx,1);nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);REST_NUBE.error="";actualizaEstadoNube();
+      }catch(e){const q=REST_NUBE.queue[0];if(q)q.intentos=(q.intentos||0)+1;REST_NUBE.error=String(e&&e.message||e||"Error de red").slice(0,80);nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);actualizaEstadoNube();clearTimeout(REST_NUBE.retryTimer);REST_NUBE.retryTimer=setTimeout(()=>{if(REST_NUBE.enabled)vaciaColaNube();},Math.min(30000,1000*Math.pow(2,Math.min(5,q&&q.intentos||1))));break;}
+    }
+    if(!REST_NUBE.queue.length)actualizaEstadoNube();
+    procesaLineasEntrantes();
+  })().finally(()=>{REST_NUBE.uploadPromise=null;});
+  return REST_NUBE.uploadPromise;
+}
+function muestraMigracionNube(titulo,detalle){const modal=$("#restaurantNubeMigracion");$("#restaurantNubeMigracionTitulo").textContent=titulo;$("#restaurantNubeMigracionDetalle").textContent=detalle;modal.hidden=false;return new Promise(resolve=>{const done=value=>{modal.hidden=true;["restaurantNubeMigracionSi","restaurantNubeMigracionLocal","restaurantNubeMigracionCancelar"].forEach(id=>document.getElementById(id).removeEventListener("click",handlers[id]));resolve(value);};const handlers={restaurantNubeMigracionSi:()=>done("subir"),restaurantNubeMigracionLocal:()=>done("local"),restaurantNubeMigracionCancelar:()=>done("local")};Object.keys(handlers).forEach(id=>document.getElementById(id).addEventListener("click",handlers[id]));});}
+function descargaRespaldoRestaurant(){try{const payload={fecha:new Date().toISOString(),negocio:RESTAURANT_ACCOUNT.accountName,menu:MENU,mesas:MESAS,comandas:COMANDAS,P:Object.assign({},P,{negocio:Object.assign({},P.negocio,{logo:"[imagen local no incluida]"})}),equipo:EQUIPO.map(u=>({id:u.id,nombre:u.nombre,rol:u.rol}))};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="respaldo-restaurant-"+hoyISO()+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);}catch(e){toast("No se pudo bajar el respaldo local.");}}
+function resumenLocalRestaurant(){return {mesas:(MESAS||[]).length,platillos:(MENU.plats||[]).length,abiertas:(COMANDAS||[]).filter(c=>c.estado!=="cerrada").length,tickets:(COMANDAS||[]).filter(c=>c.estado==="cerrada"&&!c.cancelada).length};}
+async function iniciaNubeRestaurant(){
+  actualizaEstadoNube();
+  if(RESTAURANT_ACCOUNT.localOnly){REST_NUBE.localOnly=true;REST_NUBE.error="SQL 19 pendiente";actualizaEstadoNube();return;}
+  if(!navigator.onLine){REST_NUBE.enabled=true;REST_NUBE.ready=true;REST_NUBE.verified=false;actualizaEstadoNube();return;}
+  if(localStorage.getItem(LS_BASE+"_nube_migracion_v1")==="local"){REST_NUBE.localOnly=true;REST_NUBE.error="Conexión a nube pausada en este aparato";actualizaEstadoNube();return;}
+  try{const available=await RESTAURANT_SB.rpc("nuvoor_rest_nube_disponible");if(available.error||available.data!==true){REST_NUBE.localOnly=true;REST_NUBE.error=available.error&&available.error.message||"SQL 20 pendiente";actualizaEstadoNube();return;}}
+  catch(e){REST_NUBE.localOnly=true;REST_NUBE.error=String(e&&e.message||e);actualizaEstadoNube();return;}
+  REST_NUBE.verified=true;REST_NUBE.error="";
+  const result=await RESTAURANT_SB.from("documentos").select("cuenta_id,coleccion,doc_id,cuerpo,actualizado").eq("cuenta_id",RESTAURANT_ACCOUNT.accountId).like("coleccion","rest_%").order("actualizado",{ascending:true}).limit(5000);
+  if(result.error){REST_NUBE.localOnly=true;REST_NUBE.error=String(result.error.message||"No se pudo leer la nube").slice(0,90);actualizaEstadoNube();return;}
+  (result.data||[]).forEach(row=>{const key=nubeClave(row.coleccion,row.doc_id);REST_NUBE.serverDocs[key]=row;if(row.coleccion==="rest_tickets")REST_NUBE.ticketIds.add(row.doc_id);if(row.actualizado&&row.actualizado>REST_NUBE.cursor)REST_NUBE.cursor=row.actualizado;});
+  const rawCloud=nubeDocsDesdeServidor(),cloud=nubeDocsDeContexto(rawCloud),remoteCfg=Object.values(cloud).find(d=>d.coleccion==="rest_config");if(remoteCfg&&remoteCfg.cuerpo.pinSalt){REST_NUBE.pinSalt=remoteCfg.cuerpo.pinSalt;try{localStorage.setItem(LS_BASE+"_nube_pin_salt_v1",REST_NUBE.pinSalt);}catch(_){}}
+  const local=await proyectaRestaurant(),hasLocal=REST_LOCAL_START_KEYS.size>0||Object.keys(REST_NUBE.projection).length>0||REST_NUBE.queue.length>0;
+  REST_NUBE.enabled=true;REST_NUBE.ready=true;
+  if(!Object.keys(cloud).length&&hasLocal&&!REST_NUBE.queue.length){const n=resumenLocalRestaurant(),choice=await muestraMigracionNube("Subir los datos de esta tablet", "¿Subir los datos de esta tablet a la nube de "+(RESTAURANT_ACCOUNT.accountName||"tu negocio")+"? ("+n.mesas+" mesas, "+n.platillos+" platillos, "+n.abiertas+" comandas abiertas, "+n.tickets+" tickets). Los datos originales se conservan en este aparato.");if(choice!=="subir"){REST_NUBE.enabled=false;REST_NUBE.localOnly=true;REST_NUBE.error="";try{localStorage.setItem(LS_BASE+"_nube_migracion_v1","local");}catch(_){}actualizaEstadoNube();return;}try{localStorage.setItem(LS_BASE+"_nube_migracion_v1","si");}catch(_){}REST_NUBE.projection={};nubeGuarda(REST_NUBE_PROJECTION_KEY,{});REST_NUBE.pinSalt="";await sincronizaNubeEnSerie(true);}
+  else if(Object.keys(cloud).length&&hasLocal&&!REST_NUBE.queue.length){const keys=new Set([...Object.keys(cloud),...Object.keys(local)]),different=[...keys].some(k=>!cloud[k]||!local[k]||nubeCanon(cloud[k].cuerpo)!==nubeCanon(local[k].cuerpo));if(different){$("#restaurantNubeDetalle").textContent="Esta tablet tiene datos distintos. Elige «Bajar respaldo y usar la nube» o deja sus datos sólo en este aparato.";$("#restaurantNubeConflicto").hidden=false;const choice=await new Promise(resolve=>{const done=x=>{$("#restaurantNubeConflicto").hidden=true;["restaurantNubeBajar","restaurantNubeUsar","restaurantNubeLocal"].forEach(id=>document.getElementById(id).removeEventListener("click",handlers[id]));resolve(x);};const handlers={restaurantNubeBajar:()=>{descargaRespaldoRestaurant();done("cloud");},restaurantNubeUsar:()=>done("cloud"),restaurantNubeLocal:()=>done("local")};Object.keys(handlers).forEach(id=>document.getElementById(id).addEventListener("click",handlers[id]));});if(choice==="local"){REST_NUBE.enabled=false;REST_NUBE.localOnly=true;try{localStorage.setItem(LS_BASE+"_nube_migracion_v1","local");}catch(_){}actualizaEstadoNube();return;}}aplicaDocumentosRestaurant(cloud);}
+  else if(Object.keys(cloud).length){aplicaDocumentosRestaurant(nubeRebaseMap());}
+  else {REST_NUBE.projection={};nubeGuarda(REST_NUBE_PROJECTION_KEY,{});await sincronizaNubeEnSerie(true);}
+  escuchaNubeRestaurant();if(REST_NUBE.queue.length)await vaciaColaNube();actualizaAvisosReclamosNube();actualizaEstadoNube();
+}
+async function recargaCambiosNube(){if(!REST_NUBE.enabled||!navigator.onLine)return;try{const since=new Date(Math.max(0,new Date(REST_NUBE.cursor).getTime()-1000)).toISOString(),r=await RESTAURANT_SB.from("documentos").select("cuenta_id,coleccion,doc_id,cuerpo,actualizado").eq("cuenta_id",RESTAURANT_ACCOUNT.accountId).like("coleccion","rest_%").gt("actualizado",since).order("actualizado",{ascending:true}).limit(2000);if(r.error)throw r.error;let changed=false;(r.data||[]).forEach(row=>{const key=nubeClave(row.coleccion,row.doc_id),old=REST_NUBE.serverDocs[key];if(!old||nubeCanon(old.cuerpo)!==nubeCanon(row.cuerpo)){REST_NUBE.serverDocs[key]=row;changed=true;if(row.coleccion==="rest_lineas"&&row.cuerpo&&row.cuerpo.enviada&&!REST_NUBE.queue.some(q=>q.key===key))REST_NUBE.incomingLines.add(row.cuerpo.id||row.doc_id.replace(/^linea_/,""));}if(row.actualizado&&row.actualizado>REST_NUBE.cursor)REST_NUBE.cursor=row.actualizado;});if(changed){if(REST_NUBE.localDirty){REST_NUBE.applyPending=true;}else aplicaDocumentosRestaurant(nubeRebaseMap());}if(REST_NUBE.queue.length)await vaciaColaNube();REST_NUBE.error="";actualizaAvisosReclamosNube();actualizaEstadoNube();}catch(e){REST_NUBE.error=String(e&&e.message||e||"Error de sondeo").slice(0,80);actualizaEstadoNube();}}
+function escuchaNubeRestaurant(){
+  if(!RESTAURANT_SB||!RESTAURANT_SB.channel)return;
   try{
-    lsSet("menu", MENU); lsSet("mesas", MESAS); lsSet("comandas", COMANDAS);
-    lsSet("turnos", TURNOS); lsSet("P", P); lsSet("equipo", EQUIPO);
-    lsSet("asistencias", ASISTENCIAS); lsSet("compras", COMPRAS); lsSet("recetas", RECETAS);
-    lsSet("decor", DECOR);
-  }catch(e){}
+    REST_NUBE.channel=RESTAURANT_SB.channel("restaurant-"+restaurantSafeId(RESTAURANT_ACCOUNT.accountId)+"-"+REST_NUBE.deviceId)
+      .on("postgres_changes",{event:"*",schema:"public",table:"documentos",filter:"cuenta_id=eq."+RESTAURANT_ACCOUNT.accountId},payload=>{
+        const row=payload.new;if(!row||!String(row.coleccion||"").startsWith("rest_"))return;
+        const key=nubeClave(row.coleccion,row.doc_id);REST_NUBE.serverDocs[key]=row;
+        if(row.actualizado&&row.actualizado>REST_NUBE.cursor)REST_NUBE.cursor=row.actualizado;
+        if(row.coleccion==="rest_lineas"&&row.cuerpo&&row.cuerpo.enviada&&!REST_NUBE.queue.some(q=>q.key===key))REST_NUBE.incomingLines.add(row.cuerpo.id||row.doc_id.replace(/^linea_/,""));
+        if(REST_NUBE.localDirty){REST_NUBE.applyPending=true;return;}
+        clearTimeout(REST_NUBE.realtimeTimer);
+        REST_NUBE.realtimeTimer=setTimeout(()=>{
+          REST_NUBE.realtimeTimer=null;
+          if(REST_NUBE.localDirty){REST_NUBE.applyPending=true;return;}
+          aplicaDocumentosRestaurant(nubeRebaseMap());
+        },80);
+      });
+    REST_NUBE.channel.subscribe();
+  }catch(e){REST_NUBE.error=String(e&&e.message||e).slice(0,80);}
+  if(REST_NUBE.poll)clearInterval(REST_NUBE.poll);
+  REST_NUBE.poll=setInterval(recargaCambiosNube,10000);
 }
-function persist(){
-  clearTimeout(guardaT);
-  if(restaurando) return;
-  guardaT = setTimeout(()=>{
-    lsSet("menu", MENU); lsSet("mesas", MESAS); lsSet("comandas", COMANDAS);
-    lsSet("turnos", TURNOS); lsSet("P", P); lsSet("equipo", EQUIPO);
-    lsSet("asistencias", ASISTENCIAS); lsSet("compras", COMPRAS); lsSet("recetas", RECETAS);
-    lsSet("decor", DECOR);
-    try{ localStorage.setItem(LS+"_latido", String(Date.now())); }catch(e){}
-    subeNube();
-  }, 500);
+
+function aplicaDocumentosRestaurant(docs){
+  docs=nubeDocsDeContexto(docs);const raw=Object.values(docs),has=(col)=>raw.some(d=>d&&d.coleccion===col),ev=nubeEventoId(),all=raw.filter(d=>d&&d.cuerpo&&!d.cuerpo._eliminado),mine=all.filter(d=>d.coleccion!=="rest_eventos"&&(d.cuerpo.eventoId||"")===ev),by=(col)=>mine.filter(d=>d.coleccion===col).map(d=>d.cuerpo),oldMenu=MENU||{},oldMesas=MESAS||[],oldEquipo=EQUIPO||[],oldP=P||paramsPorDefecto();
+  const cfg=by("rest_config")[0];if(cfg){P=Object.assign(paramsPorDefecto(),P,{negocio:Object.assign({},P.negocio,{nombre:cfg.nombre||P.negocio.nombre,tel:cfg.tel||"",dir:cfg.dir||""}),iva:num(cfg.iva,P.iva),propina:num(cfg.propina,P.propina),servicio:num(cfg.servicio,P.servicio),apps:Array.isArray(cfg.apps)?cfg.apps:P.apps,fiscal:cfg.fiscal||P.fiscal,ticket:Object.assign({},P.ticket,cfg.ticket||{}),folios:cfg.folios||P.folios});REST_NUBE.pinSalt=cfg.pinSalt||REST_NUBE.pinSalt;}
+  const carta=by("rest_carta"),cats=carta.filter(x=>x.tipo==="categoria").map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;return y;}),groups=carta.filter(x=>x.tipo==="grupo").map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;return y;}),plats=carta.filter(x=>x.tipo==="platillo").map(x=>{const y=Object.assign({},x),foto=nubeFotoLocal(oldMenu.plats,y.id,"foto");delete y.tipo;delete y.eventoId;if(foto)y.foto=foto;return y;});if(has("rest_carta"))MENU={cats,grupos:groups,plats};
+  const mesaDocs=by("rest_mesas"),mesaRows=mesaDocs.filter(x=>x.tipo==="mesa").map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;delete y.croquis;return y;});if(has("rest_mesas"))MESAS=mesaRows;
+  DECOR=mesaDocs.filter(x=>x.tipo==="decor").map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;return y;});
+  P.croquis=P.croquis||{};mesaDocs.filter(x=>x.tipo==="croquis").forEach(x=>{const prev=P.croquis[x.zona]||{};P.croquis[x.zona]={fondo:x.fondo||"cuadricula",plano:prev.plano||""};});
+  const headers=by("rest_comandas"),lineDocs=by("rest_lineas"),linesBy={};lineDocs.filter(x=>!x.tipo).forEach(x=>{const l=Object.assign({},x);delete l.eventoId;const id=l.comandaId;(linesBy[id]||(linesBy[id]=[])).push(l);});
+  const ticketDocs=by("rest_tickets"),ticketBy={};ticketDocs.forEach(x=>{const y=Object.assign({},x);delete y.eventoId;ticketBy[y.id]=y;REST_NUBE.ticketIds.add(y.id);});
+  if(has("rest_comandas")||has("rest_lineas")||has("rest_tickets")){COMANDAS=headers.map(h=>{const c=Object.assign({},h);delete c.eventoId;c.estado=h.estado==="cobrada"||h.estado==="cancelada"?"cerrada":h.estado;if(h.estado==="cancelada")c.cancelada=true;c.lineas=(linesBy[c.id]||[]).filter(l=>l.comandaId===c.id);if(ticketBy[c.id])Object.assign(c,ticketBy[c.id]);c.cancelaciones=lineDocs.filter(x=>x.tipo==="cancelacion"&&x.comandaId===c.id).map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;delete y.comandaId;return y;});return c;});}
+  const remoteTeam=by("rest_equipo").map(x=>{const prev=oldEquipo.find(y=>y.id===x.id)||{},y=Object.assign({},prev,{id:x.id,nombre:x.nombre,rol:x.rol,pin_hash:x.pin_hash||"",activo:x.activo!==false});delete y.pin;return y;});if(has("rest_equipo"))EQUIPO=remoteTeam;
+  EVENTOS=Object.values(docs).filter(d=>d&&d.coleccion==="rest_eventos"&&d.cuerpo&&!d.cuerpo._eliminado).map(d=>Object.assign({},d.cuerpo));EVENTOS.forEach(x=>delete x.eventoId);try{localStorage.setItem(EVENTOS_KEY,JSON.stringify(EVENTOS));}catch(_){}
+  guardaEstadoLocal();REST_NUBE.projection=Object.fromEntries(Object.entries(docs).filter(([,d])=>d&&d.cuerpo).map(([k,d])=>[k,{cuenta_id:d.cuenta_id,coleccion:d.coleccion,doc_id:d.doc_id,cuerpo:d.cuerpo}]));nubeGuarda(REST_NUBE_PROJECTION_KEY,REST_NUBE.projection);
+  aplicaMarca();aplicaRol();if(typeof renderMesas==="function")renderMesas();if(typeof renderCocina==="function")renderCocina();if(typeof renderComanda==="function"&&comandaActual())renderComanda();pintaTabs();actualizaAvisosReclamosNube();actualizaEstadoNube();procesaLineasEntrantes();
 }
-/* Al cerrar o al mandar la pestaña al fondo se guarda sin esperar: medio
-   segundo es poco, pero es justo el medio segundo en el que se cierra. */
-window.addEventListener("pagehide", guardaYa);
-document.addEventListener("visibilitychange", ()=>{ if(document.hidden) guardaYa(); });
-async function subeNube(){
-  if(!DB || POS_CONTEXT) return;
-  try{
-    await DB.doc("config/menu").set({menu: MENU});
-    await DB.doc("config/mesas").set({mesas: MESAS});
-    await DB.doc("config/parametros").set({P: P});
-    await DB.doc("config/equipo").set({equipo: EQUIPO});
-    laNube = true;
-  }catch(e){ laNube = false; }
-}
+function descargaEventoRestaurant(ev){if(REST_NUBE.localOnly||!REST_NUBE.enabled)return;const doc={cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:"rest_eventos",doc_id:String(ev.id),cuerpo:Object.assign({},nubeClona(ev),{eventoId:""})};nubeQueueDoc(doc);vaciaColaNube();}
+function guardaEventosNube(){if(!restaurando&&REST_NUBE.enabled)sincronizaNubeEnSerie(true);}
+function nubeResumenImpresion(c,lineas){return (lineas||[]).map(l=>Object.assign({},l,{comandaId:c.id,categoria:l.categoria||((MENU.plats||[]).find(p=>p.id===l.platId)||{}).catId||""}));}
+function rutaImpresoraNube(p){const cats=(p.categorias||[]).slice().sort().join(",")||"todas",norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");return norm(p.nombre||"cocina")+"|"+cats;}
+function claveFallaImpresionNube(linea,ruta){return String(linea&&linea.id||linea||"")+"|"+String(ruta||"");}
+async function reclamaLineasNube(lineas,ruta,tipo){if(!REST_NUBE.enabled||!navigator.onLine)return {lineas,offline:true};const pre=tipo==="cancelacion"?"cancelacion":"linea",ids=(lineas||[]).map(x=>String(x.id));const {data,error}=await RESTAURANT_SB.rpc("rest_reclama_impresion",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_lineas:ids.map(id=>nubeId(pre,id)),p_ruta:ruta,p_aparato:REST_NUBE.deviceId});if(error)throw error;const claimed=new Set((data||[]).map(x=>String(x).replace(new RegExp("^"+pre+"_"),"")));return {lineas:(lineas||[]).filter(x=>claimed.has(String(x.id))),offline:false};}
+async function confirmaLineasNube(lineas,ruta,tipo){const pre=tipo==="cancelacion"?"cancelacion":"linea",ids=(lineas||[]).map(x=>nubeId(pre,x.id)),{data,error}=await RESTAURANT_SB.rpc("rest_confirma_impresion",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_lineas:ids,p_ruta:ruta,p_aparato:REST_NUBE.deviceId});if(error)throw error;const ok=new Set(data||[]);if(ids.some(id=>!ok.has(id))){const rows=ids.map(id=>REST_NUBE.serverDocs[nubeClave("rest_lineas",id)]).filter(Boolean);if(ids.length===1&&rows[0]&&rows[0].cuerpo&&((rows[0].cuerpo.impreso||{})[ruta]||{}).ok)return true;throw new Error("El reclamo ya no pertenece a este aparato.");}return true;}
+async function liberaLineasNube(lineas,ruta,tipo){if(!REST_NUBE.enabled||!navigator.onLine)return;try{const pre=tipo==="cancelacion"?"cancelacion":"linea";await RESTAURANT_SB.rpc("rest_libera_impresion",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_lineas:(lineas||[]).map(x=>nubeId(pre,x.id)),p_ruta:ruta,p_aparato:REST_NUBE.deviceId});}catch(e){console.warn("No se pudo liberar el reclamo de impresión",e);}}
+function encolaConfirmacionImpresion(linea,ruta,tipo){const pre=tipo==="cancelacion"?"cancelacion":"linea",docId=nubeId(pre,linea.id),key=nubeClave("rest_lineas",docId),actual=REST_NUBE.queue.find(q=>q.key===key),c=(COMANDAS||[]).find(x=>(x.lineas||[]).some(y=>String(y.id)===String(linea.id))),body=actual&&actual.cuerpo||nubeResumenImpresion(c||{id:linea.comandaId},[linea])[0];nubeQueueDoc({cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:"rest_lineas",doc_id:docId,cuerpo:body,confirmarImpresion:{ruta,aparato:REST_NUBE.deviceId}});}
+function marcaImpresionOffline(c,linea,ruta,tipo){const docId=nubeId(tipo==="cancelacion"?"cancelacion":"linea",linea.id),key=nubeClave("rest_lineas",docId),actual=REST_NUBE.queue.find(q=>q.key===key),body=Object.assign({},actual&&actual.cuerpo||nubeResumenImpresion(c,[linea])[0]);body.impreso=Object.assign({},body.impreso,{[ruta]:{por:REST_NUBE.deviceId,en:new Date().toISOString(),ok:true,sinRed:true}});linea.impreso=Object.assign({},linea.impreso,{[ruta]:body.impreso[ruta]});nubeQueueDoc({cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:"rest_lineas",doc_id:docId,cuerpo:body,impresionOffline:{ruta,aparato:REST_NUBE.deviceId,tipo}});actualizaEstadoNube();}
+function actualizaAvisosReclamosNube(){if(!REST_NUBE.enabled){REST_NUBE.claimAlerts=[];muestraErroresImpresoraPOS();return;}const now=Date.now(),alerts=[];Object.values(REST_NUBE.serverDocs).forEach(row=>{if(!row||row.coleccion!=="rest_lineas"||!row.cuerpo||!row.cuerpo.enviada)return;const body=row.cuerpo;Object.entries(body.impreso||{}).forEach(([route,claim])=>{if(!claim||claim.ok===true)return;const own=String(claim.por||"")===String(REST_NUBE.deviceId),age=now-Date.parse(claim.en||"");if(!own&&(!Number.isFinite(age)||age<120000))return;const base=route.endsWith("|cancelacion")?route.slice(0,-12):route,printer=IMPRESORAS.find(p=>rutaImpresoraNube(p)===base&&(p.cocina||p.cancela));if(!printer)return;const head=Object.values(REST_NUBE.serverDocs).find(x=>x&&x.coleccion==="rest_comandas"&&x.cuerpo&&String(x.cuerpo.id||x.doc_id.replace(/^comanda_/,""))===String(body.comandaId));const comanda=(COMANDAS||[]).find(c=>String(c.id)===String(body.comandaId))||Object.assign({id:body.comandaId,folio:head&&head.cuerpo.folio||"Comanda",mesaId:head&&head.cuerpo.mesaId||"",mesaNombre:head&&head.cuerpo.mesaNombre||body.mesaNombre||"Mesa",fecha:hoyISO()},head&&head.cuerpo||{});const line=(comanda.lineas||[]).find(l=>String(l.id)===String(body.id))||Object.assign({},body,{id:body.id||row.doc_id.replace(/^linea_/,"")});if(!comanda.lineas)comanda.lineas=[line];alerts.push({key:row.doc_id+"|"+route,docId:row.doc_id,route,ajena:!own,mesa:comanda.mesaNombre||"Mesa",linea:line,comanda,impresora:printer,tipo:route.endsWith("|cancelacion")?"cancelacion":"comanda"});});});REST_NUBE.claimAlerts=alerts;muestraErroresImpresoraPOS();}
+async function imprimeReclamoPendienteNube(index){const a=REST_NUBE.claimAlerts[index];if(!a||REST_NUBE.claimBusy.has(a.key))return;REST_NUBE.claimBusy.add(a.key);muestraErroresImpresoraPOS();try{if(a.ajena){const {data,error}=await RESTAURANT_SB.rpc("rest_reasigna_impresion",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_lineas:[a.docId],p_ruta:a.route,p_aparato:REST_NUBE.deviceId});if(error)throw error;if(!(data||[]).includes(a.docId)){toast("Otra tablet ya tomó esta comanda.");return;}}await imprimeComandaRutaNube(a.comanda,a.impresora,[a.linea],a.tipo,null,true,true); }catch(e){toast("No se pudo recuperar la comanda: "+String(e&&e.message||e).slice(0,100));}finally{REST_NUBE.claimBusy.delete(a.key);actualizaAvisosReclamosNube();}}
+async function asignaFolioNube(tipo,serie){if(!REST_NUBE.enabled||!navigator.onLine)return null;try{const {data,error}=await RESTAURANT_SB.rpc("rest_siguiente_folio",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_serie:serie});if(error)throw error;return data;}catch(e){REST_NUBE.error=String(e&&e.message||e);actualizaEstadoNube();return null;}}
 
 /* ---------------- el menú de fábrica ----------------
    Trae una carta chica de ejemplo para que al abrirlo por primera vez se
@@ -2778,7 +2990,7 @@ P.fiscal=Object.assign({razon:"",rfc:"",regimen:"612",cpFiscal:"",pac:"",serie:"
 const ROLES = {
   gerente: {nombre:"Gerente", ve:["inicio","eventos","mesas","comanda","cocina","menu","caja","ventas","personal","costos","set"]},
   cajero:  {nombre:"Cajero",  ve:["inicio","eventos","mesas","comanda","cocina","caja","personal"]},
-  mesero:  {nombre:"Mesero",  ve:["mesas","comanda","cocina","personal"]},
+  mesero:  {nombre:"Mesero",  ve:["mesas","comanda","cocina"]},
   cocina:  {nombre:"Cocina",  ve:["cocina","personal"]}
 };
 let usuarioId = null;
@@ -2840,7 +3052,7 @@ function animaCambioVista(k, anterior){
   }, 1320);
 }
 function vaA(k){
-  if(!puedeVer(k) && k !== "comanda") k = PESTANAS.filter(p=>puedeVer(p.k))[0].k;
+  if(!puedeVer(k)) k = PESTANAS.filter(p=>puedeVer(p.k))[0].k;
   const anterior = PESTANAS.concat([{k:"comanda"}]).find(p=>{ const s=$("#tab-"+p.k); return s && !s.hidden; });
   const cambioVista = !anterior || anterior.k !== k;
   if(k !== "comanda") comandaId = comandaId;   /* la comanda abierta se conserva */
@@ -2888,6 +3100,12 @@ function sumaLetra(s){
   return sumaLetra(s.slice(0,-1)) + "A";
 }
 function folioNuevo(tipo){
+  if(REST_NUBE.enabled){
+    const key=LS_BASE+"_folio_local_"+tipo;
+    let n=1;try{n=Math.max(1,Number(localStorage.getItem(key)||"0")+1);localStorage.setItem(key,String(n));}catch(_){}
+    const shard=String(REST_NUBE.deviceId||"").replace(/[^a-z0-9]/gi,"").slice(-4).toUpperCase()||"LOCAL";
+    return (tipo==="cta"?"T-":"TR-")+shard+"-"+String(n).padStart(4,"0");
+  }
   if(!letrasFolio()){
     const d = new Date();
     const base = (tipo === "cta" ? "CTA-" : "TUR-") + d.getFullYear() + dos(d.getMonth()+1) + dos(d.getDate());
@@ -2905,6 +3123,8 @@ function folioNuevo(tipo){
   }
   return (tipo === "cta" ? "CTA-" : "TUR-") + serieFolio() + String(n).padStart(digitosFolio(), "0");
 }
+function folioTicketFinal(n){return letrasFolio()?"CTA-"+serieFolio()+String(n).padStart(digitosFolio(),"0"):"CTA-"+hoyISO().replace(/-/g,"")+"-"+String(n).padStart(2,"0");}
+async function reservaFolioNube(c,esApp){if(!c||!REST_NUBE.enabled||!navigator.onLine)return false;const fecha=c.fecha||hoyISO();if(c.folioPendiente){const n=await asignaFolioNube("cta","ticket:"+fecha+":"+serieFolio());if(n!=null){c.folio=folioTicketFinal(Number(n));c.folioPendiente=false;}}if(esApp&&c.appFolioPendiente){const n=await asignaFolioNube("cta","app:"+fecha+":"+String(c.appId||"app"));if(n!=null){c.appOrderNo=Number(n);c.mesaNombre=(c.appNombre||"Pedido")+" "+n;c.appFolioPendiente=false;}}if(c.folioPendiente===false||c.appFolioPendiente===false){persist();return true;}return false;}
 
 /* ===================================================================
    MESAS
@@ -3554,15 +3774,15 @@ let comandaId = null, catVista = "", comensalVista = 1;
 
 function comandaActual(){ return COMANDAS.find(c=>c.id === comandaId); }
 
-function abreMesa(mesaId){
-  if(!turnoAbierto() && !POS_EVENTO){
+async function abreMesa(mesaId){
+  if(!turnoAbierto() && !POS_EVENTO && rolActual()!=="mesero"){
     if(!confirm("La caja está cerrada.\n\n¿Abrir el turno ahora? Sin turno no se puede cobrar.")) return;
     vaA("caja"); abreTurno(); return;
   }
   let c;
   if(mesaId === "llevar"){
     const n = COMANDAS.filter(x=>x.mesaId === "llevar" && x.fecha === hoyISO()).length + 1;
-    c = nuevaComanda({id:"llevar", nombre:"Para llevar " + n, lugares:1}, 1);
+    c = await nuevaComanda({id:"llevar", nombre:"Para llevar " + n, lugares:1}, 1);
   }else{
     const m = MESAS.find(x=>x.id === mesaId); if(!m) return;
     c = comandaDe(mesaId);
@@ -3611,20 +3831,62 @@ $("#mesaComensalesCerrar").addEventListener("click", cierraSelectorComensales);
 $("#mesaComensalesCancelar").addEventListener("click", cierraSelectorComensales);
 $("#modalComensales").addEventListener("click", e=>{ if(e.target === $("#modalComensales")) cierraSelectorComensales(); });
 $("#modalComensales").addEventListener("keydown", e=>{ if(e.key === "Escape") cierraSelectorComensales(); });
-$("#mesaComensalesAbrir").addEventListener("click", ()=>{
+$("#mesaComensalesAbrir").addEventListener("click", async()=>{
   const m = mesaPendienteComensales; if(!m || cantidadComensalesPendiente < 1) return;
   const cantidad = cantidadComensalesPendiente;
   cierraSelectorComensales();
-  entraAComanda(nuevaComanda(m, cantidad));
+  entraAComanda(await nuevaComanda(m, cantidad));
 });
-function nuevaComanda(m, personas){
+async function comandaReservadaDesdeNube(docId,draft){
+  const headerResult=await RESTAURANT_SB.from("documentos").select("cuenta_id,coleccion,doc_id,cuerpo,actualizado").eq("cuenta_id",RESTAURANT_ACCOUNT.accountId).eq("coleccion","rest_comandas").eq("doc_id",docId).maybeSingle();
+  if(headerResult.error)throw headerResult.error;
+  if(!headerResult.data)return null;
+  const header=headerResult.data,body=header.cuerpo||{},id=body.id||String(docId).replace(/^comanda_/,"");
+  if(body.estado!=="abierta")return null;
+  const linesResult=await RESTAURANT_SB.from("documentos").select("cuenta_id,coleccion,doc_id,cuerpo,actualizado").eq("cuenta_id",RESTAURANT_ACCOUNT.accountId).eq("coleccion","rest_lineas").limit(5000);
+  if(linesResult.error)throw linesResult.error;
+  const related=(linesResult.data||[]).filter(row=>row.cuerpo&&row.cuerpo.comandaId===id);
+  [header,...related].forEach(row=>{REST_NUBE.serverDocs[nubeClave(row.coleccion,row.doc_id)]=row;});
+  if(header.actualizado&&header.actualizado>REST_NUBE.cursor)REST_NUBE.cursor=header.actualizado;
+  aplicaDocumentosRestaurant(nubeRebaseMap());
+  return COMANDAS.find(c=>c.id===id)||null;
+}
+async function nuevaComanda(m, personas, appId){
   const c = {
     id: uid(), folio: folioNuevo("cta"), mesaId: m.id, mesaNombre: m.nombre,
     personas: Math.max(1, num(personas, m.lugares || 2)), abre: horaAhora(), fecha: hoyISO(),
     mesero: usuarioActual().nombre || "", meseroId: usuarioActual().id || "",
     lineas: [], estado: "abierta", pagos: [], propina: 0, ts: Date.now()
   };
+  if(appId){const app=appDe(appId);c.appId=appId;c.appNombre=app&&app.nombre||"Pedido";c.appColor=app&&app.color||"";c.comisionPct=num(app&&app.comision);c.appFolioPendiente=REST_NUBE.enabled;c.appOrderNo=REST_NUBE.enabled?"A-"+String(REST_NUBE.deviceId||"").slice(-4).toUpperCase()+"-0001":null;c.mesaNombre=c.appNombre+" "+(c.appOrderNo||"");}
+  c.folioPendiente=REST_NUBE.enabled;
+  if(REST_NUBE.enabled&&navigator.onLine&&!POS_EVENTO&&!appId&&m.id!=="llevar"){
+    try{
+      await sincronizaNubeEnSerie(true);
+      const body=Object.assign({},c);delete body.lineas;delete body.cancelaciones;delete body.folioPendiente;delete body.appFolioPendiente;body.eventoId="";body.estado="abierta";
+      const result=await RESTAURANT_SB.rpc("rest_reserva_comanda",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_mesa:String(m.id),p_doc_id:nubeId("comanda",c.id),p_cuerpo:body});
+      if(result.error)throw result.error;
+      const docId=String(result.data||"");
+      if(docId&&docId!==nubeId("comanda",c.id)){
+        const existing=await comandaReservadaDesdeNube(docId,c);
+        if(existing)return existing;
+        throw new Error("La mesa se reservó pero su comanda todavía no llegó.");
+      }
+    }catch(e){REST_NUBE.error=String(e&&e.message||e||"No se pudo reservar la mesa").slice(0,80);actualizaEstadoNube();toast("No se pudo revisar la mesa en la nube. La comanda se guardará en este aparato y se intentará subir.");}
+  }
   COMANDAS.unshift(c); persist();
+  if(REST_NUBE.enabled){
+    await sincronizaNubeEnSerie(true);
+    let actual=COMANDAS.find(x=>x.id===c.id)||c;
+    // Los indicadores de folio pendiente son locales y no viajan en la cabecera.
+    // Al hidratar otra vez, reconoce los folios provisionales y reserva los definitivos.
+    if(String(actual.folio||"").startsWith("T-"))actual.folioPendiente=true;
+    if(appId&&String(actual.appOrderNo||"").startsWith("A-"))actual.appFolioPendiente=true;
+    await reservaFolioNube(actual,!!appId);
+    actual=COMANDAS.find(x=>x.id===c.id)||actual;
+    if(actual.folioPendiente||actual.appFolioPendiente)setTimeout(()=>{const viva=COMANDAS.find(x=>x.id===c.id)||actual;reservaFolioNube(viva,!!appId);},1000);
+    return actual;
+  }
   return c;
 }
 
@@ -3642,12 +3904,14 @@ function pintaAppsFila(){
 $("#appsFila").addEventListener("click",e=>{
   const b=e.target.closest("[data-abreapp]"); if(b) abreApp(b.dataset.abreapp);
 });
-function abreApp(appId){
+async function abreApp(appId){
   const a=appDe(appId); if(!a||a.activa===false) return;
   if(POS_EVENTO){toast("Los pedidos por app se registran en el restaurante, no en el punto móvil.");return;}
   if(!turnoAbierto()){toast("Abre el turno de caja antes de tomar pedidos por app.");return;}
   const numero=COMANDAS.filter(c=>c.appId===a.id&&c.fecha===hoyISO()).length+1;
-  const c=nuevaComanda({id:"llevar",nombre:(a.nombre||"Pedido")+" "+numero,lugares:1},1);
+  const creada=await nuevaComanda({id:"llevar",nombre:(a.nombre||"Pedido")+" "+numero,lugares:1},1,a.id);
+  const c=COMANDAS.find(x=>x.id===creada.id)||creada;
+  if(!REST_NUBE.enabled){c.mesaNombre=(a.nombre||"Pedido")+" "+numero;}
   c.appId=a.id; c.appNombre=a.nombre||"Plataforma"; c.appColor=a.color||"";
   c.comisionPct=num(a.comision);
   persist(); entraAComanda(c);
@@ -3687,6 +3951,7 @@ function renderComanda(){
   pintaLineas();
 }
 const ET_EDO = {pedido:"en cocina", preparando:"preparando", listo:"listo", entregada:"entregado"};
+function lineaImpresionEstado(linea){const entries=Object.entries(linea.impreso||{});if(!entries.length)return "";const nombres=entries.map(([ruta])=>{const p=IMPRESORAS.find(x=>rutaImpresoraNube(x)===ruta);return p?p.nombre:(ruta.split("|")[0]||"cocina").replace(/-/g," ");});return '<small class="impresoEstado">Impreso en '+esc([...new Set(nombres)].join(", "))+' ✓</small>';}
 function pintaLineas(){
   const c = comandaActual(); if(!c) return;
   const n = Math.max(1, num(c.personas,1));
@@ -3715,7 +3980,7 @@ function pintaLineas(){
           (l.nota ? '<small>✎ '+esc(l.nota)+'</small>' : '')+
           (l.cancelada ? '<small>cancelado · '+esc(l.motivo||"")+'</small>'
             : l.enviada
-              ? '<span class="edo '+edo+'">'+(ET_EDO[edo]||edo)+' '+esc(l.enviada)+'</span>'+
+              ? '<span class="edo '+edo+'">'+(ET_EDO[edo]||edo)+' '+esc(l.enviada)+'</span>'+lineaImpresionEstado(l)+
                 '<span class="acc"><button data-corrige="'+esc(l.id)+'">Corregir</button></span>'
               : '<span class="acc"><button data-menos="'+esc(l.id)+'">−</button>'+
                 '<button data-mas="'+esc(l.id)+'">+</button>'+
@@ -3818,19 +4083,15 @@ function abreCorrige(linId){
   $("#modalCorrige").hidden = false;
 }
 function anotaCancelacion(c, l, cant, motivo, nota, merma, autorizo){
+  c.cancelaciones = c.cancelaciones || [];
+  const cancelacion={id:uid(), linId:l.id, comandaId:c.id,nombre:l.nombre, categoria:l.categoria||((MENU.plats||[]).find(p=>p.id===l.platId)||{}).catId||"",cant:cant,
+    importe:importeLinea(Object.assign({},l,{cant:cant})),motivo:motivo,nota:nota||"",merma:!!merma,
+    quien:usuarioActual().nombre||"",hora:horaAhora(),estadoAlCancelar:l.estado||"pedido",autorizo:autorizo||null};
   /* A la cocina se le avisa en papel solo si ya estaba preparandolo: una
      linea que nunca salio de la comanda no le interesa a nadie alla. */
   if(merma && IMPRESORAS.some(p=>p.cancela))
-    setTimeout(()=> imprimeCancelacion(c, {cant:cant, nombre:l.nombre, motivo:motivo,
-      nota:nota||"", quien: usuarioActual().nombre||""}), 60);
-  c.cancelaciones = c.cancelaciones || [];
-  c.cancelaciones.push({
-    id: uid(), linId: l.id, nombre: l.nombre, cant: cant,
-    importe: importeLinea(Object.assign({},l,{cant:cant})),
-    motivo: motivo, nota: nota||"", merma: !!merma,
-    quien: usuarioActual().nombre||"", hora: horaAhora(), estadoAlCancelar: l.estado||"pedido",
-    autorizo: autorizo || null
-  });
+    setTimeout(()=> imprimeCancelacion(c, cancelacion), 60);
+  c.cancelaciones.push(cancelacion);
 }
 $("#corrCerrar").addEventListener("click", ()=>{ $("#modalCorrige").hidden = true; corrigiendo = null; });
 $("#corrCuerpo").addEventListener("click", e=>{
@@ -3895,10 +4156,9 @@ $("#comGente").addEventListener("click", ()=>{
 $("#comEnviar").addEventListener("click", ()=>{
   const c = comandaActual(); if(!c) return;
   const h = horaAhora();
-  let n = 0;
-  const nuevas = [];
-  (c.lineas||[]).forEach(l=>{ if(!l.enviada && !l.cancelada){ l.enviada = h; l.enviadaTs = Date.now(); l.estado = "pedido"; n++; nuevas.push(l); } });
-  persist(); pintaLineas(); pintaTabs();
+  const nuevas=(c.lineas||[]).filter(l=>!l.enviada&&!l.cancelada),n=nuevas.length,envioId=uid();
+  nuevas.forEach(l=>{l.enviada=h;l.enviadaTs=Date.now();l.envioId=envioId;l.envioTotal=n;l.estado="pedido";});
+  guardaYa(); pintaLineas(); pintaTabs();
   /* Sólo lo que se acaba de mandar: reimprimir la comanda entera hace que la
      cocina prepare dos veces lo mismo. */
   const hayImpresoraComandas = IMPRESORAS.some(p=>p.cocina);
@@ -3929,10 +4189,8 @@ $("#comCancelar").addEventListener("click", ()=>{
           (quien && quien.nombre && !quien.propio ? " · autorizó " + quien.nombre : ""));
   };
   /* Una mesa entera es la cancelacion mas cara que existe. */
-  if(enCocina)
-    pideAutorizacion('Se va a cancelar <b>' + esc(c.mesaNombre) + '</b> completa, con <b>' + enCocina +
-      '</b> platillo(s) ya en cocina. Motivo: <b>' + esc(motivo) + '</b>.', hacerlo);
-  else hacerlo({id: usuarioActual().id||"", nombre: usuarioActual().nombre||"", propio:true});
+  pideAutorizacion('Se va a cancelar <b>' + esc(c.mesaNombre) + '</b> completa' + (enCocina
+    ? ', con <b>' + enCocina + '</b> platillo(s) ya en cocina' : '') + '. Motivo: <b>' + esc(motivo) + '</b>.', hacerlo);
 });
 
 /* ---------------- modificadores ---------------- */
@@ -4001,7 +4259,7 @@ $("#modsOk").addEventListener("click", ()=>{
 });
 function agregaLinea(p, mods, nota, cant){
   const c = comandaActual(); if(!c) return;
-  c.lineas.push({id:uid(), platId:p.id, nombre:p.nombre, precio:num(p.precio), ivaModo:p.ivaModo||"incluido",
+  c.lineas.push({id:uid(), platId:p.id, categoria:p.catId||"", nombre:p.nombre, precio:num(p.precio), ivaModo:p.ivaModo||"incluido",
                  cant: Math.max(1, num(cant,1)), mods: mods||[], nota: nota||"",
                  satClave:p.satClave||"", satNombre:p.satNombre||"", satUnidad:p.satUnidad||"",
                  comensal: comensalVista, enviada:"", estado:"", ts: Date.now()});
@@ -4150,8 +4408,12 @@ function abreCobroApp(c){
   $("#modalApp").hidden=false;
 }
 $("#apAppCerrar").addEventListener("click",()=>{$("#modalApp").hidden=true;});
-$("#apAppOk").addEventListener("click",()=>{
-  const c=comandaActual(); if(!c||!c.appId) return;
+$("#apAppOk").addEventListener("click",async()=>{
+  if(!soyAutoridad()){toast("Sólo un gerente o cajero puede cerrar un pedido por app.");return;}
+  let c=comandaActual(); if(!c||!c.appId) return;
+  const id=c.id;
+  if(c.folioPendiente)await reservaFolioNube(c,false);
+  c=COMANDAS.find(x=>x.id===id)||c;
   const s=sumaComanda(c);
   c.estado="cerrada"; c.cierra=horaAhora(); c.subtotal=s.sub; c.servicio=s.serv;
   c.propina=0; c.total=s.total; c.pagos=[{tipo:"app",monto:s.total}];
@@ -4164,6 +4426,7 @@ $("#apAppOk").addEventListener("click",()=>{
 });
 
 $("#comCobrar").addEventListener("click", ()=>{
+  if(!soyAutoridad()){toast("Sólo un gerente o cajero puede cobrar.");return;}
   const c = comandaActual(); if(!c || !(c.lineas||[]).length) return;
   if(!turnoAbierto()){ toast(POS_EVENTO ? "Abre la caja del evento antes de cobrar" : "Abre el turno de caja antes de cobrar"); return; }
   if(c.appId){ abreCobroApp(c); return; }
@@ -4309,8 +4572,11 @@ $("#modalCobro").addEventListener("click", e=>{
   const prop = cobroPropPct === null ? num($("#cobroPropMonto").value) : s.sub * cobroPropPct/100;
   imprimeCuenta(c, cobroPagos, prop, false);
 });
-$("#cobroOk").addEventListener("click", ()=>{
-  const c = comandaActual(); if(!c) return;
+$("#cobroOk").addEventListener("click", async()=>{
+  let c = comandaActual(); if(!c) return;
+  const id=c.id;
+  if(c.folioPendiente)await reservaFolioNube(c,false);
+  c=COMANDAS.find(x=>x.id===id)||c;
   const s = sumaComanda(c);
   const prop = cobroPropPct === null ? num($("#cobroPropMonto").value) : s.sub * cobroPropPct/100;
   const total = s.total + prop;
@@ -4460,6 +4726,7 @@ function pintaTurnoChip(){
     ch.className = "turnoChip cerrado";
     ch.innerHTML = cajaLabel + " <b>cerrada</b>";
   }
+  ch.classList.toggle("meseroOculto",rolActual()==="mesero");
 }
 $("#cajaCuerpo").addEventListener("click", e=>{
   if(e.target.closest("#cajaAbrir"))  { abreTurno(); return; }
@@ -5088,11 +5355,7 @@ function pideAutorizacion(queTexto, alAutorizar){
   }
   const jefes = jefesConClave();
   if(!jefes.length){
-    /* Nadie con clave para autorizar: no se traba el servicio, pero se
-       anota que nadie autorizo. Mentir diciendo que si, seria peor. */
-    if(!confirm("Nadie del equipo tiene clave para autorizar esto.\n\n" +
-        "Se va a registrar SIN autorización. Ponle clave al gerente o al cajero en Ajustes → Equipo.\n\n¿Seguir?")) return;
-    alAutorizar({id:"", nombre:"", sinClave:true});
+    toast("Para autorizarlo, un gerente o cajero debe tener una clave en Ajustes → Equipo.");
     return;
   }
   autoDestino = alAutorizar;
@@ -5105,9 +5368,9 @@ function pideAutorizacion(queTexto, alAutorizar){
 }
 $("#autoCerrar").addEventListener("click", ()=>{ $("#modalAuto").hidden = true; autoDestino = null; });
 $("#autoPin").addEventListener("keydown", e=>{ if(e.key === "Enter") $("#autoOk").click(); });
-$("#autoOk").addEventListener("click", ()=>{
+$("#autoOk").addEventListener("click", async()=>{
   const pin = String($("#autoPin").value || "").trim();
-  const u = jefesConClave().find(x=>String(x.pin||"") === pin);
+  let u = null;for(const posible of jefesConClave()){if(await validaClavePerfil(posible,pin)){u=posible;break;}}
   if(!u){ toast("Esa clave no es de nadie que pueda autorizar"); $("#autoPin").value = ""; return; }
   const f = autoDestino; autoDestino = null;
   $("#modalAuto").hidden = true;
@@ -5667,10 +5930,12 @@ function resuelveResultadoImpresoraPOS(id,ok,mensaje){
 }
 function muestraErroresImpresoraPOS(){
   const contenedor=$("#impPrinterErrors"); if(!contenedor) return;
-  contenedor.innerHTML=erroresImpresionPOS.map((f,i)=>
+  const errores=erroresImpresionPOS.map((f,i)=>
     '<div class="impPrinterError"><div><strong>'+esc(f.trabajo.impresora.nombre||"Impresora")+' no imprimió</strong>'+
     '<small>'+esc(f.mensaje||"Revisa que esté encendida y cerca.")+'</small></div>'+
     '<button type="button" data-imp-reintentar="'+i+'">Reintentar</button></div>').join("");
+  const reclamos=(REST_NUBE.claimAlerts||[]).map((a,i)=>'<div class="impPrinterError"><div><strong>Comanda sin imprimir · '+esc(a.mesa)+'</strong><small>'+esc(a.linea.nombre||"Platillo")+' · '+esc(a.impresora.nombre)+'</small></div><button type="button" data-imp-reclamo="'+i+'">'+(a.ajena?"Imprimir aquí":"Imprimir")+'</button></div>').join("");
+  contenedor.innerHTML=errores+reclamos;
 }
 function reportaFalloImpresoraPOS(trabajo,mensaje){
   erroresImpresionPOS.push({trabajo:trabajo,mensaje:mensaje||"No se pudo conectar."});
@@ -5717,8 +5982,9 @@ async function procesaColaImpresionPOS(){
     while(colaImpresionPOS.length){
       const trabajo=colaImpresionPOS.shift();
       const respuesta=await ejecutaTrabajoImpresoraPOS(trabajo);
-      if(!respuesta.ok) reportaFalloImpresoraPOS(trabajo,respuesta.mensaje);
+      if(!respuesta.ok){if(trabajo.nubeLineas&&trabajo.nubeRuta){trabajo.nubeLineas.forEach(linea=>REST_NUBE.failedPrints.add(claveFallaImpresionNube(linea,trabajo.nubeRuta)));await liberaLineasNube(trabajo.nubeLineas,trabajo.nubeRuta,trabajo.nubeTipo);}reportaFalloImpresoraPOS(trabajo,respuesta.mensaje);}
       else if(trabajo.esPrueba && $("#impTestEstado")) $("#impTestEstado").textContent="Prueba enviada.";
+      if(trabajo.resuelve)trabajo.resuelve(respuesta);
     }
   }finally{
     procesandoColaImpresionPOS=false;
@@ -5726,11 +5992,12 @@ async function procesaColaImpresionPOS(){
   }
 }
 function encolaTrabajoImpresoraPOS(trabajo){
-  colaImpresionPOS.push(trabajo); procesaColaImpresionPOS();
+  return new Promise(resolve=>{trabajo.resuelve=resolve;colaImpresionPOS.push(trabajo);procesaColaImpresionPOS();});
 }
 function reintentaTrabajoImpresoraPOS(indice){
   const fallido=erroresImpresionPOS.splice(num(indice,-1),1)[0];
   if(!fallido) return;
+  if(fallido.trabajo.reintentaNube){muestraErroresImpresoraPOS();fallido.trabajo.reintentaNube();return;}
   colaImpresionPOS.unshift(fallido.trabajo); muestraErroresImpresoraPOS(); procesaColaImpresionPOS();
 }
 function impresorasParaTicketPOS(tipo,automatico){
@@ -5741,11 +6008,12 @@ function imprimeHoja(titulo,cuerpo,opciones={}){
   const destinos=opciones.impresora ? [opciones.impresora] : opciones.impresoraId
     ? IMPRESORAS.filter(p=>p.id===opciones.impresoraId)
     : impresorasParaTicketPOS(opciones.tipo||"",!!opciones.automatico);
-  destinos.forEach(p=>encolaTrabajoImpresoraPOS({
+  const trabajos=destinos.map(p=>encolaTrabajoImpresoraPOS(Object.assign({
     impresora:Object.assign({},p,{categorias:(p.categorias||[]).slice()}),
     titulo:titulo,cuerpo:cuerpo,esPrueba:!!opciones.esPrueba
-  }));
+  },opciones.nubeLineas?{nubeLineas:opciones.nubeLineas,nubeRuta:opciones.nubeRuta,nubeTipo:opciones.nubeTipo,reintentaNube:opciones.reintentaNube}:{})));
   if(!destinos.length && opciones.esPrueba) toast("Activa lo que imprime esta impresora y vuelve a probar.");
+  return Promise.all(trabajos);
 }
 const lineaPar = (izq, der, cl) =>
   '<table><tr><td'+(cl?' class="'+cl+'"':'')+'>'+izq+'</td>' +
@@ -5826,7 +6094,7 @@ function imprimeCuenta(c, pagos, propina, automatico=false){
    va grande para que cuadre con el recibo cuando es para llevar. */
 function categoriaLineaImpresionPOS(linea){
   const platillo=(MENU.plats||[]).find(p=>p.id===linea.platId);
-  return platillo ? platillo.catId : "";
+  return platillo ? platillo.catId : (linea.categoria||"");
 }
 function lineasParaImpresoraPOS(lineas,impresora){
   const categorias=Array.isArray(impresora.categorias)?impresora.categorias:[];
@@ -5861,17 +6129,47 @@ function cuerpoComandaCocinaPOS(c,lineas){
   cuerpo += '<hr><div class="c" style="font-size:9px">'+esc(c.folio)+' · '+esc(c.fecha)+'</div>';
   return cuerpo;
 }
-function imprimeComandaCocina(c,lineas){
-  if(!c || !lineas || !lineas.length) return;
-  IMPRESORAS.filter(p=>p.cocina).forEach(p=>{
-    const filtradas=lineasParaImpresoraPOS(lineas,p);
-    if(filtradas.length) imprimeHoja("Cocina " + c.folio,cuerpoComandaCocinaPOS(c,filtradas),{tipo:"comanda",impresoraId:p.id});
-  });
+async function imprimeComandaRutaNube(c,p,lineas,tipo,contenido,forzado,reclamoYaTomado){
+  if(!lineas.length)return {ok:true};
+  const route=rutaImpresoraNube(p)+(tipo==="cancelacion"?"|cancelacion":"");
+  const reintenta=()=>{lineas.forEach(linea=>REST_NUBE.failedPrints.delete(claveFallaImpresionNube(linea,route)));return imprimeComandaRutaNube(c,p,lineas,tipo,contenido,true,false);};
+  let propias=lineas;
+  const sinRed=REST_NUBE.enabled&&!navigator.onLine;
+  if(REST_NUBE.enabled){
+    propias=lineas.filter(linea=>forzado||!REST_NUBE.failedPrints.has(claveFallaImpresionNube(linea,route)));
+    if(!propias.length)return {ok:true,omitida:true,pospuesta:true};
+    try{if(!sinRed&&!reclamoYaTomado){await sincronizaNubeEnSerie(true);const reclamo=await reclamaLineasNube(propias,route,tipo);propias=reclamo.lineas;if(!propias.length)return {ok:true,omitida:true};}}
+    catch(e){lineas.forEach(linea=>REST_NUBE.failedPrints.add(claveFallaImpresionNube(linea,route)));const trabajo={impresora:p,titulo:(tipo==="cancelacion"?"Cancelación ":"Cocina ")+c.folio,cuerpo:"",nubeLineas:lineas,nubeRuta:route,nubeTipo:tipo,reintentaNube:reintenta};reportaFalloImpresoraPOS(trabajo,"No se pudo reservar esta impresión: "+String(e&&e.message||e).slice(0,130));return {ok:false,mensaje:e&&e.message||String(e)};}
+  }
+  const titulo=(tipo==="cancelacion"?"Cancelación ":"Cocina ")+c.folio;
+  const html=tipo==="cancelacion"?(contenido||""):cuerpoComandaCocinaPOS(c,propias);
+  const resultado=await imprimeHoja(titulo,html,{tipo:tipo==="cancelacion"?"cancelacion":"comanda",impresoraId:p.id,...(REST_NUBE.enabled?{nubeLineas:propias,nubeRuta:route,nubeTipo:tipo,reintentaNube:reintenta}:{})});
+  if(REST_NUBE.enabled&&resultado.some(r=>r.ok)){
+    if(sinRed){propias.forEach(linea=>marcaImpresionOffline(c,linea,route,tipo));}
+    else{try{await confirmaLineasNube(propias,route,tipo);propias.forEach(linea=>{linea.impreso=linea.impreso||{};linea.impreso[route]={por:REST_NUBE.deviceId,en:new Date().toISOString(),ok:true};});}
+      catch(e){propias.forEach(linea=>{linea.impreso=linea.impreso||{};linea.impreso[route]={por:REST_NUBE.deviceId,en:new Date().toISOString(),ok:false};encolaConfirmacionImpresion(linea,route,tipo);});REST_NUBE.error="Impresión pendiente de confirmar";}}
+    guardaEstadoLocal();return {ok:true};
+  }
+  return resultado[0]||{ok:true};
+}
+async function imprimeComandaCocina(c,lineas,yaEnNube){
+  if(!c||!lineas||!lineas.length)return;
+  const destinos=IMPRESORAS.filter(p=>p.cocina&&lineasParaImpresoraPOS(lineas,p).length);
+  if(!destinos.length)return;
+  if(REST_NUBE.enabled&&navigator.onLine&&!yaEnNube)await sincronizaNubeEnSerie(true);
+  const jobs=destinos.map(async p=>{const filtradas=lineasParaImpresoraPOS(lineas,p);if(filtradas.length)await imprimeComandaRutaNube(c,p,filtradas,"comanda");});
+  await Promise.all(jobs);
+}
+function procesaLineasEntrantes(){
+  if(!REST_NUBE.incomingLines.size)return;
+  const ids=new Set(REST_NUBE.incomingLines);REST_NUBE.incomingLines.clear();
+  const envios={};(COMANDAS||[]).forEach(c=>(c.lineas||[]).forEach(l=>{if(ids.has(String(l.id))&&l.enviada&&!l.cancelada){const id=l.envioId||"linea:"+l.id,key=c.id+"|"+id;(envios[key]||(envios[key]={c,id,total:l.envioId?Math.max(1,num(l.envioTotal,1)):1,legado:!l.envioId,lineas:[]})).lineas.push(l);}}));
+  Object.values(envios).forEach(x=>{const batch=x.legado?x.lineas:(x.c.lineas||[]).filter(l=>l.envioId===x.id&&l.enviada),pendientes=batch.filter(l=>!l.cancelada);if(batch.length<x.total){pendientes.forEach(l=>REST_NUBE.incomingLines.add(String(l.id)));return;}if(pendientes.length)imprimeComandaCocina(x.c,pendientes,true);});
 }
 
 /* Lo cancelado también se imprime: si la cocina no tiene pantalla, el papel
    es la única forma de que se entere. */
-function imprimeCancelacion(c, x){
+async function imprimeCancelacion(c, x){
   let cuerpo = '<div class="c xl">CANCELAR</div>';
   cuerpo += '<div class="c g">'+(c.appId ? esc(c.appNombre||c.mesaNombre).toUpperCase() : c.mesaId === "llevar" ? "PARA LLEVAR" : esc(c.mesaNombre).toUpperCase())+'</div>';
   cuerpo += '<div class="c">'+esc(c.folio)+' · '+esc(horaAhora())+'</div><hr>';
@@ -5879,7 +6177,8 @@ function imprimeCancelacion(c, x){
   cuerpo += '<div class="caja">'+esc(x.motivo).toUpperCase()+'</div>';
   if(x.nota) cuerpo += '<div class="c">'+esc(x.nota)+'</div>';
   cuerpo += '<div class="c">Pidió: '+esc(x.quien||"")+'</div>';
-  imprimeHoja("Cancelación " + c.folio, cuerpo, {tipo:"cancelacion"});
+  const destinos=IMPRESORAS.filter(p=>p.cancela&&( !Array.isArray(p.categorias)||!p.categorias.length||p.categorias.includes(x.categoria)));
+  await Promise.all(destinos.map(p=>imprimeComandaRutaNube(c,p,[x],"cancelacion",cuerpo)));
 }
 
 /* ===================================================================
@@ -7204,6 +7503,8 @@ $("#impresorasCard").addEventListener("click",e=>{
 document.addEventListener("click",e=>{
   const reintentar=e.target.closest("[data-imp-reintentar]");
   if(reintentar) reintentaTrabajoImpresoraPOS(reintentar.dataset.impReintentar);
+  const reclamo=e.target.closest("[data-imp-reclamo]");
+  if(reclamo) imprimeReclamoPendienteNube(Number(reclamo.dataset.impReclamo));
 });
 window.onMakersPrinterPermissionResult=function(concedido){
   if(concedido) buscaEmparejadasImpresorasPOS();
@@ -7287,7 +7588,7 @@ function renderEquipo(){
         (u.foto?'<button class="btn sm ghost" type="button" data-fotoquitar>Quitar</button>':'')+'</div></td>' +
       '<td><select data-uk="rol">'+Object.keys(ROLES).map(r=>
         '<option value="'+r+'"'+(r===u.rol?" selected":"")+'>'+ROLES[r].nombre+'</option>').join("")+'</select></td>' +
-      '<td><input data-uk="pin" type="password" inputmode="numeric" maxlength="12" value="'+esc(u.pin||"")+'" placeholder="sin clave"></td>' +
+      '<td><input data-uk="pin" type="password" inputmode="numeric" maxlength="12" value="'+esc(u.pin||"")+'" placeholder="'+(u.pin_hash?"registrada · escribe para cambiar":"sin clave")+'"></td>' +
       '<td style="text-align:center"><input type="checkbox" data-uk="activo" style="width:auto"'+(u.activo!==false?" checked":"")+'></td>' +
       '<td><button class="btn sm ghost" data-delusr="'+esc(u.id)+'"'+(EQUIPO.length<2?" disabled":"")+'>✕</button></td></tr>').join("") +
     '</tbody>';
@@ -7316,7 +7617,7 @@ $("#tab-set").addEventListener("input", e=>{
   const tru = t.closest("[data-usr]");
   if(tru && t.dataset.uk){
     const u = EQUIPO.find(x=>x.id === tru.dataset.usr);
-    if(u){ u[t.dataset.uk] = t.value; pintaNotaBloqueo(); persist(); }
+    if(u){ if(t.dataset.uk==="pin"){delete u.pin_hash;delete u.pinHash;}u[t.dataset.uk] = t.value; pintaNotaBloqueo(); persist(); }
   }
 });
 $("#tab-set").addEventListener("change", e=>{
@@ -7507,6 +7808,8 @@ function aplicaRol(){
   $("#userRol").textContent = (ROLES[r]||ROLES.gerente).nombre;
   const userAv=$("#userAv"); userAv.innerHTML=u.foto?'<img src="'+esc(u.foto)+'" alt="Foto de usuario">':esc((u.nombre||"?").trim().charAt(0).toUpperCase());
   contextoPOSUI();
+  document.body.classList.toggle("modo-mesero",r==="mesero");
+  $("#comCobrar").classList.toggle("meseroOculto",!soyAutoridad());
   pintaTabs();
   /* Todo lo que dependa del rol se vuelve a pintar AQUI. Es el unico lugar
      por donde pasa un cambio de persona, y lo que no se repinte aqui se
@@ -7514,7 +7817,7 @@ function aplicaRol(){
   pintaTurnoChip();
   const visible = PESTANAS.filter(p=>puedeVer(p.k)).map(p=>p.k);
   const abierta = PESTANAS.concat([{k:"comanda"}]).find(p=>{ const s=$("#tab-"+p.k); return s && !s.hidden; });
-  if(!abierta || (abierta.k !== "comanda" && visible.indexOf(abierta.k) < 0)) vaA(visible[0]);
+  if(!abierta || !puedeVer(abierta.k)) vaA(visible[0]);
   else if(abierta.k !== "comanda") vaA(abierta.k);   /* la misma pestaña, pero con los ojos del nuevo */
 }
 
@@ -7524,7 +7827,8 @@ function aplicaRol(){
 var bloqueado = false, relojInactivo = null;
 var relojBloqueoIntervalo = null;
 const MIN_BLOQUEO = 10;
-const tieneClave = u => !!String((u||{}).pin||"").trim();
+const tieneClave = u => !!(String((u||{}).pin||"").trim()||String((u||{}).pin_hash||(u||{}).pinHash||"").trim());
+async function validaClavePerfil(u,clave){if(!u)return false;const hash=u.pin_hash||u.pinHash;if(hash){try{return await nubeSha256((REST_NUBE.pinSalt||localStorage.getItem(LS_BASE+"_nube_pin_salt_v1")||"")+String(clave||""))===hash;}catch(_){return false;}}return String(clave||"")===String(u.pin||"");}
 const minutosBloqueo = () => { const n = num(P.bloqueoMin, MIN_BLOQUEO); return n > 0 ? n : 0; };
 const puedeBloquear = () => minutosBloqueo() > 0;
 
@@ -7666,9 +7970,9 @@ $("#accesoPerfiles").addEventListener("click", e=>{
   $("#accesoClave").hidden = false; $("#accesoPass").focus();
   pintaAccesoReloj();
 });
-$("#accesoEntrar").addEventListener("click", ()=>{
+$("#accesoEntrar").addEventListener("click", async ()=>{
   const u = EQUIPO.find(x=>x.id === perfilPendiente); if(!u) return;
-  if(($("#accesoPass").value||"") !== u.pin){
+  if(!(await validaClavePerfil(u,$("#accesoPass").value||""))){
     $("#accesoError").textContent = "Clave incorrecta"; $("#accesoError").hidden = false;
     $("#accesoPass").value = ""; $("#accesoPass").focus(); return;
   }
@@ -7786,41 +8090,23 @@ function start(){
   window.addEventListener("storage", e=>{
     if(e.key === EVENTOS_KEY){ EVENTOS=leeEventos(); pintaTabs(); if(!$("#tab-eventos").hidden) renderEventos(); return; }
     if(!e.key || e.key.indexOf(LS) !== 0) return;
+    MENU     = lsGet("menu", MENU);
     COMANDAS = lsGet("comandas", COMANDAS);
     MESAS    = lsGet("mesas", MESAS);
-    TURNOS   = lsGet("turnos", TURNOS);
+    P        = Object.assign(paramsPorDefecto(),lsGet("P",P));
+    EQUIPO   = lsGet("equipo",EQUIPO);
+    DECOR    = lsGet("decor",DECOR);
     if(!$("#tab-cocina").hidden) renderCocina();
     if(!$("#tab-mesas").hidden)  renderMesas();
     if(!$("#tab-comanda").hidden && comandaActual()) pintaLineas();
     pintaTabs(); pintaTurnoChip();
   });
 }
-start();
-
-/* La nube es opcional: si existe, se baja lo guardado y se mezcla. Si no,
-   el punto de venta funciona igual — que es justo lo que tiene que pasar
-   cuando se cae el internet a media comida. */
-(async function(){
-  if(POS_CONTEXT){ cargaAnuncios(); return; }
-  try{
-    DB = await (window.claude && window.claude.use ? window.claude.use("db") : null);
-  }catch(e){ DB = null; }
-  if(DB){
-    try{
-      const m = await DB.doc("config/menu").get();
-      if(m && m.exists && m.data().menu) { MENU = m.data().menu; }
-      const ms = await DB.doc("config/mesas").get();
-      if(ms && ms.exists && ms.data().mesas) { MESAS = ms.data().mesas; }
-      const pp = await DB.doc("config/parametros").get();
-      if(pp && pp.exists && pp.data().P) { P = Object.assign(paramsPorDefecto(), pp.data().P); }
-      const eq = await DB.doc("config/equipo").get();
-      if(eq && eq.exists && eq.data().equipo) { EQUIPO = eq.data().equipo; }
-      laNube = true;
-      aplicaRol(); renderMesas();
-    }catch(e){}
-  }
-  cargaAnuncios();
-})();
+async function iniciaRestaurant(){
+  try{await iniciaNubeRestaurant();}catch(e){REST_NUBE.localOnly=true;REST_NUBE.error="No se pudo revisar SQL 20";actualizaEstadoNube();}
+  start();cargaAnuncios();
+}
+iniciaRestaurant();
 })();
 </script>
 
