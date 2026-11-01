@@ -12,6 +12,17 @@ Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este r
    0c. ✅ **`TAREA-PRECIOS.md`** (publicado el 31 oct, `6111648`; la landing va en `nuvoo-web` `0477c33`): la promoción de apertura ($98 los primeros 3 meses en Imprenta Básico, Restaurant y Store) y **Multiempresa = sucursales** ($899, hasta 4, por sistema). Se quita el combo Restaurant + Store.
    0d. ✅ **`TAREA-NEGOCIOS.md`** (publicado el 31 oct, `41f410d`; falta que Carlos corra `sql/19`): varios negocios con el mismo correo. Carlos tendrá Imprenta, Restaurant y Store, cada uno como **cuenta propia**, y al iniciar sesión escoge con cuál trabaja («Tus negocios»). Lleva `sql/19-negocios-por-correo.sql` (RLS por membresía y rol en ESA cuenta, `mis_empresas` con producto, `crear_negocio`, escalera de planes sólo en Imprenta) y cambios en la puerta, Restaurant, Store e Imprenta. **Los POS no cambian la cuenta activa.**
    0e. **`TAREA-NUBE-RESTAURANT.md` (URGENTE, 31 oct 20:10):** el Restaurant en la nube y en tiempo real, como Loyverse. Tablet, celular y laptop ven y editan lo mismo, y sin internet se sigue cobrando. **La fase 1 incluye a los meseros mandando a cocina desde el celular**, con cada comanda impresa una sola vez. Lleva `sql/20-restaurant-nube.sql`. **Reemplaza la idea de «buzón» de `TAREA-MESEROS.md`.**
+      - ✅ La fase 1 se publicó el 31 oct (`8f68dd2`). **La prueba real del 1 nov falló:** el negocio nació vencido y las subidas iniciales se iban a mezclar. Ver 0f.
+   0f. **`TAREA-NUBE-ARREGLO.md` (URGENTE, 1 nov):**
+      - `crear_negocio` con 15 días de prueba (`sql/21`).
+      - Aviso claro de «plan vencido».
+      - Nunca mezclar dos subidas iniciales.
+      - El Lab ve el 19, el 20 y el 21.
+   0g. **`TAREA-TICKETS-Y-LLEVAR.md` (1 nov):**
+      - Comandas de cocina grandes y con negritas (ESC/POS; quizá APK 0.1.3).
+      - Nombre del cliente en los pedidos para llevar, en cocina y en caja.
+      - **Maqueta de los tickets primero.**
+   0h. **Fase 2 del Restaurant en la nube:** caja, turnos y cortes compartidos. Carlos ya lo necesita: «tienen cortes de caja diferentes». Se escribe la tarea después de 0g.
       - **Pendientes que pidió Carlos para después de la fase 1** (ver la sección 3.8 de esa tarea):
         - **Modo local en el APK:** la tablet como servidor en el WiFi, para que los meseros manden sin internet.
         - **Versión de celular más simple.**

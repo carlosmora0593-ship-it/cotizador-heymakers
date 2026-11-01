@@ -1358,6 +1358,8 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 .restaurantSyncIndicator{display:inline-flex;align-items:center;gap:6px;max-width:230px;min-width:0;color:var(--ink-2);font-size:10px;font-weight:750;line-height:1.2}
 .restaurantSyncIndicator i{width:8px;height:8px;flex:none;border-radius:50%;background:var(--ink-3)}
 .restaurantSyncIndicator span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.restaurantSyncIndicator.error{max-width:min(440px,38vw);align-items:flex-start;color:var(--mal)}
+.restaurantSyncIndicator.error span{overflow:visible;text-overflow:clip;white-space:normal}
 .restaurantSyncIndicator.enlinea i{background:var(--good)}.restaurantSyncIndicator.pendiente i{background:var(--warn)}
 .restaurantSyncIndicator.error i{background:var(--mal)}.restaurantSyncIndicator.local i{background:var(--ink-3)}
 @media(max-width:620px){.restaurantSyncIndicator{order:7;flex:1 0 100%;max-width:none;font-size:10.5px}.restaurantSyncIndicator span{white-space:normal}}
@@ -2199,7 +2201,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
   <div class="card" style="width:min(520px,100%)">
     <header><h2 id="restaurantNubeTitulo">Hay datos en este aparato y en la nube</h2></header>
     <div class="body">
-      <p id="restaurantNubeDetalle" class="note" style="margin:0 0 14px">Para no mezclar comandas, elige qué datos abrir.</p>
+      <p id="restaurantNubeDetalle" class="note" style="margin:0 0 14px">La nube ya tiene datos distintos. Para no mezclarlos, elige qué datos abrir.</p>
       <p id="restaurantNubeRespaldoAviso" class="hint" aria-live="polite" hidden></p>
       <div class="grid" style="gap:9px">
         <button class="btn" id="restaurantNubeBajar" type="button">Bajar respaldo y usar la nube</button>
@@ -2624,21 +2626,37 @@ function lsSet(k, v){ try{ localStorage.setItem(LS+"_"+k, JSON.stringify(v)); }c
 const REST_NUBE_QUEUE_KEY=LS_BASE+"_nube_salida_v1";
 const REST_NUBE_DEVICE_KEY=LS_BASE+"_nube_aparato_v1";
 const REST_NUBE_PROJECTION_KEY=LS_BASE+"_nube_proyeccion_v1";
+const REST_NUBE_MIGRATION_FIELD="_nuvoorMigracion";
+const REST_NUBE_MIGRATION_FLAG=LS_BASE+"_nube_migracion_v1";
+const REST_NUBE_SYNCED_KEY=LS_BASE+"_nube_sync_ok_v1";
+const REST_NUBE_MIGRATION_BACKUP_KEY=LS_BASE+"_respaldo_migracion_v1";
+const REST_NUBE_MIGRATION_LOCK_ID="migracion_inicial";
 let DB = null, laNube = false;
 let guardaT = null;
 let restaurando = false;
-const REST_NUBE={enabled:false,localOnly:false,ready:false,verified:false,deviceId:"",queue:[],serverDocs:{},projection:{},cursor:"1970-01-01T00:00:00.000Z",channel:null,poll:null,realtimeTimer:null,flushPromise:null,localDirty:false,applyPending:false,pinSalt:"",error:"",retryTimer:null,claimedLines:new Set(),failedPrints:new Set(),ticketIds:new Set(),incomingLines:new Set(),claimAlerts:[],claimBusy:new Set()};
+const REST_NUBE={enabled:false,localOnly:false,ready:false,verified:false,deviceId:"",queue:[],serverDocs:{},projection:{},cursor:"1970-01-01T00:00:00.000Z",channel:null,poll:null,realtimeTimer:null,flushPromise:null,localDirty:false,applyPending:false,pinSalt:"",error:"",retryTimer:null,subscriptionBlocked:false,migrandoInicial:false,migrationClaimed:false,migrationConflictOpen:false,conflictResolver:null,claimedLines:new Set(),failedPrints:new Set(),ticketIds:new Set(),incomingLines:new Set(),claimAlerts:[],claimBusy:new Set()};
 function nubeLee(key,defecto){try{const value=localStorage.getItem(key);return value?JSON.parse(value):defecto;}catch(_){return defecto;}}
 function nubeGuarda(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true;}catch(_){return false;}}
+function nubeTieneBaseSincronizada(){try{return localStorage.getItem(REST_NUBE_SYNCED_KEY)==="si"||localStorage.getItem(REST_NUBE_MIGRATION_FLAG)==="hecho";}catch(_){return false;}}
+function nubeMarcaBaseSincronizada(){try{localStorage.setItem(REST_NUBE_SYNCED_KEY,"si");}catch(_){}}
+function nubeConOrigenMigracion(cuerpo,aparato){const body=Object.assign({},cuerpo||{});body[REST_NUBE_MIGRATION_FIELD]={aparato:String(aparato||"")};return body;}
+function nubeOrigenMigracion(cuerpo){return String(cuerpo&&cuerpo[REST_NUBE_MIGRATION_FIELD]&&cuerpo[REST_NUBE_MIGRATION_FIELD].aparato||"");}
+function nubeSinMarcaMigracion(cuerpo){const body=Object.assign({},cuerpo||{});delete body[REST_NUBE_MIGRATION_FIELD];return body;}
 function nubeDeviceId(){let id="";try{id=localStorage.getItem(REST_NUBE_DEVICE_KEY)||"";if(!id){id=uid();localStorage.setItem(REST_NUBE_DEVICE_KEY,id);}}catch(_){id=uid();}return id;}
 REST_NUBE.deviceId=nubeDeviceId();
 REST_NUBE.queue=nubeLee(REST_NUBE_QUEUE_KEY,[]);
+try{const migFlag=localStorage.getItem(REST_NUBE_MIGRATION_FLAG),sinBase=nubeTieneBaseSincronizada(),marcarCola=migFlag==="si"||(!sinBase&&migFlag!=="local"&&migFlag!=="hecho");if(marcarCola){let changed=false;REST_NUBE.queue=REST_NUBE.queue.map(q=>{if(!q||String(q.cuenta_id)!==String(RESTAURANT_ACCOUNT.accountId))return q;const aparato=q.aparato||REST_NUBE.deviceId;if(q.migracion!==true||!q.aparato||nubeOrigenMigracion(q.cuerpo)!==aparato)changed=true;return Object.assign({},q,{migracion:true,aparato,cuerpo:nubeConOrigenMigracion(q.cuerpo,aparato)});});if(changed)nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);REST_NUBE.migrandoInicial=REST_NUBE.queue.some(q=>q&&String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)&&q.migracion===true);}}catch(_){}
 REST_NUBE.projection=nubeLee(REST_NUBE_PROJECTION_KEY,{});
 function estadoNube(tipo,texto){const el=$("#restaurantSync"),label=$("#restaurantSyncText");if(!el||!label)return;el.className="restaurantSyncIndicator "+tipo;label.textContent=texto;}
 function cantidadCambiosNube(queue){const grupos=new Set();(queue||[]).filter(q=>String(q&&q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)).forEach(q=>{const c=q&&q.cuerpo||{},id=q&&q.coleccion==="rest_comandas"?c.id:q&&q.coleccion==="rest_lineas"?c.comandaId:null;grupos.add(id?"comanda:"+id:(q&&q.key)||"");});return grupos.size;}
+function nubeEsErrorPlan(error){const msg=typeof error==="string"?error:String(error&&(error.message||error.details||error.code)||error||"");return /SUSCRIPCION_VENCIDA|SIN_PLAN/i.test(msg);}
+function nubeBloqueaYProgramaReintento(){REST_NUBE.subscriptionBlocked=true;if(REST_NUBE.retryTimer)return;clearTimeout(REST_NUBE.retryTimer);REST_NUBE.retryTimer=setTimeout(()=>{REST_NUBE.retryTimer=null;REST_NUBE.subscriptionBlocked=false;REST_NUBE.error="";if(REST_NUBE.enabled&&navigator.onLine)sincronizaNubeEnSerie(true);else actualizaEstadoNube();},120000);}
+function nubeRegistraError(error){REST_NUBE.error=String(error&&error.message||error||"Error de nube").slice(0,120);if(nubeEsErrorPlan(error)){clearTimeout(REST_NUBE.retryTimer);REST_NUBE.retryTimer=null;REST_NUBE.subscriptionBlocked=true;nubeBloqueaYProgramaReintento();}actualizaEstadoNube();}
 function actualizaEstadoNube(){
   const pendientes=cantidadCambiosNube(REST_NUBE.queue);
   if(REST_NUBE.localOnly||!REST_NUBE.enabled){estadoNube("local","Sólo este aparato"+(REST_NUBE.error?" · "+REST_NUBE.error:""));return;}
+  if(nubeEsErrorPlan(REST_NUBE.error))nubeBloqueaYProgramaReintento();
+  if(REST_NUBE.subscriptionBlocked){estadoNube("error","La nube no guarda: el plan de "+(RESTAURANT_ACCOUNT.accountName||"este negocio")+" venció. Actívalo en el Lab o en Licencias.");return;}
   if(!navigator.onLine){estadoNube("pendiente","Sin conexión · "+pendientes+" cambio"+(pendientes===1?"":"s")+" por subir");return;}
   if(REST_NUBE.error){estadoNube("error","No se pudo sincronizar · "+(REST_NUBE.error||"revisa conexión"));return;}
   if(pendientes){estadoNube("pendiente","Sincronizando · "+pendientes+" cambio"+(pendientes===1?"":"s"));return;}
@@ -2687,13 +2705,13 @@ async function proyectaRestaurant(){
   (EVENTOS||[]).forEach(x=>nubePut(out,"rest_eventos",String(x.id),Object.assign({},nubeClona(x),{eventoId:""})));
   return out;
 }
-function nubeQueueDoc(doc){const key=nubeClave(doc.coleccion,doc.doc_id),idx=REST_NUBE.queue.findIndex(x=>x.key===key),old=idx>=0?REST_NUBE.queue[idx]:{},entry=Object.assign({key,creado:new Date().toISOString(),intentos:0},doc);if(idx>=0){entry.creado=old.creado;entry.intentos=old.intentos||0;if(!Object.prototype.hasOwnProperty.call(doc,"impresionOffline")&&old.impresionOffline)entry.impresionOffline=old.impresionOffline;if(!Object.prototype.hasOwnProperty.call(doc,"confirmarImpresion")&&old.confirmarImpresion)entry.confirmarImpresion=old.confirmarImpresion;REST_NUBE.queue[idx]=entry;}else REST_NUBE.queue.push(entry);nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);}
+function nubeQueueDoc(doc){const key=nubeClave(doc.coleccion,doc.doc_id),idx=REST_NUBE.queue.findIndex(x=>x.key===key),old=idx>=0?REST_NUBE.queue[idx]:{},entry=Object.assign({key,creado:new Date().toISOString(),intentos:0},doc);if(idx>=0){entry.creado=old.creado;entry.intentos=old.intentos||0;if(!Object.prototype.hasOwnProperty.call(doc,"impresionOffline")&&old.impresionOffline)entry.impresionOffline=old.impresionOffline;if(!Object.prototype.hasOwnProperty.call(doc,"confirmarImpresion")&&old.confirmarImpresion)entry.confirmarImpresion=old.confirmarImpresion;}const aparato=entry.aparato||old.aparato||REST_NUBE.deviceId;if(entry.migracion||old.migracion||REST_NUBE.migrandoInicial){entry.migracion=true;entry.aparato=aparato;entry.cuerpo=nubeConOrigenMigracion(entry.cuerpo,aparato);}else{const origen=nubeOrigenMigracion(old.cuerpo)||nubeOrigenMigracion(REST_NUBE.serverDocs[key]&&REST_NUBE.serverDocs[key].cuerpo);if(origen)entry.cuerpo=nubeConOrigenMigracion(entry.cuerpo,origen);}if(idx>=0)REST_NUBE.queue[idx]=entry;else REST_NUBE.queue.push(entry);nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);}
 function nubeCanon(v){if(v===null||typeof v!=="object")return JSON.stringify(v);if(Array.isArray(v))return "["+v.map(nubeCanon).join(",")+"]";return "{"+Object.keys(v).sort().map(k=>JSON.stringify(k)+":"+nubeCanon(v[k])).join(",")+"}";}
 function nubeDocsDesdeServidor(){return Object.fromEntries(Object.entries(REST_NUBE.serverDocs).map(([k,v])=>[k,{cuenta_id:v.cuenta_id,coleccion:v.coleccion,doc_id:v.doc_id,cuerpo:v.cuerpo}]));}
 function nubeRebaseMap(){const out=nubeDocsDesdeServidor();REST_NUBE.queue.filter(q=>String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)).forEach(q=>out[q.key]={cuenta_id:q.cuenta_id,coleccion:q.coleccion,doc_id:q.doc_id,cuerpo:q.cuerpo});return out;}
 function nubeDocsDeContexto(docs){const ev=nubeEventoId();return Object.fromEntries(Object.entries(docs).filter(([,d])=>d&&d.coleccion!=="rest_contadores"&&d.coleccion!=="rest_locks"&&(d.coleccion==="rest_eventos"||(d.cuerpo&&String(d.cuerpo.eventoId||"")===ev))));}
 async function sincronizaNubeLocal(){
-  if(!REST_NUBE.enabled||REST_NUBE.localOnly||REST_NUBE.localDirty||restaurando)return;
+  if(!REST_NUBE.enabled||REST_NUBE.localOnly||REST_NUBE.localDirty||REST_NUBE.subscriptionBlocked||restaurando)return;
   const current=await proyectaRestaurant(),previous=REST_NUBE.projection||{};
   Object.keys(current).forEach(key=>{const old=previous[key];if(!old||nubeCanon(old.cuerpo)!==nubeCanon(current[key].cuerpo)){if(current[key].coleccion==="rest_tickets"&&(REST_NUBE.ticketIds.has(current[key].doc_id)||REST_NUBE.queue.some(q=>q.key===key)))return;nubeQueueDoc(current[key]);}});
   Object.keys(previous).forEach(key=>{if(current[key])return;const old=previous[key];if(!old||old.cuerpo&&old.cuerpo._eliminado)return;nubeQueueDoc({cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:old.coleccion,doc_id:old.doc_id,cuerpo:{_eliminado:true,eventoId:nubeEventoId(),borradoEn:new Date().toISOString()}});});
@@ -2709,12 +2727,15 @@ function sincronizaNubeEnSerie(inmediato){
 function vaciaColaNube(){
   if(REST_NUBE.uploadPromise)return REST_NUBE.uploadPromise;
   REST_NUBE.uploadPromise=(async()=>{
-    if(!REST_NUBE.enabled||!navigator.onLine||!RESTAURANT_SB||!REST_NUBE.queue.length){actualizaEstadoNube();return;}
+    if(!REST_NUBE.enabled||REST_NUBE.subscriptionBlocked||!navigator.onLine||!RESTAURANT_SB||!REST_NUBE.queue.length){actualizaEstadoNube();return;}
     actualizaEstadoNube();
+    let loteMigracionVerificado=false;
     while(REST_NUBE.queue.length&&navigator.onLine){
       const cuentaActiva=String(RESTAURANT_ACCOUNT.accountId),idx=REST_NUBE.queue.findIndex(q=>String(q.cuenta_id)===cuentaActiva);if(idx<0)break;
       const q=REST_NUBE.queue[idx],payload={cuenta_id:q.cuenta_id,coleccion:q.coleccion,doc_id:q.doc_id,cuerpo:q.cuerpo};
       try{
+        const migPendiente=REST_NUBE.queue.find(x=>x&&x.migracion===true&&String(x.cuenta_id)===cuentaActiva);
+        if(migPendiente&&!loteMigracionVerificado){const guard=await nubePreparaLoteMigracion(migPendiente);if(!guard.ok){const decision=await resuelveConflictoMigracionNube(guard.detalle);if(decision==="cloud"){loteMigracionVerificado=false;continue;}break;}loteMigracionVerificado=true;}
         let result;
         if(q.impresionOffline){result=await RESTAURANT_SB.rpc("rest_subir_impresion_offline",{p_cuenta:q.cuenta_id,p_doc_id:q.doc_id,p_cuerpo:q.cuerpo,p_ruta:q.impresionOffline.ruta,p_aparato:q.impresionOffline.aparato});if(result.error)throw result.error;}
         else if(q.confirmarImpresion){result=await RESTAURANT_SB.rpc("rest_confirma_impresion",{p_cuenta:q.cuenta_id,p_lineas:[q.doc_id],p_ruta:q.confirmarImpresion.ruta,p_aparato:q.confirmarImpresion.aparato});if(result.error)throw result.error;if(!(result.data||[]).includes(q.doc_id)){REST_NUBE.error="No se pudo confirmar el reclamo de impresión";actualizaEstadoNube();break;}}
@@ -2722,38 +2743,127 @@ function vaciaColaNube(){
         const actualizado=new Date().toISOString();
         const body=q.impresionOffline?Object.assign({},q.cuerpo,{impreso:Object.assign({},q.cuerpo.impreso,{[q.impresionOffline.ruta]:{por:q.impresionOffline.aparato,en:actualizado,ok:true,confirmado:actualizado,sinRed:true}})}):q.cuerpo;
         REST_NUBE.serverDocs[q.key]={cuenta_id:q.cuenta_id,coleccion:q.coleccion,doc_id:q.doc_id,cuerpo:body,actualizado};if(q.coleccion==="rest_tickets")REST_NUBE.ticketIds.add(q.doc_id);if(!q.impresionOffline&&!q.confirmarImpresion&&q.coleccion==="rest_lineas"&&q.cuerpo&&q.cuerpo.enviada)REST_NUBE.incomingLines.add(q.cuerpo.id||q.doc_id.replace(/^linea_/,""));
-        REST_NUBE.queue.splice(idx,1);nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);REST_NUBE.error="";actualizaEstadoNube();
-      }catch(e){const q=REST_NUBE.queue[0];if(q)q.intentos=(q.intentos||0)+1;REST_NUBE.error=String(e&&e.message||e||"Error de red").slice(0,80);nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);actualizaEstadoNube();clearTimeout(REST_NUBE.retryTimer);REST_NUBE.retryTimer=setTimeout(()=>{if(REST_NUBE.enabled)vaciaColaNube();},Math.min(30000,1000*Math.pow(2,Math.min(5,q&&q.intentos||1))));break;}
+        REST_NUBE.queue.splice(idx,1);nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);REST_NUBE.subscriptionBlocked=false;clearTimeout(REST_NUBE.retryTimer);REST_NUBE.retryTimer=null;REST_NUBE.error="";actualizaEstadoNube();
+      }catch(e){
+        const current=REST_NUBE.queue.find(x=>x.key===q.key);
+        if(current)current.intentos=(current.intentos||0)+1;
+        nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);
+        clearTimeout(REST_NUBE.retryTimer);REST_NUBE.retryTimer=null;
+        if(nubeEsErrorPlan(e))nubeRegistraError(e);
+        else{
+          REST_NUBE.error=String(e&&e.message||e||"Error de red").slice(0,120);
+          REST_NUBE.retryTimer=setTimeout(()=>{REST_NUBE.retryTimer=null;if(REST_NUBE.enabled&&!REST_NUBE.subscriptionBlocked)vaciaColaNube();},Math.min(30000,1000*Math.pow(2,Math.min(5,current&&current.intentos||1))));
+          actualizaEstadoNube();
+        }
+        break;
+      }
     }
+    if(!REST_NUBE.queue.some(q=>q&&String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId))&&!REST_NUBE.error){if(REST_NUBE.migrandoInicial){REST_NUBE.migrandoInicial=false;try{if(localStorage.getItem(REST_NUBE_MIGRATION_FLAG)==="si")localStorage.setItem(REST_NUBE_MIGRATION_FLAG,"hecho");}catch(_){}}nubeMarcaBaseSincronizada();}
     if(!REST_NUBE.queue.length)actualizaEstadoNube();
     procesaLineasEntrantes();
   })().finally(()=>{REST_NUBE.uploadPromise=null;});
   return REST_NUBE.uploadPromise;
 }
-function muestraMigracionNube(titulo,detalle){const modal=$("#restaurantNubeMigracion");$("#restaurantNubeMigracionTitulo").textContent=titulo;$("#restaurantNubeMigracionDetalle").textContent=detalle;modal.hidden=false;return new Promise(resolve=>{const done=value=>{modal.hidden=true;["restaurantNubeMigracionSi","restaurantNubeMigracionLocal","restaurantNubeMigracionCancelar"].forEach(id=>document.getElementById(id).removeEventListener("click",handlers[id]));resolve(value);};const handlers={restaurantNubeMigracionSi:()=>done("subir"),restaurantNubeMigracionLocal:()=>done("local"),restaurantNubeMigracionCancelar:()=>done("local")};Object.keys(handlers).forEach(id=>document.getElementById(id).addEventListener("click",handlers[id]));});}
-function descargaRespaldoRestaurant(){try{const payload={fecha:new Date().toISOString(),negocio:RESTAURANT_ACCOUNT.accountName,menu:MENU,mesas:MESAS,comandas:COMANDAS,P:Object.assign({},P,{negocio:Object.assign({},P.negocio,{logo:"[imagen local no incluida]"})}),equipo:EQUIPO.map(u=>({id:u.id,nombre:u.nombre,rol:u.rol}))};const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="respaldo-restaurant-"+hoyISO()+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);}catch(e){toast("No se pudo bajar el respaldo local.");}}
+function muestraMigracionNube(titulo,detalle,accion){const modal=$("#restaurantNubeMigracion"),btn=$("#restaurantNubeMigracionSi"),original=btn.textContent;$("#restaurantNubeMigracionTitulo").textContent=titulo;$("#restaurantNubeMigracionDetalle").textContent=detalle;if(accion)btn.textContent=accion;modal.hidden=false;return new Promise(resolve=>{const done=value=>{modal.hidden=true;btn.textContent=original;["restaurantNubeMigracionSi","restaurantNubeMigracionLocal","restaurantNubeMigracionCancelar"].forEach(id=>document.getElementById(id).removeEventListener("click",handlers[id]));resolve(value);};const handlers={restaurantNubeMigracionSi:()=>done("subir"),restaurantNubeMigracionLocal:()=>done("local"),restaurantNubeMigracionCancelar:()=>done("local")};Object.keys(handlers).forEach(id=>document.getElementById(id).addEventListener("click",handlers[id]));});}
+function respaldoRestaurantActual(){return {fecha:new Date().toISOString(),negocio:RESTAURANT_ACCOUNT.accountName,menu:MENU,mesas:MESAS,comandas:COMANDAS,P:Object.assign({},P,{negocio:Object.assign({},P.negocio,{logo:"[imagen local no incluida]"})}),equipo:EQUIPO.map(u=>({id:u.id,nombre:u.nombre,rol:u.rol}))};}
+function guardaRespaldoMigracionRestaurant(){try{localStorage.setItem(REST_NUBE_MIGRATION_BACKUP_KEY,JSON.stringify(respaldoRestaurantActual()));return true;}catch(e){toast("No hubo espacio para guardar el respaldo local. Tus datos siguen aquí; no apliqué la nube.");return false;}}
+function descargaRespaldoRestaurant(){try{const blob=new Blob([JSON.stringify(respaldoRestaurantActual(),null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="respaldo-restaurant-"+hoyISO()+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);}catch(e){toast("No se pudo bajar el respaldo local.");}}
+function nubeQuitaMigracionActual(){const antes=REST_NUBE.queue.length;REST_NUBE.queue=REST_NUBE.queue.filter(q=>!(q&&q.migracion===true&&String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)&&String(q.aparato||"")===String(REST_NUBE.deviceId)));if(REST_NUBE.queue.length!==antes)nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);try{localStorage.removeItem(REST_NUBE_MIGRATION_FLAG);}catch(_){}nubeMarcaBaseSincronizada();REST_NUBE.migrandoInicial=false;REST_NUBE.migrationClaimed=false;}
+function pausaNubeEnEsteAparato(){REST_NUBE.enabled=false;REST_NUBE.localOnly=true;REST_NUBE.error="";try{localStorage.setItem(REST_NUBE_MIGRATION_FLAG,"local");}catch(_){}actualizaEstadoNube();}
+async function resuelveConflictoMigracionNube(detalle){const modal=$("#restaurantNubeConflicto");$("#restaurantNubeDetalle").textContent=detalle||"La nube ya tiene datos distintos que no subió este aparato. No voy a mezclar la cola inicial.";modal.hidden=false;const choice=await new Promise(resolve=>{const done=value=>{modal.hidden=true;["restaurantNubeBajar","restaurantNubeUsar","restaurantNubeLocal"].forEach(id=>document.getElementById(id).removeEventListener("click",handlers[id]));if(REST_NUBE.conflictResolver===done)REST_NUBE.conflictResolver=null;resolve(value);};const handlers={restaurantNubeBajar:()=>{descargaRespaldoRestaurant();done("cloud");},restaurantNubeUsar:()=>done("cloud"),restaurantNubeLocal:()=>done("local")};REST_NUBE.conflictResolver=done;Object.keys(handlers).forEach(id=>document.getElementById(id).addEventListener("click",handlers[id]));});if(choice==="local"){pausaNubeEnEsteAparato();return "local";}if(!guardaRespaldoMigracionRestaurant())return "error";nubeQuitaMigracionActual();aplicaDocumentosRestaurant(nubeRebaseMap());actualizaEstadoNube();return "cloud";}
 function resumenLocalRestaurant(){return {mesas:(MESAS||[]).length,platillos:(MENU.plats||[]).length,abiertas:(COMANDAS||[]).filter(c=>c.estado!=="cerrada").length,tickets:(COMANDAS||[]).filter(c=>c.estado==="cerrada"&&!c.cancelada).length};}
+function restauranteEsEjemploSinCambios(){
+  if(!P||!MENU||P.negocio.nombre!=="Mi restaurante"||P.negocio.tel||P.negocio.dir||P.negocio.logo)return false;
+  if((COMANDAS||[]).length||(TURNOS||[]).length||(ASISTENCIAS||[]).length||(COMPRAS||[]).length||Object.keys(RECETAS||{}).length||(EVENTOS||[]).length||(IMPRESORAS||[]).length)return false;
+  if((EQUIPO||[]).length!==1||EQUIPO[0].nombre!=="Administrador"||EQUIPO[0].rol!=="gerente"||EQUIPO[0].activo===false||EQUIPO[0].pin||EQUIPO[0].pin_hash)return false;
+  const cats=(MENU.cats||[]).map(x=>[x.nombre,x.orden]);
+  const catsDemo=[["Para empezar",10],["Fuertes",20],["Bebidas",30],["Postres",40]];
+  if(nubeCanon(cats)!==nubeCanon(catsDemo))return false;
+  const groups=(MENU.grupos||[]).map(x=>[x.nombre,x.min,x.max,(x.ops||[]).map(o=>[o.nombre,num(o.extra)])]);
+  const groupsDemo=[["Término",1,1,[["Tres cuartos",0],["Término medio",0],["Bien cocido",0]]],["¿Qué le quito?",0,4,[["Sin cebolla",0],["Sin cilantro",0],["Sin chile",0],["Sin queso",0]]],["Extras",0,3,[["Queso extra",15],["Guacamole",25],["Tocino",20]]]];
+  if(nubeCanon(groups)!==nubeCanon(groupsDemo))return false;
+  const plats=(MENU.plats||[]).map(x=>({nombre:x.nombre,categoria:(MENU.cats||[]).find(c=>c.id===x.catId)?.nombre||"",precio:num(x.precio),costo:num(x.costo),mods:(x.mods||[]).map(id=>(MENU.grupos||[]).find(g=>g.id===id)?.nombre||"").sort(),activo:x.activo!==false,foto:!!(x.foto||x.imagen||x.base64)}));
+  const platsDemo=[
+    {nombre:"Guacamole con totopos",categoria:"Para empezar",precio:95,costo:32,mods:[],activo:true,foto:false},
+    {nombre:"Queso fundido",categoria:"Para empezar",precio:110,costo:40,mods:["Extras"],activo:true,foto:false},
+    {nombre:"Arrachera 250 g",categoria:"Fuertes",precio:285,costo:120,mods:["Extras","Término"],activo:true,foto:false},
+    {nombre:"Tacos de pastor (4)",categoria:"Fuertes",precio:125,costo:42,mods:["Extras","¿Qué le quito?"],activo:true,foto:false},
+    {nombre:"Hamburguesa de la casa",categoria:"Fuertes",precio:165,costo:58,mods:["Extras","Término","¿Qué le quito?"],activo:true,foto:false},
+    {nombre:"Enchiladas verdes",categoria:"Fuertes",precio:135,costo:45,mods:["¿Qué le quito?"],activo:true,foto:false},
+    {nombre:"Refresco",categoria:"Bebidas",precio:38,costo:12,mods:[],activo:true,foto:false},
+    {nombre:"Agua del día",categoria:"Bebidas",precio:42,costo:9,mods:[],activo:true,foto:false},
+    {nombre:"Cerveza",categoria:"Bebidas",precio:55,costo:22,mods:[],activo:true,foto:false},
+    {nombre:"Flan napolitano",categoria:"Postres",precio:65,costo:18,mods:[],activo:true,foto:false},
+    {nombre:"Pastel de chocolate",categoria:"Postres",precio:78,costo:26,mods:[],activo:true,foto:false}
+  ];
+  if(nubeCanon(plats)!==nubeCanon(platsDemo))return false;
+  const mesas=(MESAS||[]).map(x=>[x.nombre,x.zona,x.lugares,x.x,x.y,x.forma,x.activa!==false]);
+  const mesasDemo=[];for(let i=1;i<=8;i++)mesasDemo.push(["Mesa "+i,"Salón",4,16+((i-1)%4)*23,26+Math.floor((i-1)/4)*34,"cuadrada",true]);for(let i=1;i<=4;i++)mesasDemo.push(["Terraza "+i,"Terraza",2,20+(i-1)*21,40,"redonda",true]);mesasDemo.push(["Barra 1","Barra",1,35,45,"redonda",true],["Barra 2","Barra",1,60,45,"redonda",true]);
+  if(nubeCanon(mesas)!==nubeCanon(mesasDemo))return false;
+  const decor=(DECOR||[]).map(x=>[x.tipo,x.zona,x.x,x.y,x.w,x.h]);
+  const decorDemo=[["cocina","Salón",50,8,18,12],["entrada","Salón",8,92,14,6],["planta","Salón",8,12,6,7],["barra","Terraza",50,12,30,7]];
+  if(nubeCanon(decor)!==nubeCanon(decorDemo))return false;
+  const p0=paramsPorDefecto();for(const k of Object.keys(p0))if(nubeCanon(P[k])!==nubeCanon(p0[k]))return false;
+  const fiscalDemo={razon:"",rfc:"",regimen:"612",cpFiscal:"",pac:"",serie:"A",folioFactura:1,sellosAlta:false};
+  if(nubeCanon(P.fiscal)!==nubeCanon(fiscalDemo))return false;
+  if(nubeCanon((P.apps||[]).map(a=>[a.id,a.nombre,num(a.comision),a.color,a.activa!==false]))!==nubeCanon([["uber","Uber Eats",30,"#0DBF5B",true],["rappi","Rappi",30,"#FF5A5F",true],["didi","DiDi Food",25,"#FF8A00",true]]))return false;
+  if(Object.values(P.croquis||{}).some(z=>z&&(z.fondo&&z.fondo!=="cuadricula"||z.plano)))return false;
+  return true;
+}
+function nubeOrigenDeFila(row){if(!row||!row.cuerpo)return "";if(row.coleccion==="rest_locks"&&row.doc_id===REST_NUBE_MIGRATION_LOCK_ID)return String(row.cuerpo.aparato||"");return nubeOrigenMigracion(row.cuerpo);}
+function nubeHayOrigenAjeno(rows,aparato){return (rows||[]).some(row=>String(row.coleccion||"").startsWith("rest_")&&row.coleccion!=="rest_locks"&&nubeOrigenDeFila(row)!==String(aparato||""));}
+async function nubeLeeFilasRestaurant(){const {data,error}=await RESTAURANT_SB.from("documentos").select("cuenta_id,coleccion,doc_id,cuerpo,actualizado").eq("cuenta_id",RESTAURANT_ACCOUNT.accountId).like("coleccion","rest_%").order("actualizado",{ascending:true}).limit(5000);if(error)throw error;const rows=data||[];Object.keys(REST_NUBE.serverDocs).forEach(key=>{const row=REST_NUBE.serverDocs[key];if(row&&String(row.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)&&String(row.coleccion||"").startsWith("rest_"))delete REST_NUBE.serverDocs[key];});rows.forEach(row=>{REST_NUBE.serverDocs[nubeClave(row.coleccion,row.doc_id)]=row;if(row.actualizado&&row.actualizado>REST_NUBE.cursor)REST_NUBE.cursor=row.actualizado;});return rows;}
+function nubeHayMigracionPendienteActual(){return REST_NUBE.queue.some(q=>q&&q.migracion===true&&String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId));}
+async function nubeVigilaCambioDuranteMigracion(){
+  if(!nubeHayMigracionPendienteActual())return false;
+  if(REST_NUBE.migrationConflictOpen)return true;
+  REST_NUBE.migrationConflictOpen=true;
+  try{
+    const rows=await nubeLeeFilasRestaurant();
+    if(nubeHayOrigenAjeno(rows,REST_NUBE.deviceId)){
+      if(restauranteEsEjemploSinCambios()){
+        REST_NUBE.subscriptionBlocked=false;clearTimeout(REST_NUBE.retryTimer);REST_NUBE.retryTimer=null;REST_NUBE.error="";
+        if(REST_NUBE.conflictResolver)REST_NUBE.conflictResolver("cloud");
+        else{nubeQuitaMigracionActual();aplicaDocumentosRestaurant(nubeRebaseMap());}
+      }else{
+        const detalle="La nube ya tiene datos distintos que no subió este aparato. No voy a mezclar la cola inicial. Elige «Usar los de la nube» para guardar una copia local o deja estos datos sólo en este aparato.";
+        const choice=await resuelveConflictoMigracionNube(detalle);
+        if(choice==="cloud"&&REST_NUBE.queue.length)await vaciaColaNube();
+      }
+    }
+    return true;
+  }finally{REST_NUBE.migrationConflictOpen=false;}
+}
+async function nubePreparaLoteMigracion(q){const aparato=String(q&&q.aparato||REST_NUBE.deviceId),rows=await nubeLeeFilasRestaurant();if(nubeHayOrigenAjeno(rows,aparato))return {ok:false,detalle:"La nube ya tiene datos de otro aparato. No se subirá esta cola inicial para evitar mezclar datos. Elige qué conservar."};if(!REST_NUBE.migrationClaimed){const {data,error}=await RESTAURANT_SB.rpc("rest_reclama_migracion",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_aparato:aparato});if(error)throw error;if(data!==true){const latest=await nubeLeeFilasRestaurant();const lock=latest.find(row=>row.coleccion==="rest_locks"&&row.doc_id===REST_NUBE_MIGRATION_LOCK_ID),otro=lock&&String(lock.cuerpo&&lock.cuerpo.aparato||"")!==aparato;return {ok:false,detalle:nubeHayOrigenAjeno(latest,aparato)?"Otro aparato ya inició la subida. No se mezclará esta cola inicial.":otro?"Otro aparato ya reservó la subida inicial. No voy a enviar esta cola mientras trabaja; elige esperar a la nube o dejar estos datos sólo en este aparato.":"No se pudo reservar esta subida inicial. Revisa la conexión y vuelve a intentar."};}REST_NUBE.migrationClaimed=true;const lock={cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:"rest_locks",doc_id:REST_NUBE_MIGRATION_LOCK_ID,cuerpo:{aparato},actualizado:new Date().toISOString()};REST_NUBE.serverDocs[nubeClave(lock.coleccion,lock.doc_id)]=lock;}return {ok:true,rows};}
 async function iniciaNubeRestaurant(){
   actualizaEstadoNube();
   if(RESTAURANT_ACCOUNT.localOnly){REST_NUBE.localOnly=true;REST_NUBE.error="SQL 19 pendiente";actualizaEstadoNube();return;}
   if(!navigator.onLine){REST_NUBE.enabled=true;REST_NUBE.ready=true;REST_NUBE.verified=false;actualizaEstadoNube();return;}
-  if(localStorage.getItem(LS_BASE+"_nube_migracion_v1")==="local"){REST_NUBE.localOnly=true;REST_NUBE.error="Conexión a nube pausada en este aparato";actualizaEstadoNube();return;}
+  if(localStorage.getItem(REST_NUBE_MIGRATION_FLAG)==="local"){REST_NUBE.localOnly=true;REST_NUBE.error="Conexión a nube pausada en este aparato";actualizaEstadoNube();return;}
   try{const available=await RESTAURANT_SB.rpc("nuvoor_rest_nube_disponible");if(available.error||available.data!==true){REST_NUBE.localOnly=true;REST_NUBE.error=available.error&&available.error.message||"SQL 20 pendiente";actualizaEstadoNube();return;}}
   catch(e){REST_NUBE.localOnly=true;REST_NUBE.error=String(e&&e.message||e);actualizaEstadoNube();return;}
   REST_NUBE.verified=true;REST_NUBE.error="";
-  const result=await RESTAURANT_SB.from("documentos").select("cuenta_id,coleccion,doc_id,cuerpo,actualizado").eq("cuenta_id",RESTAURANT_ACCOUNT.accountId).like("coleccion","rest_%").order("actualizado",{ascending:true}).limit(5000);
-  if(result.error){REST_NUBE.localOnly=true;REST_NUBE.error=String(result.error.message||"No se pudo leer la nube").slice(0,90);actualizaEstadoNube();return;}
-  (result.data||[]).forEach(row=>{const key=nubeClave(row.coleccion,row.doc_id);REST_NUBE.serverDocs[key]=row;if(row.coleccion==="rest_tickets")REST_NUBE.ticketIds.add(row.doc_id);if(row.actualizado&&row.actualizado>REST_NUBE.cursor)REST_NUBE.cursor=row.actualizado;});
+  let rows=[];try{rows=await nubeLeeFilasRestaurant();}catch(e){REST_NUBE.localOnly=true;REST_NUBE.error=String(e&&e.message||"No se pudo leer la nube").slice(0,90);actualizaEstadoNube();return;}
+  (rows||[]).forEach(row=>{if(row.coleccion==="rest_tickets")REST_NUBE.ticketIds.add(row.doc_id);});
   const rawCloud=nubeDocsDesdeServidor(),cloud=nubeDocsDeContexto(rawCloud),remoteCfg=Object.values(cloud).find(d=>d.coleccion==="rest_config");if(remoteCfg&&remoteCfg.cuerpo.pinSalt){REST_NUBE.pinSalt=remoteCfg.cuerpo.pinSalt;try{localStorage.setItem(LS_BASE+"_nube_pin_salt_v1",REST_NUBE.pinSalt);}catch(_){}}
-  const local=await proyectaRestaurant(),hasLocal=REST_LOCAL_START_KEYS.size>0||Object.keys(REST_NUBE.projection).length>0||REST_NUBE.queue.length>0;
+  const local=await proyectaRestaurant(),esDemo=restauranteEsEjemploSinCambios(),hasMigration=REST_NUBE.queue.some(q=>q&&q.migracion===true&&String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)),migrationElegida=localStorage.getItem(REST_NUBE_MIGRATION_FLAG)==="si",hasLocal=REST_LOCAL_START_KEYS.size>0||Object.keys(REST_NUBE.projection).length>0||REST_NUBE.queue.length>0||esDemo;
   REST_NUBE.enabled=true;REST_NUBE.ready=true;
-  if(!Object.keys(cloud).length&&hasLocal&&!REST_NUBE.queue.length){const n=resumenLocalRestaurant(),choice=await muestraMigracionNube("Subir los datos de esta tablet", "¿Subir los datos de esta tablet a la nube de "+(RESTAURANT_ACCOUNT.accountName||"tu negocio")+"? ("+n.mesas+" mesas, "+n.platillos+" platillos, "+n.abiertas+" comandas abiertas, "+n.tickets+" tickets). Los datos originales se conservan en este aparato.");if(choice!=="subir"){REST_NUBE.enabled=false;REST_NUBE.localOnly=true;REST_NUBE.error="";try{localStorage.setItem(LS_BASE+"_nube_migracion_v1","local");}catch(_){}actualizaEstadoNube();return;}try{localStorage.setItem(LS_BASE+"_nube_migracion_v1","si");}catch(_){}REST_NUBE.projection={};nubeGuarda(REST_NUBE_PROJECTION_KEY,{});REST_NUBE.pinSalt="";await sincronizaNubeEnSerie(true);}
-  else if(Object.keys(cloud).length&&hasLocal&&!REST_NUBE.queue.length){const keys=new Set([...Object.keys(cloud),...Object.keys(local)]),different=[...keys].some(k=>!cloud[k]||!local[k]||nubeCanon(cloud[k].cuerpo)!==nubeCanon(local[k].cuerpo));if(different){$("#restaurantNubeDetalle").textContent="Esta tablet tiene datos distintos. Elige «Bajar respaldo y usar la nube» o deja sus datos sólo en este aparato.";$("#restaurantNubeConflicto").hidden=false;const choice=await new Promise(resolve=>{const done=x=>{$("#restaurantNubeConflicto").hidden=true;["restaurantNubeBajar","restaurantNubeUsar","restaurantNubeLocal"].forEach(id=>document.getElementById(id).removeEventListener("click",handlers[id]));resolve(x);};const handlers={restaurantNubeBajar:()=>{descargaRespaldoRestaurant();done("cloud");},restaurantNubeUsar:()=>done("cloud"),restaurantNubeLocal:()=>done("local")};Object.keys(handlers).forEach(id=>document.getElementById(id).addEventListener("click",handlers[id]));});if(choice==="local"){REST_NUBE.enabled=false;REST_NUBE.localOnly=true;try{localStorage.setItem(LS_BASE+"_nube_migracion_v1","local");}catch(_){}actualizaEstadoNube();return;}}aplicaDocumentosRestaurant(cloud);}
-  else if(Object.keys(cloud).length){aplicaDocumentosRestaurant(nubeRebaseMap());}
-  else {REST_NUBE.projection={};nubeGuarda(REST_NUBE_PROJECTION_KEY,{});await sincronizaNubeEnSerie(true);}
+  const hayNube=Object.keys(cloud).length>0;
+  if(hayNube&&esDemo){nubeQuitaMigracionActual();aplicaDocumentosRestaurant(nubeRebaseMap());}
+   else if(!hayNube&&hasLocal){
+     if(migrationElegida){REST_NUBE.migrandoInicial=true;if(!hasMigration){REST_NUBE.projection={};nubeGuarda(REST_NUBE_PROJECTION_KEY,{});}await sincronizaNubeEnSerie(true);}
+    else{const n=resumenLocalRestaurant(),titulo=esDemo?"¿Empezar con datos de ejemplo?":"Subir los datos de esta tablet",detalle=esDemo?"La nube está vacía. Puedes empezar con la carta y las mesas de ejemplo; después podrás cambiarlas.":"¿Subir los datos de esta tablet a la nube de "+(RESTAURANT_ACCOUNT.accountName||"tu negocio")+"? ("+n.mesas+" mesas, "+n.platillos+" platillos, "+n.abiertas+" comandas abiertas, "+n.tickets+" tickets). Los datos originales se conservan en este aparato.",choice=await muestraMigracionNube(titulo,detalle,esDemo?"Sí, usar los datos de ejemplo":"");if(choice!=="subir"){pausaNubeEnEsteAparato();return;}try{localStorage.setItem(REST_NUBE_MIGRATION_FLAG,"si");}catch(_){}REST_NUBE.migrandoInicial=true;REST_NUBE.migrationClaimed=false;REST_NUBE.projection={};nubeGuarda(REST_NUBE_PROJECTION_KEY,{});REST_NUBE.pinSalt="";await sincronizaNubeEnSerie(true);}
+  }
+  else if(hayNube&&hasLocal){
+    const filas=Object.values(REST_NUBE.serverDocs),hayAjenos=nubeHayOrigenAjeno(filas,REST_NUBE.deviceId),puedePreguntar=!REST_NUBE.queue.length||hasMigration;
+    if(hasMigration&&!hayAjenos){aplicaDocumentosRestaurant(nubeRebaseMap());}
+     else{const keys=new Set([...Object.keys(cloud),...Object.keys(local)]),different=[...keys].some(k=>!cloud[k]||!local[k]||nubeCanon(nubeSinMarcaMigracion(cloud[k].cuerpo))!==nubeCanon(nubeSinMarcaMigracion(local[k].cuerpo)));if((hasMigration&&hayAjenos)||(puedePreguntar&&different)){const detalle=hayAjenos?"La nube ya tiene datos distintos que no subió este aparato. No voy a mezclar la cola inicial. Elige «Usar los de la nube» para guardar una copia local o deja estos datos sólo en este aparato.":"Esta tablet tiene datos distintos. Elige qué datos conservar; antes de aplicar la nube guardaré una copia local.",choice=await resuelveConflictoMigracionNube(detalle);if(choice==="local"||choice==="error")return;}aplicaDocumentosRestaurant(nubeRebaseMap());nubeMarcaBaseSincronizada();}
+  }
+   else if(hayNube){aplicaDocumentosRestaurant(nubeRebaseMap());nubeMarcaBaseSincronizada();}
+  else{REST_NUBE.projection={};nubeGuarda(REST_NUBE_PROJECTION_KEY,{});await sincronizaNubeEnSerie(true);}
   escuchaNubeRestaurant();if(REST_NUBE.queue.length)await vaciaColaNube();actualizaAvisosReclamosNube();actualizaEstadoNube();
 }
-async function recargaCambiosNube(){if(!REST_NUBE.enabled||!navigator.onLine)return;try{const since=new Date(Math.max(0,new Date(REST_NUBE.cursor).getTime()-1000)).toISOString(),r=await RESTAURANT_SB.from("documentos").select("cuenta_id,coleccion,doc_id,cuerpo,actualizado").eq("cuenta_id",RESTAURANT_ACCOUNT.accountId).like("coleccion","rest_%").gt("actualizado",since).order("actualizado",{ascending:true}).limit(2000);if(r.error)throw r.error;let changed=false;(r.data||[]).forEach(row=>{const key=nubeClave(row.coleccion,row.doc_id),old=REST_NUBE.serverDocs[key];if(!old||nubeCanon(old.cuerpo)!==nubeCanon(row.cuerpo)){REST_NUBE.serverDocs[key]=row;changed=true;if(row.coleccion==="rest_lineas"&&row.cuerpo&&row.cuerpo.enviada&&!REST_NUBE.queue.some(q=>q.key===key))REST_NUBE.incomingLines.add(row.cuerpo.id||row.doc_id.replace(/^linea_/,""));}if(row.actualizado&&row.actualizado>REST_NUBE.cursor)REST_NUBE.cursor=row.actualizado;});if(changed){if(REST_NUBE.localDirty){REST_NUBE.applyPending=true;}else aplicaDocumentosRestaurant(nubeRebaseMap());}if(REST_NUBE.queue.length)await vaciaColaNube();REST_NUBE.error="";actualizaAvisosReclamosNube();actualizaEstadoNube();}catch(e){REST_NUBE.error=String(e&&e.message||e||"Error de sondeo").slice(0,80);actualizaEstadoNube();}}
+async function recargaCambiosNube(){if(!REST_NUBE.enabled||!navigator.onLine)return;try{const since=new Date(Math.max(0,new Date(REST_NUBE.cursor).getTime()-1000)).toISOString(),r=await RESTAURANT_SB.from("documentos").select("cuenta_id,coleccion,doc_id,cuerpo,actualizado").eq("cuenta_id",RESTAURANT_ACCOUNT.accountId).like("coleccion","rest_%").gt("actualizado",since).order("actualizado",{ascending:true}).limit(2000);if(r.error)throw r.error;let changed=false;(r.data||[]).forEach(row=>{const key=nubeClave(row.coleccion,row.doc_id),old=REST_NUBE.serverDocs[key];if(!old||nubeCanon(old.cuerpo)!==nubeCanon(row.cuerpo)){REST_NUBE.serverDocs[key]=row;changed=true;if(row.coleccion==="rest_lineas"&&row.cuerpo&&row.cuerpo.enviada&&!REST_NUBE.queue.some(q=>q.key===key))REST_NUBE.incomingLines.add(row.cuerpo.id||row.doc_id.replace(/^linea_/,""));}if(row.actualizado&&row.actualizado>REST_NUBE.cursor)REST_NUBE.cursor=row.actualizado;});if(changed){if(REST_NUBE.localDirty){REST_NUBE.applyPending=true;}else if(nubeHayMigracionPendienteActual()){await nubeVigilaCambioDuranteMigracion();}else aplicaDocumentosRestaurant(nubeRebaseMap());}if(REST_NUBE.queue.length)await vaciaColaNube();REST_NUBE.error="";actualizaAvisosReclamosNube();actualizaEstadoNube();}catch(e){REST_NUBE.error=String(e&&e.message||e||"Error de sondeo").slice(0,80);actualizaEstadoNube();}}
 function escuchaNubeRestaurant(){
   if(!RESTAURANT_SB||!RESTAURANT_SB.channel)return;
   try{
@@ -2764,6 +2874,7 @@ function escuchaNubeRestaurant(){
         if(row.actualizado&&row.actualizado>REST_NUBE.cursor)REST_NUBE.cursor=row.actualizado;
         if(row.coleccion==="rest_lineas"&&row.cuerpo&&row.cuerpo.enviada&&!REST_NUBE.queue.some(q=>q.key===key))REST_NUBE.incomingLines.add(row.cuerpo.id||row.doc_id.replace(/^linea_/,""));
         if(REST_NUBE.localDirty){REST_NUBE.applyPending=true;return;}
+        if(nubeHayMigracionPendienteActual()){nubeVigilaCambioDuranteMigracion().catch(nubeRegistraError);return;}
         clearTimeout(REST_NUBE.realtimeTimer);
         REST_NUBE.realtimeTimer=setTimeout(()=>{
           REST_NUBE.realtimeTimer=null;
@@ -2778,7 +2889,7 @@ function escuchaNubeRestaurant(){
 }
 
 function aplicaDocumentosRestaurant(docs){
-  docs=nubeDocsDeContexto(docs);const raw=Object.values(docs),has=(col)=>raw.some(d=>d&&d.coleccion===col),ev=nubeEventoId(),all=raw.filter(d=>d&&d.cuerpo&&!d.cuerpo._eliminado),mine=all.filter(d=>d.coleccion!=="rest_eventos"&&(d.cuerpo.eventoId||"")===ev),by=(col)=>mine.filter(d=>d.coleccion===col).map(d=>d.cuerpo),oldMenu=MENU||{},oldMesas=MESAS||[],oldEquipo=EQUIPO||[],oldP=P||paramsPorDefecto();
+  docs=nubeDocsDeContexto(docs);docs=Object.fromEntries(Object.entries(docs).map(([k,d])=>[k,Object.assign({},d,{cuerpo:nubeSinMarcaMigracion(d.cuerpo)})]));const raw=Object.values(docs),has=(col)=>raw.some(d=>d&&d.coleccion===col),ev=nubeEventoId(),all=raw.filter(d=>d&&d.cuerpo&&!d.cuerpo._eliminado),mine=all.filter(d=>d.coleccion!=="rest_eventos"&&(d.cuerpo.eventoId||"")===ev),by=(col)=>mine.filter(d=>d.coleccion===col).map(d=>d.cuerpo),oldMenu=MENU||{},oldMesas=MESAS||[],oldEquipo=EQUIPO||[],oldP=P||paramsPorDefecto();
   const cfg=by("rest_config")[0];if(cfg){P=Object.assign(paramsPorDefecto(),P,{negocio:Object.assign({},P.negocio,{nombre:cfg.nombre||P.negocio.nombre,tel:cfg.tel||"",dir:cfg.dir||""}),iva:num(cfg.iva,P.iva),propina:num(cfg.propina,P.propina),servicio:num(cfg.servicio,P.servicio),apps:Array.isArray(cfg.apps)?cfg.apps:P.apps,fiscal:cfg.fiscal||P.fiscal,ticket:Object.assign({},P.ticket,cfg.ticket||{}),folios:cfg.folios||P.folios});REST_NUBE.pinSalt=cfg.pinSalt||REST_NUBE.pinSalt;}
   const carta=by("rest_carta"),cats=carta.filter(x=>x.tipo==="categoria").map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;return y;}),groups=carta.filter(x=>x.tipo==="grupo").map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;return y;}),plats=carta.filter(x=>x.tipo==="platillo").map(x=>{const y=Object.assign({},x),foto=nubeFotoLocal(oldMenu.plats,y.id,"foto");delete y.tipo;delete y.eventoId;if(foto)y.foto=foto;return y;});if(has("rest_carta"))MENU={cats,grupos:groups,plats};
   const mesaDocs=by("rest_mesas"),mesaRows=mesaDocs.filter(x=>x.tipo==="mesa").map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;delete y.croquis;return y;});if(has("rest_mesas"))MESAS=mesaRows;
@@ -2799,12 +2910,12 @@ function rutaImpresoraNube(p){const cats=(p.categorias||[]).slice().sort().join(
 function claveFallaImpresionNube(linea,ruta){return String(linea&&linea.id||linea||"")+"|"+String(ruta||"");}
 async function reclamaLineasNube(lineas,ruta,tipo){if(!REST_NUBE.enabled||!navigator.onLine)return {lineas,offline:true};const pre=tipo==="cancelacion"?"cancelacion":"linea",ids=(lineas||[]).map(x=>String(x.id));const {data,error}=await RESTAURANT_SB.rpc("rest_reclama_impresion",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_lineas:ids.map(id=>nubeId(pre,id)),p_ruta:ruta,p_aparato:REST_NUBE.deviceId});if(error)throw error;const claimed=new Set((data||[]).map(x=>String(x).replace(new RegExp("^"+pre+"_"),"")));return {lineas:(lineas||[]).filter(x=>claimed.has(String(x.id))),offline:false};}
 async function confirmaLineasNube(lineas,ruta,tipo){const pre=tipo==="cancelacion"?"cancelacion":"linea",ids=(lineas||[]).map(x=>nubeId(pre,x.id)),{data,error}=await RESTAURANT_SB.rpc("rest_confirma_impresion",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_lineas:ids,p_ruta:ruta,p_aparato:REST_NUBE.deviceId});if(error)throw error;const ok=new Set(data||[]);if(ids.some(id=>!ok.has(id))){const rows=ids.map(id=>REST_NUBE.serverDocs[nubeClave("rest_lineas",id)]).filter(Boolean);if(ids.length===1&&rows[0]&&rows[0].cuerpo&&((rows[0].cuerpo.impreso||{})[ruta]||{}).ok)return true;throw new Error("El reclamo ya no pertenece a este aparato.");}return true;}
-async function liberaLineasNube(lineas,ruta,tipo){if(!REST_NUBE.enabled||!navigator.onLine)return;try{const pre=tipo==="cancelacion"?"cancelacion":"linea";await RESTAURANT_SB.rpc("rest_libera_impresion",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_lineas:(lineas||[]).map(x=>nubeId(pre,x.id)),p_ruta:ruta,p_aparato:REST_NUBE.deviceId});}catch(e){console.warn("No se pudo liberar el reclamo de impresión",e);}}
+async function liberaLineasNube(lineas,ruta,tipo){if(!REST_NUBE.enabled||!navigator.onLine)return;try{const pre=tipo==="cancelacion"?"cancelacion":"linea";await RESTAURANT_SB.rpc("rest_libera_impresion",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_lineas:(lineas||[]).map(x=>nubeId(pre,x.id)),p_ruta:ruta,p_aparato:REST_NUBE.deviceId});}catch(e){if(nubeEsErrorPlan(e))nubeRegistraError(e);console.warn("No se pudo liberar el reclamo de impresión",e);}}
 function encolaConfirmacionImpresion(linea,ruta,tipo){const pre=tipo==="cancelacion"?"cancelacion":"linea",docId=nubeId(pre,linea.id),key=nubeClave("rest_lineas",docId),actual=REST_NUBE.queue.find(q=>q.key===key),c=(COMANDAS||[]).find(x=>(x.lineas||[]).some(y=>String(y.id)===String(linea.id))),body=actual&&actual.cuerpo||nubeResumenImpresion(c||{id:linea.comandaId},[linea])[0];nubeQueueDoc({cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:"rest_lineas",doc_id:docId,cuerpo:body,confirmarImpresion:{ruta,aparato:REST_NUBE.deviceId}});}
 function marcaImpresionOffline(c,linea,ruta,tipo){const docId=nubeId(tipo==="cancelacion"?"cancelacion":"linea",linea.id),key=nubeClave("rest_lineas",docId),actual=REST_NUBE.queue.find(q=>q.key===key),body=Object.assign({},actual&&actual.cuerpo||nubeResumenImpresion(c,[linea])[0]);body.impreso=Object.assign({},body.impreso,{[ruta]:{por:REST_NUBE.deviceId,en:new Date().toISOString(),ok:true,sinRed:true}});linea.impreso=Object.assign({},linea.impreso,{[ruta]:body.impreso[ruta]});nubeQueueDoc({cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:"rest_lineas",doc_id:docId,cuerpo:body,impresionOffline:{ruta,aparato:REST_NUBE.deviceId,tipo}});actualizaEstadoNube();}
 function actualizaAvisosReclamosNube(){if(!REST_NUBE.enabled){REST_NUBE.claimAlerts=[];muestraErroresImpresoraPOS();return;}const now=Date.now(),alerts=[];Object.values(REST_NUBE.serverDocs).forEach(row=>{if(!row||row.coleccion!=="rest_lineas"||!row.cuerpo||!row.cuerpo.enviada)return;const body=row.cuerpo;Object.entries(body.impreso||{}).forEach(([route,claim])=>{if(!claim||claim.ok===true)return;const own=String(claim.por||"")===String(REST_NUBE.deviceId),age=now-Date.parse(claim.en||"");if(!own&&(!Number.isFinite(age)||age<120000))return;const base=route.endsWith("|cancelacion")?route.slice(0,-12):route,printer=IMPRESORAS.find(p=>rutaImpresoraNube(p)===base&&(p.cocina||p.cancela));if(!printer)return;const head=Object.values(REST_NUBE.serverDocs).find(x=>x&&x.coleccion==="rest_comandas"&&x.cuerpo&&String(x.cuerpo.id||x.doc_id.replace(/^comanda_/,""))===String(body.comandaId));const comanda=(COMANDAS||[]).find(c=>String(c.id)===String(body.comandaId))||Object.assign({id:body.comandaId,folio:head&&head.cuerpo.folio||"Comanda",mesaId:head&&head.cuerpo.mesaId||"",mesaNombre:head&&head.cuerpo.mesaNombre||body.mesaNombre||"Mesa",fecha:hoyISO()},head&&head.cuerpo||{});const line=(comanda.lineas||[]).find(l=>String(l.id)===String(body.id))||Object.assign({},body,{id:body.id||row.doc_id.replace(/^linea_/,"")});if(!comanda.lineas)comanda.lineas=[line];alerts.push({key:row.doc_id+"|"+route,docId:row.doc_id,route,ajena:!own,mesa:comanda.mesaNombre||"Mesa",linea:line,comanda,impresora:printer,tipo:route.endsWith("|cancelacion")?"cancelacion":"comanda"});});});REST_NUBE.claimAlerts=alerts;muestraErroresImpresoraPOS();}
-async function imprimeReclamoPendienteNube(index){const a=REST_NUBE.claimAlerts[index];if(!a||REST_NUBE.claimBusy.has(a.key))return;REST_NUBE.claimBusy.add(a.key);muestraErroresImpresoraPOS();try{if(a.ajena){const {data,error}=await RESTAURANT_SB.rpc("rest_reasigna_impresion",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_lineas:[a.docId],p_ruta:a.route,p_aparato:REST_NUBE.deviceId});if(error)throw error;if(!(data||[]).includes(a.docId)){toast("Otra tablet ya tomó esta comanda.");return;}}await imprimeComandaRutaNube(a.comanda,a.impresora,[a.linea],a.tipo,null,true,true); }catch(e){toast("No se pudo recuperar la comanda: "+String(e&&e.message||e).slice(0,100));}finally{REST_NUBE.claimBusy.delete(a.key);actualizaAvisosReclamosNube();}}
-async function asignaFolioNube(tipo,serie){if(!REST_NUBE.enabled||!navigator.onLine)return null;try{const {data,error}=await RESTAURANT_SB.rpc("rest_siguiente_folio",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_serie:serie});if(error)throw error;return data;}catch(e){REST_NUBE.error=String(e&&e.message||e);actualizaEstadoNube();return null;}}
+async function imprimeReclamoPendienteNube(index){const a=REST_NUBE.claimAlerts[index];if(!a||REST_NUBE.claimBusy.has(a.key))return;REST_NUBE.claimBusy.add(a.key);muestraErroresImpresoraPOS();try{if(a.ajena){const {data,error}=await RESTAURANT_SB.rpc("rest_reasigna_impresion",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_lineas:[a.docId],p_ruta:a.route,p_aparato:REST_NUBE.deviceId});if(error)throw error;if(!(data||[]).includes(a.docId)){toast("Otra tablet ya tomó esta comanda.");return;}}await imprimeComandaRutaNube(a.comanda,a.impresora,[a.linea],a.tipo,null,true,true); }catch(e){nubeRegistraError(e);toast("No se pudo recuperar la comanda: "+String(e&&e.message||e).slice(0,100));}finally{REST_NUBE.claimBusy.delete(a.key);actualizaAvisosReclamosNube();}}
+async function asignaFolioNube(tipo,serie){if(!REST_NUBE.enabled||!navigator.onLine)return null;try{const {data,error}=await RESTAURANT_SB.rpc("rest_siguiente_folio",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_serie:serie});if(error)throw error;return data;}catch(e){nubeRegistraError(e);return null;}}
 
 /* ---------------- el menú de fábrica ----------------
    Trae una carta chica de ejemplo para que al abrirlo por primera vez se
@@ -3872,7 +3983,7 @@ async function nuevaComanda(m, personas, appId){
         if(existing)return existing;
         throw new Error("La mesa se reservó pero su comanda todavía no llegó.");
       }
-    }catch(e){REST_NUBE.error=String(e&&e.message||e||"No se pudo reservar la mesa").slice(0,80);actualizaEstadoNube();toast("No se pudo revisar la mesa en la nube. La comanda se guardará en este aparato y se intentará subir.");}
+    }catch(e){nubeRegistraError(e);toast("No se pudo revisar la mesa en la nube. La comanda se guardará en este aparato y se intentará subir.");}
   }
   COMANDAS.unshift(c); persist();
   if(REST_NUBE.enabled){
@@ -6139,7 +6250,7 @@ async function imprimeComandaRutaNube(c,p,lineas,tipo,contenido,forzado,reclamoY
     propias=lineas.filter(linea=>forzado||!REST_NUBE.failedPrints.has(claveFallaImpresionNube(linea,route)));
     if(!propias.length)return {ok:true,omitida:true,pospuesta:true};
     try{if(!sinRed&&!reclamoYaTomado){await sincronizaNubeEnSerie(true);const reclamo=await reclamaLineasNube(propias,route,tipo);propias=reclamo.lineas;if(!propias.length)return {ok:true,omitida:true};}}
-    catch(e){lineas.forEach(linea=>REST_NUBE.failedPrints.add(claveFallaImpresionNube(linea,route)));const trabajo={impresora:p,titulo:(tipo==="cancelacion"?"Cancelación ":"Cocina ")+c.folio,cuerpo:"",nubeLineas:lineas,nubeRuta:route,nubeTipo:tipo,reintentaNube:reintenta};reportaFalloImpresoraPOS(trabajo,"No se pudo reservar esta impresión: "+String(e&&e.message||e).slice(0,130));return {ok:false,mensaje:e&&e.message||String(e)};}
+    catch(e){nubeRegistraError(e);lineas.forEach(linea=>REST_NUBE.failedPrints.add(claveFallaImpresionNube(linea,route)));const trabajo={impresora:p,titulo:(tipo==="cancelacion"?"Cancelación ":"Cocina ")+c.folio,cuerpo:"",nubeLineas:lineas,nubeRuta:route,nubeTipo:tipo,reintentaNube:reintenta};reportaFalloImpresoraPOS(trabajo,"No se pudo reservar esta impresión: "+String(e&&e.message||e).slice(0,130));return {ok:false,mensaje:e&&e.message||String(e)};}
   }
   const titulo=(tipo==="cancelacion"?"Cancelación ":"Cocina ")+c.folio;
   const html=tipo==="cancelacion"?(contenido||""):cuerpoComandaCocinaPOS(c,propias);
@@ -6147,7 +6258,7 @@ async function imprimeComandaRutaNube(c,p,lineas,tipo,contenido,forzado,reclamoY
   if(REST_NUBE.enabled&&resultado.some(r=>r.ok)){
     if(sinRed){propias.forEach(linea=>marcaImpresionOffline(c,linea,route,tipo));}
     else{try{await confirmaLineasNube(propias,route,tipo);propias.forEach(linea=>{linea.impreso=linea.impreso||{};linea.impreso[route]={por:REST_NUBE.deviceId,en:new Date().toISOString(),ok:true};});}
-      catch(e){propias.forEach(linea=>{linea.impreso=linea.impreso||{};linea.impreso[route]={por:REST_NUBE.deviceId,en:new Date().toISOString(),ok:false};encolaConfirmacionImpresion(linea,route,tipo);});REST_NUBE.error="Impresión pendiente de confirmar";}}
+      catch(e){propias.forEach(linea=>{linea.impreso=linea.impreso||{};linea.impreso[route]={por:REST_NUBE.deviceId,en:new Date().toISOString(),ok:false};encolaConfirmacionImpresion(linea,route,tipo);});nubeRegistraError(e);}}
     guardaEstadoLocal();return {ok:true};
   }
   return resultado[0]||{ok:true};
