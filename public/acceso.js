@@ -5,14 +5,23 @@ const P={
   tiendita:{name:"Nuvoor Store",example:"https://nuvoor.mx/#store",icon:"▤",sub:"Mostrador, caja e inventario",href:"./tiendita/"}
 };
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],params=new URLSearchParams(location.search),validos=Object.keys(P);
-let sb=null,sesion=null,negocios=[],cuenta=null,productos=[],modo="entrar",requested=[],negociosDisponible=false,skipAutoOpenOnce=false;
+const ALTAS_ABIERTAS=false;
+let sb=null,sesion=null,negocios=[],cuenta=null,productos=[],modo="entrar",requested=[],negociosDisponible=false,skipAutoOpenOnce=false,accessMode="login",accessTransition=0,firstAccessReveal=true,launchTimer=null;
 function esc(s){return String(s||"").replace(/[&<>\"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 function lista(xs){return [...new Set((Array.isArray(xs)?xs:[]).filter(x=>validos.includes(x)))];}
-function show(id){["#authPanel","#accountPanel","#loadingPanel"].forEach(s=>$(s).hidden=s!==id);}
+function panelCopy(screen){const title=$("#panelTitle"),sub=$("#panelSubtitle");if(!title||!sub)return;if(screen==="signup"){title.textContent="Bienvenido a Nuvoor";sub.textContent="15 días gratis, sin tarjeta.";}else if(screen==="business"){title.textContent="Hola de nuevo";sub.textContent=sesion&&sesion.user&&sesion.user.email||"Elige con qué negocio quieres trabajar.";}else{title.textContent="¡Qué gusto verte!";sub.textContent="Entra y sigue vendiendo.";}}
+function cambiaVista(screen,inicial=false){
+  const card=$("#accessCard");if(!card)return;const serial=++accessTransition,reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches,entrada=inicial||firstAccessReveal;firstAccessReveal=false;accessMode=screen;
+  card.dataset.formReady="false";card.classList.add("is-entering");
+  const destino=()=>{if(serial!==accessTransition)return;panelCopy(screen);card.dataset.screen=screen;card.dataset.phase="travel";setTimeout(()=>{if(serial!==accessTransition)return;card.dataset.formReady="true";card.dataset.phase="steady";card.classList.remove("is-entering");},reduced?0:entrada?650:150);};
+  if(entrada){card.dataset.screen="cover";card.dataset.phase="initial";setTimeout(destino,reduced?0:350);}
+  else{card.dataset.phase="cover";card.dataset.screen="cover";setTimeout(destino,reduced?0:450);}
+}
+function show(id){["#authPanel","#accountPanel","#loadingPanel"].forEach(s=>$(s).hidden=s!==id);if(id==="#authPanel")cambiaVista(accessMode,firstAccessReveal);else if(id==="#accountPanel")cambiaVista("business",firstAccessReveal);}
 function message(t,k=""){const n=$("#msg");n.textContent=t;n.className="msg"+(k?" "+k:"");}
 function detalleError(e){const code=String(e&&e.code||"").trim(),msg=String(e&&e.message||"").trim().replace(/[\r\n\t]+/g," ").slice(0,240);return [code,msg].filter(Boolean).join(" · ")||"La base no devolvió más detalles.";}
 function limpiaSesionLocal(){try{const project=new URL(CONFIG.SUPABASE_URL).hostname.split(".")[0];localStorage.removeItem("sb-"+project+"-auth-token");}catch(_){}}
-function setMode(k){if(k==="alta")k="entrar";modo=k;const alta=k==="alta";$$('[data-mode]').forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.mode===k)));$("#signupFields").hidden=!alta;$("#personName").required=alta;$("#businessName").required=alta;$("#password").autocomplete=alta?"new-password":"current-password";$("#authTitle").textContent=alta?"Empieza gratis con Nuvoor":"Entra a Nuvoor";$("#authSub").textContent=alta?"Crea tu cuenta y abre el POS que elegiste.":"Accede a los productos de tu cuenta.";$("#submit").textContent=alta?"Crear cuenta y probar 15 días":"Iniciar sesión";message("");if(alta)seleccionInicial();}
+function setMode(k){const quiereAlta=k==="alta",alta=quiereAlta&&ALTAS_ABIERTAS,altaCerrada=quiereAlta&&!ALTAS_ABIERTAS;modo=alta?"alta":"entrar";accessMode=quiereAlta?"signup":"login";$$('[data-mode]').forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.mode===k)));$("#signupFields").hidden=!alta;$("#personName").required=alta;$("#businessName").required=alta;$("#password").autocomplete=alta?"new-password":"current-password";$("#authTitle").textContent=quiereAlta?"Crea una cuenta":"Entra a Nuvoor";$("#authSub").textContent=quiereAlta?"Elige tu sistema y abre tu espacio de trabajo.":"Accede a los productos de tu cuenta.";$("#submit").textContent=alta?"Crear cuenta y probar 15 días":"Iniciar sesión";$("#authForm").hidden=altaCerrada;$("#closedSignup").hidden=!altaCerrada;$("#authSwitch").hidden=altaCerrada;const switchButton=$("#authSwitch [data-mode]");if(switchButton){switchButton.dataset.mode=alta?"entrar":"alta";switchButton.innerHTML=alta?'Iniciar sesión <span aria-hidden="true">→</span>':'Crea una cuenta <span aria-hidden="true">→</span>';$("#authSwitch").querySelector("span").textContent=alta?"¿Ya tienes cuenta?":"¿Primera vez aquí?";}message("");if(alta)seleccionInicial();if(!$("#authPanel").hidden&&$("#accessCard").dataset.formReady==="true")cambiaVista(accessMode,false);}
 function seleccionInicial(){const pick=params.get("producto"),defaults=pick&&P[pick]?[pick]:["taller"];$$('input[name="producto"]').forEach(x=>x.checked=defaults.includes(x.value));actualizaSeleccion();}
 function actualizaSeleccion(){requested=$$('input[name="producto"]:checked').map(x=>x.value).slice(0,1);}
 function productosDe(row,detail){return lista(row&&row.productos).length?lista(row.productos):lista([row&&row.producto,detail&&detail.producto]).length?lista([row&&row.producto,detail&&detail.producto]):lista(detail&&detail.productos);}
@@ -41,20 +50,22 @@ async function leerEmpresas(){
   return negocios;
 }
 function urlProducto(k,id){const url=new URL(P[k].href,location.href);if(k!=="taller"&&id)url.searchParams.set("cuenta",id);if(params.get("app")==="android")url.searchParams.set("app","android");return url.href;}
+function animarApertura(k,n){const overlay=$("#launchOverlay");if(!overlay){location.replace(urlProducto(k,n.id));return;}clearTimeout(launchTimer);$("#launchTitle").textContent="Abriendo "+P[k].name;$("#launchBusiness").textContent=n.nombre||"Mi negocio";overlay.hidden=false;overlay.setAttribute("aria-hidden","false");overlay.classList.remove("active");requestAnimationFrame(()=>overlay.classList.add("active"));const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;launchTimer=setTimeout(()=>location.replace(urlProducto(k,n.id)),reduced?400:2500);}
 async function abreNegocio(k,n){
   if(!P[k]||!n)return;
   if(k==="taller"&&!n.activa){
     const {error}=await sb.rpc("cambiar_empresa",{destino:n.id});
     if(error){const note=$("#businessNotice");note.hidden=false;note.textContent="No se pudo abrir Nuvoor Imprenta: "+detalleError(error)+". Revisa que sql/19-negocios-por-correo.sql esté aplicado.";return;}
   }
-  location.replace(urlProducto(k,n.id));
+  animarApertura(k,n);
 }
 function vigencia(n){return n&&n.estado==="activa"&&new Date(n.vence)>new Date();}
 function badgeProductos(n){return n.productos.length?n.productos.map(k=>P[k].name.replace("Nuvoor ","")).join(" · "):"Sistema por identificar";}
 function renderNegocio(n,productoSolicitado){
   const products=productoSolicitado&&n.productos.includes(productoSolicitado)?[productoSolicitado]:n.productos,supported=products.length>0;
   const buttons=supported?products.map(k=>'<button class="businessOpen" type="button" data-open-product="'+k+'" data-business="'+esc(n.id)+'">Abrir '+esc(P[k].name.replace("Nuvoor ",""))+' →</button>').join(""):'<small class="businessMissing">Falta ejecutar sql/19-negocios-por-correo.sql para identificar este negocio.</small>';
-  return '<article class="businessCard"><div class="businessHead"><span class="businessIcon" aria-hidden="true">'+(supported?products.map(k=>P[k].icon).join(" "):"•")+'</span><div><strong>'+esc(n.nombre)+'</strong><small>'+esc(badgeProductos(n))+' · '+esc(n.rol||"miembro")+'</small></div></div><div class="businessActions">'+buttons+(supported?'<button class="businessLicense" type="button" data-license-business="'+esc(n.id)+'">Ver licencias</button>':"")+'</div></article>';
+  const rolVisible=n.rol==="dueno"?"dueño":n.rol||"miembro";
+  return '<article class="businessCard"><div class="businessHead"><span class="businessIcon" aria-hidden="true">'+(supported?products.map(k=>P[k].icon).join(" "):"•")+'</span><div><strong>'+esc(n.nombre)+'</strong><small>'+esc(badgeProductos(n))+' · '+esc(rolVisible)+'</small></div></div><div class="businessActions">'+buttons+(supported?'<button class="businessLicense" type="button" data-license-business="'+esc(n.id)+'">Ver licencias</button>':"")+'</div></article>';
 }
 function pintaCuenta(){
   const preventDirect=skipAutoOpenOnce;skipAutoOpenOnce=false;
@@ -106,6 +117,6 @@ async function envia(e){e.preventDefault();const alta=modo==="alta",email=$("#em
   try{let data,error;if(alta){({data,error}=await sb.auth.signUp({email,password,options:{data:{nombre:$("#personName").value.trim(),negocio:$("#businessName").value.trim()||P[requested[0]].name,producto:requested[0],productos:requested}}}));}else{({data,error}=await sb.auth.signInWithPassword({email,password}));}if(error)throw error;if(!data.session){message("Te mandamos un correo para confirmar tu cuenta. Después vuelve aquí e inicia sesión para abrir tu POS.","good");setMode("entrar");$("#email").value=email;$("#password").value="";b.disabled=false;b.textContent="Iniciar sesión";return;}await entra(data.session);}
   catch(e){message(e.message||"No se pudo abrir la cuenta.","error");b.disabled=false;b.textContent=alta?"Crear cuenta y probar 15 días":"Iniciar sesión";}}
 async function init(){show("#loadingPanel");if(!window.CONFIG||!window.supabase){show("#authPanel");message("Falta cargar la conexión de Nuvoor. Intenta actualizar la página.","error");return;}sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);const hint=$("#multiHint");if(hint)hint.textContent="Cada negocio es una cuenta independiente; sus datos no se mezclan.";$$('[data-mode]').forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));$("#authForm").addEventListener("submit",envia);$("#addBusinessForm").addEventListener("submit",agregaNegocio);$$('input[name="producto"]').forEach(x=>x.addEventListener("change",actualizaSeleccion));$("#logout").addEventListener("click",async()=>{try{await sb.auth.signOut();}catch(_){}finally{limpiaSesionLocal();location.replace("./acceso.html");}});
-  const {data,error}=await sb.auth.getSession();if(error){show("#authPanel");message("No pudimos revisar la sesión. Intenta iniciar sesión.","error");return;}if(data.session){await entra(data.session);return;}show("#authPanel");if(modo==="alta")setMode("alta");else setMode("entrar");}
+  const {data,error}=await sb.auth.getSession();if(error){show("#authPanel");message("No pudimos revisar la sesión. Intenta iniciar sesión.","error");return;}if(data.session){await entra(data.session);return;}show("#authPanel");}
 init();
 })();

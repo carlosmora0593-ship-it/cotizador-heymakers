@@ -1,43 +1,103 @@
 <!doctype html>
 <html lang="es-MX">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f5f5f7"><title>Acceso · Nuvoor</title>
-<link rel="stylesheet" href="./acceso.css?v=20261031-1913">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f3f5f8" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#0a0d14" media="(prefers-color-scheme:dark)">
+<meta name="color-scheme" content="light dark">
+<title>Acceso · Nuvoor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./acceso.css?v=20261101-2139">
 </head>
 <body>
-<header class="top"><a class="brand" href="https://nuvoor.mx"><span class="mark">N</span><span>Nuvoor</span></a><a href="https://nuvoor.mx">Volver a Nuvoor</a></header>
+<header class="top">
+  <a class="brand" href="https://nuvoor.mx" aria-label="Nuvoor, volver al sitio">
+    <img class="brandSymbol" src="./img/marca/n-body.png" alt="">
+    <span class="brandWord" aria-label="Nuvoor"></span>
+  </a>
+  <a class="topLink" href="https://nuvoor.mx">Volver a Nuvoor <span aria-hidden="true">↗</span></a>
+</header>
 <main>
-  <div class="wrap">
-    <section class="intro"><div class="eyebrow">Un acceso para tu negocio</div><h1>Entra. Elige tu POS. Sigue trabajando.</h1><p>Usa tu correo para abrir el punto de venta que tienes contratado.</p><div class="introNote" hidden><span class="dot"></span><span>La prueba no pide tarjeta.</span></div><!-- ALTAS: al reabrir, regresar el texto de la prueba --></section>
-    <section class="card" id="authPanel" hidden>
-      <h2 id="authTitle">Entra a Nuvoor</h2><p class="sub" id="authSub">Accede a los productos de tu cuenta Nuvoor.</p>
-      <div class="tabs" hidden><button type="button" data-mode="entrar" aria-pressed="true">Iniciar sesión</button><button type="button" data-mode="alta" aria-pressed="false" hidden>Crear cuenta gratis</button></div><p class="sub" id="altaPronto" style="margin-top:10px">Las cuentas nuevas abren muy pronto. Si ya tienes cuenta, entra con tu correo.</p>
-      <form id="authForm" autocomplete="on">
-        <div id="signupFields" hidden>
-          <div class="two"><div class="field"><label for="personName">Tu nombre</label><input id="personName" autocomplete="name"></div><div class="field"><label for="businessName">Negocio</label><input id="businessName" autocomplete="organization"></div></div>
-          <div class="pickProducts"><span class="groupTitle">¿Qué quieres probar?</span><div class="choices">
-            <label class="choice"><input type="radio" name="producto" value="taller"><span><i>✂</i>Nuvoor Imprenta</span></label>
-            <label class="choice"><input type="radio" name="producto" value="restaurant"><span><i>♨</i>Nuvoor Restaurant</span></label>
-            <label class="choice"><input type="radio" name="producto" value="tiendita"><span><i>▤</i>Nuvoor Store</span></label>
-          </div><p class="help" id="multiHint">Cada cuenta corresponde a un sistema. Multiempresa permite hasta 4 sucursales de ese mismo sistema.</p></div>
+  <div class="accessWrap">
+    <div class="accessCard" id="accessCard" data-screen="cover" data-phase="initial" data-form-ready="false">
+      <div class="sweepPanel" aria-hidden="true">
+        <div class="panelMessage" id="panelMessage">
+          <span class="panelEyebrow">UN ACCESO PARA TU NEGOCIO</span>
+          <h1 id="panelTitle">¡Qué gusto verte!</h1>
+          <p id="panelSubtitle">Entra y sigue vendiendo.</p>
+          <div class="systemDots" aria-hidden="true"><i></i><i></i><i></i></div>
         </div>
-        <div class="field"><label for="email">Correo electrónico</label><input id="email" type="email" autocomplete="email" required></div>
-        <div class="field"><label for="password">Contraseña</label><input id="password" type="password" autocomplete="current-password" minlength="6" required></div>
-        <p class="msg" id="msg" role="status" aria-live="polite"></p><button class="btn" id="submit" type="submit">Iniciar sesión</button>
-        <p class="footnote">Tus datos de acceso se protegen con Supabase.</p>
-      </form>
-    </section>
-    <section class="card" id="accountPanel" hidden><div class="accountTop"><div><h2 id="accountTitle">Tu cuenta Nuvoor</h2><p class="sub" id="accountEmail"></p></div><button class="logout" id="logout" type="button">Cerrar sesión</button></div>
-      <div class="status" id="accountStatus"></div><small id="accountErrorDetail" class="help" hidden></small><div id="productOptions"></div>
-      <section class="addBusiness" id="addBusinessPanel" hidden><h3>Agregar un negocio</h3><p>Elige su sistema y asígnale un nombre. Tendrá su propia cuenta y sus propios datos.</p><form id="addBusinessForm"><div class="field"><label for="newBusinessProduct">Sistema</label><select id="newBusinessProduct"><option value="taller">Nuvoor Imprenta</option><option value="restaurant">Nuvoor Restaurant</option><option value="tiendita">Nuvoor Store</option></select></div><div class="field"><label for="newBusinessName">Nombre del negocio</label><input id="newBusinessName" maxlength="100" required placeholder="Mi nuevo negocio"></div><button class="btn" id="createBusiness" type="submit">Crear negocio</button><p class="msg" id="newBusinessMessage" role="status" aria-live="polite"></p></form></section>
-      <section class="license" id="licensePanel" hidden><h3>Licencias del negocio</h3><p id="licenseIntro">Cada licencia cubre un sistema.</p><div class="licProducts" id="licenseProducts"></div><div class="licGrid" id="licenseCards"></div><div class="notice" id="paymentNotice" hidden></div></section>
-      <a class="backLink" href="https://nuvoor.mx">Ver todos los productos de Nuvoor</a>
-    </section>
-    <section class="card" id="loadingPanel"><div class="spinner" aria-label="Cargando"></div></section>
+      </div>
+
+      <section class="pane authPane" id="authPanel" hidden>
+        <div class="paneIntro">
+          <span class="eyebrow">ACCESO SEGURO</span>
+          <h2 id="authTitle">Entra a Nuvoor</h2>
+          <p class="sub" id="authSub">Accede a los productos de tu cuenta.</p>
+        </div>
+        <div class="closedSignup" id="closedSignup" hidden>
+          <p class="closedNotice" id="altaPronto">Las cuentas nuevas abren muy pronto. Si ya tienes cuenta, entra con tu correo.</p>
+          <button class="btn secondaryBtn" type="button" data-mode="entrar">Entra a tu cuenta <span aria-hidden="true">→</span></button>
+        </div>
+        <form id="authForm" autocomplete="on">
+          <div id="signupFields" hidden>
+            <div class="two">
+              <div class="field"><label for="personName">Tu nombre</label><input id="personName" autocomplete="name" placeholder="Nombre completo"></div>
+              <div class="field"><label for="businessName">Negocio</label><input id="businessName" autocomplete="organization" placeholder="Nombre del negocio"></div>
+            </div>
+            <div class="pickProducts">
+              <span class="groupTitle">¿Qué quieres probar?</span>
+              <div class="choices">
+                <label class="choice"><input type="radio" name="producto" value="taller"><span><i>✂</i>Nuvoor Imprenta</span></label>
+                <label class="choice"><input type="radio" name="producto" value="restaurant"><span><i>♨</i>Nuvoor Restaurant</span></label>
+                <label class="choice"><input type="radio" name="producto" value="tiendita"><span><i>▤</i>Nuvoor Store</span></label>
+              </div>
+              <p class="help" id="multiHint">Cada negocio es una cuenta independiente; sus datos no se mezclan.</p>
+            </div>
+          </div>
+          <div class="field">
+            <label for="email">Correo electrónico</label>
+            <span class="inputShell"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"></rect><path d="m5 7 7 5 7-5"></path></svg><input id="email" type="email" autocomplete="email" required placeholder="tu@negocio.com"></span>
+          </div>
+          <div class="field">
+            <label for="password">Contraseña</label>
+            <span class="inputShell"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10" rx="2.5"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v2"></path></svg><input id="password" type="password" autocomplete="current-password" minlength="6" required placeholder="Tu contraseña"></span>
+          </div>
+          <p class="msg" id="msg" role="status" aria-live="polite"></p>
+          <button class="btn" id="submit" type="submit">Iniciar sesión <span aria-hidden="true">→</span></button>
+          <p class="footnote">Tus datos de acceso se protegen con Supabase.</p>
+        </form>
+        <div class="authSwitch" id="authSwitch"><span>¿Primera vez aquí?</span><button class="textButton" type="button" data-mode="alta">Crea una cuenta <span aria-hidden="true">→</span></button></div>
+      </section>
+
+      <section class="pane accountPane" id="accountPanel" hidden>
+        <div class="accountTop"><div><span class="eyebrow">TU ESPACIO NUVOOR</span><h2 id="accountTitle">Tus negocios</h2><p class="sub" id="accountEmail"></p></div><button class="logout" id="logout" type="button">Cerrar sesión</button></div>
+        <div class="status" id="accountStatus"></div><small id="accountErrorDetail" class="help" hidden></small><div id="productOptions"></div>
+        <section class="addBusiness" id="addBusinessPanel" hidden><h3>Agregar un negocio</h3><p>Elige su sistema y asígnale un nombre. Tendrá su propia cuenta y sus propios datos.</p><form id="addBusinessForm"><div class="field"><label for="newBusinessProduct">Sistema</label><select id="newBusinessProduct"><option value="taller">Nuvoor Imprenta</option><option value="restaurant">Nuvoor Restaurant</option><option value="tiendita">Nuvoor Store</option></select></div><div class="field"><label for="newBusinessName">Nombre del negocio</label><input id="newBusinessName" maxlength="100" required placeholder="Mi nuevo negocio"></div><button class="btn" id="createBusiness" type="submit">Crear negocio</button><p class="msg" id="newBusinessMessage" role="status" aria-live="polite"></p></form></section>
+        <section class="license" id="licensePanel" hidden><h3>Licencias del negocio</h3><p id="licenseIntro">Cada licencia cubre un sistema.</p><div class="licProducts" id="licenseProducts"></div><div class="licGrid" id="licenseCards"></div><div class="notice" id="paymentNotice" hidden></div></section>
+        <a class="backLink" href="https://nuvoor.mx">Ver todos los productos de Nuvoor</a>
+      </section>
+      <section class="loadingPane" id="loadingPanel" aria-label="Cargando"><div class="spinner"></div><span>Preparando tu espacio…</span></section>
+    </div>
   </div>
 </main>
-<footer>Nuvoor · Nuvoor Imprenta · Nuvoor Restaurant · Nuvoor Store</footer>
-<script src="./config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="./acceso.js?v=20261031-1913"></script>
-</body></html>
+<footer class="siteFooter">Nuvoor · Tu negocio, a tu manera</footer>
+
+<div class="launchOverlay" id="launchOverlay" hidden aria-hidden="true">
+  <div class="launchContent">
+    <div class="launchMark" aria-hidden="true"><img class="launchN" src="./img/marca/n-body.png" alt=""><span class="launchShine"></span><img class="launchStar" src="./img/marca/star.png" alt=""></div>
+    <span class="launchWord" aria-label="Nuvoor"></span>
+    <p class="launchTitle" id="launchTitle">Abriendo Nuvoor</p>
+    <strong class="launchBusiness" id="launchBusiness"></strong>
+    <div class="launchTrack" aria-hidden="true"><i></i></div>
+  </div>
+</div>
+
+<script src="./config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
+<script src="./acceso.js?v=20261101-2139"></script>
+</body>
+</html>
