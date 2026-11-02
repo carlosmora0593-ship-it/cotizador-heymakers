@@ -3,7 +3,7 @@
    El diagnóstico
    ============================================================
    Seis preguntas, una recomendación, y un renglón guardado para que
-   Hey Makers sepa qué pide la gente que llega.
+   Nuvoor sepa qué pide la gente que llega.
 
    La recomendación NO usa inteligencia artificial, y es a propósito.
    Con seis preguntas y reglas claras el resultado es el mismo, sale al

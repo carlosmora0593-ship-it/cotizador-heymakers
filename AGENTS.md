@@ -13,15 +13,10 @@ Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este r
    0d. ✅ **`TAREA-NEGOCIOS.md`** (publicado el 31 oct, `41f410d`; falta que Carlos corra `sql/19`): varios negocios con el mismo correo. Carlos tendrá Imprenta, Restaurant y Store, cada uno como **cuenta propia**, y al iniciar sesión escoge con cuál trabaja («Tus negocios»). Lleva `sql/19-negocios-por-correo.sql` (RLS por membresía y rol en ESA cuenta, `mis_empresas` con producto, `crear_negocio`, escalera de planes sólo en Imprenta) y cambios en la puerta, Restaurant, Store e Imprenta. **Los POS no cambian la cuenta activa.**
    0e. **`TAREA-NUBE-RESTAURANT.md` (URGENTE, 31 oct 20:10):** el Restaurant en la nube y en tiempo real, como Loyverse. Tablet, celular y laptop ven y editan lo mismo, y sin internet se sigue cobrando. **La fase 1 incluye a los meseros mandando a cocina desde el celular**, con cada comanda impresa una sola vez. Lleva `sql/20-restaurant-nube.sql`. **Reemplaza la idea de «buzón» de `TAREA-MESEROS.md`.**
       - ✅ La fase 1 se publicó el 31 oct (`8f68dd2`). **La prueba real del 1 nov falló:** el negocio nació vencido y las subidas iniciales se iban a mezclar. Ver 0f.
-   0f. **`TAREA-NUBE-ARREGLO.md` (URGENTE, 1 nov):**
-      - `crear_negocio` con 15 días de prueba (`sql/21`).
-      - Aviso claro de «plan vencido».
-      - Nunca mezclar dos subidas iniciales.
-      - El Lab ve el 19, el 20 y el 21.
-   0g. **`TAREA-TICKETS-Y-LLEVAR.md` (1 nov):**
-      - Comandas de cocina grandes y con negritas (ESC/POS; quizá APK 0.1.3).
-      - Nombre del cliente en los pedidos para llevar, en cocina y en caja.
-      - **Maqueta de los tickets primero.**
+   0f. ✅ **`TAREA-NUBE-ARREGLO.md` (1 nov):** `sql/21`, aviso de plan vencido, subidas iniciales sin mezclar. Publicado y probado en los tres aparatos de Carlos.
+   0g. ✅ **`TAREA-TICKETS-Y-LLEVAR.md` (1 nov):** tickets raster, nombre en para llevar, folio sin `CTA-CTA` y cámara. APK 0.1.3 publicado el 1 nov (`4c14ac9`). **Falta la prueba en papel y con la cámara de Carlos.**
+   0i. **`TAREA-SIN-MAKERSOS.md` (1 nov), va ANTES de 0h porque es corta:** que nada visible diga MakersOS ni Makers, el Lab pasa a «Nuvoor Lab» y el logo de Nuvoor entra a los sistemas. **Maqueta (capturas) primero.**
+   0j. **`TAREA-ACCESO-ANIMADO.md` (1 nov), justo después de 0i:** el acceso con el panel diagonal animado (color B, aprobado por Carlos) y el logo animado antes de abrir cualquier POS. Maqueta aprobada; capturas antes de publicar.
    0h. **Fase 2 del Restaurant en la nube:** caja, turnos y cortes compartidos. Carlos ya lo necesita: «tienen cortes de caja diferentes». Se escribe la tarea después de 0g.
       - **Pendientes que pidió Carlos para después de la fase 1** (ver la sección 3.8 de esa tarea):
         - **Modo local en el APK:** la tablet como servidor en el WiFi, para que los meseros manden sin internet.
@@ -37,7 +32,7 @@ Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este r
 2b. **Publicar.** Carlos autorizó el 31 oct que **Codex corra `PUBLICAR.bat` SÓLO cuando Claude escriba «aprobado, publica»**, después de revisar. Sin esa aprobación no se publica nada. Si el `.bat` espera una tecla, corre sus mismos comandos git. Al terminar, confirma el commit y el push en el historial.
 3. **Lleva tu propio historial** en `HISTORIAL-CODEX/` mientras trabajas: un archivo por sesión con `PLANTILLA.md` y una línea arriba en `INDICE.md`. Nada de contraseñas, llaves ni el correo de Carlos. La carpeta está en `.gitignore` porque el repo es público.
 
-Última actualización: 31 de octubre de 2026, 14:28 (cuentas por negocio y APK 0.1.2; pendiente publicación y validación real en los dispositivos de Carlos).
+Última actualización: 1 de noviembre de 2026, 16:30 (APK 0.1.3 publicado; sigue 0i, quitar MakersOS).
 
 ## Qué es esto
 
@@ -166,8 +161,8 @@ La rama local es `docs/estructura-carpeta`. `PUBLICAR.bat` empuja con `git push 
 3. **Cobros.** Los secretos de las Edge Functions en Supabase **están vacíos** (sólo existe `SITIO_URL`). Hoy, al terminar la prueba de 15 días, nadie puede pagar.
    - Ver `PASOS-STRIPE.md` y actualizar ahí `SITIO_URL` a `https://app.nuvoor.mx`; lo mismo en `PASOS-SUPABASE.md`.
    - Las llaves las pone Carlos.
-4. **Cuando `nuvoor.mx` esté vivo:** `MakersOS.html` y `productos/*` redirigen a `https://nuvoor.mx`, y el «Volver a Nuvoor» de `acceso.html` también.
-5. **Logo de Nuvoor dentro de los POS:** puerta de acceso, barra y favicon. Los archivos están en `Claude outputs/nuvoor-landing/sitio/img/marca/`:
+4. ✅ `MakersOS.html` y `productos/*` ya redirigen a `https://nuvoor.mx`. Se quedan como redirecciones hasta que Carlos decida borrarlas (ver `TAREA-SIN-MAKERSOS.md`).
+5. **Logo de Nuvoor dentro de los POS** (ahora va dentro de `TAREA-SIN-MAKERSOS.md`): puerta de acceso, barra y favicon. Los archivos están en `Claude outputs/nuvoor-landing/sitio/img/marca/`:
    - `n-64.png`, `n-192.png`, `n-512.png`: la N con su estrella.
    - `palabra-96.png`: la palabra NUVOOR en negro. En modo oscuro se pinta con `mask` sobre `background: var(--ink)`.
    - Colores del logo: morado `#4c4780`, índigo `#4458a4`, cielo `#49a6de`, agua `#79cce0`, tinta `#0a0e1a`.

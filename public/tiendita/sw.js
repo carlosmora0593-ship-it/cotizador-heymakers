@@ -1,4 +1,4 @@
-const CACHE_NAME = "makers-tiendita-v9-negocios";
+const CACHE_NAME = "nuvoor-store-v10-marca";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,
@@ -15,7 +15,7 @@ self.addEventListener("install", event => {
 
 self.addEventListener("activate", event => {
   event.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(key => key.startsWith("makers-tiendita-") && key !== CACHE_NAME).map(key => caches.delete(key))
+    keys.filter(key => (key.startsWith("makers-tiendita-") || key.startsWith("nuvoor-store-")) && key !== CACHE_NAME).map(key => caches.delete(key))
   )).then(() => self.clients.claim()));
 });
 

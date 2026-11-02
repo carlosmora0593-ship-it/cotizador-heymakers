@@ -1,7 +1,7 @@
 /* ============================================================
-   MAKERS LAB · puente con Supabase
+   Nuvoor Lab · puente con Supabase
    ------------------------------------------------------------
-   Makers Lab por dentro no cambia: sigue pidiendo sus datos con
+   Nuvoor Lab por dentro no cambia: sigue pidiendo sus datos con
    window.claude.use("db"), igual que cuando era un artefacto de
    prueba. Lo que cambia es de dónde salen.
 
@@ -13,7 +13,7 @@
      contenido de lo que cotizó. Esa promesa no vive en esta
      pantalla: vive en la forma de las vistas, en la base.
 
-   · Tu EQUIPO, tus ALIANZAS y tus CITAS son tuyas, de Hey Makers,
+   · Tu EQUIPO, tus ALIANZAS y tus CITAS son tuyas, de Nuvoor,
      así que viven en tu propio cuaderno (la tabla lab_datos) y las
      escribes con toda libertad.
    ============================================================ */
@@ -75,7 +75,7 @@ async function arranca(){
   SOY = await quienSoy();
   if(!SOY){
     portazo("Esta parte no es para esta cuenta",
-      "Makers Lab es la consola interna de Hey Makers. Tu sesión (" + SESION.user.email +
+      "Nuvoor Lab es la consola interna de Nuvoor. Tu sesión (" + SESION.user.email +
       ") no está dada de alta como parte del equipo, así que aquí no hay nada que enseñarte. " +
       "Si buscabas tu cotizador, está en la página principal.", true);
     return;
@@ -107,18 +107,18 @@ function portazo(titulo, texto, conSalida){
 function pideEntrar(msg){
   q("#labPuerta").hidden = false;
   document.body.classList.add("sin-sesion");
-  q("#puertaTitulo").textContent = "Makers Lab";
-  q("#puertaTexto").textContent = msg || "Entra con tu correo de Hey Makers.";
+  q("#puertaTitulo").textContent = "Nuvoor Lab";
+  q("#puertaTexto").textContent = msg || "Entra con tu correo de Nuvoor.";
   q("#puertaForm").hidden = false;
   q("#puertaSalir").hidden = true;
   q("#puertaInicio").hidden = true;
 }
 
 /* ============================================================
-   2. Traducción: la base de datos → lo que Makers Lab espera
+   2. Traducción: la base de datos → lo que Nuvoor Lab espera
    ============================================================ */
 
-/* La base habla en UTC y con milésimas; Makers Lab habla en la hora del
+/* La base habla en UTC y con milésimas; Nuvoor Lab habla en la hora del
    reloj de quien está mirando, con el formato AAAA-MM-DDTHH:MM que usan
    todos sus cálculos de tiempo. Sin esta traducción un ticket que entró
    a las 9 de la mañana aparecería a las 3 de la tarde. */
@@ -132,13 +132,13 @@ function aSello(ts){
 }
 
 /* Los dos programas le dicen distinto a lo mismo. El cotizador habla
-   desde el cliente ("lo envié", "ya lo cerré"); Makers Lab habla desde
+   desde el cliente ("lo envié", "ya lo cerré"); Nuvoor Lab habla desde
    soporte ("nadie lo ha tomado", "está en curso"). Es el mismo ticket
    visto desde los dos lados del mostrador, y aquí se traduce. */
 const TK_A_LAB  = {enviado:"abierto", contestado:"encurso", esperando:"esperando", cerrado:"resuelto"};
 const TK_A_BASE = {abierto:"enviado", encurso:"contestado", esperando:"esperando", resuelto:"cerrado"};
 
-/* Supabase guarda plan y estado por separado; Makers Lab los junta
+/* Supabase guarda plan y estado por separado; Nuvoor Lab los junta
    en un solo estado, que es como se habla del negocio: "está en
    prueba", "ya venció". Esta función traduce de uno al otro. */
 function estadoDe(r){
@@ -150,7 +150,7 @@ function estadoDe(r){
   return "activa";
 }
 
-/* Un renglón de v_cuentas, con la forma que Makers Lab sabe pintar.
+/* Un renglón de v_cuentas, con la forma que Nuvoor Lab sabe pintar.
    Los números son los de verdad; los campos comerciales (de dónde
    llegó, quién la atiende, su RFC) los pones tú y viven aparte. */
 function cuentaDeVista(r, nota){
@@ -191,7 +191,7 @@ function cuentaDeVista(r, nota){
   return base;
 }
 
-/* Un ticket de v_soporte con la forma de Makers Lab. */
+/* Un ticket de v_soporte con la forma de Nuvoor Lab. */
 function ticketDeVista(r, nota){
   const t = {
     id: r.ticket_id,
@@ -211,7 +211,7 @@ function ticketDeVista(r, nota){
     version: r.version,
     navegador: r.navegador,
     reaperturas: Number(r.reaperturas || 0),
-    /* Los nombres que Makers Lab usa para el reloj. Los sellos los puso
+    /* Los nombres que Nuvoor Lab usa para el reloj. Los sellos los puso
        la base, no el navegador del cliente: no se pueden maquillar. */
     creado:     aSello(r.entro),
     primeraResp: aSello(r.contestado),
@@ -226,7 +226,7 @@ function ticketDeVista(r, nota){
       msg: e.msg || e.mensaje || String(e),
       donde: e.donde || ""
     })),
-    /* El cotizador guarda la hora del mensaje en "hora"; Makers Lab la
+    /* El cotizador guarda la hora del mensaje en "hora"; Nuvoor Lab la
        busca en "f". Se rellenan las dos para que ninguno de los dos se
        quede mirando un hueco. */
     mensajes: (r.mensajes || []).map(m => ({
@@ -258,13 +258,13 @@ function ticketDeVista(r, nota){
 
 /* De solo lectura quiere decir "no se borra desde aquí". Los tickets sí
    se contestan —eso es su razón de ser— pero borrar el reporte de un
-   cliente no es algo que Makers Lab deba poder hacer. */
+   cliente no es algo que Nuvoor Lab deba poder hacer. */
 const SOLO_LECTURA = {cuentas: true, tickets: true, errores: true, codigos: true, diagnosticos: true};
 
 /* La vista de soporte es la última pieza que se instala, y si falta, lo
    que aparece es "no existe la tabla v_soporte": cierto y perfectamente
    inútil. Aquí se traduce a la instrucción de qué correr, una sola vez,
-   y el resto de Makers Lab sigue funcionando en lugar de caerse entero.
+   y el resto de Nuvoor Lab sigue funcionando en lugar de caerse entero.
 
    Los reportes no se pierden mientras eso pasa: están guardados en la
    cuenta de cada taller, esperando que la vista exista. */
@@ -421,7 +421,7 @@ async function contestaTicket(id, t){
   const antes = actual.cuerpo || {};
 
   /* Los mensajes se mandan como los guarda el cotizador: con "hora". Se
-     deja también "f" para que Makers Lab los pinte igual sin recargar. */
+     deja también "f" para que Nuvoor Lab los pinte igual sin recargar. */
   const mensajes = (t.mensajes || antes.mensajes || []).map(m=>{
     const f = m.f || m.hora || "";
     return {de: m.de, txt: m.txt,
@@ -462,7 +462,7 @@ function refCol(col){
       const filas = await leeColeccion(col);
       return {docs: filas.map(f=> ({id: f.id, data: ()=> f}))};
     },
-    /* Makers Lab escucha cambios. Los de soporte llegan solos por
+    /* Nuvoor Lab escucha cambios. Los de soporte llegan solos por
        Realtime; los demás se refrescan cada minuto, que para un
        tablero de suscripciones sobra. */
     onSnapshot(fn, falla){
@@ -500,7 +500,7 @@ const PUENTE_DOWNLOADS = {
 
 /* ---------- el carrusel de publicidad ----------
    No pasa por el puente de documentos a propósito: esa tabla está amarrada a
-   una cuenta, y un anuncio no es de ningún taller — es de Hey Makers y lo ven
+   una cuenta, y un anuncio no es de ningún taller — es de Nuvoor y lo ven
    todos. Tiene su tabla propia, y del otro lado las políticas sólo dejan
    escribir al staff del Lab, así que esto no abre ninguna puerta nueva. */
 window.__labAnuncios = {
@@ -608,7 +608,7 @@ window.__labBase = {
 window.claude = { use: async nombre =>
   nombre === "db" ? {doc: refDoc, collection: refCol} :
   nombre === "downloads" ? PUENTE_DOWNLOADS :
-  null };          // 'sample' no existe fuera de Claude: Makers Lab ya sabe vivir sin él
+  null };          // 'sample' no existe fuera de Claude: Nuvoor Lab ya sabe vivir sin él
 
 
 /* ============================================================

@@ -8,6 +8,7 @@
 <script src="config.js?v=20261016-1350"></script>
 <style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Nuvoor Imprenta</title>
+<link rel="icon" type="image/png" href="./marca/n-64.png">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -15,7 +16,7 @@
 [hidden]{display:none!important}
 
 :root{
-  /* colores de marca Hey Makers */
+  /* colores de marca Nuvoor */
   --mk-cyan:#06A1D7; --mk-magenta:#F51B95; --mk-yellow:#FFEC30; --mk-black:#141414;
 
   --bg:#EDF5FA; --surface:#FFFFFF; --surface-2:#F5FAFD; --line:#CFE2ED; --line-soft:#E4EFF6;
@@ -95,6 +96,11 @@ header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;backgroun
 .brand .who{display:flex;flex-direction:column;line-height:1.15}
 .brand b{font-family:"Fredoka";font-weight:600;font-size:16px}
 .brand .who>span{color:var(--ink-3);font-size:10px;text-transform:uppercase;letter-spacing:.11em;font-weight:700}
+.brand .negocioMarca{width:40px;height:40px;padding:0;border-radius:11px;background:var(--accent);color:var(--accent-ink);box-shadow:none;overflow:hidden;flex:none}
+.brand .negocioMarca img{width:100%;height:100%;max-height:none;object-fit:contain;padding:4px}
+#brandInitial{display:grid;place-items:center;width:100%;height:100%;font:700 14px/1 Fredoka,sans-serif;letter-spacing:.02em}
+.nuvoorPie{display:flex;align-items:center;gap:6px;font-size:10.5px;opacity:.68}
+.nuvoorPie img{display:block;width:16px;height:16px;object-fit:contain}
 nav.tabs{display:flex;gap:2px;background:var(--surface-2);padding:3px;border-radius:9px;border:1px solid var(--line-soft);overflow-x:auto}
 nav.tabs button{font:inherit;font-weight:500;border:0;background:transparent;color:var(--ink-2);padding:6px 12px;border-radius:7px;cursor:pointer;white-space:nowrap}
 nav.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
@@ -2963,7 +2969,7 @@ body.sin-plan header.top{z-index:65}
 
 /* ---- el menú de perfil ----
    Todo lo de la cuenta cabe aquí: el plan, la empresa, el equipo, los
-   ajustes, Makers Lab y la salida. Antes eran seis cosas sueltas peleando
+   ajustes, Nuvoor Lab y la salida. Antes eran seis cosas sueltas peleando
    por el ancho del encabezado. */
 /* Hasta la derecha, siempre. Con la barra lateral puesta, la marca y el menú
    se salen del encabezado y el perfil se quedaba pegado a la izquierda: su
@@ -3387,7 +3393,7 @@ body.rol-produccion #btnPrint{display:none!important}
   <div class="barraCmyk"><i></i><i></i><i></i><i></i></div>
   <div class="barraTop" id="barraTop"></div>
   <div class="barraNav" id="barraNav"></div>
-  <div class="barraPie"><span id="barraVer"></span></div>
+  <div class="barraPie"><span id="barraVer" class="nuvoorPie"><img src="./marca/n-64.png" alt=""><span>Nuvoor</span></span></div>
 </aside>
 </head>
 <body class="sin-sesion">
@@ -3395,8 +3401,8 @@ body.rol-produccion #btnPrint{display:none!important}
   <div class="cmyk"><i></i><i></i><i></i><i></i></div>
   <div class="top-in">
     <div class="brand">
-      <span class="plaque"><img id="brandLogo" src="" alt="Hey Makers"></span>
-      <span class="who"><b id="brandProducto">Nuvoor Imprenta</b><span id="brandSlogan">Cursos y talleres</span></span>
+      <span class="plaque negocioMarca" id="brandMark"><img id="brandLogo" src="" alt="" hidden><span id="brandInitial" aria-hidden="true">MN</span></span>
+      <span class="who"><b id="brandProducto">Mi negocio</b><span id="brandSlogan">Imprenta</span></span>
     </div>
     <div class="menuWrap">
       <button class="menuBtn" id="menuBtn" aria-expanded="false" aria-haspopup="true">
@@ -3464,7 +3470,7 @@ body.rol-produccion #btnPrint{display:none!important}
         <div class="perfilLista">
           <button role="menuitem" id="btnPlanes"><b>Mi plan</b><small>Tu suscripción, el pago y el cambio de plan</small></button>
           <button role="menuitem" id="btnAjustes"><b>Ajustes</b><small>Utilidad, IVA, equipo y datos de tu empresa</small></button>
-          <button role="menuitem" id="btnLab" hidden class="esLab"><b>Makers Lab</b><small>La consola interna de Hey Makers</small></button>
+          <button role="menuitem" id="btnLab" hidden class="esLab"><b>Nuvoor Lab</b><small>La consola interna de Nuvoor</small></button>
         </div>
 
         <div class="perfilPie">
@@ -3507,7 +3513,7 @@ body.rol-produccion #btnPrint{display:none!important}
 </div>
 
 <!-- El diagnóstico. Seis preguntas antes de elegir plan: para que el taller
-     no adivine, y para que Hey Makers sepa quién está llegando. Se puede
+     no adivine, y para que Nuvoor sepa quién está llegando. Se puede
      saltar completo — a quien ya decidió, obligarlo a contestar seis
      pantallas es la forma más rápida de perderlo. -->
 <div class="diagMuro" id="diagMuro" hidden>
@@ -4730,13 +4736,13 @@ body.rol-produccion #btnPrint{display:none!important}
     <header><h2>Datos de tu empresa</h2><span class="hint">aparecen en la cotización impresa</span></header>
     <div class="body">
       <div class="grid g4">
-        <div><label class="f" for="e_nombre">Nombre comercial</label><input id="e_nombre"></div>
+        <div><label class="f" for="e_nombre">Nombre comercial</label><input id="e_nombre" placeholder="Mi negocio"></div>
         <div><label class="f" for="e_slogan">Eslogan</label><input id="e_slogan"></div>
         <div><label class="f" for="e_tel">Teléfono</label><input id="e_tel"></div>
         <div><label class="f" for="e_mail">Correo</label><input id="e_mail"></div>
       </div>
       <div class="artbox" style="margin-top:14px">
-        <span class="plaque"><img id="logoPrev" src="" alt="" style="height:44px"></span>
+        <span class="plaque"><img id="logoPrev" src="" alt="" style="height:44px" hidden></span>
         <div class="artmeta"><b>Logotipo</b><small>Se usa en el encabezado y en los documentos impresos.</small></div>
         <div class="upwrap">
           <button class="btn sm" id="btnLogo">Cambiar logo</button>
@@ -5631,7 +5637,7 @@ const TEMAS = {
     "--serie-1":"#0680AB", "--serie-2":"#D6127F", "--serie-3":"#B26A00", "--serie-4":"#0E7C57",
     "--shadow":"0 1px 2px rgba(28,26,23,.06), 0 12px 28px -20px rgba(28,26,23,.30)"
   }},
-  heymakers:{nombre:"Hey Makers", acento:"#D6127F", amb:["#06A1D7","#F51B95","#FFEC30"]},
+  heymakers:{nombre:"Magenta", acento:"#D6127F", amb:["#06A1D7","#F51B95","#FFEC30"]},
   guinda:   {nombre:"Guinda",     acento:"#A81B4A", amb:["#7A1231","#C4295C","#E8B9CA"]},
   oceano:   {nombre:"Océano",     acento:"#0A7EA4", amb:["#06A1D7","#19C3C3","#7FE3F0"]},
   bosque:   {nombre:"Bosque",     acento:"#0E7C57", amb:["#14A06B","#8FD14F","#0E7C57"]},
@@ -5951,7 +5957,7 @@ function defaultParams(){ return {giro:"taller", guiado:true, guiadoElegido:fals
   tarifaKwh:4, bloqueoMin:10,
   folios:{letras:"", extra:"", digitos:6, desde:{cot:1, op:1, req:1}},
   compras:{tope:2000, siempre:false},
-  empresa:{nombre:"Hey Makers",eslogan:"Cursos y Talleres",tel:"",mail:"",logo:"",
+  empresa:{nombre:"",eslogan:"",tel:"",mail:"",logo:"",
   /* Lo fiscal va aparte de lo comercial a propósito: el nombre comercial es
      con el que te conocen y la razón social es con la que facturas, y casi
      nunca son el mismo. Mezclarlos es de donde salen las facturas rechazadas. */
@@ -9571,7 +9577,7 @@ function pintaArranque(){
       '<div class="grid g2">' +
         '<div><label class="f" for="arrNombre">¿Cómo se llama tu taller?</label>' +
         '<input id="arrNombre" placeholder="Nuvoor Imprenta" value="' +
-          esc(arrEstado.nombre || (P.empresa && P.empresa.nombre === "Hey Makers" ? "" : (P.empresa||{}).nombre) || "") + '"></div>' +
+          esc(arrEstado.nombre || (P.empresa||{}).nombre || "") + '"></div>' +
         '<div><label class="f" for="arrTel">Teléfono o WhatsApp</label>' +
         '<input id="arrTel" placeholder="443 000 0000" value="' + esc(arrEstado.tel || (P.empresa||{}).tel || "") + '"></div>' +
       '</div>';
@@ -10213,8 +10219,7 @@ function renderSet(){
   const bv = $("#barraVer");
   /* En el pie va la plataforma, no el negocio del cliente: es la firma del
      producto, como el «Windows» de abajo a la derecha. */
-  if(bv) bv.textContent = (window.PRODUCTO && window.PRODUCTO.plataforma) ||
-                          (P.empresa && P.empresa.nombre) || "Nuvoor";
+  if(bv) bv.innerHTML = '<img src="./marca/n-64.png" alt=""><span>Nuvoor</span>';
   $("#p_margen").value=P.margen; $("#p_modo").value=P.modo; $("#p_merma").value=P.merma; $("#p_mo").value=P.manoObra;
   $("#p_nesting").checked = P.nesting !== false;
   const pgu = $("#p_guiado"); if(pgu) pgu.checked = (P.guiado !== false);
@@ -10334,11 +10339,17 @@ function faltaParaFacturar(){
   if(String(E.cpFiscal||"").trim().length !== 5) f.push("el código postal fiscal");
   return f;
 }
-function logoSrc(){ return P.empresa.logo || LOGO_MARCA; }
+function logoSrc(){ return String(P.empresa && P.empresa.logo || "").trim(); }
+function inicialesNombreNegocio(nombre){ const partes=String(nombre||"").trim().split(/\s+/).filter(Boolean); return (partes.length>1?partes[0].charAt(0)+partes[1].charAt(0):String(nombre||"").trim().slice(0,2)).toUpperCase()||"MN"; }
 function aplicaMarca(){
-  const b = $("#brandLogo"); if(b){ b.src = logoSrc(); b.alt = P.empresa.nombre||"Logo"; }
-  const s = $("#brandSlogan"); if(s) s.textContent = P.empresa.eslogan || "";
-  const p = $("#logoPrev"); if(p) p.src = logoSrc();
+  const nombre=String(P.empresa && P.empresa.nombre || "").trim()||"Mi negocio", logo=logoSrc();
+  const b=$("#brandLogo"); if(b){ b.hidden=!logo; if(logo)b.src=logo; b.alt="Logo de "+nombre; }
+  const inicial=$("#brandInitial"); if(inicial){ inicial.textContent=inicialesNombreNegocio(nombre); inicial.hidden=!!logo; }
+  const marca=$("#brandMark"); if(marca) marca.classList.toggle("conLogo",!!logo);
+  const titulo=$("#brandProducto"); if(titulo) titulo.textContent=nombre;
+  const s=$("#brandSlogan"); if(s) s.textContent=String(P.empresa && P.empresa.eslogan || "").trim()||"Imprenta";
+  const p=$("#logoPrev"); if(p){ p.hidden=!logo; if(logo)p.src=logo; const caja=p.closest(".plaque"); if(caja)caja.hidden=!logo; }
+  const al=$("#accesoLogo"); if(al){ al.hidden=!logo; if(logo){al.src=logo;al.alt="Logo de "+nombre;} if(al.parentElement)al.parentElement.hidden=!logo; }
 }
 $("#btnLogo").addEventListener("click", ()=>{
   if(!ASSETS){ toast("Para cambiar el logo necesitas permiso de edición en esta página"); return; }
@@ -10353,7 +10364,7 @@ $("#logoFile").addEventListener("change", async e=>{
        persist(); aplicaMarca(); toast("Logo actualizado"); }
   catch(err){ toast("No se pudo subir el logo"); }
 });
-$("#btnLogoDef").addEventListener("click", ()=>{ P.empresa.logo = ""; persist(); aplicaMarca(); toast("Logo original restaurado"); });
+$("#btnLogoDef").addEventListener("click", ()=>{ P.empresa.logo = ""; persist(); aplicaMarca(); toast("Logo del negocio quitado"); });
 
 /* ---------- eventos ---------- */
 /* ---------- menú ---------- */
@@ -15489,7 +15500,7 @@ const TIPS = [
   ["Una cotización vence", "La vigencia en Ajustes sale impresa en el documento. Sin fecha de vencimiento, el cliente de marzo te pide el precio de enero."],
   ["Revisa la utilidad, no el total", "Una cotización de cien mil con 8% de utilidad deja menos que una de treinta mil con 40%. El resumen te da las dos cifras."]
 ];
-/* Los tips de arriba son los de fábrica. Makers Lab puede mandar los suyos,
+/* Los tips de arriba son los de fábrica. Nuvoor Lab puede mandar los suyos,
    y entonces mandan esos — pero si la tabla no existe, no hay red o están
    todos apagados, el tablero sigue enseñando uno de los de fábrica. Un
    consejo que no carga no tiene por qué dejar un hueco. */
@@ -16664,7 +16675,7 @@ const PRODUCTO = window.PRODUCTO = {
 };
 function aplicaProducto(){
   try{ document.title = PRODUCTO.edicion; }catch(e){}
-  const b = $("#brandProducto"); if(b) b.textContent = PRODUCTO.edicion;
+  aplicaMarca();
 }
 aplicaProducto();
 
@@ -16934,7 +16945,7 @@ $("#tab-set").addEventListener("change", async e=>{
   if(d.colonia)   E.colonia   = d.colonia;
   if(d.municipio) E.municipio = d.municipio;
   if(d.estado)    E.estado    = d.estado;
-  if(!P.empresa.nombre || P.empresa.nombre === "Hey Makers") P.empresa.nombre = d.comercial || d.razon || P.empresa.nombre;
+  if(!P.empresa.nombre) P.empresa.nombre = d.comercial || d.razon || "";
   persist(); renderSet(); renderResumen();
   toast("Listo: quedaron tus datos fiscales");
 });
@@ -17463,8 +17474,8 @@ function aplicaGiro(){
   PRODUCTO.clave   = g.clave;
   PRODUCTO.giro    = g.giro;
   const marca = document.getElementById("brandProducto");
-  if(marca) marca.textContent = g.edicion;
-  if(document.title && /Makers/.test(document.title)) document.title = g.edicion;
+  if(marca) aplicaMarca();
+  if(document.title && /Nuvoor/.test(document.title)) document.title = g.edicion;
 
   /* Los nombres: "Mostrador" en el taller es "Vender" en la tienda. Lo
      que se llama distinto en la calle tiene que llamarse distinto aquí. */
@@ -18654,7 +18665,7 @@ function pideAcceso(opc){
     const rec = $("#accesoRecordarFila"); if(rec) rec.hidden = true;
     if(otro) otro.hidden = !conClave;
   }else{
-    if(at)  at.textContent  = window.CONFIG ? "¿Quién va a trabajar en " + CONFIG.MARCA + "?"
+    if(at)  at.textContent  = window.CONFIG ? "¿Quién va a trabajar en " + (String(P.empresa && P.empresa.nombre || "").trim() || "tu negocio") + "?"
                                             : "¿Quién va a trabajar?";
     if(sub) sub.textContent = "Elige tu perfil. Cada quien ve solo lo de su área.";
     $("#accesoPerfiles").hidden = false;
@@ -21744,7 +21755,7 @@ function svDefs(){
 /* ------------------------------------------------------------------
    El catálogo de servicios. Vive en cat.svcCat, así que se guarda y viaja
    con el catálogo de siempre. Las secciones con «bloq» salen con candado:
-   las prende MakersOS desde el Lab (window.__seccionSvc).
+   las prende Nuvoor desde el Lab (window.__seccionSvc).
    Cada grupo de opciones dice cómo mueve el precio:
      base · x · porM2 · perim · porUnidad · pedido · nada · rollo
    y los grupos «num» piden un número (ojillos, piezas a planchar).
@@ -23170,7 +23181,7 @@ function textoReclamo(r){
   const pv = provDe(r.provId) || {};
   const f = faltantesDe(r);
   return "Hola" + (pv.contacto ? " " + pv.contacto : "") + ", sobre la requisición " + r.folio +
-    " de " + ((P.empresa&&P.empresa.nombre)||"Hey Makers") + ":\n\n" +
+    (P.empresa&&P.empresa.nombre ? " de "+P.empresa.nombre : "") + ":\n\n" +
     "Ya revisamos lo que llegó y nos falta:\n" +
     f.map(x=> "• " + faltaDe(x) + " × " + x.desc + " (habíamos pedido " + num(x.cant) + ", llegaron " + num(x.recibido||0) + ")").join("\n") +
     "\n\n¿Nos confirmas cuándo cae lo que falta? Gracias.";
@@ -23471,8 +23482,8 @@ function acuseCancel(r){
 async function avisaCancel(folio){
   const r = compras().find(x=>x.folio===folio); if(!r) return;
   const pv = provDe(r.provId) || {};
-  const texto = "Hola" + (pv.contacto ? " " + pv.contacto : "") + ", te escribo de " +
-    ((P.empresa&&P.empresa.nombre)||"Hey Makers") + ". Cancelamos la requisición " + r.folio +
+  const texto = "Hola" + (pv.contacto ? " " + pv.contacto : "") + ", te escribo" +
+    (P.empresa&&P.empresa.nombre ? " de "+P.empresa.nombre : "") + ". Cancelamos la requisición " + r.folio +
     " del " + r.fecha + ".\n\nMotivo: " + ((r.cancel&&r.cancel.motivo)||"") +
     "\n\nSi ya la tenías en proceso, avísanos por favor. Gracias.";
   const url = pv.tel
@@ -23492,7 +23503,7 @@ async function avisaCancel(folio){
 /* ---------- el texto que se le manda al proveedor ---------- */
 function textoReq(r){
   const pv = provDe(r.provId) || {};
-  return "Requisición " + r.folio + " · " + ((P.empresa&&P.empresa.nombre)||"Hey Makers") + "\n\n" +
+  return "Requisición " + r.folio + (P.empresa&&P.empresa.nombre ? " · "+P.empresa.nombre : "") + "\n\n" +
     "Hola" + (pv.contacto ? " " + pv.contacto : "") + ", te paso nuestro pedido:\n\n" +
     (r.partidas||[]).map(x=> "• " + num(x.cant) + " × " + x.desc + (num(x.costo)? " (a " + mx(num(x.costo)) + ")" : "")).join("\n") +
     "\n\nTotal estimado: " + mx(totalReq(r)) +
@@ -23825,7 +23836,7 @@ async function accionReq(acc, folio){
     const url = acc==="wa"
       ? "https://wa.me/52" + (pv.tel||"").replace(/\D/g,"") + "?text=" + encodeURIComponent(texto)
       : "mailto:" + encodeURIComponent(pv.correo||"") +
-        "?subject=" + encodeURIComponent("Requisición " + r.folio + " · " + ((P.empresa&&P.empresa.nombre)||"Hey Makers")) +
+        "?subject=" + encodeURIComponent("Requisición " + r.folio + (P.empresa&&P.empresa.nombre ? " · "+P.empresa.nombre : "")) +
         "&body=" + encodeURIComponent(texto);
     if(!abreLink(url)){
       try{ await navigator.clipboard.writeText(texto); }catch(e){}
@@ -24032,7 +24043,7 @@ async function accionReq(acc, folio){
 
 /* ==========================================================
    AYUDA Y SOPORTE
-   El cliente escribe desde aquí; la respuesta llega desde Makers Lab.
+   El cliente escribe desde aquí; la respuesta llega desde Nuvoor Lab.
    Antes de molestar a nadie, el panel intenta resolverlo con la ayuda
    de la pantalla en la que está y con las preguntas de siempre.
    ========================================================== */
@@ -24217,7 +24228,7 @@ function ayudaHilo() {
     '<span class="ayudaFolio">' + esc(t.folio) + ' · ' + esc(t.creado) + '</span>' +
     '<h4>' + esc(t.asunto) + '</h4>' +
     (t.mensajes || []).map(m => '<div class="ayudaMsg' + (m.de === "cliente" ? " mio" : "") + '">' +
-      '<b>' + (m.de === "cliente" ? "Tú" : "Soporte Hey Makers") + ' · ' + esc(m.hora) + '</b>' + esc(m.txt) + '</div>').join("") +
+      '<b>' + (m.de === "cliente" ? "Tú" : "Soporte Nuvoor") + ' · ' + esc(m.hora) + '</b>' + esc(m.txt) + '</div>').join("") +
     (t.estado === "esperando"
       ? '<div class="ayudaFila"><button class="btn sm primary" data-conf="si">Ya quedó</button>' +
         '<button class="btn sm" data-conf="no">Sigue igual</button></div>'
@@ -24277,10 +24288,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261031-1913";</script>
+<script>window.BUILD="20261101-2006";</script>
 <script>
 (function(){
-  var mio = "20261031-1913";
+  var mio = "20261101-2006";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }

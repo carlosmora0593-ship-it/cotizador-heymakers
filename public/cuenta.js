@@ -9,7 +9,7 @@
 
 const q = s => document.querySelector(s);
 const VERSION_SITIO = window.BUILD || "sin sello";
-console.log("Cotizador Hey Makers · versión " + VERSION_SITIO);
+console.log("Cotizador Nuvoor · versión " + VERSION_SITIO);
 
 /* El arreglo de roles, tal cual viene en sql/03-arreglo-roles.sql, para
    poder ponerlo en el portapapeles sin que nadie busque el archivo. */
@@ -95,7 +95,7 @@ const URL_SB = String((window.CONFIG && CONFIG.SUPABASE_URL) || "").trim().repla
 const SB = PROBLEMA_CONFIG ? null : window.supabase.createClient(URL_SB, CONFIG.SUPABASE_ANON_KEY);
 let SESION = null, CUENTA = null, PERFIL = null;
 let EMPRESAS = [];      // todas las empresas a las que pertenece este correo
-let SOY_STAFF = false;  // ¿es alguien de Hey Makers? lo decide la base, no la pantalla
+let SOY_STAFF = false;  // ¿es alguien de Nuvoor? lo decide la base, no la pantalla
 
 /* Prueba directa contra Supabase: dice si el problema es la dirección,
    la llave, o si todo está bien y el error viene de otro lado. */
@@ -588,10 +588,10 @@ async function cargaCuenta(){
 }
 
 
-/* ---------- ¿Eres de Hey Makers? ----------
-   La puerta de Makers Lab no es una dirección secreta: quien la adivinara
+/* ---------- ¿Eres de Nuvoor? ----------
+   La puerta de Nuvoor Lab no es una dirección secreta: quien la adivinara
    entraría igual. Quien decide es la base. Si tu correo no está en `staff`,
-   las vistas de Makers Lab te contestan cero renglones aunque las pidas a
+   las vistas de Nuvoor Lab te contestan cero renglones aunque las pidas a
    mano; esto solo se ahorra enseñarte un botón que no lleva a ningún lado. */
 async function revisaStaff(){
   SOY_STAFF = false;
@@ -907,7 +907,7 @@ function aplicaPlan(){
   document.querySelectorAll("[data-solo-maker]").forEach(el=> el.hidden = !esMaker());
   /* Los datos fiscales no son una pestaña que se pueda esconder con un
      atributo: son dos bloques dentro de Ajustes que el cotizador pinta.
-     Cuando tu equipo le sube el plan a alguien desde Makers Lab, esto tiene
+     Cuando tu equipo le sube el plan a alguien desde Nuvoor Lab, esto tiene
      que abrirse en el momento, sin recargar. */
   if(typeof window.__candadoFiscal === "function") window.__candadoFiscal();
 }
@@ -1050,13 +1050,13 @@ function pintaSuscripcion(){
     conMP
       ? "Pagas por Mercado Pago, con cargo automático " +
         (CUENTA.ciclo === "anual" ? "cada año" : "cada mes") + ". La tarjeta y los recibos se " +
-        "cambian desde tu propia cuenta de Mercado Pago: entra a Suscripciones y busca Hey Makers." +
+        "cambian desde tu propia cuenta de Mercado Pago: entra a Suscripciones y busca Nuvoor." +
         '<button class="btn sm" id="suscMP" type="button">Abrir Mercado Pago</button>'
       : enPrueba
         ? "Todavía no hay nada que cobrar: estás en la prueba y no pediste tarjeta. " +
           "Cuando elijas un plan te pedimos la forma de pago en ese momento."
         : "Esta cuenta no tiene un cargo automático dado de alta. El plan lo activó " +
-          "Hey Makers a mano, así que la renovación también se hace hablando con ellos."
+          "Nuvoor a mano, así que la renovación también se hace hablando con ellos."
   ) + '</div>';
 
   /* --- Facturación --- */
@@ -1138,7 +1138,7 @@ q("#planesGrid").addEventListener("click", async e=>{
     const plan = (CONFIG.PLANES[b.dataset.contratar] || {}).nombre || b.dataset.contratar;
     alert(err.code === SIN_SERVIDOR
       ? "El cobro en línea todavía no está conectado en esta publicación.\n\n" +
-        "Para contratar el plan " + plan + ", escríbele a Hey Makers: te lo activan " +
+        "Para contratar el plan " + plan + ", escríbele a Nuvoor: te lo activan " +
         "y sigues trabajando con todo lo que ya tienes, sin perder nada."
       : "No se pudo abrir el cobro: " + err.message);
   }
@@ -1161,7 +1161,7 @@ async function revisaTrasPago(){
 /* Si config.js todavía no tiene las llaves, SB no existe: no le pedimos nada,
    y dejamos que arrancaSesion pinte el aviso de qué falta configurar. */
 /* ---------- Que los cambios del panel lleguen solos ----------
-   Cuando Hey Makers cambia tu plan desde Makers Lab, no tienes por qué
+   Cuando Nuvoor cambia tu plan desde Nuvoor Lab, no tienes por qué
    recargar la página ni enterarte al día siguiente. Tres caminos, del más
    rápido al más terco, porque uno solo siempre falla en algún navegador:
      1. Tiempo real: la base avisa en cuanto cambia la fila.
@@ -1204,7 +1204,7 @@ function escuchaCuenta(){
   escuchaSoporte();
 }
 
-/* Cuando soporte contesta un reporte desde Makers Lab, escribe en el
+/* Cuando soporte contesta un reporte desde Nuvoor Lab, escribe en el
    documento de esta cuenta. Esto se entera en ese momento y le prende el
    punto rojo al botón de ayuda, sin que nadie recargue nada: el cliente
    pidió ayuda y le contestaron; enterarse media hora después, cuando

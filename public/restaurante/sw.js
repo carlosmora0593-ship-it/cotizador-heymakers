@@ -1,4 +1,4 @@
-const CACHE_NAME = "makers-restaurant-account-v23-tickets-raster-camera";
+const CACHE_NAME = "nuvoor-restaurant-v24-marca";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,
@@ -16,7 +16,7 @@ self.addEventListener("install", event => {
 
 self.addEventListener("activate", event => {
   event.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(key => key.startsWith("makers-restaurant-") && key !== CACHE_NAME).map(key => caches.delete(key))
+    keys.filter(key => (key.startsWith("makers-restaurant-") || key.startsWith("nuvoor-restaurant-")) && key !== CACHE_NAME).map(key => caches.delete(key))
   )).then(() => self.clients.claim()));
 });
 
@@ -26,7 +26,6 @@ self.addEventListener("fetch", event => {
   const url = new URL(request.url);
   const configPath = new URL("../config.js", APP_SCOPE).pathname;
   if (url.origin !== APP_SCOPE.origin || (!url.pathname.startsWith(APP_SCOPE.pathname) && url.pathname !== configPath)) return;
-  if (url.pathname.endsWith("/Makers-Restaurant.apk")) return;
 
   if (request.mode === "navigate") {
     event.respondWith(fetch(request).then(response => {
