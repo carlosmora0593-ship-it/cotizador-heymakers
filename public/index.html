@@ -6222,6 +6222,7 @@ async function initStore(){
 }
 let saveT;
 function persist(what){
+  if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor(true)) return;
   clearTimeout(saveT);
   saveT = setTimeout(async ()=>{
     if(DB){
@@ -9756,6 +9757,7 @@ $("#arrAtras").addEventListener("click", ()=> arrAvanza(-1));
 /* Se abre solo una vez, en una cuenta que todavía no ha hecho nada: si ya
    hay cotizaciones o ya capturó su catálogo, no se le estorba. */
 function arranqueSiEsNuevo(){
+  if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor(true)) return false;
   if(cat.arranque && cat.arranque.hecho) return false;
   if((guardadas||[]).length || (ventas||[]).length || (clientes||[]).length){
     cat.arranque = {hecho:true, saltado:true};  // cuenta con trabajo: no se pregunta
@@ -13613,6 +13615,7 @@ function abreEnviar(folio){
 /* El PDF: el navegador nombra el archivo con el título de la página, así que
    se le presta el folio el tiempo que dura el diálogo de impresión. */
 function descargaCotizacion(folio){
+  if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) return;
   const g = cotDeFolio(folio); if(!g) return;
   try{
     hoja(g);
@@ -13790,6 +13793,7 @@ function recuperaBorrador(){
    la cobra. */
 function esPrimeraVez(){ return !(guardadas||[]).length; }
 function cotizacionNueva(conEjemplo){
+  if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) return;
   cot = nuevaCot(conEjemplo === true);
   if(typeof normalizaItems === "function") normalizaItems(cot);
   tiraBorrador();
@@ -15703,7 +15707,7 @@ function abreHub(nombre){
   $("#hubIco").innerHTML = icoSeccion(h.ico);
   $("#hubRejilla").innerHTML = lista.map((x,i)=>{
     const d = datoHub(x.d);
-    return '<button class="hubCard'+(d.tono? " "+d.tono : "")+'" data-hub="'+i+'">'+
+    return '<button class="hubCard'+(d.tono? " "+d.tono : "")+'" data-hub="'+i+'" data-suspende-operacion="'+(x.accion || ['cot','mos','com','calc'].includes(x.t) ? '1' : '0')+'">'+
       '<span class="hubIco">'+icoHub(x.ico || x.t)+'</span>'+
       '<span class="hubTxt"><b>'+esc(x.et)+'</b><small>'+esc(x.det)+'</small></span>'+
       (d.n !== "" ? '<span class="hubN">'+esc(String(d.n))+'</span>' : '')+
@@ -17033,6 +17037,7 @@ $("#btnConfirmar").addEventListener("click", async ()=>{
     (cons.cortos.length ? " · sin material: " + cons.cortos.join(", ") : ""));
 });
 async function guardaCot(){
+  if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) throw new Error("Tu plan está suspendido. Actualiza tu pago para guardar cambios.");
   if(typeof guardaItemActivo==="function") guardaItemActivo(cot);
   selloVendedor(cot);
   const r = calcDe(cot);
@@ -17112,6 +17117,7 @@ function renderInventario(){
   }
 }
 async function moverInventario(artId, tipo, cantidad, nota, silencioso, req){
+  if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) return;
   const a = cat.articulos.find(a=>a.id===artId); if(!a) return;
   const antes = num(a.existencia);
   let delta = 0, queda = antes;
@@ -17641,12 +17647,14 @@ function hojaXls(wb, nombre, filas, anchos){
   XLSX.utils.book_append_sheet(wb, ws, nombre.slice(0,31));
 }
 function bajaLibro(wb, nombre){
+  if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) return;
   try{
     const datos = XLSX.write(wb, {bookType:"xlsx", type:"array"});
     descargaBlob(new Blob([datos], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}), nombre);
   }catch(e){ console.error(e); toast("No se pudo armar el reporte"); }
 }
 async function descargaBlob(blob, nombre){
+  if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) return;
   try{
     const bajar = await (window.claude && window.claude.use ? window.claude.use("downloads") : null);
     if(bajar){ await bajar.save({filename:nombre, data:blob}); toast("Descargando "+nombre); return; }
@@ -17659,6 +17667,7 @@ async function descargaBlob(blob, nombre){
 const encabezado = (titulo, sub) => [[P.empresa.nombre || "Mi taller"], [titulo], [sub||""], []];
 
 function reporte(tipo){
+  if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) return;
   if(typeof XLSX === "undefined"){ toast("La herramienta de Excel no cargó. Recarga la página."); return; }
   const wb = XLSX.utils.book_new();
   const hoy = hoyISO();
@@ -18924,6 +18933,7 @@ async function agregaNota(folio, texto){
   toast("Nota agregada a "+g.op.folio);
 }
 async function guardaOrden(folio){
+  if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) throw new Error("Tu plan está suspendido. Actualiza tu pago para guardar cambios.");
   const g = guardadas.find(g=>g.folio===folio); if(!g) return;
   if(DB){ try{ await DB.collection("cotizaciones").doc(folio).set({cot:g,fecha:g.fecha,cliente:g.cliente||"",total:g._total||0}); }catch(e){ toast("No se pudo guardar el cambio"); } }
   else lsSet("cots",guardadas);
@@ -21511,6 +21521,7 @@ function verOrdenDe(folio){
 }
 
 /* Abre la cotización de un folio guardado (con precios: solo admin y ventas). */
+window.__consultaCotNuvoor = folio => verCotizacionDe(folio);
 function verCotizacionDe(folio){
   if(rolActual()==="produccion"){ toast("La cotización es para ventas y administración"); return; }
   const g = guardadas.find(g=>g.folio===folio) || (cot.folio===folio ? cot : null);
@@ -22971,6 +22982,7 @@ document.addEventListener("change", e=>{
    haría «Cobrar», con su anticipo como primer abono. Si ya había venta de
    ese folio (se canceló y se volvió a confirmar), se suma como abono. */
 async function cv2RegistraPago(q){
+  if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) throw new Error("Tu plan está suspendido. Actualiza tu pago para guardar cambios.");
   const pg = q.pago; if(!pg || pg.registrado) return;
   const r = calcDe(q);
   if(typeof selloVendedor === "function") selloVendedor(q);
@@ -24421,10 +24433,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261102-1810";</script>
+<script>window.BUILD="20261102-1911";</script>
 <script>
 (function(){
-  var mio = "20261102-1810";
+  var mio = "20261102-1911";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -24452,7 +24464,8 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="cuenta.js?v=20261102-1810"></script>
+<script src="suspension.js?v=20261102-1911"></script>
+<script src="cuenta.js?v=20261102-1911"></script>
 <script src="diagnostico.js?v=20261026-2139"></script>
 </body>
 </html>

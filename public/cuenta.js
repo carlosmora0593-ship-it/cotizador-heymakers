@@ -114,6 +114,10 @@ async function pruebaConexion(){
 const plan = () => (CUENTA && CUENTA.plan) || "prueba";
 const vigente = () => !!(CUENTA && CUENTA.plan !== "ninguno" &&
   CUENTA.estado === "activa" && new Date(CUENTA.vence) > new Date());
+window.__estadoLicenciaNuvoor=()=>({cargada:!!CUENTA,suspendida:!!CUENTA&&!vigente()});
+function exigeEscrituraNuvoor(){
+  if(!CUENTA||!vigente())throw {code:"vencida",message:"Tu plan está suspendido. Actualiza tu pago para guardar cambios."};
+}
 
 /* Los planes van en escalera: lo que abre uno sigue abierto en los de
    arriba. La prueba abre todo para que el cliente vea qué está comprando.
@@ -155,6 +159,7 @@ function refDoc(path){
       return {exists: !!data, data: () => data ? data.cuerpo : undefined};
     },
     async set(cuerpo){
+      if(col!=="soporte")exigeEscrituraNuvoor();
       const fila = {cuenta_id:CUENTA.id, coleccion:col, doc_id:id, cuerpo,
                     fecha: cuerpo.fecha || (cuerpo.cot && cuerpo.cot.fecha) || (cuerpo.venta && cuerpo.venta.fecha) || null,
                     total: cuerpo.total != null ? cuerpo.total : null};
@@ -162,6 +167,7 @@ function refDoc(path){
       if(error) throw traduce(error);
     },
     async delete(){
+      if(col!=="soporte")exigeEscrituraNuvoor();
       await SB.from(TABLA).delete().eq("cuenta_id",CUENTA.id).eq("coleccion",col).eq("doc_id",id);
     }
   };
@@ -187,6 +193,7 @@ const PUENTE_DB = {doc: refDoc, collection: refCol};
 /* ---------- Puente: archivos ---------- */
 const PUENTE_ASSETS = {
   async upload(file){
+    exigeEscrituraNuvoor();
     const ext = (file.name.split(".").pop() || "bin").toLowerCase();
     const ruta = CUENTA.id + "/" + Date.now() + "-" + Math.random().toString(36).slice(2,8) + "." + ext;
     const {error} = await SB.storage.from("disenos").upload(ruta, file, {contentType:file.type||undefined, upsert:false});
@@ -217,7 +224,7 @@ const PUENTE_ASSETS = {
     }catch(e){ return {}; }
   },
   async list(){ return {assets:[], usage:{}}; },
-  async delete(id){ await SB.storage.from("disenos").remove([id]); }
+  async delete(id){ exigeEscrituraNuvoor(); await SB.storage.from("disenos").remove([id]); }
 };
 
 function traduce(error){
@@ -239,6 +246,7 @@ function traduce(error){
 /* Descargas: en el sitio propio basta con un enlace normal. */
 const PUENTE_DOWNLOADS = {
   async save({filename, data}){
+    exigeEscrituraNuvoor();
     const url = URL.createObjectURL(data instanceof Blob ? data : new Blob([data]));
     const a = document.createElement("a"); a.href = url; a.download = filename || "archivo";
     document.body.appendChild(a); a.click(); a.remove();
@@ -301,12 +309,13 @@ function enElPlan(t){
      que termina en un documento que no existe.
 
      Ojo con la diferencia: esto es para el que NUNCA tuvo plan. A quien
-     se le venció no se le cierra nada — sigue viendo lo suyo, y la base
-     es la que no le deja guardar. Quitarle la vista a quien ya pagó
+     se le venció conserva la consulta de lo suyo; sus acciones quedan
+     suspendidas y la base también valida las escrituras. Quitarle la vista a quien ya pagó
      sería castigarlo por atrasarse un día. */
   if(sinPlan()) return false;
-  if(SOLO_PRO.indexOf(t) >= 0)   return esPro();
-  if(SOLO_MAKER.indexOf(t) >= 0) return esMaker();
+  // Conservar la consulta del plan contratado; las acciones vencidas se suspenden.
+  if(SOLO_PRO.indexOf(t) >= 0)   return nivelPlan() >= 3;
+  if(SOLO_MAKER.indexOf(t) >= 0) return nivelPlan() >= 2;
   return true;
 }
 function puede(seccion){
@@ -888,14 +897,21 @@ function pintaCuenta(){
       "para guardar tu trabajo elige uno. Si tomaste un curso Hey Makers y traes código, escríbenos y te lo activamos.";
   } else if(!vigente()){
     q("#avisoPagoTxt").textContent =
-      "Tu " + (esPrueba() ? "prueba" : "suscripción") + " terminó el " + String(CUENTA.vence).slice(0,10) +
-      ". Puedes seguir consultando lo que ya tienes, pero para guardar cambios hay que " +
-      (esPrueba() ? "elegir un plan." : "reactivarla.");
+      "Tu plan está suspendido. Puedes consultar tus cotizaciones y reportes; actualiza tu pago para cotizar, vender, guardar o exportar.";
   } else if(esPrueba() && dias <= 5){
     q("#avisoPago").hidden = false;
     q("#avisoPagoTxt").textContent = "Te quedan " + dias + " día(s) de prueba. Elige un plan para no perder tu información.";
   }
+  q("#avisoPagoBtn").textContent=!vigente()?(CUENTA.stripe_cliente?"Actualizar método de pago":"Renovar plan"):"Ver planes";
+  if(window.__aplicaSuspensionNuvoor)window.__aplicaSuspensionNuvoor();
 }
+window.__avisoSuspensionNuvoor=()=>{
+  if(!CUENTA)return;
+  pintaCuenta();q("#avisoPago").hidden=false;
+  q("#avisoPago").scrollIntoView({behavior:"smooth",block:"nearest"});
+  q("#avisoPagoBtn").focus({preventScroll:true});
+};
+window.__cambioSuspensionNuvoor=()=>{if(CUENTA)pintaCuenta();};
 /* El muro: lo único que ve una cuenta sin plan. No es una pantalla de
    castigo — es la que le dice cómo empezar, con las dos puertas que
    tiene: pagar, o traer el código de su curso. */
@@ -919,6 +935,7 @@ function aplicaPlan(){
      Cuando tu equipo le sube el plan a alguien desde Nuvoor Lab, esto tiene
      que abrirse en el momento, sin recargar. */
   if(typeof window.__candadoFiscal === "function") window.__candadoFiscal();
+  if(window.__aplicaSuspensionNuvoor)window.__aplicaSuspensionNuvoor();
 }
 
 q("#btnSalir").addEventListener("click", async ()=>{ await SB.auth.signOut(); location.reload(); });
@@ -968,7 +985,10 @@ if(btnEquipo) btnEquipo.addEventListener("click", ()=> vaA("set", "#equipoCaja")
 const btnAjustes = q("#btnAjustes");
 if(btnAjustes) btnAjustes.addEventListener("click", ()=> vaA("set"));
 q("#btnPlanes").addEventListener("click", ()=> abrePlanes());
-q("#avisoPagoBtn").addEventListener("click", ()=> abrePlanes());
+q("#avisoPagoBtn").addEventListener("click", ()=>{
+  if(CUENTA&&!vigente()&&CUENTA.stripe_cliente&&puedeGestionarPlan())abrirPortalStripe();
+  else abrePlanes();
+});
 
 /* ---------- Los botones del muro ---------- */
 /* El muro abre el diagnóstico, no la lista de precios. Quien llega aquí
