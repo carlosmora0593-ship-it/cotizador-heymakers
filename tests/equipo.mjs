@@ -1,0 +1,25 @@
+import assert from 'node:assert/strict';
+let handler,mode='active',writes=0;
+globalThis.Deno={env:{get:()=> 'fake'},serve:f=>handler=f};
+globalThis.fetch=async(input,init={})=>{
+ const u=String(input);let data=[];
+ if(u.endsWith('/auth/v1/admin/users'))data={id:'new-user'};
+ else if(u.includes('/auth/v1/user'))data={id:'owner'};
+ else if(u.includes('perfiles?'))data=[{cuenta_id:'business',cuenta_activa:'business',rol:mode==='role'?'produccion':'admin'}];
+ else if(u.includes('membresias?'))data=mode==='role'?[]:[{rol:'admin'}];
+ else if(u.includes('cuentas?'))data=[{plan:'pro',estado:mode==='expired'?'vencida':'activa',vence:new Date(Date.now()+86400000).toISOString()}];
+ if(init.method&&init.method!=='GET')writes++;
+ return Response.json(data);
+};
+await import('../supabase/functions/invitar-usuario/index.ts');
+const req=(data={},token=true)=>new Request('https://fake.test',{method:'POST',headers:token?{authorization:'Bearer fake'}:{},body:JSON.stringify(data)});
+assert.equal((await handler(new Request('https://fake.test',{method:'OPTIONS'}))).headers.get('Access-Control-Allow-Origin'),'*');
+assert.equal((await handler(req({},false))).status,401);
+mode='role';assert.equal((await handler(req())).status,403);
+mode='expired';assert.equal((await handler(req())).status,402);
+mode='active';assert.equal((await handler(req({correo:'persona@example.test,',rol:'produccion'}))).status,400);
+assert.equal((await handler(req({correo:'persona@example.test',rol:'owner'}))).status,400);
+assert.equal(writes,0);
+const added=await handler(req({correo:'persona@example.test',nombre:'Prueba',rol:'produccion'}));
+assert.equal(added.status,200);const result=await added.json();assert.equal(result.ok,true);assert.equal(result.rol,'produccion');assert.ok(result.temporal.length>=20);assert.ok(writes>=3);
+console.log('Equipo: CORS, sesión, rol, vencimiento, correo inválido y alta con servicios ficticios: OK.');

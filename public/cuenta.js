@@ -487,13 +487,16 @@ async function renderEquipo(){
   }
 }
 async function llamaEquipo(cuerpo){
-  const r = await fetch(FUNCIONES + "invitar-usuario", {
+  exigeEscrituraNuvoor();
+  let r;
+  try{r = await fetch(FUNCIONES + "invitar-usuario", {
     method:"POST",
     headers:{"Content-Type":"application/json","Authorization":"Bearer "+SESION.access_token},
     body: JSON.stringify(cuerpo)
   });
+  }catch(err){throw new Error("No se pudo conectar con el servicio del equipo. Revisa tu conexión y vuelve a intentarlo.");}
   const data = await leeJson(r);
-  if(!r.ok) throw new Error(data.error || "No se pudo completar");
+  if(!r.ok) throw new Error(r.status===404?"El servicio del equipo todavía no está disponible. Inténtalo más tarde.":(data.error || "No se pudo completar"));
   return data;
 }
 document.addEventListener("click", async e=>{
@@ -505,7 +508,7 @@ document.addEventListener("click", async e=>{
 
     /* Errores que se ven antes de molestar al servidor */
     const mio = String((PERFIL && PERFIL.correo) || (SESION && SESION.user && SESION.user.email) || "").toLowerCase();
-    if(!correo || correo.indexOf("@") < 0){ alert("Escribe el correo de la persona que vas a dar de alta."); return; }
+    if(!/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(correo)){ alert("Escribe un correo válido, sin espacios ni comas al final."); q("#equipoCorreo").focus(); return; }
     if(correo.toLowerCase() === mio){
       alert("Ese es tu propio correo. Cada persona del equipo entra con el suyo: ponle a "+(nombre||"esta persona")+" un correo distinto.");
       return;

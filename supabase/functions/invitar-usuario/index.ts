@@ -79,7 +79,7 @@ async function graba(ruta: string, metodo: string, cuerpo?: unknown) {
   if (!r.ok) {
     const t = await r.text();
     console.error("escritura", metodo, ruta, r.status, t);
-    return { error: t };
+    throw new Error("No se pudo completar la escritura del equipo");
   }
   return { error: null };
 }
@@ -131,10 +131,13 @@ Deno.serve(async (req) => {
     // La empresa en la que está parado ahora, y su rol EN ESA empresa.
     const cuentaId = perfil.cuenta_activa || perfil.cuenta_id;
     const mem = await una("membresias?select=rol&usuario_id=eq." + esc(yoUsuario.id) + "&cuenta_id=eq." + esc(cuentaId));
-    const miRol = (mem && mem.rol) || (ROLES.includes(perfil.rol) ? perfil.rol : "admin");
+    const miRol = (mem && mem.rol) || (cuentaId === perfil.cuenta_id ? perfil.rol : null);
     if (miRol !== "admin") return resp(403, { error: "Solo un administrador puede manejar al equipo" });
 
     const yo = { cuenta_id: cuentaId };
+    const cuenta = await una("cuentas?select=plan,estado,vence&id=eq." + esc(cuentaId));
+    if(!cuenta || cuenta.plan === "ninguno" || cuenta.estado !== "activa" || !(new Date(cuenta.vence).getTime() > Date.now()))
+      return resp(402, {error:"Tu plan está suspendido. Actualiza tu pago para administrar el equipo."});
 
     // ---- quitar a alguien del equipo ----
     if (accion === "quitar") {
@@ -166,11 +169,10 @@ Deno.serve(async (req) => {
     }
 
     // ---- invitar ----
-    if (!correo || String(correo).indexOf("@") < 0) return resp(400, { error: "Escribe un correo válido" });
+    if (typeof correo !== "string" || !/^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(correo.trim())) return resp(400, { error: "Escribe un correo válido" });
     if (!ROLES.includes(rol)) return resp(400, { error: "Rol desconocido" });
 
     // Cada plan tiene su tope de usuarios.
-    const cuenta = await una("cuentas?select=plan,estado,vence&id=eq." + esc(yo.cuenta_id));
     const cuantos = await cuantas("membresias?select=usuario_id&cuenta_id=eq." + esc(yo.cuenta_id));
     const suPlan = (cuenta && cuenta.plan) || "basico";
     const tope = TOPE_USUARIOS[suPlan] != null ? TOPE_USUARIOS[suPlan] : 1;
@@ -182,8 +184,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const temporal = Math.random().toString(36).slice(2, 10) +
-      Math.random().toString(36).slice(2, 6).toUpperCase() + "!";
+    const temporal = crypto.randomUUID() + "aA1!";
 
     const rCrea = await fetch(SB + "/auth/v1/admin/users", {
       method: "POST",
