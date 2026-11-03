@@ -34,6 +34,21 @@ try{
  await page.goto('http://127.0.0.1:4180/index.html?producto=taller');
  await page.waitForFunction(()=>typeof window.__qaCategorias==='object'&&typeof CUENTA!=='undefined'&&!!CUENTA);
  await licencia();
+  // El acceso principal conserva contraste estando activo e inactivo.
+  for(const theme of ['papel','tecno']){
+    await app('TEMA.preset='+JSON.stringify(theme)+';aplicaTema()');
+    for(const selected of ['inicio','cot']){
+      await page.locator('#tabs [data-tab="'+selected+'"]').click();
+      const colors=await page.locator('#tabs [data-tab="cot"]').evaluate(b=>({
+        bg:getComputedStyle(b).backgroundColor,text:getComputedStyle(b.querySelector('b')).color,
+        icon:getComputedStyle(b.querySelector('.ico')).color,label:b.querySelector('b').textContent.trim()
+      }));
+      assert.equal(colors.label,'Cotizar');
+      assert.notEqual(colors.bg,colors.text,'Cotizar sin contraste '+theme+' activo='+selected);
+      assert.notEqual(colors.bg,colors.icon,'Icono sin contraste '+theme+' activo='+selected);
+      if(theme==='papel'&&selected==='cot')await page.screenshot({path:'tmp/stripe/menu-cotizar-activo-claro.png'});
+    }
+  }
  assert.equal(await page.locator('#tabs [data-tab]').count(),18);
  assert.equal(await page.locator('#tabs [data-nav-grupo][aria-expanded="true"]').count(),4);
  assert.equal(await page.locator('#tabs [data-tab="val"] #valBadge').count(),1);
@@ -85,6 +100,11 @@ try{
  await page.locator('#tabs [data-nav-grupo="Dinero"]').click();
  assert.ok(await page.locator('#tabs').isVisible());
  await page.locator('#tabs [data-nav-grupo="Dinero"]').click();
+ await page.locator('#tabs [data-tab="cot"]').click();
+ await page.locator('#menuBtn').click();
+ const mobileColors=await page.locator('#tabs [data-tab="cot"]').evaluate(b=>({bg:getComputedStyle(b).backgroundColor,text:getComputedStyle(b.querySelector('b')).color,icon:getComputedStyle(b.querySelector('.ico')).color}));
+ assert.notEqual(mobileColors.bg,mobileColors.text,'Cotizar activo sin contraste móvil');
+ assert.notEqual(mobileColors.bg,mobileColors.icon,'Icono activo sin contraste móvil');
  await page.screenshot({path:'tmp/stripe/menu-integrado-movil.png'});
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await page.locator('#tabs [data-tab="set"]').focus();await page.keyboard.press('Tab');

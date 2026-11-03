@@ -3433,6 +3433,8 @@ nav.nvNav button[data-tab] b{font-size:12.5px;line-height:1.4;font-weight:500;ov
 nav.nvNav button[data-tab]>.ico{width:17px;height:17px;flex:none}
 nav.nvNav button[data-tab][aria-selected="true"],body.conBarra nav.nvNav button[data-tab][aria-selected="true"]{background:var(--accent-soft);background-image:none;box-shadow:none;color:var(--accent)}
 nav.nvNav button[data-tab][aria-selected="true"] b,nav.nvNav button[data-tab][aria-selected="true"] .ico,body.conBarra nav.nvNav button[data-tab][aria-selected="true"] b,body.conBarra nav.nvNav button[data-tab][aria-selected="true"] .ico{color:var(--accent)}
+/* Cotizar conserva texto e icono contrastantes también al estar seleccionado. */
+nav.tabs.nvNav .nvNavRapidos button[data-tab="cot"] :is(b,.ico),body.conBarra nav.tabs.nvNav .nvNavRapidos button[data-tab="cot"] :is(b,.ico){color:var(--accent-ink)}
 .nvNavGrupo{margin-top:10px}
 nav.nvNav .nvNavTitulo{display:flex;width:100%;align-items:center;gap:10px;padding:11px 12px;border-radius:9px;background:var(--surface-2);color:var(--ink);text-align:left}
 nav.nvNav .nvNavTitulo b{font:inherit;font-weight:700;font-size:13px}
@@ -24618,10 +24620,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261102-2230";</script>
+<script>window.BUILD="20261102-2240";</script>
 <script>
 (function(){
-  var mio = "20261102-2230";
+  var mio = "20261102-2240";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
