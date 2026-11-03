@@ -3497,8 +3497,9 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   <div class="barraNav" id="barraNav"></div>
   <div class="barraPie"><span id="barraVer" class="nuvoorPie"><img src="./marca/n-64.png" alt=""><span>Nuvoor</span></span></div>
 </aside>
-<link rel="stylesheet" href="tablero.css?v=20261103-1025">
-<link rel="stylesheet" href="bloqueo.css?v=20261103-1025">
+<link rel="stylesheet" href="variantes.css?v=20261103-1522">
+<link rel="stylesheet" href="tablero.css?v=20261103-1522">
+<link rel="stylesheet" href="bloqueo.css?v=20261103-1522">
 <style id="mvEstilo">
 .mvSeccionTitulo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:20px 0 14px}.mvSeccionTitulo h2{font-size:17px;margin:0}.mvSeccionTitulo span{font-size:11px;color:var(--ink-3)}
 #mosRejilla.mvCategorias{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.mvCategoria{min-height:152px;padding:20px 10px 17px!important;gap:8px!important}.mvCategoria .svIco{width:62px;height:62px}.mvCategoria b{font-size:15px}.mvCategoria small{font-size:12px;color:var(--ink-3)}
@@ -4026,7 +4027,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
         <div class="ceFotoFila"><div id="ceFoto"></div><div><b>Foto del artículo</b><p>JPG, PNG o WebP</p><button type="button" class="btn sm" id="ceSubirFoto">Subir foto</button> <button type="button" class="btn sm ghost" id="ceQuitarFoto" hidden>Quitar</button></div></div>
         <div class="ceGrid"><div class="ceAncho"><label class="f" for="ce_nombre">Nombre del modelo</label><input id="ce_nombre" data-ce="nombre" placeholder="Ej. Playera cuello redondo algodón" autocomplete="off"></div><div class="ceAncho"><label class="f" for="ce_cat">Categoría del catálogo</label><input id="ce_cat" data-ce="cat" list="ceCategorias" autocomplete="off" placeholder="Textil, Tazas, Gorras…"><datalist id="ceCategorias"></datalist></div></div>
         <section class="cePrecios"><h3>Costo y precio</h3><div class="ceGrid"><div><label class="f" for="ce_costo">Costo de producción</label><input type="number" min="0" step="0.01" id="ce_costo" data-ce="costo" inputmode="decimal"><small>Lo que te cuesta cada pieza.</small></div><div><label class="f" for="ce_precio">Precio público</label><input type="number" min="0" step="0.01" id="ce_precio" data-ce="precio" inputmode="decimal"><small>A cuánto vendes la pieza.</small></div></div><p>Si dejas el precio público en cero, el cotizador lo calcula con tu utilidad.</p></section>
-        <section class="ceOpciones"><h3>¿Lleva tallas o colores?</h3><div class="ceGrid"><label class="ceCheck"><input type="checkbox" id="ce_tallas" data-ce="tallas"> Lleva tallas</label><label class="ceCheck"><input type="checkbox" id="ce_colores" data-ce="colores"> Lleva colores</label></div><div id="ceColores"><label class="f" for="ce_listaColores">Colores disponibles</label><input id="ce_listaColores" data-ce="listaColores" placeholder="Blanca, negra, roja, marino"><small>Sepáralos con comas.</small></div></section>
+        <section class="ceOpciones"><h3>¿Lleva tallas o colores?</h3><div class="ceGrid"><label class="ceCheck"><input type="checkbox" id="ce_tallas" data-ce="tallas"> Lleva tallas</label><label class="ceCheck"><input type="checkbox" id="ce_colores" data-ce="colores"> Lleva colores</label></div><div id="ceTallas"><label class="f" for="ce_listaTallas">Tallas disponibles</label><input id="ce_listaTallas" data-ce="listaTallas" placeholder="CH, M, G, EG, EEG"><small>Sepáralas con comas. Si queda vacío se usan CH, M, G, EG y EEG.</small></div><div id="ceColores"><label class="f" for="ce_listaColores">Colores disponibles</label><input id="ce_listaColores" data-ce="listaColores" placeholder="Blanca, negra, roja, marino"><small>Sepáralos con comas.</small></div></section>
         <details class="ceOpcional" id="ceCodigos"><summary>Códigos del artículo · SKU, barras y SAT</summary><div class="ceGrid"><div><label class="f" for="ce_sku">SKU</label><input id="ce_sku" data-ce="sku" placeholder="TEXT-0001"></div><div><label class="f" for="ce_barras">Código de barras</label><input id="ce_barras" data-ce="barras" placeholder="Opcional"></div><div><label class="f" for="ce_claveSat">Clave del SAT</label><input id="ce_claveSat" data-ce="claveSat" inputmode="numeric" placeholder="8 dígitos"></div><div><label class="f" for="ce_claveUnidad">Unidad del SAT</label><select id="ce_claveUnidad" data-ce="claveUnidad"></select></div></div></details>
         <details class="ceOpcional" id="ceInventario"><summary>Inventario · existencia y mínimo</summary><div class="ceGrid"><div><label class="f" for="ce_existencia">Existencia actual</label><input id="ce_existencia" type="number" readonly></div><div><label class="f" for="ce_minimo_inv">Avisar cuando queden</label><input id="ce_minimo_inv" data-ce="minimo_inv" type="number" min="0" step="1"><small>Mínimo de piezas en inventario.</small></div></div><p>Las entradas y salidas de existencias se registran desde Inventario.</p></details>
         <button type="button" class="btn sm ghost ceEliminar" id="ceEliminar">Eliminar modelo</button>
@@ -4108,7 +4109,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:end">
           <div style="min-width:220px;flex:1"><label class="f" for="inv_art">Artículo</label><select id="inv_art"></select></div>
           <div><label class="f" for="inv_tipo">Movimiento</label><select id="inv_tipo">
-            <option value="entrada">Entrada (compra)</option><option value="salida">Salida (merma, uso)</option><option value="ajuste">Ajuste de conteo</option></select></div>
+            <option value="entrada">Entrada (compra)</option><option value="salida">Salida (merma, uso)</option><option value="ajuste">Ajuste de conteo</option><option value="clasificar">Clasificar stock existente</option></select></div>
           <div style="width:120px"><label class="f" for="inv_cant">Cantidad</label><input id="inv_cant" type="number" min="0" step="1"></div>
           <div style="width:170px"><label class="f" for="inv_req">N.º requisición</label><input id="inv_req" placeholder="REQ-…"></div>
         </div>
@@ -5723,8 +5724,9 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   </div>
 </div>
 
-<script src="bloqueo.js?v=20261103-1025"></script>
-<script src="tablero.js?v=20261103-1025"></script>
+<script src="bloqueo.js?v=20261103-1522"></script>
+<script src="variantes.js?v=20261103-1522"></script>
+<script src="tablero.js?v=20261103-1522"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -9139,7 +9141,7 @@ function colsDe(key){
 }
 /* Editor del catálogo de Imprenta. Cada modelo se confirma por separado. */
 let CE = null;
-const CE_CAMPOS = ["nombre","cat","costo","precio","tallas","colores","listaColores","sku","barras","claveSat","claveUnidad","minimo_inv"];
+const CE_CAMPOS = ["nombre","cat","costo","precio","tallas","colores","listaTallas","listaColores","sku","barras","claveSat","claveUnidad","minimo_inv"];
 const ceCuenta = () => window.__estadoLicenciaNuvoor ? window.__estadoLicenciaNuvoor().cuenta : null;
 const ceMismaCuenta = () => !!CE && CE.cuenta === ceCuenta();
 const ceCopia = a => JSON.parse(JSON.stringify(a));
@@ -9172,7 +9174,7 @@ function ceCarga(a){
   if(CE.preview)URL.revokeObjectURL(CE.preview);CE.preview="";
   $("#ceError").hidden=true;$("#ceCampos").disabled=false;
   CE_CAMPOS.forEach(k=>{const e=$("#ce_"+k);if(e.type==="checkbox")e.checked=!!a[k];else e.value=a[k]??"";});
-  $("#ce_existencia").value=num(a.existencia);$("#ceColores").hidden=!a.colores;
+  $("#ce_existencia").value=num(a.existencia);$("#ceColores").hidden=!a.colores;$("#ceTallas").hidden=!a.tallas;
   $("#ceCodigos").open=false;$("#ceInventario").open=false;
   $("#ceCategorias").innerHTML=[...new Set((cat.articulos||[]).map(a=>a.cat||"Otros"))].map(c=>'<option value="'+esc(c)+'">').join("");
   const unidades=[['','Sin capturar']].concat(CLAVES_UNIDAD);
@@ -9280,7 +9282,7 @@ document.addEventListener("input",e=>{
   if(!CE||CE.busy||!e.target.closest("#ceCampos"))return;
   const k=e.target.dataset.ce;if(!CE_CAMPOS.includes(k))return;
   CE.draft[k]=e.target.type==="checkbox"?e.target.checked:e.target.type==="number"?(e.target.value===""?0:Number(e.target.value)):e.target.value;
-  $("#ceColores").hidden=!CE.draft.colores;ceEstado();
+  $("#ceColores").hidden=!CE.draft.colores;$("#ceTallas").hidden=!CE.draft.tallas;ceEstado();
 });
 document.addEventListener("change",e=>{
   if(e.target.id==="ce_claveUnidad"&&CE){CE.draft.claveUnidad=e.target.value;ceEstado();}
@@ -10979,6 +10981,95 @@ function caPintaTarjetas(){
 }
 /* El artículo y su primera ubicación se editan sobre una copia. Cancelar
    no cambia precios, tallas, aplicaciones, archivos ni conceptos. */
+/* Tallas, colores y existencia dentro de la ventana de artículos. */
+function nvVarModelo(){return SVV?.artSelector&&(cat.articulos||[]).find(a=>a.id===SVV.artSelector.id);}
+function nvVarBorrador(){
+ const a=nvVarModelo();if(!a)return [];
+ const s=SVV.artSelector;if(s.varModelo!==a.id){
+  s.varModelo=a.id;
+  s.variantes=a.id===cot.articuloId?JSON.parse(JSON.stringify(cot.tallas||[])):[];
+  if(NuvoorVariantes.usa(a)&&!s.variantes.length)s.variantes=[{id:uid(),talla:'',color:'',cant:qtyPedido()}];
+  s.variantes.forEach(v=>{if(!v.id)v.id=uid();if(!a.tallas)v.talla='';if(!a.colores)v.color='';});
+ }
+ return s.variantes||[];
+}
+function nvVarStockHTML(a,v,cant){
+ const r=NuvoorVariantes.resumen(a),hay=NuvoorVariantes.stock(a,v);
+ if(r.revisar)return '<span class="nvVarStock pendiente">Existencia por combinación pendiente de revisar.</span>';
+ if(hay===null)return '<span class="nvVarStock pendiente">Existencia de esta combinación: sin desglose</span>';
+ return '<span class="nvVarStock'+(hay<num(cant)?' falta':'')+'">'+hay+' pieza(s) en esta combinación'+(hay<num(cant)?' · faltan '+(num(cant)-hay):'')+'</span>';
+}
+function nvVarOpcionesHTML(a,v,indice,prefijo){
+ return ['talla','color'].filter(k=>a[k==='talla'?'tallas':'colores']).map(k=>{
+  const opciones=NuvoorVariantes.opciones(a,k),actual=String(v[k]||'');if(actual&&!opciones.includes(actual))opciones.push(actual);
+  return '<div class="nvVarEtiqueta">'+(k==='talla'?'Talla':'Color')+'</div><div class="nvVarChips">'+opciones.map(o=>'<button type="button" class="svChip" data-nvvar-'+prefijo+'="'+k+'" data-nvvar-i="'+indice+'" data-nvvar-v="'+esc(o)+'" aria-pressed="'+(actual===o)+'">'+esc(o)+'</button>').join('')+'</div>'+
+   (opciones.length?'':'<input class="nvVarLibre" data-nvvar-libre="'+prefijo+':'+k+'" data-nvvar-i="'+indice+'" aria-label="'+(k==='talla'?'Talla':'Color')+'" placeholder="Escribe '+(k==='talla'?'la talla':'el color')+'" value="'+esc(actual)+'">');
+ }).join('');
+}
+function nvVarCotHTML(){
+ const a=nvVarModelo();if(!a)return '';const r=NuvoorVariantes.resumen(a);
+ if(!NuvoorVariantes.usa(a))return '<p class="nvVarNota">Existencia del artículo: '+r.total+' pieza(s).</p>';
+ const filas=nvVarBorrador();
+ return '<section class="nvVarSeccion" id="nvVarCot"><h3>Elige tallas y colores</h3><p>'+r.total+' pieza(s) en inventario'+(r.sinClasificar>0?' · '+r.sinClasificar+' sin clasificar por talla/color':'')+'.</p>'+filas.map((v,i)=>'<div class="nvVarFila"><div class="nvVarCab"><b>Combinación '+(i+1)+'</b>'+(filas.length>1?'<button type="button" class="btn sm ghost" data-nvvar-quita="'+i+'">Quitar</button>':'')+'</div>'+nvVarOpcionesHTML(a,v,i,'cot')+'<div class="nvVarCantidad"><span data-nvvar-stock="'+i+'">'+nvVarStockHTML(a,v,v.cant)+'</span><label><span class="nvVarEtiqueta">Piezas</span><input type="number" min="1" step="1" inputmode="numeric" data-nvvar-cant="'+i+'" aria-label="Piezas de la combinación '+(i+1)+'" value="'+num(v.cant)+'"></label></div></div>').join('')+'<button type="button" class="btn sm" data-nvvar-nueva="1">+ Otra talla o color</button><p class="nvVarTotal" id="nvVarSuma">'+filas.reduce((s,v)=>s+num(v.cant),0)+' piezas en total</p><p class="nvVarError" id="nvVarError" role="status"></p></section>';
+}
+function nvVarRefrescaCot(){
+ const a=nvVarModelo();if(!a)return;
+ const filas=nvVarBorrador(),error=NuvoorVariantes.valida(a,filas);
+ const e=$('#nvVarError');if(e)e.textContent=error;
+ const suma=$('#nvVarSuma');if(suma)suma.textContent=filas.reduce((s,v)=>s+num(v.cant),0)+' piezas en total';
+ const sub=$('#svVSub');if(sub&&NuvoorVariantes.usa(a))sub.textContent=filas.reduce((s,v)=>s+num(v.cant),0)+' pieza(s) · elige tallas, colores e impresión';
+ filas.forEach((v,i)=>{const s=document.querySelector('[data-nvvar-stock="'+i+'"]');if(s)s.innerHTML=nvVarStockHTML(a,v,v.cant);});
+ if(error)$('#svVAgregar').disabled=true;
+}
+function nvVarInvCampo(a,k){
+ const nombre=k==='talla'?'Talla':'Color',id='nvInv'+nombre,opciones=NuvoorVariantes.opciones(a,k);
+ return '<div><label class="f" for="'+id+'">'+nombre+' del movimiento</label>'+(opciones.length?'<select id="'+id+'"><option value="">Elige…</option>'+opciones.map(o=>'<option>'+esc(o)+'</option>').join('')+'</select>':'<input id="'+id+'" maxlength="60" placeholder="Escribe '+(k==='talla'?'la talla':'el color')+'">')+'</div>';
+}
+function nvVarInventario(){
+ const a=(cat.articulos||[]).find(a=>a.id===$('#inv_art')?.value);let box=$('#nvInvVariantes');
+ if(!box){box=document.createElement('div');box.id='nvInvVariantes';$('#t_invMov')?.closest('.tbl-wrap').before(box);}
+ const aplica=NuvoorVariantes.usa(a),op=$('#inv_tipo option[value="clasificar"]');if(op)op.hidden=!aplica;
+ if(!aplica){box.hidden=true;if($('#inv_tipo')?.value==='clasificar')$('#inv_tipo').value='entrada';return;}
+ const contexto=ceCuenta()+'|'+a.id,mismo=box.dataset.contexto===contexto;
+ const prevT=mismo?box.querySelector('#nvInvTalla')?.value||'':'',prevC=mismo?box.querySelector('#nvInvColor')?.value||'':'';
+ box.hidden=false;box.dataset.contexto=contexto;const r=NuvoorVariantes.resumen(a);
+ box.innerHTML='<section class="nvVarSeccion"><h3>Existencias por talla y color</h3><p>Total: '+r.total+' · Sin clasificar: '+r.sinClasificar+(r.revisar?' · Revisa el conteo: hay movimientos sin desglose.':'')+'</p><div class="nvVarInvCampos">'+['talla','color'].filter(k=>a[k==='talla'?'tallas':'colores']).map(k=>nvVarInvCampo(a,k)).join('')+'</div><p class="nvVarNota">Para repartir el stock anterior, elige «Clasificar stock existente». El total se conserva. Las compras sin desglose quedan sin clasificar.</p>'+((a.invVariantes||[]).length?'<table class="nvVarTabla"><thead><tr><th>Talla / color</th><th>Existencia</th></tr></thead><tbody>'+(a.invVariantes||[]).map(v=>'<tr><td>'+esc([v.talla,v.color].filter(Boolean).join(' · '))+'</td><td>'+num(v.existencia)+'</td></tr>').join('')+'</tbody></table>':'<p class="nvVarNota">Todavía no se ha registrado stock por talla/color.</p>')+'</section>';
+ if($('#nvInvTalla'))$('#nvInvTalla').value=prevT;if($('#nvInvColor'))$('#nvInvColor').value=prevC;
+}
+function nvVarInvSeleccion(){return {talla:$('#nvInvTalla')?.value||'',color:$('#nvInvColor')?.value||''};}
+async function nvVarSalida(a,q,cantidad,nota,req){
+ const filas=(q.tallas||[]).filter(v=>num(v.cant)>0);
+ if(NuvoorVariantes.usa(a)&&!NuvoorVariantes.valida(a,filas,cantidad)){
+  for(const v of filas)await moverInventario(a.id,'salida',num(v.cant),nota,true,req,v);
+ }else await moverInventario(a.id,'salida',cantidad,nota,true,req);
+}
+function nvVarMostrador(){
+ const a=mvActual();if(!a||!NuvoorVariantes.usa(a))return '';
+ if(mvEstado.varModelo!==a.id){mvEstado.varModelo=a.id;mvEstado.variante={talla:'',color:''};}
+ return '<section class="nvVarSeccion" id="mvVariantes"><h3>Elige talla y color</h3>'+nvVarOpcionesHTML(a,mvEstado.variante,0,'mos')+'<div id="nvVarMosStock" style="margin-top:14px"></div></section>';
+}
+function nvVarRefrescaMos(){
+ const a=mvActual();if(!a||!NuvoorVariantes.usa(a))return;
+ const el=$('#nvVarMosStock');if(el)el.innerHTML=nvVarStockHTML(a,mvEstado.variante,mvEstado.cantidad);
+ if(!NuvoorVariantes.completa(a,mvEstado.variante))$('#mvAgregar').disabled=true;
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-nvvar-cot],[data-nvvar-mos],[data-nvvar-quita],[data-nvvar-nueva]');if(!b)return;
+ if(window.__exigeVigenciaNuvoor&&!window.__exigeVigenciaNuvoor())return;
+ if(b.hasAttribute('data-nvvar-mos')){if(!mvEstado||!mvPuede())return;mvEstado.variante[b.dataset.nvvarMos]=b.dataset.nvvarV;mvPintaModelo();return;}
+ if(!SVV?.artSelector)return;const filas=nvVarBorrador(),i=Number(b.dataset.nvvarI);
+ if(b.hasAttribute('data-nvvar-cot')&&filas[i])filas[i][b.dataset.nvvarCot]=b.dataset.nvvarV;
+ if(b.hasAttribute('data-nvvar-quita'))filas.splice(Number(b.dataset.nvvarQuita),1);
+ if(b.hasAttribute('data-nvvar-nueva'))filas.push({id:uid(),talla:'',color:'',cant:1});
+ cv2PintaFormApp();
+});
+document.addEventListener('input',e=>{
+ const t=e.target;
+ if(t.dataset.nvvarLibre){const [zona,k]=t.dataset.nvvarLibre.split(':');if(zona==='mos'&&mvEstado){mvEstado.variante[k]=t.value;mvPintaImporte();}else if(SVV?.artSelector){nvVarBorrador()[Number(t.dataset.nvvarI)][k]=t.value;cv2RefrescaApp();nvVarRefrescaCot();}return;}
+ if(t.hasAttribute('data-nvvar-cant')&&SVV?.artSelector){nvVarBorrador()[Number(t.dataset.nvvarCant)].cant=t.value;cv2RefrescaApp();nvVarRefrescaCot();}
+});
+document.addEventListener('change',e=>{if(e.target.id==='inv_art')nvVarInventario();});
+
 function caCotModelo(){
   const q = JSON.parse(JSON.stringify(cot)), a = (cat.articulos||[]).find(x=>x.id === SVV.artSelector.id);
   if(!a) return q;
@@ -10988,6 +11079,10 @@ function caCotModelo(){
     const puesta = (q.desc||"").trim(), auto = !puesta || q.descAuto !== false || (cat.articulos||[]).some(x=>x.nombre === puesta);
     if(auto){ q.desc = a.nombre; q.descAuto = true; }
   }
+  if(NuvoorVariantes.usa(a)){
+    q.tallas=JSON.parse(JSON.stringify(nvVarBorrador()));
+    const suma=q.tallas.reduce((s,v)=>s+num(v.cant),0);if(suma>0){q.cantidad=suma;q.cantManual=false;}
+  }else if(a.id!==cot.articuloId){q.tallas=[];}
   return q;
 }
 let caEnCopia = false;
@@ -11005,7 +11100,7 @@ function caAbre(key, origen){
   const app = anterior ? JSON.parse(JSON.stringify(anterior)) : {id:uid(),ubic:"Frente",tecnicaId:(t[0]||{}).id||"",tamanoId:s.id||"",ancho:num(s.ancho),alto:num(s.alto),tintas:1,puntadas:8000,art:null};
   if(!t.some(x=>x.id === app.tecnicaId)) app.tecnicaId = (t[0]||{}).id||"";
   svOrigen = origen || null;
-  SVV = {modo:"app",app,nuevo:!anterior,artSelector:{key,id:sel.id}};
+  SVV = {modo:"app",app,nuevo:!anterior,artSelector:{key,id:sel.id,cuenta:ceCuenta(),folio:cot.folio}};
   caConCopia(()=>{ if(!anterior){ app.ubic = cv2Ubicaciones()[0]; const tam=cv2TamPorUbi(app.ubic); if(tam){app.tamanoId=tam.id;app.ancho=num(tam.ancho);app.alto=num(tam.alto);} } });
   $("#svVelo").classList.add("caVentana");
   $("#svVIco").innerHTML = caIcono(g); $("#svVTit").textContent = g.nom;
@@ -11022,14 +11117,17 @@ function caTecnicasHTML(){
   return '<section class="svGrp"><h3>¿Qué tipo de impresión llevará?</h3><div class="caTecnicas">'+(cat.tecnicas||[]).map(t=>'<button type="button" class="svChip" data-catecnica="'+esc(t.id)+'" aria-pressed="'+(SVV.app.tecnicaId===t.id)+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+azDibujoTec(t)+'</svg><span>'+esc(t.nombre)+'</span></button>').join("")+'</div></section>';
 }
 function caSinTecnicas(){
-  $("#svVForm").innerHTML = '<p class="svAviso">Todavía no tienes técnicas de impresión en tu catálogo. Puedes elegir el artículo y agregar la impresión después.</p>';
+  $("#svVForm").innerHTML = nvVarCotHTML()+'<p class="svAviso">Todavía no tienes técnicas de impresión en tu catálogo. Puedes elegir el artículo y agregar la impresión después.</p>';
   $("#svVTotal").textContent = "—"; $("#svVPorPieza").textContent = ""; $("#svVUtil").textContent = ""; $("#svVAgregar").disabled = false;
+  const r=caConCopia(()=>calc());$("#svVTotal").textContent=mx(r.total);nvVarRefrescaCot();
 }
 function caGuarda(){
   if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) return;
   if(!SVV || !SVV.artSelector || $("#svVAgregar").disabled) return;
   if(!(cat.articulos||[]).some(a=>a.id === SVV.artSelector.id)){ toast("Este modelo ya no está en el catálogo. Elige otro."); return; }
+  if(SVV.artSelector.cuenta!==ceCuenta()||SVV.artSelector.folio!==cot.folio){svCierra();toast("Cambió el pedido o la cuenta. Vuelve a elegir el artículo.");return;}
   const q = caCotModelo();
+  const errorVar=NuvoorVariantes.valida(nvVarModelo(),q.tallas);if(errorVar){toast(errorVar);return;}
   if((cat.tecnicas||[]).length){
     const app = JSON.parse(JSON.stringify(SVV.app));
     const i = q.apps.findIndex(x=>x.id === app.id); if(i<0) q.apps.push(app); else q.apps[i] = app;
@@ -12198,7 +12296,7 @@ function folioSol(){
 }
 /* Un artículo cuenta para el inventario cuando alguien se tomó la molestia de
    ponerle mínimo o de registrarle existencia. Los demás no se vigilan. */
-function seVigila(a){ return num(a.minimo_inv) > 0 || num(a.existencia) > 0; }
+function seVigila(a){ return num(a.minimo_inv)>0||num(a.existencia)!==0||(a.invVariantes||[]).length>0; }
 function estadoStock(a){
   const hay = num(a.existencia), min = num(a.minimo_inv);
   if(hay <= 0)        return {clase:"agotado", et:"Agotado",    falta: Math.max(1, min)};
@@ -12450,9 +12548,8 @@ async function mandaAProduccion(folio){
   const rG = calcDe(g);
   for(const p of rG.partes){
     const a = (cat.articulos||[]).find(a=>a.id===p.q.articuloId);
-    if(a && num(a.existencia) > 0)
-      await moverInventario(a.id, "salida", p.r.qty, "Salida por pedido cobrado", true,
-                            {folio: g.op.folio, archivo: null});
+    if(a && (num(a.existencia)>0||(a.invVariantes||[]).length))
+      await nvVarSalida(a,p.q,p.r.qty,"Salida por pedido cobrado",{folio:g.op.folio,archivo:null});
   }
   descuentaInsumos(g, rG, g.op.folio);
   renderInvInsumos();
@@ -13129,6 +13226,16 @@ function cobraLinea(ln){
   const bruto = Math.round(precio*cant*100)/100;
   const p = esGranel(a) ? null : promoDe(a);      /* el granel no lleva promo de piezas */
   if(!p) return {bruto, neto:bruto, ahorro:0, promo:null};
+  /* Un mismo modelo sigue contando junto para promociones aunque cambie la talla. */
+  const juntas=ln.variante&&mosTicket.lineas.some(l=>l.id===ln.id)?mosTicket.lineas.filter(l=>l.artId===ln.artId&&num(l.precio)===precio):[];
+  if(juntas.length>1){
+    const totalPiezas=juntas.reduce((s,l)=>s+num(l.cant),0),pos=juntas.findIndex(l=>l.id===ln.id);
+    const previas=juntas.slice(0,pos).reduce((s,l)=>s+num(l.cant),0);
+    const grupos=Math.floor(totalPiezas/(p.tipo==='nxm'?p.lleva:p.piezas));
+    const importe=p.tipo==='nxm'?(grupos*p.paga+totalPiezas-grupos*p.lleva)*precio:grupos*p.precio+(totalPiezas-grupos*p.piezas)*precio;
+    const neto=Math.round((Math.round(importe*(previas+cant)/totalPiezas*100)-Math.round(importe*previas/totalPiezas*100)))/100;
+    return {bruto,neto,ahorro:Math.round((bruto-neto)*100)/100,promo:p};
+  }
   const n = Math.round(cant);
   let neto;
   if(p.tipo === "nxm"){
@@ -13247,7 +13354,8 @@ function mvPintaModelos(){
 function mvPintaModelo(){
   const a=mvActual();if(!a)return;
   const vig=seVigila(a),ex=num(a.existencia),granel=esGranel(a),p=promoDe(a);
-  $('#mvDetalle').innerHTML='<div class="mvFoto">'+miniArt(a)+'</div><div class="mvDatos"><span class="mvEyebrow">'+esc(a.sku||caFamilia(a))+'</span><h3>'+esc(a.nombre||'Artículo')+'</h3><strong class="mvPrecio">'+mx(precioMostrador(a))+'<small> / '+esc(granel?a.granel:'pieza')+'</small></strong><p class="mvStock'+(vig&&ex<=0?' mvAgotado':'')+'">'+(vig?(ex>0?esc(cantTxt(ex,a.granel))+' en existencia':'Sin existencia registrada'):'Artículo del catálogo')+'</p>'+(p?'<p class="mvPromo">'+esc(p.texto)+' · '+esc(p.detalle||'')+'</p>':'')+'<label class="f" for="mvCantidad">'+(granel?'Cantidad ('+esc(a.granel)+')':'¿Cuántas piezas?')+'</label><div class="mvCantidad"><button type="button" data-mv-cantidad="-1" aria-label="Disminuir cantidad">−</button><input id="mvCantidad" type="number" min="'+(granel?'.001':'1')+'" step="'+(granel?'.001':'1')+'" inputmode="'+(granel?'decimal':'numeric')+'" value="'+mvEstado.cantidad+'"><button type="button" data-mv-cantidad="1" aria-label="Aumentar cantidad">+</button></div><p class="mvNota">El artículo se agregará al ticket para cobrarlo.</p><p class="mvError" id="mvError" role="alert" hidden></p></div>';
+  const variantesHTML=nvVarMostrador();
+  $('#mvDetalle').innerHTML='<div class="mvFoto">'+miniArt(a)+'</div><div class="mvDatos"><span class="mvEyebrow">'+esc(a.sku||caFamilia(a))+'</span><h3>'+esc(a.nombre||'Artículo')+'</h3><strong class="mvPrecio">'+mx(precioMostrador(a))+'<small> / '+esc(granel?a.granel:'pieza')+'</small></strong><p class="mvStock'+(vig&&ex<=0?' mvAgotado':'')+'">'+(vig?(ex>0?esc(cantTxt(ex,a.granel))+' en existencia':'Sin existencia registrada'):'Artículo del catálogo')+'</p>'+(p?'<p class="mvPromo">'+esc(p.texto)+' · '+esc(p.detalle||'')+'</p>':'')+variantesHTML+'<label class="f" for="mvCantidad">'+(granel?'Cantidad ('+esc(a.granel)+')':'¿Cuántas piezas?')+'</label><div class="mvCantidad"><button type="button" data-mv-cantidad="-1" aria-label="Disminuir cantidad">−</button><input id="mvCantidad" type="number" min="'+(granel?'.001':'1')+'" step="'+(granel?'.001':'1')+'" inputmode="'+(granel?'decimal':'numeric')+'" value="'+mvEstado.cantidad+'"><button type="button" data-mv-cantidad="1" aria-label="Aumentar cantidad">+</button></div><p class="mvNota">El artículo se agregará al ticket para cobrarlo.</p><p class="mvError" id="mvError" role="alert" hidden></p></div>';
   $('#mvSub').textContent='Elige el modelo y '+(granel?'la cantidad que vas a vender.':'cuántas piezas vas a vender.');mvPintaImporte();
 }
 function mvCantidadValida(){
@@ -13261,7 +13369,7 @@ function mvPintaImporte(){
   const linea=cobraLinea({artId:a.id,precio:precioMostrador(a),cant:c,granel:a.granel||''});
   $('#mvImporte').textContent=valida?mx(linea.neto):'—';
   $('#mvImporteNota').textContent=(P.ivaOn?'Importe antes de IVA':'Importe')+(linea.ahorro>0?' · promoción aplicada':'');
-  $('#mvAgregar').disabled=!valida;
+  $('#mvAgregar').disabled=!valida;nvVarRefrescaMos();
 }
 function mvAgrega(){
   if(!mvEstado||!mvPuede())return;
@@ -13269,7 +13377,9 @@ function mvAgrega(){
   if(!mvActual()){mvCierra();renderMostrador();toast('Este modelo ya no está en el catálogo.');return;}
   if(!mvCantidadValida()){$('#mvError').textContent='Escribe una cantidad mayor que cero'+(esGranel(mvActual())?'.':' y sin decimales.');$('#mvError').hidden=false;return;}
   const id=mvEstado.id,cantidad=Number($('#mvCantidad').value);
-  mvCierra(false);mosAgrega(id,cantidad);mosEnfoca();toast('Artículo agregado al ticket');
+  const variante=mvEstado.variante?{...mvEstado.variante}:null;
+  if(NuvoorVariantes.usa(mvActual())&&!NuvoorVariantes.completa(mvActual(),variante))return;
+  mvCierra(false);mosAgrega(id,cantidad,variante);mosEnfoca();toast('Artículo agregado al ticket');
 }
 function mvPintaResumen(){
   const b=$('#mvTicketResumen');if(!b)return;
@@ -13294,17 +13404,21 @@ document.addEventListener('keydown',e=>{
   if(e.shiftKey&&document.activeElement===primero){e.preventDefault();ultimo.focus();}else if(!e.shiftKey&&document.activeElement===ultimo){e.preventDefault();primero.focus();}
 });
 
-function mosAgrega(artId, cuantos){
+function mosAgrega(artId, cuantos, variante){
   const a = (cat.articulos||[]).find(x=>x.id===artId);
   if(!a){ toast("No encuentro ese artículo"); return; }
+  if(NuvoorVariantes.usa(a)&&!NuvoorVariantes.completa(a,variante)){
+    const previo=mosQ;mosQ='';mvAbre(caClave(caFamilia(a)),document.activeElement);mosQ=previo;
+    if(mvEstado){mvEstado.id=a.id;mvEstado.cantidad=Math.max(1,num(cuantos,1));mvPintaModelos();mvPintaModelo();}return;
+  }
   /* Lo que se vende por kilo no se puede meter de a uno: hay que pesarlo.
      Si no viene la cantidad, se abre la báscula. */
   if(esGranel(a) && cuantos == null){ abreBascula(a); return; }
   const n = esGranel(a) ? num(cuantos) : Math.max(1, Math.round(num(cuantos, 1)));
   if(n <= 0) return;
-  const ya = mosTicket.lineas.find(l=>l.artId===artId);
+  const ya = mosTicket.lineas.find(l=>l.artId===artId&&NuvoorVariantes.clave(l.variante)===NuvoorVariantes.clave(variante));
   if(ya) ya.cant = Math.round((num(ya.cant) + n)*1000)/1000;
-  else mosTicket.lineas.push({id:uid(), artId, nombre:a.nombre||"Artículo",
+  else mosTicket.lineas.push({id:uid(), artId, variante:variante?{...variante}:null,nombre:(a.nombre||"Artículo")+(variante?" · "+[variante.talla,variante.color].filter(Boolean).join(" / "):""),
                               sku:a.sku||"", precio:precioMostrador(a),
                               costo:num(a.costo), cant:n, granel:a.granel||""});
   renderMostrador();
@@ -13570,7 +13684,7 @@ async function cobraMostrador(conTicket){
   for(const ln of mosTicket.lineas){
     const a = (cat.articulos||[]).find(x=>x.id===ln.artId);
     if(a && seVigila(a)) await moverInventario(a.id, "salida", num(ln.cant),
-      "Venta de mostrador " + folio, true);
+      "Venta de mostrador " + folio, true,undefined,ln.variante);
   }
 
   /* Y si cobró en efectivo con la caja abierta, el movimiento entra solo:
@@ -17467,9 +17581,8 @@ $("#btnConfirmar").addEventListener("click", async ()=>{
   const rC = calcDe(cot);
   for(const p of rC.partes){
     const art = cat.articulos.find(a=>a.id===p.q.articuloId);
-    if(art && num(art.existencia) > 0)
-      await moverInventario(art.id, "salida", p.r.qty, "Salida por pedido confirmado", true,
-                            {folio: cot.op.folio, archivo: null});
+    if(art && (num(art.existencia)>0||(art.invVariantes||[]).length))
+      await nvVarSalida(art,p.q,p.r.qty,"Salida por pedido confirmado",{folio:cot.op.folio,archivo:null});
   }
   const cons = descuentaInsumos(cot, rC, cot.op.folio);
   if(cons.lista.length) renderInvInsumos();
@@ -17540,8 +17653,11 @@ $("#tab-sav").addEventListener("click", async e=>{
 
 /* ============ INVENTARIO ============ */
 function renderInventario(){
+  const elegido=$("#inv_art")?.value;
   const sel = $("#inv_art");
   if(sel) sel.innerHTML = cat.articulos.map(a=>'<option value="'+a.id+'">'+esc(a.nombre)+' · '+num(a.existencia)+' pza(s)</option>').join("");
+  if(elegido&&cat.articulos.some(a=>a.id===elegido))sel.value=elegido;
+  nvVarInventario();
   const bajos = cat.articulos.filter(a=> num(a.minimo_inv)>0 && num(a.existencia) <= num(a.minimo_inv));
   const total = cat.articulos.reduce((t,a)=>t+num(a.existencia),0);
   const valor = cat.articulos.reduce((t,a)=>t+num(a.existencia)*num(a.costo),0);
@@ -17559,31 +17675,29 @@ function renderInventario(){
     t.innerHTML = movs.length
       ? '<thead><tr><th>Fecha</th><th>Artículo</th><th>Movimiento</th><th>Cantidad</th><th>Quedó en</th><th>Nota</th><th>Quién</th></tr></thead><tbody>'+
         movs.map(m=>'<tr><td class="num">'+esc(m.fecha)+'</td><td>'+esc(m.articulo)+'</td>'+
-          '<td>'+esc(m.tipo)+'</td><td class="num" style="color:'+(m.delta>0?"var(--good)":"var(--accent)")+'">'+(m.delta>0?"+":"")+m.delta+'</td>'+
+          '<td>'+esc(m.tipo)+(m.variante?'<small style="display:block">'+esc([m.variante.talla,m.variante.color].filter(Boolean).join(' · '))+' · '+num(m.cantidad)+' pza(s)</small>':'')+'</td><td class="num" style="color:'+(m.delta>0?"var(--good)":"var(--accent)")+'">'+(m.delta>0?"+":"")+m.delta+'</td>'+
           '<td class="num">'+m.queda+'</td><td>'+esc(m.nota||"")+'</td><td>'+esc(m.quien||"")+'</td></tr>').join("")+'</tbody>'
       : '<tbody><tr><td style="color:var(--ink-3);padding:14px">Sin movimientos de inventario todavía.</td></tr></tbody>';
   }
 }
-async function moverInventario(artId, tipo, cantidad, nota, silencioso, req){
+async function moverInventario(artId, tipo, cantidad, nota, silencioso, req, variante){
   if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) return;
   const a = cat.articulos.find(a=>a.id===artId); if(!a) return;
-  const antes = num(a.existencia);
-  let delta = 0, queda = antes;
-  if(tipo==="entrada"){ delta = Math.abs(cantidad); queda = antes + delta; }
-  else if(tipo==="salida"){ delta = -Math.abs(cantidad); queda = antes + delta; }
-  else { queda = Math.abs(cantidad); delta = queda - antes; }
-  a.existencia = queda;
+  let mov;try{mov=NuvoorVariantes.mueve(a,tipo,cantidad,variante);}catch(e){toast(e.message);return false;}
+  const {delta,queda}=mov;
   cat.invMovs = cat.invMovs || [];
   cat.invMovs.push({id:uid(), fecha:hoyISO()+" "+horaAhora(), articulo:a.nombre, artId,
-                    tipo: tipo==="entrada"?"Entrada":tipo==="salida"?"Salida":"Ajuste",
+                    tipo: tipo==="entrada"?"Entrada":tipo==="salida"?"Salida":tipo==="clasificar"?"Clasificación":"Ajuste",
+                    variante:mov.variante,quedaVariante:mov.quedaVariante,cantidad:mov.cantidad,
                     delta, queda, nota:nota||"", quien: usuarioActual().nombre||"",
                     req: req || {folio:"(automático)", archivo:null}});
   if(cat.invMovs.length>400) cat.invMovs = cat.invMovs.slice(-400);
   persist(); renderInventario(); renderTabla("articulos");
   if(!silencioso) toast(a.nombre+": queda "+queda+" pza(s)");
+  return true;
 }
 let reqArchivo = null;
-document.addEventListener("click", e=>{
+document.addEventListener("click", async e=>{
   if(e.target.closest("#inv_adj")){
     if(!ASSETS){ toast("Adjuntar archivos necesita permiso de edición"); return; }
     const f = $("#inv_file"); if(f) f.click();
@@ -17595,8 +17709,9 @@ document.addEventListener("click", e=>{
   if(!cant && $("#inv_tipo").value!=="ajuste"){ toast("Escribe la cantidad"); return; }
   if(!req){ toast("Escribe el número de requisición"); return; }
   if(!reqArchivo){ toast("Adjunta la requisición firmada para poder mover existencias"); return; }
-  moverInventario($("#inv_art").value, $("#inv_tipo").value, cant, ($("#inv_nota").value||"").trim(),
-                  false, {folio:req, archivo:reqArchivo});
+  const art=cat.articulos.find(a=>a.id===$("#inv_art").value),variante=NuvoorVariantes.usa(art)?nvVarInvSeleccion():null;
+  if(variante&&!NuvoorVariantes.completa(art,variante)){toast("Elige la talla y el color del movimiento.");return;}
+  const ok=await moverInventario($("#inv_art").value, $("#inv_tipo").value, cant, ($("#inv_nota").value||"").trim(),false,{folio:req,archivo:reqArchivo},variante);if(!ok)return;
   $("#inv_cant").value=""; $("#inv_nota").value=""; $("#inv_req").value="";
   reqArchivo = null; $("#inv_adjNom").textContent = "Sin archivo";
 });
@@ -18829,8 +18944,7 @@ function coloresDe(g){
   g = g || cot;
   const a = cat.articulos.find(a=>a.id===g.articuloId);
   if(!a || !a.colores) return [];
-  return String(a.listaColores||"").split(/[,;\/|]+/)
-    .map(x=>x.trim()).filter(Boolean).filter((x,i,l)=>l.indexOf(x)===i);
+  return NuvoorVariantes.lista(a.listaColores);
 }
 function aplicaPasoTallas(){
   aplicaModo();
@@ -23278,11 +23392,11 @@ function cv2PintaFormAppBase(){
   h += svRefHTML(a.art, "Diseño o imagen de referencia");
   h += '<section class="svDesg"><h3>De dónde sale el precio</h3><ol id="svRen"></ol><div id="svAvisos"></div></section>';
   const f = $("#svVForm"), y = f.scrollTop;
-  f.innerHTML = (SVV.artSelector ? caTecnicasHTML() : '') + h; f.scrollTop = y;
+  f.innerHTML = (SVV.artSelector ? nvVarCotHTML()+caTecnicasHTML() : '') + h; f.scrollTop = y;
   f.classList.remove("editando");
   cv2RefrescaApp();
 }
-function cv2RefrescaApp(){ return caConCopia(cv2RefrescaAppBase); }
+function cv2RefrescaApp(){ const r=caConCopia(cv2RefrescaAppBase);if(SVV?.artSelector)nvVarRefrescaCot();return r; }
 function cv2RefrescaAppBase(){
   const a = SVV.app, P2 = cv2Previa(a), d = P2.d, qty = P2.qty;
   const t = (cat.tecnicas||[]).find(x=>x.id === a.tecnicaId);
@@ -23395,6 +23509,8 @@ function cv2FaltaConfirmar(){
     const it = its[i];
     if(it.modo === "impresion"){ if(!it.svc) return "El concepto " + (i+1) + " todavía no tiene su servicio de impresión"; continue; }
     if(it.modo === "servicio") continue;
+    const artVar=cat.articulos.find(a=>a.id===it.articuloId);
+    const faltaVar=NuvoorVariantes.valida(artVar,it.tallas,Math.max(1,usaTallas(it)?sumaTallas(it):Math.round(num(it.cantidad,1))));if(faltaVar)return faltaVar;
     if(!(it.apps||[]).length) return (its.length > 1 ? "«" + nombreItem(it, i+1) + "» no tiene" : "Agrega al menos una") + " ubicación con su impresión antes de confirmar";
   }
   return "";
@@ -24848,10 +24964,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261103-1025";</script>
+<script>window.BUILD="20261103-1522";</script>
 <script>
 (function(){
-  var mio = "20261103-1025";
+  var mio = "20261103-1522";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -24879,8 +24995,8 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="suspension.js?v=20261103-1025"></script>
-<script src="cuenta.js?v=20261103-1025"></script>
+<script src="suspension.js?v=20261103-1522"></script>
+<script src="cuenta.js?v=20261103-1522"></script>
 <script src="diagnostico.js?v=20261026-2139"></script>
 </body>
 </html>

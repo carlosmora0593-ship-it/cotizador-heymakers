@@ -1,5 +1,5 @@
 import fs from 'node:fs';import path from 'node:path';import http from 'node:http';
-import {chromium} from '../tmp/categorias/playwright/package/index.mjs';
+const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'../tmp/categorias/playwright/package/index.mjs');
 export async function abre(dir,port=4185){
  dir=path.resolve(dir);
  const server=http.createServer((req,res)=>{const file=path.resolve(dir,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!file.startsWith(dir+path.sep)){res.writeHead(403).end();return;}fs.readFile(file,(e,b)=>{if(e){res.writeHead(file.endsWith('favicon.ico')?204:404).end();return;}res.writeHead(200,{'Content-Type':({'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript; charset=utf-8','.png':'image/png'}[path.extname(file)]||'application/octet-stream')}).end(b);});});

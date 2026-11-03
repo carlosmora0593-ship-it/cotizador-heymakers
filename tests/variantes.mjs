@@ -1,0 +1,15 @@
+import fs from 'node:fs';import vm from 'node:vm';import assert from 'node:assert/strict';
+const sandbox={window:{}};vm.runInNewContext(fs.readFileSync('public/variantes.js','utf8'),sandbox);const v=sandbox.window.NuvoorVariantes;
+const a={tallas:true,colores:true,existencia:20,listaTallas:'CH, M, G',listaColores:'Negra/blanca, roja'};
+assert.equal(v.stock(a,{talla:'M',color:'Negra/blanca'}),null);assert.equal(v.opciones(a,'color').length,2);
+v.mueve(a,'clasificar',8,{talla:'M',color:'Negra/blanca'});assert.equal(a.existencia,20);assert.equal(v.stock(a,{talla:'m',color:'negra/blanca'}),8);assert.equal(v.resumen(a).sinClasificar,12);
+assert.throws(()=>v.mueve(a,'clasificar',13,{talla:'G',color:'Roja'}));assert.equal(a.existencia,20);
+assert.throws(()=>v.mueve(a,'entrada',1.5,{talla:'G',color:'Roja'}));assert.equal(a.existencia,20);
+v.mueve(a,'clasificar',12,{talla:'G',color:'Roja'});assert.equal(v.stock(a,{talla:'CH',color:'Roja'}),0);
+v.mueve(a,'salida',2,{talla:'M',color:'Negra/blanca'});assert.equal(a.existencia,18);assert.equal(a.invVariantes[0].existencia,6);
+v.mueve(a,'ajuste',5,{talla:'M',color:'Negra/blanca'});assert.equal(a.existencia,17);assert.equal(a.invVariantes[0].existencia,5);
+v.mueve(a,'entrada',4,{talla:'M',color:'Negra/blanca'});assert.equal(a.existencia,21);assert.equal(a.invVariantes[0].existencia,9);
+assert.ok(v.valida(a,[{talla:'M',color:'Roja',cant:2}],3));assert.ok(v.valida(a,[{talla:'',color:'Roja',cant:1}]));assert.equal(v.valida(a,[{talla:'M',color:'Roja',cant:2}],2),'');
+v.mueve(a,'salida',1);assert.equal(a.invVariantesRevisar,true);assert.equal(v.stock(a,{talla:'M',color:'Negra/blanca'}),null);
+const simple={existencia:10};v.mueve(simple,'entrada',2);v.mueve(simple,'salida',3);v.mueve(simple,'ajuste',8);assert.equal(simple.existencia,8);assert.equal(simple.invVariantes,undefined);
+console.log('Variantes: stock anterior sin clasificar, clasificación sin duplicar total, entradas/salidas/ajuste por combinación, color compuesto, validación y salida antigua sin desglose OK.');

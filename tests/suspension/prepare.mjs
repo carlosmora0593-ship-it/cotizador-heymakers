@@ -1,7 +1,7 @@
 import fs from 'node:fs';import path from 'node:path';
 const root=process.cwd(),out=path.join(root,'tmp/stripe/preview');
 fs.mkdirSync(out,{recursive:true});fs.mkdirSync(path.join(out,'img/marca'),{recursive:true});fs.mkdirSync(path.join(out,'marca'),{recursive:true});
-for(const f of ['acceso.html','acceso.css','acceso.js','lab.html','lab.js','lab-nuvoor.js','lab-nuvoor.css','index.html','cuenta.js','suspension.js','version.json','tablero.js','tablero.css','bloqueo.js','bloqueo.css'])fs.copyFileSync(path.join(root,'public',f),path.join(out,f));
+for(const f of ['acceso.html','acceso.css','acceso.js','lab.html','lab.js','lab-nuvoor.js','lab-nuvoor.css','index.html','cuenta.js','suspension.js','version.json','tablero.js','tablero.css','variantes.js','variantes.css','bloqueo.js','bloqueo.css'])fs.copyFileSync(path.join(root,'public',f),path.join(out,f));
 for(const f of ['n-body.png','star.png','n-64.png','n-192.png','n-512.png','palabra-96.png']){
  const src=path.join(root,'public/img/marca',f);if(fs.existsSync(src))fs.copyFileSync(src,path.join(out,'img/marca',f));
 }
