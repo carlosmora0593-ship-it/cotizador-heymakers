@@ -6,11 +6,11 @@
   const estado=()=>window.__estadoLicenciaNuvoor?window.__estadoLicenciaNuvoor():{cargada:false,suspendida:false};
   const suspendida=()=>estado().suspendida===true;
   const navSuspendida=new Set(['cot','mos','com','calc']);
-  const zona='#tab-cot,#tab-mos,#tab-com,#tab-sav,#tab-ven,#tab-caj,#tab-inv,#tab-cat,#tab-cli,#tab-dis,#tab-pro,#tab-arc,#tab-asi,#tab-nom,#tab-val,#tab-set,.modal,#docview,#visor';
+  const zona='#tab-cot,#tab-mos,#tab-com,#tab-sav,#tab-ven,#tab-caj,#tab-inv,#tab-cat,#tab-cli,#tab-dis,#tab-pro,#tab-arc,#tab-asi,#tab-nom,#tab-val,#tab-set,.modal,#docview,#visor,#svVelo';
   const excepciones='#auth,#modalPlanes,.nuvoorStripeFondo,[id^="nuvoorStripe"],#perfilMenu,#perfilBox,#modalUser,#modalAyuda,#ayudaPanel,#sinPlanMuro';
   const leer='[data-load],[data-vercot],[data-verdoc-op],[data-verdocped],[data-verdocs],[data-verdis],[data-exp],[data-cotmas],[data-secvolver],[data-seclz],[data-verarchivo]';
   const filtros='#savOrden,#arcBuscar,#venFecha,#venSeg button,#venPrev,#venNext,#venHoy,[data-sfiltro],[data-savfiltro],[data-cxc-edad],[data-cxcedad],[data-rango],[data-periodo]';
-  const cierre=/^(docClose|visorClose|visorPrev|visorNext|visorZoomIn|visorZoomOut|perfilBtn|btnSalir|menuBtn|btnPlanes|avisoPagoBtn|btnLab|btnBloquea|userBloquea|pinCancel|pinOk|modal.*Cerrar)$/i;
+  const cierre=/^(svVCerrar|docClose|visorClose|visorPrev|visorNext|visorZoomIn|visorZoomOut|perfilBtn|btnSalir|menuBtn|btnPlanes|avisoPagoBtn|btnLab|btnBloquea|userBloquea|pinCancel|pinOk|modal.*Cerrar)$/i;
   const etiquetaLectura=/^(cerrar|volver|atrás|hoy|anterior|siguiente|día|semana|mes|año|todas|todos|cotizaciones|pedidos|por cobrar|facturadas|por facturar)$/i;
   let refresco=false,ultimoEstado=null;
 

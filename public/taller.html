@@ -3217,6 +3217,22 @@ body.rol-produccion #btnPrint{display:none!important}
 [data-paso="articulo"].cv2SinCant .body > :not(#cantPrimero):not(.guiaPie){display:none!important}
 
 /* La tarjeta de servicios */
+
+/* Familias de artículos, con la misma ventana que los servicios. */
+#azArt .svRej{margin-top:14px}
+#azArt .svTile[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.caMas{font-size:40px;line-height:60px;color:var(--accent)}
+.caElegido{display:flex;gap:12px;align-items:center;padding:12px;margin-top:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}
+.caElegido>span{flex:1;min-width:0}.caElegido b,.caElegido small{display:block}.caElegido small{color:var(--ink-3);font-size:12px;margin-top:3px}
+.caModelo{display:flex;align-items:center;gap:8px;width:100%;min-width:0}.caModelo>span:last-child{min-width:0;overflow-wrap:anywhere}.caModelo .artMini{width:42px;height:42px;flex:none;object-fit:contain;border-radius:8px}
+.caModelo .artMini svg{width:34px;height:34px}
+.caTecnicas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.caTecnicas .svChip{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;min-width:0;white-space:normal;padding:12px 8px}
+.caTecnicas svg{width:34px;height:34px;fill:none;stroke:var(--accent);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.caVentana{z-index:85}
+.caVentana .svVCab h2{overflow-wrap:anywhere}.caVentana .svVCuerpo{grid-template-columns:240px minmax(0,1fr)}
+@media(max-width:760px){.caVentana .svVCuerpo{display:flex;flex-direction:column;overflow:auto}.caVentana .svVProds{display:flex;flex-direction:row;overflow-x:auto;flex:none}.caVentana .caModelo{width:180px;flex:none}.caVentana .svVForm{overflow:visible;flex:none}.caTecnicas{grid-template-columns:repeat(2,minmax(0,1fr))}.caVentana .svVPie{flex-wrap:wrap}.caElegido{flex-wrap:wrap}.caElegido .artMini{width:40px;height:40px}}
+
 .svRej{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 @media (max-width:900px){ .svRej{grid-template-columns:repeat(3,minmax(0,1fr))} }
 @media (max-width:520px){ .svRej{grid-template-columns:repeat(2,minmax(0,1fr))} }
@@ -10594,38 +10610,125 @@ function azClientesPinta(){
 }
 /* ---------- 2. el artículo ---------- */
 function azArticulos(){ azConFoco(()=>azArticulosPinta()); }
-function azArticulosPinta(){
-  /* En modo servicio no hay artículo que escoger: ahí manda el material. */
-  if(cot.modo === "servicio" || cot.modo === "impresion"){ azQuita("azArt"); return; }
-  const c = azCaja("azArt", '[data-paso="articulo"] .body', "afterbegin");
-  if(!c) return;
-  { const cp = document.getElementById("cantPrimero"); if(cp && cp.nextElementSibling !== c) cp.after(c); }
-  const q = (AZ.artBusca||"").trim().toLowerCase();
-  let ls = (cat.articulos||[]).slice();
-  if(AZ.artCat) ls = ls.filter(a=>(a.cat||"Otros") === AZ.artCat);
-  if(q) ls = ls.filter(a=> ((a.nombre||"")+" "+(a.cat||"")).toLowerCase().indexOf(q) >= 0);
-  const cats = (typeof categoriasArt === "function") ? categoriasArt() : [];
-  c.innerHTML =
-    '<label class="f" for="azArtBusca">¿Qué se va a personalizar?</label>' +
-    '<div class="azBarra"><input id="azArtBusca" placeholder="Buscar artículo" value="'+esc(AZ.artBusca||"")+'">' +
-      '<span class="hint">'+ls.length+' de '+(cat.articulos||[]).length+'</span></div>' +
-    (cats.length > 1
-      ? '<div class="azChips" id="azArtCats"><button type="button" data-azartcat=""'+(AZ.artCat?'':' aria-pressed="true"')+'>Todos</button>' +
-        cats.map(x=>'<button type="button" data-azartcat="'+esc(x)+'"'+(AZ.artCat===x?' aria-pressed="true"':'')+'>'+esc(x)+'</button>').join("") +
-        '</div>'
-      : '') +
-    '<div class="azRej">' +
-      '<button type="button" class="azIt azNuevo" data-artpick="" aria-pressed="'+(!cot.articuloId)+'">' +
-        '<span class="azIco">'+azIco('<path d="M12 5v14M5 12h14"/>')+'</span>' +
-        '<b>A mi manera</b><small>nombre y costo a mano</small></button>' +
-      ls.map(a=>
-        '<button type="button" class="azIt" data-artpick="'+esc(a.id)+'" style="--azc:var(--guinda)" ' +
-        'aria-pressed="'+(cot.articuloId===a.id)+'">' + miniArt(a) +
-        '<b>'+esc(a.nombre)+'</b><small>'+esc(a.cat||"Sin familia")+' · '+mx(num(a.costo))+'</small></button>'
-      ).join("") +
-    '</div>' +
-    (ls.length ? '' : '<p class="azVacio">Nada con ese nombre. Puedes capturarlo a mano aquí abajo.</p>');
+/* Artículos por familia: sólo agrupa la vista, nunca cambia el catálogo. */
+function caClave(s){ return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim().replace(/\s+/g," ").toLowerCase(); }
+function caFamilia(a){
+  const c = String(a.cat||"Otros").trim()||"Otros", k = caClave(c), n = caClave(a.nombre);
+  if(["textil","ropa","prendas"].includes(k)){
+    if(/sudadera|hoodie/.test(n)) return "Sudaderas";
+    if(/playera|camiseta|camisa polo|polo/.test(n)) return "Playeras";
+  }
+  const nombres = {playeras:"Playeras",sudaderas:"Sudaderas",gorras:"Gorras",tazas:"Tazas",termos:"Termos",oficina:"Oficina",otros:"Otros",promocional:"Promocionales",promocionales:"Promocionales",textil:"Textil"};
+  return nombres[k] || c;
 }
+function caGrupos(){
+  const grupos = new Map();
+  (cat.articulos||[]).forEach(a=>{
+    const nom = caFamilia(a), key = caClave(nom);
+    if(!grupos.has(key)) grupos.set(key,{key,nom,modelos:[]});
+    grupos.get(key).modelos.push(a);
+  });
+  const orden = ["playeras","sudaderas","gorras","tazas","termos","promocionales","oficina"];
+  return [...grupos.values()].sort((a,b)=>{
+    const i = orden.indexOf(a.key), j = orden.indexOf(b.key);
+    return (i<0?99:i)-(j<0?99:j) || a.nom.localeCompare(b.nom,"es");
+  });
+}
+function caIcono(g){
+  if(g.key === "playeras") return svIco("playera");
+  if(g.key === "tazas") return svIco("subli");
+  return '<svg class="svIco caDibujo" viewBox="0 0 24 24" aria-hidden="true">'+dibujoArt({cat:g.nom,nombre:(g.modelos[0]||{}).nombre||""})+'</svg>';
+}
+function caPintaTarjetas(){
+  if(cot.modo !== "articulo"){ azQuita("azArt"); return; }
+  const c = azCaja("azArt", '[data-paso="articulo"] .body', "afterbegin"); if(!c) return;
+  const cp = $("#cantPrimero"); if(cp && cp.nextElementSibling !== c) cp.after(c);
+  const actual = (cat.articulos||[]).find(a=>a.id === cot.articuloId);
+  const q = caClave(AZ.artBusca), grupos = caGrupos().filter(g=>!q || caClave(g.nom).includes(q) || g.modelos.some(a=>caClave(a.nombre).includes(q)));
+  c.innerHTML = '<label class="f" for="azArtBusca">¿Qué se va a personalizar?</label><div class="azBarra"><input id="azArtBusca" placeholder="Buscar categoría o modelo" value="'+esc(AZ.artBusca||"")+'"></div>' +
+    (actual ? '<div class="caElegido">'+miniArt(actual)+'<span><b>'+esc(actual.nombre)+'</b><small>'+esc(caFamilia(actual))+' · '+(cot.apps||[]).length+' ubicación(es)</small></span><button type="button" class="btn sm" data-cafamilia="'+esc(caClave(caFamilia(actual)))+'">Cambiar</button></div>' : '') +
+    '<div class="svRej">'+grupos.map(g=>'<button type="button" class="svTile" data-cafamilia="'+esc(g.key)+'" aria-pressed="'+!!(actual && caClave(caFamilia(actual))===g.key)+'">'+caIcono(g)+'<b>'+esc(g.nom)+'</b><small>'+g.modelos.length+' modelo'+(g.modelos.length===1?'':'s')+'</small></button>').join("")+
+    '<button type="button" class="svTile caManual" data-artpick="" aria-pressed="'+!cot.articuloId+'"><span class="caMas">+</span><b>A mi manera</b><small>nombre y costo a mano</small></button></div>' +
+    (grupos.length ? '' : '<p class="azVacio">No hay modelos con ese nombre. Puedes capturar uno a tu manera.</p>');
+}
+/* El artículo y su primera ubicación se editan sobre una copia. Cancelar
+   no cambia precios, tallas, aplicaciones, archivos ni conceptos. */
+function caCotModelo(){
+  const q = JSON.parse(JSON.stringify(cot)), a = (cat.articulos||[]).find(x=>x.id === SVV.artSelector.id);
+  if(!a) return q;
+  q.modo = "articulo"; q.svc = null;
+  if(a.id !== q.articuloId){
+    q.articuloId = a.id; q.costoArt = num(a.costo); q.precioArt = num(a.precio);
+    const puesta = (q.desc||"").trim(), auto = !puesta || q.descAuto !== false || (cat.articulos||[]).some(x=>x.nombre === puesta);
+    if(auto){ q.desc = a.nombre; q.descAuto = true; }
+  }
+  return q;
+}
+let caEnCopia = false;
+function caConCopia(fn){
+  if(!SVV || !SVV.artSelector || caEnCopia) return fn();
+  const anterior = cot; cot = caCotModelo(); caEnCopia = true;
+  try{ return fn(); }finally{ cot = anterior; caEnCopia = false; }
+}
+function caAbre(key, origen){
+  if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) return;
+  const g = caGrupos().find(x=>x.key === key); if(!g) return;
+  const sel = g.modelos.find(a=>a.id === cot.articuloId) || g.modelos.find(a=>caClave(a.nombre).includes(caClave(AZ.artBusca))) || g.modelos[0];
+  const t = cat.tecnicas||[], anterior = (cot.apps||[])[0];
+  const s = cv2TamPorUbi("Frente") || {ancho:20,alto:20,id:""};
+  const app = anterior ? JSON.parse(JSON.stringify(anterior)) : {id:uid(),ubic:"Frente",tecnicaId:(t[0]||{}).id||"",tamanoId:s.id||"",ancho:num(s.ancho),alto:num(s.alto),tintas:1,puntadas:8000,art:null};
+  if(!t.some(x=>x.id === app.tecnicaId)) app.tecnicaId = (t[0]||{}).id||"";
+  svOrigen = origen || null;
+  SVV = {modo:"app",app,nuevo:!anterior,artSelector:{key,id:sel.id}};
+  caConCopia(()=>{ if(!anterior){ app.ubic = cv2Ubicaciones()[0]; const tam=cv2TamPorUbi(app.ubic); if(tam){app.tamanoId=tam.id;app.ancho=num(tam.ancho);app.alto=num(tam.alto);} } });
+  $("#svVelo").classList.add("caVentana");
+  $("#svVIco").innerHTML = caIcono(g); $("#svVTit").textContent = g.nom;
+  $("#svVSub").textContent = qtyPedido()+" pieza(s) · elige el modelo y cómo se personaliza";
+  $("#svVAgregar").textContent = "Usar este artículo"; $("#svVPrecios").hidden = true;
+  svPintaProds(); cv2PintaFormApp(); svMuestra();
+}
+function caPintaModelos(){
+  const g = caGrupos().find(x=>x.key === SVV.artSelector.key);
+  $("#svVCuerpo").classList.remove("solo"); $("#svVProds").hidden = false;
+  $("#svVProds").innerHTML = '<span class="k">Modelos</span>'+(g?g.modelos:[]).map(a=>'<button type="button" class="svProd caModelo" data-camodelo="'+esc(a.id)+'" aria-current="'+(a.id === SVV.artSelector.id)+'">'+miniArt(a)+'<span><b>'+esc(a.nombre)+'</b>'+(svVer()?'<small>'+mx(num(a.costo))+' costo</small>':'')+'</span></button>').join("");
+}
+function caTecnicasHTML(){
+  return '<section class="svGrp"><h3>¿Qué tipo de impresión llevará?</h3><div class="caTecnicas">'+(cat.tecnicas||[]).map(t=>'<button type="button" class="svChip" data-catecnica="'+esc(t.id)+'" aria-pressed="'+(SVV.app.tecnicaId===t.id)+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+azDibujoTec(t)+'</svg><span>'+esc(t.nombre)+'</span></button>').join("")+'</div></section>';
+}
+function caSinTecnicas(){
+  $("#svVForm").innerHTML = '<p class="svAviso">Todavía no tienes técnicas de impresión en tu catálogo. Puedes elegir el artículo y agregar la impresión después.</p>';
+  $("#svVTotal").textContent = "—"; $("#svVPorPieza").textContent = ""; $("#svVUtil").textContent = ""; $("#svVAgregar").disabled = false;
+}
+function caGuarda(){
+  if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) return;
+  if(!SVV || !SVV.artSelector || $("#svVAgregar").disabled) return;
+  if(!(cat.articulos||[]).some(a=>a.id === SVV.artSelector.id)){ toast("Este modelo ya no está en el catálogo. Elige otro."); return; }
+  const q = caCotModelo();
+  if((cat.tecnicas||[]).length){
+    const app = JSON.parse(JSON.stringify(SVV.app));
+    const i = q.apps.findIndex(x=>x.id === app.id); if(i<0) q.apps.push(app); else q.apps[i] = app;
+  }
+  cot = q; guardaItemActivo(cot); svCierra(); sincronizaArmado(); renderCot(); azArticulos();
+  if(typeof guiaRevisa === "function") guiaRevisa();
+  const cambiar = document.querySelector("#azArt .caElegido button"); if(cambiar) cambiar.focus();
+  toast("Artículo e impresión en la cotización");
+}
+document.addEventListener("click", e=>{
+  const c = e.target.closest("[data-cafamilia]"); if(c){ caAbre(c.dataset.cafamilia,c); return; }
+  if(!SVV || !SVV.artSelector) return;
+  const m = e.target.closest("[data-camodelo]");
+  if(m){ SVV.artSelector.id = m.dataset.camodelo; svPintaProds(); cv2PintaFormApp(); return; }
+  const t = e.target.closest("[data-catecnica]"); if(t) cv2CambiaTecnica(t.dataset.catecnica);
+});
+document.addEventListener("keydown", e=>{
+  if(!SVV || !SVV.artSelector || e.key !== "Tab") return;
+  const ls = [...$("#svVelo").querySelectorAll('button,input,select,textarea,a[href]')].filter(x=>!x.disabled && x.getClientRects().length);
+  const primero = ls[0], ultimo = ls[ls.length-1];
+  if(e.shiftKey && document.activeElement === primero){ e.preventDefault(); ultimo.focus(); }
+  else if(!e.shiftKey && document.activeElement === ultimo){ e.preventDefault(); primero.focus(); }
+});
+
+function azArticulosPinta(){ caPintaTarjetas(); }
 /* ---------- 3. la técnica y el tamaño, dentro de cada aplicación ---------- */
 /* Los colores salen de la paleta del taller, no escritos a mano: así la
    misma pantalla se ve bien en el tema oscuro, en Papel y en Estudio. */
@@ -22311,6 +22414,7 @@ function svMuestra(){
   setTimeout(()=>{ const c = $("#svVCerrar"); if(c) c.focus(); }, 40);
 }
 function svCierra(){
+  $("#svVelo").classList.remove("caVentana");
   $("#svVelo").hidden = true; SVV = null; svPrecios = false;
   $("#svVPrecios").setAttribute("aria-pressed","false"); $("#svVPrecios").textContent = "Editar precios";
   document.body.style.overflow = "";
@@ -22332,6 +22436,7 @@ function svAbre(secId, pid, accion, origen){
   svPintaProds(); svPintaForm(); svMuestra();
 }
 function svPintaProds(){
+  if(SVV.artSelector) return caPintaModelos();
   const nav = $("#svVProds"), cu = $("#svVCuerpo");
   if(SVV.modo === "app"){
     cu.classList.remove("solo"); nav.hidden = false;
@@ -22704,6 +22809,10 @@ function cv2Previa(app){
   finally{ cot = prev; }
 }
 function cv2PintaFormApp(){
+  if(SVV.artSelector && !(cat.tecnicas||[]).length) return caSinTecnicas();
+  return caConCopia(cv2PintaFormAppBase);
+}
+function cv2PintaFormAppBase(){
   const a = SVV.app;
   const t = (cat.tecnicas||[]).find(x=>x.id === a.tecnicaId) || cat.tecnicas[0];
   const ubis = cv2Ubicaciones(), usadas = cot.apps.filter(x=>x.id !== a.id).map(x=>x.ubic);
@@ -22742,11 +22851,12 @@ function cv2PintaFormApp(){
   h += svRefHTML(a.art, "Diseño o imagen de referencia");
   h += '<section class="svDesg"><h3>De dónde sale el precio</h3><ol id="svRen"></ol><div id="svAvisos"></div></section>';
   const f = $("#svVForm"), y = f.scrollTop;
-  f.innerHTML = h; f.scrollTop = y;
+  f.innerHTML = (SVV.artSelector ? caTecnicasHTML() : '') + h; f.scrollTop = y;
   f.classList.remove("editando");
   cv2RefrescaApp();
 }
-function cv2RefrescaApp(){
+function cv2RefrescaApp(){ return caConCopia(cv2RefrescaAppBase); }
+function cv2RefrescaAppBase(){
   const a = SVV.app, P2 = cv2Previa(a), d = P2.d, qty = P2.qty;
   const t = (cat.tecnicas||[]).find(x=>x.id === a.tecnicaId);
   const L = [];
@@ -22773,6 +22883,11 @@ function cv2RefrescaApp(){
   $("#svVTotal").textContent = mx(total);
   $("#svVPorPieza").textContent = d ? mx(porPieza) + " por pieza" : "";
   $("#svVUtil").textContent = (d && svVer()) ? "costo " + mx(num(d.costoConMaterial != null ? d.costoConMaterial : d.costo)) + " por pieza" : "";
+  if(SVV.artSelector && P2.r){
+    $("#svVTotal").textContent = mx(P2.r.total);
+    $("#svVPorPieza").textContent = "artículo e impresión · " + mx(num(P2.r.total)/Math.max(1,qty)) + " por pieza";
+    $("#svVUtil").textContent = "";
+  }
   const medOk = !t || t.modo !== "area" || (num(a.ancho) > 0 && num(a.alto) > 0);
   $("#svVAgregar").disabled = !(a.ubic||"").trim() || !medOk;
 }
@@ -22822,6 +22937,7 @@ function cv2ChangeApp(t){
   if(t.id === "apArmado"){ SVV.app.sinArmado = !t.checked; cv2RefrescaApp(); }
 }
 function cv2GuardaApp(){
+  if(SVV.artSelector) return caGuarda();
   const a = JSON.parse(JSON.stringify(SVV.app));
   const nuevo = SVV.nuevo;
   const i = cot.apps.findIndex(x=>x.id === a.id);
@@ -24300,10 +24416,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261102-1930";</script>
+<script>window.BUILD="20261102-2204";</script>
 <script>
 (function(){
-  var mio = "20261102-1930";
+  var mio = "20261102-2204";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -24331,7 +24447,7 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="suspension.js?v=20261102-1911"></script>
+<script src="suspension.js?v=20261102-2204"></script>
 <script src="cuenta.js?v=20261102-1930"></script>
 <script src="diagnostico.js?v=20261026-2139"></script>
 </body>
