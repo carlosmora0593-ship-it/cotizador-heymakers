@@ -7,6 +7,7 @@ process.chdir(fileURLToPath(new URL('../',import.meta.url)));
 // PLAYWRIGHT_MODULE puede apuntar al paquete instalado en otra carpeta.
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE || '../tmp/categorias/playwright/package/index.mjs');
 const dir=path.resolve('tmp/stripe/preview');fs.mkdirSync(dir,{recursive:true});
+for(const file of ['tablero.js','tablero.css','bloqueo.js','bloqueo.css'])fs.copyFileSync(path.join('public',file),path.join(dir,file));
 let html=fs.readFileSync('public/index.html','utf8');
 html=html.replace(/<script\b[^>]*src="(?:https?:\/\/|config\.js|cuenta\.js|diagnostico\.js|suspension\.js)[^"]*"[^>]*><\/script>/g,'');
 html=html.replace(/<link\b[^>]*(?:googleapis|gstatic)\.com[^>]*>/g,'');
@@ -18,7 +19,7 @@ const server=http.createServer((req,res)=>{
  const file=path.resolve(dir,'.'+new URL(req.url,'http://localhost').pathname);
  if(!file.startsWith(dir+path.sep)){res.writeHead(403).end();return;}
  fs.readFile(file,(error,body)=>{if(error){res.writeHead(404).end();return;}
- res.writeHead(200,{'Content-Type':file.endsWith('.html')?'text/html; charset=utf-8':file.endsWith('.png')?'image/png':'text/plain'}).end(body);});
+ res.writeHead(200,{'Content-Type':file.endsWith('.html')?'text/html; charset=utf-8':file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.png')?'image/png':'text/plain'}).end(body);});
 });
 await new Promise(r=>server.listen(4180,'127.0.0.1',r));
 let browser;

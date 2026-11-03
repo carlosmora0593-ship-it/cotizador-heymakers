@@ -16,7 +16,7 @@ const server=http.createServer((req,res)=>{
  if(!file.startsWith(dir+path.sep)){res.writeHead(403).end();return;}
  if(file.endsWith('favicon.ico')){res.writeHead(204).end();return;}
  fs.readFile(file,(err,body)=>{if(err){res.writeHead(404).end();return;}
- res.writeHead(200,{'Content-Type':file.endsWith('.html')?'text/html; charset=utf-8':file.endsWith('.js')?'text/javascript; charset=utf-8':file.endsWith('.png')?'image/png':'text/plain'}).end(body);});
+ res.writeHead(200,{'Content-Type':file.endsWith('.html')?'text/html; charset=utf-8':file.endsWith('.js')?'text/javascript; charset=utf-8':file.endsWith('.css')?'text/css':file.endsWith('.png')?'image/png':'text/plain'}).end(body);});
 });
 await new Promise(r=>server.listen(4180,'127.0.0.1',r));
 let browser;

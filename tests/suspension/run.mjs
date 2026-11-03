@@ -86,7 +86,7 @@ try {
   await configure(1280,950,'light');
   await navigate('http://127.0.0.1:4178/index.html?producto=taller','#cuentaPlan',15000);
   for(let i=0;i<60;i++){
-    if(await evalJs("typeof window.__qaSuspension==='object' && typeof CUENTA!=='undefined' && !!CUENTA && document.querySelector('#tbAccesos').children.length>0"))break;
+    if(await evalJs("typeof window.__qaSuspension==='object' && typeof CUENTA!=='undefined' && !!CUENTA && !!document.querySelector('#nvMetricas')?.children.length"))break;
     await delay(250);
   }
   const check=async(expr,note)=>{if(!await evalJs(expr))throw new Error(note);};

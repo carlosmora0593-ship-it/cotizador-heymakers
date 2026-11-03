@@ -3497,6 +3497,8 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   <div class="barraNav" id="barraNav"></div>
   <div class="barraPie"><span id="barraVer" class="nuvoorPie"><img src="./marca/n-64.png" alt=""><span>Nuvoor</span></span></div>
 </aside>
+<link rel="stylesheet" href="tablero.css?v=20261102-2346">
+<link rel="stylesheet" href="bloqueo.css?v=20261102-2346">
 </head>
 <body class="sin-sesion">
 <header class="top">
@@ -3656,69 +3658,22 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
 </section>
 
 <section id="tab-inicio">
-  <div class="tbHero">
-    <div class="tbHeroTxt">
-      <p class="tbFecha" id="tbFecha">—</p>
-      <h1 id="tbHola">Hola</h1>
-      <p class="tbSub" id="tbCuando">—</p>
-    </div>
-    <button class="btn tbBtnVisto" id="tbVisto" hidden>
-      <span class="tbCheck">✓</span> Ya lo vi
-    </button>
-  </div>
-  <div class="inicioSeg">
-    <div class="seg" id="inVista">
-      <button data-inv="tablero" aria-pressed="true">Tablero</button>
-      <button data-inv="apps" aria-pressed="false">Aplicaciones</button>
-    </div>
-  </div>
+  <header class="nvHeader">
+    <div class="nvHeading"><img class="nvLogo" src="marca/n-64.png" alt="Nuvoor"><div><p class="nvDate" id="nvFecha"></p><h1>Tu taller hoy</h1><p class="nvSub">Primero lo que necesita tu atención.</p></div></div>
+    <div class="nvHeadTools"><div class="nvActions" id="nvAcciones"></div><button type="button" class="nvTheme" id="nvTema" role="switch" aria-checked="false" aria-label="Cambiar a modo nocturno"><svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></svg><svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.7 13.2A8.8 8.8 0 0 1 10.8 3.3a8.8 8.8 0 1 0 9.9 9.9Z"/></svg></button></div>
+  </header>
+  <div class="inicioSeg"><div class="seg" id="inVista"><button data-inv="tablero" aria-pressed="true">Tablero</button><button data-inv="apps" aria-pressed="false">Aplicaciones</button></div></div>
   <div id="lanzador" class="lanzador" hidden></div>
-
-  <div class="tbAccesos" id="tbAccesos"></div>
-  <div class="tbTiles" id="tbTiles"></div>
-  <div class="tbAnillos" id="tbAnillos"></div>
-
-  <div class="tbCols tbCols2">
-    <div class="tbPila">
-      <div class="tbPanel" id="tbPanelMio">
-        <header><h2>Lo tuyo</h2><span class="tbCuenta" id="tbMioCuenta"></span></header>
-        <div class="tbPanelBody"><div id="tbMio"></div></div>
-      </div>
-      <div class="tbPanel" id="tbCardPaso">
-        <header><h2>Mientras no estabas</h2><span class="tbDesde" id="tbDesde"></span></header>
-        <div class="tbPanelBody"><div id="tbPaso"></div></div>
-      </div>
+  <div id="nvDashboard">
+    <div class="nvMetrics" id="nvMetricas"></div>
+    <div class="nvMain nvSinAnuncio" id="nvMain">
+      <section class="nvPanel"><header class="nvPanelHead"><div><h2>Qué necesita atención</h2><p>Abre cada pendiente y continúa desde ahí.</p></div></header><div id="nvPendientes"></div></section>
+      <aside class="anuncios" id="anuncios" hidden aria-label="Publicidad"><div class="anunTop"><span class="anunSello">Publicidad</span><div class="anunFlechas"><button type="button" id="anunAnt" aria-label="Anuncio anterior">‹</button><button type="button" id="anunSig" aria-label="Anuncio siguiente">›</button></div></div><div class="anunViewport" id="anunVista"><div class="anunPista" id="anunPista"></div></div><div class="anunPuntos" id="anunPuntos"></div></aside>
     </div>
-    <div class="tbPila">
-      <div class="tbPanel tbPanelTip">
-        <header><h2>Tip del día</h2></header>
-        <div class="tbPanelBody"><div id="tbTip"></div></div>
-      </div>
-      <div class="tbPanel">
-        <header><h2>Lo que urge</h2><span class="tbCuenta" id="tbUrgeCuenta"></span></header>
-        <div class="tbPanelBody"><div id="tbUrge"></div></div>
-      </div>
-      <div class="tbPanel" id="tbPanelDeben" data-solo-admin>
-        <header><h2>Quién debe más</h2><span class="tbCuenta" id="tbDebenCuenta"></span></header>
-        <div class="tbPanelBody"><div id="tbDeben"></div></div>
-      </div>
-      <div class="tbPanel" id="tbPanelSemana">
-        <header><h2>Entregado por día</h2><span class="tbDesde">últimos 7 días</span></header>
-        <div class="tbPanelBody"><div id="tbSemana"></div></div>
-      </div>
-    </div>
+    <div class="nvCharts"><section class="nvPanel nvChart" id="nvCobros"></section><section class="nvPanel nvChart" id="nvPedidos"></section></div>
+    <section class="nvPanel"><header class="nvPanelHead"><div><h2>Próximas entregas</h2><p>Las fechas más cercanas, en un solo lugar.</p></div></header><div id="nvEntregas"></div></section>
   </div>
-  <div class="anuncios" id="anuncios" hidden aria-label="Anuncios">
-    <div class="anunTop">
-      <span class="anunSello">Publicidad</span>
-      <span class="anunNav">
-        <button class="anunFlecha" id="anunAnt" type="button" aria-label="Anuncios anteriores">‹</button>
-        <button class="anunFlecha" id="anunSig" type="button" aria-label="Anuncios siguientes">›</button>
-      </span>
-    </div>
-    <div class="anunViewport" id="anunVista"><div class="anunPista" id="anunPista"></div></div>
-    <div class="anunPuntos" id="anunPuntos"></div>
-  </div>
+  <button id="tbVisto" hidden type="button">Ya lo vi</button>
 </section>
 
 <section id="tab-cot" hidden>
@@ -4981,6 +4936,8 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
 
 
 <div class="accesoWrap" id="acceso" hidden>
+ <div class="nvLockLayout">
+  <aside class="nvLockAside"><div class="nvLockBrand"><img src="marca/n-64.png" alt="Nuvoor"><span>Tu taller, en orden.</span></div><div class="nvLockClock" aria-label="Hora actual"><time id="nvLockHora"></time><span id="nvLockFecha"></span></div><div class="anunBloq" id="anunBloq" hidden aria-label="Publicidad"><span class="anunBloqSello">Publicidad</span><div class="anunBloqPieza" id="anunBloqPieza"></div></div><p class="nvLockFoot">Hecho para seguir creando.</p></aside>
   <div class="accesoCard">
     <div class="cmyk"><i></i><i></i><i></i><i></i></div>
     <div class="accesoBody">
@@ -5005,10 +4962,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
       <button class="btn ghost accesoOtro" id="accesoOtro" hidden type="button">Entrar con otro usuario</button>
     </div>
   </div>
-  <div class="anunBloq" id="anunBloq" hidden aria-label="Publicidad">
-    <span class="anunBloqSello">Publicidad</span>
-    <div class="anunBloqPieza" id="anunBloqPieza"></div>
-  </div>
+ </div>
 </div>
 
 
@@ -5719,6 +5673,8 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   </div>
 </div>
 
+<script src="bloqueo.js?v=20261102-2346"></script>
+<script src="tablero.js?v=20261102-2346"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -5858,6 +5814,7 @@ function aplicaTema(){
   raiz.dataset.vidrio = TEMA.vidrio;
   const meta = document.querySelector('meta[name="theme-color"]');
   if(meta) meta.setAttribute("content", ac);
+  if(window.NuvoorTablero) window.NuvoorTablero.tema();
 }
 
 function renderTema(){
@@ -11650,6 +11607,7 @@ async function cargaAnuncios(){
   ANUNCIOS = anunciosDe("cotizador");
   /* Si la puerta está abierta en este momento, que vea lo que acaba de llegar. */
   if(typeof pintaAnuncioBloqueo === "function" && !$("#acceso").hidden) pintaAnuncioBloqueo();
+  $("#nvMain").classList.toggle("nvSinAnuncio", !ANUNCIOS.length);
   if(!ANUNCIOS.length){ caja.hidden = true; return; }
   caja.hidden = false;
   anunIdx = 0;
@@ -11660,61 +11618,34 @@ async function cargaAnuncios(){
 /* El paso de la tira: el ancho de un recuadro más su separación. De aquí sale
    todo lo demás —cuántos caben, cuántas paradas hay— sin repetir en JS los
    números que ya dice el CSS. */
-function anunPaso(){
-  const t = $("#anunPista"); if(!t || !t.firstElementChild) return 1;
-  const a = t.children[0], b = t.children[1];
-  if(b) return Math.max(1, b.offsetLeft - a.offsetLeft);
-  return Math.max(1, a.offsetWidth);
-}
-function anunCaben(){
-  const v = $("#anunVista"); if(!v) return 1;
-  return Math.max(1, Math.round(v.clientWidth / anunPaso()));
-}
-function anunParadas(){ return Math.max(1, ANUNCIOS.length - anunCaben() + 1); }
-
-function pintaAnuncios(){
-  const pista = $("#anunPista"); if(!pista) return;
-  pista.innerHTML = ANUNCIOS.map(a=>{
-    const cuerpo = '<img src="'+esc(a.imagen)+'" alt="'+esc(anunAlt(a))+'" loading="lazy">';
-    return a.enlace
-      ? '<a class="anunPieza" href="'+esc(a.enlace)+'" target="_blank" rel="noopener noreferrer nofollow sponsored" '+
-        'data-anun="'+a.id+'">'+cuerpo+'</a>'
-      : '<div class="anunPieza">'+cuerpo+'</div>';
-  }).join("");
-  requestAnimationFrame(()=>{ pintaPuntosAnun(); vaAnuncio(0, true); anunCuenta(); });
-}
-
+function anunPaso(){ return 1; }
+function anunCaben(){ return 1; }
+function anunParadas(){ return Math.max(1, ANUNCIOS.length); }
+function pintaAnuncios(){ vaAnuncio(anunIdx, true); }
 function pintaPuntosAnun(){
-  const puntos = $("#anunPuntos"); if(!puntos) return;
-  const paradas = anunParadas(), hayMas = paradas > 1;
-  puntos.innerHTML = hayMas
-    ? Array.from({length:paradas}, (_,i)=>'<button type="button" data-anunir="'+i+'" '+
-        'aria-label="Anuncios '+(i+1)+' de '+paradas+'"'+(i===anunIdx?' aria-current="true"':'')+'></button>').join("")
-    : "";
-  const a = $("#anunAnt"), s = $("#anunSig");
-  if(a) a.hidden = !hayMas;
-  if(s) s.hidden = !hayMas;
+  const puntos = $("#anunPuntos"), mas = ANUNCIOS.length > 1;
+  if(puntos) puntos.textContent = mas ? (anunIdx+1)+" de "+ANUNCIOS.length : "";
+  ["#anunAnt","#anunSig"].forEach(s=>{const b=$(s);if(b)b.hidden=!mas;});
 }
-
-function vaAnuncio(i, quieto){
-  const v = $("#anunVista"); if(!v || !ANUNCIOS.length) return;
-  const paradas = anunParadas();
-  anunIdx = ((i % paradas) + paradas) % paradas;
-  const sinMovimiento = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  v.scrollTo({left: anunIdx * anunPaso(), behavior: (quieto || sinMovimiento) ? "auto" : "smooth"});
-  const puntos = $("#anunPuntos");
-  if(puntos) puntos.querySelectorAll("button").forEach((b,k)=>{
-    if(k===anunIdx) b.setAttribute("aria-current","true"); else b.removeAttribute("aria-current");
-  });
+function vaAnuncio(i){
+  const pista = $("#anunPista"); if(!pista || !ANUNCIOS.length) return;
+  anunIdx = ((i % ANUNCIOS.length)+ANUNCIOS.length)%ANUNCIOS.length;
+  const a = ANUNCIOS[anunIdx], href = window.NuvoorTablero.seguro(a.enlace);
+  const texto = '<img class="nvAdImage" src="'+esc(a.imagen)+'" alt="'+esc(anunAlt(a))+'" loading="lazy"><div class="nvAdBody"><h3>'+esc(a.titulo||a.alt||"Conoce esta propuesta")+'</h3>'+(href?'<span class="nvAdCta">Conocer más →</span>':'')+'</div>';
+  pista.innerHTML = href ? '<a class="nvAdPiece" href="'+esc(href)+'" target="_blank" rel="noopener noreferrer nofollow sponsored" data-anun="'+esc(a.id)+'">'+texto+'</a>' : '<div class="nvAdPiece">'+texto+'</div>';
+  pintaPuntosAnun();
+  const pieza = pista.querySelector(".nvAdPiece");
+  if(pieza && window.IntersectionObserver){
+    if(window.__nvAnunObserver) window.__nvAnunObserver.disconnect();
+    window.__nvAnunObserver = new IntersectionObserver(entries=>{if(entries.some(e=>e.isIntersecting&&e.intersectionRatio>=.5))anunCuenta();},{threshold:.5});
+    window.__nvAnunObserver.observe(pieza);
+  }
 }
-
-/* Cuenta como vista todo lo que de verdad está en pantalla, no nada más el
-   primero: si se ven tres, se vieron tres. */
 function anunCuenta(){
-  const v = $("#anunVista"); if(!v) return;
-  const desde = Math.round(v.scrollLeft / anunPaso());
-  for(let k = desde; k < desde + anunCaben() && k < ANUNCIOS.length; k++)
-    marcaAnuncio(ANUNCIOS[k], "vista");
+  const v=$("#anunVista"),puerta=$("#acceso");
+  if(!v || document.hidden || document.body.classList.contains("sin-sesion") || !$("#tab-inicio") || $("#tab-inicio").hidden || (puerta&&!puerta.hidden) || vistaInicio()!=="tablero") return;
+  const r=v.getBoundingClientRect();
+  if(r.width>0&&r.height>0&&Math.min(r.bottom,innerHeight)-Math.max(r.top,0)>=r.height*.5)marcaAnuncio(ANUNCIOS[anunIdx],"vista");
 }
 
 /* Una vista por anuncio y por sesión: si contáramos cada vuelta del carrusel,
@@ -11745,6 +11676,7 @@ function pintaAnuncioBloqueo(){
   const quieto = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if(ANUN_BLOQ.length > 1 && !quieto)
     anunBloqReloj = setInterval(()=>{
+      if(document.hidden || $("#acceso").hidden) return;
       anunBloqIdx = (anunBloqIdx + 1) % ANUN_BLOQ.length;
       ponAnuncioBloqueo();
     }, 8000);
@@ -11752,12 +11684,13 @@ function pintaAnuncioBloqueo(){
 function ponAnuncioBloqueo(){
   const w = $("#anunBloqPieza"), a = ANUN_BLOQ[anunBloqIdx];
   if(!w || !a) return;
-  const img = '<img src="'+esc(a.imagen)+'" alt="'+esc(anunAlt(a))+'">';
-  w.innerHTML = a.enlace
-    ? '<a href="'+esc(a.enlace)+'" target="_blank" rel="noopener noreferrer nofollow sponsored" '+
+  const href = window.NuvoorTablero.seguro(a.enlace);
+  const img = '<img src="'+esc(a.imagen)+'" alt="'+esc(anunAlt(a))+'"><div class="nvLockAdText"><b>'+esc(a.titulo||a.alt||"Conoce esta propuesta")+'</b>'+(href?'<span>Conocer más →</span>':'')+'</div>';
+  w.innerHTML = href
+    ? '<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer nofollow sponsored" '+
       'data-anunb="'+esc(String(a.id))+'">'+img+'</a>'
     : img;
-  marcaAnuncio(a, "vista");
+  if(!document.hidden && !$("#acceso").hidden) marcaAnuncio(a, "vista");
 }
 function paraAnuncioBloqueo(){
   if(anunBloqReloj){ clearInterval(anunBloqReloj); anunBloqReloj = null; }
@@ -11767,12 +11700,7 @@ $("#anunBloq").addEventListener("click", e=>{
   marcaAnuncio(ANUN_BLOQ.find(a=>String(a.id)===liga.dataset.anunb), "clic");
 });
 
-function anunArranca(){
-  anunPara();
-  if(anunParadas() < 2) return;
-  if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  anunReloj = setInterval(()=>vaAnuncio(anunIdx + 1), 7000);
-}
+function anunArranca(){ anunPara(); anunCuenta(); }
 function anunPara(){ if(anunReloj){ clearInterval(anunReloj); anunReloj = null; } }
 
 /* Al cambiar el ancho cambian cuántos caben, así que cambian las paradas. */
@@ -11800,21 +11728,6 @@ function anunAcomoda(){
   caja.addEventListener("focusin", anunPara);
   caja.addEventListener("focusout", anunArranca);
   caja.addEventListener("pointerdown", anunPara);
-  const vista = $("#anunVista");
-  if(vista) vista.addEventListener("scroll", ()=>{
-    clearTimeout(anunQuieto);
-    anunQuieto = setTimeout(()=>{
-      const i = Math.round(vista.scrollLeft / anunPaso());
-      if(i !== anunIdx){
-        anunIdx = Math.max(0, Math.min(i, anunParadas() - 1));
-        const puntos = $("#anunPuntos");
-        if(puntos) puntos.querySelectorAll("button").forEach((b,k)=>{
-          if(k===anunIdx) b.setAttribute("aria-current","true"); else b.removeAttribute("aria-current");
-        });
-      }
-      anunCuenta();
-    }, 160);
-  }, {passive:true});
   document.addEventListener("visibilitychange", ()=>{ if(document.hidden) anunPara(); else anunArranca(); });
   let anunResize = null;
   window.addEventListener("resize", ()=>{ clearTimeout(anunResize); anunResize = setTimeout(anunAcomoda, 180); });
@@ -12049,64 +11962,31 @@ const TB_MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agos
                   "septiembre","octubre","noviembre","diciembre"];
 const TB_DIAS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
 
+var nvTablero;
+function nvPuedeTablero(t){
+  return puedeVer(t) && (typeof window.__enElPlan !== "function" || window.__enElPlan(t));
+}
 function renderTablero(){
-  if(typeof renderDeben === "function") renderDeben();
-  if(!$("#tab-inicio")) return;
-  const u = usuarioActual();
-  const d = new Date(), h = d.getHours();
-  const saludo = h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches";
-  const nombre = (u.nombre||"").split(" ")[0] || "";
-  $("#tbHola").textContent = saludo + (nombre ? ", "+nombre : "");
-  $("#tbFecha").textContent = TB_DIAS[d.getDay()] + " " + d.getDate() + " de " + TB_MESES[d.getMonth()] +
-    " · " + horaAhora();
-
-  const foto = turnoGuardado();
-  const hace = foto ? haceCuanto(foto.cuando) : "";
-  $("#tbCuando").textContent = foto
-    ? "Tu último vistazo fue " + (hace || "hace un momento")
-    : "Es la primera vez que abres el tablero: desde aquí empiezo a contar.";
-
-  pintaAccesos(); pintaAnillos(); pintaMio(); pintaTip();
-  aplicaVistaInicio();
-
-  /* tiles */
-  $("#tbTiles").innerHTML = pulsoDeHoy().map(t=>
-    '<div class="tbTile'+(t.tono? " "+t.tono : "")+'">'+
-      '<span class="tbTileIco">'+tbSvg(t.ico)+'</span>'+
-      '<span class="et">'+esc(t.et)+'</span>'+
-      '<span class="v">'+esc(String(t.v))+'</span>'+
-      '<span class="sub">'+esc(t.sub)+'</span></div>').join("");
-  pintaSemana();
-
-  /* lo que pasó */
-  const movs = movimientosDelTurno();
-  $("#tbVisto").hidden = !movs.length;
-  $("#tbDesde").textContent = foto ? ("desde el "+foto.cuando) : "";
-  $("#tbPaso").innerHTML = !foto
-    ? '<div class="empty">Vuelve después de un rato y aquí va a estar lo que se movió mientras no estabas: '+
-      'las órdenes que avanzaron, lo que anotó producción y lo que entró de dinero.</div>'
-    : (movs.length
-      ? movs.map(m=>
-          '<div class="tbMov'+(m.clase? " "+m.clase : "")+'"'+(m.folio? ' data-tbir="'+esc(m.folio)+'"':'')+'>'+
-          '<span class="tbIco">'+m.icono+'</span>'+
-          '<div class="tbTxt">'+((m.op||m.folio) ? '<b>'+esc(m.op || m.folio)+'</b>' : '')+
-            (m.cliente ? ' <span class="tbCli">'+esc(m.cliente)+'</span>' : '')+
-            '<div>'+m.texto+'</div>'+
-            (m.quien || m.sello ? '<small>'+esc(m.quien||"")+(m.sello? " · "+esc(m.sello) : "")+'</small>' : '')+
-          '</div></div>').join("")
-      : '<div class="empty">Nada se movió desde entonces.</div>');
-
-  /* lo que urge */
-  const urge = urgenciasDeHoy();
-  $("#tbUrgeCuenta").textContent = urge.length ? urge.length+" cosa(s)" : "todo al corriente";
-  $("#tbUrge").innerHTML = urge.length
-    ? urge.map(x=>
-        '<div class="tbUrge '+x.clase+'"'+(x.op? ' data-tbir="'+esc(x.folio)+'"':'')+'>'+
-        '<span class="tbQue">'+esc(x.que)+'</span>'+
-        '<div class="tbTxt"><b>'+esc(x.op || x.folio)+'</b>'+
-          (x.cliente ? ' <span class="tbCli">'+esc(x.cliente)+'</span>' : '')+
-          '<div>'+esc(x.detalle)+'</div></div></div>').join("")
-    : '<div class="empty">Nada vencido, nada detenido, nada por cobrar fuera de plazo. Buen momento para adelantar.</div>';
+  if(!$("#tab-inicio") || !window.NuvoorTablero) return;
+  if(!nvTablero) nvTablero = window.NuvoorTablero.crea({
+    puede: nvPuedeTablero,
+    icono: icoSeccion,
+    lee: ()=>{
+      const finanzas = nvPuedeTablero("ven");
+      return {hoy:hoyISO(), finanzas,
+        ventas:finanzas ? ventas : [],
+        pedidos:(nvPuedeTablero("pro") || nvPuedeTablero("sav") || nvPuedeTablero("dis")) ? guardadas : [],
+        faltantes:nvPuedeTablero("inv") ? faltantesInv().length : 0,
+        cajaAbierta:nvPuedeTablero("caj") ? cajaDe(hoyISO()).abierta : false,
+        pendientes:pendientesMios().filter(p=>nvPuedeTablero(p.t))};
+    },
+    cambiaTema:()=>{
+      TEMA.preset = document.documentElement.dataset.theme === "dark" ? "papel" : "tecno";
+      guardaTema(); aplicaTema(); renderTema();
+    },
+    despues:()=>{aplicaVistaInicio(); if(typeof window.__aplicaSuspensionNuvoor === "function") window.__aplicaSuspensionNuvoor();}
+  });
+  nvTablero.render();
 }
 
 /* ---------- eventos del tablero ---------- */
@@ -16814,7 +16694,7 @@ function ponVistaInicio(v){
 }
 /* Los bloques del tablero de siempre. El lanzador no los borra: los esconde,
    y el botón los devuelve. */
-const BLOQUES_TABLERO = ["#tbAccesos","#tbTiles","#tbAnillos",".tbCols2"];
+const BLOQUES_TABLERO = ["#nvDashboard"];
 function aplicaVistaInicio(){
   const v = vistaInicio();
   const lz = $("#lanzador"); if(!lz) return;
@@ -19068,12 +18948,15 @@ function pideAcceso(opc){
     if(otro) otro.hidden = true;
   }
   pintaAccesoReloj();
-  if(typeof pintaAnuncioBloqueo === "function") pintaAnuncioBloqueo();
   $("#acceso").hidden = false;
+  if(window.NuvoorBloqueo) window.NuvoorBloqueo.activa(true);
+  if(!ANUN_TODOS.length) cargaAnuncios();
+  if(typeof pintaAnuncioBloqueo === "function") pintaAnuncioBloqueo();
   document.body.classList.add("sin-acceso");
   if(bloq) setTimeout(()=>{ const p = $("#accesoPass"); if(p) p.focus(); }, 60);
 }
 function cierraAcceso(){
+  if(window.NuvoorBloqueo) window.NuvoorBloqueo.activa(false);
   if(typeof paraAnuncioBloqueo === "function") paraAnuncioBloqueo();
   $("#acceso").hidden = true;
   document.body.classList.remove("sin-acceso");
@@ -23519,6 +23402,7 @@ window.__arranca = () => initStore().then(async ()=>{
     await cargaNominas(); nmPer = P.nominaPeriodo || "semana"; renderNomina();
   }
   aplicaGiro();
+  cargaAnuncios();         /* sesión y segmentación del negocio ya listas */
   renderCot(); renderSet(); renderSaved(); pintaSelectClientes();
   if(typeof renderTablero === "function") renderTablero();   /* ya con datos */
   try{ renderVales(); }catch(e){}
@@ -24823,10 +24707,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261102-2306";</script>
+<script>window.BUILD="20261102-2346";</script>
 <script>
 (function(){
-  var mio = "20261102-2306";
+  var mio = "20261102-2346";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -24854,8 +24738,8 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="suspension.js?v=20261102-2306"></script>
-<script src="cuenta.js?v=20261102-2306"></script>
+<script src="suspension.js?v=20261102-2346"></script>
+<script src="cuenta.js?v=20261102-2346"></script>
 <script src="diagnostico.js?v=20261026-2139"></script>
 </body>
 </html>
