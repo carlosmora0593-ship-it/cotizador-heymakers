@@ -3497,9 +3497,10 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   <div class="barraNav" id="barraNav"></div>
   <div class="barraPie"><span id="barraVer" class="nuvoorPie"><img src="./marca/n-64.png" alt=""><span>Nuvoor</span></span></div>
 </aside>
-<link rel="stylesheet" href="variantes.css?v=20261103-1522">
-<link rel="stylesheet" href="tablero.css?v=20261103-1522">
-<link rel="stylesheet" href="bloqueo.css?v=20261103-1522">
+<link rel="stylesheet" href="variantes.css?v=20261103-1542">
+<link rel="stylesheet" href="clientes-selector.css?v=20261103-1542">
+<link rel="stylesheet" href="tablero.css?v=20261103-1542">
+<link rel="stylesheet" href="bloqueo.css?v=20261103-1542">
 <style id="mvEstilo">
 .mvSeccionTitulo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:20px 0 14px}.mvSeccionTitulo h2{font-size:17px;margin:0}.mvSeccionTitulo span{font-size:11px;color:var(--ink-3)}
 #mosRejilla.mvCategorias{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.mvCategoria{min-height:152px;padding:20px 10px 17px!important;gap:8px!important}.mvCategoria .svIco{width:62px;height:62px}.mvCategoria b{font-size:15px}.mvCategoria small{font-size:12px;color:var(--ink-3)}
@@ -3715,6 +3716,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
       <div class="card plegable" data-paso="cliente">
         <header><span class="step">1</span><h2>Cliente y pedido</h2><span class="hint" id="folioHint"></span><span class="resumenPaso" data-res="cliente"></span><span class="chev">▾</span></header><div class="plegado"><div>
         <div class="body fclBody">
+          <h3 id="nvCliTituloFicha">Datos del cliente nuevo</h3>
           <div class="fclBasicos">
             <div><label class="f" for="c_cliente">Cliente o nombre comercial</label><input id="c_cliente" placeholder="Nombre de la persona o empresa" autocomplete="off"></div>
             <div><label class="f" for="fcl_persona">Persona de contacto</label><input id="fcl_persona" data-fcl="persona" placeholder="¿Con quién vemos el pedido?" autocomplete="off"></div>
@@ -5017,6 +5019,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
 
 
 <div class="modal" id="modalFichaCliente" hidden><section class="card" role="dialog" aria-modal="true" aria-labelledby="fclTitulo"><header><h2 id="fclTitulo">Cliente y datos fiscales</h2><button type="button" class="btn sm" id="modalFclCerrar">Cerrar</button></header><div id="fclLectura"></div></section></div>
+<div class="modal" id="modalBuscarClientes" hidden><section class="card" role="dialog" aria-modal="true" aria-labelledby="nvCliTitulo"><header><div><h2 id="nvCliTitulo">Buscar cliente</h2><p>Elige una ficha para editar su información.</p></div><button type="button" class="btn sm" id="modalBuscarClientesCerrar">Cerrar</button></header><div class="nvCliCuerpo"><input type="search" id="nvCliBusca" placeholder="Buscar por nombre, teléfono, correo o RFC" autocomplete="off"><p id="nvCliEstado" role="status" aria-live="polite"></p><div class="nvCliRejilla" id="nvCliLista"></div></div><footer class="nvCliPaginacion"><div><b id="nvCliRango"></b><small id="nvCliPagina"></small></div><div><button type="button" class="btn sm" id="nvCliAnterior">Anterior</button><button type="button" class="btn sm" id="nvCliSiguiente">Siguiente</button></div></footer></section></div>
 <div class="modal" id="modalEnviar" hidden>
   <div class="card" style="width:min(560px,100%);max-height:88vh;overflow:auto">
     <header><h2>Enviar la cotización</h2>
@@ -5724,9 +5727,10 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   </div>
 </div>
 
-<script src="bloqueo.js?v=20261103-1522"></script>
-<script src="variantes.js?v=20261103-1522"></script>
-<script src="tablero.js?v=20261103-1522"></script>
+<script src="clientes-selector.js?v=20261103-1542"></script>
+<script src="bloqueo.js?v=20261103-1542"></script>
+<script src="variantes.js?v=20261103-1542"></script>
+<script src="tablero.js?v=20261103-1542"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -10906,35 +10910,23 @@ function azConFoco(fn){
 
 /* ---------- 1. el cliente ---------- */
 function azClientes(){ azConFoco(()=>azClientesPinta()); }
+var nvCliSelector;
 function azClientesPinta(){
-  const c = azCaja("azCli", '[data-paso="cliente"] .body', "afterbegin");
-  if(!c) return;
-  const q = (AZ.cliBusca||"").trim().toLowerCase();
-  const todos = (typeof clientes !== "undefined" && Array.isArray(clientes)) ? clientes : [];
-  const ls = todos.filter(x=> !q ||
-    ((x.nombre||"")+" "+(x.razon||"")+" "+(x.rfc||"")+" "+(x.tel||"")+" "+(x.mail||"")).toLowerCase().indexOf(q) >= 0);
-  const vista = AZ.cliTodos ? ls : ls.slice(0, AZ_TOPE);
-  c.innerHTML =
-    '<label class="f" for="azCliBusca">¿Para quién es?</label>' +
-    '<div class="azBarra"><input id="azCliBusca" placeholder="Buscar cliente por nombre, teléfono o RFC" value="'+esc(AZ.cliBusca||"")+'">' +
-      '<span class="hint">'+ls.length+' de '+todos.length+'</span></div>' +
-    '<div class="azRej">' +
-      '<button type="button" class="azIt azNuevo" data-azcli="" style="--azc:var(--accent)" aria-pressed="'+(!cot.clienteId)+'">' +
-        '<span class="azIco">'+azIco('<path d="M12 5v14M5 12h14"/>')+'</span>' +
-        '<b>Cliente nuevo</b><small>lo escribes abajo</small></button>' +
-      vista.map(x=>{
-        const cont = x.tel || x.mail || "";
-        return '<button type="button" class="azIt" data-azcli="'+esc(x.id)+'" style="--azc:var(--cyan)" ' +
-          'aria-pressed="'+(cot.clienteId===x.id)+'">' +
-          '<span class="azIco">'+azIco('<circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/>')+'</span>' +
-          '<b>'+esc(x.nombre||x.razon||"Sin nombre")+'</b>' +
-          '<small>'+esc(cont || x.rfc || "sin datos")+'</small></button>';
-      }).join("") +
-    '</div>' +
-    (ls.length > vista.length
-      ? '<p class="azMas"><button type="button" class="btn sm ghost" id="azCliTodos">Ver los '+ls.length+'</button></p>'
-      : '') +
-    (todos.length ? '' : '<p class="azVacio">Todavía no tienes clientes guardados. Escribe el nombre abajo y usa «Guardar como cliente».</p>');
+  const host=azCaja("azCli",'[data-paso="cliente"] .body',"afterbegin");if(!host||!window.NuvoorClientes)return;
+  if(!nvCliSelector)nvCliSelector=NuvoorClientes.crea({
+    estado:()=>({cuenta:fclCuenta(),folio:cot.folio,clienteId:cot.clienteId,nombre:cot.cliente}),
+    puede:()=>fclPuedeLeer()&&!FCL.ocupado,
+    buscar:(t,p,c)=>window.__directorioClientes.buscar(t,p,c),
+    obtener:(id,c)=>window.__directorioClientes.obtener(id,c),
+    selecciona:c=>{
+      const i=clientes.findIndex(x=>x.id===c.id);if(i<0)clientes.push(c);else clientes[i]=c;
+      cot.clienteId=c.id;cot.cliente=c.nombre||c.razon||"";cot.contacto=c.tel||c.mail||"";
+      fclSelecciona(c);pintaSelectClientes();azClientes();persist();resumenPasos();guiaRevisa();
+    },
+    editar:()=>{guiaVaA("cliente");$("#c_cliente").focus();$("#nvCliTituloFicha").scrollIntoView({block:"nearest",behavior:"smooth"});}
+  });
+  nvCliSelector.render();
+  const t=$("#nvCliTituloFicha");if(t)t.textContent=cot.clienteId?"Editar información del cliente":"Datos del cliente nuevo";
 }
 /* ---------- 2. el artículo ---------- */
 function azArticulos(){ azConFoco(()=>azArticulosPinta()); }
@@ -24964,10 +24956,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261103-1522";</script>
+<script>window.BUILD="20261103-1542";</script>
 <script>
 (function(){
-  var mio = "20261103-1522";
+  var mio = "20261103-1542";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -24995,8 +24987,8 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="suspension.js?v=20261103-1522"></script>
-<script src="cuenta.js?v=20261103-1522"></script>
+<script src="suspension.js?v=20261103-1542"></script>
+<script src="cuenta.js?v=20261103-1542"></script>
 <script src="diagnostico.js?v=20261026-2139"></script>
 </body>
 </html>

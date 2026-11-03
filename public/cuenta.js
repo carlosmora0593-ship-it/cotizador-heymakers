@@ -190,6 +190,27 @@ function refCol(col){
 }
 const PUENTE_DB = {doc: refDoc, collection: refCol};
 
+/* La búsqueda no depende de las primeras 500 fichas cargadas al abrir la app. */
+window.__directorioClientes={
+  async buscar(texto,pagina,cuenta){
+    if(!SESION||!CUENTA||CUENTA.id!==cuenta)throw new Error("Cambió la cuenta. Vuelve a abrir el directorio.");
+    const {data,error}=await SB.rpc("buscar_clientes_nuvoor",{p_cuenta:cuenta,p_busqueda:String(texto||""),p_pagina:pagina});
+    if(error)throw traduce(error);
+    if(!CUENTA||CUENTA.id!==cuenta)throw new Error("Cambió la cuenta. Vuelve a abrir el directorio.");
+    return data;
+  },
+  async obtener(id,cuenta){
+    if(!SESION||!CUENTA||CUENTA.id!==cuenta)throw new Error("Cambió la cuenta. Vuelve a elegir al cliente.");
+    const {data,error}=await SB.from(TABLA).select("cuerpo").eq("cuenta_id",cuenta).eq("coleccion","clientes").eq("doc_id",id).maybeSingle();
+    if(error)throw traduce(error);
+    if(!CUENTA||CUENTA.id!==cuenta)throw new Error("Cambió la cuenta. Vuelve a elegir al cliente.");
+    const c=data?.cuerpo?.cliente;
+    if(!c)throw new Error("Esta ficha ya no está disponible. Actualiza la búsqueda.");
+    if(c.id&&c.id!==id)throw new Error("La ficha tiene un identificador distinto. Revísala en Clientes.");
+    return {...c,id};
+  }
+};
+
 /* ---------- Puente: archivos ---------- */
 const PUENTE_ASSETS = {
   async upload(file){

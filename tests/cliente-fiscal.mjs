@@ -6,15 +6,19 @@ fs.writeFileSync('tmp/stripe/preview/cliente-fiscal-propuesta.html',preview);
 const h=fs.readFileSync('tmp/stripe/preview/cliente-fiscal-propuesta.html','utf8');
 for(const [i,m]of [...h.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].entries())if(m[1].trim())new vm.Script(m[1],{filename:'fcl-'+i});
 const q=await abre('tmp/stripe/preview'),{page}=q,app=code=>page.evaluate(code=>__qaFcl.eval(code),code);
+async function eligeEjemplo(){
+ await page.evaluate(c=>{window.__directorioClientes={buscar:async()=>({clientes:[c],total:1,pagina:0,porPagina:6}),obtener:async()=>c};},await app('JSON.parse(JSON.stringify(clientes.find(c=>c.id==="cliente-ejemplo")))'));
+ await page.locator('#nvCliAbrir').click();await page.locator('[data-nvcliente="cliente-ejemplo"]').click();await page.waitForFunction(()=>document.querySelector('#modalBuscarClientes').hidden);
+}
 try{
  await page.goto(q.url+'/cliente-fiscal-propuesta.html?producto=taller');await page.waitForFunction(()=>window.__qaFcl&&typeof CUENTA!=='undefined'&&CUENTA);
  await page.evaluate(()=>{Object.assign(CUENTA,{plan:'pro',estado:'activa',vence:new Date(Date.now()+86400000).toISOString()});Object.assign(PERFIL,{rol:'admin'});pintaCuenta();aplicaPlan();});await app('aplicaRol();__qaFcl.seed()');
- await page.locator('[data-azcli="cliente-ejemplo"]').click();
+ await eligeEjemplo();
  assert.equal(await page.locator('#fcl_mail').inputValue(),'compras@example.test');assert.equal(await page.locator('#fcl_rfc').inputValue(),'AAA010101AAA');
  await page.locator('[data-azcli=""]').click();assert.equal(await page.locator('#fcl_rfc').inputValue(),'');assert.equal(await page.locator('#fcl_tel').inputValue(),'');assert.equal(await page.locator('#fcl_regimen').inputValue(),'');
  await page.locator('#c_cliente').fill('Cliente sin factura');await app('DB=null;fclCaptura();guardaCot()');
  assert.equal(await app('guardadas.find(g=>g.folio===cot.folio).clienteFicha.rfc'),'');
- await page.locator('[data-azcli="cliente-ejemplo"]').click();
+ await eligeEjemplo();
  await app(`window.__fclDocs=[];window.__fclRemoto=JSON.parse(JSON.stringify(clientes[0]));DB={collection:col=>({doc:id=>({get:async()=>({data:()=>({cliente:window.__fclRemoto})}),set:async d=>{if(window.__fclFalla)throw Error('No hay conexión de prueba');window.__fclDocs.push({col,id,d});if(d.cliente)window.__fclRemoto=JSON.parse(JSON.stringify(d.cliente));}})})}`);
  await page.locator('#fcl_mail').fill('facturas@example.test');await page.locator('#btnGuardarCliente').click();await page.waitForFunction(()=>window.__fclDocs.length===1);
  assert.equal(await app('clientes[0].mail'),'facturas@example.test');assert.equal(await app('clientes[0].credito'),5000);
