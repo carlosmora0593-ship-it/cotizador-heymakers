@@ -3497,8 +3497,8 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   <div class="barraNav" id="barraNav"></div>
   <div class="barraPie"><span id="barraVer" class="nuvoorPie"><img src="./marca/n-64.png" alt=""><span>Nuvoor</span></span></div>
 </aside>
-<link rel="stylesheet" href="tablero.css?v=20261103-0937">
-<link rel="stylesheet" href="bloqueo.css?v=20261103-0937">
+<link rel="stylesheet" href="tablero.css?v=20261103-1025">
+<link rel="stylesheet" href="bloqueo.css?v=20261103-1025">
 <style id="mvEstilo">
 .mvSeccionTitulo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:20px 0 14px}.mvSeccionTitulo h2{font-size:17px;margin:0}.mvSeccionTitulo span{font-size:11px;color:var(--ink-3)}
 #mosRejilla.mvCategorias{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.mvCategoria{min-height:152px;padding:20px 10px 17px!important;gap:8px!important}.mvCategoria .svIco{width:62px;height:62px}.mvCategoria b{font-size:15px}.mvCategoria small{font-size:12px;color:var(--ink-3)}
@@ -3511,6 +3511,12 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
 @media(max-width:760px){#mvVelo .svVentana{border-radius:0;max-height:100dvh;max-height:100%}#mvVelo .svVCab{padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top,0px))}#mvVelo .svVCab .svIco{width:40px;height:40px}#mvVelo .svVCab h2{font-size:20px}#mvVelo .svVCab p{font-size:11px;line-height:1.45}#mvVelo .svVCuerpo{display:flex;flex-direction:column;overflow-y:auto}#mvVelo .svVProds{flex-direction:row;overflow-x:auto;overflow-y:hidden;flex:none;gap:8px;border-bottom:1px solid var(--line);border-right:0;padding:10px 12px}#mvVelo .svVProds .k{display:none}.mvModelo{width:192px;flex:none;min-height:82px;padding:10px}.mvModelo .artMini,.mvModelo .artSinFoto{width:36px;height:42px}.mvDetalle{padding:18px;overflow:visible;flex:none;gap:14px}.mvFoto{min-height:120px;padding:12px}.mvFoto .artMini,.mvFoto .artSinFoto{height:94px;width:105px}.mvDatos h3{font-size:19px;margin-top:6px}.mvStock{margin-bottom:16px}.mvPie{display:grid!important;grid-template-columns:1fr auto;padding:12px 16px max(12px,env(safe-area-inset-bottom))!important;gap:8px}.mvPie>div{margin:0}.mvPie #mvCancelar{grid-column:2;grid-row:1;padding:7px 12px;font-size:11px}.mvPie #mvAgregar{grid-column:1/-1;min-height:45px}.mvPie strong{font-size:23px}.mvCategoria{min-height:145px!important}.mvCategoria .svIco{width:58px;height:58px}.mvSeccionTitulo span{display:none}.mvTicketResumen{display:flex;position:sticky;bottom:12px;z-index:20;width:100%;align-items:center;justify-content:space-between;border:1px solid var(--accent);border-radius:14px;background:var(--accent);color:var(--accent-ink,#fff);font:inherit;padding:13px 16px;box-shadow:0 8px 22px #0002;margin-top:16px;cursor:pointer}.mvTicketResumen>span{font-weight:700;font-size:13px}.mvTicketResumen small{font-size:10px;display:block;font-weight:400;margin-top:3px;opacity:.85}.mvTicketResumen b{font-size:18px}.mvAbierta .mvTicketResumen{display:none}#tab-mos{padding-bottom:20px}.mosDer{scroll-margin-top:130px}}
 @media(prefers-reduced-motion:reduce){.mvCategoria,#mvVelo,#mvVelo .svVentana{animation:none!important;transition:none!important}}
 @media(max-width:760px){.mvTicketResumen{position:fixed;left:16px;right:16px;width:calc(100% - 32px);bottom:calc(12px + env(safe-area-inset-bottom,0px));margin:0}#tab-mos .mosWrap{padding-bottom:75px}body:has(#tab-mos:not([hidden])) .ayudaBtn{bottom:calc(88px + env(safe-area-inset-bottom,0px))}}
+
+</style>
+<style id="fclEstilo">
+.fclBody{display:block!important}.fclBody #azCli{margin-bottom:22px}.fclBasicos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 18px}.fclAncho{grid-column:1/-1}.fclBasicos input,.fclBasicos select,.fclBasicos textarea{width:100%;min-width:0}.fclBasicos input::placeholder{font-size:12px}.fclBasicos .f{margin-bottom:6px;display:block;font-size:11px}.fclFiscal{margin-top:22px;border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}.fclFiscal>summary{list-style:none;display:flex;gap:12px;align-items:center;padding:15px 17px;cursor:pointer;background:var(--surface-2)}.fclFiscal>summary::-webkit-details-marker{display:none}.fclFiscal>summary::after{content:'⌄';color:var(--ink-3);margin-left:4px}.fclFiscal[open]>summary::after{transform:rotate(180deg)}.fclFiscal>summary>span:nth-child(2){flex:1}.fclFiscal summary b{display:block;font-size:13px}.fclFiscal summary small{display:block;color:var(--ink-3);font-size:11px;margin-top:4px}.fclFacturaIco{display:grid;place-items:center;width:34px;height:38px;background:var(--accent-soft);border-radius:9px;color:var(--accent);flex:none}.fclFacturaIco svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}.fclBadge{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);border-radius:99px;padding:5px 8px;font-size:10px;white-space:nowrap}.fclFiscalCampos{padding:17px}.fclAyuda{font-size:11px;color:var(--ink-3);line-height:1.6;margin:0 0 16px}.fclDomicilio{margin-top:18px;border-top:1px solid var(--line);padding-top:13px}.fclDomicilio>summary{color:var(--ink-2);font-size:12px;cursor:pointer}.fclDomicilio .fclBasicos{margin-top:14px}.fclPie{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:16px}.fclPie p{font-size:11px;line-height:1.55;color:var(--ink-3);margin:0;max-width:380px}.fclPie .btn{white-space:nowrap}.fclLegacy{margin-top:14px}.fclError{color:var(--warn);background:var(--warn-soft);border:1px solid var(--warn);border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.5;margin-top:13px}.fclFiscal #fcl_rfc{text-transform:uppercase}
+#modalFichaCliente{z-index:3250}#modalFichaCliente .card{width:min(700px,100%);max-height:90vh;overflow:auto}#modalFichaCliente header{display:flex;gap:12px;align-items:center}#modalFichaCliente header .btn{margin-left:auto}#fclLectura{padding:21px}.fclResumenNombre{font-size:19px;font-weight:700;margin:0 0 8px}.fclResumenSub{font-size:12px;color:var(--ink-3);line-height:1.6;margin-bottom:20px}.fclResumenBloque{border-top:1px solid var(--line);padding-top:15px;margin-top:15px}.fclResumenBloque h3{font-size:13px;margin:0 0 13px}.fclResumenFilas{display:grid;grid-template-columns:1fr 1fr;gap:15px}.fclResumenFilas small{display:block;font-size:10px;color:var(--ink-3);margin-bottom:5px}.fclResumenFilas span{font-size:12px;overflow-wrap:anywhere}.fclResumenFilas .ancho{grid-column:1/-1}.fclNotaArchivo{border-radius:9px;padding:12px;background:var(--accent-soft);color:var(--ink-2);font-size:11px;line-height:1.6;margin-top:21px}
+@media(max-width:600px){.fclBasicos{grid-template-columns:1fr;gap:14px}.fclAncho{grid-column:auto}.fclBody .azRej{grid-template-columns:repeat(2,minmax(0,1fr))}.fclFiscal>summary{padding:13px 12px;gap:9px}.fclFiscal summary small{font-size:10px}.fclBadge{font-size:9px;padding:4px 6px}.fclFiscalCampos{padding:15px 12px}.fclPie{align-items:stretch;flex-direction:column;gap:12px}.fclPie .btn{justify-content:center;width:100%;min-height:42px}.fclResumenFilas{grid-template-columns:1fr}.fclResumenFilas .ancho{grid-column:auto}#fclLectura{padding:18px}}
 
 </style>
 </head>
@@ -3707,15 +3713,36 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
 
       <div class="card plegable" data-paso="cliente">
         <header><span class="step">1</span><h2>Cliente y pedido</h2><span class="hint" id="folioHint"></span><span class="resumenPaso" data-res="cliente"></span><span class="chev">▾</span></header><div class="plegado"><div>
-        <div class="body grid g3">
-          <div><label class="f" for="c_cliente">Cliente</label><input id="c_cliente" placeholder="Nombre o empresa"></div>
-          <div><label class="f" for="c_contacto">Contacto</label><input id="c_contacto" placeholder="Tel. / correo"></div>
-          <div><label class="f" for="c_ref">Referencia del trabajo</label><input id="c_ref" placeholder="Ej. Uniformes evento"></div>
-          <div style="grid-column:1/-1;display:flex;gap:8px;align-items:end">
-            <div style="flex:1"><label class="f" for="c_clienteSel">O elige un cliente guardado</label>
-              <select id="c_clienteSel"></select></div>
-            <button class="btn sm" id="btnGuardarCliente">Guardar como cliente</button>
+        <div class="body fclBody">
+          <div class="fclBasicos">
+            <div><label class="f" for="c_cliente">Cliente o nombre comercial</label><input id="c_cliente" placeholder="Nombre de la persona o empresa" autocomplete="off"></div>
+            <div><label class="f" for="fcl_persona">Persona de contacto</label><input id="fcl_persona" data-fcl="persona" placeholder="¿Con quién vemos el pedido?" autocomplete="off"></div>
+            <div><label class="f" for="fcl_tel">Teléfono / WhatsApp</label><input id="fcl_tel" data-fcl="tel" type="tel" inputmode="tel" placeholder="Número de contacto" autocomplete="off"></div>
+            <div><label class="f" for="fcl_mail">Correo electrónico</label><input id="fcl_mail" data-fcl="mail" type="email" inputmode="email" placeholder="cliente@empresa.com" autocomplete="off"></div>
+            <div class="fclAncho"><label class="f" for="c_ref">Referencia del trabajo</label><input id="c_ref" placeholder="Ej. Uniformes para evento" autocomplete="off"></div>
           </div>
+          <input id="c_contacto" type="hidden">
+          <details class="fclFiscal" id="fclFiscal"><summary><span class="fclFacturaIco" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-4 2-4-2-3 2Z"/><path d="M8 7h8M8 11h8M8 15h4"/></svg></span><span><b>Datos para facturar</b><small>Opcionales para hacer la cotización</small></span><span class="fclBadge" id="fclEstado">Sin capturar</span></summary>
+            <div class="fclFiscalCampos"><p class="fclAyuda">Captura los datos que te proporcione el cliente. Quedarán a la mano cuando solicite su factura.</p>
+              <div class="fclBasicos">
+                <div class="fclAncho"><label class="f" for="fcl_razon">Nombre completo o razón social fiscal</label><input id="fcl_razon" data-fcl="razon" placeholder="Como aparece en sus datos fiscales" autocomplete="off"></div>
+                <div><label class="f" for="fcl_rfc">RFC</label><input id="fcl_rfc" data-fcl="rfc" maxlength="13" placeholder="RFC del cliente" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
+                <div><label class="f" for="fcl_cp">Código postal fiscal</label><input id="fcl_cp" data-fcl="cp" inputmode="numeric" maxlength="5" placeholder="5 dígitos" autocomplete="off"></div>
+                <div class="fclAncho"><label class="f" for="fcl_regimen">Régimen fiscal</label><select id="fcl_regimen" data-fcl="regimen"></select></div>
+                <div class="fclAncho"><label class="f" for="fcl_uso">Uso del CFDI habitual</label><select id="fcl_uso" data-fcl="uso"></select></div>
+              </div>
+              <details class="fclDomicilio"><summary>Domicilio y notas del cliente</summary><div class="fclBasicos">
+                <div class="fclAncho"><label class="f" for="fcl_calle">Calle y número</label><input id="fcl_calle" data-fcl="calle" autocomplete="off"></div>
+                <div><label class="f" for="fcl_colonia">Colonia</label><input id="fcl_colonia" data-fcl="colonia" autocomplete="off"></div>
+                <div><label class="f" for="fcl_ciudad">Ciudad / municipio</label><input id="fcl_ciudad" data-fcl="ciudad" autocomplete="off"></div>
+                <div><label class="f" for="fcl_estado">Estado</label><input id="fcl_estado" data-fcl="estado" autocomplete="off"></div>
+                <div class="fclAncho"><label class="f" for="fcl_notas">Notas del cliente</label><textarea id="fcl_notas" data-fcl="notas" rows="2" placeholder="Ej. Correo para recibir facturas" autocomplete="off"></textarea></div>
+              </div></details>
+            </div>
+          </details>
+          <div class="fclError" id="fclError" role="alert" hidden></div>
+          <div class="fclPie"><p>Los datos se conservan con la cotización y su pedido. Guarda la ficha del cliente para reutilizarlos.</p><button class="btn sm" id="btnGuardarCliente" type="button">Guardar ficha del cliente</button></div>
+          <div class="fclLegacy"><label class="f" for="c_clienteSel">Cliente guardado</label><select id="c_clienteSel"></select></div>
         </div>
       </div></div></div>
 
@@ -4993,6 +5020,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
 </div>
 
 
+<div class="modal" id="modalFichaCliente" hidden><section class="card" role="dialog" aria-modal="true" aria-labelledby="fclTitulo"><header><h2 id="fclTitulo">Cliente y datos fiscales</h2><button type="button" class="btn sm" id="modalFclCerrar">Cerrar</button></header><div id="fclLectura"></div></section></div>
 <div class="modal" id="modalEnviar" hidden>
   <div class="card" style="width:min(560px,100%);max-height:88vh;overflow:auto">
     <header><h2>Enviar la cotización</h2>
@@ -5700,8 +5728,8 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   </div>
 </div>
 
-<script src="bloqueo.js?v=20261103-0937"></script>
-<script src="tablero.js?v=20261103-0937"></script>
+<script src="bloqueo.js?v=20261103-1025"></script>
+<script src="tablero.js?v=20261103-1025"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -6129,7 +6157,7 @@ const hoyISO = () => new Date(Date.now() - new Date().getTimezoneOffset()*60000)
 function nuevaCot(demo){
   return {
     folio: folioNuevo(), fecha: new Date().toISOString().slice(0,10),
-    cliente: demo? "Cliente de ejemplo":"", contacto:"", clienteId:"", ref: demo? "Uniformes para evento":"",
+    cliente: demo? "Cliente de ejemplo":"", contacto:"", clienteId:"", clienteFicha:null, ref: demo? "Uniformes para evento":"",
     articuloId: demo? "a2":"", costoArt: demo? 78:0, precioArt: demo? 125:0, desc: demo? "Playera algodón color, tallas surtidas":"",
     cantidad: demo? 50:1, cantManual:false, modo:"articulo",
     armado: [], descOn:true, descTipo:"pct", descVal:0, descNota:"",
@@ -7391,6 +7419,7 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;",
 function renderCot(){
   $("#folioHint").textContent = cot.folio + " · " + cot.fecha;
   $("#c_cliente").value = cot.cliente; $("#c_contacto").value = cot.contacto; $("#c_ref").value = cot.ref;
+  if(typeof fclPinta === "function") fclPinta();
   $("#c_art").innerHTML = optArticulos(cot.articuloId);
   if(typeof pintaBotonArt==="function") pintaBotonArt();
   $("#c_qty").value = cot.cantidad; $("#c_costoArt").value = cot.costoArt;
@@ -11134,6 +11163,7 @@ document.addEventListener("click", e=>{
     if($("#c_cliente"))  $("#c_cliente").value  = cot.cliente;
     if($("#c_contacto")) $("#c_contacto").value = cot.contacto;
     if(sel){ try{ sel.value = cot.clienteId; }catch(e){} }
+    fclSelecciona(x);
     azClientes();
     if(!x){ const n = $("#c_cliente"); if(n) n.focus(); }
     if(typeof persist === "function") persist();
@@ -16206,6 +16236,7 @@ function abreExpPedido(folio){
       (op? ' · '+esc(op.estatus||"Pendiente") : ' · sin confirmar')+'</small>';
 
   const bl = [];
+  if(fclPuedeLeer() && fclFichaDe(g)) bl.push({ico:"cli", et:"Cliente y datos fiscales", det:"Contacto y datos capturados en este trabajo",n:1,ver:'data-expver="cliente"'});
   const puedeVerPrecios = rolActual() !== "produccion";
   if(puedeVerPrecios)
     bl.push({ico:"cot", et:"Cotización", det:"Como se la mandaste al cliente",
@@ -16254,6 +16285,7 @@ function abreExpPedido(folio){
 function abreParteExp(que){
   const g = guardadas.find(x=>x.folio===pedAbierto) || (cot.folio===pedAbierto ? cot : null);
   if(!g) return;
+  if(que === "cliente"){ $("#modalPed").hidden = true; fclAbreArchivo(g); return; }
   if(que === "cot"){ $("#modalPed").hidden = true; verCotizacionDe(g.folio); return; }
   if(que === "orden"){ $("#modalPed").hidden = true; verOrdenDe(g.folio); return; }
   if(que === "disenos"){ const it = archivosDe(g); if(it.length) abreVisor(it, 0); return; }
@@ -16319,6 +16351,7 @@ async function zipPedido(folio, boton){
         }catch(e){ fallaron++; }
       }
     }
+    if(fclPuedeLeer() && fclFichaDe(g)) zip.file(base+"7-cliente/cliente-y-datos-fiscales.json", JSON.stringify(fclFichaDe(g),null,2));
     const blob = await zip.generateAsync({type:"blob"});
     await descargaBlob(blob, limpiaNombre((g.op? g.op.folio : g.folio)+(g.cliente? " "+g.cliente : ""))+".zip");
     if(fallaron) toast(fallaron+" archivo(s) no se pudieron incluir");
@@ -17393,14 +17426,14 @@ $("#fileIn").addEventListener("change", e=>{
 
 /* guardar / cargar */
 $("#btnSave").addEventListener("click", async ()=>{
-  await guardaCot(); renderSaved();
+  if(await guardaCot() === false) return; renderSaved();
   if(nuevaAlGuardar()) terminaYEmpieza("Guardada");
   else toast("Cotización "+cot.folio+" guardada");
 });
 /* Terminar: la guarda y limpia la pantalla. Es el final explícito, para
    quien prefiere cerrar a mano. */
 $("#btnTerminar").addEventListener("click", async ()=>{
-  await guardaCot(); renderSaved(); terminaYEmpieza("Terminada");
+  if(await guardaCot() === false) return; renderSaved(); terminaYEmpieza("Terminada");
 });
 $("#btnNew").addEventListener("click", ()=>{ cotizacionNueva(false); toast("Cotización nueva"); });
 
@@ -17428,7 +17461,7 @@ $("#btnConfirmar").addEventListener("click", async ()=>{
   if(cot.estado === "confirmada"){
     if(!confirm("¿Cancelar la confirmación? La orden "+cot.op.folio+" deja de ser válida.")) return;
     cot.estado = "borrador"; cot.op = null;
-    renderEstado(); await guardaCot(); toast("El pedido volvió a borrador");
+    renderEstado(); if(await guardaCot() === false) return; toast("El pedido volvió a borrador");
     return;
   }
   const faltaConf = (typeof cv2FaltaConfirmar === "function") ? cv2FaltaConfirmar() : "";
@@ -17449,8 +17482,8 @@ $("#btnConfirmar").addEventListener("click", async ()=>{
   const cons = descuentaInsumos(cot, rC, cot.op.folio);
   if(cons.lista.length) renderInvInsumos();
   const art = cat.articulos.find(a=>a.id===cot.articuloId);
-  renderEstado(); await guardaCot(); renderSaved();
-  if(cot.pago && !cot.pago.registrado && typeof cv2RegistraPago === "function"){ await cv2RegistraPago(cot); await guardaCot(); renderEstado(); }
+  renderEstado(); if(await guardaCot() === false) return; renderSaved();
+  if(cot.pago && !cot.pago.registrado && typeof cv2RegistraPago === "function"){ await cv2RegistraPago(cot); if(await guardaCot() === false) return; renderEstado(); }
   toast("Pedido confirmado · orden "+cot.op.folio +
     (art && num(art.existencia)<0 ? " · ojo: existencia en negativo" : "") +
     (cons.cortos.length ? " · sin material: " + cons.cortos.join(", ") : ""));
@@ -17458,13 +17491,17 @@ $("#btnConfirmar").addEventListener("click", async ()=>{
 async function guardaCot(){
   if(window.__exigeVigenciaNuvoor && !window.__exigeVigenciaNuvoor()) throw new Error("Tu plan está suspendido. Actualiza tu pago para guardar cambios.");
   if(typeof guardaItemActivo==="function") guardaItemActivo(cot);
+  fclCaptura();
   selloVendedor(cot);
   const r = calcDe(cot);
   const rec = JSON.parse(JSON.stringify(cot)); rec._total = r.total; rec._unit = r.precioUnit;
+  try{
+    if(DB) await DB.collection("cotizaciones").doc(rec.folio).set({cot:rec,fecha:rec.fecha,cliente:rec.cliente||"",total:r.total});
+    else lsSet("cots",guardadas.filter(g=>g.folio!==rec.folio).concat(rec));
+  }catch(e){ guardaBorrador(); toast("No se guardó en la nube. Conservamos tu borrador aquí; vuelve a intentarlo."); return false; }
   const i = guardadas.findIndex(g=>g.folio===rec.folio);
   if(i>=0) guardadas[i]=rec; else guardadas.push(rec);
-  if(DB){ try{ await DB.collection("cotizaciones").doc(rec.folio).set({cot:rec,fecha:rec.fecha,cliente:rec.cliente||"",total:r.total}); }catch(e){ toast("No se pudo guardar en la nube"); } }
-  else lsSet("cots",guardadas);
+  return true;
 }
 $("#tab-sav").addEventListener("click", async e=>{
   const sd = e.target.closest("[data-subedoc]");
@@ -19462,12 +19499,10 @@ const REGIMENES = [["601","General de Ley Personas Morales"],["603","Personas Mo
  ["605","Sueldos y Salarios"],["606","Arrendamiento"],["607","Enajenación o Adquisición de Bienes"],
  ["608","Demás ingresos"],["610","Residentes en el Extranjero"],["611","Dividendos"],
  ["612","Personas Físicas con Actividades Empresariales y Profesionales"],["614","Ingresos por Intereses"],
- ["616","Sin obligaciones fiscales"],["620","Sociedades Cooperativas de Producción"],["621","Incorporación Fiscal"],
+ ["615","Régimen de los ingresos por obtención de premios"],["616","Sin obligaciones fiscales"],["620","Sociedades Cooperativas de Producción"],["621","Incorporación Fiscal"],
  ["622","Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras"],["623","Opcional para Grupos de Sociedades"],
  ["624","Coordinados"],["625","Plataformas Tecnológicas"],["626","Régimen Simplificado de Confianza"]];
-const USOS_CFDI = [["G01","Adquisición de mercancías"],["G02","Devoluciones y descuentos"],["G03","Gastos en general"],
- ["I01","Construcciones"],["I02","Mobiliario y equipo de oficina"],["I04","Equipo de cómputo"],
- ["P01","Por definir"],["S01","Sin efectos fiscales"],["D01","Honorarios médicos"],["CP01","Pagos"]];
+const USOS_CFDI = [["G01","Adquisición de mercancías"],["G02","Devoluciones, descuentos o bonificaciones"],["G03","Gastos en general"],["I01","Construcciones"],["I02","Mobiliario y equipo de oficina por inversiones"],["I03","Equipo de transporte"],["I04","Equipo de cómputo y accesorios"],["I05","Dados, troqueles, moldes, matrices y herramental"],["I06","Comunicaciones telefónicas"],["I07","Comunicaciones satelitales"],["I08","Otra maquinaria y equipo"],["D01","Honorarios médicos, dentales y gastos hospitalarios"],["D02","Gastos médicos por incapacidad o discapacidad"],["D03","Gastos funerales"],["D04","Donativos"],["D05","Intereses reales por créditos hipotecarios"],["D06","Aportaciones voluntarias al SAR"],["D07","Primas por seguros de gastos médicos"],["D08","Gastos de transportación escolar obligatoria"],["D09","Depósitos en cuentas para el ahorro y pensiones"],["D10","Pagos por servicios educativos (colegiaturas)"],["S01","Sin efectos fiscales"],["CP01","Pagos"],["CN01","Nómina"]];
 const FORMAS_SAT = {"Efectivo":"01","Transferencia":"03","Tarjeta":"04","Depósito":"03","Otro":"99"};
 
 /* ============================================================
@@ -20269,6 +20304,84 @@ async function descarga(url, nombre){
 }
 
 /* Vincular cliente a la cotización */
+/* Captura del cliente y copia de sus datos para el expediente del trabajo. */
+const FCL_CAMPOS=['nombre','persona','tel','mail','razon','rfc','cp','regimen','uso','calle','colonia','ciudad','estado','notas'];
+let FCL={clave:'',base:{},sucios:new Set(),ocupado:false};
+function fclVacia(){return Object.fromEntries(FCL_CAMPOS.map(k=>[k,'']));}
+function fclDesdeCliente(c){const d=fclVacia();for(const k of FCL_CAMPOS)d[k]=String(c?.[k]||'');return d;}
+function fclPuedeLeer(){return puedeVer('cli')&&(!window.__enElPlan||window.__enElPlan('cli'));}
+function fclCuenta(){return window.__estadoLicenciaNuvoor?window.__estadoLicenciaNuvoor().cuenta:null;}
+function fclActual(){
+ if(cot.clienteFicha)return {...fclVacia(),...cot.clienteFicha};
+ const c=clientes.find(c=>c.id===cot.clienteId),d=fclDesdeCliente(c);d.nombre=cot.cliente||d.nombre;
+ if(!c&&cot.contacto){if(cot.contacto.includes('@'))d.mail=cot.contacto;else d.tel=cot.contacto;}
+ return d;
+}
+function fclOpciones(lista,valor){let h='<option value="">Sin capturar</option>'+opcionesSelect(lista,valor);if(valor&&!lista.some(x=>x[0]===valor))h+='<option selected value="'+esc(valor)+'">'+esc(valor)+' — dato guardado</option>';return h;}
+function fclPinta(){
+ if(!$('#fcl_tel'))return;
+ const clave=cot.folio+'|'+cot.clienteId,c=clientes.find(c=>c.id===cot.clienteId),d=fclActual();
+ if(FCL.clave!==clave)FCL={clave,base:fclDesdeCliente(c),sucios:new Set(),ocupado:false};
+ for(const k of FCL_CAMPOS){const i=k==='nombre'?$('#c_cliente'):$('#fcl_'+k);if(i)i.value=d[k]||'';}
+ $('#fcl_regimen').innerHTML=fclOpciones(REGIMENES,d.regimen);$('#fcl_regimen').value=d.regimen||'';
+ $('#fcl_uso').innerHTML=fclOpciones(USOS_CFDI,d.uso);$('#fcl_uso').value=d.uso||'';
+ $('#btnGuardarCliente').textContent=c?'Guardar cambios del cliente':'Guardar ficha del cliente';fclPintaEstado();
+}
+function fclPintaEstado(){
+ const d=fclActual(),n=['razon','rfc','cp','regimen','uso'].filter(k=>String(d[k]||'').trim()).length;
+ if($('#fclEstado'))$('#fclEstado').textContent=n?n+' dato(s) capturado(s)':'Sin capturar';
+}
+function fclCaptura(){
+ const d=fclVacia();for(const k of FCL_CAMPOS){const i=k==='nombre'?$('#c_cliente'):$('#fcl_'+k);d[k]=i?String(i.value||'').trim():'';}
+ d.rfc=d.rfc.toUpperCase().replace(/\s/g,'');
+ cot.clienteFicha={version:1,...d};cot.cliente=d.nombre;cot.contacto=d.tel||d.mail||'';$('#c_contacto').value=cot.contacto;
+ return d;
+}
+function fclSelecciona(c){cot.clienteFicha=c?{version:1,...fclDesdeCliente(c)}:null;FCL.clave='';fclPinta();$('#fclError').hidden=true;}
+function fclError(m){$('#fclError').textContent=m;$('#fclError').hidden=false;}
+async function fclGuarda(){
+ if(FCL.ocupado)return;
+ if(!fclPuedeLeer()||(window.__exigeVigenciaNuvoor&&!window.__exigeVigenciaNuvoor()))return;
+ const d=fclCaptura();
+ if(!d.nombre){fclError('Escribe el nombre del cliente para guardar su ficha.');$('#c_cliente').focus();return;}
+ if(d.mail&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.mail)){fclError('Revisa el correo electrónico.');$('#fcl_mail').focus();return;}
+ if(d.rfc&&!/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/.test(d.rfc)){fclError('Revisa el formato del RFC. Puedes dejarlo vacío y capturarlo después.');$('#fcl_rfc').focus();return;}
+ if(d.cp&&!/^\d{5}$/.test(d.cp)){fclError('El código postal fiscal debe tener 5 dígitos.');$('#fcl_cp').focus();return;}
+ const cuenta=fclCuenta(),folio=cot.folio,idOriginal=cot.clienteId,prev=clientes.find(c=>c.id===idOriginal),nuevo=!prev,cambios=new Set(FCL.sucios);
+ let destino=prev?{...prev}:nuevoCliente();if(nuevo){destino.regimen='';destino.uso='';destino.ciudad='';destino.estado='';}
+ const b=$('#btnGuardarCliente'),et=b.textContent,campos=[...document.querySelectorAll('[data-fcl],#c_cliente')].map(el=>[el,el.disabled]);FCL.ocupado=true;b.disabled=true;campos.forEach(([el])=>el.disabled=true);b.textContent='Guardando…';$('#fclError').hidden=true;
+ try{
+  const ref=DB?DB.collection('clientes').doc(destino.id):null;
+  if(ref&&!nuevo){const s=await ref.get();if(cuenta!==fclCuenta()||folio!==cot.folio||idOriginal!==cot.clienteId)throw Error("Cambió la cuenta o la cotización. Vuelve a elegir el cliente.");const raw=s&&typeof s.data==='function'?s.data():null;if(!raw?.cliente)throw Error('La ficha ya no está disponible. Vuelve a elegir el cliente.');destino={...raw.cliente};
+   for(const k of cambios)if(String(destino[k]||'')!==String(FCL.base[k]||'')&&String(destino[k]||'')!==d[k])throw Error('La ficha cambió en otro dispositivo. Vuelve a elegir el cliente antes de guardar.');
+  }
+  if(cuenta!==fclCuenta()||folio!==cot.folio||idOriginal!==cot.clienteId)throw Error('Cambió la cuenta o la cotización. Vuelve a elegir el cliente.');
+  for(const k of FCL_CAMPOS)if(nuevo||cambios.has(k))destino[k]=d[k];
+  delete destino._t;
+  if(ref)await ref.set({cliente:JSON.parse(JSON.stringify(destino)),fecha:destino.creado||hoyISO()});
+  else{const lista=clientes.filter(c=>c.id!==destino.id).concat(destino);lsSet('clientes',lista);}
+  if(cuenta!==fclCuenta()||folio!==cot.folio||idOriginal!==cot.clienteId)return;
+  const i=clientes.findIndex(c=>c.id===destino.id);if(i<0)clientes.push(destino);else clientes[i]=destino;
+  cot.clienteId=destino.id;cot.clienteFicha={version:1,...d};FCL.clave='';pintaSelectClientes();fclPinta();azClientes();toast('Ficha del cliente guardada');
+ }catch(e){fclError(e.message||'No se pudo guardar la ficha. Tus datos siguen en el formulario.');}
+ finally{FCL.ocupado=false;b.disabled=false;campos.forEach(([el,disabled])=>el.disabled=disabled);if(b.textContent==='Guardando…')b.textContent=et;}
+}
+function fclFichaDe(g){return g&&g.clienteFicha?{...fclVacia(),...g.clienteFicha}:null;}
+function fclResumenHTML(g){
+ const d=fclFichaDe(g);if(!d)return '<p>Esta cotización no tiene una ficha de cliente capturada.</p>';
+ const fila=(et,v,ancho=false)=>'<div'+(ancho?' class="ancho"':'')+'><small>'+et+'</small><span>'+esc(v||'Sin capturar')+'</span></div>';
+ const nombre=(lista,k)=>{const x=lista.find(x=>x[0]===k);return k?(k+(x?' · '+x[1]:'')):'';};
+ return '<div class="fclResumenNombre">'+esc(d.nombre||g.cliente||'Cliente')+'</div><div class="fclResumenSub">'+esc(g.folio)+(g.op?' · '+esc(g.op.folio):'')+' · Datos conservados en este trabajo</div><div class="fclResumenFilas">'+fila('Persona de contacto',d.persona)+fila('Teléfono / WhatsApp',d.tel)+fila('Correo electrónico',d.mail,true)+'</div><div class="fclResumenBloque"><h3>Datos para facturar</h3><div class="fclResumenFilas">'+fila('Nombre o razón social fiscal',d.razon,true)+fila('RFC',d.rfc)+fila('Código postal fiscal',d.cp)+fila('Régimen fiscal',nombre(REGIMENES,d.regimen),true)+fila('Uso del CFDI habitual',nombre(USOS_CFDI,d.uso),true)+'</div></div><div class="fclResumenBloque"><h3>Domicilio y notas</h3><div class="fclResumenFilas">'+fila('Domicilio',[d.calle,d.colonia,d.ciudad,d.estado].filter(Boolean).join(', '),true)+fila('Notas del cliente',d.notas,true)+'</div></div><p class="fclNotaArchivo">Esta es la copia que se guardó con el trabajo. Los cambios posteriores en Clientes no modifican esta ficha.</p>';
+}
+function fclAbreArchivo(g){if(!fclPuedeLeer())return;$('#fclLectura').innerHTML=fclResumenHTML(g);$('#modalFichaCliente').hidden=false;$('#modalFclCerrar').focus();}
+document.addEventListener('input',e=>{
+ const k=e.target.id==='c_cliente'?'nombre':e.target.dataset.fcl;if(!k)return;FCL.sucios.add(k);fclCaptura();fclPintaEstado();if(typeof apuntaBorrador==='function')apuntaBorrador();
+});
+document.addEventListener('change',e=>{if(e.target.dataset.fcl){FCL.sucios.add(e.target.dataset.fcl);fclCaptura();fclPintaEstado();}});
+document.addEventListener('click',e=>{if(e.target.closest('#modalFclCerrar')||e.target.id==='modalFichaCliente')$('#modalFichaCliente').hidden=true;});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#modalFichaCliente').hidden)$('#modalFichaCliente').hidden=true;});
+document.addEventListener('click',e=>{if(FCL.ocupado&&e.target.closest('[data-azcli]')){e.preventDefault();e.stopImmediatePropagation();}},true);
+
 function pintaSelectClientes(){
   $("#c_clienteSel").innerHTML = '<option value="">— Sin cliente guardado —</option>' +
     clientes.map(c=>'<option value="'+c.id+'"'+(c.id===cot.clienteId?" selected":"")+'>'+esc(c.nombre||"Sin nombre")+(c.rfc?" · "+esc(c.rfc):"")+'</option>').join("");
@@ -20278,18 +20391,10 @@ $("#c_clienteSel").addEventListener("change", e=>{
   const c = clientes.find(c=>c.id===cot.clienteId);
   if(c){ cot.cliente = c.nombre || c.razon; cot.contacto = c.tel || c.mail || "";
     $("#c_cliente").value = cot.cliente; $("#c_contacto").value = cot.contacto; }
+  fclSelecciona(c);
 });
-$("#btnGuardarCliente").addEventListener("click", ()=>{
-  const nombre = ($("#c_cliente").value||"").trim();
-  if(!nombre){ toast("Escribe primero el nombre del cliente"); return; }
-  let c = clientes.find(c=>c.id===cot.clienteId);
-  if(!c){ c = nuevoCliente(); clientes.push(c); }
-  c.nombre = nombre;
-  const cont = ($("#c_contacto").value||"").trim();
-  if(cont.indexOf("@")>=0) c.mail = cont; else if(cont) c.tel = cont;
-  cot.clienteId = c.id; guardaCliente(c); pintaSelectClientes();
-  toast("“"+nombre+"” guardado en clientes");
-});
+$("#btnGuardarCliente").addEventListener("click", fclGuarda);
+
 
 /* ============ CAJA ============ */
 let cajaFecha = hoyISO(), cajas = {}, cortes = [];
@@ -23313,10 +23418,10 @@ function pgCredito(total){
   return {ok:true, c, cr};
 }
 function pgAbre(){
-  const r = calcDe(cot), c = (typeof clienteDe === "function") ? clienteDe(cot.clienteId) : null;
+  const r = calcDe(cot), c = fclFichaDe(cot) || ((typeof clienteDe === "function") ? clienteDe(cot.clienteId) : null);
   PG = {tipo:"anticipo", pct:60, monto:null, forma:"", factura:false, total:Math.round(r.total*100)/100,
         rfc:(c && c.rfc) || "", razon:(c && (c.razon || c.nombre)) || (cot.cliente||""), cp:(c && c.cp) || "",
-        regimen:(c && c.regimen) || "612", uso:(c && c.uso) || "G03"};
+        regimen:(c && c.regimen) || "", uso:(c && c.uso) || ""};
   pgPinta();
   $("#pgVelo").hidden = false; document.body.style.overflow = "hidden";
   setTimeout(()=>{ const x = $("#pgCerrar"); if(x) x.focus(); }, 40);
@@ -23358,8 +23463,8 @@ function pgPinta(){
         '<div><label class="f" for="pgRfc">RFC</label><input id="pgRfc" value="'+esc(PG.rfc)+'" placeholder="12 o 13 caracteres" autocomplete="off"></div>' +
         '<div><label class="f" for="pgRazon">Razón social</label><input id="pgRazon" value="'+esc(PG.razon)+'"></div>' +
         '<div><label class="f" for="pgCp">Código postal</label><input id="pgCp" value="'+esc(PG.cp)+'" inputmode="numeric"></div>' +
-        '<div><label class="f" for="pgReg">Régimen fiscal</label><select id="pgReg">'+opcionesSelect(REGIMENES, PG.regimen)+'</select></div>' +
-        '<div><label class="f" for="pgUso">Uso del CFDI</label><select id="pgUso">'+opcionesSelect(USOS_CFDI, PG.uso)+'</select></div>' +
+        '<div><label class="f" for="pgReg">Régimen fiscal</label><select id="pgReg">'+fclOpciones(REGIMENES, PG.regimen)+'</select></div>' +
+        '<div><label class="f" for="pgUso">Uso del CFDI</label><select id="pgUso">'+fclOpciones(USOS_CFDI, PG.uso)+'</select></div>' +
         '</div><p class="pgNota">' + (PG.tipo === "anticipo" ? "Queda por facturar con el anticipo anotado. Al entregar, la factura final debe descontar lo que ya pagó."
           : PG.tipo === "total" ? "Queda por facturar como pagada en una sola exhibición (PUE)."
           : "Queda por facturar en parcialidades o diferido (PPD); cada pago lleva su complemento.") + ' Los datos salen de la ficha del cliente.</p>';
@@ -23378,6 +23483,10 @@ function pgRevisa(){
   else if(PG.tipo === "anticipo" && hoy > tot + 0.004) motivo = "El anticipo no puede ser mayor que el total. Si lo paga todo, escoge «Pago total».";
   else if(PG.tipo !== "credito" && !PG.forma) motivo = "Escoge la forma de pago.";
   else if(PG.factura && !/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/.test(PG.rfc)) motivo = "Para facturar falta el RFC del cliente (12 o 13 caracteres).";
+  else if(PG.factura && !String(PG.razon||"").trim()) motivo = "Escribe el nombre o razón social fiscal del cliente.";
+  else if(PG.factura && !/^\d{5}$/.test(PG.cp||"")) motivo = "Captura los 5 dígitos del código postal fiscal.";
+  else if(PG.factura && !REGIMENES.some(x=>x[0]===PG.regimen)) motivo = "Selecciona el régimen fiscal que indicó el cliente.";
+  else if(PG.factura && !USOS_CFDI.some(x=>x[0]===PG.uso)) motivo = "Selecciona el uso del CFDI que indicó el cliente.";
   const el = $("#pgMotivo"); el.hidden = !motivo || motivo === "x"; el.textContent = motivo === "x" ? "" : motivo;
   $("#pgOk").disabled = !!motivo;
   $("#pgHoyK").textContent = PG.tipo === "credito" ? "Se carga a su cuenta" : "Recibes hoy";
@@ -23407,14 +23516,14 @@ document.addEventListener("input", e=>{
   const t = e.target;
   if(t.id === "pgMonto"){ PG.monto = Math.max(0, num(t.value)); document.querySelectorAll("[data-pgpct]").forEach(c=> c.setAttribute("aria-pressed","false")); pgRevisa(); }
   if(t.id === "pgRfc"){ PG.rfc = t.value.toUpperCase().replace(/\s/g,""); pgRevisa(); }
-  if(t.id === "pgRazon") PG.razon = t.value;
-  if(t.id === "pgCp") PG.cp = t.value;
+  if(t.id === "pgRazon"){ PG.razon = t.value; pgRevisa(); }
+  if(t.id === "pgCp"){ PG.cp = t.value; pgRevisa(); }
 });
 document.addEventListener("change", e=>{
   if(!PG || !e.target.closest("#pgForm")) return;
   if(e.target.id === "pgFactura"){ PG.factura = e.target.checked; pgPinta(); }
-  if(e.target.id === "pgReg") PG.regimen = e.target.value;
-  if(e.target.id === "pgUso") PG.uso = e.target.value;
+  if(e.target.id === "pgReg"){ PG.regimen = e.target.value; pgRevisa(); }
+  if(e.target.id === "pgUso"){ PG.uso = e.target.value; pgRevisa(); }
 });
 /* Lo que se cobró al confirmar entra a Ventas: es la misma venta que
    haría «Cobrar», con su anticipo como primer abono. Si ya había venta de
@@ -24872,10 +24981,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261103-0937";</script>
+<script>window.BUILD="20261103-1025";</script>
 <script>
 (function(){
-  var mio = "20261103-0937";
+  var mio = "20261103-1025";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -24903,8 +25012,8 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="suspension.js?v=20261103-0937"></script>
-<script src="cuenta.js?v=20261103-0937"></script>
+<script src="suspension.js?v=20261103-1025"></script>
+<script src="cuenta.js?v=20261103-1025"></script>
 <script src="diagnostico.js?v=20261026-2139"></script>
 </body>
 </html>

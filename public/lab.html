@@ -477,6 +477,8 @@ body.sin-sesion .telon{display:none!important}
 .labPie{font-size:11px;color:var(--ink-3);line-height:1.5;margin:10px 0 0}
 </style>
 
+<link rel="stylesheet" href="lab-nuvoor.css?v=20261103-1025">
+<script src="lab-nuvoor.js?v=20261103-1025"></script>
 </head>
 <body class="sin-sesion">
 
@@ -506,19 +508,20 @@ body.sin-sesion .telon{display:none!important}
       <span class="txt"><span class="logoWord" aria-label="Nuvoor"><small>Lab</small></span></span>
     </div>
     <div class="nav" id="nav">
-      <button data-v="tablero" aria-current="true">Tablero</button>
-      <button data-v="cuentas">Cuentas <span class="cuenta" id="n_cuentas">0</span></button>
-      <button data-v="agenda">Agenda <span class="cuenta" id="n_agenda">0</span></button>
-      <button data-v="soporte">Soporte <span class="cuenta" id="n_soporte">0</span></button>
-      <button data-v="cobros">Cobros <span class="cuenta" id="n_cobros">0</span></button>
-      <button data-v="transferencias">Transferencias <span class="cuenta" id="n_transferencias">0</span></button>
-      <button data-v="codigos">Códigos</button>
-      <button data-v="diagnosticos">Diagnósticos</button>
-      <button data-v="equipo">Equipo</button>
-      <button data-v="anuncios">Publicidad <span class="cuenta" id="n_anuncios">0</span></button>
-      <button data-v="tips">Tips <span class="cuenta" id="n_tips">0</span></button>
-      <button data-v="base">Base de datos <span class="cuenta" id="n_base">·</span></button>
-      <button data-v="numeros">Números</button>
+      <p>OPERACIÓN</p><button data-v="tablero" aria-current="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10 12 3l9 7v11h-7v-7h-4v7H3Z"/></svg>Tablero</button>
+      <button data-v="usuarios"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M13 3a4 4 0 0 1 0 8M22 21v-2a4 4 0 0 0-4-4"/></svg>Usuarios <span class="cuenta" id="n_usuarios">—</span></button>
+      <button data-v="cuentas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v13H3ZM7 8V3h10v5M3 13h18"/></svg>Negocios y cuentas <span class="cuenta" id="n_cuentas">0</span></button>
+      <button data-v="agenda"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v16H4ZM8 2v6m8-6v6M4 11h16"/></svg>Agenda <span class="cuenta" id="n_agenda">0</span></button>
+      <button data-v="soporte"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14V9a8 8 0 0 1 16 0v5M4 10H2v7h4v-7Zm16 0h2v7h-4v-7"/></svg>Soporte <span class="cuenta" id="n_soporte">0</span></button>
+      <p>COBROS</p><button data-v="cobros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5h20v14H2ZM12 8a3 3 0 1 0 0 6 3 3 0 0 0 0-6"/></svg>Cobros <span class="cuenta" id="n_cobros">0</span></button>
+      <button data-v="transferencias"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h17m-4-4 4 4-4 4M21 17H4m4-4-4 4 4 4"/></svg>Transferencias <span class="cuenta" id="n_transferencias">0</span></button>
+      <button data-v="codigos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5-6 7 6 7M16 5l6 7-6 7M14 3l-4 18"/></svg>Códigos</button>
+      <p>PLATAFORMA</p><button data-v="diagnosticos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h16v18H4ZM8 8l2 2 5-5M8 15h8"/></svg>Diagnósticos</button>
+      <button data-v="equipo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8"/></svg>Equipo</button>
+      <button data-v="anuncios"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h5l12-5v16L8 15H3ZM7 15v6h4l-1-5"/></svg>Publicidad <span class="cuenta" id="n_anuncios">0</span></button>
+      <button data-v="tips"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 16a7 7 0 1 1 8 0l-1 4H9ZM9 23h6"/></svg>Tips <span class="cuenta" id="n_tips">0</span></button>
+      <button data-v="base"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5c0-4 18-4 18 0v14c0 4-18 4-18 0ZM3 5c0 4 18 4 18 0M3 12c0 4 18 4 18 0"/></svg>Base de datos <span class="cuenta" id="n_base">·</span></button>
+      <button data-v="numeros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M7 16l4-5 4 2 6-7"/></svg>Números</button>
     </div>
     <div class="lanza">
       <span class="et">Abrir un producto</span>
@@ -538,7 +541,8 @@ body.sin-sesion .telon{display:none!important}
 
   <main>
     <div class="barra">
-      <h1 id="titulo">Tablero</h1>
+      <button type="button" class="btn sm" id="labMenu" aria-label="Abrir o cerrar el menú">☰</button><h1 id="titulo">Tablero</h1>
+      <div id="labTools"><button type="button" id="labTema" role="switch" aria-checked="false" aria-label="Cambiar a modo nocturno"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><svg viewBox="0 0 24 24"><path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/></svg></button></div>
       <input class="busca" id="busca" type="search" placeholder="Buscar taller, correo o ciudad" hidden>
       <select id="filtroEstado" style="width:auto" hidden></select>
       <select id="filtroPlan" style="width:auto" hidden></select>
@@ -831,6 +835,119 @@ function senales(c) {
 }
 
 /* ================= almacén ================= */
+/* Nuvoor Lab: usuarios y fichas de seguimiento, separados por persona/negocio. */
+let nlUsuarios=[],nlUsuariosListos=false,nlErrorUsuarios='',nlCargaPendiente=null,nlMeses=6,nlEspecial='',nlTextoUsuarios='';
+let nlTipo='',nlId='',nlTab='persona',nlBase={},nlGuardando=false;
+const nlBorradores=new Map();
+function nlDatos(){return {cuentas:ficheros.cuentas,usuarios:nlUsuarios,usuariosListos:nlUsuariosListos,errorUsuarios:nlErrorUsuarios,
+  mrr:mrr(),h:historico(nlMeses),meses:nlMeses,paga,chipPlan,chipEstado,citas:citasHoy().length,pendientes:pendientes(),
+  agenda:listaCitas(citasProximas().filter(q=>difDias(q.fecha,iso(HOY))<=1),true),planes:grafPlanes(),
+  porDepositar:ficheros.cobros.filter(p=>p.estado==='aprobado'&&!p.depositado).reduce((s,p)=>s+cargo(p),0)};}
+async function nlCargaUsuarios(){
+  if(nlCargaPendiente)return nlCargaPendiente;
+  nlCargaPendiente=(async()=>{try{nlUsuarios=await window.__labPersonas.lista();nlErrorUsuarios='';nlUsuariosListos=true;}
+    catch(e){nlErrorUsuarios=e.message||'Revisa la conexión.';}finally{nlCargaPendiente=null;pinta();}})();
+  return nlCargaPendiente;
+}
+function nlCampo(k,t,v,o={}){return NuvoorLab.campo(k,t,v,o);}
+function nlClave(){return nlTipo+'|'+nlId+'|'+nlTab;}
+function nlTomaBorrador(){
+  const f=$('#ficha [data-nlform]');if(!f)return;
+  const valores={};f.querySelectorAll('[data-nlcampo]').forEach(i=>{if(!i.readOnly)valores[i.dataset.nlcampo]=i.value;});
+  nlBorradores.set(nlClave(),{valores,revision:nlBase.revision??nlBase.fichaRevision??null});
+}
+function nlFichaPersona(p){
+  const b=nlBorradores.get(nlClave()),d={...p,...(b?.valores||{})};nlBase={...p,revision:b?b.revision:p.revision};
+  return '<form class="nlFicha" data-nlform="persona"><p class="nlIntro">Datos de contacto para el seguimiento. El correo de acceso y los permisos de cada negocio se consultan por separado.</p><h3>Identidad y contacto</h3><div class="nlFields">'+
+    nlCampo('nombre','Nombre(s)',d.nombre)+nlCampo('apellidos','Apellidos',d.apellidos)+nlCampo('correo','Correo de acceso',p.correo,{readonly:true,full:true,nota:'Es el correo con el que inicia sesión.'})+
+    nlCampo('tel','Teléfono / WhatsApp',d.tel,{type:'tel'})+nlCampo('idioma','Idioma de contacto',d.idioma)+
+    '</div><h3 class="nlSectionTitle">Ubicación de la persona</h3><div class="nlFields">'+nlCampo('pais','País',d.pais,{list:'nlPaises'})+nlCampo('estadoGeo','Estado / provincia',d.estadoGeo)+nlCampo('ciudad','Ciudad / municipio',d.ciudad)+nlCampo('nota','Notas de contacto',d.nota,{full:true})+'</div>'+nlPieGuarda()+'</form>';
+}
+function nlFichaNegocio(c){
+  const b=nlBorradores.get(nlClave()),d={...c,nombre:c.taller,...(b?.valores||{})};nlBase={...c,fichaRevision:b?b.revision:c.fichaRevision};
+  return '<form class="nlFicha" data-nlform="negocio"><p class="nlIntro">'+esc(nombreProducto(c))+' · '+esc(planDe(c).nombre)+' · '+esc(ESTADOS[c.estado]?.nombre||c.estado)+'</p><h3>Identificación del negocio</h3><div class="nlFields">'+
+    nlCampo('nombre','Nombre comercial',d.nombre,{full:true})+nlCampo('razon','Nombre o razón social fiscal',d.razon,{full:true})+nlCampo('rfc','RFC / identificación fiscal',d.rfc)+nlCampo('contacto','Persona de contacto del negocio',d.contacto)+nlCampo('tel','Teléfono del negocio',d.tel,{type:'tel'})+
+    '</div><h3 class="nlSectionTitle">Ubicación del negocio</h3><div class="nlFields">'+nlCampo('pais','País',d.pais,{list:'nlPaises'})+nlCampo('estadoGeo','Estado / provincia',d.estadoGeo)+nlCampo('ciudad','Ciudad / municipio',d.ciudad)+nlCampo('cp','Código postal',d.cp)+nlCampo('direccion','Domicilio',d.direccion,{full:true})+nlCampo('zona','Zona horaria',d.zona,{full:true,list:'nlZonas'})+'</div>'+nlPieGuarda()+'</form>';
+}
+function nlPieGuarda(){return '<p class="nlError" id="nlFichaError" role="alert" hidden></p><div class="nlSave"><p>Los datos faltantes pueden capturarse después.</p><button type="button" class="btn" data-nlactualiza>Actualizar ficha</button><button type="submit" class="btn p" id="nlGuardaFicha">Guardar datos</button></div>';}
+function nlFijaPie(){
+  const f=$('#ficha [data-nlform]'),pie=f?.querySelector('.nlSave');if(!pie)return;
+  f.id='nlFichaForm';pie.querySelector('[type="submit"]').setAttribute('form','nlFichaForm');$('#ficha').append(pie);
+}
+function nlEquipo(c){return '<div class="nlFicha"><h3>Usuarios de '+esc(c.taller)+'</h3>'+(!nlUsuariosListos?'<p class="nlIntro">'+esc(nlErrorUsuarios||'Cargando usuarios…')+'</p>':nlUsuarios.filter(p=>(p.negocios||[]).some(n=>n.id===c.id)).map(p=>{const n=p.negocios.find(n=>n.id===c.id);return '<div class="nlTask"><div><b>'+esc(NuvoorLab.nombre(p)||'Nombre sin capturar')+'</b><p>'+esc(p.correo)+' · '+esc({admin:'Administrador',ventas:'Ventas',produccion:'Producción',diseno:'Diseño'}[n.rol]||n.rol)+'</p></div><button type="button" class="nlLink" data-nlpersona="'+esc(p.id)+'">Ver persona →</button></div>';}).join('')||'<p class="nlIntro">No hay usuarios asignados a esta cuenta.</p>')+'</div>';}
+function nlDibujaPersona(id){
+  const p=nlUsuarios.find(p=>p.id===id);if(!p)return;
+  abierta=null;personaAbierta=null;fallaAbierta=null;nlTipo='persona';nlId=id;
+  const tabs=[['persona','Datos personales'],['accesos','Accesos y negocios']];if(!tabs.some(t=>t[0]===nlTab))nlTab='persona';
+  $('#ficha').innerHTML='<header><div><h2>'+esc(NuvoorLab.nombre(p)||'Nombre sin capturar')+'</h2><p class="sitio">Perfil de usuario</p></div><button class="btn sm" id="cerrarFicha">Cerrar</button></header>'+nlTabs(tabs)+'<div class="desliza">'+(nlTab==='persona'?nlFichaPersona(p):'<div class="nlFicha"><h3>Negocios de esta persona</h3>'+((p.negocios||[]).map(n=>'<div class="nlTask"><div><b>'+esc(n.nombre)+'</b><p>'+esc(n.rol)+'</p></div><button type="button" class="nlLink" data-nlcuenta="'+esc(n.id)+'">Ver negocio →</button></div>').join('')||'<p class="nlIntro">Sin negocio asignado.</p>')+'</div>')+'</div>';
+  nlFijaPie();muestraPanel();
+}
+function nlTabs(tabs){return '<nav class="nlTabs" aria-label="Apartados de la ficha">'+tabs.map(([k,t])=>'<button type="button" data-nltab="'+k+'" aria-selected="'+(nlTab===k)+'">'+t+'</button>').join('')+'</nav>';}
+function abreFicha(id){
+  const c=cuentaDe(id);if(!c)return;
+  if(nlTipo!=='negocio'||nlId!==id)nlTab='persona';nlTipo='negocio';nlId=id;
+  nlAbreFichaAnterior(id);
+  $('#ficha>header').insertAdjacentHTML('afterend',nlTabs([['persona','Responsable'],['negocio','Negocio y ubicación'],['equipo','Usuarios'],['plan','Plan y pagos'],['actividad','Actividad'],['seguimiento','Seguimiento']]));
+  const d=$('#ficha .desliza'),p=NuvoorLab.persona(c,nlDatos());
+  [...d.children].forEach(el=>{const t=el.querySelector('h3')?.textContent||'';el.hidden=nlTab==='plan'?!(/Suscripción|Datos fiscales|Últimos cobros/.test(t)||el.matches('.pares')):nlTab==='actividad'?!(/Diagnóstico|Tickets|Historial/.test(t)):nlTab==='seguimiento'?!(/Qué sigue|Contacto|Citas/.test(t)):true;});
+  if(nlTab==='persona')d.insertAdjacentHTML('afterbegin',p?nlFichaPersona(p)+'<p><button class="nlLink" data-nlpersona="'+esc(p.id)+'">Ver todos los accesos de esta persona →</button></p>':'<div class="nlFicha nlIntro">'+esc(nlErrorUsuarios||(!nlUsuariosListos?'Cargando usuarios…':'No se encontró al responsable por su correo. Revisa los usuarios de la cuenta.'))+' <button class="nlLink" data-nlactualiza>Actualizar ficha</button></div>');
+  if(nlTab==='negocio')d.insertAdjacentHTML('afterbegin',nlFichaNegocio(c));
+  if(nlTab==='equipo')d.insertAdjacentHTML('afterbegin',nlEquipo(c));
+  nlFijaPie();
+}
+async function nlGuardaFormulario(form){
+  if(nlGuardando)return;nlTomaBorrador();
+  const key=nlClave(),draft=nlBorradores.get(key),isPersona=form.dataset.nlform==='persona',c=cuentaDe(nlId),p=nlTipo==='persona'?nlUsuarios.find(p=>p.id===nlId):NuvoorLab.persona(c,nlDatos()),id=isPersona?p?.id:c?.id;
+  if(!id)return;
+  const error=$('#nlFichaError'),campos=[...form.querySelectorAll('input,button'),...document.querySelectorAll('#ficha .nlSave button')],et=$('#nlGuardaFicha');error.hidden=true;
+  nlGuardando=true;campos.forEach(i=>i.disabled=true);et.textContent='Guardando…';
+  try{
+    const guardada=await window.__labPersonas.guarda(isPersona?'persona':'negocio',id,draft.valores,draft.revision);
+    nlBorradores.delete(key);
+    if(isPersona){const i=nlUsuarios.findIndex(x=>x.id===id);if(i>=0)nlUsuarios[i]={...nlUsuarios[i],...draft.valores,revision:guardada.revision};}
+    else Object.assign(c,draft.valores,{taller:draft.valores.nombre||c.taller,fichaRevision:guardada.revision});
+    if(nlCargaPendiente)await nlCargaPendiente;
+    await nlCargaUsuarios();
+    const actual=isPersona?null:await window.__labPersonas.cuenta(id);
+    if(actual){const i=ficheros.cuentas.findIndex(c=>c.id===id);if(i>=0)ficheros.cuentas[i]=actual;}
+    pinta();
+    if(nlClave()===key&&$('#ficha').classList.contains('abierta')){if(nlTipo==='persona')nlDibujaPersona(nlId);else abreFicha(nlId);}
+    aviso('Ficha guardada.');
+  }catch(e){error.textContent=e.message||'No se pudo guardar. Tus datos siguen aquí.';error.hidden=false;error.scrollIntoView({block:'nearest'});}
+  finally{nlGuardando=false;campos.forEach(i=>i.disabled=false);if(et.isConnected)et.textContent='Guardar datos';}
+}
+function nlVe(go){
+  if(go==='usuarios'){vista='usuarios';nlTextoUsuarios='';$('#busca').value='';}
+  else if(['cuentas','activas','incompletas','vencidas'].includes(go)){vista='cuentas';nlEspecial=go==='incompletas'?'incompletas':'';filtro.estado=go==='activas'?'activa':go==='vencidas'?'vencida':'';filtro.plan='';filtro.texto='';filtroProducto='';$('#busca').value='';$('#filtroEstado').value=filtro.estado;$('#filtroPlan').value='';}
+  else{vista=go;nlEspecial='';}
+  document.body.classList.remove('nlMenuOpen');pinta();window.scrollTo(0,0);
+}
+document.addEventListener('input',e=>{if(e.target.closest('[data-nlform]'))nlTomaBorrador();});
+document.addEventListener('submit',e=>{const f=e.target.closest('[data-nlform]');if(f){e.preventDefault();nlGuardaFormulario(f);}});
+document.addEventListener('click',async e=>{
+  const go=e.target.closest('[data-nlgo]');if(go)nlVe(go.dataset.nlgo);
+  const c=e.target.closest('[data-nlcuenta]');if(c&&!nlGuardando){nlTomaBorrador();abreFicha(c.dataset.nlcuenta);}
+  const p=e.target.closest('[data-nlpersona]');if(p&&!nlGuardando){nlTomaBorrador();nlTab='persona';nlDibujaPersona(p.dataset.nlpersona);}
+  const tab=e.target.closest('[data-nltab]');if(tab&&!nlGuardando){nlTomaBorrador();nlTab=tab.dataset.nltab;if(nlTipo==='persona')nlDibujaPersona(nlId);else abreFicha(nlId);}
+  const periodo=e.target.closest('[data-nlperiodo]');if(periodo){nlMeses=Number(periodo.dataset.nlperiodo)===12?12:6;pinta();}
+  const barra=e.target.closest('[data-nlbarra]');if(barra)$('#nlChartHint').textContent=barra.dataset.nlbarra;
+  if(e.target.closest('[data-nlrecarga]'))nlCargaUsuarios();
+  if(e.target.closest('[data-nlquita]')){nlEspecial='';pinta();}
+  if(e.target.closest('[data-nlactualiza]')&&!nlGuardando){nlBorradores.delete(nlClave());await nlCargaUsuarios();if(nlTipo==='persona')nlDibujaPersona(nlId);else{const c=await window.__labPersonas.cuenta(nlId);if(c){const i=ficheros.cuentas.findIndex(x=>x.id===nlId);ficheros.cuentas[i]=c;}abreFicha(nlId);}}
+  if(e.target.closest('#labMenu'))document.body.classList.toggle('nlMenuOpen');
+  if(e.target.closest('#nav [data-v]')){document.body.classList.remove('nlMenuOpen');nlEspecial='';}
+  if(e.target.closest('#labTema')){const dark=document.documentElement.dataset.theme!=='dark';document.documentElement.dataset.theme=dark?'dark':'light';localStorage.setItem('nuvoor_lab_tema',dark?'dark':'light');nlPintaTema();}
+});
+function nlPintaTema(){const b=$('#labTema');if(!b)return;const dark=document.documentElement.dataset.theme==='dark';b.setAttribute('aria-checked',String(dark));b.setAttribute('aria-label',dark?'Cambiar a modo día':'Cambiar a modo nocturno');}
+function nlIniciaVista(){
+  try{document.documentElement.dataset.theme=localStorage.getItem('nuvoor_lab_tema')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');}catch(e){document.documentElement.dataset.theme='light';}nlPintaTema();
+  const regiones='AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW'.split(' ');
+  const nombres=new Intl.DisplayNames(['es'],{type:'region'}),paises=regiones.map(r=>nombres.of(r)).sort((a,b)=>a.localeCompare(b,'es'));
+  const zonas=Intl.supportedValuesOf?Intl.supportedValuesOf('timeZone'):['America/Mexico_City'];
+  document.body.insertAdjacentHTML('beforeend','<datalist id="nlPaises">'+paises.map(p=>'<option value="'+esc(p)+'">').join('')+'</datalist><datalist id="nlZonas">'+zonas.map(z=>'<option value="'+esc(z)+'">').join('')+'</datalist>');
+}
+nlIniciaVista();
+
 async function arranca() {
   try { DB = await (window.claude && window.claude.use ? window.claude.use("db") : null); } catch (e) { DB = null; }
   /* Los anuncios no pasan por DB: tienen tabla propia y puente propio, porque
@@ -844,7 +961,9 @@ async function arranca() {
   /* Sin await: si la base tarda, el Lab abre igual y el letrero aparece
      cuando haya respuesta. */
   revisaPuertaPlan().catch(() => {});
-  if (!DB) { generaEjemplo(true); listo = true; pinta(); return; }
+  if (!DB) { listo = true; aviso("No se conectó el Lab. Revisa tu sesión e intenta de nuevo."); pinta(); return; }
+  nlCargaUsuarios();
+  setInterval(nlCargaUsuarios,60000);
   const cfg = await DB.doc("meta/config").get().catch(() => ({ exists: false }));
   if (cfg.exists) CFG = Object.assign(CFG, cfg.data());
   const meta = await DB.doc("meta/estado").get().catch(() => ({ exists: false }));
@@ -1692,6 +1811,7 @@ const REVISA_MIG = {
   "17-productos.sql":         ["v_cuentas", "producto"]
 };
 const REVISA_RPC_MIG = {
+  "24-lab-personas.sql":"nuvoor_lab_personas_disponible",
   "19-negocios-por-correo.sql": "nuvoor_negocios_disponible",
   "20-restaurant-nube.sql": "nuvoor_rest_nube_disponible",
   "21-negocio-con-prueba.sql": "nuvoor_negocio_prueba_disponible",
@@ -1789,76 +1909,12 @@ function urlEditorSQL(){
 }
 
 /* ================= vistas ================= */
-function vTablero() {
-  const act = ficheros.cuentas.filter(paga).length;
-  const pru = ficheros.cuentas.filter(c => c.estado === "prueba").length;
-  const ven = ficheros.cuentas.filter(c => c.estado === "vencida").length;
-  const h = historico(6), prev = h.length > 1 ? h[h.length - 2].v : 0, ahora = mrr();
-  const delta = prev ? Math.round((ahora - prev) / prev * 100) : 0;
-  const pend = pendientes(), hoy = citasHoy();
-  const porCobrar = ficheros.cobros.filter(p => p.estado === "aprobado" && !p.depositado).reduce((s, p) => s + cargo(p), 0);
-
-  return '<div style="display:flex;flex-direction:column;gap:20px">' +
-    '<div class="tiles">' +
-      tile("Ingreso recurrente", $$$(ahora), (delta >= 0 ? "+" : "") + delta + "% contra el mes pasado", true) +
-      tile("Cuentas pagando", act, pru + " en prueba ahora mismo") +
-      tile("Citas de hoy", hoy.length, hoy.length ? "La siguiente a las " + hoy[0].hora : "Sin citas agendadas") +
-      tile("Por depositar", $$$(porCobrar), ven ? ven + " cobro(s) rechazado(s) por revisar" : "Nada rechazado") +
-    '</div>' +
-    '<div class="rejilla2">' +
-      '<div class="tarjeta"><header><h2>Para hoy</h2><span class="pista">' + pend.length + (pend.length === 1 ? " pendiente" : " pendientes") + '</span></header>' +
-        (pend.length ? '<div class="pendientes">' + pend.slice(0, 10).map(p =>
-          '<div class="pend clic ' + p.cls + '"' + (p.tick ? ' data-tick="' + p.tick + '"' : p.falla ? ' data-falla="' + p.falla + '"' : ' data-abre="' + p.id + '"') +
-          ' tabindex="0" role="button"><span class="raya"></span><span class="txt"><b>' + esc(p.t) + '</b><small>' + esc(p.s) + '</small></span></div>').join("") + '</div>'
-          : '<div class="vacio">Nada urgente. Aprovecha para grabar contenido.</div>') + '</div>' +
-      '<div style="display:flex;flex-direction:column;gap:20px">' +
-        '<div class="tarjeta"><header><h2>Agenda de hoy y mañana</h2></header>' + listaCitas(citasProximas().filter(q => difDias(q.fecha, iso(HOY)) <= 1), true) + '</div>' +
-        '<div class="tarjeta"><header><h2>Ingreso recurrente</h2><span class="pista">últimos 6 meses</span></header><div class="cuerpo">' + grafIngreso() + '</div></div>' +
-        '<div class="tarjeta"><header><h2>De dónde viene el ingreso</h2></header><div class="cuerpo">' + grafPlanes() + '</div></div>' +
-      '</div></div></div>';
-}
-
-function vCuentas() {
-  const t = filtro.texto.toLowerCase();
-  const lista = ficheros.cuentas.filter(c =>
-    (!filtroProducto || productoDe(c) === filtroProducto) &&
-    (!filtro.estado || c.estado === filtro.estado) && (!filtro.plan || c.plan === filtro.plan) &&
-    (!t || (c.taller + " " + c.correo + " " + c.sitio + " " + c.contacto).toLowerCase().indexOf(t) >= 0)
-  );
-  const orden = { urge: 0, pronto: 1, info: 2, ok: 3 };
-  lista.forEach(c => c._j = jugada(c));
-  lista.sort((a, b) => orden[a._j.urg] - orden[b._j.urg] || a.taller.localeCompare(b.taller));
-  const cuentasPorProducto = {};
-  ficheros.cuentas.forEach(c=>{ const k = productoDe(c); cuentasPorProducto[k] = (cuentasPorProducto[k]||0) + 1; });
-  const barraProd = '<div class="prodFila">' +
-    '<button type="button" data-prod="" aria-pressed="' + (!filtroProducto) + '">Todos ' +
-      '<i>' + ficheros.cuentas.length + '</i></button>' +
-    Object.keys(PRODUCTOS).map(k=>
-      '<button type="button" data-prod="'+k+'" aria-pressed="'+(filtroProducto===k)+'">' +
-      esc(PRODUCTOS[k].nombre) + ' <i>' + (cuentasPorProducto[k]||0) + '</i></button>').join("") +
-    '</div>';
-
-  if (!lista.length) return barraProd +
-    '<div class="tarjeta"><div class="vacio">Ninguna cuenta coincide con esa búsqueda.</div></div>';
-
-  return barraProd + '<div class="tarjeta"><header><h2>Cuentas</h2>' +
-    '<span class="pista">' + lista.length + ' de ' + ficheros.cuentas.length + ' · ordenadas por lo que urge atender</span></header>' +
-    '<div class="marco"><table style="min-width:840px"><thead><tr>' +
-      '<th>Cuenta</th><th>Producto</th><th>Estado</th><th>Plan</th><th class="der">Al mes</th><th>Qué sigue</th><th>Vence</th><th>Último acceso</th><th></th>' +
-    '</tr></thead><tbody>' + lista.map(c => {
-      const sin = difDias(iso(HOY), c.ultimo), j = c._j;
-      return '<tr class="clic" data-abre="' + c.id + '" tabindex="0">' +
-        '<td><span class="taller">' + esc(c.taller) + '</span><br><span class="sitio">' + esc(c.sitio) + ' · ' + esc(c.contacto) + '</span></td>' +
-        '<td><span class="chip prod-' + productoDe(c) + '">' + esc(nombreProducto(c)) + '</span></td>' +
-        '<td>' + chipEstado(c) + '</td>' +
-        '<td>' + chipPlan(c) + ' <span class="sitio">' + (c.periodo === "anual" ? "anual" : "mensual") + '</span></td>' +
-        '<td class="der mono">' + (paga(c) ? $$$(cobroMes(c)) : "—") + '</td>' +
-        '<td><span class="chip ' + (j.urg === "urge" ? "mal" : j.urg === "pronto" ? "aviso" : j.urg === "ok" ? "bien" : "info") + '">' + esc(j.titulo) + '</span></td>' +
-        '<td class="mono">' + fCorta(c.vence) + '</td>' +
-        '<td class="mono"' + (sin >= 14 ? ' style="color:var(--aviso)"' : '') + '>' + (sin === 0 ? "hoy" : "hace " + sin + " d") + '</td>' +
-        '<td class="der"><a class="btn sm" href="' + esc(waLink(c, j.guion)) + '" target="_blank" rel="noopener" data-alto>WhatsApp</a></td>' +
-      '</tr>';
-    }).join("") + '</tbody></table></div></div>';
+function vTablero(){ return NuvoorLab.tablero(nlDatos()); }
+function vCuentas(){
+  const d=nlDatos(),t=filtro.texto.toLowerCase();
+  const ls=ficheros.cuentas.filter(c=>(!filtroProducto||productoDe(c)===filtroProducto)&&(!filtro.estado||c.estado===filtro.estado)&&(!filtro.plan||c.plan===filtro.plan)&&(!nlEspecial||NuvoorLab.faltan(c,d))&&(!t||[c.taller,c.correo,c.sitio,c.contacto,c.pais,c.ciudad,NuvoorLab.nombre(NuvoorLab.persona(c,d))].join(' ').toLowerCase().includes(t)));
+  const barra='<div class="prodFila"><button data-prod="" aria-pressed="'+(!filtroProducto)+'">Todos '+ficheros.cuentas.length+'</button>'+Object.keys(PRODUCTOS).map(k=>'<button data-prod="'+k+'" aria-pressed="'+(filtroProducto===k)+'">'+esc(PRODUCTOS[k].nombre)+' '+ficheros.cuentas.filter(c=>productoDe(c)===k).length+'</button>').join('')+(nlEspecial?'<button data-nlquita>Faltan datos ×</button>':'')+'</div>';
+  return barra+'<section class="nlPanel"><header class="nlPanelHead"><div><h2>Negocios y cuentas</h2><p>Responsable, ubicación y suscripción de cada negocio.</p></div></header>'+NuvoorLab.cuentas(ls,d)+'</section>';
 }
 
 function listaCitas(lista, compacta) {
@@ -2433,7 +2489,7 @@ function vNumeros() {
 }
 
 /* ================= ficha de la cuenta ================= */
-function abreFicha(id) {
+function nlAbreFichaAnterior(id) {
   const c = cuentaDe(id); if (!c) return;
   abierta = id;
   const j = jugada(c), sin = difDias(iso(HOY), c.ultimo), dv = difDias(c.vence, iso(HOY));
@@ -3204,12 +3260,13 @@ async function mueveSuscripcion(c, acc) {
 
 /* ================= pintar ================= */
 function pinta() {
-  const titulos = { tablero: "Tablero", cuentas: "Cuentas", agenda: "Agenda", soporte: "Soporte",
+  const titulos = { usuarios:"Personas y accesos", tablero: "Tablero", cuentas: "Negocios y cuentas", agenda: "Agenda", soporte: "Soporte",
     cobros: "Cobros y facturación", transferencias: "Transferencias por confirmar", equipo: "Equipo y alianzas", numeros: "Números",
     anuncios: "Publicidad", tips: "Tips del tablero", base: "Base de datos",
     codigos: "Códigos de curso", diagnosticos: "Qué necesita cada taller" };
   $("#titulo").textContent = titulos[vista];
   $("#n_cuentas").textContent = ficheros.cuentas.length;
+  $("#n_usuarios").textContent = nlUsuariosListos ? nlUsuarios.length : "—";
   $("#n_agenda").textContent = citasHoy().length;
   $("#n_agenda").className = "cuenta" + (citasHoy().length ? " urge" : "");
   const sop = ficheros.tickets.filter(t => t.estado !== "resuelto").length +
@@ -3226,9 +3283,11 @@ function pinta() {
   if(nb){ nb.textContent = faltanMig || "·"; nb.className = "cuenta" + (faltanMig ? " urge" : ""); }
   $("#avisoDemo").hidden = !esEjemplo;
   ["busca", "filtroEstado", "filtroPlan", "btnNueva"].forEach(i => { $("#" + i).hidden = vista !== "cuentas"; });
+  $("#busca").hidden = !["cuentas","usuarios"].includes(vista);
+  $("#busca").value = vista === "usuarios" ? nlTextoUsuarios : filtro.texto;
   document.querySelectorAll("#nav button").forEach(b => b.setAttribute("aria-current", String(b.dataset.v === vista)));
   if (!listo) { $("#vista").innerHTML = '<div class="tarjeta"><div class="vacio">Cargando tus cuentas…</div></div>'; return; }
-  $("#vista").innerHTML = vista === "tablero" ? vTablero() : vista === "cuentas" ? vCuentas()
+  $("#vista").innerHTML = vista === "tablero" ? vTablero() : vista === "usuarios" ? NuvoorLab.usuarios(nlDatos(),nlTextoUsuarios) : vista === "cuentas" ? vCuentas()
     : vista === "agenda" ? vAgenda() : vista === "soporte" ? vSoporte()
     : vista === "cobros" ? vCobros() : vista === "transferencias" ? vTransferencias() : vista === "equipo" ? vEquipo()
     : vista === "anuncios" ? vAnuncios()
@@ -3460,7 +3519,7 @@ document.addEventListener("keydown", e => {
   if (t) { e.preventDefault(); t.click(); }
 });
 
-$("#busca").addEventListener("input", e => { filtro.texto = e.target.value; if (vista === "cuentas") pinta(); });
+$("#busca").addEventListener("input", e => { if(vista === "usuarios") nlTextoUsuarios=e.target.value; else filtro.texto=e.target.value; if (["cuentas","usuarios"].includes(vista)) pinta(); });
 $("#filtroEstado").innerHTML = '<option value="">Todos los estados</option>' +
   Object.keys(ESTADOS).map(k => '<option value="' + k + '">' + ESTADOS[k].nombre + '</option>').join("");
 $("#filtroPlan").innerHTML = '<option value="">Todos los planes</option>' +
@@ -3543,9 +3602,9 @@ async function nuevaCuenta() {
 }
 
 async function exporta() {
-  const cab = ["Taller","Ciudad","Contacto","Correo","Telefono","Estado","Plan","Periodo","Al mes","Alta","Vence",
+  const cab = ["Negocio","País","Estado / provincia","Ciudad","Responsable","Correo","Teléfono","Estado","Plan","Periodo","Al mes","Alta","Vence",
     "Ultimo acceso","Cotizaciones","Origen","La cerro","Que sigue","Pide factura","RFC"];
-  const filas = ficheros.cuentas.map(c => [c.taller, c.sitio, c.contacto, c.correo, c.tel, ESTADOS[c.estado].nombre,
+  const filas = ficheros.cuentas.map(c => [c.taller, c.pais||"", c.estadoGeo||"", c.ciudad||c.sitio||"", NuvoorLab.nombre(NuvoorLab.persona(c,{usuarios:nlUsuarios}))||c.contacto||"", c.correo, NuvoorLab.persona(c,{usuarios:nlUsuarios})?.tel||c.tel||"", ESTADOS[c.estado].nombre,
     planDe(c).nombre, c.periodo, paga(c) ? Math.round(mensual(c)) : 0, c.alta, c.vence, c.ultimo, c.cotizaciones,
     c.alianza ? (aliDe(c.alianza) || {}).nombre : ORIGENES[c.origen],
     c.cerradoPor ? (eqDe(c.cerradoPor) || {}).nombre : "", jugada(c).titulo,
@@ -3911,10 +3970,10 @@ function vDiagnosticos() {
 
 </script>
 
-<script>window.BUILD="20261102-1810";</script>
+<script>window.BUILD="20261103-1025";</script>
 <script>
 (function(){
-  var mio = "20261102-1810";
+  var mio = "20261103-1025";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -3946,7 +4005,8 @@ function vDiagnosticos() {
 <!-- STRIPE-MIGRATION-22 -->
 <script>window.__MIGRACIONES.push({"archivo":"22-stripe-planes.sql","titulo":"Planes de Stripe en transferencias","sql":"-- ============================================================\n--  22 · Planes de Stripe en pagos por transferencia\n--  Correr después de sql/18-stripe.sql. Se puede repetir.\n--  Reemplaza únicamente aplica_pago y agrega un marcador de revisión.\n-- ============================================================\n\ncreate or replace function public.aplica_pago(p_id bigint)\nreturns void\nlanguage plpgsql security definer set search_path = public\nas $$\ndeclare\n  p public.pagos_pendientes%rowtype;\n  v timestamptz;\n  plan_interno text;\nbegin\n  if not public.es_staff() then\n    raise exception 'Sólo el staff del Lab puede aplicar un pago';\n  end if;\n\n  select * into p from public.pagos_pendientes where id = p_id and estado = 'esperando' for update;\n  if not found then\n    raise exception 'Ese pago no existe o ya se había aplicado';\n  end if;\n\n  plan_interno := case p.plan\n    when 'imprenta_basico' then 'basico'\n    when 'imprenta_maker' then 'maker'\n    when 'imprenta_pro' then 'pro'\n    when 'restaurant_estandar' then 'basico'\n    when 'restaurant_multi' then 'maker'\n    when 'store_estandar' then 'basico'\n    when 'store_multi' then 'maker'\n    when 'taller_basico' then 'basico'\n    when 'taller_maker' then 'maker'\n    when 'taller_pro' then 'pro'\n    when 'rest_normal' then 'basico'\n    when 'rest_multi' then 'maker'\n    when 'tienda_normal' then 'basico'\n    when 'tienda_multi' then 'maker'\n    else null\n  end;\n  if plan_interno is null then\n    raise exception 'El plan de esta transferencia no se reconoce';\n  end if;\n\n  -- Si todavía le queda tiempo, se le suma; si ya venció, cuenta desde hoy.\n  select greatest(coalesce(vence, now()), now()) into v\n    from public.cuentas where id = p.cuenta_id for update;\n  v := v + (case when p.ciclo = 'anual' then interval '1 year' else interval '1 month' end) + interval '1 day';\n\n  update public.cuentas\n     set plan = plan_interno,\n         estado = 'activa',\n         ciclo = p.ciclo,\n         vence = v,\n         forma_pago = p.forma,\n         cobro_fallido = null\n   where id = p.cuenta_id;\n\n  update public.pagos_pendientes\n     set estado = 'pagado', aplicado = now(), aplicado_por = auth.uid()\n   where id = p_id;\nend $$;\n\ncreate or replace function public.nuvoor_stripe_planes_disponible()\nreturns boolean\nlanguage sql stable security definer set search_path = public\nas $$ select true $$;\n\nrevoke all on function public.nuvoor_stripe_planes_disponible() from public;\ngrant execute on function public.nuvoor_stripe_planes_disponible() to authenticated;\n\ncomment on function public.aplica_pago is\n  'Marca pagada una transferencia y extiende la cuenta asignando el plan interno de Nuvoor. Sólo el staff del Lab.';\n"});</script>
 <!-- /STRIPE-MIGRATION-22 -->
-<script src="lab.js?v=20261102-1810"></script>
+<script src="lab.js?v=20261103-1025"></script>
 <script>window.__MIGRACIONES.push({"archivo":"23-stripe-seguro.sql","titulo":"Cobros Stripe sin duplicados","sql":"-- 23 · Entregas de Stripe e intentos de cobro seguros.\n-- Después de 18-stripe.sql y 22-stripe-planes.sql. Repetible.\n-- Sólo tablas y funciones de cobro; no cambia Auth, staff ni mi_cuenta().\nbegin;\nalter table public.cuentas add column if not exists pago_previo boolean not null default false;\nupdate public.cuentas c set pago_previo = true\n where not pago_previo and (plan in ('basico','maker','pro') or stripe_suscripcion is not null\n or exists (select 1 from public.pagos_pendientes p where p.cuenta_id=c.id and p.estado='pagado'));\n\n-- Ninguna de estas tablas se expone al navegador.\ncreate table if not exists public.stripe_control (\n cuenta_id uuid primary key references public.cuentas(id) on delete cascade,\n token uuid, hasta timestamptz,\n intento jsonb\n);\ncreate table if not exists public.stripe_entregas (\n evento text primary key,\n cuenta_id uuid not null references public.cuentas(id) on delete cascade,\n sesion text unique,\n aplicado timestamptz not null default now()\n);\nalter table public.stripe_control enable row level security;\nalter table public.stripe_entregas enable row level security;\nrevoke all on public.stripe_control, public.stripe_entregas from public, anon, authenticated;\ngrant select on public.stripe_control, public.stripe_entregas to service_role;\n\n-- Un solo trabajador por negocio, incluso entre instancias Edge distintas.\n-- No se mantiene una transacción SQL abierta mientras se consulta Stripe.\ncreate or replace function public.stripe_toma(p_cuenta uuid, p_token uuid)\nreturns boolean language plpgsql security definer set search_path=public as $$\nbegin\n insert into public.stripe_control(cuenta_id,token,hasta)\n values(p_cuenta,p_token,clock_timestamp()+interval '2 minutes')\n on conflict(cuenta_id) do update set token=excluded.token,hasta=excluded.hasta\n where stripe_control.hasta is null or stripe_control.hasta < clock_timestamp();\n return found;\nend $$;\n\ncreate or replace function public.stripe_suelta(p_cuenta uuid,p_token uuid)\nreturns void language sql security definer set search_path=public as $$\n update public.stripe_control set token=null,hasta=null where cuenta_id=p_cuenta and token=p_token\n$$;\n\n-- Persiste el cuerpo exacto de Checkout ANTES de enviarlo a Stripe.\n-- Así un fallo de red puede reintentar con la misma Idempotency-Key.\ncreate or replace function public.stripe_intento(p_cuenta uuid,p_token uuid,p_intento jsonb)\nreturns void language plpgsql security definer set search_path=public as $$\nbegin\n update public.stripe_control set intento=p_intento,hasta=clock_timestamp()+interval '2 minutes'\n where cuenta_id=p_cuenta and token=p_token and hasta>clock_timestamp();\n if not found then raise exception 'La operación de cobro perdió su turno'; end if;\nend $$;\n\n-- Registrar el evento y modificar la licencia es UNA transacción.\n-- La unicidad de sesion cubre eventos distintos sobre un mismo pago OXXO.\ncreate or replace function public.stripe_aplica(\n p_cuenta uuid,p_token uuid,p_evento text,p_sesion text,p_cambios jsonb,p_sumar text default null)\nreturns boolean language plpgsql security definer set search_path=public as $$\ndeclare c public.cuentas%rowtype; v timestamptz;\nbegin\n perform 1 from public.stripe_control where cuenta_id=p_cuenta and token=p_token\n and hasta>clock_timestamp() for update;\n if not found then raise exception 'La operación de cobro perdió su turno'; end if;\n if p_evento is null or p_evento='' then raise exception 'Falta el evento'; end if;\n select * into strict c from public.cuentas where id=p_cuenta for update;\n insert into public.stripe_entregas(evento,cuenta_id,sesion)\n values(p_evento,p_cuenta,p_sesion) on conflict do nothing;\n if not found then return false; end if;\n if p_sumar is not null then\n   if p_sumar not in ('mensual','anual') or p_sesion is null then raise exception 'Periodo inválido'; end if;\n   v := greatest(coalesce(c.vence,now()),now())\n      + case when p_sumar='anual' then interval '1 year' else interval '1 month' end + interval '1 day';\n end if;\n update public.cuentas set\n   plan=coalesce(p_cambios->>'plan',plan),\n   ciclo=coalesce(p_cambios->>'ciclo',ciclo),\n   estado=coalesce(p_cambios->>'estado',estado),\n   forma_pago=coalesce(p_cambios->>'forma_pago',forma_pago),\n   stripe_suscripcion=coalesce(p_cambios->>'stripe_suscripcion',stripe_suscripcion),\n   vence=coalesce(v,(p_cambios->>'vence')::timestamptz,vence),\n   cobro_fallido=case when p_cambios ? 'cobro_fallido' then (p_cambios->>'cobro_fallido')::timestamptz else cobro_fallido end,\n   pago_previo=pago_previo or coalesce((p_cambios->>'pago_previo')::boolean,false)\n where id=p_cuenta;\n return true;\nend $$;\n\nrevoke all on function public.stripe_toma(uuid,uuid) from public,anon,authenticated;\nrevoke all on function public.stripe_suelta(uuid,uuid) from public,anon,authenticated;\nrevoke all on function public.stripe_intento(uuid,uuid,jsonb) from public,anon,authenticated;\nrevoke all on function public.stripe_aplica(uuid,uuid,text,text,jsonb,text) from public,anon,authenticated;\ngrant execute on function public.stripe_toma(uuid,uuid),public.stripe_suelta(uuid,uuid),\n public.stripe_intento(uuid,uuid,jsonb),public.stripe_aplica(uuid,uuid,text,text,jsonb,text) to service_role;\n\n-- El navegador pregunta por ESE pago, no sólo por una licencia que ya estaba activa.\ncreate or replace function public.stripe_confirmado(p_cuenta uuid,p_sesion text)\nreturns boolean language sql stable security definer set search_path=public as $$\n select exists(select 1 from public.stripe_entregas e where e.cuenta_id=p_cuenta and e.sesion=p_sesion\n and exists(select 1 from public.membresias m where m.cuenta_id=e.cuenta_id and m.usuario_id=auth.uid()))\n$$;\nrevoke all on function public.stripe_confirmado(uuid,text) from public,anon;\ngrant execute on function public.stripe_confirmado(uuid,text) to authenticated;\n\n-- Marcar también las transferencias posteriores sin recrear aplica_pago.\ncreate or replace function public.stripe_pago_transferencia()\nreturns trigger language plpgsql security definer set search_path=public as $$\nbegin\n if new.estado='pagado' then\n   update public.cuentas set pago_previo=true where id=new.cuenta_id;\n end if;\n return new;\nend $$;\nrevoke all on function public.stripe_pago_transferencia() from public,anon,authenticated;\ndrop trigger if exists stripe_transferencia_pagada on public.pagos_pendientes;\ncreate trigger stripe_transferencia_pagada after insert or update of estado on public.pagos_pendientes\nfor each row execute function public.stripe_pago_transferencia();\ncommit;\n"});</script>
+<script>window.__MIGRACIONES.push({"archivo":"24-lab-personas.sql","titulo":"Personas y fichas privadas del Lab","sql":"-- Nuvoor Lab: personas y fichas de seguimiento. Seguro de repetir.\n-- No modifica Auth, planes, membresías ni datos internos de los negocios.\nbegin;\n\ncreate or replace function public.staff_usuarios()\nreturns jsonb language plpgsql stable security definer set search_path=public\nas $$\nbegin\n  if auth.uid() is null or not public.es_staff() then\n    raise exception 'Sólo el equipo de Nuvoor puede consultar estas personas' using errcode='42501';\n  end if;\n  return coalesce((select jsonb_agg(f order by f->>'nombre') from (\n    select jsonb_build_object(\n      'id',u.id,'nombre',coalesce(n.cuerpo->>'nombre',nullif(p.nombre,''),nullif(u.raw_user_meta_data->>'full_name',''),''),\n      'apellidos',coalesce(n.cuerpo->>'apellidos',''), 'correo',coalesce(u.email,p.correo,''),\n      'tel',coalesce(n.cuerpo->>'tel',u.phone,''),'pais',coalesce(n.cuerpo->>'pais',''),\n      'estadoGeo',coalesce(n.cuerpo->>'estadoGeo',''),'ciudad',coalesce(n.cuerpo->>'ciudad',''),\n      'idioma',coalesce(n.cuerpo->>'idioma',''),'nota',coalesce(n.cuerpo->>'nota',''),\n      'creado',u.created_at,'ultimo',u.last_sign_in_at,'revision',n.actualizado,\n      'negocios',coalesce((select jsonb_agg(jsonb_build_object('id',c.id,'nombre',c.nombre,'producto',c.producto,'rol',m.rol) order by c.nombre)\n        from public.membresias m join public.cuentas c on c.id=m.cuenta_id where m.usuario_id=u.id),'[]'::jsonb)\n    ) as f\n    from auth.users u left join public.perfiles p on p.id=u.id\n    left join public.lab_datos n on n.coleccion='personas' and n.doc_id=u.id::text\n    where u.deleted_at is null\n  ) x),'[]'::jsonb);\nend $$;\nrevoke all on function public.staff_usuarios() from public,anon;\ngrant execute on function public.staff_usuarios() to authenticated;\n\ncreate or replace function public.staff_guarda_ficha(p_tipo text,p_id uuid,p_datos jsonb,p_revision timestamptz default null)\nreturns jsonb language plpgsql security definer set search_path=public\nas $$\ndeclare col text; permitidos text[]; dato record; anterior jsonb; nuevo jsonb;\n        rev timestamptz; salida timestamptz; cu uuid;\nbegin\n  if auth.uid() is null or not public.es_staff() then\n    raise exception 'Sólo el equipo de Nuvoor puede editar estas fichas' using errcode='42501';\n  end if;\n  if jsonb_typeof(p_datos) is distinct from 'object' or octet_length(p_datos::text)>20000 then\n    raise exception 'Ficha no válida';\n  end if;\n  if p_tipo='persona' then\n    col:='personas';\n    permitidos:=array['nombre','apellidos','tel','pais','estadoGeo','ciudad','idioma','nota'];\n    if not exists(select 1 from auth.users where id=p_id and deleted_at is null) then raise exception 'La persona ya no existe'; end if;\n  elsif p_tipo='negocio' then\n    col:='notas_cuenta'; cu:=p_id;\n    permitidos:=array['nombre','contacto','tel','pais','estadoGeo','ciudad','direccion','zona','sitio','razon','rfc','cp'];\n    if not exists(select 1 from public.cuentas where id=p_id) then raise exception 'El negocio ya no existe'; end if;\n  else raise exception 'Tipo de ficha no válido';\n  end if;\n  for dato in select key,value from jsonb_each(p_datos) loop\n    if not dato.key=any(permitidos) or jsonb_typeof(dato.value)<>'string' or length(dato.value#>>'{}')>2000 then\n      raise exception 'La ficha contiene un campo no permitido';\n    end if;\n  end loop;\n  if p_datos ? 'zona' and nullif(p_datos->>'zona','') is not null and not exists(select 1 from pg_timezone_names where name=p_datos->>'zona') then\n    raise exception 'Revisa la zona horaria';\n  end if;\n  perform pg_advisory_xact_lock(hashtextextended(col||p_id::text,0));\n  select cuerpo,actualizado into anterior,rev from public.lab_datos where coleccion=col and doc_id=p_id::text for update;\n  if rev is distinct from p_revision then\n    raise exception 'La ficha cambió en otro dispositivo. Actualízala antes de guardar.' using errcode='40001';\n  end if;\n  if p_tipo='negocio' and p_datos ? 'nombre' then\n    if length(btrim(p_datos->>'nombre')) not between 1 and 200 then raise exception 'Escribe el nombre del negocio'; end if;\n    update public.cuentas set nombre=btrim(p_datos->>'nombre') where id=p_id;\n  end if;\n  nuevo:=coalesce(anterior,'{}'::jsonb)||(p_datos-'nombre');\n  if p_tipo='persona' then nuevo:=coalesce(anterior,'{}'::jsonb)||p_datos; end if;\n  insert into public.lab_datos(coleccion,doc_id,cuerpo) values(col,p_id::text,nuevo)\n    on conflict(coleccion,doc_id) do update set cuerpo=excluded.cuerpo\n    returning actualizado into salida;\n  -- Registra sólo qué campos cambiaron; evita duplicar datos personales en la bitácora.\n  insert into public.lab_bitacora(cuenta_id,quien,que,antes,despues)\n    values(cu,auth.uid(),'Ficha de '||p_tipo||' actualizada',null,\n      jsonb_build_object('tipo',p_tipo,'id',p_id,'campos',(select jsonb_agg(key) from jsonb_object_keys(p_datos) key)));\n  return jsonb_build_object('ok',true,'revision',salida);\nend $$;\nrevoke all on function public.staff_guarda_ficha(text,uuid,jsonb,timestamptz) from public,anon;\ngrant execute on function public.staff_guarda_ficha(text,uuid,jsonb,timestamptz) to authenticated;\n\ncreate or replace function public.nuvoor_lab_personas_disponible()\nreturns boolean language sql stable security invoker set search_path=public\nas $$ select auth.uid() is not null and public.es_staff() $$;\nrevoke all on function public.nuvoor_lab_personas_disponible() from public,anon;\ngrant execute on function public.nuvoor_lab_personas_disponible() to authenticated;\n\ncommit;\n"});</script>
 </body>
 </html>

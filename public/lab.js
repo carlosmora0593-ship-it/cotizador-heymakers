@@ -156,6 +156,7 @@ function estadoDe(r){
 function cuentaDeVista(r, nota){
   const base = {
     id: r.id,
+    producto: r.producto || "taller",
     taller: r.taller || "Sin nombre",
     correo: r.correo_dueno || "",
     /* El plan que se muestra es el que la cuenta tiene de verdad.
@@ -183,7 +184,8 @@ function cuentaDeVista(r, nota){
      dijera que hizo 40 cotizaciones y la base dice 12, manda la base. */
   const mio = nota || {};
   ["sitio","contacto","tel","origen","alianza","cerradoPor","requiereFactura",
-   "rfc","razon","cp","regimen","uso","apoyo","historial","nota"].forEach(k=>{
+   "rfc","razon","cp","regimen","uso","apoyo","historial","nota",
+   "pais","estadoGeo","ciudad","direccion","zona"].forEach(k=>{
     if(mio[k] !== undefined) base[k] = mio[k];
   });
   base.historial = base.historial || [{f: base.alta, t: "Se abrió la cuenta."}];
@@ -289,17 +291,20 @@ async function leeSoporte(){
 
 async function leeColeccion(col){
   if(col === "cuentas"){
-    const [{data: filas}, {data: notas}] = await Promise.all([
+    const [rFilas, rNotas] = await Promise.all([
       SB.from("v_cuentas").select("*").order("creada", {ascending:false}),
-      SB.from("lab_datos").select("doc_id,cuerpo").eq("coleccion","notas_cuenta")
+      SB.from("lab_datos").select("doc_id,cuerpo,actualizado").eq("coleccion","notas_cuenta")
     ]);
+    if(rFilas.error) throw new Error(rFilas.error.message);
+    if(rNotas.error) throw new Error(rNotas.error.message);
+    const filas=rFilas.data, notas=rNotas.data;
     const porId = {};
-    (notas||[]).forEach(n=> porId[n.doc_id] = n.cuerpo);
+    (notas||[]).forEach(n=> porId[n.doc_id] = {...n.cuerpo,fichaRevision:n.actualizado});
     /* Nos quedamos con el renglón tal cual viene de la base. Al guardar,
        comparamos contra esto para mandar solo lo que de verdad cambió. */
     window.__cuentasCrudas = {};
     (filas||[]).forEach(r=> window.__cuentasCrudas[r.id] = r);
-    return (filas||[]).map(r=> cuentaDeVista(r, porId[r.id]));
+    return (filas||[]).map(r=>Object.assign(cuentaDeVista(r, porId[r.id]),{fichaRevision:porId[r.id]?.fichaRevision||null}));
   }
 
   if(col === "tickets"){
@@ -364,11 +369,13 @@ function refDoc(ruta){
       if(col === "cuentas"){
         const mio = {};
         ["sitio","contacto","tel","origen","alianza","cerradoPor","requiereFactura",
-         "rfc","razon","cp","regimen","uso","apoyo","historial","nota"].forEach(k=>{
+         "rfc","razon","cp","regimen","uso","apoyo","historial","nota",
+         "pais","estadoGeo","ciudad","direccion","zona"].forEach(k=>{
           if(cuerpo[k] !== undefined) mio[k] = cuerpo[k];
         });
-        await SB.from("lab_datos").upsert(
+        const {error}=await SB.from("lab_datos").upsert(
           {coleccion:"notas_cuenta", doc_id:id, cuerpo:mio}, {onConflict:"coleccion,doc_id"});
+        if(error) throw new Error(error.message);
         return;
       }
       if(col === "tickets"){ await contestaTicket(id, cuerpo); return; }
@@ -643,4 +650,20 @@ if(q("#labSalir")) q("#labSalir").addEventListener("click", async ()=>{
 if(q("#labCotizador")) q("#labCotizador").addEventListener("click", ()=>{ location.href = ALCOTIZADOR; });
 
 if(SB) SB.auth.onAuthStateChange(evt=>{ if(evt === "SIGNED_OUT") location.href = ALCOTIZADOR; });
+/* Fichas privadas del Lab: Auth y membresías permanecen de consulta. */
+window.__labPersonas={
+  async lista(){
+    const {data,error}=await SB.rpc("staff_usuarios");
+    if(error) throw new Error(error.message);
+    if(!Array.isArray(data)) throw new Error("La consulta de personas no devolvió una lista válida.");
+    return data||[];
+  },
+  async guarda(tipo,id,datos,revision){
+    const {data,error}=await SB.rpc("staff_guarda_ficha",{p_tipo:tipo,p_id:id,p_datos:datos,p_revision:revision||null});
+    if(error) throw new Error(error.message);
+    if(!data?.ok) throw new Error("No se guardó la ficha");
+    return data;
+  },
+  async cuenta(id){return (await leeColeccion("cuentas")).find(c=>c.id===id);}
+};
 arranca();
