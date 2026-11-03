@@ -11884,6 +11884,8 @@ function ponIconos(){
   /* compras: el carrito */
   com:'<circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17.5" cy="19.5" r="1.4"/>'+
       '<path d="M2.5 3.5H5l2.5 10.2a1.8 1.8 0 0 0 1.8 1.4h7.4a1.8 1.8 0 0 0 1.8-1.4L20.5 7H6"/>',
+  /* vales: comprobante con autorización */
+  val:'<path d="M5 3h14v18l-3-2-4 2-4-2-3 2Z"/><path d="M8 7h8M8 10h5M9 14l2 2 4-4"/>',
   /* caja: un billete */
   caj:'<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/>'+
       '<path d="M6 12h.01M18 12h.01"/>',
@@ -24549,10 +24551,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261102-2204";</script>
+<script>window.BUILD="20261102-2213";</script>
 <script>
 (function(){
-  var mio = "20261102-2204";
+  var mio = "20261102-2213";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
