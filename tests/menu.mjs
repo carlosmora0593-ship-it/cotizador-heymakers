@@ -58,30 +58,18 @@ try{
  assert.equal(await page.locator('#tabs [data-tab="pro"]').getAttribute('aria-current'),'page');
  await page.screenshot({path:'tmp/stripe/menu-integrado-escritorio.png'});
  const footer=await page.locator('#tabs .nvNavAjustes').boundingBox();assert.ok(footer.y+footer.height<=950);
- // No se mezclan el filtro ni los grupos plegados con los permisos.
- await page.locator('#nvNavBuscar').fill('nomina');
- assert.ok(await page.locator('#tabs [data-tab="nom"]').isVisible());
- assert.equal(await page.locator('#tabs [data-tab="ven"]').isVisible(),false);
+ assert.equal(await page.locator('#tabs input').count(),0,'El menú no debe ofrecer campos para autocompletado');
  await page.locator('#tabs [data-tab="nom"]').click();
- assert.equal(await page.locator('#nvNavBuscar').inputValue(),'');
  await page.locator('#tabs [data-nav-grupo="Materiales"]').click();
  assert.equal(await page.locator('#tabs [data-tab="calc"]').isVisible(),false);
- await page.locator('#nvNavBuscar').fill('calculadora');
+ await page.locator('#tabs [data-nav-grupo="Materiales"]').click();
  assert.ok(await page.locator('#tabs [data-tab="calc"]').isVisible());
- await page.locator('#nvNavBuscar').fill('');
- assert.equal(await page.locator('#tabs [data-tab="calc"]').isVisible(),false);
- await page.locator('#tabs [data-nav-grupo="Materiales"]').click();
- await page.locator('#nvNavBuscar').fill('zzzz');assert.ok(await page.locator('#nvNavVacio').isVisible());
- await page.locator('#nvNavBuscar').fill('');
  await page.locator('#tabs [data-tab="set"]').click();
  assert.ok(await page.locator('#tab-set').isVisible());
  await licencia('pro','produccion');
  assert.equal(await page.locator('#tabs [data-tab="set"]').isVisible(),false);
  assert.equal(await page.locator('#tabs [data-tab="ven"]').isVisible(),false);
- await page.locator('#nvNavBuscar').fill('nomina');
  assert.equal(await page.locator('#tabs [data-tab="nom"]').isVisible(),false);
- assert.ok(await page.locator('#nvNavVacio').isVisible());
- await page.locator('#nvNavBuscar').fill('');
  assert.ok(await page.locator('#tabs [data-tab="inv"]').isVisible());
  await licencia('basico','admin');
  for(const t of ['ven','caj','inv','com'])assert.equal(await page.locator('#tabs [data-tab="'+t+'"]').isVisible(),false);
@@ -112,7 +100,6 @@ try{
  await page.keyboard.press('Escape');assert.equal(await page.locator('#tabs').isVisible(),false);
  assert.equal(await page.evaluate(()=>document.activeElement.id),'menuBtn');
  await page.locator('#menuBtn').click();
- await page.locator('#nvNavBuscar').fill('calculadora');
  await page.locator('#tabs [data-tab="calc"]').click();
  assert.equal(await page.locator('#tabs').isVisible(),false);
  assert.ok(await page.locator('#tab-calc').isVisible());
@@ -129,5 +116,5 @@ try{
  await page.screenshot({path:'tmp/stripe/menu-integrado-oscuro.png'});
  assert.equal(await page.locator('#tabs [data-nav-grupo][aria-expanded="true"]').count(),4);
  assert.deepEqual(errors,[]);
- console.log('Menú integrado: 18 botones únicos, selección, grupos, búsqueda, roles/planes, vencida, badges, Ajustes, móvil, foco, Escape, fondo y oscuro: OK.');
+ console.log('Menú integrado: 18 botones únicos, selección, grupos, sin buscador/autocompletado, roles/planes, vencida, badges, Ajustes, móvil, foco, Escape, fondo y oscuro: OK.');
 }finally{await browser?.close();await new Promise(r=>server.close(r));}

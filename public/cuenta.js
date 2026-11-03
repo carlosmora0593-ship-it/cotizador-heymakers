@@ -114,7 +114,7 @@ async function pruebaConexion(){
 const plan = () => (CUENTA && CUENTA.plan) || "prueba";
 const vigente = () => !!(CUENTA && CUENTA.plan !== "ninguno" &&
   CUENTA.estado === "activa" && new Date(CUENTA.vence) > new Date());
-window.__estadoLicenciaNuvoor=()=>({cargada:!!CUENTA,suspendida:!!CUENTA&&!vigente()});
+window.__estadoLicenciaNuvoor=()=>({cargada:!!CUENTA,cuenta:CUENTA?CUENTA.id:null,suspendida:!!CUENTA&&!vigente()});
 function exigeEscrituraNuvoor(){
   if(!CUENTA||!vigente())throw {code:"vencida",message:"Tu plan está suspendido. Actualiza tu pago para guardar cambios."};
 }
