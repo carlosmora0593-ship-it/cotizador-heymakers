@@ -393,7 +393,7 @@ window.__rolServidor = () => PERFIL ? rol() : null;
 function aplicaPermisos(){
   const permitidas = (PERMISOS[rol()] || PERMISOS.admin).filter(enElPlan);
   document.querySelectorAll('#tabs [data-tab]').forEach(b=>{
-    b.hidden = b.dataset.tab === "set" || permitidas.indexOf(b.dataset.tab) < 0;
+    b.hidden = permitidas.indexOf(b.dataset.tab) < 0;
   });
   // Si está parado en una sección que ya no le toca, lo mandamos a la primera suya.
   const actual = document.querySelector('#tabs [data-tab][aria-selected="true"]');
@@ -969,8 +969,8 @@ if(listaPerfil) listaPerfil.addEventListener("click", e=>{
 });
 
 /* Llevar a una pestaña y, si hace falta, a una tarjeta dentro de ella.
-   Ajustes ya no está en el menú de secciones —vive en el de perfil— así que
-   su botón está oculto; aquí lo usamos igual, que para eso sigue existiendo. */
+   Ajustes está al pie del menú y también en el perfil. Se utiliza el mismo
+   botón, cuya disponibilidad ya valida el rol y el plan de la cuenta. */
 function vaA(pestana, ancla){
   const b = document.querySelector('#tabs [data-tab="' + pestana + '"]');
   if(!b){ alert("Esa sección no está disponible con tu plan o tu rol."); return; }

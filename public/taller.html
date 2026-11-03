@@ -6,7 +6,9 @@
 <meta name="description" content="Cotizador de artículos personalizados: playeras, gorras y tazas con DTF, sublimación, serigrafía y bordado. Cotiza, produce y lleva tus ventas.">
 <meta name="theme-color" content="#F51B95">
 <script src="config.js?v=20261016-1350"></script>
-<style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{color-scheme:light dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+
+</style>
 <title>Nuvoor Imprenta</title>
 <link rel="icon" type="image/png" href="./marca/n-64.png">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3403,6 +3405,49 @@ body.rol-produccion #btnPrint{display:none!important}
 .pgNota{font-size:12px;color:var(--ink-3);margin:8px 0 0}
 @media (prefers-reduced-motion:reduce){ .cv2Perilla,.svTile,.svVentana,.svVelo{transition:none!important;animation:none!important} }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* Menú aprobado: cuatro grupos abiertos, accesos rápidos y búsqueda. */
+@media screen{
+:root{--barra:270px}
+.barraNav{overflow:hidden;padding:12px 10px 0}
+#barra{overflow:hidden}
+nav.tabs.nvNav,body.conBarra nav.tabs.nvNav{display:flex;flex-direction:column;gap:0;overflow:hidden;padding:12px;max-height:none;overscroll-behavior:contain}
+body.conBarra nav.tabs.nvNav{height:100%;padding:0;background:transparent;border:0}
+.nvNavCab{display:flex;align-items:center;justify-content:space-between;flex:none;padding:2px 2px 12px}
+body.conBarra .nvNavCab{display:none}
+nav.nvNav .nvNavCab button{display:block;padding:7px 11px;border:1px solid var(--line);background:var(--surface);border-radius:10px}
+.nvNavBusca{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:11px;padding:0 10px;flex:none;margin:0 3px 14px;background:var(--surface-2);color:var(--ink-3)}
+.nvNavBusca svg{width:17px;height:17px;flex:none}
+.nvNavBusca input{width:100%;min-width:0;padding:10px 0;border:0;background:transparent;box-shadow:none;font:inherit;font-size:12px;color:var(--ink)}
+.nvNavBusca:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.nvNavBusca input:focus{outline:0;box-shadow:none}
+.nvNavRapidos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:0 3px 15px;flex:none;border-bottom:1px solid var(--line-soft);margin-bottom:10px}
+nav.nvNav .nvNavRapidos button,body.conBarra nav.nvNav .nvNavRapidos button{display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 7px;border:1px solid var(--line);background:var(--surface);border-radius:11px;min-width:0}
+nav.nvNav .nvNavRapidos button b{font-size:13px;white-space:normal}
+nav.tabs.nvNav .nvNavRapidos button[data-tab="cot"],body.conBarra nav.tabs.nvNav .nvNavRapidos button[data-tab="cot"]{background:var(--accent)!important;border-color:var(--accent);color:var(--accent-ink)}
+nav.nvNav .nvNavRapidos button[data-tab="cot"] b,nav.nvNav .nvNavRapidos button[data-tab="cot"] .ico{color:var(--accent-ink)}
+nav.nvNav .nvNavRapidos .ico{width:17px;height:17px;flex:none}
+nav.nvNav button small{display:none}
+.nvNavLista{min-height:0;overflow-y:auto;overscroll-behavior:contain;flex:1;padding:0 2px 12px;scrollbar-width:thin}
+nav.nvNav button[data-tab],body.conBarra nav.nvNav button[data-tab]{width:100%;display:flex;gap:10px;align-items:center;padding:10px 11px;text-align:left;white-space:normal;min-width:0}
+nav.nvNav button[data-tab] b{font-size:12.5px;line-height:1.4;font-weight:500;overflow-wrap:anywhere}
+nav.nvNav button[data-tab]>.ico{width:17px;height:17px;flex:none}
+nav.nvNav button[data-tab][aria-selected="true"],body.conBarra nav.nvNav button[data-tab][aria-selected="true"]{background:var(--accent-soft);background-image:none;box-shadow:none;color:var(--accent)}
+nav.nvNav button[data-tab][aria-selected="true"] b,nav.nvNav button[data-tab][aria-selected="true"] .ico,body.conBarra nav.nvNav button[data-tab][aria-selected="true"] b,body.conBarra nav.nvNav button[data-tab][aria-selected="true"] .ico{color:var(--accent)}
+.nvNavGrupo{margin-top:10px}
+nav.nvNav .nvNavTitulo{display:flex;width:100%;align-items:center;gap:10px;padding:11px 12px;border-radius:9px;background:var(--surface-2);color:var(--ink);text-align:left}
+nav.nvNav .nvNavTitulo b{font:inherit;font-weight:700;font-size:13px}
+.nvNavTitulo .ico{width:18px;height:18px;color:var(--ink-3)}
+.nvNavFlecha{width:13px;height:13px;margin-left:auto;flex:none;transition:transform .15s;color:var(--ink-3)}
+.nvNavTitulo[aria-expanded="true"] .nvNavFlecha{transform:rotate(90deg)}
+.nvNavLinks{margin:5px 0 8px 18px;border-left:1px solid var(--line);padding-left:8px}
+.nvNavAjustes{flex:none;padding:10px 0;border-top:1px solid var(--line-soft)}
+.nvNavVacio{font-size:12px;color:var(--ink-3);padding:12px;line-height:1.5}
+nav.nvNav [data-nav-filtrado]{display:none!important}
+nav.nvNav [hidden]{display:none!important}
+body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom:0;width:min(310px,calc(100vw - 36px));min-width:0;height:100vh;height:100dvh;max-height:none;z-index:82;border-radius:0;border:0;border-right:1px solid var(--line);background:var(--surface);padding-top:max(16px,env(safe-area-inset-top));padding-bottom:max(10px,env(safe-area-inset-bottom));box-shadow:20px 0 60px #0003}
+#nvNavFondo{position:fixed;inset:0;background:rgba(10,12,24,.48);z-index:81}
+#nvNavFondo[hidden]{display:none!important}
+}
 </style>
 
 <aside id="barra" hidden>
@@ -3429,22 +3474,22 @@ body.rol-produccion #btnPrint{display:none!important}
       <nav class="tabs" id="tabs" role="menu" hidden>
         <button role="menuitem" data-tab="inicio" aria-selected="true"><b>Inicio</b><small>Qué pasó y qué urge</small></button>
         <button role="menuitem" data-tab="cot" aria-selected="false"><b>Cotizar</b><small>Armar una cotización nueva</small></button>
-        <button role="menuitem" data-tab="mos" aria-selected="false"><b>Mostrador</b><small>Vender y cobrar en el momento</small></button>
-        <button role="menuitem" data-tab="sav" aria-selected="false"><b>Cotizaciones / Pedidos</b><small>Guardadas, confirmadas y por facturar</small></button>
-        <button role="menuitem" data-tab="dis" aria-selected="false"><b>Diseño</b><small>Archivos de impresión de cada orden</small></button>
+        <button role="menuitem" data-tab="mos" aria-selected="false"><b>Vender</b><small>Vender y cobrar en el momento</small></button>
+        <button role="menuitem" data-tab="sav" aria-selected="false"><b>Cotizaciones y pedidos</b><small>Guardadas, confirmadas y por facturar</small></button>
+        <button role="menuitem" data-tab="dis" aria-selected="false"><b>Diseño y archivos</b><small>Archivos de impresión de cada orden</small></button>
         <button role="menuitem" data-tab="pro" aria-selected="false"><b>Producción</b><small>Tablero de órdenes y su estatus</small></button>
         <button role="menuitem" data-tab="cli" aria-selected="false"><b>Clientes</b><small>Datos fiscales y expedientes</small></button>
         <button role="menuitem" data-tab="arc" aria-selected="false"><b>Archivo</b><small>Órdenes y facturas por cliente y mes</small></button>
         <button role="menuitem" data-tab="caj" aria-selected="false"><b>Caja</b><small>Apertura, movimientos y corte</small></button>
-        <button role="menuitem" data-tab="ven" aria-selected="false"><b>Ventas</b><small>Cortes, análisis y proyección</small></button>
+        <button role="menuitem" data-tab="ven" aria-selected="false"><b>Ventas y reportes</b><small>Cortes, análisis y proyección</small></button>
         <button role="menuitem" data-tab="cat" aria-selected="false"><b>Catálogo / Artículos</b><small>Artículos, técnicas, precios e inventario</small></button>
         <button role="menuitem" data-tab="calc" aria-selected="false"><b>Calculadora de costos</b><small>Qué te cuesta producir, paso a paso</small></button>
-        <button role="menuitem" data-tab="inv" aria-selected="false"><b>Inventario <span class="mbadge" id="invBadge" hidden>0</span></b><small>Qué hay en el taller y qué hay que pedir</small></button>
+        <button role="menuitem" data-tab="inv" aria-selected="false"><b>Inventario de producción <span class="mbadge" id="invBadge" hidden>0</span></b><small>Qué hay en el taller y qué hay que pedir</small></button>
         <button role="menuitem" data-tab="com" aria-selected="false"><b>Compras <span class="mbadge" hidden>0</span></b><small>Requisiciones, proveedores y facturas</small></button>
-        <button role="menuitem" data-tab="val" aria-selected="false"><b>Vales <span class="mbadge" id="valBadge" hidden>0</span></b><small>Herramienta y dinero que sale, con su firma</small></button>
+        <button role="menuitem" data-tab="val" aria-selected="false"><b>Vales y préstamos <span class="mbadge" id="valBadge" hidden>0</span></b><small>Herramienta y dinero que sale, con su firma</small></button>
         <button role="menuitem" data-tab="asi" aria-selected="false"><b>Asistencia</b><small>Reloj checador y horas trabajadas</small></button>
         <button role="menuitem" data-tab="nom" aria-selected="false"><b>Nómina</b><small>Lo que se le paga a cada quien</small></button>
-        <button role="menuitem" data-tab="set" aria-selected="false" hidden><b>Ajustes</b><small>Utilidad, IVA y datos de tu empresa</small></button>
+        <button role="menuitem" data-tab="set" aria-selected="false" hidden><b>Ajustes del negocio</b><small>Utilidad, IVA y datos de tu empresa</small></button>
       </nav>
     </div>
     <button class="userChip" id="userChip" title="Cambiar de usuario">
@@ -10388,102 +10433,121 @@ $("#btnLogoDef").addEventListener("click", ()=>{ P.empresa.logo = ""; persist();
 /* ---------- menú ---------- */
 function abreMenu(v){
   if(document.body.classList.contains("conBarra")) return;   // con barra siempre está a la vista
-  $("#tabs").hidden = !v;
-  $("#menuBtn").setAttribute("aria-expanded", String(v));
+  $("#tabs").hidden = !v; nvNavEstado(v);
+  if(v) setTimeout(()=>{const c=$("#nvNavCerrar");if(c)c.focus();},0);
 }
 $("#menuBtn").addEventListener("click", e=>{ e.stopPropagation(); abreMenu($("#tabs").hidden); });
-document.addEventListener("click", e=>{ if(!e.target.closest(".menuWrap")) abreMenu(false); });
-document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !$("#tabs").hidden) abreMenu(false); });
+document.addEventListener("click", e=>{ if(!e.target.closest(".menuWrap,#tabs")) abreMenu(false); });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !document.body.classList.contains("conBarra") && !$("#tabs").hidden){ abreMenu(false); $("#menuBtn").focus(); } });
 
 /* ---------- menú lateral ---------- */
-/* Agrupadas por para qué sirven, no por orden de aparición. */
+/* Los botones originales se mueven, no se copian: conservan permisos,
+   contadores y sus manejadores. Los grupos empiezan todos abiertos. */
 const GRUPOS_BARRA = [
-  ["",           ["inicio"]],
-  ["Comercial",  ["cot","mos","sav","cli","arc"]],
-  ["Producción", ["dis","pro","inv"]],
-  ["Administración", ["caj","ven","com","val"]],
-  ["Personal",    ["asi","nom"]],
-  ["Taller",     ["cat","calc","set"]]
+  ["Pedidos",["sav","cli","dis","pro","arc"]],
+  ["Dinero",["caj","ven","com","val"]],
+  ["Materiales",["inv","cat","calc"]],
+  ["Equipo",["asi","nom"]]
 ];
+const NV_NAV_ICONOS = {Pedidos:"sav",Dinero:"caj",Materiales:"inv",Equipo:"asi"};
+const nvNavIcono = t => '<svg viewBox="0 0 24 24" class="ico" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+((window.ICONOS_SEC||{})[t]||'')+'</svg>';
 function agrupaBarra(){
   const tabs = $("#tabs"); if(!tabs || tabs.dataset.agrupado) return;
   const botones = {};
-  [...tabs.querySelectorAll("button[data-tab]")].forEach(b=> botones[b.dataset.tab] = b);
-  const sueltos = Object.keys(botones).filter(t=> !GRUPOS_BARRA.some(g=>g[1].indexOf(t)>=0));
-  GRUPOS_BARRA.concat(sueltos.length ? [["Otros", sueltos]] : []).forEach(g=>{
-    if(g[0]){
-      const h = document.createElement("button");
-      h.type = "button";
-      h.className = "barraGrupo"; h.textContent = g[0]; h.dataset.grupo = g[0];
-      h.setAttribute("aria-current", "false");
-      if(window.HUBS && window.HUBS[g[0]]){ h.title = "Ver la portada de " + g[0];
-        h.classList.add("conPortada"); }
-      tabs.appendChild(h);
-    }
-    g[1].forEach(t=>{ if(botones[t]) tabs.appendChild(botones[t]); });
+  tabs.querySelectorAll("button[data-tab]").forEach(b=>{botones[b.dataset.tab]=b;b.removeAttribute("role");const s=b.querySelector("small");if(s&&!b.title)b.title=s.textContent;});
+  tabs.classList.add("nvNav"); tabs.setAttribute("role","navigation"); tabs.setAttribute("aria-label","Menú principal");
+  const cab = document.createElement("div"); cab.className="nvNavCab";
+  cab.innerHTML='<b>Menú</b><button type="button" id="nvNavCerrar" aria-label="Cerrar menú">✕</button>';
+  tabs.appendChild(cab);
+  const buscador = document.createElement("label");buscador.className="nvNavBusca";
+  buscador.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="nvNavBuscar" type="search" placeholder="Buscar en el menú" aria-label="Buscar en el menú" autocomplete="off">';tabs.appendChild(buscador);
+  const rapidos=document.createElement("div");rapidos.className="nvNavRapidos";
+  ["cot","mos"].forEach(t=>{if(botones[t])rapidos.appendChild(botones[t]);});tabs.appendChild(rapidos);
+  const lista=document.createElement("div");lista.className="nvNavLista";tabs.appendChild(lista);
+  if(botones.inicio)lista.appendChild(botones.inicio);
+  if(typeof ponIconos==="function")ponIconos();
+  const agrupados=new Set(["inicio","cot","mos","set"]);
+  const sueltos=Object.keys(botones).filter(t=>!agrupados.has(t)&&!GRUPOS_BARRA.some(g=>g[1].includes(t)));
+  GRUPOS_BARRA.concat(sueltos.length?[["Otros",sueltos]]:[]).forEach(([nombre,miembros],i)=>{
+    const grupo=document.createElement("section");grupo.className="nvNavGrupo";grupo.dataset.navAbierto="1";
+    const h=document.createElement("button");h.type="button";h.className="nvNavTitulo";h.dataset.navGrupo=nombre;
+    h.setAttribute("aria-expanded","true");h.setAttribute("aria-controls","nvNavLista"+i);
+    h.innerHTML=nvNavIcono(NV_NAV_ICONOS[nombre]||"inicio")+'<b>'+esc(nombre)+'</b><svg class="nvNavFlecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>';
+    grupo.appendChild(h);
+    const cuerpo=document.createElement("div");cuerpo.className="nvNavLinks";cuerpo.id="nvNavLista"+i;
+    miembros.forEach(t=>{if(botones[t])cuerpo.appendChild(botones[t]);});grupo.appendChild(cuerpo);lista.appendChild(grupo);
   });
-  // en la barra sólo se ve el nombre; la explicación queda como globo de ayuda
-  [...tabs.querySelectorAll("button[data-tab]")].forEach(b=>{
-    const ch = b.querySelector("small");
-    if(ch && !b.title) b.title = ch.textContent;
-  });
-  tabs.dataset.agrupado = "1";
-  if(typeof ponIconos==="function") ponIconos();
+  const vacio=document.createElement("p");vacio.id="nvNavVacio";vacio.className="nvNavVacio";vacio.hidden=true;vacio.textContent="No encontré esa opción. Prueba con otro nombre.";lista.appendChild(vacio);
+  const pie=document.createElement("div");pie.className="nvNavAjustes";if(botones.set)pie.appendChild(botones.set);tabs.appendChild(pie);
+  const fondo=document.createElement("div");fondo.id="nvNavFondo";fondo.hidden=true;fondo.setAttribute("aria-hidden","true");document.body.appendChild(fondo);
+  $("#menuBtn").setAttribute("aria-controls","tabs");$("#menuBtn").removeAttribute("aria-haspopup");
+  tabs.dataset.agrupado="1";
+  if(typeof ponIconos==="function")ponIconos();
   limpiaGrupos();
 }
-/* Un encabezado de grupo sin pestañas visibles sobra: el rol de cada quien
-   esconde las que no le tocan. */
 function limpiaGrupos(){
-  const tabs = $("#tabs"); if(!tabs) return;
-  let actual = null, vivos = 0;
-  [...tabs.children].forEach(el=>{
-    if(el.classList.contains("barraGrupo")){
-      if(actual) actual.hidden = vivos === 0;
-      actual = el; vivos = 0;
-    } else if(el.tagName === "BUTTON" && !el.hidden) vivos++;
+  const tabs=$("#tabs");if(!tabs||!tabs.dataset.agrupado)return;
+  const normaliza=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
+  const q=normaliza(($("#nvNavBuscar")||{}).value);let encontrados=0;
+  tabs.querySelectorAll("button[data-tab]").forEach(b=>{
+    const g=b.closest(".nvNavGrupo"),h=g&&g.querySelector("[data-nav-grupo]");
+    const coincide=!q||normaliza((b.querySelector("b")||b).textContent+" "+(b.title||"")+" "+(h?h.dataset.navGrupo:"")).includes(q);
+    const oculta=!coincide;b.toggleAttribute("data-nav-filtrado",oculta);
+    if(!b.hidden&&coincide)encontrados++;
   });
-  if(actual) actual.hidden = vivos === 0;
+  tabs.querySelectorAll(".nvNavGrupo").forEach(g=>{
+    const hay=[...g.querySelectorAll("button[data-tab]")].some(b=>!b.hidden&&!b.hasAttribute("data-nav-filtrado"));
+    g.hidden=!hay;
+    const abierto=!!q||g.dataset.navAbierto!=="0";
+    g.querySelector(".nvNavLinks").hidden=!abierto;
+    g.querySelector("[data-nav-grupo]").setAttribute("aria-expanded",String(abierto));
+  });
+  tabs.querySelectorAll(".nvNavRapidos,.nvNavAjustes").forEach(c=>c.hidden=![...c.querySelectorAll("[data-tab]")].some(b=>!b.hidden&&!b.hasAttribute("data-nav-filtrado")));
+  $("#nvNavVacio").hidden=!q||encontrados>0;
 }
-
+let nvNavOverflow="";
+function nvNavEstado(abierto){
+  const estaba=document.body.classList.contains("nvNavAbierta");
+  document.body.classList.toggle("nvNavAbierta",abierto);
+  const f=$("#nvNavFondo");if(f)f.hidden=!abierto;
+  $("#menuBtn").setAttribute("aria-expanded",String(abierto));
+  if(abierto&&!estaba){nvNavOverflow=document.body.style.overflow;document.body.style.overflow="hidden";}
+  if(!abierto&&estaba)document.body.style.overflow=nvNavOverflow;
+}
 function acomodaBarra(){
-  const barra = $("#barra"), tabs = $("#tabs"); if(!barra || !tabs) return;
-  agrupaBarra();
-  const marca = document.querySelector(".brand");   // puede estar en el header o ya en la barra
-  const wrap  = document.querySelector("header.top .menuWrap");
-  const cabe  = window.innerWidth >= 1100;
+  const barra=$("#barra"),tabs=$("#tabs");if(!barra||!tabs)return;
+  agrupaBarra();nvNavEstado(false);
+  const marca=document.querySelector(".brand"),fila=document.querySelector("header.top .top-in");
+  const cabe=window.innerWidth>=1100;
   if(cabe){
-    if(tabs.parentElement !== $("#barraNav")){
-      if(marca) $("#barraTop").appendChild(marca);
-      $("#barraNav").appendChild(tabs);
-    }
-    tabs.hidden = false; barra.hidden = false;
-    document.body.classList.add("conBarra");
-  } else {
-    if(wrap && tabs.parentElement !== wrap){
-      const fila = document.querySelector("header.top .top-in");
-      if(marca && fila) fila.prepend(marca);
-      wrap.appendChild(tabs);
-    }
-    tabs.hidden = true; barra.hidden = true;
-    document.body.classList.remove("conBarra");
+    if(marca&&marca.parentElement!==$("#barraTop"))$("#barraTop").appendChild(marca);
+    if(tabs.parentElement!==$("#barraNav"))$("#barraNav").appendChild(tabs);
+    document.body.classList.add("conBarra");tabs.hidden=false;barra.hidden=false;
+  }else{
+    if(marca&&fila&&marca.parentElement!==fila)fila.prepend(marca);
+    if(tabs.parentElement!==document.body)document.body.appendChild(tabs);
+    document.body.classList.remove("conBarra");tabs.hidden=true;barra.hidden=true;
   }
-  // El desplegable se cuelga de la pantalla, no del botón: en un teléfono
-  // angosto colgarlo del botón lo mandaba medio fuera de la vista.
-  const enc = document.querySelector("header.top");
-  if(enc) document.documentElement.style.setProperty("--menuTop",
-    Math.round(enc.getBoundingClientRect().bottom + 6) + "px");
   limpiaGrupos();
 }
-window.addEventListener("resize", ()=>{ clearTimeout(window.__tBarra);
-  window.__tBarra = setTimeout(acomodaBarra, 120); });
-/* El rol esconde pestañas después de arrancar: hay que volver a limpiar. */
-try{
-  new MutationObserver(ms=>{
-    // los encabezados los escondemos nosotros: si no, nos perseguimos la cola
-    if(ms.every(m=> m.target.classList && m.target.classList.contains("barraGrupo"))) return;
-    limpiaGrupos();
-  }).observe($("#tabs"), {attributes:true, attributeFilter:["hidden"], subtree:true});
-}catch(e){}
+window.addEventListener("resize",()=>{clearTimeout(window.__tBarra);window.__tBarra=setTimeout(acomodaBarra,120);});
+try{new MutationObserver(ms=>{
+  if(ms.some(m=>m.target.matches("button[data-tab]")))limpiaGrupos();
+}).observe($("#tabs"),{attributes:true,attributeFilter:["hidden"],subtree:true});}catch(e){}
+document.addEventListener("input",e=>{if(e.target.id==="nvNavBuscar")limpiaGrupos();});
+document.addEventListener("click",e=>{
+  const h=e.target.closest("[data-nav-grupo]");if(h){const g=h.closest(".nvNavGrupo");g.dataset.navAbierto=g.dataset.navAbierto==="0"?"1":"0";limpiaGrupos();return;}
+  if(e.target.closest("#nvNavCerrar")||e.target.id==="nvNavFondo"){abreMenu(false);$("#menuBtn").focus();}
+});
+document.addEventListener("keydown",e=>{
+  if(!document.body.classList.contains("nvNavAbierta"))return;
+  if(e.key==="Escape"){$("#menuBtn").focus();return;}
+  if(e.key!=="Tab")return;
+  const els=[...$("#tabs").querySelectorAll("button,input")].filter(b=>!b.disabled&&b.getClientRects().length);
+  const first=els[0],last=els[els.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+});
 acomodaBarra();
 
 
@@ -11019,7 +11083,10 @@ function resumenPasos(){
 
 $("#tabs").addEventListener("click", e=>{
   const b = e.target.closest("button[data-tab]"); if(!b) return;
-  [...$("#tabs").children].forEach(x=>x.setAttribute("aria-selected", x===b));
+  $("#tabs").querySelectorAll("button[data-tab]").forEach(x=>{x.setAttribute("aria-selected", x===b);if(x===b)x.setAttribute("aria-current","page");else x.removeAttribute("aria-current");});
+  const buscadorNav=$("#nvNavBuscar");if(buscadorNav)buscadorNav.value="";
+  const grupoNav=b.closest(".nvNavGrupo");if(grupoNav)grupoNav.dataset.navAbierto="1";
+  limpiaGrupos();
   const rot = (b.querySelector("b")||b).cloneNode(true);   // sin el contador
   const bd = rot.querySelector(".mbadge"); if(bd) bd.remove();
   $("#menuActual").textContent = rot.textContent.trim();
@@ -16585,7 +16652,7 @@ const PASOS_TOUR = [
    txt:"En dos minutos te enseño el camino completo de un trabajo: cotizarlo, confirmarlo, producirlo y cobrarlo. Puedes salirte cuando quieras con la ✕, y volver a verlo desde el botón de Ayuda."},
 
   {tab:"inicio", sel:"#tabs", tit:"Todo está aquí",
-   txt:"El menú agrupa por áreas: lo Comercial, lo de Producción, la Administración, el Personal y el Taller. Tocar el nombre de un grupo abre su portada, con todo lo que trae adentro."},
+   txt:"Cotizar y Vender están arriba. Debajo encuentras Pedidos, Dinero, Materiales y Equipo. Los grupos empiezan abiertos; puedes plegarlos o buscar cualquier opción por su nombre."},
 
   {tab:"inicio", sel:"#inVista", tit:"Tu pantalla de inicio",
    txt:"Dos vistas del mismo Inicio: el Tablero, con lo que urge y tus números del día, o las Aplicaciones, la rejilla de iconos. La que escojas se queda puesta."},
@@ -17629,7 +17696,7 @@ function aplicaRol(){
   document.body.classList.toggle("rol-produccion", r==="produccion");
   document.body.classList.toggle("rol-diseno", r==="diseno");
   if(typeof aplicaCostos === "function") aplicaCostos();
-  document.querySelectorAll('#tabs [data-tab]').forEach(b=> b.hidden = b.dataset.tab === "set" || !puedeVer(b.dataset.tab) || (window.__enElPlan && !window.__enElPlan(b.dataset.tab)));
+  document.querySelectorAll('#tabs [data-tab]').forEach(b=> b.hidden = !puedeVer(b.dataset.tab) || (window.__enElPlan && !window.__enElPlan(b.dataset.tab)));
   /* Un grupo sin una sola sección visible es un encabezado huérfano. */
   document.querySelectorAll('#tabs [data-grupo]').forEach(h=>{
     const g = GRUPOS_BARRA.find(x=>x[0] === h.dataset.grupo);
@@ -24418,10 +24485,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261102-2213";</script>
+<script>window.BUILD="20261102-2230";</script>
 <script>
 (function(){
-  var mio = "20261102-2213";
+  var mio = "20261102-2230";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -24450,7 +24517,7 @@ async function accionAyuda(e) {
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
 <script src="suspension.js?v=20261102-2204"></script>
-<script src="cuenta.js?v=20261102-1930"></script>
+<script src="cuenta.js?v=20261102-2230"></script>
 <script src="diagnostico.js?v=20261026-2139"></script>
 </body>
 </html>
