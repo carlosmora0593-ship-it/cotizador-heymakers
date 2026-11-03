@@ -115,9 +115,9 @@ const PRECIOS: Record<string, any> = {
 };
 const PRODUCTOS_VALIDOS = ["taller", "restaurant", "tiendita"];
 const NOMBRES_PRODUCTO: Record<string, string> = {
-  taller: "Taller Makers",
-  restaurant: "Makers Restaurant",
-  tiendita: "Tiendita Makers",
+   taller: "Nuvoor Imprenta",
+   restaurant: "Nuvoor Restaurant",
+   tiendita: "Nuvoor Store",
 };
 
 function limpiaProductos(valor: unknown): string[] {
@@ -160,10 +160,10 @@ Deno.serve(async (req) => {
     const seleccionados = productos.length ? productos : productosActuales;
     if (!seleccionados.length) return resp(400, { error: "Selecciona al menos un producto" });
     if (seleccionados.includes("taller") && seleccionados.length > 1) {
-      return resp(400, { error: "Taller Makers se licencia por separado de Restaurant y Tiendita" });
+       return resp(400, { error: "Nuvoor Imprenta se licencia por separado de Restaurant y Store" });
     }
     if (!seleccionados.includes("taller")) {
-      if (plan === "pro") return resp(400, { error: "Pro es un plan exclusivo de Taller Makers" });
+       if (plan === "pro") return resp(400, { error: "Pro es un plan exclusivo de Nuvoor Imprenta" });
       if (seleccionados.length > 1 && plan !== "maker") {
         return resp(400, { error: "La licencia Multiempresa para Restaurant y Tiendita cuesta $449 MXN al mes" });
       }

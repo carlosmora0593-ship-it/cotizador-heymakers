@@ -46,55 +46,10 @@ const esc = (v: unknown) => encodeURIComponent(String(v ?? ""));
 async function pide(ruta: string, opc: RequestInit & { prefer?: string } = {}) {
   const { prefer, ...resto } = opc;
   return await fetch(SB + "/rest/v1/" + ruta, {
+    signal: AbortSignal.timeout(10000),
     ...resto,
     headers: { ...CAB, ...(prefer ? { Prefer: prefer } : {}) },
   });
-}
-
-async function filas(ruta: string): Promise<any[]> {
-  const r = await pide(ruta);
-  if (!r.ok) { console.error("lectura", ruta, r.status, await r.text()); return []; }
-  try { return await r.json(); } catch { return []; }
-}
-
-async function una(ruta: string): Promise<any | null> {
-  const f = await filas(ruta + (ruta.includes("?") ? "&" : "?") + "limit=1");
-  return f.length ? f[0] : null;
-}
-
-/* Contar sin traerse las filas: PostgREST lo dice en la cabecera
-   content-range, que viene como "0-4/5". El total es lo de después
-   de la diagonal. */
-async function cuantas(ruta: string): Promise<number> {
-  const r = await pide(ruta, { prefer: "count=exact" });
-  const n = Number((r.headers.get("content-range") || "").split("/")[1]);
-  return Number.isFinite(n) ? n : 0;
-}
-
-async function graba(ruta: string, metodo: string, cuerpo?: unknown) {
-  const r = await pide(ruta, {
-    method: metodo,
-    body: cuerpo === undefined ? undefined : JSON.stringify(cuerpo),
-  });
-  if (!r.ok) {
-    const t = await r.text();
-    console.error("escritura", metodo, ruta, r.status, t);
-    return { error: t };
-  }
-  return { error: null };
-}
-
-/* ¿Quién llama? El token de sesión que manda el navegador se lo
-   preguntamos a Supabase: si contesta con un usuario, es válido; si
-   no, no hay nada que hacer. Esta es la única autenticación que
-   importa, y por eso estas funciones NO necesitan "Verify JWT"
-   prendido: lo revisan ellas mismas. */
-async function quienEres(token: string): Promise<any | null> {
-  const r = await fetch(SB + "/auth/v1/user", {
-    headers: { apikey: LLAVE, Authorization: "Bearer " + token },
-  });
-  if (!r.ok) return null;
-  try { const u = await r.json(); return u && u.id ? u : null; } catch { return null; }
 }
 
 /* ---------- Stripe, sin librería ----------
@@ -121,6 +76,7 @@ function aForm(obj: any, prefijo = "", fuera: string[] = []): string[] {
 
 async function stripe(ruta: string, cuerpo?: any, metodo = "POST") {
   const r = await fetch("https://api.stripe.com/v1/" + ruta, {
+    signal: AbortSignal.timeout(10000),
     method: metodo,
     headers: {
       "Authorization": "Bearer " + STRIPE,
@@ -145,13 +101,13 @@ async function stripe(ruta: string, cuerpo?: any, metodo = "POST") {
 
    Van en centavos porque así los pide Stripe. */
 const PLANES: Record<string, { nombre: string; mensual: number; anual: number }> = {
-  taller_basico: { nombre: "Taller Makers · Básico", mensual: 19900, anual: 199000 },
-  taller_maker:  { nombre: "Taller Makers · Maker",  mensual: 44900, anual: 449000 },
-  taller_pro:    { nombre: "Taller Makers · Pro",    mensual: 89900, anual: 899000 },
-  rest_normal:   { nombre: "Makers Restaurant",      mensual: 19900, anual: 199000 },
-  rest_multi:    { nombre: "Makers Restaurant · Multisucursal", mensual: 44900, anual: 449000 },
-  tienda_normal: { nombre: "Tiendita Makers",        mensual: 19900, anual: 199000 },
-  tienda_multi:  { nombre: "Tiendita Makers · Empresarial",      mensual: 44900, anual: 449000 },
+  imprenta_basico: { nombre: "Nuvoor Imprenta · Básico", mensual: 19900, anual: 199000 },
+  imprenta_maker: { nombre: "Nuvoor Imprenta · Maker", mensual: 44900, anual: 449000 },
+  imprenta_pro: { nombre: "Nuvoor Imprenta · Pro (hasta 4 sucursales)", mensual: 89900, anual: 899000 },
+  restaurant_estandar: { nombre: "Nuvoor Restaurant", mensual: 19900, anual: 199000 },
+  restaurant_multi: { nombre: "Nuvoor Restaurant · Multiempresa (hasta 4 sucursales)", mensual: 89900, anual: 899000 },
+  store_estandar: { nombre: "Nuvoor Store", mensual: 19900, anual: 199000 },
+  store_multi: { nombre: "Nuvoor Store · Multiempresa (hasta 4 sucursales)", mensual: 89900, anual: 899000 },
 };
 
 /* ==================================================================
@@ -202,112 +158,134 @@ async function firmaBuena(cuerpo: string, cabecera: string, secreto: string): Pr
 }
 
 const PLAN_INTERNO: Record<string, string> = {
+  imprenta_basico: "basico", imprenta_maker: "maker", imprenta_pro: "pro",
+  restaurant_estandar: "basico", restaurant_multi: "maker",
+  store_estandar: "basico", store_multi: "maker",
   taller_basico: "basico", taller_maker: "maker", taller_pro: "pro",
-  rest_normal: "basico", rest_multi: "maker",
-  tienda_normal: "basico", tienda_multi: "maker",
+  rest_normal: "basico", rest_multi: "maker", tienda_normal: "basico", tienda_multi: "maker",
 };
 
-function sumaPeriodo(desde: Date, ciclo: string) {
-  const d = new Date(desde);
-  if (ciclo === "anual") d.setFullYear(d.getFullYear() + 1); else d.setMonth(d.getMonth() + 1);
-  d.setDate(d.getDate() + 1);          // un día de gracia
-  return d;
+function metadatosFactura(o: any) {
+  const cabeza = o.subscription_details || (o.parent && o.parent.subscription_details);
+  if (cabeza && cabeza.metadata && cabeza.metadata.cuenta_id) return cabeza.metadata;
+  if (o.metadata && o.metadata.cuenta_id) return o.metadata;
+  const lineas = (o.lines && o.lines.data) || [];
+  for (const linea of lineas) {
+    const m = linea.metadata || (linea.parent && linea.parent.subscription_item_details && linea.parent.subscription_item_details.metadata);
+    if (m && m.cuenta_id) return m;
+  }
+  return (cabeza && cabeza.metadata) || o.metadata || {};
+}
+
+// Sólo las Edge Functions con service_role pueden llamar estas RPC.
+async function rpc(nombre: string, datos: any) {
+  const r = await pide("rpc/" + nombre, { method: "POST", body: JSON.stringify(datos) });
+  if (!r.ok) throw new Error("No se pudo aplicar el aviso de Stripe: " + r.status);
+  return r.status === 204 ? null : await r.json();
+}
+async function cuentaDe(id: string) {
+  const r = await pide("cuentas?select=id,producto,stripe_cliente,stripe_suscripcion&limit=1&id=eq." + esc(id));
+  if (!r.ok) throw new Error("No se pudo leer la cuenta");
+  const filas = await r.json();
+  if (!filas[0]) throw new Error("El aviso no corresponde a una cuenta existente");
+  return filas[0];
+}
+function idDe(o: any) { return typeof o === "string" ? o : o && o.id; }
+function corresponde(plan: string, producto: string) {
+  const prefijo = producto === "taller" ? /^(imprenta_|taller_)/ :
+    producto === "restaurant" ? /^(restaurant_|rest_)/ : /^(store_|tienda_)/;
+  return !!PLAN_INTERNO[plan] && prefijo.test(plan);
 }
 
 Deno.serve(async (req) => {
+  if (req.method !== "POST") return new Response("Método no permitido", { status: 405 });
   const crudo = await req.text();
   const firma = req.headers.get("stripe-signature") || "";
   const secreto = Deno.env.get("STRIPE_WEBHOOK_SECRETO") || "";
-
-  if (!(await firmaBuena(crudo, firma, secreto))) {
-    console.error("firma inválida");
-    return new Response("firma inválida", { status: 400 });
-  }
-
-  let ev: any = {};
-  try { ev = JSON.parse(crudo); } catch { return ok("cuerpo ilegible"); }
-  const o = (ev.data && ev.data.object) || {};
-
+  if (!(await firmaBuena(crudo, firma, secreto))) return new Response("firma inválida", { status: 400 });
+  let ev: any;
+  try { ev = JSON.parse(crudo); } catch { return new Response("cuerpo ilegible", { status: 400 }); }
+  const o = ev.data?.object || {};
+  let turno: any = null;
   try {
-    switch (ev.type) {
-      /* ---- pago suelto: OXXO o tarjeta de una sola vez ---- */
-      case "checkout.session.completed":
-      case "checkout.session.async_payment_succeeded": {
-        if (o.mode !== "payment") return ok("sesión de suscripción, la atiende el otro aviso");
-        if (o.payment_status !== "paid") return ok("todavía sin pagar: " + o.payment_status);
-        const m = o.metadata || {};
-        const cuentaId = m.cuenta_id || o.client_reference_id;
-        if (!cuentaId) return ok("sesión sin cuenta");
-        const c = await una("cuentas?select=vence&id=eq." + esc(cuentaId));
-        const desde = c && c.vence && new Date(c.vence) > new Date() ? new Date(c.vence) : new Date();
-        await graba("cuentas?id=eq." + esc(cuentaId), "PATCH", {
-          plan: PLAN_INTERNO[m.plan] || "basico",
-          ciclo: m.ciclo || "mensual",
-          estado: "activa",
-          vence: sumaPeriodo(desde, m.ciclo || "mensual").toISOString(),
-          forma_pago: "oxxo",
-        });
-        return ok("cuenta " + cuentaId + " extendida");
-      }
-
-      /* ---- la suscripción con tarjeta ---- */
-      case "customer.subscription.created":
-      case "customer.subscription.updated": {
-        const m = o.metadata || {};
-        const cuentaId = m.cuenta_id;
-        if (!cuentaId) return ok("suscripción sin cuenta");
-        /* current_period_end viene en segundos; más un día de gracia para
-           que un cobro que tarde no tumbe a nadie. */
-        const fin = new Date((Number(o.current_period_end) || 0) * 1000);
-        fin.setDate(fin.getDate() + 1);
-        const vivo = o.status === "active" || o.status === "trialing";
-        const cambios: Record<string, unknown> = {
-          stripe_suscripcion: o.id,
-          forma_pago: "tarjeta",
-          estado: vivo ? "activa" : (o.status === "canceled" ? "cancelada" : "vencida"),
-        };
-        if (m.plan) cambios.plan = PLAN_INTERNO[m.plan] || "basico";
-        if (m.ciclo) cambios.ciclo = m.ciclo;
-        if (vivo && Number(o.current_period_end)) cambios.vence = fin.toISOString();
-        await graba("cuentas?id=eq." + esc(cuentaId), "PATCH", cambios);
-        return ok("cuenta " + cuentaId + " → " + o.status);
-      }
-
-      case "customer.subscription.deleted": {
-        const cuentaId = (o.metadata || {}).cuenta_id;
-        if (!cuentaId) return ok("suscripción sin cuenta");
-        /* Se cancela, pero se respeta el periodo ya pagado: la fecha de
-           vencimiento no se toca. */
-        await graba("cuentas?id=eq." + esc(cuentaId), "PATCH", { estado: "cancelada" });
-        return ok("cuenta " + cuentaId + " cancelada");
-      }
-
-      /* ---- el cobro rebotó ---- */
-      case "invoice.payment_failed": {
-        const cuentaId = (o.subscription_details && o.subscription_details.metadata &&
-                          o.subscription_details.metadata.cuenta_id) || (o.metadata || {}).cuenta_id;
-        console.warn("cobro rechazado", cuentaId, o.id);
-        /* Aquí NO se vence la cuenta: Stripe reintenta varios días y avisa
-           al cliente. Si al final no entra, llega subscription.updated con
-           past_due o unpaid, y ése sí la vence. */
-        if (cuentaId) await graba("cuentas?id=eq." + esc(cuentaId), "PATCH", { cobro_fallido: new Date().toISOString() });
-        return ok("rechazo registrado");
-      }
-
-      case "invoice.paid": {
-        const cuentaId = (o.subscription_details && o.subscription_details.metadata &&
-                          o.subscription_details.metadata.cuenta_id);
-        if (cuentaId) await graba("cuentas?id=eq." + esc(cuentaId), "PATCH", { cobro_fallido: null });
-        return ok("cobrado");
-      }
-
-      default:
-        return ok("aviso ignorado: " + ev.type);
+    if (ev.type === "checkout.session.async_payment_failed") {
+      console.warn("pago pendiente de OXXO vencido", o.id || "sin id");
+      return ok("fallo de pago asíncrono registrado");
     }
+    const checkout = ["checkout.session.completed", "checkout.session.async_payment_succeeded"].includes(ev.type);
+    const suscripcion = ["customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted"].includes(ev.type);
+    const factura = ["invoice.paid", "invoice.payment_failed"].includes(ev.type);
+    if (!checkout && !suscripcion && !factura) return ok("aviso ignorado");
+    if (checkout && o.mode === "payment" && o.payment_status !== "paid") return ok("sin pago suelto confirmado");
+    if (checkout && o.mode !== "payment" && o.mode !== "subscription") return ok("sesión sin licencia");
+    if (!ev.id || !o.id) throw new Error("Falta identificador del aviso");
+    const m = factura ? metadatosFactura(o) : o.metadata || {};
+    let subId = suscripcion ? o.id : (factura || checkout) ? idDe(o.subscription || o.parent?.subscription_details?.subscription) : null;
+    let cuentaId = m.cuenta_id || (checkout ? o.client_reference_id : null);
+    // Algunas facturas no incluyen metadatos; la suscripción conserva la relación.
+    if (!cuentaId && subId) {
+      const sub = await stripe("subscriptions/" + esc(subId), undefined, "GET");
+      cuentaId = sub.metadata?.cuenta_id;
+    }
+    if (!cuentaId) return ok("aviso ajeno a Nuvoor");
+    const llave = { p_cuenta: cuentaId, p_token: crypto.randomUUID() };
+    if (!await rpc("stripe_toma", llave)) throw new Error("Otro aviso está procesando este negocio");
+    turno = llave;
+    const c = await cuentaDe(cuentaId);
+    let cambios: Record<string, unknown>;
+    let sumar: string | null = null;
+    let sesion: string | null = null;
+    if (checkout && o.mode === "payment") {
+      // Consultar la sesión evita aplicar un snapshot antiguo o incompleto.
+      const actual = await stripe("checkout/sessions/" + esc(o.id), undefined, "GET");
+      if (actual.payment_status !== "paid" || actual.mode !== "payment") return ok("pago no confirmado");
+      if (idDe(actual.customer) !== c.stripe_cliente || actual.metadata?.cuenta_id !== cuentaId)
+        throw new Error("La sesión no corresponde al cliente de la cuenta");
+      const p = actual.metadata?.plan;
+      if (!corresponde(p, c.producto) || !["mensual", "anual"].includes(actual.metadata?.ciclo))
+        throw new Error("Plan o periodo del pago desconocido");
+      const alias: Record<string,string> = { taller_basico:"imprenta_basico",taller_maker:"imprenta_maker",taller_pro:"imprenta_pro",rest_normal:"restaurant_estandar",rest_multi:"restaurant_multi",tienda_normal:"store_estandar",tienda_multi:"store_multi" };
+      const precio = PLANES[p] || PLANES[alias[p]];
+      const monto = actual.metadata.ciclo === "anual" ? precio.anual : precio.mensual;
+      if (actual.currency !== "mxn" || actual.amount_total !== monto) throw new Error("Importe de OXXO inesperado");
+      cambios = { plan: PLAN_INTERNO[p], ciclo: actual.metadata.ciclo, estado: "activa", forma_pago: "oxxo", pago_previo: true, cobro_fallido: null };
+      sumar = actual.metadata.ciclo; sesion = actual.id;
+    } else {
+      subId = subId || c.stripe_suscripcion;
+      if (!subId) return ok("factura sin suscripción");
+      // Se consulta BAJO el turno por cuenta: eventos viejos y del mismo segundo
+      // aplican el estado actual de Stripe, no su snapshot fuera de orden.
+      const sub = await stripe("subscriptions/" + esc(subId) + "?expand[]=latest_invoice", undefined, "GET");
+      if (idDe(sub.customer) !== c.stripe_cliente || sub.metadata?.cuenta_id !== cuentaId)
+        throw new Error("La suscripción no corresponde a la cuenta");
+      if (c.stripe_suscripcion && c.stripe_suscripcion !== sub.id) {
+        const previa = await stripe("subscriptions/" + esc(c.stripe_suscripcion), undefined, "GET");
+        if (!["canceled", "incomplete_expired"].includes(previa.status) || Number(previa.created) >= Number(sub.created))
+          return ok("aviso de otra suscripción ignorado");
+      }
+      if (!corresponde(sub.metadata?.plan, c.producto)) throw new Error("Plan de suscripción desconocido");
+      const vivo = sub.status === "active" || sub.status === "trialing";
+      if (checkout && !vivo) return ok("suscripción aún sin activar");
+      const fin = Number(sub.current_period_end ?? sub.items?.data?.[0]?.current_period_end);
+      if (vivo && !(fin > 0)) throw new Error("Falta la fecha del periodo de Stripe");
+      const ultima = typeof sub.latest_invoice === "object" ? sub.latest_invoice : null;
+      cambios = {
+        stripe_suscripcion: sub.id, plan: PLAN_INTERNO[sub.metadata.plan], ciclo: sub.metadata.ciclo,
+        estado: vivo ? "activa" : sub.status === "canceled" ? "cancelada" : "vencida",
+        forma_pago: "tarjeta", pago_previo: true,
+        cobro_fallido: ["past_due", "unpaid"].includes(sub.status) ? new Date().toISOString() : null,
+      };
+      if (vivo) cambios.vence = new Date((fin + 86400) * 1000).toISOString();
+      if (ultima?.status === "paid") cambios.cobro_fallido = null;
+      if (checkout) sesion = o.id;
+      // canceled conserva vence. cancel_at_period_end NO vuelve activa una deuda.
+    }
+    const aplicado = await rpc("stripe_aplica", { ...turno, p_evento: ev.id, p_sesion: sesion, p_cambios: cambios, p_sumar: sumar });
+    return ok(aplicado ? "licencia actualizada" : "pago ya aplicado");
   } catch (e) {
-    console.error(e);
-    /* Siempre 200 salvo firma mala: si contestamos error, Stripe reintenta
-       en bucle y el problema se multiplica en vez de verse. */
-    return ok("error registrado");
+    console.error("aviso Stripe pendiente de reintento", (e as Error).message);
+    return new Response("No se pudo procesar; reintentar", { status: 503 });
+  } finally {
+    if (turno) try { await rpc("stripe_suelta", turno); } catch (_) { /* el turno caduca */ }
   }
 });

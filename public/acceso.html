@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./acceso.css?v=20261101-2139">
+<link rel="stylesheet" href="./acceso.css?v=20261102-1810">
 </head>
 <body>
 <header class="top">
@@ -77,7 +77,7 @@
         <div class="accountTop"><div><span class="eyebrow">TU ESPACIO NUVOOR</span><h2 id="accountTitle">Tus negocios</h2><p class="sub" id="accountEmail"></p></div><button class="logout" id="logout" type="button">Cerrar sesión</button></div>
         <div class="status" id="accountStatus"></div><small id="accountErrorDetail" class="help" hidden></small><div id="productOptions"></div>
         <section class="addBusiness" id="addBusinessPanel" hidden><h3>Agregar un negocio</h3><p>Elige su sistema y asígnale un nombre. Tendrá su propia cuenta y sus propios datos.</p><form id="addBusinessForm"><div class="field"><label for="newBusinessProduct">Sistema</label><select id="newBusinessProduct"><option value="taller">Nuvoor Imprenta</option><option value="restaurant">Nuvoor Restaurant</option><option value="tiendita">Nuvoor Store</option></select></div><div class="field"><label for="newBusinessName">Nombre del negocio</label><input id="newBusinessName" maxlength="100" required placeholder="Mi nuevo negocio"></div><button class="btn" id="createBusiness" type="submit">Crear negocio</button><p class="msg" id="newBusinessMessage" role="status" aria-live="polite"></p></form></section>
-        <section class="license" id="licensePanel" hidden><h3>Licencias del negocio</h3><p id="licenseIntro">Cada licencia cubre un sistema.</p><div class="licProducts" id="licenseProducts"></div><div class="licGrid" id="licenseCards"></div><div class="notice" id="paymentNotice" hidden></div></section>
+        <section class="license" id="licensePanel" hidden><h3>Licencias del negocio</h3><p id="licenseIntro">Cada licencia cubre un sistema.</p><label class="licenseCycleLabel" for="licenseCycle">Periodo de pago</label><select id="licenseCycle"><option value="mensual">Mensual</option><option value="anual">Anual · paga 10 meses</option></select><div class="licProducts" id="licenseProducts"></div><div class="licGrid" id="licenseCards"></div><div class="notice" id="paymentNotice" hidden></div></section>
         <a class="backLink" href="https://nuvoor.mx">Ver todos los productos de Nuvoor</a>
       </section>
       <section class="loadingPane" id="loadingPanel" aria-label="Cargando"><div class="spinner"></div><span>Preparando tu espacio…</span></section>
@@ -85,6 +85,22 @@
   </div>
 </main>
 <footer class="siteFooter">Nuvoor · Tu negocio, a tu manera</footer>
+
+<div class="paymentBackdrop" id="paymentModal" hidden>
+  <section class="paymentDialog" role="dialog" aria-modal="true" aria-labelledby="paymentTitle">
+    <button class="paymentClose" id="paymentClose" type="button" aria-label="Cerrar">×</button>
+    <span class="eyebrow">FORMA DE PAGO</span>
+    <h2 id="paymentTitle">Elige cómo pagar</h2>
+    <p id="paymentPrice" class="paymentPrice"></p>
+    <div class="paymentChoices" id="paymentChoices">
+      <button type="button" data-paymethod="tarjeta"><b>Tarjeta <span>Recomendada</span></b><small>Se cobra sola cada mes. Cancelas cuando quieras.</small></button>
+      <button type="button" data-paymethod="oxxo"><b>Efectivo en OXXO</b><small>Pagas un mes a la vez en cualquier OXXO.</small></button>
+      <button type="button" data-paymethod="transferencia"><b>Transferencia</b><small>Pago anual, sin comisión.</small></button>
+    </div>
+    <p class="paymentModalNote" id="paymentModalNote" role="status" hidden></p>
+    <div class="paymentTransfer" id="paymentTransfer" hidden><p id="paymentBank"></p><b>Referencia</b><code id="paymentReference"></code><b>Monto</b><strong id="paymentAmount"></strong><button class="btn primaryBtn" id="copyPaymentReference" type="button">Copiar referencia</button></div>
+  </section>
+</div>
 
 <div class="launchOverlay" id="launchOverlay" hidden aria-hidden="true">
   <div class="launchContent">
@@ -98,6 +114,6 @@
 
 <script src="./config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="./acceso.js?v=20261101-2139"></script>
+<script src="./acceso.js?v=20261102-1810"></script>
 </body>
 </html>

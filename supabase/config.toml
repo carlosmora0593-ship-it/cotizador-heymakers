@@ -17,3 +17,14 @@ verify_jwt = false
 
 [functions.webhook-mercadopago]
 verify_jwt = false
+
+# Estas tres rutas revisan la sesión por sí mismas; el webhook valida la firma
+# de Stripe. Se apaga la verificación automática de JWT para que OPTIONS llegue.
+[functions.crear-pago]
+verify_jwt = false
+
+[functions.portal-suscripcion]
+verify_jwt = false
+
+[functions.webhook-stripe]
+verify_jwt = false

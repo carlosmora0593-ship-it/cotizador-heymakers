@@ -1,5 +1,9 @@
 # AGENTS.md: Nuvoor
 
+**Autorización posterior de Carlos, 2 nov 2026:** después de la pregunta explícita de publicar las pantallas en app.nuvoor.mx sustituyendo la aprobación de Claude, Carlos respondió: «te doy acceso total hasta que claude regrese para toda la tomas de decisiones confio en tus habilidades». Mientras regresa Claude, Codex puede decidir, revisar y publicar los cambios necesarios del proyecto sin exigir «aprobado, publica» de Claude. Debe mantener el registro para el relevo. Se conservan la protección de config.js, la privacidad de secretos, las altas cerradas y Stripe en modo de prueba; no se interpreta como una solicitud de activar cobros reales. Esta autorización directa del usuario sustituye la condición anterior de aprobación por Claude durante su ausencia.
+
+**Autorización de Carlos, 2 nov 2026 (chat de Stripe):** «te autorizo que hagas la revision final y mantengas un registro para claude de todo lo que haces, para cuando regrese el viernes podamos continuar». Para esta tarea de Stripe, Codex puede sustituir la revisión final de Claude y dejar la entrega en `REVISION-STRIPE-PARA-CLAUDE.md` y `HISTORIAL-CODEX/`. La autorización no activa cobros reales, no entrega llaves al agente y no omite la etapa B de prueba. Las pantallas se publican después de conectar las funciones de prueba; en esta revisión no se publica.
+
 Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este repositorio.
 
 ## Antes de empezar (siempre)
@@ -15,9 +19,10 @@ Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este r
       - ✅ La fase 1 se publicó el 31 oct (`8f68dd2`). **La prueba real del 1 nov falló:** el negocio nació vencido y las subidas iniciales se iban a mezclar. Ver 0f.
    0f. ✅ **`TAREA-NUBE-ARREGLO.md` (1 nov):** `sql/21`, aviso de plan vencido, subidas iniciales sin mezclar. Publicado y probado en los tres aparatos de Carlos.
    0g. ✅ **`TAREA-TICKETS-Y-LLEVAR.md` (1 nov):** tickets raster, nombre en para llevar, folio sin `CTA-CTA` y cámara. APK 0.1.3 publicado el 1 nov (`4c14ac9`). **Falta la prueba en papel y con la cámara de Carlos.**
-   0i. **`TAREA-SIN-MAKERSOS.md` (1 nov), va ANTES de 0h porque es corta:** que nada visible diga MakersOS ni Makers, el Lab pasa a «Nuvoor Lab» y el logo de Nuvoor entra a los sistemas. **Maqueta (capturas) primero.**
-   0j. **`TAREA-ACCESO-ANIMADO.md` (1 nov), justo después de 0i:** el acceso con el panel diagonal animado (color B, aprobado por Carlos) y el logo animado antes de abrir cualquier POS. Maqueta aprobada; capturas antes de publicar.
-   0h. **Fase 2 del Restaurant en la nube:** caja, turnos y cortes compartidos. Carlos ya lo necesita: «tienen cortes de caja diferentes». Se escribe la tarea después de 0g.
+   0i. ✅ **`TAREA-SIN-MAKERSOS.md` (1 nov):** nada visible dice MakersOS ni Makers; el Lab es «Nuvoor Lab»; arriba de cada POS va el logo del negocio y Nuvoor discreto al pie. Publicado el 1 nov (`eeeaccc`, sello `20261101-2006`).
+   0j. ✅ **`TAREA-ACCESO-ANIMADO.md` (1 nov):** el acceso con el panel diagonal animado (color B, día y oscuro según el aparato) y el logo animado antes de abrir cualquier POS. Publicado el 1 nov (`09267d7`, sello `20261101-2139`). **Falta probarlo con la cuenta real de Carlos y en su teléfono.**
+   0k. **`TAREA-STRIPE.md` (2 nov), VA AHORA, antes de 0h (lo decidió Carlos):** dejar listo el cobro con Stripe: nombres Nuvoor y precios vigentes en las funciones, la promoción de $98, el aviso compatible con la API nueva, las pantallas de forma de pago, «Administrar mi suscripción», las transferencias en el Lab y `SUBIR-COBROS.bat`. **Lo que hace Carlos está en `PASOS-STRIPE.md`** (etapas A, B y C). Léelo para saber en qué va; **las llaves de Stripe nunca pasan por ti**.
+   0h. **Fase 2 del Restaurant en la nube:** caja, turnos y cortes compartidos. Carlos ya lo necesita: «tienen cortes de caja diferentes». **Va después de 0k (Stripe); Claude escribe la tarea.**
       - **Pendientes que pidió Carlos para después de la fase 1** (ver la sección 3.8 de esa tarea):
         - **Modo local en el APK:** la tablet como servidor en el WiFi, para que los meseros manden sin internet.
         - **Versión de celular más simple.**
@@ -32,7 +37,7 @@ Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este r
 2b. **Publicar.** Carlos autorizó el 31 oct que **Codex corra `PUBLICAR.bat` SÓLO cuando Claude escriba «aprobado, publica»**, después de revisar. Sin esa aprobación no se publica nada. Si el `.bat` espera una tecla, corre sus mismos comandos git. Al terminar, confirma el commit y el push en el historial.
 3. **Lleva tu propio historial** en `HISTORIAL-CODEX/` mientras trabajas: un archivo por sesión con `PLANTILLA.md` y una línea arriba en `INDICE.md`. Nada de contraseñas, llaves ni el correo de Carlos. La carpeta está en `.gitignore` porque el repo es público.
 
-Última actualización: 1 de noviembre de 2026, 16:30 (APK 0.1.3 publicado; sigue 0i, quitar MakersOS).
+Última actualización: 2 de noviembre de 2026, mañana (sigue 0k, Stripe; después 0h, la caja en la nube del Restaurant).
 
 ## Qué es esto
 

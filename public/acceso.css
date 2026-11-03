@@ -119,3 +119,28 @@ main{width:100%;flex:1;display:grid;place-items:center;padding:30px 22px 22px}
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .accessCard{animation:none}.launchN,.launchStar,.launchWord,.launchTitle,.launchBusiness,.launchTrack i{animation:none;clip-path:none;filter:none;opacity:1;transform:none}.launchShine{display:none}.launchOverlay.active .launchContent{animation:none}
 }
+
+/* Cobro Nuvoor: el mismo esquema automático de día y noche que la puerta. */
+.licenseCycleLabel{display:block;margin:12px 0 5px;font-size:11px;font-weight:700;color:var(--muted)}
+#licenseCycle{width:100%;max-width:260px;min-height:42px;margin-bottom:14px;border:1px solid var(--field-border);border-radius:12px;padding:0 12px;background:var(--field);color:var(--ink);font:inherit}
+#stripeManage{margin:10px 0 0}
+.paymentBackdrop{position:fixed;inset:0;z-index:1200;display:grid;place-items:center;padding:18px;background:rgba(5,10,20,.62);backdrop-filter:blur(10px)}
+.paymentBackdrop[hidden]{display:none}
+.paymentDialog{position:relative;width:min(100%,520px);max-height:min(90vh,780px);overflow:auto;padding:30px;border:1px solid var(--field-border);border-radius:24px;background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+.paymentDialog h2{margin:10px 40px 6px 0;font-size:26px;letter-spacing:-.04em}
+.paymentPrice{margin:0 0 20px;color:var(--muted);font-size:14px}
+.paymentClose{position:absolute;right:17px;top:15px;width:36px;height:36px;border:1px solid var(--field-border);border-radius:50%;background:var(--field);color:var(--ink);font-size:22px;cursor:pointer}
+.paymentChoices{display:grid;gap:10px}
+.paymentChoices button{display:grid;gap:5px;text-align:left;padding:14px 16px;border:1px solid var(--field-border);border-radius:15px;background:var(--field);color:var(--ink);cursor:pointer;transition:border-color .18s,transform .18s,background .18s}
+.paymentChoices button:hover{border-color:var(--focus);transform:translateY(-1px);background:var(--open-bg)}
+.paymentChoices button:disabled{opacity:.62;cursor:wait;transform:none}
+.paymentChoices b{font-size:14px}.paymentChoices b span{margin-left:7px;padding:3px 7px;border-radius:99px;background:var(--open-bg);color:var(--open-ink);font-size:10px}
+.paymentChoices small{color:var(--muted);font-size:12px;line-height:1.45}
+.paymentModalNote{margin:14px 0 0;padding:12px 14px;border-left:3px solid var(--focus);border-radius:8px;background:var(--open-bg);color:var(--ink);font-size:12px;line-height:1.5}
+.paymentTransfer{display:grid;gap:8px;margin-top:14px;padding:15px;border:1px solid var(--field-border);border-radius:15px;background:var(--field)}
+.paymentTransfer p{margin:0 0 5px;color:var(--muted);font-size:12px;white-space:pre-wrap}
+.paymentTransfer b{font-size:11px;color:var(--muted)}
+.paymentTransfer code{overflow-wrap:anywhere;padding:8px 10px;border-radius:9px;background:var(--card);font:600 13px "IBM Plex Mono",monospace}
+.paymentTransfer strong{font-size:19px}
+.paymentTransfer button{margin-top:4px}
+@media(max-width:520px){.paymentDialog{padding:25px 19px 20px;border-radius:21px}.paymentDialog h2{font-size:23px}.paymentChoices button{padding:12px}}

@@ -67,16 +67,18 @@ function renderNegocio(n,productoSolicitado){
   const rolVisible=n.rol==="dueno"?"dueño":n.rol||"miembro";
   return '<article class="businessCard"><div class="businessHead"><span class="businessIcon" aria-hidden="true">'+(supported?products.map(k=>P[k].icon).join(" "):"•")+'</span><div><strong>'+esc(n.nombre)+'</strong><small>'+esc(badgeProductos(n))+' · '+esc(rolVisible)+'</small></div></div><div class="businessActions">'+buttons+(supported?'<button class="businessLicense" type="button" data-license-business="'+esc(n.id)+'">Ver licencias</button>':"")+'</div></article>';
 }
+let pagoPollStarted=false, pagoSeleccionado=null;
 function pintaCuenta(){
   const preventDirect=skipAutoOpenOnce;skipAutoOpenOnce=false;
   show("#accountPanel");$("#accountTitle").textContent=negocios.length>1?"Tus negocios":(negocios[0].nombre||"Tu cuenta Nuvoor");$("#accountEmail").textContent=sesion.user.email||"";
-  const requestedProduct=params.get("producto"),matching=negocios.flatMap(n=>n.productos.filter(k=>!requestedProduct||k===requestedProduct).map(k=>({n,k})));
+  const requestedProduct=params.get("producto"),targetId=params.get("cuenta");
+  const matching=negocios.flatMap(n=>n.productos.filter(k=>(!requestedProduct||k===requestedProduct)&&(!targetId||n.id===targetId)).map(k=>({n,k})));
   if(!preventDirect&&requestedProduct&&P[requestedProduct]&&matching.length===1&&!params.has("gestion")&&!params.has("planes")&&!params.has("pago")){abreNegocio(matching[0].k,matching[0].n);return;}
   const singleLegacy=negocios.length===1&&negocios[0].productos.length===1;
   if(!preventDirect&&singleLegacy&&!requestedProduct&&!params.has("gestion")&&!params.has("planes")&&!params.has("pago")){abreNegocio(negocios[0].productos[0],negocios[0]);return;}
-  const active=negocios.find(n=>n.activa)||negocios[0],days=Math.max(0,Math.ceil((new Date(active.vence)-new Date())/86400000));
+  const active=(targetId&&negocios.find(n=>n.id===targetId))||negocios.find(n=>n.activa)||negocios[0],days=Math.max(0,Math.ceil((new Date(active.vence)-new Date())/86400000));
   $("#accountStatus").innerHTML=vigencia(active)?'<strong>'+(active.plan==="prueba"?"Prueba gratis activa":"Licencia activa")+'</strong>'+(active.plan==="prueba"?"Te quedan "+days+" día(s), sin tarjeta.":"El negocio seleccionado conserva su licencia."):'<strong>Activa una licencia para seguir</strong>Tu información se conserva.';
-  const pane=$("#productOptions"),businessesView=requestedProduct&&P[requestedProduct]?negocios.filter(n=>!n.productos.length||n.productos.includes(requestedProduct)):negocios;
+  const pane=$("#productOptions"),businessesView=requestedProduct&&P[requestedProduct]?negocios.filter(n=>(!targetId||n.id===targetId)&&(!n.productos.length||n.productos.includes(requestedProduct))):negocios;
   pane.innerHTML='<p class="sub">'+(requestedProduct&&P[requestedProduct]?"Elige un negocio de "+P[requestedProduct].name+".":negocios.length>1?"Elige con qué negocio quieres trabajar.":negocios[0].productos.length>1?"Esta cuenta antigua conserva varios POS. Elige uno para continuar.":"Abre el sistema de tu negocio.")+'</p><div class="businessGrid">'+businessesView.map(n=>renderNegocio(n,requestedProduct&&P[requestedProduct]?requestedProduct:"")).join("")+'</div><p id="businessNotice" class="notice" hidden></p><div class="addBusinessRow"><button class="plain addBusinessButton" id="showAddBusiness" type="button">＋ Agregar un negocio</button></div>';
   $("#addBusinessPanel").hidden=true;
   pane.querySelectorAll("[data-open-product]").forEach(b=>b.addEventListener("click",()=>{const n=negocios.find(x=>x.id===b.dataset.business);abreNegocio(b.dataset.openProduct,n);}));
@@ -84,32 +86,107 @@ function pintaCuenta(){
   $("#showAddBusiness").addEventListener("click",()=>{$("#addBusinessPanel").hidden=!$("#addBusinessPanel").hidden;});
   if(requestedProduct&&P[requestedProduct]&&!matching.length){const note=$("#businessNotice");note.hidden=false;note.textContent="No tienes un negocio de "+P[requestedProduct].name+" todavía. Agrégalo aquí; cada sistema tendrá su propia cuenta.";}
   if(!negociosDisponible){const note=$("#businessNotice");note.hidden=false;note.textContent="Para crear nuevos negocios y abrir Restaurant o Store separados, falta ejecutar sql/19-negocios-por-correo.sql desde el Lab → Base de datos.";}
-  if(params.get("pago")==="ok")$("#accountStatus").innerHTML='<strong>Pago recibido</strong>Mercado Pago avisó a Nuvoor. La licencia puede tardar unos segundos en reflejarse.';
-  if(params.has("planes")||params.has("gestion")||params.has("pago")){cuenta=matching[0]?matching[0].n:active;productos=cuenta.productos;pintaLicencias();}
+  if(params.get("pago")==="ok"){
+    $("#accountStatus").innerHTML='<strong>Pago recibido</strong>Estamos esperando la confirmación de Stripe. Tu negocio sigue seleccionado.';
+    if(!pagoPollStarted){pagoPollStarted=true;setTimeout(confirmarPagoAcceso,0);}
+  }else if(params.get("pago")==="cancelado"){
+    $("#accountStatus").innerHTML='<strong>Pago no completado</strong>No se hizo ningún cambio en tu licencia. Puedes intentarlo de nuevo cuando quieras.';
+  }
+  if(params.has("planes")||params.has("gestion")||params.has("pago")){
+    cuenta=(targetId&&negocios.find(n=>n.id===targetId))||(matching[0]&&matching[0].n)||active;
+    productos=cuenta.productos||[];pintaLicencias();
+  }
 }
+function puedeContratar(){return !!cuenta&&["admin","dueno","owner"].includes(String(cuenta.rol||"").toLowerCase());}
+function etiquetaPlan(plan,producto){return producto==="taller"?({basico:"imprenta_basico",maker:"imprenta_maker",pro:"imprenta_pro"}[plan]||plan):producto==="restaurant"?({basico:"restaurant_estandar",multiempresa:"restaurant_multi",maker:"restaurant_multi"}[plan]||plan):({basico:"store_estandar",multiempresa:"store_multi",maker:"store_multi"}[plan]||plan);}
+function formatoPrecio(n){return "$"+Number(n||0).toLocaleString("es-MX");}
 function pintaLicencias(){
   if(!cuenta){$("#licensePanel").hidden=true;return;}
   $("#licensePanel").hidden=false;
   const host=$("#licenseProducts"),notice=$("#paymentNotice"),cards=$("#licenseCards");
   if(productos.length>1){host.innerHTML='<span class="help">Cuenta anterior · '+esc(badgeProductos(cuenta))+'</span>';cards.innerHTML="";notice.hidden=false;notice.textContent="Esta cuenta antigua conserva varios POS. Para cambiar sus licencias, primero organiza cada sistema en su propia cuenta.";return;}
-  const producto=productos[0]||cuenta.producto||"taller";host.innerHTML='<span class="help">'+esc(P[producto].name)+' · '+esc(cuenta.nombre||"este negocio")+'</span>';
-  const esImprenta=producto==="taller",planes=esImprenta?[
-    {id:"basico",name:"Básico",price:98,description:"$98 al mes los primeros 3 meses; después $199",ready:false},
-    {id:"maker",name:"Maker",price:449,info:"Hasta 3 usuarios · compras e inventario",ready:true},
-    {id:"pro",name:"Pro",price:899,info:"Usuarios sin límite · caja y reportes · incluye hasta 4 sucursales",ready:true}
+  const producto=productos[0]||cuenta.producto||"taller",esImprenta=producto==="taller",ciclo=$("#licenseCycle").value||"mensual";
+  host.innerHTML='<span class="help">'+esc(P[producto].name)+' · '+esc(cuenta.nombre||"este negocio")+'</span>'+(cuenta.stripe_cliente&&puedeContratar()?'<button class="btn secondaryBtn" id="stripeManage" type="button">Administrar mi suscripción</button>':"");
+  const planes=esImprenta?[
+    {id:"basico",name:"Básico",monthly:199,annual:1990,description:"Hasta 1 usuario · cotizaciones e impresión",promo:true},
+    {id:"maker",name:"Maker",monthly:449,annual:4490,description:"Hasta 3 usuarios · compras e inventario"},
+    {id:"pro",name:"Pro",monthly:899,annual:8990,description:"Usuarios sin límite · incluye hasta 4 sucursales"}
   ]:[
-    {id:"basico",name:"Estándar",price:98,description:"$98 al mes los primeros 3 meses; después $199",ready:false},
-    {id:"multiempresa",name:"Multiempresa",price:899,info:"Hasta 4 sucursales del mismo sistema",ready:false}
+    {id:"basico",name:"Estándar",monthly:199,annual:1990,description:"Todo lo necesario para operar",promo:true},
+    {id:"multiempresa",name:"Multiempresa",monthly:899,annual:8990,description:"Hasta 4 sucursales del mismo sistema"}
   ];
   $("#licenseIntro").textContent=esImprenta?"Pro incluye hasta 4 sucursales de Imprenta.":"Cada licencia cubre un sistema. Multiempresa es para hasta 4 sucursales de ese mismo sistema.";
-  cards.innerHTML=planes.map(x=>'<article class="licCard"><b>'+x.name+'</b><strong>$'+x.price.toLocaleString("es-MX")+' <small>MXN / mes</small></strong><small>'+(x.description||x.info)+'</small><button type="button" '+(x.ready&&cuenta.activa?'data-plan="'+x.id+'"':x.ready?'disabled aria-label="Abre este negocio para cambiar el plan"':'disabled aria-label="'+x.name+': próximamente"')+'>'+(x.ready?(cuenta.activa?'Contratar':'Abre este negocio primero'):'Próximamente')+'</button></article>').join("");
-  cards.querySelectorAll("[data-plan]").forEach(b=>b.addEventListener("click",()=>contrata(b.dataset.plan,[producto])));
-  if(cuenta.mp_preapproval_id){notice.hidden=false;notice.textContent="Hay una suscripción de Mercado Pago registrada. Para cambiar de licencia sin generar otro cobro, cancela la actual en Mercado Pago y después vuelve aquí.";}
-  else if(!cuenta.activa){notice.hidden=false;notice.textContent="Para cambiar una licencia, abre primero este negocio desde Tus negocios. Así el cobro se aplica a la cuenta correcta.";}
-  else if(planes.some(x=>!x.ready)){notice.hidden=false;notice.textContent=esImprenta?"La promoción estará disponible cuando se actualicen los cobros. Pro ya incluye hasta 4 sucursales.":"La promoción y Multiempresa estarán disponibles cuando se actualicen los cobros y las sucursales.";}
+  const admin=puedeContratar();
+  cards.innerHTML=planes.map(x=>'<article class="licCard"><b>'+x.name+'</b><strong>'+formatoPrecio(ciclo==="anual"?x.annual:x.monthly)+' <small>MXN / '+(ciclo==="anual"?"año":"mes")+'</small></strong><small>'+(x.promo?(ciclo==="mensual"?"Con tarjeta: $98 los primeros 3 meses; después $199. OXXO conserva $199 al mes.":"El pago anual no lleva promoción."):x.description)+(ciclo==="anual"?" · equivale a 10 meses":"")+'</small><button type="button" '+(admin?'data-plan="'+x.id+'"':'disabled')+'>'+(admin?"Contratar":"Pídele al dueño del negocio que contrate")+'</button></article>').join("");
+  cards.querySelectorAll("[data-plan]").forEach(b=>b.addEventListener("click",()=>abrePagoAcceso(b.dataset.plan,producto,ciclo)));
+  $("#licenseCycle").onchange=()=>pintaLicencias();
+  const manage=$("#stripeManage");if(manage)manage.onclick=()=>administraStripeAcceso();
+  if(cuenta.mp_preapproval_id){notice.hidden=false;notice.textContent="Hay una suscripción anterior de Mercado Pago. Antes de contratar otra, cancélala desde esa cuenta para evitar un doble cobro.";}
+  else if(!admin){notice.hidden=false;notice.textContent="Pídele al dueño del negocio que contrate o administre el plan.";}
   else notice.hidden=true;
 }
-async function contrata(plan,chosen){const b=$("#licenseCards").querySelector('[data-plan="'+plan+'"]');if(!b)return;b.disabled=true;b.textContent="Abriendo Mercado Pago…";try{const {data}=await sb.auth.getSession(),url=String(CONFIG.SUPABASE_URL).replace(/\/+$/,""),r=await fetch(url+"/functions/v1/crear-suscripcion",{method:"POST",headers:{"Content-Type":"application/json","apikey":CONFIG.SUPABASE_ANON_KEY,"Authorization":"Bearer "+data.session.access_token},body:JSON.stringify({plan,ciclo:"mensual",productos:chosen})});let d={};try{d=await r.json();}catch(_){}if(!r.ok||!d.init_point)throw new Error(d.error||"No se pudo iniciar el pago.");location.assign(d.init_point);}catch(e){b.disabled=false;b.textContent="Contratar";const n=$("#paymentNotice");n.hidden=false;n.textContent=e.message;}}
+function abrePagoAcceso(plan,producto,ciclo){
+  if(!puedeContratar()){const n=$("#paymentNotice");n.hidden=false;n.textContent="Pídele al dueño del negocio que contrate.";return;}
+  const data={plan,producto,ciclo,cuenta:cuenta.id};pagoSeleccionado=data;
+  const item=producto==="taller"?({basico:[199,1990],maker:[449,4490],pro:[899,8990]}[plan]):({basico:[199,1990],multiempresa:[899,8990]}[plan]);
+  const mensual=ciclo==="mensual",promo=plan==="basico"&&mensual;
+  $("#paymentTitle").textContent="Contratar "+(producto==="taller"?(plan==="basico"?"Imprenta Básico":plan==="maker"?"Imprenta Maker":"Imprenta Pro"):producto==="restaurant"?"Restaurant "+(plan==="multiempresa"?"Multiempresa":"Estándar"):"Store "+(plan==="multiempresa"?"Multiempresa":"Estándar"));
+  $("#paymentPrice").textContent=promo?"$98 MXN al mes durante 3 meses; después $199 al mes.":formatoPrecio(item[mensual?0:1])+" MXN / "+(mensual?"mes":"año");
+  $("#paymentChoices").hidden=false;$("#paymentTransfer").hidden=true;$("#paymentModalNote").hidden=true;$("#paymentModalNote").textContent="";
+  $("#paymentModal").hidden=false;$("#paymentModal").setAttribute("aria-hidden","false");
+}
+async function iniciarPagoAcceso(forma){
+  if(!pagoSeleccionado||!cuenta||!puedeContratar())return;
+  const note=$("#paymentModalNote"),buttons=$$("#paymentChoices button");buttons.forEach(b=>b.disabled=true);note.hidden=false;note.textContent="Preparando el pago…";
+  if(forma==="oxxo"){
+    const mensual=pagoSeleccionado.plan==="multiempresa"?899:pagoSeleccionado.plan==="maker"?449:pagoSeleccionado.plan==="pro"?899:199;
+    $("#paymentPrice").textContent=formatoPrecio(mensual)+" MXN / mes con OXXO. La promoción es sólo para tarjeta.";
+  }else if(forma==="transferencia"){
+    const anual=pagoSeleccionado.plan==="multiempresa"?8990:pagoSeleccionado.plan==="maker"?4490:pagoSeleccionado.plan==="pro"?8990:1990;
+    $("#paymentPrice").textContent=formatoPrecio(anual)+" MXN / año por transferencia.";
+  }
+  try{
+    const {data}=await sb.auth.getSession();if(!data.session)throw new Error("Tu sesión terminó. Vuelve a entrar.");
+    const body={plan:pagoSeleccionado.plan,ciclo:forma==="transferencia"?"anual":forma==="oxxo"?"mensual":pagoSeleccionado.ciclo,forma,producto:pagoSeleccionado.producto,cuenta_id:pagoSeleccionado.cuenta,app:params.get("app")||""};
+    const url=String(CONFIG.SUPABASE_URL).replace(/\/+$/,""),r=await fetch(url+"/functions/v1/crear-pago",{method:"POST",headers:{"Content-Type":"application/json","apikey":CONFIG.SUPABASE_ANON_KEY,"Authorization":"Bearer "+data.session.access_token},body:JSON.stringify(body)});
+    const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"No se pudo preparar el pago.");
+    if(forma==="transferencia"){
+      $("#paymentChoices").hidden=true;$("#paymentModalNote").textContent=d.aviso||"Haz la transferencia para activar el año de servicio.";
+      $("#paymentBank").textContent=d.banco||"Los datos bancarios aparecerán aquí cuando estén configurados.";$("#paymentReference").textContent=d.referencia||"—";$("#paymentAmount").textContent=formatoPrecio(d.monto)+" MXN";$("#paymentTransfer").hidden=false;return;
+    }
+    if(!d.url)throw new Error("Stripe no devolvió el enlace de pago.");location.assign(d.url);
+  }catch(e){note.textContent=e.message||"No se pudo iniciar el pago.";}
+  finally{buttons.forEach(b=>b.disabled=false);}
+}
+async function administraStripeAcceso(){
+  try{const {data}=await sb.auth.getSession();if(!data.session)throw new Error("Tu sesión terminó. Vuelve a entrar.");
+    const r=await fetch(String(CONFIG.SUPABASE_URL).replace(/\/+$/ ,"")+"/functions/v1/portal-suscripcion",{method:"POST",headers:{"Content-Type":"application/json","apikey":CONFIG.SUPABASE_ANON_KEY,"Authorization":"Bearer "+data.session.access_token},body:JSON.stringify({cuenta_id:cuenta.id,app:params.get("app")||""})});
+    const d=await r.json().catch(()=>({}));if(!r.ok||!d.url)throw new Error(d.error||"No se pudo abrir la administración.");location.assign(d.url);
+  }catch(e){const n=$("#paymentNotice");n.hidden=false;n.textContent=e.message||"No se pudo abrir la administración.";}
+}
+async function confirmarPagoAcceso(){
+  const id=params.get("cuenta");
+  for(let i=0;i<10;i++){
+    await new Promise(r=>setTimeout(r,3000));
+    try{await leerEmpresas();}catch(_){continue;}
+    const actualizado=(id&&negocios.find(n=>n.id===id))||negocios.find(n=>n.activa)||negocios[0];if(!actualizado)continue;
+    cuenta=actualizado;productos=actualizado.productos||[];
+    const sesionPago=params.get("sesion");
+    let confirmado=false;
+    if(sesionPago){try{const r=await sb.rpc("stripe_confirmado",{p_cuenta:actualizado.id,p_sesion:sesionPago});confirmado=!r.error&&r.data===true;}catch(_){}}
+    if(confirmado&&vigencia(actualizado)&&!['prueba','ninguno',''].includes(actualizado.plan||'')){
+      $("#accountStatus").innerHTML='<strong>¡Listo! Tu plan quedó activo.</strong>El negocio ya puede seguir trabajando.';pintaLicencias();return;
+    }
+  }
+  $("#accountStatus").innerHTML='<strong>Tu pago se está confirmando.</strong>En unos minutos se activa. No vuelvas a pagar mientras llega el aviso.';
+}
+function conectaPagoAcceso(){
+  $("#paymentClose").addEventListener("click",()=>{$("#paymentModal").hidden=true;$("#paymentModal").setAttribute("aria-hidden","true");});
+  $("#paymentModal").addEventListener("click",e=>{if(e.target===$("#paymentModal"))$("#paymentClose").click();});
+  $("#paymentChoices").addEventListener("click",e=>{const b=e.target.closest("[data-paymethod]");if(b)iniciarPagoAcceso(b.dataset.paymethod);});
+  $("#copyPaymentReference").addEventListener("click",async()=>{const ref=$("#paymentReference").textContent;try{await navigator.clipboard.writeText(ref);}catch(_){const t=document.createElement("textarea");t.value=ref;document.body.appendChild(t);t.select();document.execCommand("copy");t.remove();}$("#copyPaymentReference").textContent="Referencia copiada";});
+}
+conectaPagoAcceso();
 async function agregaNegocio(e){e.preventDefault();const nombre=$("#newBusinessName").value.trim(),producto=$("#newBusinessProduct").value,b=$("#createBusiness");if(!nombre){$("#newBusinessMessage").textContent="Escribe el nombre del negocio.";return;}if(!negociosDisponible){$("#newBusinessMessage").textContent="Falta ejecutar sql/19-negocios-por-correo.sql desde el Lab → Base de datos.";return;}b.disabled=true;b.textContent="Creando…";$("#newBusinessMessage").textContent="";try{const r=await sb.rpc("crear_negocio",{nombre,producto});if(r.error)throw r.error;$("#newBusinessName").value="";await leerEmpresas();skipAutoOpenOnce=true;pintaCuenta();$("#addBusinessPanel").hidden=true;}catch(err){$("#newBusinessMessage").textContent=detalleError(err);}finally{b.disabled=false;b.textContent="Crear negocio";}}
 async function entra(session){sesion=session;show("#loadingPanel");try{await leerEmpresas();$("#accountErrorDetail").hidden=true;$("#accountErrorDetail").textContent="";pintaCuenta();}catch(e){show("#accountPanel");$("#accountTitle").textContent="No pudimos abrir tu cuenta";$("#accountEmail").textContent=sesion.user.email||"";$("#accountStatus").textContent=e.message||"No pudimos abrir la cuenta de este negocio.";const d=$("#accountErrorDetail");d.textContent=e.detail||detalleError(e);d.hidden=false;$("#productOptions").innerHTML="";}}
 async function envia(e){e.preventDefault();const alta=modo==="alta",email=$("#email").value.trim(),password=$("#password").value;if(alta){actualizaSeleccion();if(!requested.length){message("Selecciona el POS que quieres probar.","error");return;}}

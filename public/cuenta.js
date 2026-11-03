@@ -122,6 +122,11 @@ const vigente = () => !!(CUENTA && CUENTA.plan !== "ninguno" &&
    pero no guarda nada hasta contratar. 'prueba' queda por compatibilidad
    con las cuentas viejas. */
 const NIVEL = {ninguno:0, basico:1, maker:2, pro:3, prueba:3};
+const PLANES_NUVOOR = {
+  basico:{nombre:"Imprenta · Básico", mensual:199, anual:1990, para:"Cotiza e imprime sin complicaciones.", incluye:["1 usuario","Cotizaciones e impresión"]},
+  maker:{nombre:"Imprenta · Maker", mensual:449, anual:4490, para:"Más herramientas para el trabajo diario.", incluye:["Hasta 3 usuarios","Compras e inventario"]},
+  pro:{nombre:"Imprenta · Pro", mensual:899, anual:8990, para:"Control completo y hasta 4 sucursales.", incluye:["Usuarios sin límite","Caja, reportes y sucursales"]}
+};
 const nivelPlan = () => NIVEL[plan()] || 0;
 const esPro   = () => vigente() && nivelPlan() >= 3;   // caja, ventas, utilidad
 const esMaker = () => vigente() && nivelPlan() >= 2;   // compras, inventario, equipo
@@ -129,7 +134,8 @@ const sinPlan = () => plan() === "ninguno";
 const esPrueba = () => !!(CUENTA && CUENTA.es_prueba) || plan() === "prueba";
 const nombrePlan = () => {
   if(sinPlan()) return "Sin plan";
-  const p = CONFIG.PLANES[plan()];
+  const p = PLANES_NUVOOR[plan()];
+  if(plan()==="maker" && CUENTA && ["restaurant","tiendita","store"].includes(CUENTA.producto)) return "Multiempresa · hasta 4 sucursales";
   return p ? p.nombre : plan() === "prueba" ? "Prueba" : plan();
 };
 const TOPE_USUARIOS = {basico:1, maker:3, pro:0, prueba:0};   // 0 = sin límite
@@ -571,8 +577,11 @@ async function cargaCuenta(){
     return false;
   }
   const activa=EMPRESAS.find(e=>e.activa)||null;
-  const elegida=imprentas.find(e=>activa&&e.id===activa.id)||imprentas[0];
-  if(!elegida.activa){
+  const solicitada=new URLSearchParams(location.search).get("cuenta");
+  const elegida=(solicitada&&imprentas.find(e=>e.id===solicitada))||imprentas.find(e=>activa&&e.id===activa.id)||imprentas[0];
+  /* El regreso de Stripe selecciona esta cuenta sólo para mostrar su plan.
+     No cambia el negocio activo de la persona ni la sesión de otros aparatos. */
+  if(!elegida.activa&&!solicitada){
     const {error}=await SB.rpc("cambiar_empresa",{destino:elegida.id});
     if(error) throw new Error("No se pudo abrir Nuvoor Imprenta: "+error.message);
     location.reload();
@@ -583,7 +592,7 @@ async function cargaCuenta(){
   const {data: cuenta, error} = await SB.from("cuentas").select("*").eq("id",elegida.id).maybeSingle();
   if(error) throw error;
   CUENTA = cuenta || elegida;
-  PERFIL = Object.assign({},perfil||{id:SESION.user.id,cuenta_id:elegida.id,nombre:SESION.user.user_metadata&&SESION.user.user_metadata.nombre,correo:SESION.user.email}, {rol:elegida.rol||"admin"});
+  PERFIL = Object.assign({},perfil||{id:SESION.user.id,cuenta_id:elegida.id,nombre:SESION.user.user_metadata&&SESION.user.user_metadata.nombre,correo:SESION.user.email}, {rol:elegida.rol||perfil&&perfil.rol||"ventas"});
   return !!CUENTA;
 }
 
@@ -1045,9 +1054,13 @@ function pintaSuscripcion(){
       '<b>' + (viva && enPrueba ? dias + " día(s)" : fechaLarga(CUENTA.vence)) + '</b></div>';
 
   /* --- Forma de pago --- */
-  const conMP = !!(CUENTA.mp_preapproval_id);
+  const conMP = !!(CUENTA.mp_preapproval_id), conStripe = !!CUENTA.stripe_cliente;
+  const puedeAdministrar = puedeGestionarPlan();
   q("#suscPago").innerHTML = '<div class="suscFila">' + (
-    conMP
+    conStripe
+      ? "Tu suscripción se administra con Stripe. Puedes cambiar tu tarjeta, ver recibos o cancelar al final del periodo." +
+        (puedeAdministrar ? '<button class="btn sm" id="suscStripe" type="button">Administrar mi suscripción</button>' : "")
+      : conMP
       ? "Pagas por Mercado Pago, con cargo automático " +
         (CUENTA.ciclo === "anual" ? "cada año" : "cada mes") + ". La tarjeta y los recibos se " +
         "cambian desde tu propia cuenta de Mercado Pago: entra a Suscripciones y busca Nuvoor." +
@@ -1071,7 +1084,9 @@ function pintaSuscripcion(){
 
   /* --- Baja --- */
   q("#suscBaja").innerHTML = '<div class="suscFila">' + (
-    conMP
+    conStripe
+      ? "Para cancelar, abre Administrar mi suscripción y elige cancelar al final del periodo. Tu cuenta sigue activa hasta la fecha ya pagada."
+      : conMP
       ? "Para dar de baja la suscripción, cancélala en Mercado Pago. Tu plan sigue funcionando " +
         "hasta que termine el periodo que ya pagaste, y tu información se queda donde está."
       : "No hay ningún cargo automático corriendo, así que no hay nada que cancelar. " +
@@ -1083,26 +1098,74 @@ function pintaSuscripcion(){
     const v = window.open("https://www.mercadopago.com.mx/subscriptions", "_blank", "noopener");
     if(!v) alert("Tu navegador bloqueó la ventana. Entra a mercadopago.com.mx → Suscripciones.");
   });
+  const stripeBtn = q("#suscStripe");
+  if(stripeBtn) stripeBtn.addEventListener("click", abrirPortalStripe);
   const dt = q("#suscDatos");
   if(dt) dt.addEventListener("click", ()=>{ q("#modalPlanes").hidden = true; vaA("set"); });
 }
 
+function puedeGestionarPlan(){return !!PERFIL&&["admin","dueno","owner"].includes(String(PERFIL.rol||"").toLowerCase());}
+let pagoStripeElegido=null;
+function agregaModalStripe(){
+  if(q("#modalPagoStripe"))return;
+  const css=document.createElement("style");css.id="nuvoorStripeCss";css.textContent=`
+    .nuvoorStripeFondo{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:18px;background:rgba(4,10,22,.64);backdrop-filter:blur(9px)}
+    .nuvoorStripeFondo[hidden]{display:none}.nuvoorStripeCaja{position:relative;width:min(100%,520px);max-height:90vh;overflow:auto;padding:26px;border:1px solid var(--line,var(--field-border,#d8dce5));border-radius:22px;background:var(--surface,var(--card,#fff));color:var(--ink,var(--text,#152033));box-shadow:0 24px 80px rgba(0,0,0,.3)}
+    .nuvoorStripeCaja h2{margin:5px 40px 8px 0}.nuvoorStripeCaja p{color:var(--muted,var(--ink-2,#657083));font-size:13px;line-height:1.5}.nuvoorStripeCerrar{position:absolute;right:15px;top:13px;width:36px;height:36px;border:1px solid var(--line,var(--field-border,#d8dce5));border-radius:50%;background:var(--surface-2,var(--bg,#f4f6f8));color:inherit;font-size:22px;cursor:pointer}
+    .nuvoorStripeOpciones{display:grid;gap:10px}.nuvoorStripeOpciones button{display:grid;gap:5px;text-align:left;padding:14px;border:1px solid var(--line,var(--field-border,#d8dce5));border-radius:14px;background:var(--surface-2,var(--bg,#f4f6f8));color:inherit;cursor:pointer}.nuvoorStripeOpciones button:hover{border-color:var(--accent,#5866ad)}.nuvoorStripeOpciones small{color:var(--muted,var(--ink-2,#657083));line-height:1.4}.nuvoorStripeAviso{padding:12px;border-left:3px solid var(--accent,#5866ad);border-radius:8px;background:var(--surface-2,var(--bg,#f4f6f8))}.nuvoorStripeTransfer{display:grid;gap:8px;padding:14px;border:1px solid var(--line,var(--field-border,#d8dce5));border-radius:14px;background:var(--surface-2,var(--bg,#f4f6f8))}.nuvoorStripeTransfer code{overflow-wrap:anywhere;padding:9px;border-radius:8px;background:var(--surface,var(--card,#fff))}
+    @media(max-width:520px){.nuvoorStripeCaja{padding:22px 17px;border-radius:19px}}
+  `;document.head.appendChild(css);
+  const d=document.createElement("div");d.id="modalPagoStripe";d.className="nuvoorStripeFondo";d.hidden=true;d.innerHTML='<section class="nuvoorStripeCaja" role="dialog" aria-modal="true" aria-labelledby="nuvoorStripeTitulo"><button class="nuvoorStripeCerrar" id="nuvoorStripeCerrar" type="button" aria-label="Cerrar">×</button><small>FORMA DE PAGO</small><h2 id="nuvoorStripeTitulo">Elige cómo pagar</h2><p id="nuvoorStripePrecio"></p><div class="nuvoorStripeOpciones" id="nuvoorStripeOpciones"><button type="button" data-forma-stripe="tarjeta"><b>Tarjeta · recomendada</b><small>Se cobra sola cada mes. Cancelas cuando quieras.</small></button><button type="button" data-forma-stripe="oxxo"><b>Efectivo en OXXO</b><small>Pagas un mes a la vez en cualquier OXXO.</small></button><button type="button" data-forma-stripe="transferencia"><b>Transferencia</b><small>Pago anual, sin comisión.</small></button></div><p class="nuvoorStripeAviso" id="nuvoorStripeAviso" role="status" hidden></p><div class="nuvoorStripeTransfer" id="nuvoorStripeTransfer" hidden><p id="nuvoorStripeBanco"></p><b>Referencia</b><code id="nuvoorStripeReferencia"></code><b>Monto</b><strong id="nuvoorStripeMonto"></strong><button class="btn" id="nuvoorStripeCopiar" type="button">Copiar referencia</button></div></section>';
+  document.body.appendChild(d);
+  q("#nuvoorStripeCerrar").addEventListener("click",()=>d.hidden=true);
+  d.addEventListener("click",e=>{if(e.target===d)d.hidden=true;});
+  q("#nuvoorStripeOpciones").addEventListener("click",e=>{const b=e.target.closest("[data-forma-stripe]");if(b)iniciaPagoStripe(b.dataset.formaStripe);});
+  q("#nuvoorStripeCopiar").addEventListener("click",async()=>{const t=q("#nuvoorStripeReferencia").textContent;try{await navigator.clipboard.writeText(t);}catch(_){const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove();}q("#nuvoorStripeCopiar").textContent="Referencia copiada";});
+}
+function abrePagoStripe(planElegido,ciclo){
+  if(!puedeGestionarPlan()){alert("Pídele al dueño del negocio que contrate.");return;}
+  pagoStripeElegido={plan:planElegido,ciclo,cuenta_id:CUENTA.id};agregaModalStripe();
+  const p=PLANES_NUVOOR[planElegido],promo=planElegido==="basico"&&ciclo==="mensual";
+  q("#nuvoorStripeTitulo").textContent="Contratar "+p.nombre;
+  q("#nuvoorStripePrecio").textContent=promo?"$98 MXN al mes durante 3 meses; después $199 al mes.":"$"+(ciclo==="anual"?p.anual:p.mensual).toLocaleString("es-MX")+" MXN / "+(ciclo==="anual"?"año":"mes");
+  q("#nuvoorStripeOpciones").hidden=false;q("#nuvoorStripeTransfer").hidden=true;q("#nuvoorStripeAviso").hidden=true;q("#nuvoorStripeAviso").textContent="";q("#modalPagoStripe").hidden=false;
+}
+async function iniciaPagoStripe(forma){
+  if(!pagoStripeElegido||!puedeGestionarPlan())return;
+  const nota=q("#nuvoorStripeAviso"),opciones=[...q("#nuvoorStripeOpciones").querySelectorAll("button")];opciones.forEach(b=>b.disabled=true);nota.hidden=false;nota.textContent="Preparando el pago…";
+  const precioPlan=PLANES_NUVOOR[pagoStripeElegido.plan];
+  if(forma==="oxxo")q("#nuvoorStripePrecio").textContent="$"+precioPlan.mensual.toLocaleString("es-MX")+" MXN / mes con OXXO. La promoción es sólo para tarjeta.";
+  else if(forma==="transferencia")q("#nuvoorStripePrecio").textContent="$"+precioPlan.anual.toLocaleString("es-MX")+" MXN / año por transferencia.";
+  try{
+    const r=await fetch(FUNCIONES+"crear-pago",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+SESION.access_token,"apikey":CONFIG.SUPABASE_ANON_KEY},body:JSON.stringify({plan:pagoStripeElegido.plan,ciclo:forma==="transferencia"?"anual":forma==="oxxo"?"mensual":pagoStripeElegido.ciclo,forma,producto:"taller",cuenta_id:pagoStripeElegido.cuenta_id,app:new URLSearchParams(location.search).get("app")||""})});
+    const data=await leeJson(r);if(!r.ok)throw new Error(data.error||"No se pudo preparar el pago.");
+    if(typeof window.__diagEligio==="function"){try{await window.__diagEligio(pagoStripeElegido.plan);}catch(_){}}
+    if(forma==="transferencia"){
+      q("#nuvoorStripeOpciones").hidden=true;nota.textContent=data.aviso||"Haz la transferencia y espera la confirmación del Lab.";
+      q("#nuvoorStripeBanco").textContent=data.banco||"Los datos bancarios aparecerán aquí cuando estén configurados.";q("#nuvoorStripeReferencia").textContent=data.referencia||"—";q("#nuvoorStripeMonto").textContent="$"+Number(data.monto||0).toLocaleString("es-MX")+" MXN";q("#nuvoorStripeTransfer").hidden=false;return;
+    }
+    if(!data.url)throw new Error("Stripe no devolvió el enlace de pago.");location.assign(data.url);
+  }catch(err){nota.textContent=err.message||"No se pudo iniciar el pago.";}
+  finally{opciones.forEach(b=>b.disabled=false);}
+}
+async function abrirPortalStripe(){
+  if(!puedeGestionarPlan())return;
+  try{const r=await fetch(FUNCIONES+"portal-suscripcion",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+SESION.access_token,"apikey":CONFIG.SUPABASE_ANON_KEY},body:JSON.stringify({cuenta_id:CUENTA.id,app:new URLSearchParams(location.search).get("app")||""})});const data=await leeJson(r);if(!r.ok||!data.url)throw new Error(data.error||"No se pudo abrir la administración.");location.assign(data.url);}catch(e){alert("No se pudo abrir la administración: "+e.message);}
+}
 function abrePlanes(){
   pintaSuscripcion();
-  const ciclo = q("#cicloSel").value;
-  q("#planesGrid").innerHTML = Object.keys(CONFIG.PLANES).map(k=>{
-    const p = CONFIG.PLANES[k], precio = ciclo==="anual" ? p.anual : p.mensual;
-    const actual = plan()===k && vigente();
-    return '<div class="planCard'+(p.destacado?" destacado":"")+'" data-plan="'+k+'">'+
-      '<h3>'+p.nombre+'</h3><p class="para">'+p.para+'</p>'+
-      '<div class="precio">$'+precio.toLocaleString("es-MX")+'<span> MXN / '+(ciclo==="anual"?"año":"mes")+'</span></div>'+
-      '<ul>'+p.incluye.map(i=>"<li>"+i+"</li>").join("")+'</ul>'+
-      '<button class="btn '+(p.destacado?"primary":"")+'" data-contratar="'+k+'"'+(actual?" disabled":"")+'>'+
-      (actual?"Es tu plan actual":"Suscribirme")+'</button></div>';
+  const ciclo=q("#cicloSel").value,admin=puedeGestionarPlan();
+  q("#planesGrid").innerHTML=Object.keys(PLANES_NUVOOR).map(k=>{
+    const p=PLANES_NUVOOR[k],precio=ciclo==="anual"?p.anual:p.mensual,actual=plan()===k&&vigente();
+    return '<div class="planCard'+(k==="pro"?" destacado":"")+'" data-plan="'+k+'">'+
+      '<h3>'+p.nombre+'</h3><p class="para">'+p.para+'</p>'+ '<div class="precio">$'+precio.toLocaleString("es-MX")+'<span> MXN / '+(ciclo==="anual"?"año":"mes")+'</span></div>'+
+      '<ul>'+p.incluye.map(i=>"<li>"+i+"</li>").join("")+(k==="basico"&&ciclo==="mensual"?"<li>Promoción: $98 los primeros 3 meses con tarjeta</li>":"")+'</ul>'+
+      '<button class="btn '+(k==="pro"?"primary":"")+'" data-contratar="'+k+'"'+(actual||!admin?" disabled":"")+'>'+
+      (actual?"Es tu plan actual":admin?"Elegir forma de pago":"Pídele al dueño del negocio que contrate")+'</button></div>';
   }).join("");
-  q("#modalPlanes").hidden = false;
+  q("#modalPlanes").hidden=false;
 }
-q("#cicloSel").addEventListener("change", abrePlanes);
+q("#cicloSel").addEventListener("change",abrePlanes);
 
 const tabsPlan = document.querySelector(".planTabs");
 if(tabsPlan) tabsPlan.addEventListener("click", e=>{
@@ -1114,48 +1177,29 @@ if(tabsPlan) tabsPlan.addEventListener("click", e=>{
 });
 q("#planesCerrar").addEventListener("click", ()=> q("#modalPlanes").hidden = true);
 
-q("#planesGrid").addEventListener("click", async e=>{
-  const b = e.target.closest("[data-contratar]"); if(!b) return;
-
-  b.disabled = true; b.textContent = "Abriendo Mercado Pago…";
-  try{
-    const r = await fetch(FUNCIONES + "crear-suscripcion", {
-      method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+SESION.access_token},
-      body: JSON.stringify({plan:b.dataset.contratar, ciclo:q("#cicloSel").value})
-    });
-    const data = await leeJson(r);
-    if(!r.ok || !data.init_point) throw new Error(data.error || "No se pudo crear la suscripción");
-    /* Antes de irnos a Mercado Pago, dejamos anotado qué eligió. Comparar
-       eso contra lo que le sugerimos es lo que dice si las preguntas del
-       diagnóstico sirven o hay que cambiarlas. */
-    if(typeof window.__diagEligio === "function"){
-      try{ await window.__diagEligio(b.dataset.contratar); }catch(e){}
-    }
-    location.href = data.init_point;
-  }catch(err){
-    b.disabled = false; b.textContent = "Suscribirme";
-    const plan = (CONFIG.PLANES[b.dataset.contratar] || {}).nombre || b.dataset.contratar;
-    alert(err.code === SIN_SERVIDOR
-      ? "El cobro en línea todavía no está conectado en esta publicación.\n\n" +
-        "Para contratar el plan " + plan + ", escríbele a Nuvoor: te lo activan " +
-        "y sigues trabajando con todo lo que ya tienes, sin perder nada."
-      : "No se pudo abrir el cobro: " + err.message);
-  }
+q("#planesGrid").addEventListener("click",e=>{
+  const b=e.target.closest("[data-contratar]");if(!b)return;
+  if(!puedeGestionarPlan()){alert("Pídele al dueño del negocio que contrate.");return;}
+  abrePagoStripe(b.dataset.contratar,q("#cicloSel").value);
 });
 
-/* Al volver de Mercado Pago revisamos el estado un par de veces,
-   porque el aviso de pago puede tardar unos segundos en llegar. */
+/* Al volver de Stripe, esperamos hasta 30 segundos a que llegue el webhook. */
 async function revisaTrasPago(){
-  if(location.search.indexOf("pago=")<0) return;
-  q("#avisoPagoTxt").textContent = "Confirmando tu pago con Mercado Pago…";
+  if(new URLSearchParams(location.search).get("pago")!=="ok") return;
+  q("#avisoPagoTxt").textContent = "Confirmando tu pago con Stripe…";
   q("#avisoPago").hidden = false;
-  for(let i=0;i<8;i++){
-    await new Promise(r=>setTimeout(r,2500));
-    await cargaCuenta();
-    if(vigente() && plan()!=="prueba"){ history.replaceState({},"",location.pathname); pintaCuenta(); aplicaPlan(); return; }
+  for(let i=0;i<10;i++){
+    await new Promise(r=>setTimeout(r,3000));
+    try { await cargaCuenta(); } catch (_) { continue; }
+    const sesionPago=new URLSearchParams(location.search).get("sesion");
+    let confirmado=false;
+    if(sesionPago){try{const r=await SB.rpc("stripe_confirmado",{p_cuenta:CUENTA.id,p_sesion:sesionPago});confirmado=!r.error&&r.data===true;}catch(_){}}
+    if(confirmado && vigente() && plan()!=="prueba" && plan()!=="ninguno"){
+      const vuelta=new URL(location.href);vuelta.searchParams.delete("pago");vuelta.searchParams.delete("sesion");history.replaceState({},"",vuelta.pathname+vuelta.search+vuelta.hash);pintaCuenta();aplicaPlan();vaA("set","#suscResumen");
+      q("#avisoPagoTxt").textContent="¡Listo! Tu plan quedó activo.";q("#avisoPago").hidden=false;return;
+    }
   }
-  pintaCuenta();
+  pintaCuenta();q("#avisoPagoTxt").textContent="Tu pago se está confirmando; en unos minutos se activa.";q("#avisoPago").hidden=false;vaA("set","#suscResumen");
 }
 
 /* Si config.js todavía no tiene las llaves, SB no existe: no le pedimos nada,

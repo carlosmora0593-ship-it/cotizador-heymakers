@@ -46,6 +46,7 @@ const esc = (v: unknown) => encodeURIComponent(String(v ?? ""));
 async function pide(ruta: string, opc: RequestInit & { prefer?: string } = {}) {
   const { prefer, ...resto } = opc;
   return await fetch(SB + "/rest/v1/" + ruta, {
+    signal: AbortSignal.timeout(10000),
     ...resto,
     headers: { ...CAB, ...(prefer ? { Prefer: prefer } : {}) },
   });
@@ -53,8 +54,8 @@ async function pide(ruta: string, opc: RequestInit & { prefer?: string } = {}) {
 
 async function filas(ruta: string): Promise<any[]> {
   const r = await pide(ruta);
-  if (!r.ok) { console.error("lectura", ruta, r.status, await r.text()); return []; }
-  try { return await r.json(); } catch { return []; }
+  if (!r.ok) throw new Error("No se pudo consultar la cuenta de cobro");
+  return await r.json();
 }
 
 async function una(ruta: string): Promise<any | null> {
@@ -91,6 +92,7 @@ async function graba(ruta: string, metodo: string, cuerpo?: unknown) {
    prendido: lo revisan ellas mismas. */
 async function quienEres(token: string): Promise<any | null> {
   const r = await fetch(SB + "/auth/v1/user", {
+    signal: AbortSignal.timeout(10000),
     headers: { apikey: LLAVE, Authorization: "Bearer " + token },
   });
   if (!r.ok) return null;
@@ -121,6 +123,7 @@ function aForm(obj: any, prefijo = "", fuera: string[] = []): string[] {
 
 async function stripe(ruta: string, cuerpo?: any, metodo = "POST") {
   const r = await fetch("https://api.stripe.com/v1/" + ruta, {
+    signal: AbortSignal.timeout(10000),
     method: metodo,
     headers: {
       "Authorization": "Bearer " + STRIPE,
@@ -145,14 +148,29 @@ async function stripe(ruta: string, cuerpo?: any, metodo = "POST") {
 
    Van en centavos porque así los pide Stripe. */
 const PLANES: Record<string, { nombre: string; mensual: number; anual: number }> = {
-  taller_basico: { nombre: "Taller Makers · Básico", mensual: 19900, anual: 199000 },
-  taller_maker:  { nombre: "Taller Makers · Maker",  mensual: 44900, anual: 449000 },
-  taller_pro:    { nombre: "Taller Makers · Pro",    mensual: 89900, anual: 899000 },
-  rest_normal:   { nombre: "Makers Restaurant",      mensual: 19900, anual: 199000 },
-  rest_multi:    { nombre: "Makers Restaurant · Multisucursal", mensual: 44900, anual: 449000 },
-  tienda_normal: { nombre: "Tiendita Makers",        mensual: 19900, anual: 199000 },
-  tienda_multi:  { nombre: "Tiendita Makers · Empresarial",      mensual: 44900, anual: 449000 },
+  imprenta_basico: { nombre: "Nuvoor Imprenta · Básico", mensual: 19900, anual: 199000 },
+  imprenta_maker: { nombre: "Nuvoor Imprenta · Maker", mensual: 44900, anual: 449000 },
+  imprenta_pro: { nombre: "Nuvoor Imprenta · Pro (hasta 4 sucursales)", mensual: 89900, anual: 899000 },
+  restaurant_estandar: { nombre: "Nuvoor Restaurant", mensual: 19900, anual: 199000 },
+  restaurant_multi: { nombre: "Nuvoor Restaurant · Multiempresa (hasta 4 sucursales)", mensual: 89900, anual: 899000 },
+  store_estandar: { nombre: "Nuvoor Store", mensual: 19900, anual: 199000 },
+  store_multi: { nombre: "Nuvoor Store · Multiempresa (hasta 4 sucursales)", mensual: 89900, anual: 899000 },
 };
+
+function urlVuelta(sitio: string, cuentaId: string, producto: string, app: string) {
+  if (producto === "taller") {
+    const u = new URL("/", sitio);
+    u.searchParams.set("cuenta", cuentaId); u.searchParams.set("producto", "taller");
+    u.hash = "suscResumen";
+    if (app === "android") u.searchParams.set("app", "android");
+    return u.toString();
+  }
+  const u = new URL("/acceso.html", sitio);
+  u.searchParams.set("planes", "1"); u.searchParams.set("gestion", "1");
+  u.searchParams.set("producto", producto); u.searchParams.set("cuenta", cuentaId);
+  if (app === "android") u.searchParams.set("app", "android");
+  return u.toString();
+}
 
 /* ==================================================================
    portal-suscripcion
@@ -174,25 +192,32 @@ Deno.serve(async (req) => {
     const user = await quienEres(token);
     if (!user) return resp(401, { error: "Sesión no válida" });
 
+    let cuerpo: any = {};
+    try { cuerpo = await req.json(); } catch { cuerpo = {}; }
     const perfil = await una("perfiles?select=cuenta_id,cuenta_activa,rol&id=eq." + esc(user.id));
     if (!perfil) return resp(404, { error: "Tu perfil no existe" });
-    const cuentaId = perfil.cuenta_activa || perfil.cuenta_id;
+    const cuentaId = cuerpo.cuenta_id || perfil.cuenta_activa || perfil.cuenta_id;
+    if (!cuentaId) return resp(404, { error: "No se encontró el negocio elegido" });
 
     const mem = await una("membresias?select=rol&usuario_id=eq." + esc(user.id) + "&cuenta_id=eq." + esc(cuentaId));
-    const miRol = (mem && mem.rol) || perfil.rol || "admin";
+    if (!mem && perfil.cuenta_id !== cuentaId)
+      return resp(403, { error: "No tienes acceso a este negocio" });
+    const miRol = (mem && mem.rol) || perfil.rol || "";
     if (miRol !== "admin" && miRol !== "dueno") {
       return resp(403, { error: "Solo un administrador puede ver la suscripción" });
     }
 
-    const cuenta = await una("cuentas?select=stripe_cliente&id=eq." + esc(cuentaId));
+    const cuenta = await una("cuentas?select=stripe_cliente,producto&id=eq." + esc(cuentaId));
     if (!cuenta || !cuenta.stripe_cliente) {
       return resp(409, { error: "Esta cuenta todavía no tiene una suscripción con tarjeta" });
     }
 
-    const sitio = (Deno.env.get("SITIO_URL") || req.headers.get("origin") || "").replace(/\/+$/, "");
+    const sitio = (Deno.env.get("SITIO_URL") || "https://app.nuvoor.mx").replace(/\/+$/, "");
+    if (sitio !== "https://app.nuvoor.mx") return resp(500, { error: "SITIO_URL debe ser https://app.nuvoor.mx" });
+    const producto = cuenta.producto === "store" ? "tiendita" : cuenta.producto;
     const s = await stripe("billing_portal/sessions", {
       customer: cuenta.stripe_cliente,
-      return_url: sitio + "/",
+      return_url: urlVuelta(sitio, cuentaId, producto, cuerpo.app || ""),
       locale: "es-419",
     });
 

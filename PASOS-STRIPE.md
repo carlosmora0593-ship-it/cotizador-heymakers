@@ -1,184 +1,232 @@
-# Cambiar el cobro a Stripe
+# Conectar Stripe: tus pasos, Carlos (2 nov 2026)
 
-Lo que sigue son tus pasos. El código ya está escrito y probado; sin tu cuenta
-de Stripe no sirve de nada, y esa sólo la puedes abrir tú.
+> **Actualización, 2 nov por la tarde:** Carlos autorizó a Codex hacer la revisión final mientras Claude regresa el viernes 6. La revisión local y los pendientes reales se documentan en `REVISION-STRIPE-PARA-CLAUDE.md`. Las llaves siguen siendo sólo de Carlos. Esta autorización no activa modo real.
 
-## Por qué Stripe y no otro
+Lo escribió Claude. **Es la guía de lo que tienes que hacer tú**: Codex la lee para saber en qué paso vas y acompañarte, pero **las llaves sólo las ves y las pegas tú**. Lo que le toca a Codex está en `TAREA-STRIPE.md`.
 
-Buscamos "como pagar Netflix": la tarjeta se guarda y se cobra sola, y el
-cliente no se vuelve a enterar hasta que algo falla.
+Hay tres etapas:
 
-Dato contra la intuición: **Stripe es la más cara de las cuatro.** Cobra 3.6% +
-$3, más 0.7% del módulo de suscripciones. A $199 se lleva $13.41 (6.7%), contra
-$12.70 de Mercado Pago y $9.59 de Conekta.
-
-Se eligió de todos modos porque trae hecho lo que de otro modo hay que
-construir y mantener: la página de cobro, **el portal donde el cliente cambia
-su tarjeta y cancela solo**, la actualización automática de tarjetas vencidas,
-los reintentos cuando un cobro rebota y los correos de aviso. Con 50 clientes
-la diferencia contra Mercado Pago son $70 al mes. Eso es lo que cuesta no
-construir un portal de suscripciones.
+- **A. Hoy.** Abres la cuenta y la dejas lista en modo de prueba. No necesitas a Codex.
+- **B. Cuando Claude apruebe el código de Codex.** Subes las funciones, pegas las llaves de prueba, registras el aviso y pruebas con tarjetas de juguete.
+- **C. Al final.** Activas la cuenta con tu RFC y tu CLABE y cambias todo a modo real.
 
 ---
 
-## 1. Abrir la cuenta de Stripe (10 min)
+## Reglas de seguridad (léelas una vez)
 
-En **stripe.com**, cuenta de México. Te va a pedir:
-
-- **RFC.** Si estás como persona física con actividad empresarial, sirve el tuyo.
-- **CLABE** de una cuenta de banco en pesos. Ahí te deposita.
-- Los datos del representante.
-
-Empieza en **modo de prueba**. Todo lo de abajo funciona igual en prueba, con
-las tarjetas de prueba de Stripe, y no mueve dinero de nadie.
-
-> **Stripe deposita en 2 o 3 días hábiles, y la primera vez tarda 7.** Mercado
-> Pago te daba el dinero al instante. Tenlo en cuenta para tu flujo.
+- **La llave secreta de Stripe (`sk_…`) y el secreto del aviso (`whsec_…`) sólo van en Supabase → Edge Functions → Secrets.** Nunca en el chat, en WhatsApp, en un archivo, en `config.js` ni se las dictes a Codex o a Claude. Quien tiene la llave secreta puede cobrarle a tus clientes y mover tu dinero.
+- **Si una llave se te escapa** (la pegaste donde no era), en Stripe → Desarrolladores → Claves de API → «⋯» → **Cambiar la clave (roll)**. Luego pegas la nueva en Supabase.
+- **La «clave publicable» (`pk_…`) no hace falta.** El sistema no la usa.
+- **Nunca captures números de tarjeta de nadie.** Stripe los guarda; Nuvoor no los ve.
 
 ---
 
-## 2. Subir las tres funciones (6 min)
+## Etapa A · Hoy, sin esperar a nadie (unos 30 min)
 
-En **Supabase → Edge Functions → Deploy a new function → Via Editor**. Tres
-veces, con estos nombres exactos:
+### A1. Abrir la cuenta
 
-| Función | Qué pegar | Qué hace |
+1. Entra a **stripe.com/mx** → «Comenzar ahora».
+2. Usa el correo que vayas a administrar para Nuvoor, el país **México**, y una contraseña que sólo tú sepas.
+3. Confirma el correo y **prende la verificación en dos pasos** (Stripe te la pide; usa una app de autenticación).
+
+Al entrar, Stripe te deja en **modo de prueba** (a veces dice «entorno de prueba» o «sandbox»). Todo lo de la etapa A y la B se hace ahí. **No mueve dinero de nadie.**
+
+> Stripe te va a pedir «activar pagos» con tu RFC y tu CLABE. **Eso puede esperar a la etapa C.** Si quieres adelantarlo, mira primero los datos que pide en C1.
+
+### A2. Cómo te ve el cliente
+
+**Configuración → Detalles públicos de la empresa** (o «Información pública»):
+
+| Campo | Qué poner |
+|---|---|
+| Nombre público | **Nuvoor** |
+| Descriptor del estado de cuenta | **NUVOOR** (es lo que sale en el estado de cuenta del cliente) |
+| Sitio web | **https://nuvoor.mx** |
+| Correo y teléfono de soporte | Los de Nuvoor, no tu personal |
+
+**Configuración → Marca (Branding):**
+
+- Ícono: la N de Nuvoor (`Claude outputs/acceso-animado/n-512.png`).
+- Color principal: **#4458A4**.
+
+### A3. Formas de pago
+
+**Configuración → Métodos de pago:**
+
+- **Tarjetas:** prendido. Es la buena: se cobra sola cada mes.
+- **OXXO:** prendido. Es para quien no tiene tarjeta. Cada mes paga un mes en efectivo.
+- Lo demás (Apple Pay, Google Pay, Link): déjalo como venga.
+
+> **OXXO no sirve para cobrar solo cada mes**: es un pago suelto y no se puede reembolsar. El ticket vence a los pocos días y el máximo es $10,000.
+
+### A4. El portal del cliente (donde cambia su tarjeta y cancela solo)
+
+**Configuración → Billing → Portal del cliente** → «Activar».
+
+- **Métodos de pago:** sí, que pueda cambiar su tarjeta.
+- **Historial de facturas:** sí, que vea y baje sus recibos.
+- **Cancelar suscripción:** sí, **al final del periodo** (no «de inmediato»): lo que ya pagó, lo conserva. Deja prendido «motivo de cancelación».
+- **Cambiar de plan: NO.** El cambio de plan se hace dentro de Nuvoor.
+- **Códigos de promoción: NO.**
+- **Encabezado:** «Administra tu suscripción de Nuvoor».
+- **Enlace de regreso:** `https://app.nuvoor.mx/acceso.html`
+
+### A5. Cobros que rebotan y correos
+
+**Configuración → Billing → Suscripciones y correos** (o «Recuperación de ingresos»):
+
+- **Reintentos inteligentes:** prendidos, unos 4 intentos en 2 semanas.
+- **Si todos los reintentos fallan:** «marcar la suscripción como **no pagada** (unpaid)». Así la cuenta se pausa, pero el cliente puede poner otra tarjeta y seguir sin volver a contratar.
+- **Correos al cliente:** prende los de pago fallido, tarjeta por vencer y recibo de pago.
+
+**Ya terminaste la etapa A.** Avísale a Claude: «Stripe etapa A lista».
+
+---
+
+## Etapa B · Con el código revisado por Codex, autorizado por Carlos (modo de prueba)
+
+La revisión local de las correcciones queda registrada en `REVISION-STRIPE-PARA-CLAUDE.md`. Sigue esta etapa sólo en el entorno de prueba. No cambies las llaves por las de modo real todavía.
+
+### B1. La base de datos
+
+**Supabase → SQL Editor:** corre cada archivo completo por separado, en este orden:
+
+1. `sql/18-stripe.sql`.
+2. `sql/22-stripe-planes.sql`.
+3. `sql/23-stripe-seguro.sql`.
+
+El 22 corrige los planes y bloquea la cuenta al sumar transferencias. El 23 evita aplicar dos veces un pago OXXO, conserva los intentos de Checkout y registra si ya hubo pagos para no repetir la promoción. Los tres pueden repetirse **en ese orden**. Si aparece un error, no sigas con el siguiente: comparte el texto del error sin datos personales. No ejecutes otros SQL llamados 18 (por ejemplo, `18-productos-cuenta.sql`) como parte de estos pasos.
+
+El SQL no contiene llaves ni las necesita. El 23 depende de las tablas de cuentas y membresías existentes. No modifica el staff, la puerta, Auth ni `mi_cuenta()`. La copia disponible hoy en el Lab publicado todavía puede ser la anterior: usa los archivos locales revisados hasta que se publiquen las pantallas.
+
+### B2. Subir las tres funciones
+
+**Con doble clic:** `SUBIR-COBROS.bat`. Usa la consola oficial portable de Supabase 3.0.0: no requiere instalar Node, npx ni Docker. Si falta la consola, la descarga del repositorio oficial y verifica su SHA256 en `tmp/stripe/cli/` (carpeta local ignorada por Git). La primera vez abre el navegador para que entres a Supabase con tu cuenta; después sube sólo las tres funciones al proyecto indicado, sin pedir contraseña de la base ni correr SQL. Si pregunta si deseas continuar con la subida de esas funciones al proyecto indicado, confirma.
+
+Si el navegador te pide iniciar sesión o confirmar un código de acceso de la consola, lo haces tú en Supabase y la ventana de la consola; no compartas ese código ni tokens por chat. El modo `SUBIR-COBROS.bat --comprobar` verifica únicamente la versión, sin iniciar sesión ni desplegar.
+
+**Si el `.bat` falla**, a mano en **Supabase → Edge Functions → Deploy a new function → Via Editor**, tres veces, con estos nombres exactos:
+
+| Función | Qué pegas | Para qué |
 |---|---|---|
 | `crear-pago` | `supabase/functions/crear-pago/index.ts` | Abre la página de cobro |
 | `portal-suscripcion` | `supabase/functions/portal-suscripcion/index.ts` | Abre el portal del cliente |
 | `webhook-stripe` | `supabase/functions/webhook-stripe/index.ts` | Recibe los avisos de Stripe |
 
-**En las tres, "Verify JWT" apagado.** Las dos primeras revisan por su cuenta
-el token de sesión; el webhook se protege con la firma de Stripe, que es más
-fuerte que cualquier contraseña en la dirección.
+**En las tres, «Verify JWT» apagado.** Las dos primeras revisan solas la sesión. El aviso se protege con la firma de Stripe.
 
-Las viejas de Mercado Pago (`crear-suscripcion`, `webhook-mercadopago`) **déjalas
-ahí por ahora**. El día que una suscripción de Mercado Pago ya no exista, se
-borran.
+### B3. La llave de prueba
 
----
+1. En Stripe, modo de prueba: **Desarrolladores → Claves de API → Clave secreta** → «Revelar». Empieza con `sk_test_`.
+2. Cópiala y **pégala directo** en **Supabase → Edge Functions → Secrets** → «Add new secret»:
 
-## 3. Los secretos (3 min)
-
-**Supabase → Edge Functions → Secrets:**
-
-| Nombre | De dónde sale |
+| Nombre | Valor |
 |---|---|
-| `STRIPE_LLAVE` | Stripe → Developers → API keys → **Secret key** (empieza con `sk_test_` en prueba) |
-| `STRIPE_WEBHOOK_SECRETO` | Del paso 4, cuando registres el webhook |
-| `SITIO_URL` | `https://carlosmora0593-ship-it.github.io/cotizador-heymakers` |
-| `DATOS_BANCO` | Tu banco, CLABE y a nombre de quién. Es lo que se le enseña a quien paga por transferencia. |
+| `STRIPE_LLAVE` | la `sk_test_…` |
+| `SITIO_URL` | `https://app.nuvoor.mx` |
+| `DATOS_BANCO` | Banco, CLABE y titular, en una línea. Es lo que ve quien paga por transferencia. |
 
-La llave secreta de Stripe **nunca** va en `config.js`, ni en el repositorio, ni
-en el navegador. Quien la tenga puede cobrarle a tus clientes.
+### B4. El aviso de Stripe (webhook)
 
----
+1. Stripe → **Desarrolladores → Webhooks** (se abre «Workbench») → **«Crear un destino de eventos»**.
+2. **De dónde:** «Tu cuenta».
+3. **Tipo de carga:** **«Snapshot»**. **No** elijas «Thin»: con «Thin» el sistema no entiende los avisos. Si te pide versión de la API, deja la que propone.
+4. **Eventos**, marca estos ocho:
+   - `checkout.session.completed`
+   - `checkout.session.async_payment_succeeded`
+   - `customer.subscription.created`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+   - `invoice.paid`
+   - `invoice.payment_failed`
+   - `checkout.session.async_payment_failed` (sólo deja registro; no cambia la licencia)
+5. **Destino:** «Endpoint de webhook». **URL:**
 
-## 4. Registrar el webhook (3 min)
+   ```
+   https://vgobhszuziyrrgfysenk.supabase.co/functions/v1/webhook-stripe
+   ```
 
-**Stripe → Developers → Webhooks → Add endpoint.**
+6. Créalo. En su página, **«Revelar secreto»**: empieza con `whsec_`. Pégalo en Supabase → Secrets como **`STRIPE_WEBHOOK_SECRETO`**.
 
-```
-https://vgobhszuziyrrgfysenk.supabase.co/functions/v1/webhook-stripe
-```
+> Sin ese secreto, el aviso rechaza **todo** a propósito. Es lo único que separa un aviso de Stripe de alguien que adivine la dirección y se regale el plan Pro.
 
-Eventos a marcar, los siete:
+### B5. Avisar
 
-- `checkout.session.completed`
-- `checkout.session.async_payment_succeeded`
-- `customer.subscription.created`
-- `customer.subscription.updated`
-- `customer.subscription.deleted`
-- `invoice.paid`
-- `invoice.payment_failed`
+Dile a Codex: «Stripe etapa B lista». Se comprueba la conexión de prueba y después se publican las pantallas nuevas de pago. Claude tendrá el registro completo al regresar.
 
-Al guardarlo, Stripe te da el **Signing secret** (empieza con `whsec_`). Ése va
-en `STRIPE_WEBHOOK_SECRETO`.
+### B6. Probar con tarjetas de juguete (en modo de prueba)
 
-> Sin ese secreto el webhook rechaza **todo**, a propósito. Es lo único que
-> separa un aviso de Stripe de cualquiera que adivine tu dirección y se regale
-> el plan Pro.
+Usa **tu** cuenta de prueba, nunca la de un cliente.
 
----
+1. **Tarjeta:** contrata Restaurant Estándar. Paga con `4242 4242 4242 4242`, cualquier fecha futura y cualquier CVC.
+   - Al regresar, la licencia debe quedar **activa** en menos de un minuto.
+   - En Stripe → Clientes → tú → Suscripción, debe verse el **descuento de la promoción** ($98 los primeros 3 meses).
+   - Antes de modo real, comprobar también con un reloj de prueba de Stripe **tres facturas de $98 y la cuarta de $199**, incluyendo una cuenta con días de prueba restantes. El arnés local no simula el motor de facturación de Stripe.
+2. **Tarjeta que rebota:** `4000 0000 0000 0002`. Stripe dice «tarjeta rechazada» y la cuenta **no** se debe activar.
+3. **OXXO:** elige OXXO y genera el ticket. En prueba, Stripe simula que el cliente pagó **a los 3 minutos más o menos**. La cuenta debe sumar un mes.
+4. **Transferencia:** debe enseñarte banco, CLABE, referencia y monto. Luego márcala como pagada desde el Lab y la cuenta debe sumar el periodo.
+5. **Portal:** «Administrar mi suscripción» debe abrir el portal con tu tarjeta y tus recibos. Cancela ahí: la cuenta queda **cancelada al final del periodo**, sin perder los días pagados.
+6. **Sin doble cobro:** varios clics reutilizan el Checkout abierto. Con una suscripción existente se usa el portal o se contacta a Nuvoor para cambiar de plan; no se abre otra suscripción en paralelo.
+7. **APK 0.1.3:** abre Stripe en Chrome, fuera del APK. Completa el pago allí; la vuelta abre Nuvoor en ese navegador. Si pide sesión, entra con el mismo usuario. Al volver al APK, actualiza el plan. Aún falta comprobar este recorrido en la tablet. No se compiló otro APK.
 
-## 5. El portal del cliente (2 min)
+**Si algo no cuadra:**
 
-**Stripe → Settings → Billing → Customer portal.** Préndelo y deja que el
-cliente pueda:
+- **Stripe → Workbench → Webhooks → tu destino → «Entregas de eventos»** (lo que mandó Stripe).
+- **Supabase → Edge Functions → webhook-stripe → Logs** (lo que hizo el sistema).
 
-- Actualizar su método de pago ✔
-- Ver y descargar sus recibos ✔
-- Cancelar la suscripción ✔
-
-El cambio de plan **no** lo prendas ahí: eso se queda en tu cotizador, que ya
-tiene su pantalla de planes.
-
----
-
-## 6. El SQL (1 min)
-
-Corre `sql/18-stripe.sql` en Supabase → SQL Editor. Agrega cuatro columnas a
-`cuentas`, la tabla de transferencias esperadas y la función que las aplica.
+Mándale captura a Claude.
 
 ---
 
-## Precios nuevos y promoción de apertura
+## Etapa C · Modo real (cuando B salga bien)
 
-Los cobros todavía no están configurados. Al habilitarlos, la promoción para
-Imprenta Básico, Restaurant y Store debe cobrar **$98 MXN al mes durante los
-primeros 3 meses y después $199 MXN al mes**. Los 15 días de prueba gratuita
-van antes de la promoción. Configúrala en el procesador como cupón recurrente
-por 3 meses o como precio introductorio; no cambies el monto confiable del
-servidor para aceptar el precio que mande el navegador.
+### C1. Activar la cuenta
 
-En Imprenta, **Pro cuesta $899 MXN al mes e incluye hasta 4 sucursales**; no hay
-una licencia Multiempresa aparte. En Restaurant y Store, Multiempresa cuesta
-**$899 MXN al mes por hasta 4 sucursales del mismo sistema**. Imprenta Maker
-conserva $449. Restaurant y Store se contratan por separado; no hay un combo
-Restaurant + Store. Antes de habilitar estos planes hay que actualizar el
-mapeo de planes y las funciones de pago para distinguir el sistema y la
-promoción.
+Stripe → «Activar pagos». Te pide:
 
----
+- **Tipo de negocio:**
+  - **Persona física con actividad empresarial**, si facturas a tu nombre.
+  - **S.A. o S. de R.L.**, si Nuvoor ya es empresa. Esto lo decides con tu contador.
+- **Nombre legal exactamente como aparece en el RFC.**
+- **RFC:**
+  - Como persona física, va **tu RFC personal (13 caracteres) en los datos del representante**.
+  - **No lo pongas en el campo del RFC de la empresa**: Stripe dice que eso da error.
+  - Como empresa, va el RFC de la empresa (12 caracteres) y además tu RFC personal como representante.
+- **Tus datos:** fecha de nacimiento y domicilio.
+- **Del negocio:** domicilio en México, teléfono de soporte, sitio web (**nuvoor.mx**) y descripción del negocio, por ejemplo «Software de punto de venta por suscripción mensual».
+- **CLABE** de una cuenta en pesos **a nombre del mismo titular del RFC**. Ahí te deposita.
 
-## 7. Probar antes de cobrarle a nadie
+> El tablero te dice cuándo llega cada depósito. El primero suele tardar más que los siguientes, y los pagos en OXXO tardan unos días más en depositarse.
 
-Con Stripe en modo de prueba:
+### C2. Repetir en modo real
 
-1. Entra al cotizador, **Perfil → Mi plan → Maker**.
-2. Debe mandarte a la página de Stripe. Paga con la tarjeta de prueba
-   `4242 4242 4242 4242`, cualquier fecha futura, cualquier CVC.
-3. Regresa: tu cuenta debe quedar **activa** en menos de un minuto.
-4. Vuelve a Mi plan y entra a **Administrar mi suscripción**. Debe abrirte el
-   portal de Stripe con tu tarjeta y tus recibos.
-5. Cancela ahí mismo. La cuenta debe quedar **cancelada** pero con su fecha de
-   vencimiento intacta: lo que ya pagó, lo conserva.
+En Stripe hay un interruptor de **modo de prueba / modo real**. En modo real:
 
-Si algo no cuadra, **Supabase → Edge Functions → webhook-stripe → Logs**. Ahí
-aparece cada aviso que llegó y qué se hizo con él.
+1. **Repite A3, A4 y A5.** El portal y los métodos de pago se configuran aparte en cada modo.
+2. **Clave secreta real** (`sk_live_…`): reemplaza `STRIPE_LLAVE` en Supabase → Secrets.
+3. **Crea otro destino de eventos** igual al de B4: Snapshot, los mismos eventos y la misma URL. Su `whsec_…` **reemplaza** `STRIPE_WEBHOOK_SECRETO`.
 
----
+### C3. La prueba de verdad
 
-## Las tres formas de pago
-
-| | Quién la usa | Qué pasa |
-|---|---|---|
-| **Tarjeta** | Quien tiene tarjeta | Suscripción de verdad. Se cobra sola cada mes, se actualiza sola cuando la tarjeta vence, y el cliente la administra solo. Es la que queremos. |
-| **OXXO** | Quien no tiene tarjeta | Un pago suelto que suma un mes. Cada mes hay que volver a pagar: alguien tiene que acordarse. |
-| **Transferencia** | Quien paga el año completo | **No pasa por Stripe: comisión cero.** Le das tu CLABE y una referencia; cuando entra, lo marcas en el Lab y se le extienden doce meses. |
-
-Un año de Taller Pro son $8,990. Por Stripe pagarías $484 de comisión; por
-transferencia, nada. Por eso vale la pena el trabajo de marcarlo a mano.
+- Contrata con **tu tarjeta** el plan más barato, revisa que se active y cancélalo desde el portal.
+- Si quieres el dinero de vuelta, en Stripe → Pagos → ese cobro → **Reembolsar**. Stripe no te devuelve su comisión.
+- Avísale a Claude: «Stripe en modo real». Claude y Codex apagan Mercado Pago.
 
 ---
 
-## Lo que todavía falta, y lo hago yo
+## Lo que cuesta (stripe.com/mx, revisado el 2 nov 2026; todo **más IVA**)
 
-1. **La pantalla donde el cliente escoge cómo pagar** (tarjeta, OXXO o
-   transferencia) y el botón de "Administrar mi suscripción". Te la enseño en
-   artefacto antes de publicarla.
-2. **El botón del Lab para marcar una transferencia como pagada.** Para eso
-   necesito traer tu `lab.html`: tu copia pesa 34 bytes más que mi fuente, así
-   que voy a parchear la tuya.
-3. **Avisarle al cliente antes de que se le venza** el pago anual o el de OXXO.
-   Sin eso, el que no paga con tarjeta se cae sin enterarse.
+| | Comisión |
+|---|---|
+| Tarjeta mexicana | 3.6% + $3 por cobro |
+| Tarjeta extranjera | +0.5% |
+| Suscripciones (Billing) | +0.7% de lo cobrado por suscripción |
+| OXXO | 4% + $3 por pago |
+| Transferencia a tu CLABE | $0: no pasa por Stripe |
+
+Un año de Pro por transferencia ($8,990) te ahorra unos $500 de comisiones. Por eso existe esa opción.
+
+## Lo que todavía no hace (va después)
+
+- **La factura (CFDI) de cada mensualidad.** Stripe no la emite: se hará con Facturapi, que se contrata cuando Stripe ya cobre en real.
+- **El aviso antes de que se le venza el pago anual o el de OXXO**, para que quien no paga con tarjeta no se quede sin sistema sin enterarse.
