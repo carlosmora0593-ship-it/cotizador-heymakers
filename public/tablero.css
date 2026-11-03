@@ -2,6 +2,7 @@
 #tab-inicio,#acceso{--nvBg:#f2f6fb;--nvSurface:#fff;--nvSoft:#eef2f9;--nvLine:#dce3ef;--nvInk:#0a0e1a;--nvMuted:#5e6b82;--nvAccent:#4458a4;--nvAccentSoft:#e9edfa;--nvShadow:0 8px 30px #30467508;color:var(--nvInk)}
 [data-theme=dark] #tab-inicio,[data-theme=dark] #acceso{--nvBg:#0c1220;--nvSurface:#151e31;--nvSoft:#1e2941;--nvLine:#2a3650;--nvInk:#eef4ff;--nvMuted:#a4b2ce;--nvAccent:#9dc9f4;--nvAccentSoft:#263957;--nvShadow:0 8px 30px #0002}
 #tab-inicio{max-width:1380px;margin:0 auto;padding:4px 0 22px}
+.nvMetric{font:inherit;text-align:left;color:var(--nvInk);width:100%}.nvMetricLink{cursor:pointer}.nvMetricLink:focus-visible{outline:2px solid var(--nvAccent);outline-offset:3px}#proFiltro{flex-wrap:wrap}
 #tab-inicio [hidden],#acceso [hidden]{display:none!important}
 .nvHeader{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:8px 0 22px}
 .nvHeading{display:flex;align-items:center;gap:15px;min-width:0}.nvLogo{width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 5px 8px #4458a426)}

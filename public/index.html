@@ -3497,8 +3497,8 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   <div class="barraNav" id="barraNav"></div>
   <div class="barraPie"><span id="barraVer" class="nuvoorPie"><img src="./marca/n-64.png" alt=""><span>Nuvoor</span></span></div>
 </aside>
-<link rel="stylesheet" href="tablero.css?v=20261103-0252">
-<link rel="stylesheet" href="bloqueo.css?v=20261103-0252">
+<link rel="stylesheet" href="tablero.css?v=20261103-0937">
+<link rel="stylesheet" href="bloqueo.css?v=20261103-0937">
 <style id="mvEstilo">
 .mvSeccionTitulo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:20px 0 14px}.mvSeccionTitulo h2{font-size:17px;margin:0}.mvSeccionTitulo span{font-size:11px;color:var(--ink-3)}
 #mosRejilla.mvCategorias{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.mvCategoria{min-height:152px;padding:20px 10px 17px!important;gap:8px!important}.mvCategoria .svIco{width:62px;height:62px}.mvCategoria b{font-size:15px}.mvCategoria small{font-size:12px;color:var(--ink-3)}
@@ -4230,6 +4230,9 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
       <div class="periodbar">
         <div class="seg" id="proFiltro">
           <button data-fil="activas" aria-pressed="true">En proceso</button>
+          <button data-fil="hoy" aria-pressed="false">Entregas hoy</button>
+          <button data-fil="produciendo" aria-pressed="false">En producción</button>
+          <button data-fil="listas" aria-pressed="false">Listas</button>
           <button data-fil="todas" aria-pressed="false">Todas</button>
           <button data-fil="entregadas" aria-pressed="false">Entregadas</button>
         </div>
@@ -5697,8 +5700,8 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   </div>
 </div>
 
-<script src="bloqueo.js?v=20261103-0252"></script>
-<script src="tablero.js?v=20261103-0252"></script>
+<script src="bloqueo.js?v=20261103-0937"></script>
+<script src="tablero.js?v=20261103-0937"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -12034,10 +12037,33 @@ var nvTablero;
 function nvPuedeTablero(t){
   return puedeVer(t) && (typeof window.__enElPlan !== "function" || window.__enElPlan(t));
 }
+function nvAbreIndicador(clave){
+  if(clave === "cobrado" || clave === "cxc"){
+    if(!nvPuedeTablero("ven")) return;
+    if(clave === "cobrado"){
+      venPer = "dia"; venRef = hoyISO();
+      if(vaATab("ven")){ abreTarjetaSec("ven", "corte"); renderVentas(); }
+    }else{
+      cxcFiltro = ""; cxcEdad = ""; $("#cxcBusca").value = "";
+      if(vaATab("ven")){ abreTarjetaSec("ven", "cxc"); renderCobranza(); }
+    }
+    return;
+  }
+  const filtros = {pedidos:"activas", entregas:"hoy", produciendo:"produciendo", listos:"listas"};
+  if(filtros[clave]){
+    if(!nvPuedeTablero("pro")) return;
+    proFiltro = filtros[clave]; $("#proBuscar").value = "";
+    [...$("#proFiltro").children].forEach(b=>b.setAttribute("aria-pressed", b.dataset.fil === proFiltro));
+    if(vaATab("pro")) renderProduccion();
+    return;
+  }
+  if(clave === "inventario" && nvPuedeTablero("inv")) vaATab("inv");
+}
 function renderTablero(){
   if(!$("#tab-inicio") || !window.NuvoorTablero) return;
   if(!nvTablero) nvTablero = window.NuvoorTablero.crea({
     puede: nvPuedeTablero,
+    abrir: nvAbreIndicador,
     icono: icoSeccion,
     lee: ()=>{
       const finanzas = nvPuedeTablero("ven");
@@ -18660,6 +18686,9 @@ function renderProduccion(){
   let ops = ordenesConfirmadas();
   if(proFiltro==="activas")     ops = ops.filter(o=> (o.op.estatus||"Pendiente") !== "Entregada");
   if(proFiltro==="entregadas")  ops = ops.filter(o=> (o.op.estatus||"") === "Entregada");
+  if(proFiltro==="hoy") ops = ops.filter(o=>o.op.estatus!=="Entregada" && String(o.entrega||"").slice(0,10)===hoyISO());
+  if(proFiltro==="produciendo") ops = ops.filter(o=>["En impresión","En aplicación","Control de calidad"].includes(o.op.estatus));
+  if(proFiltro==="listas") ops = ops.filter(o=>["Empacada","Lista para entregar"].includes(o.op.estatus));
   if(f) ops = ops.filter(o=> (o.op.folio+" "+(o.cliente||"")+" "+(o.ref||"")).toLowerCase().indexOf(f)>=0);
 
   const activas = ordenesConfirmadas().filter(o=>(o.op.estatus||"Pendiente")!=="Entregada");
@@ -24843,10 +24872,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261103-0252";</script>
+<script>window.BUILD="20261103-0937";</script>
 <script>
 (function(){
-  var mio = "20261103-0252";
+  var mio = "20261103-0937";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -24874,8 +24903,8 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="suspension.js?v=20261103-0252"></script>
-<script src="cuenta.js?v=20261103-0252"></script>
+<script src="suspension.js?v=20261103-0937"></script>
+<script src="cuenta.js?v=20261103-0937"></script>
 <script src="diagnostico.js?v=20261026-2139"></script>
 </body>
 </html>

@@ -53,7 +53,7 @@ try{
  await page.goto('http://127.0.0.1:4180/index.html?producto=taller');
  await page.waitForFunction(()=>typeof window.__qaCategorias==='object'&&typeof CUENTA!=='undefined'&&!!CUENTA);
  await licencia();
- await app(`guardadas=${JSON.stringify(pedidos)};ventas=${JSON.stringify(ventas)};TEMA.preset='papel';aplicaTema();renderTablero();vaATab('inicio')`);
+ await app(`guardadas=${JSON.stringify(pedidos)}.map((g,i)=>Object.assign(nuevaCot(false),g,{estado:'confirmada',op:{folio:'OP-QA-'+i,...g.op}}));ventas=${JSON.stringify(ventas)}.map((v,i)=>({folio:'VTA-QA-'+i,cliente:'Cliente de muestra',...v}));TEMA.preset='papel';aplicaTema();renderTablero();vaATab('inicio')`);
  // Fecha fija en la función de datos de esta prueba, sin alterar producción.
  await page.evaluate(()=>{
    const real=NuvoorTablero.datos;
@@ -63,6 +63,24 @@ try{
  assert.equal(await page.locator('#nvMetricas .nvMetric').count(),4);
  assert.equal(await page.locator('.nvBarGroup').count(),7);
  assert.match(await page.locator('#nvMetricas').innerText(),/1,150/);
+ // Cada tarjeta abre el detalle y restablece filtros anteriores.
+ await app('venPer="mes";venRef="2025-01-01";cxcFiltro="otro cliente";cxcEdad="vencida";proFiltro="entregadas"');
+ await page.locator('[data-nvmetric="cobrado"]').focus();await page.keyboard.press('Enter');
+ assert.ok(await page.locator('#tab-ven [data-ven="corte"]').isVisible());
+ assert.equal(await page.locator('#venFecha').inputValue(),'2026-11-02');
+ assert.equal(await app('venPer'),'dia');
+ await app('vaATab("inicio")');await page.locator('[data-nvmetric="cxc"]').click();
+ assert.ok(await page.locator('#tab-ven [data-ven="cxc"]').isVisible());
+ assert.equal(await app('cxcFiltro+cxcEdad'),'');assert.equal(await page.locator('#cxcBusca').inputValue(),'');
+ await app('vaATab("inicio")');await page.locator('[data-nvmetric="pedidos"]').click();
+ assert.ok(await page.locator('#tab-pro').isVisible());assert.equal(await page.locator('#proLista .op').count(),5);
+ assert.equal(await page.locator('#proFiltro [data-fil="activas"]').getAttribute('aria-pressed'),'true');
+ await page.locator('#proBuscar').fill('no existe');
+ await app('vaATab("inicio")');await page.locator('[data-nvmetric="entregas"]').click();
+ assert.equal(await page.locator('#proBuscar').inputValue(),'');assert.equal(await page.locator('#proLista .op').count(),1);
+ assert.match(await page.locator('#proLista').innerText(),/OP-QA-0/);assert.doesNotMatch(await page.locator('#proLista').innerText(),/OP-QA-[1-7]/);
+ assert.equal(await page.locator('#proFiltro [data-fil="hoy"]').getAttribute('aria-pressed'),'true');
+ await app('vaATab("inicio")');
  await page.locator('[data-nvrange="30"]').click();assert.equal(await page.locator('.nvBarGroup').count(),30);
  await page.locator('[data-nvday="29"]').focus();assert.match(await page.locator('#nvPlotHint').innerText(),/1,150/);
  await page.keyboard.press('Enter');await page.locator('[data-nvrange="7"]').click();
@@ -92,11 +110,24 @@ try{
  assert.equal(await page.locator('#nvAcciones button').count(),0);
  assert.doesNotMatch(await page.locator('#nvDashboard').innerText(),/\$|Cobrado|Por cobrar|Facturas pendientes|Nómina sin pagar/);
  assert.match(await page.locator('#nvCobros').innerText(),/Trabajos entregados/);
+ assert.equal(await page.locator('[data-nvmetric="cxc"]').count(),0);
+ await page.locator('[data-nvmetric="produciendo"]').click();assert.equal(await page.locator('#proLista .op').count(),1);
+ assert.match(await page.locator('#proLista').innerText(),/OP-QA-2/);
+ await app('vaATab("inicio");nvAbreIndicador("listos")');assert.equal(await page.locator('#proLista .op').count(),1);
+ assert.match(await page.locator('#proLista').innerText(),/OP-QA-3/);
+ await app('vaATab("inicio")');await page.locator('[data-nvmetric="inventario"]').click();assert.ok(await page.locator('#tab-inv').isVisible());
+ await app('vaATab("inicio");nvAbreIndicador("cxc")');assert.ok(await page.locator('#tab-inicio').isVisible());
  await licencia('basico','admin');assert.doesNotMatch(await page.locator('#nvDashboard').innerText(),/\$|Cobrado|Por cobrar|caja sigue cerrada/);
+ assert.equal(await page.locator('#nvMetricas [data-nvmetric="cxc"],#nvMetricas [data-nvmetric="cobrado"]').count(),0);
  await licencia('pro','admin','vencida');
  assert.equal(await page.locator('#nvAcciones [data-tbtab="cot"]').getAttribute('aria-disabled'),'true');
  await page.locator('#nvAcciones [data-tbtab="cot"]').click({force:true});assert.ok(await page.locator('#tab-inicio').isVisible());
  await page.locator('[data-nvrange="30"]').click();assert.equal(await page.locator('.nvBarGroup').count(),30);
+ await page.locator('[data-nvmetric="entregas"]').click();assert.ok(await page.locator('#tab-pro').isVisible());
+ assert.notEqual(await page.locator('#proFiltro [data-fil="hoy"]').getAttribute('aria-disabled'),'true');
+ await page.locator('#proFiltro [data-fil="activas"]').click();assert.equal(await page.locator('#proLista .op').count(),5);
+ assert.equal(await page.locator('#tab-pro [data-reporte="produccion"]').getAttribute('aria-disabled'),'true');
+ await app('vaATab("inicio")');
  await licencia();
  await app('ponVistaInicio("apps")');assert.ok(await page.locator('#lanzador').isVisible());assert.equal(await page.locator('#nvDashboard').isVisible(),false);
  await app('ponVistaInicio("tablero");guardadas=[];ventas=[];renderTablero()');await page.waitForTimeout(700);
