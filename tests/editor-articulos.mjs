@@ -100,9 +100,9 @@ try{
  await licencia('pro','admin','vencida');await app('ceGuarda(false)');assert.equal(await page.evaluate(()=>window.__ceWrites),3);
  await page.locator('#ceCancelar').click();
  await licencia('pro','admin');await app("vaATab('cat');abreTarjetaSec('cat','articulos');renderCatalogo();clearTimeout(saveT)");
- // Mantener el ajuste masivo y el renderer anterior de otros giros.
- await app("P.giro='tiendita';renderTabla('articulos')");assert.ok(await page.locator('#t_articulos').isVisible());
- await app("P.giro='taller';renderTabla('articulos')");assert.equal(await page.locator('#t_articulos').isVisible(),false);
+ // Un parámetro antiguo de otro giro no cambia la edición de Imprenta.
+ await app("P.giro='tiendita';renderTabla('articulos')");assert.equal(await page.locator('#t_articulos').isVisible(),false);assert.equal(await app('giroActual()'),'taller');
+ await app("estrenaGuiado();renderTabla('articulos')");assert.equal(await page.locator('#t_articulos').isVisible(),false);
  await page.setViewportSize({width:390,height:950});await page.waitForTimeout(200);
  await page.locator('[data-cefamilia="playeras"]').click();
  await page.screenshot({path:'tmp/stripe/catalogo-integrado-movil.png'});
@@ -118,5 +118,5 @@ try{
   await page.waitForFunction(()=>window.__ceWrites===4);
   assert.equal(await app("cat.articulos.some(a=>a.id==='personalizado')"),false);
  assert.deepEqual(errors,[]);
- console.log('Editor real con servicios ficticios: categorías, alta/edición, foto al guardar, códigos, existencia readonly, mezcla de otros cambios, conflicto, error/reintento, roles/vencida, Store, móvil y oscuro OK.');
+ console.log('Editor real con servicios ficticios: categorías, alta/edición, foto al guardar, códigos, existencia readonly, mezcla de otros cambios, conflicto, error/reintento, roles/vencida, edición Imprenta, móvil y oscuro OK.');
 }finally{await browser?.close();await new Promise(r=>server.close(r));}

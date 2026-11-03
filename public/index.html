@@ -3497,10 +3497,10 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   <div class="barraNav" id="barraNav"></div>
   <div class="barraPie"><span id="barraVer" class="nuvoorPie"><img src="./marca/n-64.png" alt=""><span>Nuvoor</span></span></div>
 </aside>
-<link rel="stylesheet" href="variantes.css?v=20261103-1612">
-<link rel="stylesheet" href="clientes-selector.css?v=20261103-1612">
-<link rel="stylesheet" href="tablero.css?v=20261103-1612">
-<link rel="stylesheet" href="bloqueo.css?v=20261103-1612">
+<link rel="stylesheet" href="variantes.css?v=20261103-1647">
+<link rel="stylesheet" href="clientes-selector.css?v=20261103-1647">
+<link rel="stylesheet" href="tablero.css?v=20261103-1647">
+<link rel="stylesheet" href="bloqueo.css?v=20261103-1647">
 <style id="mvEstilo">
 .mvSeccionTitulo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:20px 0 14px}.mvSeccionTitulo h2{font-size:17px;margin:0}.mvSeccionTitulo span{font-size:11px;color:var(--ink-3)}
 #mosRejilla.mvCategorias{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.mvCategoria{min-height:152px;padding:20px 10px 17px!important;gap:8px!important}.mvCategoria .svIco{width:62px;height:62px}.mvCategoria b{font-size:15px}.mvCategoria small{font-size:12px;color:var(--ink-3)}
@@ -4734,6 +4734,11 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
       <div class="tbl-wrap"><table id="t_equipo"></table></div>
         <p class="notaCostos"><b>Quién ve los costos.</b> El administrador siempre. A los demás los autorizas tú con la casilla <b>Ve costos</b>: sin ella ven precios, piezas y totales, pero ni el costo de producción ni la utilidad. El detalle aplicación por aplicación y el aviso de venta bajo costo son sólo del administrador. Ojo: esto <b>esconde</b> los números de la pantalla, no los cifra — quien sepa abrir las herramientas del navegador los puede encontrar.</p>
 
+      <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line)">
+        <h3 style="font-size:14px;margin:0 0 10px">Caja por turnos</h3>
+        <label class="sw"><input type="checkbox" id="p_turnos"> Llevar la caja por <b>turno de cajero</b></label>
+        <p class="note" style="margin-top:10px">Cada cajero abre su turno con el fondo que recibe y registra su cierre de caja.</p>
+      </div>
     </div>
   </div>
   <div class="card secOculta" data-set="folios" data-solo-admin>
@@ -4812,15 +4817,6 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
       </div>
     </div>
   </div>
-  <div class="card secOculta" data-set="cotizar">
-    <header><h2>Cómo se cotiza</h2><span class="hint">la pantalla de cotizar, a tu modo</span></header>
-    <div class="body">
-      <p class="note" style="margin:0 0 14px">La pantalla de cotizar es la misma en los dos modos: los mismos campos, el mismo armado, los mismos botones. Lo único que cambia es si te los enseña <b>todos juntos</b> o <b>de uno en uno</b>.</p>
-      <label class="sw"><input type="checkbox" id="p_guiado"> <b>Cotizar por pasos</b></label>
-      <p class="note" style="margin:12px 0 0">Con esto prendido, la cotización va de un paso al siguiente y no deja seguir hasta que llenes lo que falta. Cada paso que terminas se cierra solo y deja su resumen a la vista. Sirve para quien apenas entra al programa, o para el vendedor nuevo. Si ya te sabes la pantalla de memoria, déjalo apagado: así ves todo de un golpe, como hasta hoy.</p>
-    </div>
-  </div>
-
   <div class="card secOculta" data-set="tema">
     <header><h2>Apariencia</h2><span class="hint">se guarda en este navegador, para ti</span></header>
     <div class="body">
@@ -4937,26 +4933,6 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
     </div>
   </div>
 
-  <div class="card secOculta" data-set="giro" id="cardGiro">
-    <header><h2>Giro del negocio</h2><span class="hint">qué edición de Nuvoor usas</span></header>
-    <div class="body">
-      <p class="note" style="margin:0 0 14px">
-        Es el mismo programa. Lo que cambia es qué secciones se ven y cómo se llaman:
-        un abarrotes no cotiza ni produce, pero sí cobra, sí lleva inventario y sí fía.
-        <b>Nada se borra al cambiar de giro</b>: lo que esconde una edición sigue ahí si
-        regresas a la otra.
-      </p>
-      <div class="giroOps" id="giroOps"></div>
-      <p class="note" id="giroQueCambia" style="margin-top:14px"></p>
-      <label class="sw" style="margin-top:16px"><input type="checkbox" id="p_turnos">
-        Llevar la caja por <b>turno de cajero</b></label>
-      <p class="note" style="margin-top:8px">
-        Cada quien abre su turno con el fondo que recibe y lo entrega contando a ciegas —sin
-        ver cuánto debería haber—. Es la única forma de saber de quién era el cajón cuando
-        falta dinero. En la tiendita viene prendido; en el taller, apagado.
-      </p>
-    </div>
-  </div>
   <div class="card secOculta" data-set="timbrado" id="cardTimbrado">
     <header><h2>Facturación electrónica</h2><span class="hint">cómo se timbran tus facturas</span></header>
     <div class="body">
@@ -5733,11 +5709,11 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   </div>
 </div>
 
-<script src="clientes-selector.js?v=20261103-1612"></script>
-<script src="bloqueo.js?v=20261103-1612"></script>
-<script src="variantes.js?v=20261103-1612"></script>
-<script src="conteo.js?v=20261103-1612"></script>
-<script src="tablero.js?v=20261103-1612"></script>
+<script src="clientes-selector.js?v=20261103-1647"></script>
+<script src="bloqueo.js?v=20261103-1647"></script>
+<script src="variantes.js?v=20261103-1647"></script>
+<script src="conteo.js?v=20261103-1647"></script>
+<script src="tablero.js?v=20261103-1647"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -6128,20 +6104,12 @@ function defaults(){ return {
  ], compras:[]
 };}
 const CHECKS = ["Diseño aprobado por el cliente","Material en almacén","Archivo impreso","Prensado / aplicado","Revisión de calidad","Empacado","Entregado"];
-/* Estrenar el cotizador por pasos, UNA vez.
-   El problema: `P` guardado le gana al valor de fábrica. Quien abrió la
-   versión en que el interruptor nacía apagado se llevó `guiado:false`
-   grabado en su cuenta, y ponerlo en `true` aquí ya no lo alcanzaba:
-   seguía viendo la pantalla de siempre sin saber que había otra.
-   Esto lo prende una sola vez y deja la marca; a partir de ahí manda lo
-   que el usuario escoja, incluso si lo apaga. */
+/* Imprenta cotiza por pasos y conserva su edición al cargar parámetros anteriores. */
 function estrenaGuiado(){
-  if(!P || P.guiadoElegido) return;
-  P.guiado = true;
-  P.guiadoElegido = true;
-  try{ persist(); }catch(e){}
+  if(!P)return;
+  P.guiado=true;P.guiadoElegido=true;P.giro="taller";
 }
-function defaultParams(){ return {giro:"taller", guiado:true, guiadoElegido:false, plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
+function defaultParams(){ return {giro:"taller", guiado:true, guiadoElegido:true, plazoCobro:15,origen:"utilidad",margen:60,modo:"markup",merma:5,manoObra:6,iva:16,ivaOn:true,redondeo:1,vigencia:15,
   tarifaKwh:4, bloqueoMin:10,
   folios:{letras:"", extra:"", digitos:6, desde:{cot:1, op:1, req:1}},
   compras:{tope:2000, siempre:false},
@@ -9754,16 +9722,9 @@ registraLanzador("set", [
   {id:"empresa", nombre:"Datos de tu empresa", sub:"lo que sale impreso", color:"#64748B",
    icono:'<path d="M3 21V7l9-4 9 4v14"/><path d="M9 21v-6h6v6"/><path d="M7 11h.01M17 11h.01"/>',
    card:'[data-set="empresa"]'},
-  {id:"cotizar", nombre:"Cómo se cotiza", sub:"todo junto o paso a paso", color:"#D6127F",
-   icono:'<path d="M4 6h16M4 12h10M4 18h6"/><circle cx="19" cy="15" r="3"/>',
-   card:'[data-set="cotizar"]'},
   {id:"tema", nombre:"Apariencia", sub:"tema claro u oscuro", color:"#14B8A6",
    icono:'<circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M5 5l1.7 1.7M17.3 17.3 19 19M19 5l-1.7 1.7M6.7 17.3 5 19"/>',
    card:'[data-set="tema"]'},
-  {id:"giro", nombre:"Giro del negocio", sub:"taller, tiendita…", color:"#45D483",
-   icono:'<path d="M3 9.5h18v10a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19.5Z"/>'+
-         '<path d="M3 9.5 5.5 4h13L21 9.5"/><path d="M8.5 14h7"/>',
-   card:'[data-set="giro"]'},
   {id:"fiscal", nombre:"Datos fiscales", sub:"RFC y domicilio del SAT", color:"#0680AB",
    icono:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>',
    card:'[data-set="fiscal"]'},
@@ -10590,29 +10551,8 @@ document.addEventListener("click", e=>{
 });
 
 /* ---------- ajustes ---------- */
-/* Las dos ediciones, como tarjetas: se escoge mirando, no leyendo. */
-function renderGiro(){
-  const w = $("#giroOps"); if(!w) return;
-  const act = giroActual();
-  w.innerHTML = Object.keys(GIROS).map(k=>{
-    const g = GIROS[k];
-    return '<button type="button" class="giroOp'+(k===act?" act":"")+'" data-giro="'+k+'"'+
-      (k===act?' aria-pressed="true"':'')+'>'+
-      '<b>'+esc(g.edicion)+'</b><small>'+esc(g.giro)+'</small>'+
-      '<span class="giroCheck" aria-hidden="true"></span></button>';
-  }).join("");
-  const q = $("#giroQueCambia");
-  if(q){
-    const g = cfgGiro();
-    q.innerHTML = g.sin.length
-      ? 'En esta edición se esconden <b>'+g.sin.length+' secciones</b> que no aplican '+
-        '(cotizar, diseño, producción, archivo y la calculadora de costos) y el catálogo '+
-        'deja sólo los productos. Todo eso vuelve en cuanto cambies de regreso.'
-      : 'Es la edición completa: se ven todas las secciones.';
-  }
-}
 function renderSet(){
-  renderTema(); renderMO(); renderGiro();
+  renderTema(); renderMO();
   const pt = $("#p_turnos"); if(pt) pt.checked = usaTurnos();
   const bv = $("#barraVer");
   /* En el pie va la plataforma, no el negocio del cliente: es la firma del
@@ -10620,7 +10560,6 @@ function renderSet(){
   if(bv) bv.innerHTML = '<img src="./marca/n-64.png" alt=""><span>Nuvoor</span>';
   $("#p_margen").value=P.margen; $("#p_modo").value=P.modo; $("#p_merma").value=P.merma; $("#p_mo").value=P.manoObra;
   $("#p_nesting").checked = P.nesting !== false;
-  const pgu = $("#p_guiado"); if(pgu) pgu.checked = (P.guiado !== false);
   const pg = $("#p_nuevaGuardar"); if(pg) pg.checked = P.nuevaAlGuardar !== false;
   const pc = $("#p_nuevaCobrar");  if(pc) pc.checked = P.nuevaAlCobrar  !== false;
   $("#p_iva").value=P.iva; $("#p_ivaOn").checked=!!P.ivaOn; $("#p_redondeo").value=String(P.redondeo); $("#p_vigencia").value=P.vigencia; $("#p_plazoCobro").value=num(P.plazoCobro,15);
@@ -11339,11 +11278,8 @@ const GUIA_ORDEN = ["cliente","articulo","impresion","apps","tallas","extras","p
 const GUIA_NOMBRE = {cliente:"Cliente", articulo:"Artículo", impresion:"Servicio", apps:"Impresión",
                      tallas:"Desglose", extras:"Extras", prod:"Entrega"};
 let GUIA = {actual:"cliente"};
-/* Prendido salvo que lo apaguen a mano. Una cuenta que ya existía no trae
-   este parámetro, así que `undefined` cuenta como prendido: si no, el
-   interruptor venía apagado para todos y nadie se enteraba de que existía
-   la pantalla nueva. Apagarlo es un clic en Ajustes. */
-const guiado = () => P.guiado !== false;
+/* El recorrido por pasos forma parte del funcionamiento de Imprenta. */
+const guiado = () => true;
 
 /* Las tallas sólo salen cuando el artículo las usa: preguntarle las tallas
    a una taza es hacerle perder el tiempo a quien cotiza. */
@@ -11802,11 +11738,8 @@ function claveEstado(txt){
   for(const k in EDOS_CLAVE) if(s.indexOf(EDOS_CLAVE[k]) === 0) return k;
   return "";
 }
-/* El giro vive en los ajustes, no en la marca: PRODUCTO.clave lo copia
-   para la publicidad, pero durante el arranque todavía no se ha copiado.
-   Una sola fuente de verdad, y es P.giro. */
-const giroActual = () => (typeof GIROS === "object" && GIROS[P.giro]) ? P.giro
-                       : ((window.PRODUCTO && PRODUCTO.clave) || "taller");
+/* Esta aplicación corresponde a Imprenta; Store tiene su propia entrada. */
+const giroActual = () => "taller";
 const estadoDelTaller = () => claveEstado((P.empresa || {}).estado);
 
 /* Lista vacía = a todos. Un anuncio que nadie segmentó se ve en todas partes;
@@ -14064,22 +13997,6 @@ function hojaEtiquetas(lista, titulo){
 }
 
 document.addEventListener("click", e=>{
-  const gi = e.target.closest("[data-giro]");
-  if(gi){
-    const k = gi.dataset.giro;
-    if(k === giroActual()) return;
-    P.giro = k; persist();
-    aplicaGiro(); renderGiro();
-    /* Si la pestaña abierta ya no existe en este giro, se va a la que
-       manda en la edición nueva en vez de dejar la pantalla en blanco. */
-    const abierta = document.querySelector('#tabs [data-tab][aria-selected="true"]');
-    if(!abierta || abierta.hidden){
-      const quiero = cfgGiro().arranca || "inicio";
-      if(typeof vaATab === "function" && !vaATab(quiero)) vaATab("inicio");
-    }
-    toast(cfgGiro().edicion + ": listo");
-    return;
-  }
   const bc = e.target.closest("[data-cods]");
   if(bc){ abreCodigos(bc.dataset.cods); return; }
   if(e.target.closest("#cdCerrar") || e.target.closest("#cd_cancel") || e.target.id === "modalCods"){
@@ -17526,12 +17443,6 @@ $("#tab-set").addEventListener("change", e=>{
     toast(num(t.value) ? "Se bloqueará a los " + num(t.value) + " min sin usarlo"
                        : "Ya no se bloquea solo"); }
   if(t.id==="p_ivaOn") P.ivaOn=t.checked;
-  if(t.id==="p_guiado"){
-    P.guiado = t.checked;
-    P.guiadoElegido = true;      /* a partir de aquí manda lo que tú escojas */
-    if(typeof guiaPinta === "function"){ GUIA.actual = guiaPasos()[0]; guiaPinta(); }
-    toast(t.checked ? "Cotizar por pasos: prendido" : "Cotizar por pasos: apagado");
-  }
   if(t.id==="e_regimen"){ empresaFiscal(); P.empresa.regimen=t.value; }
   if(t.id==="e_pac"){ empresaFiscal(); P.empresa.pac=t.value; notaPac(); }
   if(t.id==="e_sellosAlta"){ empresaFiscal(); P.empresa.sellosAlta=t.checked; }
@@ -17571,7 +17482,7 @@ $("#btnExport").addEventListener("click", ()=>{
 $("#btnImport").addEventListener("click", ()=> $("#fileIn").click());
 $("#fileIn").addEventListener("change", e=>{
   const f=e.target.files[0]; if(!f) return; const rd=new FileReader();
-  rd.onload=()=>{ try{ const o=JSON.parse(rd.result); if(o.cat) cat=o.cat; if(o.P) P=Object.assign(defaultParams(),o.P); persist(); renderCatalogo(); renderSet(); renderCot(); toast("Catálogo importado"); }catch(err){ toast("Archivo no válido"); } };
+  rd.onload=()=>{ try{ const o=JSON.parse(rd.result); if(o.cat) cat=o.cat; if(o.P) P=Object.assign(defaultParams(),o.P); estrenaGuiado(); persist(); renderCatalogo(); renderSet(); renderCot(); toast("Catálogo importado"); }catch(err){ toast("Archivo no válido"); } };
   rd.readAsText(f);
 });
 
@@ -25137,10 +25048,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261103-1612";</script>
+<script>window.BUILD="20261103-1647";</script>
 <script>
 (function(){
-  var mio = "20261103-1612";
+  var mio = "20261103-1647";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -25168,8 +25079,8 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="suspension.js?v=20261103-1612"></script>
-<script src="cuenta.js?v=20261103-1612"></script>
+<script src="suspension.js?v=20261103-1647"></script>
+<script src="cuenta.js?v=20261103-1647"></script>
 <script src="diagnostico.js?v=20261026-2139"></script>
 </body>
 </html>
