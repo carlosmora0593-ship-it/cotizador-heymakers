@@ -19,7 +19,7 @@ async function inicia(file){
  await page.goto(qa.url+'/'+file+'?producto=taller');
  await page.waitForFunction(()=>window.__qaCategorias&&typeof CUENTA!=='undefined'&&!!CUENTA);
  await page.evaluate(()=>{Object.assign(CUENTA,{plan:'pro',estado:'activa',vence:new Date(Date.now()+86400000).toISOString()});Object.assign(PERFIL,{rol:'admin'});pintaCuenta();aplicaPlan();});
- await app('equipo=[{id:"qa-admin",nombre:"Administrador de muestra",rol:"admin",pin:"1234",activo:true},{id:"qa-ventas",nombre:"Ventas de muestra",rol:"ventas",pin:"5678",activo:true}];usuarioId="qa-admin";asistencias=[];P.empresa.nombre="Taller de muestra";aplicaRol()');
+ await app('equipo=[{id:"qa-admin",nombre:"Administrador de muestra",rol:"admin",pin:"1234",activo:true},{id:"qa-ventas",nombre:"Ventas de muestra",rol:"ventas",pin:"5678",activo:true}];usuarioId="qa-admin";asistencias=[];P.empresa.nombre="Taller de muestra";P.empresa.logo="marca/n-192.png";aplicaMarca();aplicaRol()');
  await page.evaluate(()=>{window.__anuncios=async()=>[{id:'qa-anuncio',titulo:'Publicidad del Lab de muestra',imagen:'marca/n-192.png',enlace:'https://example.test/propuesta',lugar:'bloqueo'}];});
  await app('cargaAnuncios();pideAcceso({bloqueo:true})');
  await page.locator('#acceso').waitFor({state:'visible'});
@@ -41,6 +41,9 @@ try{
     });
     assert.equal(m.overflow,false,file+': sin desborde '+width+' '+theme);
     assert.equal(m.fit,'contain');
+    const negocio=await page.locator('#accesoLogo').evaluate(el=>({alto:el.getBoundingClientRect().height,fit:getComputedStyle(el).objectFit}));
+    assert.equal(negocio.alto,width>760?96:76,'Logo del negocio con mayor tamaño');
+    assert.equal(negocio.fit,'contain','Logo completo sin recorte');
     if(width>760){
      assert.ok(Math.abs(m.ad.top-m.card.top)<1,'Paneles alineados');
      assert.ok(Math.abs(m.logoCenter-(m.ad.x+m.ad.width/2))<1,'Logo centrado sobre publicidad');
@@ -95,6 +98,14 @@ try{
   await page.evaluate(()=>window.__anuncios=async()=>[]);await app('cargaAnuncios()');
   assert.equal(await page.locator('#anunBloq').isVisible(),false);
   assert.ok(await page.locator('#accesoEntrar').isVisible());
+  // Marcas horizontales y ausencia de logo conservan el acceso adaptable.
+  await app('P.empresa.logo="data:image/svg+xml,"+encodeURIComponent(\'<svg xmlns="http://www.w3.org/2000/svg" width="640" height="160"><rect width="640" height="160" fill="white"/><text x="20" y="105" font-size="70" fill="black">Taller de muestra</text></svg>\');aplicaMarca()');
+  await page.setViewportSize({width:320,height:568});
+  assert.equal(await page.locator('#acceso').evaluate(el=>el.scrollWidth>el.clientWidth+1),false,'Logo horizontal no desborda');
+  assert.equal(await page.locator('#accesoLogo').evaluate(el=>getComputedStyle(el).objectFit),'contain');
+  await app('P.empresa.logo="";aplicaMarca()');
+  assert.equal(await page.locator('#accesoLogo').isVisible(),false,'Sin logo no deja un recuadro vacío');
+  await app('P.empresa.logo="marca/n-192.png";aplicaMarca()');
   await page.evaluate(()=>window.__anuncios=async()=>[{id:'qa-anuncio',titulo:'Publicidad del Lab',imagen:'marca/n-192.png',lugar:'bloqueo'}]);await app('cargaAnuncios()');
   await page.setViewportSize({width:390,height:844});
   await app('TEMA.preset="tecno";aplicaTema()');

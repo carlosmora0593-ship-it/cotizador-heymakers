@@ -18,6 +18,8 @@
 #acceso .cmyk{height:4px;background:linear-gradient(90deg,#4c4780,#4458a4 35%,#49a6de 70%,#79cce0)}
 #acceso .cmyk i{display:none}
 #acceso .accesoBody{padding:25px}
+#acceso .plaque{max-width:100%;padding:10px 14px;border:1px solid var(--nvLine);border-radius:14px;background:#fff;box-shadow:none}
+#acceso #accesoLogo{display:block;width:auto;height:96px;max-width:min(320px,100%);object-fit:contain}
 #acceso .nvLockEntryTitle{display:block;color:var(--nvMuted);font:650 10px/1.5 'Inter',system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;margin-bottom:19px}
 #acceso h1{font:750 23px/1.25 'Inter',system-ui,sans-serif;letter-spacing:-.5px;margin:18px 0 9px}
 #acceso .sub{font-size:12px;line-height:1.65;color:var(--nvMuted);margin-bottom:21px}
@@ -66,6 +68,8 @@
   #acceso #nvLockFecha{font-size:10px;line-height:1.45;max-width:125px;margin-left:auto}
   #acceso .accesoCard{grid-column:1;grid-row:2;border-radius:19px}
   #acceso .accesoBody{padding:21px 19px}
+  #acceso .plaque{padding:8px 12px}
+  #acceso #accesoLogo{height:76px;max-width:min(240px,100%)}
   #acceso .nvLockAside{grid-column:1;grid-row:3}
   #acceso .anunBloq{padding:16px 18px;gap:11px;border-radius:18px}
   #acceso .anunBloqPieza img{aspect-ratio:3/1}
