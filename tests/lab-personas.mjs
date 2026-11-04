@@ -4,7 +4,7 @@ const html=fs.readFileSync('tmp/stripe/preview/lab.html','utf8');for(const [i,m]
 const q=await abre('tmp/stripe/preview'),{page}=q;
 try{
  await page.goto(q.url+'/lab.html');await page.waitForFunction(()=>document.querySelector('#n_usuarios')?.textContent==='3');
- assert.equal(await page.locator('#nav [data-v]').count(),14);assert.equal(await page.locator('.nlMetric').count(),4);
+ assert.equal(await page.locator('#nav [data-v]').count(),15);assert.equal(await page.locator('.nlMetric').count(),4);
  assert.match(await page.locator('#vista').innerText(),/Sin capturar/);assert.match(await page.locator('.nlMetric').nth(1).innerText(),/775/);
  await page.locator('[data-nlgo="usuarios"]').first().click();assert.equal(await page.locator('#vista tbody tr').count(),3);
  await page.locator('#busca').fill('Tres');assert.equal(await page.locator('#vista tbody tr').count(),1);await page.locator('#busca').fill('');

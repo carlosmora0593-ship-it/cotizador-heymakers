@@ -513,9 +513,12 @@ const PUENTE_DOWNLOADS = {
 window.__labAnuncios = {
   async lista(){
     if(!SB) return [];
-    const {data, error} = await SB.from("v_anuncios").select("*");
+    const [{data, error}, borradores] = await Promise.all([SB.from("v_anuncios").select("*"),SB.from("anuncios_borradores").select("id,cuerpo,actualizado")]);
     if(error) throw error;
+    if(borradores.error) throw borradores.error;
+    const porId=new Map((borradores.data||[]).map(b=>[String(b.id),b]));
     return (data||[]).map(a=>Object.assign({}, a, {
+      borrador:porId.get(String(a.id))?.cuerpo||null,borradorRevision:porId.get(String(a.id))?.actualizado||null,
       desde: a.desde || "", hasta: a.hasta || "",
       enlace: a.enlace || "", alt: a.alt || "", nota: a.nota || "",
       anunciante: a.anunciante || "", titulo: a.titulo || "",
@@ -538,12 +541,9 @@ window.__labAnuncios = {
        dibujar la ficha antes de que exista la fila. Ese no se manda: lo
        pone la base. */
     const esNuevo = String(a.id).indexOf("nuevo-") === 0;
-    const q = esNuevo
-      ? SB.from("anuncios").insert(fila).select("id").single()
-      : SB.from("anuncios").update(fila).eq("id", a.id).select("id").single();
-    const {data, error} = await q;
+    const {data, error} = await SB.rpc("lab_anuncio_guarda",{p_id:esNuevo?null:Number(a.id),p_datos:fila,p_modo:a._modo||(a.activo===false?"borrador":"publicar"),p_revision:a.actualizado||null,p_borrador:a.borradorRevision||null});
     if(error) throw error;
-    return data;
+    return {id:data};
   },
   async borra(id){
     if(!SB || String(id).indexOf("nuevo-") === 0) return;
@@ -563,6 +563,15 @@ window.__labAnuncios = {
     const {data} = SB.storage.from("anuncios").getPublicUrl(ruta);
     return (data && data.publicUrl) || "";
   }
+};
+
+/* Reportes y archivo de suscripciones: la base comprueba los permisos en cada RPC. */
+window.__labOperacion={
+ async reporte(desde,hasta,anuncio){const r=await SB.rpc("lab_reporte_publicidad",{p_desde:desde,p_hasta:hasta,p_anuncio:anuncio?Number(anuncio):null});if(r.error)throw r.error;return r.data;},
+ async facturas(desde,hasta,busqueda){const r=await SB.rpc("lab_facturas_lista",{p_desde:desde,p_hasta:hasta,p_busqueda:busqueda||""});if(r.error)throw r.error;return r.data;},
+ async archivo(id,formato){const r=await SB.rpc("lab_facturas_archivo",{p_id:Number(id),p_formato:formato});if(r.error)throw r.error;const a=await SB.storage.from("facturas-suscripcion").createSignedUrl(r.data,120);if(a.error)throw a.error;return a.data.signedUrl;},
+ async permisos(usuario=null,permitir=null){const r=await SB.rpc("lab_facturas_permisos",{p_usuario:usuario,p_permitir:permitir});if(r.error)throw r.error;return r.data;},
+ propietario(){return SOY?.rol==="dueno";}
 };
 
 /* ---------- los tips del tablero ----------

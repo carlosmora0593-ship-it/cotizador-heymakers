@@ -234,6 +234,7 @@ Deno.serve(async (req) => {
     const c = await cuentaDe(cuentaId);
     let cambios: Record<string, unknown>;
     let sumar: string | null = null;
+    let pagoFiscal: Record<string, unknown> | null = null;
     let sesion: string | null = null;
     if (checkout && o.mode === "payment") {
       // Consultar la sesión evita aplicar un snapshot antiguo o incompleto.
@@ -250,6 +251,8 @@ Deno.serve(async (req) => {
       if (actual.currency !== "mxn" || actual.amount_total !== monto) throw new Error("Importe de OXXO inesperado");
       cambios = { plan: PLAN_INTERNO[p], ciclo: actual.metadata.ciclo, estado: "activa", forma_pago: "oxxo", pago_previo: true, cobro_fallido: null };
       sumar = actual.metadata.ciclo; sesion = actual.id;
+      pagoFiscal = {p_cuenta:cuentaId,p_referencia:"checkout:"+actual.id,p_centavos:actual.amount_total,p_moneda:actual.currency,
+        p_fecha:new Date(Number(actual.created || ev.created)*1000).toISOString(),p_plan:p,p_ciclo:actual.metadata.ciclo,p_prueba:actual.livemode!==true};
     } else {
       subId = subId || c.stripe_suscripcion;
       if (!subId) return ok("factura sin suscripción");
@@ -258,10 +261,20 @@ Deno.serve(async (req) => {
       const sub = await stripe("subscriptions/" + esc(subId) + "?expand[]=latest_invoice", undefined, "GET");
       if (idDe(sub.customer) !== c.stripe_cliente || sub.metadata?.cuenta_id !== cuentaId)
         throw new Error("La suscripción no corresponde a la cuenta");
+      // Registrar el pago fiscal exacto, no el snapshot de la factura más reciente.
+      if (ev.type === "invoice.paid") {
+        const pagada = await stripe("invoices/" + esc(o.id), undefined, "GET");
+        if (idDe(pagada.customer) !== c.stripe_cliente || idDe(pagada.subscription || pagada.parent?.subscription_details?.subscription) !== sub.id) throw new Error("La factura no corresponde al cliente de la cuenta");
+        if (pagada.status === "paid" && Number(pagada.amount_paid) > 0) pagoFiscal = {
+          p_cuenta:cuentaId,p_referencia:"invoice:"+pagada.id,p_centavos:pagada.amount_paid,p_moneda:pagada.currency,
+          p_fecha:new Date(Number(pagada.status_transitions?.paid_at || ev.created)*1000).toISOString(),
+          p_plan:m.plan || sub.metadata.plan,p_ciclo:m.ciclo || sub.metadata.ciclo,p_prueba:pagada.livemode!==true,
+        };
+      }
       if (c.stripe_suscripcion && c.stripe_suscripcion !== sub.id) {
         const previa = await stripe("subscriptions/" + esc(c.stripe_suscripcion), undefined, "GET");
         if (!["canceled", "incomplete_expired"].includes(previa.status) || Number(previa.created) >= Number(sub.created))
-          return ok("aviso de otra suscripción ignorado");
+          { if(pagoFiscal) await rpc("registra_pago_suscripcion",pagoFiscal); return ok("aviso de otra suscripción ignorado"); }
       }
       if (!corresponde(sub.metadata?.plan, c.producto)) throw new Error("Plan de suscripción desconocido");
       const vivo = sub.status === "active" || sub.status === "trialing";
@@ -281,6 +294,9 @@ Deno.serve(async (req) => {
       // canceled conserva vence. cancel_at_period_end NO vuelve activa una deuda.
     }
     const aplicado = await rpc("stripe_aplica", { ...turno, p_evento: ev.id, p_sesion: sesion, p_cambios: cambios, p_sumar: sumar });
+    // También al reintentar un evento ya aplicado: repara un fallo entre licencia y archivo fiscal.
+    // La referencia única evita dos pagos o dos pendientes de factura para la misma operación.
+    if (pagoFiscal) await rpc("registra_pago_suscripcion", pagoFiscal);
     return ok(aplicado ? "licencia actualizada" : "pago ya aplicado");
   } catch (e) {
     console.error("aviso Stripe pendiente de reintento", (e as Error).message);

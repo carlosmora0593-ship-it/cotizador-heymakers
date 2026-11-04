@@ -3497,10 +3497,10 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   <div class="barraNav" id="barraNav"></div>
   <div class="barraPie"><span id="barraVer" class="nuvoorPie"><img src="./marca/n-64.png" alt=""><span>Nuvoor</span></span></div>
 </aside>
-<link rel="stylesheet" href="variantes.css?v=20261104-1606">
-<link rel="stylesheet" href="clientes-selector.css?v=20261104-1606">
-<link rel="stylesheet" href="tablero.css?v=20261104-1606">
-<link rel="stylesheet" href="bloqueo.css?v=20261104-1606">
+<link rel="stylesheet" href="variantes.css?v=20261104-1712">
+<link rel="stylesheet" href="clientes-selector.css?v=20261104-1712">
+<link rel="stylesheet" href="tablero.css?v=20261104-1712">
+<link rel="stylesheet" href="bloqueo.css?v=20261104-1712">
 <style id="mvEstilo">
 .mvSeccionTitulo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:20px 0 14px}.mvSeccionTitulo h2{font-size:17px;margin:0}.mvSeccionTitulo span{font-size:11px;color:var(--ink-3)}
 #mosRejilla.mvCategorias{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.mvCategoria{min-height:152px;padding:20px 10px 17px!important;gap:8px!important}.mvCategoria .svIco{width:62px;height:62px}.mvCategoria b{font-size:15px}.mvCategoria small{font-size:12px;color:var(--ink-3)}
@@ -5710,11 +5710,11 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   </div>
 </div>
 
-<script src="clientes-selector.js?v=20261104-1606"></script>
-<script src="bloqueo.js?v=20261104-1606"></script>
-<script src="variantes.js?v=20261104-1606"></script>
-<script src="conteo.js?v=20261104-1606"></script>
-<script src="tablero.js?v=20261104-1606"></script>
+<script src="clientes-selector.js?v=20261104-1712"></script>
+<script src="bloqueo.js?v=20261104-1712"></script>
+<script src="variantes.js?v=20261104-1712"></script>
+<script src="conteo.js?v=20261104-1712"></script>
+<script src="tablero.js?v=20261104-1712"></script>
 <script>
 "use strict";
 const $ = s => document.querySelector(s);
@@ -11858,9 +11858,15 @@ function ponAnuncioBloqueo(){
     ? '<a href="'+esc(href)+'" target="_blank" rel="noopener noreferrer nofollow sponsored" '+
       'data-anunb="'+esc(String(a.id))+'">'+img+'</a>'
     : img;
-  if(!document.hidden && !$("#acceso").hidden) marcaAnuncio(a, "vista");
+  if(window.__nvLockAdObserver)window.__nvLockAdObserver.disconnect();
+  if(window.IntersectionObserver){window.__nvLockAdObserver=new IntersectionObserver(cuentaAnuncioBloqueo,{threshold:.5});window.__nvLockAdObserver.observe(w);}else cuentaAnuncioBloqueo();
+}
+function cuentaAnuncioBloqueo(){
+ const w=$("#anunBloqPieza"),a=ANUN_BLOQ[anunBloqIdx];if(!w||!a||document.hidden||$("#acceso").hidden)return;
+ const r=w.getBoundingClientRect();if(r.width>0&&r.height>0&&Math.min(r.bottom,innerHeight)-Math.max(r.top,0)>=r.height*.5)marcaAnuncio(a,"vista");
 }
 function paraAnuncioBloqueo(){
+  if(window.__nvLockAdObserver)window.__nvLockAdObserver.disconnect();
   if(anunBloqReloj){ clearInterval(anunBloqReloj); anunBloqReloj = null; }
 }
 $("#anunBloq").addEventListener("click", e=>{
@@ -24921,10 +24927,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261104-1606";</script>
+<script>window.BUILD="20261104-1712";</script>
 <script>
 (function(){
-  var mio = "20261104-1606";
+  var mio = "20261104-1712";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -24952,8 +24958,8 @@ async function accionAyuda(e) {
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="suspension.js?v=20261104-1606"></script>
-<script src="cuenta.js?v=20261104-1606"></script>
+<script src="suspension.js?v=20261104-1712"></script>
+<script src="cuenta.js?v=20261104-1712"></script>
 <script src="diagnostico.js?v=20261026-2139"></script>
 </body>
 </html>

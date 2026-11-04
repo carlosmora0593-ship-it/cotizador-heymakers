@@ -477,8 +477,10 @@ body.sin-sesion .telon{display:none!important}
 .labPie{font-size:11px;color:var(--ink-3);line-height:1.5;margin:10px 0 0}
 </style>
 
-<link rel="stylesheet" href="lab-nuvoor.css?v=20261103-1025">
-<script src="lab-nuvoor.js?v=20261103-1025"></script>
+<link rel="stylesheet" href="lab-nuvoor.css?v=20261104-1712">
+<script src="lab-nuvoor.js?v=20261104-1712"></script>
+<link rel="stylesheet" href="lab-operacion.css?v=20261104-1712">
+<script src="lab-operacion.js?v=20261104-1712"></script>
 </head>
 <body class="sin-sesion">
 
@@ -514,6 +516,7 @@ body.sin-sesion .telon{display:none!important}
       <button data-v="agenda"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v16H4ZM8 2v6m8-6v6M4 11h16"/></svg>Agenda <span class="cuenta" id="n_agenda">0</span></button>
       <button data-v="soporte"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14V9a8 8 0 0 1 16 0v5M4 10H2v7h4v-7Zm16 0h2v7h-4v-7"/></svg>Soporte <span class="cuenta" id="n_soporte">0</span></button>
       <p>COBROS</p><button data-v="cobros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5h20v14H2ZM12 8a3 3 0 1 0 0 6 3 3 0 0 0 0-6"/></svg>Cobros <span class="cuenta" id="n_cobros">0</span></button>
+      <button data-v="facturas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h10l4 4v14H5ZM14 3v5h5M8 12h8M8 16h6"/></svg>Facturas <span class="cuenta" id="n_facturas">·</span></button>
       <button data-v="transferencias"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h17m-4-4 4 4-4 4M21 17H4m4-4-4 4 4 4"/></svg>Transferencias <span class="cuenta" id="n_transferencias">0</span></button>
       <button data-v="codigos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5-6 7 6 7M16 5l6 7-6 7M14 3l-4 18"/></svg>Códigos</button>
       <p>PLATAFORMA</p><button data-v="diagnosticos"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h16v18H4ZM8 8l2 2 5-5M8 15h8"/></svg>Diagnósticos</button>
@@ -1406,18 +1409,20 @@ async function guardaAnuncio(a){
   if(!p){
     ficheros.anuncios = antes; pinta();
     aviso("El Lab está abierto sin servidor: no hay a dónde guardar el anuncio.");
-    return;
+    return false;
   }
   try{
     const guardado = await p.guarda(a);
     if(guardado){ await cargaAnuncios(); pinta(); }
-    aviso(a.activo !== false
+    aviso(a._modo==="borrador" ? "Borrador guardado. La versión al aire se conserva." : a.activo !== false
       ? "Listo: «" + (a.titulo || "el anuncio") + "» quedó al aire."
-      : "Guardado, pero APAGADO: todavía no lo ve nadie. Ábrelo y presiona Publicar.");
+      : "El anuncio quedó fuera del aire.");
+    return true;
   }catch(e){
     /* Que la pantalla no mienta: si no se guardó, el anuncio no se queda ahí. */
     ficheros.anuncios = antes; pinta();
     aviso(porQueFallo(e, "«" + (a.titulo || "el anuncio") + "»"));
+    return false;
   }
 }
 async function borraAnuncio(id){
@@ -1428,7 +1433,7 @@ async function borraAnuncio(id){
 }
 function anuncioNuevo(){
   return {id:"nuevo-"+Date.now(), titulo:"", anunciante:"", imagen:"", enlace:"", alt:"",
-          nota:"", activo:true, orden:(ficheros.anuncios.length+1)*10,
+          nota:"", activo:false, orden:(ficheros.anuncios.length+1)*10,
           desde:"", hasta:"", vistas:0, clics:0,
           /* Sin 'estado' fijo: que lo calcule estadoAnuncio() a partir de
              activo y la vigencia. Traía estado:"apagado" con activo:true, y
@@ -1560,6 +1565,7 @@ function abreAnuncio(id){
     ? anuncioNuevo()
     : Object.assign({}, (ficheros.anuncios||[]).find(a=>String(a.id)===String(id)));
   if(!anEditando) return;
+  if(anEditando.borrador) anEditando=Object.assign({},anEditando,anEditando.borrador);
   const a = anEditando, nuevo = String(a.id).indexOf("nuevo-") === 0;
   const campo = (k, et, tipo, ph) =>
     '<label class="'+(["titulo","anunciante","desde","hasta","orden"].indexOf(k)<0 ? "ancho" : "")+'">'+
@@ -1630,6 +1636,8 @@ function abreAnuncio(id){
         (nuevo ? '' : '<button class="btn mal" id="anBorra">Quitar anuncio</button>')+
       '</div>'+
     '</div>';
+  document.querySelector("#an_activo").closest("label").hidden=true;
+  document.querySelector("#ficha .anAcc").innerHTML='<button class="btn" id="anVista">Vista previa</button><button class="btn" id="anGuarda">Guardar borrador</button><button class="btn p" id="anPublica">Revisar y publicar</button>'+(nuevo?'':'<button class="btn" id="anApaga">Quitar del aire</button><button class="btn mal" id="anBorra">Quitar anuncio</button>');
   pintaAnPrevio();
   pintaSinEdo();
   muestraPanel();
@@ -1639,25 +1647,28 @@ function pintaAnPrevio(){
   const url = ($("#an_imagen").value||"").trim();
   el.innerHTML = url
     ? '<img src="'+esc(url)+'" alt="Vista previa">'
-    : '<div class="anVacio">Aquí se va a ver la foto. Lo que mejor queda es una tira ancha, como de 1200 × 200.</div>';
+    : '<div class="anVacio">Aquí se va a ver la foto. Bloqueo: 1200 × 900 px. Celular: 1200 × 400 px. Usa Vista previa para revisar el resultado.</div>';
 }
 /* poner: true publica, false apaga, sin nada respeta la casilla. */
-function guardaFicha(poner){
+async function guardaFicha(poner){
   if(!anEditando) return;
-  const a = anEditando;
+  const a = Object.assign({},anEditando);
   ["titulo","anunciante","imagen","enlace","alt","nota","desde","hasta"].forEach(k=>{
     const el = $("#an_"+k); if(el) a[k] = el.value.trim();
   });
   a.orden = anNum($("#an_orden").value);
-  a.activo = (poner === undefined) ? $("#an_activo").checked : !!poner;
+  a._modo=poner==="borrador"?"borrador":poner===true?"publicar":"apagar";
+  a.activo=poner===true;
   a.lugar = $("#an_lugar").value || "cotizador";
   a.interna = $("#an_interna").checked;
   a.giros   = [...document.querySelectorAll("[data-giro]:checked")].map(x=>x.dataset.giro);
   a.estados = [...document.querySelectorAll("[data-edo]:checked")].map(x=>x.dataset.edo);
-  if(!a.imagen){ aviso("Falta la foto del anuncio."); return; }
-  cierraPanel();
-  guardaAnuncio(a);
-  anEditando = null;
+  if(poner===true&&!a.imagen){ aviso("Falta la foto del anuncio."); return false; }
+  const botones=[...document.querySelectorAll("#ficha .anAcc button")];botones.forEach(b=>b.disabled=true);
+  const ok=await guardaAnuncio(a);
+  botones.forEach(b=>b.disabled=false);
+  if(ok){cierraPanel();anEditando=null;}
+  return ok;
 }
 
 
@@ -2165,158 +2176,10 @@ async function cargaTransferencias(){
 }
 
 function vCobros() {
-  const mes = iso(HOY).slice(0, 7);
-  const delMes = ficheros.cobros.filter(p => p.fecha.slice(0, 7) === mes && p.estado === "aprobado");
-  const cobrado = delMes.reduce((s, p) => s + p.total, 0);
-  const rechazados = ficheros.cobros.filter(p => p.estado === "rechazado");
-  const porDepositar = ficheros.cobros.filter(p => p.estado === "aprobado" && !p.depositado);
-  const porEmitir = ficheros.cobros.filter(p => p.factura === "pendiente");
-  const globalMes = delMes.filter(p => p.factura === "global");
-  const globalTotal = globalMes.reduce((s, p) => s + p.total, 0);
-
-  const grupos = {};
-  porDepositar.forEach(p => { grupos[p.liquida] = (grupos[p.liquida] || 0) + cargo(p); });
-  const depos = Object.keys(grupos).sort();
-  const ultimos = ficheros.cobros.slice().sort((a, b) => b.fecha.localeCompare(a.fecha)).slice(0, 30);
-
-  const marcaFactura = p => p.factura === "emitida"
-      ? '<span class="chip bien">' + esc(p.cfdi) + (p.enviada ? '' : ' · sin enviar') + '</span>'
-    : p.factura === "pendiente" ? '<span class="chip aviso">Por emitir</span>'
-    : '<span class="chip gris">Global</span>';
-
-  return '<div style="display:flex;flex-direction:column;gap:20px">' +
-    '<div class="tiles">' +
-      tile("Cobrado este mes", $$$(totalDe(cobrado)), delMes.length + " cobros aprobados, con IVA", true) +
-      tile("Tuyo, sin IVA", $$$(baseDe(cobrado)), "esto es lo que de verdad te queda") +
-      tile("IVA por enterar", $$$(ivaDe(cobrado)), "no es tuyo: va al SAT") +
-      tile("Facturas por emitir", porEmitir.length, porEmitir.length ? "con RFC ya capturado" : "todo al corriente") +
-    '</div>' +
-    '<div class="aviso-demo">Estos movimientos son de ejemplo. En vivo los trae Mercado Pago por su aviso automático; mientras no esté conectado, se capturan a mano.</div>' +
-
-    '<div class="rejilla2">' +
-      /* --- nominativas pendientes --- */
-      '<div class="tarjeta"><header><h2>Facturas por emitir</h2>' +
-        '<span class="pista">' + porEmitir.length + ' · se emiten y se mandan por correo</span></header>' +
-        (porEmitir.length ? '<div class="pendientes">' + porEmitir.map(p => {
-          const c = cuentaDe(p.cuentaId) || {};
-          const falta = !c.rfc || !c.razon || !c.cp || !c.regimen;
-          return '<div class="pend ' + (falta ? "urge" : "pronto") + '"><span class="raya"></span><span class="txt">' +
-            '<b>' + esc(c.razon || c.taller || "Cuenta") + ' · ' + $$$(cargo(p)) + '</b>' +
-            '<small>' + esc(p.concepto) + ' · cobrado el ' + fFecha(p.fecha) + '</small>' +
-            '<small>' + (falta ? '<b style="color:var(--critico)">Le faltan datos fiscales</b>'
-              : 'RFC ' + esc(c.rfc) + ' · CP ' + esc(c.cp) + ' · ' + esc(REGIMENES[c.regimen] || c.regimen) + ' · uso ' + esc(c.uso || "G03")) + '</small>' +
-            '</span>' + (falta
-              ? '<button class="btn sm" data-abre="' + c.id + '">Capturarlos</button>'
-              : '<button class="btn sm p" data-emite="' + p.id + '">Emitir y enviar</button>') + '</div>';
-        }).join("") + '</div>' : '<div class="vacio">No hay facturas pendientes.</div>') +
-        '<div class="cuerpo" style="border-top:1px solid var(--line)"><p class="nota">' +
-        'Al entrar un pago de una cuenta que pidió factura, el CFDI se emite y se manda a su correo sin que nadie lo pida. ' +
-        'Aquí solo aparecen los que no salieron solos, casi siempre porque faltan datos fiscales.</p></div></div>' +
-
-      /* --- global del mes + facturar a solicitud --- */
-      '<div class="tarjeta"><header><h2>Factura global del mes</h2>' +
-        '<span class="pista">público en general</span></header>' +
-        '<div class="cuerpo" style="display:flex;flex-direction:column;gap:12px">' +
-          '<dl class="pares">' +
-            par("Pagos incluidos", globalMes.length) +
-            par("Total con IVA", $$$(totalDe(globalTotal))) +
-            par("Base", $$$(baseDe(globalTotal))) +
-            par("IVA", $$$(ivaDe(globalTotal))) +
-          '</dl>' +
-          '<p class="nota">Se emite a nombre de <b>PÚBLICO EN GENERAL</b>, RFC ' + RFC_PUBLICO + ', uso S01, con periodicidad mensual. ' +
-          'Junta a todos los que no pidieron factura.</p>' +
-        '</div>' +
-        '<div class="cuerpo" style="border-top:1px solid var(--line);display:flex;flex-direction:column;gap:11px">' +
-          '<h3 style="font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);font-family:\'IBM Plex Sans\',sans-serif;font-weight:700">Facturar un pago a nombre del cliente</h3>' +
-          '<p class="nota">Si alguien que no pedía factura la pide después, aquí se saca — <b>solo mientras el pago sea de este mes</b>, ' +
-          'antes de cerrar la global. Un pago de un mes anterior ya se fue en la global de ese mes y no se puede mover.</p>' +
-          (globalMes.length ? '<div class="pendientes" style="border:1px solid var(--line);border-radius:8px">' + globalMes.map(p => {
-            const c = cuentaDe(p.cuentaId) || {};
-            return '<div class="pend info"><span class="raya"></span><span class="txt">' +
-              '<b>' + esc(c.taller || "Cuenta") + ' · ' + $$$(cargo(p)) + '</b>' +
-              '<small>' + esc(p.concepto) + ' · ' + fFecha(p.fecha) + '</small></span>' +
-              '<button class="btn sm" data-pide="' + p.id + '">Facturársela</button></div>';
-          }).join("") + '</div>' : '<p class="sitio">Este mes no hay pagos sin factura.</p>') +
-        '</div></div>' +
-    '</div>' +
-
-    /* --- lo que sale --- */
-    (function () {
-      const gente = ficheros.equipo.filter(e => e.comision && e.comision.tipo !== "ninguna").map(e => ({ e: e, k: comisionDe(e) }));
-      const total = gente.reduce((s, g) => s + g.k.monto, 0);
-      return '<div class="tarjeta"><header><h2>Comisiones por pagar</h2>' +
-        '<span class="pista">' + $$$(total) + ' este mes</span></header>' +
-        (gente.length ? '<div class="marco"><table style="min-width:680px"><thead><tr>' +
-          '<th>Persona</th><th>Trato</th><th class="der">Cerró este mes</th><th class="der">Sus cuentas pagando</th><th class="der">Se le debe</th>' +
-        '</tr></thead><tbody>' + gente.map(g =>
-          '<tr><td class="taller">' + esc(g.e.nombre) + '</td>' +
-          '<td class="sitio">' + esc(tratoDe(g.e)) + '</td>' +
-          '<td class="der mono">' + g.k.nuevas + '</td><td class="der mono">' + g.k.pagando + '</td>' +
-          '<td class="der mono"' + (g.k.monto ? ' style="color:var(--critico);font-weight:600"' : '') + '>' + (g.k.monto ? $$$(g.k.monto) : "—") + '</td></tr>').join("") +
-          '<tr><td colspan="4" class="der"><b>Total a pagar</b></td><td class="der mono"><b>' + $$$(total) + '</b></td></tr>' +
-          '</tbody></table></div>' : '<div class="vacio">Nadie tiene comisión configurada.</div>') +
-        '<div class="cuerpo" style="border-top:1px solid var(--line)"><p class="nota">' +
-        'Se calcula sobre la <b>base sin IVA</b>, no sobre lo cobrado: el IVA no es tuyo y no se comisiona. ' +
-        'De los ' + $$$(baseDe(cobrado)) + ' que te quedan este mes, ' + $$$(total) + ' son de comisiones, así que tu margen real del mes es ' +
-        $$$(baseDe(cobrado) - total) + '.</p></div></div>';
-    })() +
-
-    '<div class="rejilla2">' +
-      '<div class="tarjeta"><header><h2>Estado de cuenta</h2><span class="pista">lo aprobado que todavía no cae al banco</span></header>' +
-        (depos.length ? '<div class="pendientes">' + depos.map(f =>
-          '<div class="pend ' + (difDias(iso(HOY), f) >= 0 ? "pronto" : "info") + '"><span class="raya"></span>' +
-          '<span class="txt"><b>' + $$$(grupos[f]) + '</b><small>se deposita el ' + fFecha(f) +
-          (difDias(iso(HOY), f) >= 0 ? " · ya debería haber caído" : "") + '</small></span></div>').join("") + '</div>'
-          : '<div class="vacio">No hay nada pendiente de depositar.</div>') +
-        (rechazados.length ? '<div class="cuerpo" style="border-top:1px solid var(--line)"><p class="nota">' +
-          '<b>' + rechazados.length + (rechazados.length === 1 ? ' cobro rechazado' : ' cobros rechazados') + '.</b> Están arriba en <i>Para hoy</i>: ' +
-          'atendidos el mismo día casi siempre se recuperan.</p></div>' : "") + '</div>' +
-
-      '<div class="tarjeta"><header><h2>Tus datos de emisor</h2></header>' +
-        '<div class="cuerpo" style="display:grid;grid-template-columns:1fr 1fr;gap:11px">' +
-          '<div class="campo"><label class="f" for="cfRfc">RFC</label><input id="cfRfc" value="' + esc(CFG.rfc) + '"></div>' +
-          '<div class="campo"><label class="f" for="cfRazon">Razón social</label><input id="cfRazon" value="' + esc(CFG.razon) + '"></div>' +
-          '<div class="campo"><label class="f" for="cfRegimen">Régimen</label><select id="cfRegimen">' +
-            Object.keys(REGIMENES).map(k => '<option value="' + k + '"' + (CFG.regimen === k ? " selected" : "") + '>' + k + ' · ' + REGIMENES[k] + '</option>').join("") + '</select></div>' +
-          '<div class="campo"><label class="f" for="cfSerie">Serie y folio</label><input id="cfSerie" value="' + esc(CFG.serie + "-" + CFG.folio) + '"></div>' +
-          '<div class="campo"><label class="f" for="cfIva">IVA</label><select id="cfIva">' +
-            '<option value="16"' + (CFG.iva === 16 ? " selected" : "") + '>16%</option>' +
-            '<option value="8"' + (CFG.iva === 8 ? " selected" : "") + '>8% (frontera)</option>' +
-            '<option value="0"' + (CFG.iva === 0 ? " selected" : "") + '>0%</option></select></div>' +
-          '<div class="campo"><label class="f" for="cfModo">Los precios de lista</label><select id="cfModo">' +
-            '<option value="si"' + (CFG.ivaIncluido ? " selected" : "") + '>Ya traen el IVA incluido</option>' +
-            '<option value="no"' + (!CFG.ivaIncluido ? " selected" : "") + '>Son más IVA</option></select></div>' +
-        '</div>' +
-        '<div class="cuerpo" style="border-top:1px solid var(--line)">' +
-          '<div class="marco"><table style="min-width:420px"><thead><tr><th>Plan</th><th class="der">Base</th><th class="der">IVA</th><th class="der">Lo que paga</th></tr></thead><tbody>' +
-          Object.keys(PLANES).map(k => '<tr><td class="taller">' + PLANES[k].nombre + '</td>' +
-            '<td class="der mono">' + $$$(baseDe(PLANES[k].mes)) + '</td>' +
-            '<td class="der mono">' + $$$(ivaDe(PLANES[k].mes)) + '</td>' +
-            '<td class="der mono"><b>' + $$$(totalDe(PLANES[k].mes)) + '</b></td></tr>').join("") +
-          '</tbody></table></div>' +
-          '<p class="nota" style="margin-top:12px">Con el IVA incluido, de cada $199 te quedan ' + $$$(baseDe(199)) + '. ' +
-          'Es lo correcto para el que no factura, que es tu alumno: ve un precio y paga ese precio. Si algún día lo cambias a ' +
-          '"más IVA", súbele el precio a todos los planes el mismo día o tu ingreso baja 14%.</p>' +
-        '</div></div>' +
-    '</div>' +
-
-    '<div class="tarjeta"><header><h2>Movimientos</h2><span class="pista">últimos 30</span></header>' +
-      '<div class="marco"><table style="min-width:900px"><thead><tr>' +
-        '<th>Fecha</th><th>Taller</th><th>Concepto</th><th class="der">Base</th><th class="der">IVA</th><th class="der">Total</th>' +
-        '<th>Cobro</th><th>Depósito</th><th>Factura</th>' +
-      '</tr></thead><tbody>' + ultimos.map(p => {
-        const c = cuentaDe(p.cuentaId) || { taller: "Cuenta borrada" };
-        return '<tr class="clic" data-abre="' + p.cuentaId + '" tabindex="0">' +
-          '<td class="mono">' + fCorta(p.fecha) + '</td><td class="taller">' + esc(c.taller) + '</td>' +
-          '<td>' + esc(p.concepto) + '<br><span class="sitio">' + esc(p.metodo) + '</span></td>' +
-          '<td class="der mono">' + $$$(baseDe(p.total)) + '</td>' +
-          '<td class="der mono">' + $$$(ivaDe(p.total)) + '</td>' +
-          '<td class="der mono"><b>' + $$$(cargo(p)) + '</b></td>' +
-          '<td><span class="chip ' + (p.estado === "aprobado" ? "bien" : "mal") + '">' + (p.estado === "aprobado" ? "Aprobado" : "Rechazado") + '</span></td>' +
-          '<td>' + (p.estado !== "aprobado" ? '<span class="sitio">—</span>' :
-            p.depositado ? '<span class="chip bien">Depositado</span>' : '<span class="chip aviso">' + fCorta(p.liquida) + '</span>') + '</td>' +
-          '<td>' + marcaFactura(p) + '</td></tr>';
-      }).join("") + '</tbody></table></div></div></div>';
+  const lista=(ficheros.cobros||[]).slice().sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha))).slice(0,30);
+  return '<div class="loRoot"><div class="loHead"><div><h1>Cobros</h1><p>Consulta los pagos confirmados por Stripe y su archivo fiscal.</p></div><button class="btn p" data-lo="ir-facturas">Ver pagos Stripe y facturas</button></div>'+
+    '<div class="loAviso">El seguimiento de Stripe está en Facturas. Los registros anteriores se conservan abajo; sus marcas antiguas de factura o envío no acreditan un CFDI emitido por el proveedor.</div>'+
+    '<section class="loPanel"><header><h2>Registro anterior</h2><p>Últimos 30 movimientos guardados en el Lab. No sustituye la conciliación con Stripe.</p></header><div class="loTabla"><table><thead><tr><th>Fecha</th><th>Negocio</th><th>Concepto</th><th>Total registrado</th><th>Estado registrado</th></tr></thead><tbody>'+lista.map(p=>'<tr><td>'+esc(fCorta(p.fecha))+'</td><td>'+esc((cuentaDe(p.cuentaId)||{}).taller||'Cuenta')+'</td><td>'+esc(p.concepto||'')+'</td><td>'+$$$(cargo(p))+'</td><td>'+esc(p.estado||'Sin estado')+'</td></tr>').join('')+'</tbody></table></div></section></div>';
 }
 
 function comisionDe(e) {
@@ -2593,7 +2456,7 @@ function nlAbreFichaAnterior(id) {
             Object.keys(USOS).map(k => '<option value="' + k + '"' + ((c.uso || "G03") === k ? " selected" : "") + '>' + k + ' · ' + USOS[k] + '</option>').join("") + '</select></div>' +
         '</div>' +
         '<button class="btn p sm" data-acc="guardafiscal" style="align-self:flex-start">Guardar los datos</button>' +
-        '<p class="sitio">Con estos datos, cada pago suyo genera su CFDI y se le manda al correo sin que nadie lo pida.</p>'
+        '<p class="sitio">Estos datos preparan su expediente fiscal. La emisión y el correo requieren el emisor configurado y la confirmación de Facturapi.</p>'
         : '<button class="btn sm" data-acc="guardafiscal" style="align-self:flex-start">Guardar</button>' +
           '<p class="sitio">Sus pagos entran en la factura global del mes como público en general. Si después pide factura, se le puede emitir mientras el pago sea del mes en curso.</p>') +
     '</div>' +
@@ -3012,26 +2875,12 @@ async function accionFalla(acc) {
 }
 
 /* ================= facturación ================= */
-async function emiteCFDI(pagoId, silencioso) {
-  const p = ficheros.cobros.find(x => x.id === pagoId); if (!p) return false;
-  const c = cuentaDe(p.cuentaId) || {};
-  if (!c.rfc || !c.razon || !c.cp || !c.regimen) {
-    if (!silencioso) aviso("Primero captura los datos fiscales de " + (c.taller || "la cuenta") + ".");
-    return false;
-  }
-  CFG.folio++;
-  p.factura = "emitida";
-  p.cfdi = CFG.serie + "-" + CFG.folio;
-  p.uuid = "F3B" + String(100000 + CFG.folio * 7) + "-CDA4";
-  p.emitida = iso(HOY);
-  p.enviada = true;
-  await guardaCfg();
-  await guarda("cobros", p);
-  anota(c, "Se emitió el CFDI " + p.cfdi + " por " + $$$(cargo(p)) + " y se envió a " + (c.correo || "su correo") + ".");
-  await guarda("cuentas", c);
-  if (!silencioso) aviso("CFDI " + p.cfdi + " emitido y enviado a " + (c.correo || "su correo"));
-  return true;
+async function emiteCFDI(){
+  aviso("La emisión fiscal requiere configurar Facturapi. Aquí no se simulan folios ni envíos.");
+  vista="facturas";pinta();
+  return false;
 }
+
 async function guardaCfg() {
   if (DB) { try { await DB.doc("meta/config").set(CFG); } catch (e) {} }
 }
@@ -3262,7 +3111,7 @@ async function mueveSuscripcion(c, acc) {
 function pinta() {
   const titulos = { usuarios:"Personas y accesos", tablero: "Tablero", cuentas: "Negocios y cuentas", agenda: "Agenda", soporte: "Soporte",
     cobros: "Cobros y facturación", transferencias: "Transferencias por confirmar", equipo: "Equipo y alianzas", numeros: "Números",
-    anuncios: "Publicidad", tips: "Tips del tablero", base: "Base de datos",
+    facturas:"Facturas de suscripciones", anuncios: "Publicidad", tips: "Tips del tablero", base: "Base de datos",
     codigos: "Códigos de curso", diagnosticos: "Qué necesita cada taller" };
   $("#titulo").textContent = titulos[vista];
   $("#n_cuentas").textContent = ficheros.cuentas.length;
@@ -3290,7 +3139,7 @@ function pinta() {
   $("#vista").innerHTML = vista === "tablero" ? vTablero() : vista === "usuarios" ? NuvoorLab.usuarios(nlDatos(),nlTextoUsuarios) : vista === "cuentas" ? vCuentas()
     : vista === "agenda" ? vAgenda() : vista === "soporte" ? vSoporte()
     : vista === "cobros" ? vCobros() : vista === "transferencias" ? vTransferencias() : vista === "equipo" ? vEquipo()
-    : vista === "anuncios" ? vAnuncios()
+    : vista === "anuncios" ? NuvoorLabOperacion.publicidad(ficheros.anuncios) : vista === "facturas" ? NuvoorLabOperacion.facturas()
     : vista === "tips" ? vTips()
     /* ESTO ERA EL BUG: las dos pantallas estaban escritas —vCodigos() en
        la línea 3639 y vDiagnosticos() en la 3749— pero nadie las llamaba.
@@ -3302,6 +3151,7 @@ function pinta() {
     : vista === "diagnosticos" ? vDiagnosticos()
     : vista === "base" ? vBase() : vNumeros();
   ponGlobos();
+  if(vista==="anuncios"||vista==="facturas") NuvoorLabOperacion.montar(vista);
 }
 
 function ponGlobos() {
@@ -3637,7 +3487,8 @@ document.addEventListener("click", e=>{
   const fila = e.target.closest("[data-anuncio]");
   if(fila){ abreAnuncio(fila.dataset.anuncio); return; }
   if(anEditando && e.target.closest("#cerrarFicha")){ cierraPanel(); anEditando = null; return; }
-  if(e.target.closest("#anGuarda")){ guardaFicha(); return; }
+  if(e.target.closest("#anVista")){ NuvoorLabOperacion.previaEditor(anEditando); return; }
+  if(e.target.closest("#anGuarda")){ guardaFicha("borrador"); return; }
   if(e.target.closest("#anBorra")){
     if(anEditando){ const id = anEditando.id; cierraPanel(); anEditando = null; borraAnuncio(id); }
     return;
@@ -3676,13 +3527,13 @@ document.addEventListener("change", async e=>{
       a.titulo = (fs[i].name || "Anuncio").replace(/\.[^.]+$/, "").slice(0, 60);
       a.activo = false; a.estado = "apagado";
       a.orden = (n + i + 1) * 10;
-      await guardaAnuncio(a);
-      bien++;
+      a._modo="borrador";
+      if(await guardaAnuncio(a)) bien++; else mal++;
     }catch(err){ mal++; }
   }
   b.textContent = antes; b.disabled = false;
   aviso(bien
-    ? bien + " anuncio(s) creados y apagados. Ábrelos para ponerles enlace y anunciante, y préndelos."
+    ? bien + " borrador(es) guardados. Ábrelos para revisar y publicar."
       + (mal ? " " + mal + " no se pudieron subir." : "")
     : "No se pudo subir ninguna imagen.");
 });
@@ -3728,7 +3579,7 @@ function marcaChip(input){
   if(chip) chip.classList.toggle("si", input.checked);
 }
 document.addEventListener("click", e=>{
-  if(e.target.closest("#anPublica")){ guardaFicha(true);  return; }
+  if(e.target.closest("#anPublica")){ NuvoorLabOperacion.previaEditor(anEditando); return; }
   if(e.target.closest("#anApaga")){   guardaFicha(false); return; }
 
   /* Una región prende sus estados; si ya estaban todos, los apaga. */
@@ -3970,10 +3821,10 @@ function vDiagnosticos() {
 
 </script>
 
-<script>window.BUILD="20261103-1025";</script>
+<script>window.BUILD="20261104-1712";</script>
 <script>
 (function(){
-  var mio = "20261103-1025";
+  var mio = "20261104-1712";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -4005,7 +3856,7 @@ function vDiagnosticos() {
 <!-- STRIPE-MIGRATION-22 -->
 <script>window.__MIGRACIONES.push({"archivo":"22-stripe-planes.sql","titulo":"Planes de Stripe en transferencias","sql":"-- ============================================================\n--  22 · Planes de Stripe en pagos por transferencia\n--  Correr después de sql/18-stripe.sql. Se puede repetir.\n--  Reemplaza únicamente aplica_pago y agrega un marcador de revisión.\n-- ============================================================\n\ncreate or replace function public.aplica_pago(p_id bigint)\nreturns void\nlanguage plpgsql security definer set search_path = public\nas $$\ndeclare\n  p public.pagos_pendientes%rowtype;\n  v timestamptz;\n  plan_interno text;\nbegin\n  if not public.es_staff() then\n    raise exception 'Sólo el staff del Lab puede aplicar un pago';\n  end if;\n\n  select * into p from public.pagos_pendientes where id = p_id and estado = 'esperando' for update;\n  if not found then\n    raise exception 'Ese pago no existe o ya se había aplicado';\n  end if;\n\n  plan_interno := case p.plan\n    when 'imprenta_basico' then 'basico'\n    when 'imprenta_maker' then 'maker'\n    when 'imprenta_pro' then 'pro'\n    when 'restaurant_estandar' then 'basico'\n    when 'restaurant_multi' then 'maker'\n    when 'store_estandar' then 'basico'\n    when 'store_multi' then 'maker'\n    when 'taller_basico' then 'basico'\n    when 'taller_maker' then 'maker'\n    when 'taller_pro' then 'pro'\n    when 'rest_normal' then 'basico'\n    when 'rest_multi' then 'maker'\n    when 'tienda_normal' then 'basico'\n    when 'tienda_multi' then 'maker'\n    else null\n  end;\n  if plan_interno is null then\n    raise exception 'El plan de esta transferencia no se reconoce';\n  end if;\n\n  -- Si todavía le queda tiempo, se le suma; si ya venció, cuenta desde hoy.\n  select greatest(coalesce(vence, now()), now()) into v\n    from public.cuentas where id = p.cuenta_id for update;\n  v := v + (case when p.ciclo = 'anual' then interval '1 year' else interval '1 month' end) + interval '1 day';\n\n  update public.cuentas\n     set plan = plan_interno,\n         estado = 'activa',\n         ciclo = p.ciclo,\n         vence = v,\n         forma_pago = p.forma,\n         cobro_fallido = null\n   where id = p.cuenta_id;\n\n  update public.pagos_pendientes\n     set estado = 'pagado', aplicado = now(), aplicado_por = auth.uid()\n   where id = p_id;\nend $$;\n\ncreate or replace function public.nuvoor_stripe_planes_disponible()\nreturns boolean\nlanguage sql stable security definer set search_path = public\nas $$ select true $$;\n\nrevoke all on function public.nuvoor_stripe_planes_disponible() from public;\ngrant execute on function public.nuvoor_stripe_planes_disponible() to authenticated;\n\ncomment on function public.aplica_pago is\n  'Marca pagada una transferencia y extiende la cuenta asignando el plan interno de Nuvoor. Sólo el staff del Lab.';\n"});</script>
 <!-- /STRIPE-MIGRATION-22 -->
-<script src="lab.js?v=20261103-1025"></script>
+<script src="lab.js?v=20261104-1712"></script>
 <script>window.__MIGRACIONES.push({"archivo":"23-stripe-seguro.sql","titulo":"Cobros Stripe sin duplicados","sql":"-- 23 · Entregas de Stripe e intentos de cobro seguros.\n-- Después de 18-stripe.sql y 22-stripe-planes.sql. Repetible.\n-- Sólo tablas y funciones de cobro; no cambia Auth, staff ni mi_cuenta().\nbegin;\nalter table public.cuentas add column if not exists pago_previo boolean not null default false;\nupdate public.cuentas c set pago_previo = true\n where not pago_previo and (plan in ('basico','maker','pro') or stripe_suscripcion is not null\n or exists (select 1 from public.pagos_pendientes p where p.cuenta_id=c.id and p.estado='pagado'));\n\n-- Ninguna de estas tablas se expone al navegador.\ncreate table if not exists public.stripe_control (\n cuenta_id uuid primary key references public.cuentas(id) on delete cascade,\n token uuid, hasta timestamptz,\n intento jsonb\n);\ncreate table if not exists public.stripe_entregas (\n evento text primary key,\n cuenta_id uuid not null references public.cuentas(id) on delete cascade,\n sesion text unique,\n aplicado timestamptz not null default now()\n);\nalter table public.stripe_control enable row level security;\nalter table public.stripe_entregas enable row level security;\nrevoke all on public.stripe_control, public.stripe_entregas from public, anon, authenticated;\ngrant select on public.stripe_control, public.stripe_entregas to service_role;\n\n-- Un solo trabajador por negocio, incluso entre instancias Edge distintas.\n-- No se mantiene una transacción SQL abierta mientras se consulta Stripe.\ncreate or replace function public.stripe_toma(p_cuenta uuid, p_token uuid)\nreturns boolean language plpgsql security definer set search_path=public as $$\nbegin\n insert into public.stripe_control(cuenta_id,token,hasta)\n values(p_cuenta,p_token,clock_timestamp()+interval '2 minutes')\n on conflict(cuenta_id) do update set token=excluded.token,hasta=excluded.hasta\n where stripe_control.hasta is null or stripe_control.hasta < clock_timestamp();\n return found;\nend $$;\n\ncreate or replace function public.stripe_suelta(p_cuenta uuid,p_token uuid)\nreturns void language sql security definer set search_path=public as $$\n update public.stripe_control set token=null,hasta=null where cuenta_id=p_cuenta and token=p_token\n$$;\n\n-- Persiste el cuerpo exacto de Checkout ANTES de enviarlo a Stripe.\n-- Así un fallo de red puede reintentar con la misma Idempotency-Key.\ncreate or replace function public.stripe_intento(p_cuenta uuid,p_token uuid,p_intento jsonb)\nreturns void language plpgsql security definer set search_path=public as $$\nbegin\n update public.stripe_control set intento=p_intento,hasta=clock_timestamp()+interval '2 minutes'\n where cuenta_id=p_cuenta and token=p_token and hasta>clock_timestamp();\n if not found then raise exception 'La operación de cobro perdió su turno'; end if;\nend $$;\n\n-- Registrar el evento y modificar la licencia es UNA transacción.\n-- La unicidad de sesion cubre eventos distintos sobre un mismo pago OXXO.\ncreate or replace function public.stripe_aplica(\n p_cuenta uuid,p_token uuid,p_evento text,p_sesion text,p_cambios jsonb,p_sumar text default null)\nreturns boolean language plpgsql security definer set search_path=public as $$\ndeclare c public.cuentas%rowtype; v timestamptz;\nbegin\n perform 1 from public.stripe_control where cuenta_id=p_cuenta and token=p_token\n and hasta>clock_timestamp() for update;\n if not found then raise exception 'La operación de cobro perdió su turno'; end if;\n if p_evento is null or p_evento='' then raise exception 'Falta el evento'; end if;\n select * into strict c from public.cuentas where id=p_cuenta for update;\n insert into public.stripe_entregas(evento,cuenta_id,sesion)\n values(p_evento,p_cuenta,p_sesion) on conflict do nothing;\n if not found then return false; end if;\n if p_sumar is not null then\n   if p_sumar not in ('mensual','anual') or p_sesion is null then raise exception 'Periodo inválido'; end if;\n   v := greatest(coalesce(c.vence,now()),now())\n      + case when p_sumar='anual' then interval '1 year' else interval '1 month' end + interval '1 day';\n end if;\n update public.cuentas set\n   plan=coalesce(p_cambios->>'plan',plan),\n   ciclo=coalesce(p_cambios->>'ciclo',ciclo),\n   estado=coalesce(p_cambios->>'estado',estado),\n   forma_pago=coalesce(p_cambios->>'forma_pago',forma_pago),\n   stripe_suscripcion=coalesce(p_cambios->>'stripe_suscripcion',stripe_suscripcion),\n   vence=coalesce(v,(p_cambios->>'vence')::timestamptz,vence),\n   cobro_fallido=case when p_cambios ? 'cobro_fallido' then (p_cambios->>'cobro_fallido')::timestamptz else cobro_fallido end,\n   pago_previo=pago_previo or coalesce((p_cambios->>'pago_previo')::boolean,false)\n where id=p_cuenta;\n return true;\nend $$;\n\nrevoke all on function public.stripe_toma(uuid,uuid) from public,anon,authenticated;\nrevoke all on function public.stripe_suelta(uuid,uuid) from public,anon,authenticated;\nrevoke all on function public.stripe_intento(uuid,uuid,jsonb) from public,anon,authenticated;\nrevoke all on function public.stripe_aplica(uuid,uuid,text,text,jsonb,text) from public,anon,authenticated;\ngrant execute on function public.stripe_toma(uuid,uuid),public.stripe_suelta(uuid,uuid),\n public.stripe_intento(uuid,uuid,jsonb),public.stripe_aplica(uuid,uuid,text,text,jsonb,text) to service_role;\n\n-- El navegador pregunta por ESE pago, no sólo por una licencia que ya estaba activa.\ncreate or replace function public.stripe_confirmado(p_cuenta uuid,p_sesion text)\nreturns boolean language sql stable security definer set search_path=public as $$\n select exists(select 1 from public.stripe_entregas e where e.cuenta_id=p_cuenta and e.sesion=p_sesion\n and exists(select 1 from public.membresias m where m.cuenta_id=e.cuenta_id and m.usuario_id=auth.uid()))\n$$;\nrevoke all on function public.stripe_confirmado(uuid,text) from public,anon;\ngrant execute on function public.stripe_confirmado(uuid,text) to authenticated;\n\n-- Marcar también las transferencias posteriores sin recrear aplica_pago.\ncreate or replace function public.stripe_pago_transferencia()\nreturns trigger language plpgsql security definer set search_path=public as $$\nbegin\n if new.estado='pagado' then\n   update public.cuentas set pago_previo=true where id=new.cuenta_id;\n end if;\n return new;\nend $$;\nrevoke all on function public.stripe_pago_transferencia() from public,anon,authenticated;\ndrop trigger if exists stripe_transferencia_pagada on public.pagos_pendientes;\ncreate trigger stripe_transferencia_pagada after insert or update of estado on public.pagos_pendientes\nfor each row execute function public.stripe_pago_transferencia();\ncommit;\n"});</script>
 <script>window.__MIGRACIONES.push({"archivo":"24-lab-personas.sql","titulo":"Personas y fichas privadas del Lab","sql":"-- Nuvoor Lab: personas y fichas de seguimiento. Seguro de repetir.\n-- No modifica Auth, planes, membresías ni datos internos de los negocios.\nbegin;\n\ncreate or replace function public.staff_usuarios()\nreturns jsonb language plpgsql stable security definer set search_path=public\nas $$\nbegin\n  if auth.uid() is null or not public.es_staff() then\n    raise exception 'Sólo el equipo de Nuvoor puede consultar estas personas' using errcode='42501';\n  end if;\n  return coalesce((select jsonb_agg(f order by f->>'nombre') from (\n    select jsonb_build_object(\n      'id',u.id,'nombre',coalesce(n.cuerpo->>'nombre',nullif(p.nombre,''),nullif(u.raw_user_meta_data->>'full_name',''),''),\n      'apellidos',coalesce(n.cuerpo->>'apellidos',''), 'correo',coalesce(u.email,p.correo,''),\n      'tel',coalesce(n.cuerpo->>'tel',u.phone,''),'pais',coalesce(n.cuerpo->>'pais',''),\n      'estadoGeo',coalesce(n.cuerpo->>'estadoGeo',''),'ciudad',coalesce(n.cuerpo->>'ciudad',''),\n      'idioma',coalesce(n.cuerpo->>'idioma',''),'nota',coalesce(n.cuerpo->>'nota',''),\n      'creado',u.created_at,'ultimo',u.last_sign_in_at,'revision',n.actualizado,\n      'negocios',coalesce((select jsonb_agg(jsonb_build_object('id',c.id,'nombre',c.nombre,'producto',c.producto,'rol',m.rol) order by c.nombre)\n        from public.membresias m join public.cuentas c on c.id=m.cuenta_id where m.usuario_id=u.id),'[]'::jsonb)\n    ) as f\n    from auth.users u left join public.perfiles p on p.id=u.id\n    left join public.lab_datos n on n.coleccion='personas' and n.doc_id=u.id::text\n    where u.deleted_at is null\n  ) x),'[]'::jsonb);\nend $$;\nrevoke all on function public.staff_usuarios() from public,anon;\ngrant execute on function public.staff_usuarios() to authenticated;\n\ncreate or replace function public.staff_guarda_ficha(p_tipo text,p_id uuid,p_datos jsonb,p_revision timestamptz default null)\nreturns jsonb language plpgsql security definer set search_path=public\nas $$\ndeclare col text; permitidos text[]; dato record; anterior jsonb; nuevo jsonb;\n        rev timestamptz; salida timestamptz; cu uuid;\nbegin\n  if auth.uid() is null or not public.es_staff() then\n    raise exception 'Sólo el equipo de Nuvoor puede editar estas fichas' using errcode='42501';\n  end if;\n  if jsonb_typeof(p_datos) is distinct from 'object' or octet_length(p_datos::text)>20000 then\n    raise exception 'Ficha no válida';\n  end if;\n  if p_tipo='persona' then\n    col:='personas';\n    permitidos:=array['nombre','apellidos','tel','pais','estadoGeo','ciudad','idioma','nota'];\n    if not exists(select 1 from auth.users where id=p_id and deleted_at is null) then raise exception 'La persona ya no existe'; end if;\n  elsif p_tipo='negocio' then\n    col:='notas_cuenta'; cu:=p_id;\n    permitidos:=array['nombre','contacto','tel','pais','estadoGeo','ciudad','direccion','zona','sitio','razon','rfc','cp'];\n    if not exists(select 1 from public.cuentas where id=p_id) then raise exception 'El negocio ya no existe'; end if;\n  else raise exception 'Tipo de ficha no válido';\n  end if;\n  for dato in select key,value from jsonb_each(p_datos) loop\n    if not dato.key=any(permitidos) or jsonb_typeof(dato.value)<>'string' or length(dato.value#>>'{}')>2000 then\n      raise exception 'La ficha contiene un campo no permitido';\n    end if;\n  end loop;\n  if p_datos ? 'zona' and nullif(p_datos->>'zona','') is not null and not exists(select 1 from pg_timezone_names where name=p_datos->>'zona') then\n    raise exception 'Revisa la zona horaria';\n  end if;\n  perform pg_advisory_xact_lock(hashtextextended(col||p_id::text,0));\n  select cuerpo,actualizado into anterior,rev from public.lab_datos where coleccion=col and doc_id=p_id::text for update;\n  if rev is distinct from p_revision then\n    raise exception 'La ficha cambió en otro dispositivo. Actualízala antes de guardar.' using errcode='40001';\n  end if;\n  if p_tipo='negocio' and p_datos ? 'nombre' then\n    if length(btrim(p_datos->>'nombre')) not between 1 and 200 then raise exception 'Escribe el nombre del negocio'; end if;\n    update public.cuentas set nombre=btrim(p_datos->>'nombre') where id=p_id;\n  end if;\n  nuevo:=coalesce(anterior,'{}'::jsonb)||(p_datos-'nombre');\n  if p_tipo='persona' then nuevo:=coalesce(anterior,'{}'::jsonb)||p_datos; end if;\n  insert into public.lab_datos(coleccion,doc_id,cuerpo) values(col,p_id::text,nuevo)\n    on conflict(coleccion,doc_id) do update set cuerpo=excluded.cuerpo\n    returning actualizado into salida;\n  -- Registra sólo qué campos cambiaron; evita duplicar datos personales en la bitácora.\n  insert into public.lab_bitacora(cuenta_id,quien,que,antes,despues)\n    values(cu,auth.uid(),'Ficha de '||p_tipo||' actualizada',null,\n      jsonb_build_object('tipo',p_tipo,'id',p_id,'campos',(select jsonb_agg(key) from jsonb_object_keys(p_datos) key)));\n  return jsonb_build_object('ok',true,'revision',salida);\nend $$;\nrevoke all on function public.staff_guarda_ficha(text,uuid,jsonb,timestamptz) from public,anon;\ngrant execute on function public.staff_guarda_ficha(text,uuid,jsonb,timestamptz) to authenticated;\n\ncreate or replace function public.nuvoor_lab_personas_disponible()\nreturns boolean language sql stable security invoker set search_path=public\nas $$ select auth.uid() is not null and public.es_staff() $$;\nrevoke all on function public.nuvoor_lab_personas_disponible() from public,anon;\ngrant execute on function public.nuvoor_lab_personas_disponible() to authenticated;\n\ncommit;\n"});</script>
 </body>

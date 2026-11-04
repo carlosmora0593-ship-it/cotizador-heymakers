@@ -15,7 +15,7 @@ create table membresias(usuario_id uuid,cuenta_id uuid,rol text);`);
 for(const file of ['18-stripe.sql','22-stripe-planes.sql','23-stripe-seguro.sql','23-stripe-seguro.sql']) await db.exec(fs.readFileSync('sql/'+file,'utf8'));
 console.log('SQL real PostgreSQL embebido: 18 → 22 → 23; 23 repetido: OK');
 const USER=randomUUID(), API='https://fake.supabase.test';
-let current, handler, faults={}, seq=0, calls=[], sessions=new Map(), subscriptions=new Map(), idem=new Map(), coupon=null;
+let current, handler, faults={}, seq=0, calls=[], sessions=new Map(), subscriptions=new Map(), invoices=new Map(), fiscal=new Map(), idem=new Map(), coupon=null;
 const env={SUPABASE_URL:API,SUPABASE_SERVICE_ROLE_KEY:'service-falso',STRIPE_LLAVE:'stripe-falso',STRIPE_WEBHOOK_SECRETO:'firma-falsa',SITIO_URL:'https://app.nuvoor.mx',DATOS_BANCO:'Banco de prueba'};
 globalThis.Deno={env:{get:k=>env[k]},serve:fn=>handler=fn};
 const json=(x,status=200)=>new Response(status===204?null:JSON.stringify(x),{status,headers:{'Content-Type':'application/json'}});
@@ -40,6 +40,7 @@ globalThis.fetch=async(input,opts={})=>{
   if((faults.apply && table==='stripe_aplica') || (faults.db && (table==='stripe_aplica'||table==='cuentas'))) return json({error:'base caída'},503);
   if(u.pathname.includes('/rpc/')){
    const b=JSON.parse(opts.body),args=Object.values(b);
+   if(table==='registra_pago_suscripcion'){if(faults.fiscal){faults.fiscal=false;return json({error:'fiscal temporal'},503);}fiscal.set(b.p_referencia,b);return json(b.p_referencia);}
    if(!['stripe_toma','stripe_suelta','stripe_aplica','stripe_intento'].includes(table))throw Error('RPC inesperada '+table);
    try {const row=await query('select '+table+'('+Object.keys(b).map((k,i)=>k+'=> $'+(i+1)).join(',')+') as result',args.map(x=>typeof x==='object'&&x!==null?JSON.stringify(x):x));return json(row[0].result);}
    catch(e){return json({error:e.message},500);}
@@ -54,6 +55,7 @@ globalThis.fetch=async(input,opts={})=>{
  if(u.origin==='https://api.stripe.com'){
   const path=u.pathname.slice(4),p=new URLSearchParams(opts.body||'');calls.push({path,method,p,headers:opts.headers});
   if(method==='GET'&&path==='subscriptions')return json({data:[...subscriptions.values()].filter(s=>s.customer===u.searchParams.get('customer')),has_more:false});
+  if(method==='GET'&&path.startsWith('invoices/'))return invoices.has(path.split('/')[1])?json(invoices.get(path.split('/')[1])):json({error:{message:'missing invoice'}},404);
   if(method==='GET'&&path.startsWith('subscriptions/')){const s=subscriptions.get(path.split('/')[1]);return s?json(s):json({error:{message:'missing sub'}},404);}
   if(method==='GET'&&path.startsWith('coupons/'))return coupon?json(coupon):json({error:{message:'missing coupon'}},404);
   if(path==='coupons'){coupon={id:p.get('id'),amount_off:+p.get('amount_off'),currency:p.get('currency'),duration:p.get('duration'),duration_in_months:+p.get('duration_in_months')};return json(coupon);}
@@ -79,7 +81,7 @@ await import('../../supabase/functions/webhook-stripe/index.ts?revision');const 
 await import('../../supabase/functions/portal-suscripcion/index.ts?revision');const portal=handler;
 async function pay(body={},id=current){return crear(new Request(API+'/crear',{method:'POST',headers:{authorization:'Bearer fake'},body:JSON.stringify({cuenta_id:id,producto:(await account(id)).producto,plan:'basico',forma:'tarjeta',ciclo:'mensual',...body})}));}
 async function event(type,o,{id='evt_'+randomUUID(),timestamp=Math.floor(Date.now()/1000),bad=false}={}){
- const b=JSON.stringify({id,type,data:{object:o}}),sig=createHmac('sha256',env.STRIPE_WEBHOOK_SECRETO).update(timestamp+'.'+b).digest('hex');
+ const b=JSON.stringify({id,type,created:timestamp,data:{object:o}}),sig=createHmac('sha256',env.STRIPE_WEBHOOK_SECRETO).update(timestamp+'.'+b).digest('hex');
  return webhook(new Request(API+'/webhook',{method:'POST',headers:{'stripe-signature':'t='+timestamp+',v1='+(bad?'0'.repeat(64):sig)},body:b}));
 }
 const plans=[['taller','imprenta_basico',19900,199000],['taller','imprenta_maker',44900,449000],['taller','imprenta_pro',89900,899000],['restaurant','restaurant_estandar',19900,199000],['restaurant','restaurant_multi',89900,899000],['tiendita','store_estandar',19900,199000],['tiendita','store_multi',89900,899000]];
@@ -142,6 +144,15 @@ sub.status='canceled';old=(await account()).vence;await event('customer.subscrip
 const newer={...sub,id:'sub_nueva',created:200,status:'active'};subscriptions.set(newer.id,newer);await event('customer.subscription.created',newer);
 await event('customer.subscription.deleted',sub);assert.equal((await account()).stripe_suscripcion,'sub_nueva');assert.equal((await account()).estado,'activa');
 await event('invoice.payment_failed',{id:'in_old',parent:{subscription_details:{subscription:'sub_nueva',metadata:newer.metadata}}});assert.equal((await account()).cobro_fallido,null,'factura atrasada no marca fallo resuelto');
+invoices.set('in_legacy',{id:'in_legacy',customer:'cus_sub',subscription:'sub_nueva',status:'paid',amount_paid:9800,currency:'mxn',livemode:false});
+assert.equal((await event('invoice.paid',{id:'in_legacy',subscription:'sub_nueva',subscription_details:{metadata:newer.metadata}})).status,200);
+assert.equal(fiscal.get('invoice:in_legacy').p_centavos,9800,'monto pagado exacto con promoción');
+faults.fiscal=true;assert.equal((await event('invoice.paid',{id:'in_legacy',subscription:'sub_nueva',subscription_details:{metadata:newer.metadata}},{id:'evt_fiscal_repara'})).status,503);
+assert.equal((await event('invoice.paid',{id:'in_legacy',subscription:'sub_nueva',subscription_details:{metadata:newer.metadata}},{id:'evt_fiscal_repara'})).status,200,'repara pago fiscal aun con licencia aplicada');
+invoices.set('in_gratis',{id:'in_gratis',customer:'cus_sub',subscription:'sub_nueva',status:'paid',amount_paid:0,currency:'mxn'});
+await event('invoice.paid',{id:'in_gratis',subscription:'sub_nueva',subscription_details:{metadata:newer.metadata}});assert.equal(fiscal.has('invoice:in_gratis'),false);
+invoices.set('in_pasada',{id:'in_pasada',customer:'cus_sub',subscription:'sub_actual',status:'paid',amount_paid:19900,currency:'mxn',livemode:false});
+assert.equal((await event('invoice.paid',{id:'in_pasada',subscription:'sub_actual',subscription_details:{metadata:sub.metadata}})).status,200);assert.ok(fiscal.has('invoice:in_pasada'),'pago atrasado de suscripción vieja conserva seguimiento sin degradar plan');
 await event('invoice.paid',{id:'in_legacy',subscription:'sub_nueva',subscription_details:{metadata:newer.metadata}});assert.equal((await account()).estado,'activa');
 const completed={id:'cs_sub_confirmada',mode:'subscription',subscription:'sub_nueva',metadata:newer.metadata};
 assert.equal((await event('checkout.session.completed',completed)).status,200);

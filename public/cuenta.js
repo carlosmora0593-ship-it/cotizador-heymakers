@@ -393,7 +393,8 @@ window.__tips = async function(){
 window.__anuncioMarca = function(id, tipo){
   if(!SB || !id) return;
   try{
-    SB.rpc("anuncio_marca", {p_id: id, p_tipo: tipo}).then(
+    const evento=crypto.randomUUID();
+    SB.rpc("anuncio_registra", {p_id:id,p_tipo:tipo,p_cuenta:CUENTA?.id||null,p_evento:evento}).then(
       r => { if(r && r.error) console.warn("No se pudo contar el anuncio", id, r.error.message); },
       e => { console.warn("No se pudo contar el anuncio", id, e && e.message); }
     );
