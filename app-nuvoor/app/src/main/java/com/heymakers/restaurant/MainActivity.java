@@ -132,6 +132,7 @@ public final class MainActivity extends Activity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 view.setKeepScreenOn(false);
+                if (KitchenPrintService.isRunning()) stopService(new Intent(MainActivity.this, KitchenPrintService.class));
             }
 
             @Override

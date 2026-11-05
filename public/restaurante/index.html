@@ -1452,7 +1452,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261105-1632">
+<meta name="nuvoor-build" content="20261105-1707">
 <link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
 </head>
 <body>
@@ -2014,7 +2014,11 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
   <div class="card" id="impresorasCard">
     <header><h2>Impresoras de esta tablet</h2><button class="btn sm primary" id="impAgregar" type="button">+ Agregar impresora</button></header>
     <div class="body">
-      <p class="note" style="margin:0 0 14px">Elige qué imprime cada impresora. Las Bluetooth trabajan en segundo plano y cada una conserva su configuración en este dispositivo.</p>
+      <p class="note" style="margin:0 0 14px">Elige qué imprime cada impresora. Las Bluetooth imprimen directo desde Nuvoor y cada una conserva su configuración en este dispositivo.</p>
+      <div class="note fila" id="impFondoPanel" hidden style="margin:0 0 14px">
+        <button class="btn sm" id="impFondo" type="button">Activar impresión con pantalla apagada</button>
+        <span id="impFondoEstado" aria-live="polite">Disponible durante el turno en esta tablet.</span>
+      </div>
       <div class="impPrinterLayout">
         <section class="impPrinterColumn" aria-label="Lista de impresoras">
           <header><h3>Lista</h3><span class="hint" id="impConteo"></span></header>
@@ -3193,14 +3197,34 @@ if(!window.MakersPrinter && IMPRESORAS.some(p=>p.conexion==="bluetooth")){
 function tieneCocinaBluetoothPOS(){
   return !!window.MakersPrinter&&IMPRESORAS.some(p=>p.cocina&&p.conexion==="bluetooth"&&p.impresoraBt);
 }
+let activandoCocinaFondoPOS=false;
 function actualizaPantallaCocinaPOS(){
   const puente=window.MakersPrinter;
   if(typeof puente?.setKitchenScreenOn!=="function")return;
   const activa=tieneCocinaBluetoothPOS();
-  puente.setKitchenScreenOn(activa);
-  $("#accesoCocinaActiva").hidden=!activa;
+  const fondo=!!puente.kitchenBackgroundActive?.();
+  puente.setKitchenScreenOn(activa&&!fondo);
+  const aviso=$("#accesoCocinaActiva");
+  aviso.hidden=!activa;
+  aviso.textContent=fondo?"Cocina activa con la pantalla apagada.":"Tablet de cocina activa. Puedes dejar puesto el candado de Nuvoor.";
+  const disponible=activa&&typeof puente.startKitchenBackground==="function"&&REST_NUBE.enabled&&esGerente();
+  $("#impFondoPanel").hidden=!disponible;
+  $("#impFondo").disabled=activandoCocinaFondoPOS;
+  $("#impFondo").textContent=fondo?"Detener impresión con pantalla apagada":"Activar impresión con pantalla apagada";
 }
-function guardaImpresorasPOS(){ lsSet("impresoras", IMPRESORAS); actualizaPantallaCocinaPOS(); }
+async function detieneCocinaFondoPOS(){
+  const puente=window.MakersPrinter;
+  if(!puente?.kitchenBackgroundActive?.())return;
+  puente.stopKitchenBackground();
+  try{await RESTAURANT_SB.rpc("rest_bt_apaga",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_aparato:REST_NUBE.deviceId});}catch(_){}
+}
+function guardaImpresorasPOS(){
+  if(window.MakersPrinter?.kitchenBackgroundActive?.()){
+    detieneCocinaFondoPOS();
+    $("#impFondoEstado").textContent="Cambió la impresora. Activa de nuevo la impresión con pantalla apagada.";
+  }
+  lsSet("impresoras", IMPRESORAS); actualizaPantallaCocinaPOS();
+}
 let impresorasEmparejadasPOS = [];
 let impresoraEnEdicionPOS = "";
 let borradorImpresoraPOS = null;
@@ -7926,6 +7950,7 @@ function renderEditorImpresoraPOS(){
     '<span class="hint" id="impTestEstado" aria-live="polite"></span><button class="btn sm impSave" type="button" id="impGuardar">Guardar</button></div></div>';
 }
 function renderImpresorasPOS(){
+  actualizaPantallaCocinaPOS();
   renderListaImpresorasPOS(); renderEditorImpresoraPOS();
   const aviso=$("#impAvisoWeb"); if(aviso) aviso.hidden=!!window.MakersPrinter;
   muestraErroresImpresoraPOS();
@@ -8015,6 +8040,45 @@ function actualizaBorradorPorCampoPOS(target){
   if(target.dataset.impCheck) borradorImpresoraPOS[target.dataset.impCheck]=target.checked;
 }
 $("#impAgregar").addEventListener("click",nuevoBorradorImpresoraPOS);
+$("#impFondo").addEventListener("click",async()=>{
+  const puente=window.MakersPrinter, estado=$("#impFondoEstado");
+  if(activandoCocinaFondoPOS||!esGerente()||!REST_NUBE.enabled||typeof puente?.startKitchenBackground!=="function")return;
+  if(puente.kitchenBackgroundActive()){
+    await detieneCocinaFondoPOS();
+    estado.textContent="Impresión con pantalla apagada detenida.";
+    actualizaPantallaCocinaPOS();
+    return;
+  }
+  const paso=puente.kitchenBackgroundPrerequisite();
+  if(paso!=="ok"){
+    const ayuda={bateria:"En Android, pon Nuvoor en «Sin restricciones» o «No optimizar». Regresa y vuelve a tocar Activar.",
+      notificaciones:"Permite las notificaciones de Nuvoor. Regresa y vuelve a tocar Activar.",
+      bluetooth:"Permite que Nuvoor se conecte a dispositivos cercanos. Luego vuelve a tocar Activar."};
+    estado.textContent=ayuda[paso]||"Revisa los permisos de Nuvoor en Android.";
+    toast(estado.textContent);
+    puente.openKitchenBackgroundSettings(paso);
+    return;
+  }
+  const impresoras=IMPRESORAS.filter(p=>p.cocina&&p.conexion==="bluetooth"&&p.impresoraBt);
+  const rutas=Object.fromEntries(impresoras.map(p=>[rutaImpresoraNube(p),p.categorias]));
+  if(!impresoras.length)return;
+  activandoCocinaFondoPOS=true;
+  actualizaPantallaCocinaPOS();
+  estado.textContent="Activando la tablet de cocina…";
+  try{
+    const {data,error}=await RESTAURANT_SB.rpc("rest_bt_activa",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_aparato:REST_NUBE.deviceId,p_evento:nubeEventoId(),p_rutas:rutas});
+    if(error||typeof data!=="string"){
+      estado.textContent=error?.code==="PGRST202"?"Falta habilitar la impresión con pantalla apagada en la nube de Nuvoor.":"No se pudo autorizar la estación. Revisa la conexión y el acceso de administrador.";
+      return;
+    }
+    if(!impresoras.every(p=>IMPRESORAS.includes(p)))return;
+    const printers=impresoras.map(p=>({ruta:rutaImpresoraNube(p),mac:p.impresoraBt,papel:num(p.anchoPapelBt,80),corte:!!p.corteAutomatico}));
+    puente.startKitchenBackground(JSON.stringify({url:CONFIG.SUPABASE_URL,key:CONFIG.SUPABASE_ANON_KEY,token:data,printers}));
+    for(let i=0;i<12&&!puente.kitchenBackgroundActive();i++)await new Promise(r=>setTimeout(r,250));
+    estado.textContent=puente.kitchenBackgroundActive()?"Activa hasta por 18 horas. Mira el aviso de Cocina en Android.":"Android no inició la estación. Vuelve a intentar con Nuvoor abierto.";
+  }catch(_){estado.textContent="No se pudo iniciar la estación de cocina.";}
+  finally{activandoCocinaFondoPOS=false;actualizaPantallaCocinaPOS();}
+});
 $("#impresorasCard").addEventListener("input",e=>{
   const campo=e.target.closest("[data-imp-campo]"); if(campo) actualizaBorradorPorCampoPOS(campo);
 });
@@ -8622,8 +8686,9 @@ function arrancaEquipo(){
 function start(){
   const nombreCuenta=RESTAURANT_ACCOUNT.accountName||"Mi negocio";
   ["restaurantAccountName","restaurantAccountNameSettings"].forEach(id=>{const n=document.getElementById(id);if(n)n.textContent=nombreCuenta;});
-  function cambiarDePOS(){const query=new URLSearchParams({producto:"restaurant"});if(new URLSearchParams(location.search).get("app")==="android")query.set("app","android");location.replace("../acceso.html?"+query.toString());}
+  async function cambiarDePOS(){await detieneCocinaFondoPOS();const query=new URLSearchParams({producto:"restaurant"});if(new URLSearchParams(location.search).get("app")==="android")query.set("app","android");location.replace("../acceso.html?"+query.toString());}
   async function cerrarSesionRestaurant(){
+    await detieneCocinaFondoPOS();
     try{guardaYa();}catch(_){}
     try{if(RESTAURANT_SB)await RESTAURANT_SB.auth.signOut();}catch(_){}
     restaurantClearCachedSession();
@@ -8634,6 +8699,8 @@ function start(){
   $("#barra").hidden = false;
   aplicaMarca();
   arrancaEquipo();
+  actualizaPantallaCocinaPOS();
+  window.addEventListener("nuvoor:restaurant-resume",actualizaPantallaCocinaPOS);
   contextoPOSUI();
   pintaTabs();
   vaA(puedeVer("inicio") ? "inicio" : "mesas");

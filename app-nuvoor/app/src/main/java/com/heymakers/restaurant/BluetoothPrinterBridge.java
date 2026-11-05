@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -12,6 +14,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.print.PrintAttributes;
 import android.print.PrintManager;
 import android.util.Base64;
@@ -56,8 +60,63 @@ public final class BluetoothPrinterBridge {
     public void setKitchenScreenOn(boolean active) {
         activity.runOnUiThread(() -> {
             String url = appWebView.getUrl();
-            appWebView.setKeepScreenOn(active && url != null && url.startsWith(MainActivity.APP_URL));
+            appWebView.setKeepScreenOn(active && !KitchenPrintService.isRunning()
+                    && url != null && url.startsWith(MainActivity.APP_URL));
         });
+    }
+
+    @JavascriptInterface
+    public boolean kitchenBackgroundActive() {
+        return KitchenPrintService.isRunning();
+    }
+
+    @JavascriptInterface
+    public String kitchenBackgroundPrerequisite() {
+        if (Build.VERSION.SDK_INT >= 31 && activity.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)
+                != PackageManager.PERMISSION_GRANTED) return "bluetooth";
+        if (Build.VERSION.SDK_INT >= 33 && activity.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) return "notificaciones";
+        PowerManager power = activity.getSystemService(PowerManager.class);
+        return power != null && power.isIgnoringBatteryOptimizations(activity.getPackageName()) ? "ok" : "bateria";
+    }
+
+    @JavascriptInterface
+    public void openKitchenBackgroundSettings(String step) {
+        activity.runOnUiThread(() -> {
+            if ("bateria".equals(step)) {
+                try {
+                    activity.startActivity(new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS));
+                } catch (ActivityNotFoundException unavailable) {
+                    activity.startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.parse("package:" + activity.getPackageName())));
+                }
+            } else if ("notificaciones".equals(step) && Build.VERSION.SDK_INT >= 33) {
+                activity.requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 4204);
+            } else if ("bluetooth".equals(step) && Build.VERSION.SDK_INT >= 31) {
+                activity.requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 4204);
+            }
+        });
+    }
+
+    @JavascriptInterface
+    public void startKitchenBackground(String config) {
+        activity.runOnUiThread(() -> {
+            String url = appWebView.getUrl();
+            if (url == null || !url.startsWith(MainActivity.APP_URL) || !"ok".equals(kitchenBackgroundPrerequisite())
+                    || config == null || config.length() > 20000) return;
+            Intent intent = new Intent(activity, KitchenPrintService.class).putExtra("config", config);
+            try {
+                if (Build.VERSION.SDK_INT >= 26) activity.startForegroundService(intent);
+                else activity.startService(intent);
+            } catch (IllegalStateException ignored) {
+                // Android requiere iniciar desde Ajustes de Nuvoor con la aplicación al frente.
+            }
+        });
+    }
+
+    @JavascriptInterface
+    public void stopKitchenBackground() {
+        activity.stopService(new Intent(activity, KitchenPrintService.class));
     }
 
     @JavascriptInterface
@@ -168,9 +227,7 @@ public final class BluetoothPrinterBridge {
                 int advance = Math.max(0, Math.min(30, options.optInt("avance", cut ? 3 : 8)));
                 byte[] ticket = EscPosKitchenTicket.encode(lines, paperWidthMm, advance);
                 if (ticket.length > 32_000) throw new IllegalArgumentException("La comanda es demasiado larga para imprimir.");
-                try (BluetoothSocket socket = connectBluetoothPrinter(address)) {
-                    EscPosKitchenTicket.send(socket.getOutputStream(), ticket, cut);
-                }
+                printKitchenBluetooth(activity, address, ticket, cut);
                 report(jobId, true, "sent");
             } catch (Exception e) {
                 report(jobId, false, friendlyError(e));
@@ -355,8 +412,19 @@ public final class BluetoothPrinterBridge {
     }
 
     private BluetoothSocket connectBluetoothPrinter(String address) throws IOException {
+        return connectBluetoothPrinter(activity,address);
+    }
+
+    static synchronized void printKitchenBluetooth(Context context, String address, byte[] ticket, boolean cut)
+            throws IOException, InterruptedException {
+        try (BluetoothSocket socket = connectBluetoothPrinter(context,address)) {
+            EscPosKitchenTicket.send(socket.getOutputStream(), ticket, cut);
+        }
+    }
+
+    private static BluetoothSocket connectBluetoothPrinter(Context context, String address) throws IOException {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-                && activity.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)
+                && context.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)
                 != PackageManager.PERMISSION_GRANTED) {
             throw new IOException("Falta permiso Bluetooth. Abre Ajustes de impresión y vuelve a buscar.");
         }
