@@ -3,6 +3,7 @@ package com.heymakers.restaurant;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -128,6 +129,11 @@ public final class MainActivity extends Activity {
             }
         });
         webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                view.setKeepScreenOn(false);
+            }
+
             @Override
             public void onPageFinished(WebView view, String url) {
                 if (isNuvoorPage(Uri.parse(url))) view.evaluateJavascript(APP_PAGE_SETUP, null);
@@ -362,7 +368,10 @@ public final class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (webView != null) webView.onResume();
+        if (webView != null) {
+            webView.onResume();
+            webView.evaluateJavascript("window.dispatchEvent(new Event('nuvoor:restaurant-resume'));", null);
+        }
     }
 
     @Override

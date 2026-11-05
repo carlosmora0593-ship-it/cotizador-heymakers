@@ -53,6 +53,14 @@ public final class BluetoothPrinterBridge {
     }
 
     @JavascriptInterface
+    public void setKitchenScreenOn(boolean active) {
+        activity.runOnUiThread(() -> {
+            String url = appWebView.getUrl();
+            appWebView.setKeepScreenOn(active && url != null && url.startsWith(MainActivity.APP_URL));
+        });
+    }
+
+    @JavascriptInterface
     public String listPairedDevices() {
         JSONObject result = new JSONObject();
         try {

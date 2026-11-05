@@ -1452,7 +1452,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261105-1618">
+<meta name="nuvoor-build" content="20261105-1632">
 <link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
 </head>
 <body>
@@ -2094,6 +2094,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <span class="plaque" style="width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:'Fredoka';font-weight:700;font-size:19px" id="accesoIni">M</span>
       <h1 id="accesoTitulo">¿Quién va a trabajar?</h1>
       <p class="sub" id="accesoSub">Elige tu perfil. Cada quien ve solo lo de su área.</p>
+      <p class="note" id="accesoCocinaActiva" hidden>Tablet de cocina activa. Puedes dejar puesto el candado de Nuvoor.</p>
       <div class="perfiles" id="accesoPerfiles"></div>
       <div class="claveCaja" id="accesoClave" hidden>
         <label class="f">Clave de <b id="accesoQuien"></b></label>
@@ -2738,8 +2739,9 @@ function guardaEstadoLocal(){
 function guardaYa(){clearTimeout(guardaT);if(restaurando)return;guardaEstadoLocal();if(REST_NUBE.enabled)sincronizaNubeEnSerie(true);}
 function persist(){clearTimeout(guardaT);if(restaurando)return;REST_NUBE.localDirty=true;guardaT=setTimeout(()=>{guardaEstadoLocal();REST_NUBE.localDirty=false;if(REST_NUBE.enabled)sincronizaNubeEnSerie(false);},500);}
 window.addEventListener("pagehide",guardaYa);
-document.addEventListener("visibilitychange",()=>{if(document.hidden)guardaYa();});
-window.addEventListener("online",async()=>{actualizaEstadoNube();if(REST_NUBE.enabled){const pendientes=COMANDAS.filter(c=>c.folioPendiente||c.appFolioPendiente);await Promise.all(pendientes.map(c=>reservaFolioNube(c,!!c.appId)));await sincronizaNubeEnSerie(true);}else if(!RESTAURANT_ACCOUNT.localOnly)iniciaNubeRestaurant();});
+document.addEventListener("visibilitychange",()=>{if(document.hidden)guardaYa();else recargaCambiosNube();});
+window.addEventListener("nuvoor:restaurant-resume",recargaCambiosNube);
+window.addEventListener("online",async()=>{actualizaEstadoNube();if(REST_NUBE.enabled){const pendientes=COMANDAS.filter(c=>c.folioPendiente||c.appFolioPendiente);await Promise.all(pendientes.map(c=>reservaFolioNube(c,!!c.appId)));await sincronizaNubeEnSerie(true);await recargaCambiosNube();}else if(!RESTAURANT_ACCOUNT.localOnly)iniciaNubeRestaurant();});
 window.addEventListener("offline",actualizaEstadoNube);
 function nubeClave(col,doc){return col+"|"+doc;}
 function nubePut(out,col,id,body){const docId=String(id);out[nubeClave(col,docId)]={cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:col,doc_id:docId,cuerpo:body};}
@@ -2808,7 +2810,7 @@ function vaciaColaNube(){
         else{result=await RESTAURANT_SB.from("documentos").upsert([payload],{onConflict:"cuenta_id,coleccion,doc_id"});if(result.error)throw result.error;}
         const actualizado=new Date().toISOString();
         const body=q.impresionOffline?Object.assign({},q.cuerpo,{impreso:Object.assign({},q.cuerpo.impreso,{[q.impresionOffline.ruta]:{por:q.impresionOffline.aparato,en:actualizado,ok:true,confirmado:actualizado,sinRed:true}})}):q.cuerpo;
-        REST_NUBE.serverDocs[q.key]={cuenta_id:q.cuenta_id,coleccion:q.coleccion,doc_id:q.doc_id,cuerpo:body,actualizado};if(q.coleccion==="rest_tickets")REST_NUBE.ticketIds.add(q.doc_id);if(!q.impresionOffline&&!q.confirmarImpresion&&q.coleccion==="rest_lineas"&&q.cuerpo&&q.cuerpo.enviada)REST_NUBE.incomingLines.add(q.cuerpo.id||q.doc_id.replace(/^linea_/,""));
+        REST_NUBE.serverDocs[q.key]={cuenta_id:q.cuenta_id,coleccion:q.coleccion,doc_id:q.doc_id,cuerpo:body};if(q.coleccion==="rest_tickets")REST_NUBE.ticketIds.add(q.doc_id);if(!q.impresionOffline&&!q.confirmarImpresion&&q.coleccion==="rest_lineas"&&q.cuerpo&&q.cuerpo.enviada)REST_NUBE.incomingLines.add(q.cuerpo.id||q.doc_id.replace(/^linea_/,""));
         REST_NUBE.queue.splice(idx,1);nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);REST_NUBE.subscriptionBlocked=false;clearTimeout(REST_NUBE.retryTimer);REST_NUBE.retryTimer=null;REST_NUBE.error="";actualizaEstadoNube();
       }catch(e){
         const current=REST_NUBE.queue.find(x=>x.key===q.key);
@@ -2915,6 +2917,16 @@ async function iniciaNubeRestaurant(){
   const local=await proyectaRestaurant(),esDemo=restauranteEsEjemploSinCambios(),hasMigration=REST_NUBE.queue.some(q=>q&&q.migracion===true&&String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)),migrationElegida=localStorage.getItem(REST_NUBE_MIGRATION_FLAG)==="si",hasLocal=REST_LOCAL_START_KEYS.size>0||Object.keys(REST_NUBE.projection).length>0||REST_NUBE.queue.length>0||esDemo;
   REST_NUBE.enabled=true;REST_NUBE.ready=true;
   const hayNube=Object.keys(cloud).length>0;
+  const teniaContexto=Object.values(REST_NUBE.projection).some(d=>d.coleccion==="rest_config"&&String(d.cuerpo?.eventoId||"")===nubeEventoId());
+  if(hayNube&&!hasMigration&&teniaContexto&&nubeTieneBaseSincronizada()&&tieneCocinaBluetoothPOS()){
+    for(const [key,doc] of Object.entries(cloud)){
+      const linea=doc.cuerpo, anterior=REST_NUBE.projection[key]?.cuerpo;
+      if(doc.coleccion==="rest_lineas"&&linea?.id&&linea.enviada&&!linea.cancelada&&
+        (!anterior?.enviada||anterior.envioId!==linea.envioId)&&!REST_NUBE.queue.some(q=>q.key===key)){
+        REST_NUBE.incomingLines.add(String(linea.id));
+      }
+    }
+  }
   if(hayNube&&esDemo){nubeQuitaMigracionActual();aplicaDocumentosRestaurant(nubeRebaseMap());}
    else if(!hayNube&&hasLocal){
      if(migrationElegida){REST_NUBE.migrandoInicial=true;if(!hasMigration){REST_NUBE.projection={};nubeGuarda(REST_NUBE_PROJECTION_KEY,{});}await sincronizaNubeEnSerie(true);}
@@ -2932,7 +2944,40 @@ async function iniciaNubeRestaurant(){
   else{REST_NUBE.projection={};nubeGuarda(REST_NUBE_PROJECTION_KEY,{});await sincronizaNubeEnSerie(true);}
   escuchaNubeRestaurant();if(REST_NUBE.queue.length)await vaciaColaNube();actualizaAvisosReclamosNube();actualizaEstadoNube();
 }
-async function recargaCambiosNube(){if(!REST_NUBE.enabled||!navigator.onLine)return;try{const since=new Date(Math.max(0,new Date(REST_NUBE.cursor).getTime()-1000)).toISOString(),r=await RESTAURANT_SB.from("documentos").select("cuenta_id,coleccion,doc_id,cuerpo,actualizado").eq("cuenta_id",RESTAURANT_ACCOUNT.accountId).like("coleccion","rest_%").gt("actualizado",since).order("actualizado",{ascending:true}).limit(2000);if(r.error)throw r.error;let changed=false;(r.data||[]).forEach(row=>{const key=nubeClave(row.coleccion,row.doc_id),old=REST_NUBE.serverDocs[key];if(!old||nubeCanon(old.cuerpo)!==nubeCanon(row.cuerpo)){REST_NUBE.serverDocs[key]=row;changed=true;if(row.coleccion==="rest_lineas"&&row.cuerpo&&row.cuerpo.enviada&&!REST_NUBE.queue.some(q=>q.key===key))REST_NUBE.incomingLines.add(row.cuerpo.id||row.doc_id.replace(/^linea_/,""));}if(row.actualizado&&row.actualizado>REST_NUBE.cursor)REST_NUBE.cursor=row.actualizado;});if(changed){if(REST_NUBE.localDirty){REST_NUBE.applyPending=true;}else if(nubeHayMigracionPendienteActual()){await nubeVigilaCambioDuranteMigracion();}else aplicaDocumentosRestaurant(nubeRebaseMap());}if(REST_NUBE.queue.length)await vaciaColaNube();REST_NUBE.error="";actualizaAvisosReclamosNube();actualizaEstadoNube();}catch(e){REST_NUBE.error=String(e&&e.message||e||"Error de sondeo").slice(0,80);actualizaEstadoNube();}}
+let consultaNubeEnCurso=null;
+function recargaCambiosNube(){
+  if(!REST_NUBE.enabled||!navigator.onLine)return;
+  if(!consultaNubeEnCurso)consultaNubeEnCurso=consultaCambiosNube().finally(()=>{consultaNubeEnCurso=null;});
+  return consultaNubeEnCurso;
+}
+async function consultaCambiosNube(){
+  try{
+    const since=new Date(Math.max(0,new Date(REST_NUBE.cursor).getTime()-1000)).toISOString();
+    const r=await RESTAURANT_SB.from("documentos").select("cuenta_id,coleccion,doc_id,cuerpo,actualizado")
+      .eq("cuenta_id",RESTAURANT_ACCOUNT.accountId).like("coleccion","rest_%").gt("actualizado",since)
+      .order("actualizado",{ascending:true}).limit(2000);
+    if(r.error)throw r.error;
+    let changed=false;
+    for(const row of r.data||[]){
+      if(row.actualizado&&row.actualizado>REST_NUBE.cursor)REST_NUBE.cursor=row.actualizado;
+      const key=nubeClave(row.coleccion,row.doc_id),old=REST_NUBE.serverDocs[key];
+      if(Date.parse(old?.actualizado)>Date.parse(row.actualizado))continue;
+      REST_NUBE.serverDocs[key]=row;
+      if(old&&nubeCanon(old.cuerpo)===nubeCanon(row.cuerpo))continue;
+      changed=true;
+      if(row.coleccion==="rest_lineas"&&row.cuerpo?.enviada&&!REST_NUBE.queue.some(q=>q.key===key)){
+        REST_NUBE.incomingLines.add(row.cuerpo.id||row.doc_id.replace(/^linea_/,""));
+      }
+    }
+    if(changed){
+      if(REST_NUBE.localDirty)REST_NUBE.applyPending=true;
+      else if(nubeHayMigracionPendienteActual())await nubeVigilaCambioDuranteMigracion();
+      else aplicaDocumentosRestaurant(nubeRebaseMap());
+    }
+    if(REST_NUBE.queue.length)await vaciaColaNube();
+    REST_NUBE.error="";actualizaAvisosReclamosNube();actualizaEstadoNube();
+  }catch(e){REST_NUBE.error=String(e&&e.message||e||"Error de sondeo").slice(0,80);actualizaEstadoNube();}
+}
 function escuchaNubeRestaurant(){
   if(!RESTAURANT_SB||!RESTAURANT_SB.channel)return;
   try{
@@ -2940,7 +2985,7 @@ function escuchaNubeRestaurant(){
       .on("postgres_changes",{event:"*",schema:"public",table:"documentos",filter:"cuenta_id=eq."+RESTAURANT_ACCOUNT.accountId},payload=>{
         const row=payload.new;if(!row||!String(row.coleccion||"").startsWith("rest_"))return;
         const key=nubeClave(row.coleccion,row.doc_id);REST_NUBE.serverDocs[key]=row;
-        if(row.actualizado&&row.actualizado>REST_NUBE.cursor)REST_NUBE.cursor=row.actualizado;
+        // El sondeo conserva su propio cursor para recuperar mensajes perdidos en segundo plano.
         if(row.coleccion==="rest_lineas"&&row.cuerpo&&row.cuerpo.enviada&&!REST_NUBE.queue.some(q=>q.key===key))REST_NUBE.incomingLines.add(row.cuerpo.id||row.doc_id.replace(/^linea_/,""));
         if(REST_NUBE.localDirty){REST_NUBE.applyPending=true;return;}
         if(nubeHayMigracionPendienteActual()){nubeVigilaCambioDuranteMigracion().catch(nubeRegistraError);return;}
@@ -3145,7 +3190,17 @@ if(!window.MakersPrinter && IMPRESORAS.some(p=>p.conexion==="bluetooth")){
   IMPRESORAS = IMPRESORAS.map(p=>Object.assign({},p,{conexion:"sistema"}));
   lsSet("impresoras", IMPRESORAS);
 }
-function guardaImpresorasPOS(){ lsSet("impresoras", IMPRESORAS); }
+function tieneCocinaBluetoothPOS(){
+  return !!window.MakersPrinter&&IMPRESORAS.some(p=>p.cocina&&p.conexion==="bluetooth"&&p.impresoraBt);
+}
+function actualizaPantallaCocinaPOS(){
+  const puente=window.MakersPrinter;
+  if(typeof puente?.setKitchenScreenOn!=="function")return;
+  const activa=tieneCocinaBluetoothPOS();
+  puente.setKitchenScreenOn(activa);
+  $("#accesoCocinaActiva").hidden=!activa;
+}
+function guardaImpresorasPOS(){ lsSet("impresoras", IMPRESORAS); actualizaPantallaCocinaPOS(); }
 let impresorasEmparejadasPOS = [];
 let impresoraEnEdicionPOS = "";
 let borradorImpresoraPOS = null;
@@ -4076,7 +4131,6 @@ async function comandaReservadaDesdeNube(docId,draft){
   if(linesResult.error)throw linesResult.error;
   const related=(linesResult.data||[]).filter(row=>row.cuerpo&&row.cuerpo.comandaId===id);
   [header,...related].forEach(row=>{REST_NUBE.serverDocs[nubeClave(row.coleccion,row.doc_id)]=row;});
-  if(header.actualizado&&header.actualizado>REST_NUBE.cursor)REST_NUBE.cursor=header.actualizado;
   aplicaDocumentosRestaurant(nubeRebaseMap());
   return COMANDAS.find(c=>c.id===id)||null;
 }
@@ -6646,7 +6700,7 @@ async function imprimeComandaCocina(c,lineas,yaEnNube){
 function procesaLineasEntrantes(){
   if(!REST_NUBE.incomingLines.size)return;
   const ids=new Set(REST_NUBE.incomingLines);REST_NUBE.incomingLines.clear();
-  const envios={};(COMANDAS||[]).forEach(c=>(c.lineas||[]).forEach(l=>{if(ids.has(String(l.id))&&l.enviada&&!l.cancelada){const id=l.envioId||"linea:"+l.id,key=c.id+"|"+id;(envios[key]||(envios[key]={c,id,total:l.envioId?Math.max(1,num(l.envioTotal,1)):1,legado:!l.envioId,lineas:[]})).lineas.push(l);}}));
+  const envios={};abiertas().forEach(c=>(c.lineas||[]).forEach(l=>{if(ids.has(String(l.id))&&l.enviada&&!l.cancelada){const id=l.envioId||"linea:"+l.id,key=c.id+"|"+id;(envios[key]||(envios[key]={c,id,total:l.envioId?Math.max(1,num(l.envioTotal,1)):1,legado:!l.envioId,lineas:[]})).lineas.push(l);}}));
   Object.values(envios).forEach(x=>{const batch=x.legado?x.lineas:(x.c.lineas||[]).filter(l=>l.envioId===x.id&&l.enviada),pendientes=batch.filter(l=>!l.cancelada);if(batch.length<x.total){pendientes.forEach(l=>REST_NUBE.incomingLines.add(String(l.id)));return;}if(pendientes.length)imprimeComandaCocina(x.c,pendientes,true);});
 }
 
@@ -8608,6 +8662,7 @@ function start(){
   });
 }
 async function iniciaRestaurant(){
+  actualizaPantallaCocinaPOS();
   try{await iniciaNubeRestaurant();}catch(e){REST_NUBE.localOnly=true;REST_NUBE.error="No se pudo revisar SQL 20";actualizaEstadoNube();}
   start();cargaAnuncios();
 }
