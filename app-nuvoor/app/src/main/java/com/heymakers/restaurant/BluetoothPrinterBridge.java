@@ -30,7 +30,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -138,6 +137,36 @@ public final class BluetoothPrinterBridge {
                 error = friendlyError(e);
             }
             report(jobId, error == null, error == null ? "sent" : error);
+        });
+    }
+
+    @JavascriptInterface
+    public void printKitchenTicket(String jobId, String address, int paperWidthMm,
+                                   String linesJson, String optionsJson) {
+        printQueue.execute(() -> {
+            try {
+                if (linesJson == null || linesJson.length() > 128_000)
+                    throw new IllegalArgumentException("La comanda es demasiado larga para imprimir.");
+                JSONArray rows = new JSONArray(linesJson);
+                if (rows.length() == 0) throw new IllegalArgumentException("La comanda está vacía.");
+                ArrayList<EscPosKitchenTicket.Line> lines = new ArrayList<>();
+                for (int i = 0; i < rows.length(); i++) {
+                    JSONObject row = rows.getJSONObject(i);
+                    EscPosKitchenTicket.Style style = EscPosKitchenTicket.Style.valueOf(row.getString("style"));
+                    lines.add(new EscPosKitchenTicket.Line(style, row.optString("text")));
+                }
+                JSONObject options = new JSONObject(optionsJson == null ? "{}" : optionsJson);
+                boolean cut = options.optBoolean("corte", false);
+                int advance = Math.max(0, Math.min(30, options.optInt("avance", cut ? 3 : 8)));
+                byte[] ticket = EscPosKitchenTicket.encode(lines, paperWidthMm, advance);
+                if (ticket.length > 32_000) throw new IllegalArgumentException("La comanda es demasiado larga para imprimir.");
+                try (BluetoothSocket socket = connectBluetoothPrinter(address)) {
+                    EscPosKitchenTicket.send(socket.getOutputStream(), ticket, cut);
+                }
+                report(jobId, true, "sent");
+            } catch (Exception e) {
+                report(jobId, false, friendlyError(e));
+            }
         });
     }
 
@@ -317,8 +346,7 @@ public final class BluetoothPrinterBridge {
         sendBluetooth(address, paperWidthMm, text, false, 3);
     }
 
-    private void sendBluetooth(String address, int paperWidthMm, String text,
-                               boolean cut, int advanceLines) throws Exception {
+    private BluetoothSocket connectBluetoothPrinter(String address) throws IOException {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
                 && activity.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -337,16 +365,28 @@ public final class BluetoothPrinterBridge {
         try {
             socket = device.createRfcommSocketToServiceRecord(SPP_UUID);
             socket.connect();
+            return socket;
         } catch (IOException secureFailure) {
             if (socket != null) try { socket.close(); } catch (IOException ignored) { }
             socket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
-            socket.connect();
+            try {
+                socket.connect();
+                return socket;
+            } catch (IOException insecureFailure) {
+                try { socket.close(); } catch (IOException ignored) { }
+                throw insecureFailure;
+            }
         }
-        try (BluetoothSocket connected = socket; ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+    }
+
+    private void sendBluetooth(String address, int paperWidthMm, String text,
+                               boolean cut, int advanceLines) throws Exception {
+        try (BluetoothSocket connected = connectBluetoothPrinter(address);
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             output.write(new byte[]{0x1B, 0x40});       // ESC @: iniciar impresora
             output.write(new byte[]{0x1B, 0x61, 0x00}); // alineación izquierda
             output.write(new byte[]{0x1B, 0x45, 0x01}); // primera línea en negritas
-            String[] lines = normalizeAndWrap(text, paperWidthMm <= 58 ? 32 : 48);
+            String[] lines = EscPosKitchenTicket.normalizeAndWrap(text, paperWidthMm <= 58 ? 32 : 48);
             for (int i = 0; i < lines.length; i++) {
                 if (i == 1) output.write(new byte[]{0x1B, 0x45, 0x00});
                 output.write(lines[i].getBytes(StandardCharsets.US_ASCII));
@@ -361,34 +401,12 @@ public final class BluetoothPrinterBridge {
 
     private void sendBluetoothImage(String address, Bitmap bitmap, int threshold,
                                     boolean cut, int advanceLines) throws Exception {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-                && activity.checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT)
-                != PackageManager.PERMISSION_GRANTED) {
-            throw new IOException("Falta permiso Bluetooth. Abre Ajustes de impresión y vuelve a buscar.");
-        }
-        BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if (adapter == null || !adapter.isEnabled()) throw new IOException("Activa Bluetooth en Android.");
-        BluetoothDevice device = adapter.getRemoteDevice(address);
-        boolean paired = false;
-        for (BluetoothDevice item : adapter.getBondedDevices()) {
-            if (address.equalsIgnoreCase(item.getAddress())) { paired = true; break; }
-        }
-        if (!paired) throw new IOException("La impresora ya no aparece emparejada. Vuelve a vincularla en Android.");
-
-        BluetoothSocket socket = null;
-        try {
-            socket = device.createRfcommSocketToServiceRecord(SPP_UUID);
-            socket.connect();
-        } catch (IOException secureFailure) {
-            if (socket != null) try { socket.close(); } catch (IOException ignored) { }
-            socket = device.createInsecureRfcommSocketToServiceRecord(SPP_UUID);
-            socket.connect();
-        }
         final int width = bitmap.getWidth();
         final int bytesPerRow = (width + 7) / 8;
         final int blockHeight = 128;
         final int[] pixels = new int[width];
-        try (BluetoothSocket connected = socket; OutputStream output = connected.getOutputStream()) {
+        try (BluetoothSocket connected = connectBluetoothPrinter(address)) {
+            OutputStream output = connected.getOutputStream();
             output.write(new byte[]{0x1B, 0x40});       // ESC @: iniciar impresora
             output.write(new byte[]{0x1B, 0x61, 0x00}); // alineación izquierda
             for (int top = 0; top < bitmap.getHeight(); top += blockHeight) {
@@ -418,33 +436,6 @@ public final class BluetoothPrinterBridge {
             if (cut) output.write(new byte[]{0x1D, 0x56, 0x01}); // GS V 1: corte parcial ESC/POS
             output.flush();
         }
-    }
-
-    private String[] normalizeAndWrap(String input, int columns) {
-        String normalized = Normalizer.normalize(input == null ? "" : input, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}+", "")
-                .replace("×", "x").replace("·", "-").replace("—", "-")
-                .replace("–", "-").replace("“", "\"").replace("”", "\"")
-                .replace("’", "'").replace("‘", "'").replace("\u00A0", " ")
-                .replaceAll("[^\\x20-\\x7E\\n\\r\\t]", "?");
-        ArrayList<String> lines = new ArrayList<>();
-        for (String raw : normalized.split("\\r?\\n", -1)) {
-            String line = raw.replaceAll("[\\t ]+", " ").trim();
-            if (line.isEmpty()) { lines.add(""); continue; }
-            StringBuilder current = new StringBuilder();
-            for (String word : line.split(" ")) {
-                while (word.length() > columns) {
-                    if (current.length() > 0) { lines.add(current.toString()); current.setLength(0); }
-                    lines.add(word.substring(0, columns));
-                    word = word.substring(columns);
-                }
-                if (current.length() == 0) current.append(word);
-                else if (current.length() + 1 + word.length() <= columns) current.append(' ').append(word);
-                else { lines.add(current.toString()); current.setLength(0); current.append(word); }
-            }
-            if (current.length() > 0) lines.add(current.toString());
-        }
-        return lines.toArray(new String[0]);
     }
 
     private String safeDeviceName(BluetoothDevice device) {

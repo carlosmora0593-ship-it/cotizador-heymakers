@@ -1440,7 +1440,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261105-1444">
+<meta name="nuvoor-build" content="20261105-1459">
 <link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
 </head>
 <body>
@@ -6280,13 +6280,19 @@ async function ejecutaTrabajoImpresoraPOS(trabajo){
   const p=trabajo.impresora, puente=window.MakersPrinter;
   if(p.conexion==="bluetooth"){
     if(!puente || !p.impresoraBt) return {ok:false,mensaje:"No está disponible la impresora Bluetooth guardada."};
-    if(typeof puente.printImage!=="function"&&typeof puente.printTicket!=="function"&&typeof puente.printText!=="function")
+    const cocina=trabajo.rasterModel?.tipo==="cocina";
+    const textoGrande=cocina&&typeof puente.printKitchenTicket==="function";
+    const imagen=!cocina&&trabajo.rasterModel&&typeof puente.printImage==="function";
+    if(!textoGrande&&!imagen&&typeof puente.printTicket!=="function"&&typeof puente.printText!=="function")
       return {ok:false,mensaje:"La app necesita actualizarse para imprimir por Bluetooth."};
-    if(p.corteAutomatico&&typeof puente.printTicket!=="function"&&typeof puente.printImage!=="function")
+    if(p.corteAutomatico&&!textoGrande&&!imagen&&typeof puente.printTicket!=="function")
       return {ok:false,mensaje:"Actualiza la app para usar el cortador automático."};
     const id="imp-bt-"+uid(), esperando=esperaResultadoImpresoraPOS(id,35000), mm=num(p.anchoPapelBt,80)===58?58:80;
     try{
-      if(trabajo.rasterModel&&typeof puente.printImage==="function"){
+      if(textoGrande){
+        const opciones={corte:!!p.corteAutomatico,avance:p.corteAutomatico?3:8};
+        puente.printKitchenTicket(id,p.impresoraBt,mm,JSON.stringify(renglonesComandaPOS(trabajo.rasterModel)),JSON.stringify(opciones));
+      }else if(imagen){
         const png=await rasterImagenTicketPOS(trabajo.rasterModel,mm),opciones={corte:!!p.corteAutomatico,avance:p.corteAutomatico?3:8,umbral:190};
         puente.printImage(id,p.impresoraBt,mm,png,JSON.stringify(opciones));
       }else if(typeof puente.printTicket==="function"){
@@ -6376,6 +6382,29 @@ function datosComandaRasterPOS(c,lineas,tipo="comanda",cancelacion=null){
   return {tipo:"cocina",folio:folioVisualPOS(c.folio),heading:heading.toUpperCase(),fecha:c.fecha||hoyISO(),hora:horaAhora(),mesero:c.mesero||"",personas:!esLlevar&&!c.appId&&n>1?n:null,pedido:c.appId?"Pedido por app · "+(c.appNombre||"Plataforma"):esLlevar?"Para llevar":"Comer dentro",grupos};
 }
 function datosCancelacionRasterPOS(c,x){return datosComandaRasterPOS(c,[x],"cancelacion",x);}
+function renglonesComandaPOS(modelo){
+  const filas=[];
+  const agrega=(style,text)=>{if(text||style==="RULE")filas.push({style,text:text||""});};
+  agrega("SUBTITLE","COCINA");
+  agrega("TITLE",modelo.cancelacion?"CANCELAR":modelo.heading);
+  if(modelo.cancelacion)agrega("SUBTITLE",modelo.heading);
+  agrega("SUBTITLE",modelo.folio);
+  agrega("DETAIL",modelo.fecha+" "+modelo.hora);
+  if(modelo.mesero)agrega("DETAIL",(modelo.cancelacion?"Solicitó: ":"Atiende: ")+modelo.mesero);
+  if(modelo.personas)agrega("DETAIL",modelo.personas+" comensales");
+  agrega("SUBTITLE",modelo.pedido);
+  const grupos=modelo.cancelacion?[{items:modelo.items}]:modelo.grupos;
+  for(const grupo of grupos){
+    agrega("RULE");
+    agrega("EMPHASIS",grupo.titulo);
+    for(const item of grupo.items){
+      agrega("ITEM",num(item.cantidad,1)+" x "+String(item.nombre||"Platillo").toUpperCase());
+      for(const mod of item.mods||[])agrega("DETAIL","> "+mod);
+      if(item.nota)agrega("EMPHASIS",(modelo.cancelacion?"Motivo: ":"Nota: ")+item.nota);
+    }
+  }
+  return filas;
+}
 function datosCuentaRasterPOS(c,pagos,propina){
   const s=sumaComanda(c),prop=num(propina),n=Math.max(1,num(c.personas,1)),grupos=[];
   if(c.mesaId==="llevar"){
@@ -7768,8 +7797,9 @@ function renderEditorImpresoraPOS(){
   const p=borradorImpresoraPOS;
   if(!p){ editor.innerHTML='<header><h3>Editar impresora</h3></header><div class="impPrinterHint">Selecciona una impresora de la lista o agrega una nueva.</div>'; return; }
   const nativa=!!window.MakersPrinter, conexion=nativa?(p.conexion||"bluetooth"):"sistema";
-  const soportaCorte=nativa&&typeof window.MakersPrinter.printTicket==="function";
-  const textoSimple=conexion==="bluetooth"&&typeof window.MakersPrinter.printImage!=="function";
+  const soportaCorte=nativa&&(typeof window.MakersPrinter.printTicket==="function"||typeof window.MakersPrinter.printKitchenTicket==="function");
+  const usaCocina=p.cocina||p.cancela||!p.cuenta;
+  const textoSimple=conexion==="bluetooth"&&(usaCocina?typeof window.MakersPrinter.printKitchenTicket!=="function":typeof window.MakersPrinter.printImage!=="function");
   const dispositivoGuardado=p.impresoraBt?{address:p.impresoraBt,name:p.impresoraNombre||"Impresora guardada"}:null;
   const dispositivos=impresorasEmparejadasPOS.slice();
   if(dispositivoGuardado&&!dispositivos.some(d=>d.address===dispositivoGuardado.address)) dispositivos.unshift(dispositivoGuardado);
