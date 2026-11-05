@@ -1,4 +1,4 @@
-const CACHE_NAME = "nuvoor-restaurant-v31-comandas-bluetooth";
+const CACHE_NAME = "nuvoor-restaurant-v32-acciones-pedido";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,

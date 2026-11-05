@@ -306,7 +306,6 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
 .lin b{font-size:13px;font-weight:600;display:block;line-height:1.3}
 .lin small{display:block;color:var(--ink-3);font-size:11px;line-height:1.4}
 .lin .imp{font-family:"IBM Plex Mono",monospace;font-size:13px;text-align:right}
-.lin.enviada{opacity:.72}
 .lin .acc{display:flex;gap:4px;margin-top:4px}
 .lin .acc button{cursor:pointer;width:22px;height:22px;border-radius:6px;border:1px solid var(--line);
   background:var(--surface-2);font-size:12px;line-height:1;display:grid;place-items:center}
@@ -1436,11 +1435,15 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 .meseroOculto{display:none!important}
 @media(max-width:900px){.impPrinterLayout{grid-template-columns:1fr}}
 @media(max-width:540px){.impPrinterFields{grid-template-columns:1fr}.impPrinterConnection{grid-template-columns:1fr}.impPrinterActions .impSave{margin-left:0}.impPrinterError{grid-template-columns:1fr auto}}
-#comAcciones .btn,#comCancelar{min-height:44px;touch-action:manipulation}
+#comAcciones .btn,#comCancelar,#corrCuerpo .btn{min-height:44px;touch-action:manipulation}
+.lin .acc .comCorrige{width:auto;height:auto;min-height:44px;padding:0 12px;border-radius:10px;
+  border-color:var(--cyan);background:var(--cyan);color:#fff;font-size:13px;font-weight:700;touch-action:manipulation}
+#comCancelar,#corrCancela{background:var(--mal);border-color:var(--mal);color:#fff}
+@media(hover:hover){.lin .acc .comCorrige:hover,#comCancelar:hover,#corrCancela:hover{filter:brightness(.9)}}
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261105-1459">
+<meta name="nuvoor-build" content="20261105-1508">
 <link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
 </head>
 <body>
@@ -1771,7 +1774,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
         <button class="btn primary" id="comEnviar" style="flex:1">Mandar a cocina</button>
         <button class="btn acento" id="comCobrar" style="flex:1">Cobrar</button>
       </div>
-      <div style="padding:0 15px 15px"><button class="btn ghost sm ancho" id="comCancelar">Cancelar la mesa</button></div>
+      <div style="padding:0 15px 15px"><button type="button" class="btn mal ancho" id="comCancelar">Cancelar pedido</button></div>
     </div>
   </div>
 </section>
@@ -4196,7 +4199,7 @@ function pintaLineas(){
           (l.cancelada ? '<small>cancelado · '+esc(l.motivo||"")+'</small>'
             : l.enviada
               ? '<span class="edo '+edo+'">'+(ET_EDO[edo]||edo)+' '+esc(l.enviada)+'</span>'+lineaImpresionEstado(l)+
-                '<span class="acc"><button data-corrige="'+esc(l.id)+'">Corregir</button></span>'
+                '<span class="acc"><button type="button" class="comCorrige" data-corrige="'+esc(l.id)+'" aria-label="Corregir '+esc(l.nombre)+'">Corregir</button></span>'
               : '<span class="acc"><button data-menos="'+esc(l.id)+'">−</button>'+
                 '<button data-mas="'+esc(l.id)+'">+</button>'+
                 '<button data-quita="'+esc(l.id)+'">✕</button>'+
