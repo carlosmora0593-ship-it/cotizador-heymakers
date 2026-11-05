@@ -190,6 +190,17 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
 .tile .et{display:block;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
 .tile .v{display:block;font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;margin:5px 0 2px}
 .tile .sub{display:block;font-size:11.5px;color:var(--ink-3)}
+.venPeriodoBar{margin-bottom:16px}
+.venPeriodoBar .body{display:flex;align-items:center;flex-wrap:wrap;gap:12px 18px}
+.venPeriodoBar .seg{flex-wrap:wrap}
+.venPeriodoBar .seg button{min-height:36px}
+.venFechas{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.venFechas label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2)}
+.venFechas input{width:auto;min-width:0}
+#venTiles .v{overflow-wrap:anywhere}
+#venTiles .tile:last-child{border-top:2px solid var(--good)}
+#venProductos th:last-child,#venProductos td:last-child{width:1%;white-space:nowrap}
+@media(max-width:620px){#venTiles .tile:last-child{grid-column:1/-1}}
 .salesInsightGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .salesInsightCard{position:relative;isolation:isolate;overflow:hidden;min-height:166px;padding:17px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,var(--surface),var(--surface-2));transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
 .salesInsightCard:before{content:"";position:absolute;z-index:-1;width:150px;height:150px;right:-55px;top:-60px;border-radius:50%;background:radial-gradient(circle,rgba(230,181,71,.22),transparent 68%);pointer-events:none}
@@ -1427,7 +1438,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261105-1033">
+<meta name="nuvoor-build" content="20261105-1430">
 <link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
 </head>
 <body>
@@ -1810,9 +1821,30 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 <!-- ============ VENTAS ============ -->
 <section id="tab-ventas" hidden>
   <div class="pageHeading"><div><span>ANÁLISIS</span><h1 id="ventasTitulo">Ventas del restaurante</h1><p id="ventasDescripcion">Consulta tickets, cancelaciones y cortes para entender el día.</p></div></div>
+  <div class="card venPeriodoBar">
+    <div class="body">
+      <div class="seg" id="venPeriodos" role="group" aria-label="Periodo de ventas">
+        <button type="button" data-ven-periodo="hoy" aria-pressed="true">Hoy</button>
+        <button type="button" data-ven-periodo="semana" aria-pressed="false">Semana</button>
+        <button type="button" data-ven-periodo="mes" aria-pressed="false">Mes</button>
+        <button type="button" data-ven-periodo="todo" aria-pressed="false">Todo</button>
+      </div>
+      <div class="venFechas">
+        <label>Del <input id="venDesde" type="date"></label>
+        <label>Al <input id="venHasta" type="date"></label>
+      </div>
+    </div>
+  </div>
   <div class="tiles" id="venTiles"></div>
+  <div class="card">
+    <header><h2>Artículos vendidos</h2><span class="hint" id="venPeriodoTexto" aria-live="polite"></span></header>
+    <div class="body">
+      <div class="tbl-wrap"><table id="venProductos"></table></div>
+      <p class="salesInsightFootnote" id="venUtilidadNota"></p>
+    </div>
+  </div>
   <div class="card" id="venCanalesCard">
-    <header><h2>Ventas por canal</h2><span class="hint">Hoy</span></header>
+    <header><h2>Ventas por canal</h2><span class="hint" id="venCanalPeriodo"></span></header>
     <div class="body">
       <p class="note" style="margin:0 0 12px">Las ventas de plataformas se separan de las propias. La comisión se descuenta de la utilidad y no entra al efectivo de la caja.</p>
       <div class="appResumen" id="venCanal"></div>
@@ -1834,11 +1866,6 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
         Cada reimpresión queda anotada con quién la hizo: un ticket que se reimprime tres veces es una pregunta.</p>
       <div class="fila" style="margin-bottom:12px">
         <input id="venBusca" placeholder="Buscar folio, mesa o quien atendió" style="max-width:320px">
-        <label class="f" for="venDesde" style="margin:0">Del</label>
-        <input id="venDesde" type="date" style="width:auto;flex:0 0 auto">
-        <label class="f" for="venHasta" style="margin:0">Al</label>
-        <input id="venHasta" type="date" style="width:auto;flex:0 0 auto">
-        <button class="btn sm ghost" id="venTodo">Todo</button>
       </div>
       <div class="tbl-wrap"><table id="t_ventas"></table></div>
     </div>
@@ -2723,7 +2750,7 @@ async function proyectaRestaurant(){
     nubePut(out,"rest_comandas",nubeId("comanda",c.id),head);
   (c.lineas||[]).forEach(l=>{const item=Object.assign({},nubeClona(l),{id:l.id,comandaId:c.id,eventoId:ev,categoria:l.categoria||((MENU.plats||[]).find(p=>p.id===l.platId)||{}).catId||""});delete item.foto;delete item.imagen;delete item.base64;nubePut(out,"rest_lineas",nubeId("linea",l.id),item);});
     (c.cancelaciones||[]).forEach(x=>nubePut(out,"rest_lineas",nubeId("cancelacion",x.id),Object.assign({tipo:"cancelacion",comandaId:c.id,eventoId:ev},nubeClona(x))));
-    if(c.estado==="cerrada"&&!c.cancelada){const ticket={id:c.id,folio:c.folio,fecha:c.fecha||hoyISO(),cierra:c.cierra||"",mesaId:c.mesaId,mesaNombre:c.mesaNombre,cliente:c.cliente||"",personas:c.personas,mesero:c.mesero,meseroId:c.meseroId,subtotal:num(c.subtotal),servicio:num(c.servicio),propina:num(c.propina),total:num(c.total),pagos:nubeClona(c.pagos||[]),cambio:num(c.cambio),cfdi:c.cfdi||null,appId:c.appId||"",appNombre:c.appNombre||"",comisionPct:num(c.comisionPct),comision:num(c.comision),neto:num(c.neto),turnoId:c.turnoId||"",cobro:c.cobro||"",eventoId:ev};nubePut(out,"rest_tickets",nubeId("ticket",c.id),ticket);}
+    if(c.estado==="cerrada"&&!c.cancelada){const ticket={id:c.id,folio:c.folio,fecha:c.fecha||hoyISO(),cierra:c.cierra||"",mesaId:c.mesaId,mesaNombre:c.mesaNombre,cliente:c.cliente||"",personas:c.personas,mesero:c.mesero,meseroId:c.meseroId,subtotal:num(c.subtotal),servicio:num(c.servicio),propina:num(c.propina),total:num(c.total),pagos:nubeClona(c.pagos||[]),cambio:num(c.cambio),cfdi:c.cfdi||null,appId:c.appId||"",appNombre:c.appNombre||"",comisionPct:num(c.comisionPct),comision:num(c.comision),neto:num(c.neto),turnoId:c.turnoId||"",cobro:c.cobro||"",eventoId:ev};if(c.analiticaVenta)ticket.analiticaVenta=nubeClona(c.analiticaVenta);nubePut(out,"rest_tickets",nubeId("ticket",c.id),ticket);}
   });
   for(const u of EQUIPO||[]){const pin=String(u.pin||"").trim(),hash=u.pin_hash||u.pinHash|| (pin?nubeSha256(nubePinSalt()+pin):null);const pin_hash=hash&&typeof hash.then==="function"?await hash:hash;nubePut(out,"rest_equipo",nubeId("persona",u.id),{id:u.id,nombre:u.nombre||"",rol:u.rol||"mesero",pin_hash:pin_hash||null,activo:u.activo!==false,eventoId:ev});}
   (EVENTOS||[]).forEach(x=>nubePut(out,"rest_eventos",String(x.id),Object.assign({},nubeClona(x),{eventoId:""})));
@@ -2929,6 +2956,7 @@ function aplicaDocumentosRestaurant(docs){
   EVENTOS=Object.values(docs).filter(d=>d&&d.coleccion==="rest_eventos"&&d.cuerpo&&!d.cuerpo._eliminado).map(d=>Object.assign({},d.cuerpo));EVENTOS.forEach(x=>delete x.eventoId);try{localStorage.setItem(EVENTOS_KEY,JSON.stringify(EVENTOS));}catch(_){}
   guardaEstadoLocal();REST_NUBE.projection=Object.fromEntries(Object.entries(docs).filter(([,d])=>d&&d.cuerpo).map(([k,d])=>[k,{cuenta_id:d.cuenta_id,coleccion:d.coleccion,doc_id:d.doc_id,cuerpo:d.cuerpo}]));nubeGuarda(REST_NUBE_PROJECTION_KEY,REST_NUBE.projection);
   aplicaMarca();aplicaRol();if(typeof renderMesas==="function")renderMesas();if(typeof renderCocina==="function")renderCocina();if(typeof renderComanda==="function"&&comandaActual())renderComanda();pintaTabs();actualizaAvisosReclamosNube();actualizaEstadoNube();procesaLineasEntrantes();
+  if(!$("#tab-ventas").hidden&&puedeVer("ventas"))renderVentas();
 }
 function descargaEventoRestaurant(ev){if(REST_NUBE.localOnly||!REST_NUBE.enabled)return;const doc={cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:"rest_eventos",doc_id:String(ev.id),cuerpo:Object.assign({},nubeClona(ev),{eventoId:""})};nubeQueueDoc(doc);vaciaColaNube();}
 function guardaEventosNube(){if(!restaurando&&REST_NUBE.enabled)sincronizaNubeEnSerie(true);}
@@ -4602,6 +4630,7 @@ $("#apAppOk").addEventListener("click",async()=>{
   const s=sumaComanda(c);
   c.estado="cerrada"; c.cierra=horaAhora(); c.subtotal=s.sub; c.servicio=s.serv;
   c.propina=0; c.total=s.total; c.pagos=[{tipo:"app",monto:s.total}];
+  registraAnaliticaVenta(c,s);
   c.cambio=0; c.efectivoCaja=0; c.comision=s.total*num(c.comisionPct)/100;
   c.neto=s.total-c.comision; c.turnoId=(turnoAbierto()||{}).id||"";
   c.cobro=usuarioActual().nombre||""; persist();
@@ -4771,6 +4800,7 @@ $("#cobroOk").addEventListener("click", async()=>{
 
   c.estado = "cerrada"; c.cierra = horaAhora();
   c.subtotal = s.sub; c.servicio = s.serv; c.propina = prop; c.total = total;
+  registraAnaliticaVenta(c,s);
   /* El efectivo que entra a la caja es lo que recibió menos lo que devolvió. */
   c.pagos = cobroPagos.map(p=>({tipo:p.tipo, monto:num(p.monto)}));
   c.cambio = cambio;
@@ -5278,13 +5308,10 @@ $("#eventGuideVenta").addEventListener("click", ()=>abreMesa("llevar"));
 $("#eventGuideFinish").addEventListener("click", finalizarEventoActual);
 $("#eventGuideLocal").addEventListener("click", volverAlRestauranteAnimado);
 
-function renderInsightsVentas(tickets){
+function renderInsightsVentas(rango, textoPeriodo){
   const grid=$("#salesInsightGrid"), promos=$("#salesPromoIdeas"), period=$("#salesInsightPeriod");
   if(!grid||!promos||!period) return;
-  const desde=$("#venDesde").value||"", hasta=$("#venHasta").value||"";
-  const rango=tickets.filter(c=>(!desde||String(c.fecha||"")>=desde)&&(!hasta||String(c.fecha||"")<=hasta));
-  const fechaCorta=iso=>iso?new Date(iso+"T12:00:00").toLocaleDateString("es-MX",{day:"numeric",month:"short"}):"";
-  period.textContent=desde||hasta?(desde?fechaCorta(desde):"Inicio")+" – "+(hasta?fechaCorta(hasta):"hoy"):"Todo el historial";
+  period.textContent=textoPeriodo;
   const productos=new Map(), tasa=Math.max(0,num(P.iva))/100;
   rango.forEach(c=>(c.lineas||[]).forEach(l=>{
     if(l.cancelada) return;
@@ -5345,20 +5372,125 @@ function renderInsightsVentas(tickets){
   promos.innerHTML=idea(masVendido,true)+idea(segundo,false);
 }
 
-function pintaPorCanal(lista){
-  const host=$("#venCanal");if(!host)return;
-  const costoDe=c=>(c.lineas||[]).filter(l=>!l.cancelada).reduce((sum,l)=>{
-    const p=(MENU.plats||[]).find(x=>x.id===l.platId);return sum+num(p&&p.costo)*num(l.cant,1);
-  },0);
-  const grupos=[],propias=lista.filter(c=>!c.appId);
-  if(propias.length)grupos.push({nombre:"Venta propia",color:"#7A8A99",comision:0,cs:propias});
-  (P.apps||[]).forEach(a=>{const cs=lista.filter(c=>c.appId===a.id);if(cs.length)grupos.push({nombre:a.nombre,color:a.color,cs});});
-  if(!grupos.length){host.innerHTML='<div class="empty">Todavía no hay ventas hoy.</div>';return;}
-  host.innerHTML=grupos.map(g=>{
-    const vendido=g.cs.reduce((sum,c)=>sum+num(c.total),0),com=g.cs.reduce((sum,c)=>sum+comisionDe(c),0),costo=g.cs.reduce((sum,c)=>sum+costoDe(c),0),queda=vendido-com-costo;
-    const margen=vendido?Math.round(queda/vendido*100):0;
-    return '<div class="appRen"><span class="nom"><i style="background:'+esc(g.color||"#7A8A99")+'"></i>'+esc(g.nombre)+' <small style="font-size:10px;color:var(--ink-3)">'+g.cs.length+' pedido(s)</small></span><span class="ci">'+mx(vendido)+'<small>vendido</small></span><span class="ci'+(com?' mal':'')+'">'+(com?'−'+mx(com):'—')+'<small>comisión</small></span><span class="ci '+(queda>=0?'bien':'mal')+'">'+mx(queda)+'<small>utilidad estimada · '+margen+'%</small></span></div>';
-  }).join("");
+let periodoVentas="hoy";
+const fechaVenta=c=>c.analiticaVenta?.fecha||c.fecha||"";
+const cantidadVendida=l=>Math.max(0,num(l.cant,1));
+const unidadesVenta=n=>n.toLocaleString("es-MX",{maximumFractionDigits:3});
+function aplicaPeriodoVentas(){
+  $$("[data-ven-periodo]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.venPeriodo===periodoVentas)));
+  if(periodoVentas==="personalizado")return;
+  const hoy=hoyISO(), inicio=new Date(hoy+"T12:00:00");
+  if(periodoVentas==="semana")inicio.setDate(inicio.getDate()-(inicio.getDay()+6)%7);
+  if(periodoVentas==="mes")inicio.setDate(1);
+  $("#venDesde").value=periodoVentas==="todo"?"":inicio.getFullYear()+"-"+dos(inicio.getMonth()+1)+"-"+dos(inicio.getDate());
+  $("#venHasta").value=periodoVentas==="todo"?"":hoy;
+}
+function enPeriodoVentas(c){
+  const desde=$("#venDesde").value, hasta=$("#venHasta").value, fecha=fechaVenta(c);
+  return (!desde||fecha>=desde)&&(!hasta||fecha&&fecha<=hasta);
+}
+function textoPeriodoVentas(){
+  const desde=$("#venDesde").value, hasta=$("#venHasta").value;
+  const corta=iso=>new Date(iso+"T12:00:00").toLocaleDateString("es-MX",{day:"numeric",month:"short",year:"numeric"});
+  if(desde&&hasta&&desde>hasta)return "Rango de fechas incorrecto";
+  if(desde&&desde===hasta)return corta(desde);
+  if(desde&&hasta)return corta(desde)+" – "+corta(hasta);
+  if(desde)return "Desde "+corta(desde);
+  if(hasta)return "Hasta "+corta(hasta);
+  return "Todo el historial";
+}
+function costosCartaVentas(){
+  return new Map((MENU.plats||[]).map(p=>[p.id,num(p.costo)]));
+}
+function costoLineasVendidas(lineas,costos){
+  let costo=0, faltan=0;
+  for(const l of lineas){
+    const cantidad=cantidadVendida(l), unitario=costos.get(l.platId);
+    if(unitario>0)costo+=unitario*cantidad;
+    else faltan+=cantidad;
+  }
+  return {costo,faltan};
+}
+function registraAnaliticaVenta(c,suma){
+  const lineas=vivas(c).filter(l=>cantidadVendida(l)>0);
+  const {costo,faltan}=costoLineasVendidas(lineas,costosCartaVentas());
+  c.analiticaVenta={fecha:hoyISO(),iva:suma.iva,costo:lineas.length&&!faltan?costo:null};
+}
+function datosVentasPeriodo(tickets){
+  const costos=costosCartaVentas();
+  return tickets.map(c=>{
+    const lineas=vivas(c).filter(l=>cantidadVendida(l)>0);
+    const guardado=c.analiticaVenta||{};
+    const tieneCosto=Number.isFinite(guardado.costo)&&guardado.costo>=0;
+    const costo=tieneCosto?{costo:guardado.costo,faltan:0}:costoLineasVendidas(lineas,costos);
+    const iva=Number.isFinite(guardado.iva)?guardado.iva:lineas.reduce((sum,l)=>sum+ivaLinea(l),0);
+    return {c,lineas,venta:num(c.total)-num(c.propina),iva,comision:c.appId?comisionDe(c):0,
+      ...costo,sinDetalle:!lineas.length,estimada:!tieneCosto||!Number.isFinite(guardado.iva)};
+  });
+}
+function sumaDatosVentas(datos){
+  const r={venta:0,iva:0,costo:0,comision:0,faltan:0,sinDetalle:0,estimada:false};
+  for(const d of datos){
+    r.venta+=d.venta;
+    r.iva+=d.iva;
+    r.costo+=d.costo;
+    r.comision+=d.comision;
+    r.faltan+=d.faltan;
+    if(d.sinDetalle)r.sinDetalle++;
+    r.estimada=r.estimada||d.estimada;
+  }
+  r.pendiente=!!(r.faltan||r.sinDetalle);
+  r.utilidad=r.venta-r.iva-r.costo-r.comision;
+  return r;
+}
+function pintaPorCanal(datos){
+  const host=$("#venCanal"), grupos=new Map();
+  for(const d of datos){
+    const id=d.c.appId||"", app=id?appDe(id):null;
+    if(!grupos.has(id))grupos.set(id,{nombre:id?(d.c.appNombre||app?.nombre||"Plataforma"):"Venta propia",
+      color:d.c.appColor||app?.color||"#7A8A99",datos:[]});
+    grupos.get(id).datos.push(d);
+  }
+  host.innerHTML=[...grupos.values()].map(g=>{
+    const r=sumaDatosVentas(g.datos);
+    const clase=r.pendiente?"":r.utilidad>=0?" bien":" mal";
+    return '<div class="appRen"><span class="nom"><i style="background:'+esc(g.color)+'"></i>'+esc(g.nombre)+
+      ' <small>'+g.datos.length+' pedido(s)</small></span><span class="ci">'+mx(r.venta)+'<small>vendido</small></span>'+
+      '<span class="ci'+(r.comision?' mal':'')+'">'+(r.comision?'−'+mx(r.comision):'—')+'<small>comisión</small></span>'+
+      '<span class="ci'+clase+'">'+(r.pendiente?'—':mx(r.utilidad))+'<small>utilidad estimada</small></span></div>';
+  }).join("")||'<div class="empty">No hay ventas en este periodo.</div>';
+}
+function pintaResumenVentas(datos, textoPeriodo){
+  const productos=new Map(), carta=new Map((MENU.plats||[]).map(p=>[p.id,p.nombre]));
+  let unidades=0;
+  for(const d of datos){
+    for(const l of d.lineas){
+      const cantidad=cantidadVendida(l), nombre=carta.get(l.platId)||String(l.nombre||l.platNombre||"Artículo");
+      const id=l.platId?"id:"+l.platId:"nombre:"+nombre.trim().toLowerCase();
+      if(!productos.has(id))productos.set(id,{nombre,unidades:0});
+      productos.get(id).unidades+=cantidad;
+      unidades+=cantidad;
+    }
+  }
+  const r=sumaDatosVentas(datos);
+  const faltaCosto=r.faltan?unidadesVenta(r.faltan)+(r.faltan===1?" unidad sin costo":" unidades sin costo"):"";
+  const faltaDetalle=r.sinDetalle?r.sinDetalle+(r.sinDetalle===1?" ticket sin detalle":" tickets sin detalle"):"";
+  const pendientes=[faltaCosto,faltaDetalle].filter(Boolean).join(" · ");
+  const tarjeta=(titulo,valor,sub,extra="")=>'<div class="tile'+extra+'"><span class="et">'+titulo+
+    '</span><span class="v">'+valor+'</span><span class="sub">'+sub+'</span></div>';
+  $("#venTiles").innerHTML=tarjeta("Ventas del periodo",mx(r.venta),datos.length+" ticket(s) · sin propinas"," destacada")+
+    tarjeta("Artículos vendidos",unidadesVenta(unidades),faltaDetalle||productos.size+" artículo(s) distintos")+
+    tarjeta("Costo de artículos",mx(r.costo),r.pendiente?"Costo capturado parcial":"Costo de lo vendido")+
+    tarjeta("Comisión de apps",mx(r.comision),"Sobre ventas de reparto")+
+    tarjeta("Utilidad estimada",r.pendiente?"—":mx(r.utilidad),pendientes||"Después de IVA, costos y comisiones");
+  $("#venPeriodoTexto").textContent=textoPeriodo;
+  const orden=[...productos.values()].sort((a,b)=>b.unidades-a.unidades||a.nombre.localeCompare(b.nombre,"es-MX"));
+  $("#venProductos").innerHTML='<thead><tr><th scope="col">Artículo</th><th scope="col" class="der">Unidades vendidas</th></tr></thead><tbody>'+
+    (orden.length?orden.map(p=>'<tr><td>'+esc(p.nombre)+'</td><td class="der mono">'+unidadesVenta(p.unidades)+'</td></tr>').join(""):
+      '<tr><td colspan="2"><div class="empty">'+(datos.length?"Los tickets del periodo no tienen artículos detallados.":"No hay artículos vendidos en este periodo.")+'</div></td></tr>')+'</tbody>';
+  $("#venUtilidadNota").textContent=(r.pendiente?"La utilidad queda pendiente. ":"")+
+    "La utilidad de ventas se calcula antes de renta, nómina y otros gastos fijos. Incluye el costo base de los artículos."+
+    (r.estimada?" Los tickets sin costo o IVA guardado al cobrar se estiman con la carta y el IVA actuales.":"");
 }
 
 function renderVentas(){
@@ -5371,32 +5503,17 @@ function renderVentas(){
   $("#ventasDescripcion").textContent=POS_EVENTO
     ?"Consulta únicamente las ventas y cortes de «"+POS_EVENTO.nombre+"»; el restaurante conserva sus propios totales."
     :"Consulta los tickets y cortes del restaurante. Los puntos móviles aparecen aparte en Reportes de eventos.";
-  const hoy = cerradasDe(hoyISO());
-  const total = hoy.reduce((s,c)=>s+num(c.total),0);
-  const todas = COMANDAS.filter(c=>c.estado==="cerrada" && !c.cancelada);
-  renderInsightsVentas(todas);
-  const comHoy=hoy.reduce((sum,c)=>sum+comisionDe(c),0);
-  const porApp=hoy.filter(c=>c.appId).reduce((sum,c)=>sum+num(c.total),0);
-  const costo = hoy.reduce((s,c)=> s + (c.lineas||[]).reduce((x,l)=>{
-    const p = (MENU.plats||[]).find(y=>y.id===l.platId);
-    return x + num(p && p.costo) * num(l.cant,1);
-  }, 0), 0);
-  pintaPorCanal(hoy);
-  $("#venTiles").innerHTML =
-    '<div class="tile destacada"><span class="et">Hoy</span><span class="v">' + mx(total) + '</span>' +
-      '<span class="sub">' + hoy.length + ' cuenta(s)' + (porApp?' · '+mx(porApp)+' por app':'') + '</span></div>' +
-    '<div class="tile"><span class="et">Costo de hoy</span><span class="v">' + mx(costo) + '</span>' +
-      '<span class="sub">' + (costo ? "de lo que capturaste" : "falta capturar costos") + '</span></div>' +
-      '<div class="tile"><span class="et">Comisión de apps</span><span class="v">' + mx(comHoy) + '</span>' +
-      '<span class="sub">' + (porApp ? mx(porApp)+' vendido por app' : "sin pedidos de app") + '</span></div>' +
-      '<div class="tile"><span class="et">Utilidad de hoy</span><span class="v">' + mx(total - costo - comHoy) + '</span>' +
-      '<span class="sub">' + (total ? Math.round((total-costo-comHoy)/total*100) + "% del total, ya sin comisión" : "sin ventas") + '</span></div>' +
-    '<div class="tile"><span class="et">Históricas</span><span class="v">' + todas.length + '</span>' +
-      '<span class="sub">cuentas cerradas</span></div>';
-  const lista = ventasFiltradas();
+  aplicaPeriodoVentas();
+  const todas=cerradasTodas(), rango=todas.filter(c=>!c.cancelada&&enPeriodoVentas(c));
+  const textoPeriodo=textoPeriodoVentas(), datos=datosVentasPeriodo(rango);
+  $("#venCanalPeriodo").textContent=textoPeriodo;
+  pintaResumenVentas(datos,textoPeriodo);
+  pintaPorCanal(datos);
+  renderInsightsVentas(rango,textoPeriodo);
+  const lista = ventasFiltradas(todas);
   $("#venHint").textContent = lista.length === todas.length
     ? todas.length + " en total"
-    : lista.length + " de " + cerradasTodas().length;
+    : lista.length + " de " + todas.length;
   $("#t_ventas").innerHTML = '<thead><tr><th>Folio</th><th>Mesa</th><th>Canal</th><th>Fecha</th><th>Cerró</th>' +
     '<th>Atendió</th><th>Cobró</th><th class="der">Propina</th><th class="der">Total</th>' +
     '<th style="width:90px"></th></tr></thead><tbody>' +
@@ -5405,7 +5522,7 @@ function renderVentas(){
       const canal=c.appId?'<span class="appPill"><i style="background:'+esc(c.appColor||"#7A8A99")+'"></i>'+esc(c.appNombre||"App")+' '+pct1(c.comisionPct)+'</span>':'<span style="color:var(--ink-3)">Propia</span>';
       return '<tr data-tk="'+esc(c.id)+'"><td class="mono">'+esc(folioVisualPOS(c.folio))+'</td><td>'+esc(nombreVisibleComandaPOS(c))+'</td>' +
         '<td>'+canal+'</td>'+
-        '<td class="mono">'+esc(c.fecha)+'</td><td class="mono">'+esc(c.cierra||"")+'</td>' +
+        '<td class="mono">'+esc(fechaVenta(c))+'</td><td class="mono">'+esc(c.cierra||"")+'</td>' +
         '<td>'+esc(c.mesero||"")+'</td><td>'+esc(c.cobro||"")+'</td>' +
         '<td class="der mono">'+mx(c.propina)+'</td>' +
         '<td class="der mono">'+(c.cancelada ? '<span class="pill mal">cancelada</span>' : mx(c.total))+'</td>' +
@@ -5588,14 +5705,11 @@ $("#autoOk").addEventListener("click", async()=>{
    =================================================================== */
 let tkVista = null;
 const cerradasTodas = () => COMANDAS.filter(c=>c.estado === "cerrada")
-  .slice().sort((a,b)=> (b.fecha + (b.cierra||"")) < (a.fecha + (a.cierra||"")) ? -1 : 1);
-function ventasFiltradas(){
+  .sort((a,b)=>(fechaVenta(b)+(b.cierra||"")).localeCompare(fechaVenta(a)+(a.cierra||"")));
+function ventasFiltradas(tickets){
   const q = (($("#venBusca")||{}).value || "").trim().toLowerCase();
-  const d = ($("#venDesde")||{}).value || "";
-  const h = ($("#venHasta")||{}).value || "";
-  return cerradasTodas().filter(c=>{
-    if(d && c.fecha < d) return false;
-    if(h && c.fecha > h) return false;
+  return tickets.filter(c=>{
+    if(!enPeriodoVentas(c))return false;
     if(!q) return true;
     return (c.folio + " " + c.mesaNombre + " " + (c.appNombre||"") + " " + (c.mesero||"") + " " + (c.cobro||"")).toLowerCase().indexOf(q) >= 0;
   });
@@ -5744,10 +5858,8 @@ $("#tab-ventas").addEventListener("click", e=>{
   if(e.target.closest("#canReporte")){ imprimeReporteCancelaciones(); return; }
   const promo=e.target.closest(".promoCopy");
   if(promo){ copiaTextoPromocional(promo.dataset.promoCopy||"").then(ok=>toast(ok?"Texto de promoción copiado.":"No se pudo copiar. Selecciona y copia el texto manualmente.")); return; }
-  if(e.target.closest("#venTodo")){
-    $("#venBusca").value = ""; $("#venDesde").value = ""; $("#venHasta").value = "";
-    renderVentas(); return;
-  }
+  const periodo=e.target.closest("[data-ven-periodo]");
+  if(periodo){periodoVentas=periodo.dataset.venPeriodo;renderVentas();return;}
   const tr = e.target.closest("#t_ventas tbody tr[data-tk]");
   if(tr){ abreTicket(tr.dataset.tk); return; }
 });
@@ -5755,7 +5867,7 @@ $("#tab-ventas").addEventListener("input", e=>{
   if(e.target.id === "venBusca") renderVentas();
 });
 $("#tab-ventas").addEventListener("change", e=>{
-  if(e.target.id === "venDesde" || e.target.id === "venHasta") renderVentas();
+  if(e.target.id === "venDesde" || e.target.id === "venHasta"){periodoVentas="personalizado";renderVentas();}
 });
 
 /* ===================================================================
