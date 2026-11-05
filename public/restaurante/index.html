@@ -998,6 +998,11 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
 .cmesaCentro{position:absolute;inset:7px;z-index:1;display:grid;place-items:center;align-content:center;gap:2px;border-radius:inherit;pointer-events:none;background:rgba(255,250,238,.2)}
 .cmesaCentro b{position:relative;z-index:1;color:#354b38;font-family:"DM Sans",sans-serif;font-size:13px;font-weight:800;line-height:1.1;text-shadow:0 1px rgba(255,255,255,.45)}
 .cmesaCentro .cmesaConteo{position:relative;z-index:1;color:#5e705d;font-size:9px;font-weight:700;line-height:1.1;white-space:nowrap}
+.cmesaCentro:has(.mesaResponsable){inset:4px;grid-template-columns:minmax(0,1fr)}
+.cmesaCentro b,.cmesaCentro .mesaResponsable{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mesaResponsable{display:inline-block;width:fit-content;border-radius:6px;background:var(--cyan);color:#fff;padding:2px 6px;font-size:11px;font-weight:800;line-height:1.1}
+#comResponsable{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:5px 9px;border-radius:8px;background:var(--cyan);color:#fff;font-size:12px;overflow-wrap:anywhere}
+#comResponsable[hidden]{display:none}
 .cmesa.ocupada .cmesaConteo{color:#326447}
 .cmesa.cuenta .cmesaConteo{color:#805a20}
 .silla{position:absolute;z-index:4;width:27px;height:29px;display:grid;place-items:center;opacity:1;pointer-events:none;border:1px solid #9d8969;border-radius:9px 9px 11px 11px;background:linear-gradient(145deg,#fffdf5,#e4dac5);color:#907d5f;box-shadow:0 3px 7px rgba(68,53,34,.18);transform:translate(-50%,-50%) rotate(var(--giro-silla,0deg));transition:transform .2s,background .2s,color .2s,box-shadow .2s}
@@ -1438,12 +1443,16 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 #comAcciones .btn,#comCancelar,#corrCuerpo .btn{min-height:44px;touch-action:manipulation}
 .lin .acc .comCorrige{width:auto;height:auto;min-height:44px;padding:0 12px;border-radius:10px;
   border-color:var(--cyan);background:var(--cyan);color:#fff;font-size:13px;font-weight:700;touch-action:manipulation}
+.lin .acc{flex-wrap:wrap}
+.lin .acc .comReimprime{width:auto;height:auto;min-height:44px;padding:0 10px;border-radius:10px;
+  border-color:var(--cyan);background:var(--surface);color:var(--cyan);font-size:13px;font-weight:700;touch-action:manipulation}
+.lin .acc .comReimprime:disabled{opacity:.55;cursor:wait}
 #comCancelar,#corrCancela{background:var(--mal);border-color:var(--mal);color:#fff}
 @media(hover:hover){.lin .acc .comCorrige:hover,#comCancelar:hover,#corrCancela:hover{filter:brightness(.9)}}
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261105-1508">
+<meta name="nuvoor-build" content="20261105-1618">
 <link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
 </head>
 <body>
@@ -1758,6 +1767,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     <h2 style="font-size:19px" id="comTitulo">Mesa</h2>
     <button class="btn sm ghost" id="comClienteEditar" type="button" hidden>Editar nombre</button>
     <span id="comPersonas" style="color:var(--ink-3);font-size:12.5px"></span>
+    <strong id="comResponsable" hidden></strong>
     <button class="btn sm ghost" id="comGente" style="margin-left:auto">Comensales</button>
   </div>
   <div class="comanda">
@@ -3478,14 +3488,17 @@ function renderCroquis(){
     const eleg = elegidas.indexOf(m.id) >= 0;
     const gr = num(m.rot,0);
     const reloj = c ? relojCocinaMesa(c) : null;
+    const responsable = String(c?.mesero||"").trim();
     return '<div class="cmesa '+(virtual.forma||"cuadrada")+' '+cl+(eleg?" elegida":"") +
       (!selEsDecor && selId === m.id ? " sel" : "")+'" data-cm="'+esc(m.id)+'"' +
+      (responsable ? ' title="'+esc(nombre+' · Atiende: '+responsable)+'"' : '') +
       ' style="left:'+cx+'%;top:'+cy+'%;width:'+t.w+'px;height:'+t.h+'px;' +
       'transform:translate(-50%,-50%) rotate('+gr+'deg)">' +
       sillasHTML(virtual, c ? num(c.personas) : 0) +
       '<div class="cmesaCentro" style="display:grid;place-items:center;gap:2px' +
         (gr ? ';transform:rotate(' + (-gr) + 'deg)' : '') + '">' +
         '<b>'+esc(nombre)+'</b>' +
+        (responsable ? '<span class="mesaResponsable">'+esc(responsable)+'</span>' : '') +
         '<small class="cmesaConteo">'+(c ? Math.max(0,num(c.personas))+' / ' : '')+lugaresDe(virtual)+(c?' sentados':' lugares')+'</small>' +
         (reloj ? '<small class="cocinaRelojCroquis '+reloj.clase+'" title="'+esc(reloj.texto)+'">'+esc(reloj.breve)+'</small>' : '') +
         (c ? '<span class="tot">'+mx(sumaComanda(c).total)+'</span>' : '') +
@@ -4139,7 +4152,10 @@ function renderComanda(){
   $("#comTitulo").textContent = nombreVisibleComandaPOS(c);
   $("#comClienteEditar").hidden = c.mesaId!=="llevar";
   $("#comFolio").textContent = folioVisualPOS(c.folio);
-  $("#comPersonas").textContent = (c.mesaId==="llevar"?"Pedido para llevar":""+c.personas+" comensal(es)") + " · abrió " + c.abre + " · " + (c.mesero||"");
+  $("#comPersonas").textContent = (c.mesaId==="llevar"?"Pedido para llevar":""+c.personas+" comensal(es)") + " · abrió " + c.abre;
+  const responsable = String(c.mesero||"").trim();
+  $("#comResponsable").textContent = responsable ? "Atiende: "+responsable : "";
+  $("#comResponsable").hidden = !responsable;
 
   /* A quién se le anota lo que se toque. Es lo que hace que el ticket de
      cocina salga por persona y que la cuenta se pueda dividir por consumo. */
@@ -4169,6 +4185,7 @@ function renderComanda(){
   pintaLineas();
 }
 const ET_EDO = {pedido:"en cocina", preparando:"preparando", listo:"listo", entregada:"entregado"};
+const reimpresionesEnCursoPOS = new Set();
 function lineaImpresionEstado(linea){const entries=Object.entries(linea.impreso||{});if(!entries.length)return "";const nombres=entries.map(([ruta])=>{const p=IMPRESORAS.find(x=>rutaImpresoraNube(x)===ruta);return p?p.nombre:(ruta.split("|")[0]||"cocina").replace(/-/g," ");});return '<small class="impresoEstado">Impreso en '+esc([...new Set(nombres)].join(", "))+' ✓</small>';}
 function pintaLineas(){
   const c = comandaActual(); if(!c) return;
@@ -4199,7 +4216,9 @@ function pintaLineas(){
           (l.cancelada ? '<small>cancelado · '+esc(l.motivo||"")+'</small>'
             : l.enviada
               ? '<span class="edo '+edo+'">'+(ET_EDO[edo]||edo)+' '+esc(l.enviada)+'</span>'+lineaImpresionEstado(l)+
-                '<span class="acc"><button type="button" class="comCorrige" data-corrige="'+esc(l.id)+'" aria-label="Corregir '+esc(l.nombre)+'">Corregir</button></span>'
+                '<span class="acc"><button type="button" class="comCorrige" data-corrige="'+esc(l.id)+'" aria-label="Corregir '+esc(l.nombre)+'">Corregir</button>'+
+                '<button type="button" class="comReimprime" data-reimprime="'+esc(l.id)+'" aria-label="Reimprimir '+esc(l.nombre)+'"'+
+                (reimpresionesEnCursoPOS.has(l.id)?' disabled':'')+'>Reimprimir</button></span>'
               : '<span class="acc"><button data-menos="'+esc(l.id)+'">−</button>'+
                 '<button data-mas="'+esc(l.id)+'">+</button>'+
                 '<button data-quita="'+esc(l.id)+'">✕</button>'+
@@ -4239,6 +4258,8 @@ $("#comLineas").addEventListener("click", e=>{
   const c = comandaActual(); if(!c) return;
   const corr = e.target.closest("[data-corrige]");
   if(corr){ abreCorrige(corr.dataset.corrige); return; }
+  const copia = e.target.closest("[data-reimprime]");
+  if(copia){ reimprimePlatilloPOS(c,copia); return; }
   const mov = e.target.closest("[data-mueve]");
   if(mov){ mueveComensal(mov.dataset.mueve); return; }
   const mas = e.target.closest("[data-mas]"), menos = e.target.closest("[data-menos]"),
@@ -6389,6 +6410,7 @@ function renglonesComandaPOS(modelo){
   const filas=[];
   const agrega=(style,text)=>{if(text||style==="RULE")filas.push({style,text:text||""});};
   agrega("SUBTITLE","COCINA");
+  if(modelo.reimpresion)agrega("EMPHASIS","REIMPRESION - NO PREPARAR DE NUEVO");
   agrega("TITLE",modelo.cancelacion?"CANCELAR":modelo.heading);
   if(modelo.cancelacion)agrega("SUBTITLE",modelo.heading);
   agrega("SUBTITLE",modelo.folio);
@@ -6402,7 +6424,7 @@ function renglonesComandaPOS(modelo){
     agrega("EMPHASIS",grupo.titulo);
     for(const item of grupo.items){
       agrega("ITEM",num(item.cantidad,1)+" x "+String(item.nombre||"Platillo").toUpperCase());
-      for(const mod of item.mods||[])agrega("DETAIL","> "+mod);
+      for(const mod of item.mods||[])agrega("EMPHASIS","> "+mod);
       if(item.nota)agrega("EMPHASIS",(modelo.cancelacion?"Motivo: ":"Nota: ")+item.nota);
     }
   }
@@ -6569,6 +6591,25 @@ function cuerpoComandaCocinaPOS(c,lineas){
   });
   cuerpo += '<hr><div class="c">'+esc(c.fecha)+'</div>';
   return cuerpo;
+}
+async function reimprimePlatilloPOS(c,boton){
+  const l = c.lineas.find(linea=>String(linea.id)===boton.dataset.reimprime);
+  if(!l?.enviada||l.cancelada||c.estado==="cerrada"||reimpresionesEnCursoPOS.has(l.id))return;
+  const destinos = impresorasParaTicketPOS("comanda",false).filter(p=>lineasParaImpresoraPOS([l],p).length);
+  if(!destinos.length){toast("Reimprime desde el equipo que tiene la impresora de cocina configurada para este platillo.");return;}
+  if(!confirm("¿Reimprimir «"+l.nombre+"»?\n\nSe enviará una copia a cocina con el mismo folio."))return;
+  reimpresionesEnCursoPOS.add(l.id);
+  boton.disabled = true;
+  try{
+    const cuerpo = '<div class="c g">REIMPRESIÓN · NO PREPARAR DE NUEVO</div>'+cuerpoComandaCocinaPOS(c,[l]);
+    const rasterModel = {...datosComandaRasterPOS(c,[l]),reimpresion:true};
+    // Es una copia manual. No pasa por el envío a cocina ni modifica el reclamo de impresión original.
+    const resultados = await Promise.all(destinos.map(impresora=>imprimeHoja("Reimpresión "+folioVisualPOS(c.folio),cuerpo,{impresora,rasterModel})));
+    toast(resultados.flat().every(r=>r.ok)?"Copia enviada a cocina.":"Revisa el aviso de la impresora antes de volver a intentar.");
+  }finally{
+    reimpresionesEnCursoPOS.delete(l.id);
+    $$("#comLineas [data-reimprime]").forEach(b=>{if(b.dataset.reimprime===boton.dataset.reimprime)b.disabled=false;});
+  }
 }
 async function imprimeComandaRutaNube(c,p,lineas,tipo,contenido,forzado,reclamoYaTomado){
   if(!lineas.length)return {ok:true};

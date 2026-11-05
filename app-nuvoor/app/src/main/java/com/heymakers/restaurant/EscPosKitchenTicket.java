@@ -11,7 +11,7 @@ import java.util.List;
 final class EscPosKitchenTicket {
     enum Style {
         TITLE(0x11, true, true), SUBTITLE(0x00, true, true),
-        ITEM(0x01, true, false), EMPHASIS(0x00, true, false),
+        ITEM(0x11, true, false), EMPHASIS(0x01, true, false),
         DETAIL(0x00, false, false), RULE(0x00, false, false);
 
         final int size;
@@ -41,7 +41,12 @@ final class EscPosKitchenTicket {
         out.write(new byte[]{0x1B, 0x40}); // ESC @: iniciar impresora.
         for (Line line : lines) {
             Style style = line.style;
+            boolean doubleWidth = (style.size & 0x10) != 0;
+            boolean doubleHeight = (style.size & 0x01) != 0;
+            // ESC ! and GS ! express the same size using different bits.
+            int printMode = (style.bold ? 0x08 : 0) | (doubleHeight ? 0x10 : 0) | (doubleWidth ? 0x20 : 0);
             out.write(new byte[]{0x1B, 0x61, (byte) (style.centered ? 1 : 0)});
+            out.write(new byte[]{0x1B, 0x21, (byte) printMode});
             out.write(new byte[]{0x1B, 0x45, (byte) (style.bold ? 1 : 0)});
             out.write(new byte[]{0x1D, 0x21, (byte) style.size});
             if (style == Style.RULE) {
@@ -49,13 +54,13 @@ final class EscPosKitchenTicket {
                 out.write('\n');
                 continue;
             }
-            int usableColumns = style == Style.TITLE ? columns / 2 : columns;
+            int usableColumns = doubleWidth ? columns / 2 : columns;
             for (String row : normalizeAndWrap(line.text, usableColumns)) {
                 out.write(row.getBytes(StandardCharsets.US_ASCII));
                 out.write('\n');
             }
         }
-        out.write(new byte[]{0x1D, 0x21, 0, 0x1B, 0x45, 0, 0x1B, 0x61, 0});
+        out.write(new byte[]{0x1B, 0x21, 0, 0x1D, 0x21, 0, 0x1B, 0x45, 0, 0x1B, 0x61, 0});
         for (int i = 0; i < advanceLines; i++) out.write('\n');
         return out.toByteArray();
     }
