@@ -32,3 +32,8 @@ verify_jwt = false
 # Verifica la sesión y el permiso financiero dentro de la función.
 [functions.facturacion-suscripcion]
 verify_jwt = false
+
+# Ventas de los POS: conserva la verificación JWT administrada y comprueba
+# también la sesión vigente y la membresía/rol de cada negocio en el servidor.
+[functions.facturacion-ventas]
+verify_jwt = true

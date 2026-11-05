@@ -1,10 +1,11 @@
-const CACHE_NAME = "nuvoor-restaurant-v24-marca";
+const CACHE_NAME = "nuvoor-restaurant-v25-fiscal-test";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,
   new URL("index.html", APP_SCOPE).href,
   new URL("manifest.webmanifest", APP_SCOPE).href,
   new URL("../config.js", APP_SCOPE).href,
+  new URL("../facturacion-pos.js?v=20261104-2206", APP_SCOPE).href,
   new URL("icons/icon-192.png", APP_SCOPE).href,
   new URL("icons/icon-512.png", APP_SCOPE).href,
   new URL("icons/icon-180.png", APP_SCOPE).href
@@ -25,7 +26,8 @@ self.addEventListener("fetch", event => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   const configPath = new URL("../config.js", APP_SCOPE).pathname;
-  if (url.origin !== APP_SCOPE.origin || (!url.pathname.startsWith(APP_SCOPE.pathname) && url.pathname !== configPath)) return;
+  const fiscalPath = new URL("../facturacion-pos.js", APP_SCOPE).pathname;
+  if (url.origin !== APP_SCOPE.origin || (!url.pathname.startsWith(APP_SCOPE.pathname) && url.pathname !== configPath && url.pathname !== fiscalPath)) return;
 
   if (request.mode === "navigate") {
     event.respondWith(fetch(request).then(response => {

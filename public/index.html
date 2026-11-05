@@ -3521,6 +3521,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
 @media(max-width:600px){.fclBasicos{grid-template-columns:1fr;gap:14px}.fclAncho{grid-column:auto}.fclBody .azRej{grid-template-columns:repeat(2,minmax(0,1fr))}.fclFiscal>summary{padding:13px 12px;gap:9px}.fclFiscal summary small{font-size:10px}.fclBadge{font-size:9px;padding:4px 6px}.fclFiscalCampos{padding:15px 12px}.fclPie{align-items:stretch;flex-direction:column;gap:12px}.fclPie .btn{justify-content:center;width:100%;min-height:42px}.fclResumenFilas{grid-template-columns:1fr}.fclResumenFilas .ancho{grid-column:auto}#fclLectura{padding:18px}}
 
 </style>
+<script src="facturacion-pos.js?v=20261104-2206"></script>
 </head>
 <body class="sin-sesion">
 <header class="top">
@@ -5074,7 +5075,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
       </div>
       <label class="sw" style="margin-top:12px"><input type="checkbox" id="fa_guardaCliente"> Guardar estos datos fiscales en la ficha del cliente</label>
       <div class="row-actions" style="margin-top:16px">
-        <button class="btn primary" id="fa_ok">Generar y ver los datos</button>
+        <button class="btn" id="fa_ok">Preparar datos para mi PAC</button>
         <button class="btn" id="fa_cancel">Cancelar</button>
       </div>
     </div>
@@ -20845,6 +20846,7 @@ $("#cb_ok").addEventListener("click", async ()=>{
       metodoPago: $("#cb_estado").value === "pagado" ? "PUE" : "PPD"
     } : {requiere:false}
   };
+  venta.cfdi = nvFiscalCotSnapshot(q,venta);
   const i = ventas.findIndex(v=>v.folio===venta.folio);
   if(i>=0) ventas[i]=venta; else ventas.push(venta);
   if(DB){ try{ await DB.collection("ventas").doc(venta.folio).set({venta,fecha:venta.fecha,total:venta.total}); }catch(e){ toast("No se pudo guardar la venta en la nube"); } }
@@ -21882,6 +21884,41 @@ function facturaDe(g){
   return null;
 }
 let facturando = null;
+
+/* BEGIN FACTURACION POS · mismos formularios, sólo pruebas */
+function nvFiscalCotSnapshot(q,v){
+ try{
+  const r=calcDe(q),iva=P.ivaOn?String(num(P.iva)):'pendiente';
+  const conceptos=r.partes.map((p,i)=>{const a=(cat.articulos||[]).find(a=>a.id===p.it.articuloId),sv=p.it.modo==='impresion'&&p.it.svc?svProd(p.it.svc.pid):null;
+   return {descripcion:nombreItem(p.it,i+1),cantidad:num(p.r.qty),importe:Math.round(num(p.r.total)*100)/100,clave:sv?(sv.sat||'82121500'):a&&a.claveSat||'',unidad:sv?'E48':a&&a.claveUnidad||'',iva};});
+  const total=Math.round(num(v.total)*100),suma=conceptos.reduce((s,x)=>s+Math.round(x.importe*100),0),dif=total-suma;
+  if(conceptos.length&&Math.abs(dif)<=1)conceptos[conceptos.length-1].importe+=dif/100;
+  return {version:1,total:total/100,forma:FORMAS_SAT[v.pago]||'99',conceptos};
+ }catch(_){return null;}
+}
+function nvFiscalAbreImprenta(){
+ if(!window.NuvoorFiscal)return;
+ NuvoorFiscal.montar($('#modalFactura .body'),{
+  context:()=>({cliente:typeof SB!=='undefined'?SB:null,cuenta:typeof CUENTA!=='undefined'&&CUENTA?CUENTA.id:null,sistema:'taller',documento:facturando}),
+  receptor:()=>({rfc:$('#fa_rfc').value,razon:$('#fa_razon').value,cp:$('#fa_cp').value,regimen:$('#fa_regimen').value,uso:$('#fa_uso').value,metodo:$('#fa_metodo').value,forma:FORMAS_SAT[$('#fa_pago').value]||'99'}),
+  preparar:async()=>{
+   if(window.__exigeVigenciaNuvoor&&!window.__exigeVigenciaNuvoor())throw Error('Actualiza el pago de tu suscripción para generar');
+   const folio=facturando,v=ventas.find(x=>x.folio===folio);if(!v||!v.cfdi)throw Error('Esta venta no conserva su desglose fiscal. Puedes preparar sus datos para tu PAC; las ventas nuevas guardarán el desglose');
+   if($('#fa_folioFiscal').value.trim())throw Error('Ya capturaste un UUID externo. Conserva ese comprobante; no generes otro');
+   if(!DB)throw Error('Conecta la cuenta y guarda la venta en la nube antes de facturar');
+   if($('#fa_guardaCliente').checked){
+    const g=guardadas.find(x=>x.folio===folio)||(cot.folio===folio?cot:null),c=g&&clientes.find(x=>x.id===g.clienteId);
+    if(!c)throw Error('Liga la venta a un cliente para guardar sus datos fiscales');
+    const rfc=$('#fa_rfc').value.trim().toUpperCase(),cp=$('#fa_cp').value.trim(),razon=$('#fa_razon').value.trim();
+    if(!/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/.test(rfc)||!/^\d{5}$/.test(cp)||razon.length<3)throw Error('Revisa los datos fiscales antes de guardarlos');
+    Object.assign(c,{rfc,cp,razon,regimen:$('#fa_regimen').value,uso:$('#fa_uso').value});await guardaCliente(c);
+   }
+  }
+ });
+}
+if(window.NuvoorFiscal)NuvoorFiscal.emisor($('#cardTimbrado .body'),()=>({cliente:typeof SB!=='undefined'?SB:null,cuenta:typeof CUENTA!=='undefined'&&CUENTA?CUENTA.id:null,sistema:'taller'}));
+/* END FACTURACION POS */
+
 function abreGeneraFactura(folio){
   const g = guardadas.find(g=>g.folio===folio) || (cot.folio===folio ? cot : null);
   if(!g){ toast("No encuentro esa cotización"); return; }
@@ -21929,6 +21966,7 @@ function abreGeneraFactura(folio){
   $("#fa_fecha").value = f.fecha || hoyISO();
   $("#fa_guardaCliente").checked = false;
   $("#modalFactura").hidden = false;
+  nvFiscalAbreImprenta();
 }
 $("#fa_cancel").addEventListener("click", ()=>{ $("#modalFactura").hidden = true; facturando = null; });
 $("#fa_ok").addEventListener("click", async ()=>{
@@ -23631,6 +23669,7 @@ async function cv2RegistraPago(q){
          recibido: monto, clienteId:q.clienteId||"", vendedor:q.vendedor||null, comisionPct: vdor && typeof pctDe === "function" ? pctDe(vdor) : 0,
          factura: fac, abonos: monto > 0 ? [{fecha:pg.fecha, monto, pago:pg.forma, nota: pg.tipo === "anticipo" ? "Anticipo al confirmar" : "Pago al confirmar"}] : [],
          origen:"confirmacion"};
+    v.cfdi=nvFiscalCotSnapshot(q,v);
     ventas.push(v);
   }
   if(DB){ try{ await DB.collection("ventas").doc(v.folio).set({venta:v, fecha:v.fecha, total:v.total}); }catch(e){ toast("No se pudo guardar el pago en la nube"); } }
@@ -25060,10 +25099,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261104-1712";</script>
+<script>window.BUILD="20261104-2206";</script>
 <script>
 (function(){
-  var mio = "20261104-1712";
+  var mio = "20261104-2206";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }

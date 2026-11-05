@@ -1419,6 +1419,8 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 #comAcciones .btn,#comCancelar{min-height:44px;touch-action:manipulation}
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
+<script src="../facturacion-pos.js?v=20261104-2206"></script>
+<meta name="nuvoor-build" content="20261104-2206">
 </head>
 <body>
 
@@ -2713,7 +2715,7 @@ async function proyectaRestaurant(){
     nubePut(out,"rest_comandas",nubeId("comanda",c.id),head);
   (c.lineas||[]).forEach(l=>{const item=Object.assign({},nubeClona(l),{id:l.id,comandaId:c.id,eventoId:ev,categoria:l.categoria||((MENU.plats||[]).find(p=>p.id===l.platId)||{}).catId||""});delete item.foto;delete item.imagen;delete item.base64;nubePut(out,"rest_lineas",nubeId("linea",l.id),item);});
     (c.cancelaciones||[]).forEach(x=>nubePut(out,"rest_lineas",nubeId("cancelacion",x.id),Object.assign({tipo:"cancelacion",comandaId:c.id,eventoId:ev},nubeClona(x))));
-    if(c.estado==="cerrada"&&!c.cancelada){const ticket={id:c.id,folio:c.folio,fecha:c.fecha||hoyISO(),cierra:c.cierra||"",mesaId:c.mesaId,mesaNombre:c.mesaNombre,cliente:c.cliente||"",personas:c.personas,mesero:c.mesero,meseroId:c.meseroId,subtotal:num(c.subtotal),servicio:num(c.servicio),propina:num(c.propina),total:num(c.total),pagos:nubeClona(c.pagos||[]),cambio:num(c.cambio),appId:c.appId||"",appNombre:c.appNombre||"",comisionPct:num(c.comisionPct),comision:num(c.comision),neto:num(c.neto),turnoId:c.turnoId||"",cobro:c.cobro||"",eventoId:ev};nubePut(out,"rest_tickets",nubeId("ticket",c.id),ticket);}
+    if(c.estado==="cerrada"&&!c.cancelada){const ticket={id:c.id,folio:c.folio,fecha:c.fecha||hoyISO(),cierra:c.cierra||"",mesaId:c.mesaId,mesaNombre:c.mesaNombre,cliente:c.cliente||"",personas:c.personas,mesero:c.mesero,meseroId:c.meseroId,subtotal:num(c.subtotal),servicio:num(c.servicio),propina:num(c.propina),total:num(c.total),pagos:nubeClona(c.pagos||[]),cambio:num(c.cambio),cfdi:c.cfdi||null,appId:c.appId||"",appNombre:c.appNombre||"",comisionPct:num(c.comisionPct),comision:num(c.comision),neto:num(c.neto),turnoId:c.turnoId||"",cobro:c.cobro||"",eventoId:ev};nubePut(out,"rest_tickets",nubeId("ticket",c.id),ticket);}
   });
   for(const u of EQUIPO||[]){const pin=String(u.pin||"").trim(),hash=u.pin_hash||u.pinHash|| (pin?nubeSha256(nubePinSalt()+pin):null);const pin_hash=hash&&typeof hash.then==="function"?await hash:hash;nubePut(out,"rest_equipo",nubeId("persona",u.id),{id:u.id,nombre:u.nombre||"",rol:u.rol||"mesero",pin_hash:pin_hash||null,activo:u.activo!==false,eventoId:ev});}
   (EVENTOS||[]).forEach(x=>nubePut(out,"rest_eventos",String(x.id),Object.assign({},nubeClona(x),{eventoId:""})));
@@ -4761,6 +4763,7 @@ $("#cobroOk").addEventListener("click", async()=>{
   /* El efectivo que entra a la caja es lo que recibió menos lo que devolvió. */
   c.pagos = cobroPagos.map(p=>({tipo:p.tipo, monto:num(p.monto)}));
   c.cambio = cambio;
+  if(!c.cfdi)c.cfdi=nvFiscalRestSnapshot(c);
   c.efectivoCaja = Math.max(0, efec - cambio);
   c.turnoId = (turnoAbierto()||{}).id || "";
   c.cobro = usuarioActual().nombre || "";
@@ -5440,6 +5443,25 @@ function renderFacturas(){
     }).join(""):'<tr><td colspan="9"><div class="empty">'+(facFiltro==="pend"?"No hay solicitudes por preparar.":"No hay ventas en este filtro.")+'</div></td></tr>')+'</tbody>';
 }
 function ticketDeFolio(folio){return vendidas().find(c=>c.folio===folio)||null;}
+
+/* BEGIN FACTURACION POS · dentro de Facturación y Ajustes actuales */
+function nvFiscalRestSnapshot(c){
+ try{
+  if(num(c.servicio))return null;
+  const conceptos=vivas(c).map(l=>({descripcion:l.nombre||'Consumo de restaurante',cantidad:num(l.cant,1),importe:Math.round(importeLinea(l)*100)/100,clave:l.claveSat||'90101500',unidad:'E48',iva:modoIvaLinea(l)==='exento'?'exento':String(num(P.iva))}));
+  const total=Math.round((num(c.total)-num(c.propina))*100),sum=conceptos.reduce((s,x)=>s+Math.round(x.importe*100),0),dif=total-sum;
+  if(conceptos.length&&Math.abs(dif)<=1)conceptos[conceptos.length-1].importe+=dif/100;
+  return {version:1,total:total/100,forma:FORMA_DE_PAGO[((c.pagos||[])[0]||{}).tipo]||'99',conceptos};
+ }catch(_){return null;}
+}
+function nvFiscalRestAbre(){if(!window.NuvoorFiscal)return;NuvoorFiscal.montar($('#modalFacRest .body'),{
+ context:()=>({cliente:RESTAURANT_SB,cuenta:RESTAURANT_ACCOUNT.accountId,sistema:'restaurant',documento:facFolio&&ticketDeFolio(facFolio)?nubeId('ticket',ticketDeFolio(facFolio).id):''}),
+ receptor:()=>({rfc:$('#fr_rfc').value,razon:$('#fr_razon').value,cp:$('#fr_cp').value,regimen:$('#fr_regimen').value,uso:$('#fr_uso').value,metodo:$('#fr_metodo').value,forma:$('#fr_forma').value}),
+ preparar:async()=>{const c=ticketDeFolio(facFolio);if(!c?.cfdi)throw Error('Esta cuenta no conserva su desglose fiscal. Puedes preparar los datos para tu PAC; las cuentas nuevas guardarán el desglose');if($('#fr_uuid').value.trim())throw Error('Conserva el UUID externo registrado; no generes otro comprobante');if(!navigator.onLine)throw Error('Conéctate a internet para facturar');await sincronizaNubeEnSerie(true);}
+ });}
+if(window.NuvoorFiscal)NuvoorFiscal.emisor($('#restaurantFiscalSettings .body'),()=>({cliente:RESTAURANT_SB,cuenta:RESTAURANT_ACCOUNT.accountId,sistema:'restaurant'}));
+/* END FACTURACION POS */
+
 function abreFacturaRest(folio){
   const c=ticketDeFolio(folio);if(!c){toast("No encuentro esa venta");return;}
   facFolio=folio;const f=c.factura||{},tipo=((c.pagos||[])[0]||{}).tipo||"efectivo";
@@ -5448,7 +5470,7 @@ function abreFacturaRest(folio){
   $("#fr_forma").innerHTML=opcSAT(FORMAS_SAT,f.formaSAT||FORMA_DE_PAGO[tipo]||"99");
   $("#fr_rfc").value=f.rfc||"";$("#fr_razon").value=f.razon||"";$("#fr_cp").value=f.cp||"";
   $("#fr_metodo").value=f.metodoPago||"PUE";$("#fr_fecha").value=f.fecha||c.fecha||hoyISO();$("#fr_uuid").value=f.folioFiscal||"";
-  $("#fr_quita").hidden=!f.requiere;$("#modalFacRest").hidden=false;
+  $("#fr_quita").hidden=!f.requiere;$("#modalFacRest").hidden=false;nvFiscalRestAbre();
 }
 $("#fr_cancel").addEventListener("click",()=>{$("#modalFacRest").hidden=true;facFolio=null;});
 $("#fr_quita").addEventListener("click",()=>{
