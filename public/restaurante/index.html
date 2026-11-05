@@ -311,6 +311,13 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
 .btnApp:hover{border-color:var(--accent);transform:translateY(-1px)}
 .btnApp i,.appPill i,.appRen .nom i{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
 .btnApp small{color:var(--ink-3);font-size:10.5px}
+@media(max-width:900px){
+  .appsFila{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch}
+  .appsFila .appsEyebrow{grid-column:1/-1}
+  .btnApp{display:grid;grid-template-columns:9px minmax(0,1fr);align-content:center;gap:2px 5px;min-height:44px;padding:7px;text-align:left}
+  .btnApp span{overflow-wrap:anywhere}
+  .btnApp small{grid-column:2}
+}
 .appPill{display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface-2);font-size:11px;white-space:nowrap}
 .appResumen{display:grid;gap:9px;margin-top:4px}
 .appRen{display:grid;grid-template-columns:minmax(150px,1fr) repeat(3,minmax(78px,auto));gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
@@ -1420,8 +1427,8 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261105-0950">
-<link rel="stylesheet" href="./tema-petroleo.css?v=20261104-2221">
+<meta name="nuvoor-build" content="20261105-1033">
+<link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
 </head>
 <body>
 
@@ -4074,8 +4081,8 @@ function pintaAppsFila(){
   const activas=appsActivas();
   w.hidden=!!POS_EVENTO||!activas.length;
   if(w.hidden){w.innerHTML="";return;}
-  w.innerHTML='<span class="appsEyebrow">Pedido por app</span>'+activas.map(a=>
-    '<button type="button" class="btnApp" data-abreapp="'+esc(a.id)+'"><i style="background:'+esc(a.color||"#7A8A99")+'"></i>'+esc(a.nombre||"Plataforma")+' <small>'+pct1(a.comision)+'</small></button>'
+  w.innerHTML='<span class="appsEyebrow">Registrar pedido por app</span>'+activas.map(a=>
+    '<button type="button" class="btnApp" data-abreapp="'+esc(a.id)+'"><i style="background:'+esc(a.color||"#7A8A99")+'"></i><span>'+esc(a.nombre||"Plataforma")+'</span> <small>'+pct1(a.comision)+'</small></button>'
   ).join("");
 }
 $("#appsFila").addEventListener("click",e=>{

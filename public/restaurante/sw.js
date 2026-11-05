@@ -1,10 +1,10 @@
-const CACHE_NAME = "nuvoor-restaurant-v27-inicio-nube";
+const CACHE_NAME = "nuvoor-restaurant-v28-mesas-apps";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,
   new URL("index.html", APP_SCOPE).href,
   new URL("manifest.webmanifest", APP_SCOPE).href,
-  new URL("tema-petroleo.css?v=20261104-2221", APP_SCOPE).href,
+  new URL("tema-petroleo.css?v=20261105-1033", APP_SCOPE).href,
   new URL("../config.js", APP_SCOPE).href,
   new URL("../facturacion-pos.js?v=20261104-2206", APP_SCOPE).href,
   new URL("icons/icon-192.png", APP_SCOPE).href,
