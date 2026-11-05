@@ -1420,7 +1420,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261104-2221">
+<meta name="nuvoor-build" content="20261105-0950">
 <link rel="stylesheet" href="./tema-petroleo.css?v=20261104-2221">
 </head>
 <body>
@@ -2872,7 +2872,10 @@ async function iniciaNubeRestaurant(){
     else{const n=resumenLocalRestaurant(),titulo=esDemo?"¿Empezar con datos de ejemplo?":"Subir los datos de esta tablet",detalle=esDemo?"La nube está vacía. Puedes empezar con la carta y las mesas de ejemplo; después podrás cambiarlas.":"¿Subir los datos de esta tablet a la nube de "+(RESTAURANT_ACCOUNT.accountName||"tu negocio")+"? ("+n.mesas+" mesas, "+n.platillos+" platillos, "+n.abiertas+" comandas abiertas, "+n.tickets+" tickets). Los datos originales se conservan en este aparato.",choice=await muestraMigracionNube(titulo,detalle,esDemo?"Sí, usar los datos de ejemplo":"");if(choice!=="subir"){pausaNubeEnEsteAparato();return;}try{localStorage.setItem(REST_NUBE_MIGRATION_FLAG,"si");}catch(_){}REST_NUBE.migrandoInicial=true;REST_NUBE.migrationClaimed=false;REST_NUBE.projection={};nubeGuarda(REST_NUBE_PROJECTION_KEY,{});REST_NUBE.pinSalt="";await sincronizaNubeEnSerie(true);}
   }
   else if(hayNube&&hasLocal){
-    const filas=Object.values(REST_NUBE.serverDocs),hayAjenos=nubeHayOrigenAjeno(filas,REST_NUBE.deviceId),puedePreguntar=!REST_NUBE.queue.length||hasMigration;
+    // Una copia ya sincronizada puede estar atrasada por cambios de otro aparato.
+    // Sólo la primera migración de datos locales necesita elegir una fuente.
+    // La cola de trabajo normal se conserva al aplicar nubeRebaseMap().
+    const filas=Object.values(REST_NUBE.serverDocs),hayAjenos=nubeHayOrigenAjeno(filas,REST_NUBE.deviceId),puedePreguntar=!nubeTieneBaseSincronizada()&&(!REST_NUBE.queue.length||hasMigration);
     if(hasMigration&&!hayAjenos){aplicaDocumentosRestaurant(nubeRebaseMap());}
      else{const keys=new Set([...Object.keys(cloud),...Object.keys(local)]),different=[...keys].some(k=>!cloud[k]||!local[k]||nubeCanon(nubeSinMarcaMigracion(cloud[k].cuerpo))!==nubeCanon(nubeSinMarcaMigracion(local[k].cuerpo)));if((hasMigration&&hayAjenos)||(puedePreguntar&&different)){const detalle=hayAjenos?"La nube ya tiene datos distintos que no subió este aparato. No voy a mezclar la cola inicial. Elige «Usar los de la nube» para guardar una copia local o deja estos datos sólo en este aparato.":"Esta tablet tiene datos distintos. Elige qué datos conservar; antes de aplicar la nube guardaré una copia local.",choice=await resuelveConflictoMigracionNube(detalle);if(choice==="local"||choice==="error")return;}aplicaDocumentosRestaurant(nubeRebaseMap());nubeMarcaBaseSincronizada();}
   }
@@ -8388,11 +8391,21 @@ iniciaRestaurant();
 
 <script>
 (()=>{
+  // La app instalada también debe recibir las actualizaciones de la caché.
+  if(location.protocol!=="file:"&&"serviceWorker" in navigator){
+    window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js",{scope:"./"}).catch(()=>{}));
+  }
   const button=document.getElementById("pwaInstall");
   if(!button||location.protocol==="file:") return;
   const standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true;
   if(standalone||window.MakersPrinter){button.hidden=true;return;}
   let installEvent=null;
+  let avisoInstalacionT=null;
+  function avisaInstalacion(texto){
+    const aviso=document.getElementById("toast");if(!aviso)return;
+    aviso.textContent=texto;aviso.hidden=false;clearTimeout(avisoInstalacionT);
+    avisoInstalacionT=setTimeout(()=>{aviso.hidden=true;},6000);
+  }
   button.hidden=false;
   window.addEventListener("beforeinstallprompt",event=>{
     event.preventDefault();installEvent=event;button.textContent="Instalar app";button.hidden=false;
@@ -8405,12 +8418,9 @@ iniciaRestaurant();
       return;
     }
     const apple=/iPhone|iPad|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
-    toast(apple?"En Safari, toca Compartir y elige Añadir a pantalla de inicio.":"Abre el menú del navegador y elige Instalar app o Instalar página.");
+    avisaInstalacion(apple?"En Safari, toca Compartir y elige Agregar a la pantalla de inicio. Activa Abrir como app web si aparece.":"Abre el menú del navegador y elige Instalar app o Instalar página.");
   });
-  window.addEventListener("appinstalled",()=>{button.hidden=true;toast("Nuvoor Restaurant quedó instalada.");});
-  if("serviceWorker" in navigator){
-    window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js",{scope:"./"}).catch(()=>{}));
-  }
+  window.addEventListener("appinstalled",()=>{button.hidden=true;avisaInstalacion("Nuvoor Restaurant quedó instalada.");});
 })();
 </script></body>
 </html>
