@@ -200,6 +200,8 @@ header.top{position:sticky;top:0;z-index:40;background:rgba(14,18,38,.86);
 #venTiles .v{overflow-wrap:anywhere}
 #venTiles .tile:last-child{border-top:2px solid var(--good)}
 #venProductos th:last-child,#venProductos td:last-child{width:1%;white-space:nowrap}
+#venProductos .venOpcion td{color:var(--ink-2);font-size:.92em}
+#venProductos .venOpcion td:first-child{padding-left:26px;border-left:2px solid var(--line)}
 @media(max-width:620px){#venTiles .tile:last-child{grid-column:1/-1}}
 .salesInsightGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .salesInsightCard{position:relative;isolation:isolate;overflow:hidden;min-height:166px;padding:17px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,var(--surface),var(--surface-2));transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
@@ -1438,7 +1440,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261105-1430">
+<meta name="nuvoor-build" content="20261105-1444">
 <link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
 </head>
 <body>
@@ -5467,8 +5469,14 @@ function pintaResumenVentas(datos, textoPeriodo){
     for(const l of d.lineas){
       const cantidad=cantidadVendida(l), nombre=carta.get(l.platId)||String(l.nombre||l.platNombre||"Artículo");
       const id=l.platId?"id:"+l.platId:"nombre:"+nombre.trim().toLowerCase();
-      if(!productos.has(id))productos.set(id,{nombre,unidades:0});
-      productos.get(id).unidades+=cantidad;
+      if(!productos.has(id))productos.set(id,{nombre,unidades:0,opciones:new Map()});
+      const producto=productos.get(id);
+      producto.unidades+=cantidad;
+      const opciones=(Array.isArray(l.mods)?l.mods:[]).map(m=>
+        String(typeof m==="string"?m:m?.nombre||m?.texto||"").trim()).filter(Boolean);
+      const clave=JSON.stringify(opciones.map(opcion=>opcion.normalize("NFC").toLocaleLowerCase("es-MX")).sort());
+      if(!producto.opciones.has(clave))producto.opciones.set(clave,{nombre:opciones.join(" · "),unidades:0});
+      producto.opciones.get(clave).unidades+=cantidad;
       unidades+=cantidad;
     }
   }
@@ -5485,8 +5493,16 @@ function pintaResumenVentas(datos, textoPeriodo){
     tarjeta("Utilidad estimada",r.pendiente?"—":mx(r.utilidad),pendientes||"Después de IVA, costos y comisiones");
   $("#venPeriodoTexto").textContent=textoPeriodo;
   const orden=[...productos.values()].sort((a,b)=>b.unidades-a.unidades||a.nombre.localeCompare(b.nombre,"es-MX"));
+  const filas=orden.map(p=>{
+    const opciones=[...p.opciones.values()];
+    const desglose=opciones.some(o=>o.nombre)?opciones.sort((a,b)=>b.unidades-a.unidades||a.nombre.localeCompare(b.nombre,"es-MX")):[];
+    const nombre=desglose.length?'<strong>'+esc(p.nombre)+'</strong>':esc(p.nombre);
+    return '<tr><td>'+nombre+'</td><td class="der mono">'+unidadesVenta(p.unidades)+'</td></tr>'+
+      desglose.map(o=>'<tr class="venOpcion"><td>'+esc(o.nombre||"Sin modificadores registrados")+
+        '</td><td class="der mono">'+unidadesVenta(o.unidades)+'</td></tr>').join("");
+  });
   $("#venProductos").innerHTML='<thead><tr><th scope="col">Artículo</th><th scope="col" class="der">Unidades vendidas</th></tr></thead><tbody>'+
-    (orden.length?orden.map(p=>'<tr><td>'+esc(p.nombre)+'</td><td class="der mono">'+unidadesVenta(p.unidades)+'</td></tr>').join(""):
+    (filas.length?filas.join(""):
       '<tr><td colspan="2"><div class="empty">'+(datos.length?"Los tickets del periodo no tienen artículos detallados.":"No hay artículos vendidos en este periodo.")+'</div></td></tr>')+'</tbody>';
   $("#venUtilidadNota").textContent=(r.pendiente?"La utilidad queda pendiente. ":"")+
     "La utilidad de ventas se calcula antes de renta, nómina y otros gastos fijos. Incluye el costo base de los artículos."+
@@ -6171,11 +6187,11 @@ $("#tab-menu").addEventListener("click", e=>{
    =================================================================== */
 const anchoTicket = () => num((P.ticket||{}).ancho, 80) === 58 ? 58 : 80;
 
-function hojaTicket(){
-  const mm = anchoTicket();
+function hojaTicket(ancho=anchoTicket()){
+  const mm = num(ancho,80)===58?58:80;
   return '@page{size:'+mm+'mm auto;margin:0}' +
-    'body{margin:0;padding:4mm 3mm;width:'+mm+'mm;background:#fff;color:#000;' +
-      'font-family:Arial,Roboto,sans-serif;font-size:'+(mm===58?12:14)+'px;line-height:1.35}' +
+    'body{box-sizing:border-box;margin:0;padding:4mm 3mm;width:'+mm+'mm;background:#fff;color:#000;overflow-wrap:anywhere;' +
+      'font-family:Arial,Roboto,sans-serif;font-size:'+(mm===58?14:15)+'px;line-height:1.3}' +
     '.c{text-align:center}.d{text-align:right}.b{font-weight:bold}' +
     '.g{font-size:'+(mm===58?17:20)+'px;font-weight:bold;letter-spacing:.02em}' +
     '.xl{font-size:'+(mm===58?24:30)+'px;font-weight:bold;line-height:1.1}' +
@@ -6284,9 +6300,10 @@ async function ejecutaTrabajoImpresoraPOS(trabajo){
     }catch(e){ resuelveResultadoImpresoraPOS(id,false,e&&e.message||"No se pudo iniciar la impresión."); }
     return await esperando;
   }
+  const mm=num(p.anchoPapelBt,80)===58?58:80;
   if(puente && typeof puente.printHtmlSystem==="function"){
     const id="imp-sys-"+uid(), esperando=esperaResultadoImpresoraPOS(id,120000);
-    try{ puente.printHtmlSystem(id,trabajo.titulo,num(p.anchoPapelBt,80),trabajo.cuerpo,hojaTicket()); }
+    try{ puente.printHtmlSystem(id,trabajo.titulo,mm,trabajo.cuerpo,hojaTicket(mm)); }
     catch(e){ resuelveResultadoImpresoraPOS(id,false,e&&e.message||"No se pudo abrir la impresión."); }
     return await esperando;
   }
@@ -6294,7 +6311,7 @@ async function ejecutaTrabajoImpresoraPOS(trabajo){
   if(!w) return {ok:false,mensaje:"No se pudo abrir la ventana para elegir una impresora."};
   try{
     w.document.write('<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>'+esc(trabajo.titulo)+
-      '</title><style>'+hojaTicket()+'</style></head><body>'+trabajo.cuerpo+'</body></html>');
+      '</title><style>'+hojaTicket(mm)+'</style></head><body>'+trabajo.cuerpo+'</body></html>');
     w.document.close(); w.focus(); w.print();
     return {ok:true,mensaje:""};
   }catch(e){ try{w.close();}catch(_){} return {ok:false,mensaje:"No se pudo abrir la impresión."}; }
@@ -6307,7 +6324,7 @@ async function procesaColaImpresionPOS(){
       const trabajo=colaImpresionPOS.shift();
       const respuesta=await ejecutaTrabajoImpresoraPOS(trabajo);
       if(!respuesta.ok){if(trabajo.nubeLineas&&trabajo.nubeRuta){trabajo.nubeLineas.forEach(linea=>REST_NUBE.failedPrints.add(claveFallaImpresionNube(linea,trabajo.nubeRuta)));await liberaLineasNube(trabajo.nubeLineas,trabajo.nubeRuta,trabajo.nubeTipo);}reportaFalloImpresoraPOS(trabajo,respuesta.mensaje);}
-      else if(trabajo.esPrueba && $("#impTestEstado")) $("#impTestEstado").textContent="Prueba enviada.";
+      else if(trabajo.esPrueba && $("#impTestEstado")) $("#impTestEstado").textContent="Prueba enviada. Revisa el tamaño en el papel.";
       if(trabajo.resuelve)trabajo.resuelve(respuesta);
     }
   }finally{
@@ -7752,6 +7769,7 @@ function renderEditorImpresoraPOS(){
   if(!p){ editor.innerHTML='<header><h3>Editar impresora</h3></header><div class="impPrinterHint">Selecciona una impresora de la lista o agrega una nueva.</div>'; return; }
   const nativa=!!window.MakersPrinter, conexion=nativa?(p.conexion||"bluetooth"):"sistema";
   const soportaCorte=nativa&&typeof window.MakersPrinter.printTicket==="function";
+  const textoSimple=conexion==="bluetooth"&&typeof window.MakersPrinter.printImage!=="function";
   const dispositivoGuardado=p.impresoraBt?{address:p.impresoraBt,name:p.impresoraNombre||"Impresora guardada"}:null;
   const dispositivos=impresorasEmparejadasPOS.slice();
   if(dispositivoGuardado&&!dispositivos.some(d=>d.address===dispositivoGuardado.address)) dispositivos.unshift(dispositivoGuardado);
@@ -7774,6 +7792,7 @@ function renderEditorImpresoraPOS(){
      '<label class="impPrinterSwitch"><span>Corta el papel sola (cortador automático)<small>'+(conexion!=="bluetooth"?"Disponible con impresora Bluetooth en la app de Android.":!soportaCorte?"Actualiza Nuvoor para controlar el cortador.":p.corteAutomatico?"Avanza unas líneas y corta cada ticket por separado.":"No manda el corte y deja más papel para cortar a mano.")+'</small></span><input type="checkbox" data-imp-check="corteAutomatico"'+(p.corteAutomatico?' checked':'')+((conexion!=="bluetooth"||!soportaCorte)?' disabled':'')+'></label></div>'+
     (p.cocina?'<div class="impPrinterCategory"><label class="impPrinterSwitch"><span>Imprime todas las categorías<small>Desactívalo para elegir qué platillos salen aquí.</small></span><input type="checkbox" data-imp-todas-cats'+(todas?' checked':'')+'></label>'+
       (!todas?'<div class="impPrinterCategoryList">'+cats.map(c=>'<label><input type="checkbox" data-imp-cat="'+esc(c.id)+'"'+(elegidas.includes(c.id)?' checked':'')+'> '+esc(c.nombre)+'</label>').join("")+'</div>':'')+'</div>':'')+
+    (textoSimple?'<p class="note">Esta versión de Android imprime con letra normal. Para usar letra grande, <a href="../descargas/">descarga la actualización de Nuvoor</a>.</p>':'')+
     '<div class="impPrinterActions"><button class="btn sm" type="button" id="impPrueba">Impresión de prueba</button>'+
     (p.id&&IMPRESORAS.some(x=>x.id===p.id)?'<button class="btn sm ghost impPrinterRemove" type="button" id="impEliminar">Eliminar impresora</button>':'')+
     '<span class="hint" id="impTestEstado" aria-live="polite"></span><button class="btn sm impSave" type="button" id="impGuardar">Guardar</button></div></div>';
@@ -7833,11 +7852,25 @@ function guardaBorradorImpresoraPOS(){
 function imprimePruebaImpresoraPOS(){
   const p=borradorImpresoraPOS; if(!p) return;
   if(p.conexion==="bluetooth"&&!p.impresoraBt){toast("Busca y selecciona la impresora primero.");return;}
-  const cuerpo=encabezadoTicket()+'<div class="c g">PRUEBA DE IMPRESIÓN</div><div class="c">'+esc(p.nombre)+
-    '</div><div class="c">Papel '+num(p.anchoPapelBt,80)+' mm</div><hr><div class="c">Listo</div>';
+  const cocina=p.cocina||p.cancela||!p.cuenta, papel=num(p.anchoPapelBt,80)===58?58:80;
+  const muestra={folio:"PRUEBA",mesaId:"demo",mesaNombre:cocina?"Prueba de cocina":"Prueba de cuenta",
+    fecha:hoyISO(),abre:horaAhora(),personas:1,mesero:p.nombre||"Impresora",
+    lineas:[{nombre:"Taco de bistec",cant:2,precio:40,comensal:1,mods:[{nombre:"Salsa aparte",extra:0}],nota:""}]};
+  let cuerpo, rasterModel;
+  if(cocina){
+    cuerpo=cuerpoComandaCocinaPOS(muestra,muestra.lineas);
+    rasterModel=datosComandaRasterPOS(muestra,muestra.lineas);
+    rasterModel.pedido="Papel "+papel+" mm";
+  }else{
+    rasterModel=datosCuentaRasterPOS(muestra,[],0);
+    cuerpo=encabezadoTicket()+'<div class="c xl">PRUEBA DE CUENTA</div><hr>'+
+      lineaPar('2 Taco de bistec',esc(rasterModel.grupos[0].items[0].importe),'g')+
+      '<div class="sang">Salsa aparte</div><hr>'+lineaPar('TOTAL',esc(rasterModel.total),'xl');
+    rasterModel.encabezado="Papel "+papel+" mm";
+  }
   const destino=Object.assign({},p,{categorias:(p.categorias||[]).slice()});
   const status=$("#impTestEstado"); if(status) status.textContent="Enviando prueba…";
-  imprimeHoja("Prueba · "+p.nombre,cuerpo,{impresora:destino,esPrueba:true});
+  imprimeHoja("Prueba · "+p.nombre,cuerpo,{impresora:destino,esPrueba:true,rasterModel});
 }
 function borraImpresoraPOS(){
   if(!impresoraEnEdicionPOS) return;
