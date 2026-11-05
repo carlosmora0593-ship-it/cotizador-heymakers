@@ -28,3 +28,7 @@ verify_jwt = false
 
 [functions.webhook-stripe]
 verify_jwt = false
+
+# Verifica la sesión y el permiso financiero dentro de la función.
+[functions.facturacion-suscripcion]
+verify_jwt = false

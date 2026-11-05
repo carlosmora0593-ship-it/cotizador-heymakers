@@ -8,6 +8,8 @@ client.from=table=>{
  const q={select(){return q},then(ok,bad){return Promise.resolve({data:JSON.parse(JSON.stringify(table==='v_anuncios'?op.ads:op.drafts)),error:null}).then(ok,bad)}};return q;
 };
 client.rpc=async(name,args)=>{
+ if(name==='lab_facturapi_estado')return {data:{disponible:true,mensaje:'Facturapi conectado en pruebas. Emisor fiscal real pendiente.'},error:null};
+ if(name==='lab_facturapi_solicita'){op.pruebaSolicitada=args.p_factura;return {data:true,error:null};}
  if(name==='lab_anuncio_guarda'){
   if(op.fail)return {error:{message:'No hay conexión de prueba'}};
   op.writes.push(JSON.parse(JSON.stringify(args)));let a=op.ads.find(a=>a.id===args.p_id);
@@ -24,3 +26,9 @@ client.rpc=async(name,args)=>{
  return opRpc(name,args);
 };
 client.storage.from=bucket=>({createSignedUrl:async(ref,expires)=>{op.signed.push({bucket,ref,expires});return {data:{signedUrl:location.origin+'/qa-documento.pdf'},error:null};}});
+client.functions={invoke:async(name,{body})=>{
+ if(name!=='facturacion-suscripcion')return {error:{message:'Función no simulada'}};
+ if(op.fiscalFail)return {error:{message:'Conexión fiscal de prueba fallida'}};
+ if(body.accion==='procesar')Object.assign(op.payments[0],{pdf:true,xml:true,uuid_sat:'UUID-SINTETICO',proveedor_id:'documento-qa',estado:'timbrada',motivo:'Comprobante de prueba. Sin validez fiscal; receptor ficticio.'});
+ return {data:{disponible:true,mensaje:'Facturapi conectado en pruebas. Emisor fiscal real pendiente.'},error:null};
+}};

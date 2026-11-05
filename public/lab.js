@@ -567,6 +567,9 @@ window.__labAnuncios = {
 
 /* Reportes y archivo de suscripciones: la base comprueba los permisos en cada RPC. */
 window.__labOperacion={
+ async conexion(){const r=await SB.rpc("lab_facturapi_estado",{});if(r.error)throw r.error;return r.data;},
+ async facturapi(accion){const r=await SB.functions.invoke("facturacion-suscripcion",{body:{accion}});if(r.error)throw r.error;if(r.data?.error)throw new Error(r.data.error);return r.data;},
+ async prueba(id){const r=await SB.rpc("lab_facturapi_solicita",{p_factura:Number(id)});if(r.error)throw r.error;return this.facturapi("procesar");},
  async reporte(desde,hasta,anuncio){const r=await SB.rpc("lab_reporte_publicidad",{p_desde:desde,p_hasta:hasta,p_anuncio:anuncio?Number(anuncio):null});if(r.error)throw r.error;return r.data;},
  async facturas(desde,hasta,busqueda){const r=await SB.rpc("lab_facturas_lista",{p_desde:desde,p_hasta:hasta,p_busqueda:busqueda||""});if(r.error)throw r.error;return r.data;},
  async archivo(id,formato){const r=await SB.rpc("lab_facturas_archivo",{p_id:Number(id),p_formato:formato});if(r.error)throw r.error;const a=await SB.storage.from("facturas-suscripcion").createSignedUrl(r.data,120);if(a.error)throw a.error;return a.data.signedUrl;},
