@@ -1,0 +1,66 @@
+/* Paleta aprobada por Carlos. Capa de apariencia; sin cambios de operación. */
+:root{
+ --bg:#F3E6CF;--surface:#FFFBF4;--surface-2:#EFE2CD;--line:#D6CEBC;--line-soft:#E7DCC9;
+ --ink:#123B40;--ink-2:#365D60;--ink-3:#526A6A;
+ --accent:#A24BFF;--accent-soft:#EEE2FF;--accent-ink:#0A0810;
+ --cyan:#0E4A52;--cyan-soft:#DCEBEB;--forest:#0E4A52;--forest-2:#135D65;
+ --cream:#F3E6CF;--clay:#7830B9;--gold:#C8A5F5;--olive:#427577;
+ --good:#286653;--good-soft:#E1EDE6;--warn:#865D15;--warn-soft:#FBEDD2;--mal:#A0394B;
+ --focus:rgba(162,75,255,.35);--heading-ring-rgb:14,74,82;--heading-ring-accent-rgb:162,75,255;
+ --sombra:0 4px 20px rgba(14,74,82,.07);color-scheme:light;
+}
+body{background:var(--bg);color:var(--ink)}
+#barra{background:#0E4A52;color:#F3E6CF;border-color:#285D63;box-shadow:none}
+.barraTop{border-bottom-color:#37686D}.barraTop b{color:#F3E6CF}.barraTop small,.barraGrupo,.barraPie{color:#D3DFD8}
+.barraTop .plaque{background:#F3E6CF;color:#0E4A52;box-shadow:none}.barraPie{border-top-color:#37686D}
+.barraCmyk i:nth-child(1){background:#F3E6CF}.barraCmyk i:nth-child(2){background:#A24BFF}.barraCmyk i:nth-child(3){background:#54838A}.barraCmyk i:nth-child(4){background:#D3C0EF}
+nav.tabs button{color:#F3E6CF}nav.tabs button:hover{background:#245D64;color:#FFF9F0}
+nav.tabs button[aria-selected=true]{background:#F3E6CF;color:#0E4A52;box-shadow:inset 4px 0 #A24BFF}
+nav.tabs .mbadge{background:#A24BFF;color:#0A0810}
+header.top{background:#0E4A52;color:#F3E6CF;border-color:#37686D;box-shadow:none}
+header.top .btn.ghost{background:transparent;color:#F3E6CF;border-color:#7B9B98}header.top .btn.ghost:hover{background:#245D64;color:#F3E6CF}
+#restaurantAccountName,#restaurantCloudStatus,header.top #restaurantSync,header.top #restaurantSyncText{color:#E2E1D1}
+.userChip,.candadoBtn{background:#245D64;color:#F3E6CF;border-color:#54838A}
+.userChip .av{background:#A24BFF;color:#0A0810}.userChip .rolTxt,.turnoChip{color:#E9DDC9}.turnoChip b{color:#F3E6CF}
+#pwaInstall{background:#F3E6CF;color:#0E4A52;border-color:#F3E6CF}
+input,select,textarea{background:#FFFBF4;border-color:#B6BCAD;color:#123B40}input::placeholder,textarea::placeholder{color:#5C7170}
+input:focus,select:focus,textarea:focus{border-color:#7830B9;box-shadow:0 0 0 3px var(--focus)}
+.btn{background:#FFFBF4;border-color:#C8C5B6;color:#0E4A52;box-shadow:none}
+.btn:hover:not(:disabled){background:#EFE6D8;border-color:#0E4A52;box-shadow:0 4px 14px rgba(14,74,82,.1)}
+.btn.primary,.btn.acento{background:#A24BFF;border-color:#A24BFF;color:#0A0810;box-shadow:0 5px 14px rgba(125,49,191,.15)}
+.btn.primary:hover:not(:disabled),.btn.acento:hover:not(:disabled){background:#AE62FF;border-color:#AE62FF;color:#0A0810}
+.btn.bien{background:#286653;border-color:#286653;color:#FFFBF4}.btn.mal{background:#FFF1EE;color:#A0394B;border-color:#D4A2A4}
+.btn.ghost{color:#365D60;border-color:#C8C5B6}.btn.ghost:hover{background:#E4E8DB}
+.card{background:#FFFBF4;border-color:#D6CEBC;box-shadow:var(--sombra)}.card>header{background:#F8EFDF;border-bottom-color:#E7DCC9}
+.card>header h2,.wrap>section>.fila:first-child h2{color:#123B40}.card>header .hint{color:#526A6A}
+.note{background:#E5EBDD;color:#365D60;border-left-color:#0E4A52}.empty{background:#F8EFDF;border-color:#C8C5B6;color:#526A6A}
+.heroR{background:#0E4A52;color:#F3E6CF;border-left-color:#A24BFF;box-shadow:0 12px 28px rgba(14,74,82,.12)}
+.heroR h1{color:#F3E6CF}.heroR p,.heroR .sub{color:#E2E1D1}.heroR:before{border-color:#547E82;box-shadow:0 0 0 24px rgba(162,75,255,.07),0 0 0 48px rgba(162,75,255,.04)}
+.heroAction{background:#245D64;color:#F3E6CF;border-color:#547E82}.heroAction:hover{background:#2B676F;border-color:#A24BFF}
+.heroAction.destacado,.heroAction.destacado:hover{background:#A24BFF;border-color:#A24BFF;color:#0A0810}
+.heroActionIcon{background:#37686D;color:#F3E6CF}.heroAction.destacado .heroActionIcon{background:rgba(10,8,16,.1);color:#0A0810}
+.heroAction small,.heroAction.destacado small{color:inherit;opacity:.9}.heroRBadge{color:#F3E6CF;border-color:#547E82;background:#245D64}
+.heroAction.destacado small{color:#0A0810;opacity:1}.androidApkCopy small{color:#365D60}
+.heroAction.destacado .heroActionCopy small,body.modoEvento .heroAction.destacado .heroActionCopy small{color:#0A0810;opacity:1}
+#tab-inicio .tile{border-top-color:#D6CEBC}
+.androidApkLink{background:#F3E6CF;color:#0E4A52;border-color:#D6CEBC}.androidApkIcon{background:#E5D9F5;color:#582083}
+.tile{background:#FFFBF4;border-color:#D6CEBC}.tile .v{color:#0E4A52}.tile:after{background:radial-gradient(circle,rgba(162,75,255,.1),transparent 68%)}
+.seg,.zonas button,.catFila button{background:#EFE2CD;border-color:#D6CEBC;color:#365D60}
+.seg button[aria-pressed=true]{background:#FFFBF4;color:#0E4A52}
+.zonas button[aria-pressed=true],.catFila button[aria-pressed=true]{background:#0E4A52;border-color:#0E4A52;color:#F3E6CF}
+.mesa,.mesa.libre{background:#FFFBF4;border-color:#D6CEBC}.mesa b,.mesa.libre b{color:#123B40}
+.mesa small,.mesa .sello{color:#526A6A}.mesa .tot{color:#0E4A52}.mesa .pers{background:#EFE2CD;color:#365D60}
+.mesa .mesaIcon,.mesa.libre .mesaIcon{background:#E4ECE3;color:#0E4A52;border-color:#CCDAD2}
+.mesa.ocupada{background:#F2E8FF;border-color:#B98ADC}.mesa.ocupada .mesaIcon{background:#E5D2FF;color:#582083;border-color:#CDA7F2}
+.mesa.ocupada .pers{background:#E5D2FF;color:#582083}.mesa.ocupada .tot,.mesa.ocupada .sello{color:#582083}
+.mesa.cuenta{background:#FBEDD2;border-color:#CBB176}.mesa.cuenta .mesaIcon,.mesa.cuenta .pers{background:#F1DCAA;color:#6F4E13;border-color:#CBB176}
+.mesa.cuenta .tot,.mesa.cuenta .sello{color:#6F4E13}.mesa:hover{border-color:#0E4A52;box-shadow:0 8px 22px rgba(14,74,82,.12)}
+.mesa:hover .mesaIcon{background:#0E4A52;color:#F3E6CF}.mesa:before{background:radial-gradient(circle,rgba(14,74,82,.1),transparent 68%)}
+.croquis{background:radial-gradient(ellipse at 50% 35%,#FFFBF4,#EFE2CD);border-color:#D6CEBC}
+.cmesa{background:#F3E6CF;color:#123B40;border-color:#B2A798}.cmesa.ocupada{background:#E5D2FF;border-color:#A24BFF}.cmesa.cuenta{background:#F1DCAA;border-color:#B58A3B}
+.cmesa .tot{background:#FFFBF4;color:#0E4A52;border-color:#D6CEBC}.silla{background:#728B86}.cmesa.ocupada .silla{background:#7830B9}
+.plat,.llevarCard,.kdsCard{background:#FFFBF4;border-color:#D6CEBC}.plat:hover,.llevarCard:hover{border-color:#0E4A52}
+.kdsCard header{background:#F8EFDF}.kdsLin button{background:#EFE2CD;color:#0E4A52;border-color:#D6CEBC}
+.teclado button{background:#FFFBF4;color:#123B40;border-color:#D6CEBC}
+#toast{background:#0E4A52;color:#F3E6CF;border-color:#547E82}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
