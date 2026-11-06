@@ -193,7 +193,77 @@ async function envia(e){e.preventDefault();const alta=modo==="alta",email=$("#em
   const b=$("#submit");b.disabled=true;b.textContent=alta?"Creando tu cuenta…":"Entrando…";message("");
   try{let data,error;if(alta){({data,error}=await sb.auth.signUp({email,password,options:{data:{nombre:$("#personName").value.trim(),negocio:$("#businessName").value.trim()||P[requested[0]].name,producto:requested[0],productos:requested}}}));}else{({data,error}=await sb.auth.signInWithPassword({email,password}));}if(error)throw error;if(!data.session){message("Te mandamos un correo para confirmar tu cuenta. Después vuelve aquí e inicia sesión para abrir tu POS.","good");setMode("entrar");$("#email").value=email;$("#password").value="";b.disabled=false;b.textContent="Iniciar sesión";return;}await entra(data.session);}
   catch(e){message(e.message||"No se pudo abrir la cuenta.","error");b.disabled=false;b.textContent=alta?"Crear cuenta y probar 15 días":"Iniciar sesión";}}
-async function init(){show("#loadingPanel");if(!window.CONFIG||!window.supabase){show("#authPanel");message("Falta cargar la conexión de Nuvoor. Intenta actualizar la página.","error");return;}sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);const hint=$("#multiHint");if(hint)hint.textContent="Cada negocio es una cuenta independiente; sus datos no se mezclan.";$$('[data-mode]').forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));$("#authForm").addEventListener("submit",envia);$("#addBusinessForm").addEventListener("submit",agregaNegocio);$$('input[name="producto"]').forEach(x=>x.addEventListener("change",actualizaSeleccion));$("#logout").addEventListener("click",async()=>{try{await sb.auth.signOut();}catch(_){}finally{limpiaSesionLocal();location.replace("./acceso.html");}});
-  const {data,error}=await sb.auth.getSession();if(error){show("#authPanel");message("No pudimos revisar la sesión. Intenta iniciar sesión.","error");return;}if(data.session){await entra(data.session);return;}show("#authPanel");}
+let correoCodigo="",ultimoEnvioCodigo=0,codigoOcupado=false;
+function mensajeCodigo(texto,clase=""){
+  const n=$("#emailCodeMessage");n.textContent=texto;n.className="msg"+(clase?" "+clase:"");
+}
+function pasoCodigo(correo=""){
+  correoCodigo=correo;
+  $("#codeEmail").readOnly=!!correo;
+  $("#emailCodeField").hidden=!correo;
+  $("#emailCode").disabled=!correo;
+  $("#emailCode").required=!!correo;
+  $("#emailCode").value="";
+  $("#emailCodeResend").hidden=!correo;
+  $("#emailCodeChange").hidden=!correo;
+  $("#emailCodeSubmit").textContent=correo?"Verificar y entrar":"Enviar código";
+}
+function abreAccesoCodigo(){
+  $("#codeEmail").value=$("#email").value;
+  $("#password").value="";
+  $("#authForm").hidden=true;
+  $("#authSwitch").hidden=true;
+  $("#closedSignup").hidden=true;
+  $("#emailCodeForm").hidden=false;
+  $("#authTitle").textContent="Entra con tu correo";
+  $("#authSub").textContent="Te enviaremos un código para abrir tu cuenta.";
+  pasoCodigo();mensajeCodigo("");
+}
+async function usaCodigo(e,reenviar=false){
+  e.preventDefault();
+  if(codigoOcupado)return;
+  const verificar=!!correoCodigo&&!reenviar;
+  const email=correoCodigo||$("#codeEmail").value.trim().toLowerCase();
+  const token=$("#emailCode").value.trim();
+  if(verificar&&!/^[0-9]{6}$/.test(token)){mensajeCodigo("Escribe los 6 dígitos del código.","error");return;}
+  if(!verificar&&Date.now()-ultimoEnvioCodigo<60000){mensajeCodigo("Espera un minuto antes de pedir otro código.","error");return;}
+  codigoOcupado=true;
+  const botones=$$("#emailCodeForm button");
+  botones.forEach(b=>b.disabled=true);
+  mensajeCodigo(verificar?"Verificando…":"Enviando…");
+  try{
+    if(verificar){
+      const {data,error}=await sb.auth.verifyOtp({email,token,type:"email"});
+      if(error||!data?.session){mensajeCodigo("El código no coincide o venció. Revisa el correo o pide otro código.","error");return;}
+      $("#emailCode").value="";
+      await entra(data.session);
+    }else{
+      const destino=new URL("./acceso.html",location.href);
+      for(const llave of ["producto","cuenta","app"]){const valor=params.get(llave);if(valor)destino.searchParams.set(llave,valor);}
+      destino.searchParams.set("codigo","1");
+      const {error}=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:false,emailRedirectTo:destino.href}});
+      if(error&&error.code!=="otp_disabled"&&error.code!=="signup_disabled")throw error;
+      ultimoEnvioCodigo=Date.now();
+      pasoCodigo(email);
+      mensajeCodigo("Si ese correo tiene acceso, recibirás un código. Si el mensaje incluye un enlace, también puedes usarlo.","good");
+      $("#emailCode").focus();
+    }
+  }catch(error){
+    mensajeCodigo(error?.status===429?"Espera un minuto y vuelve a intentar.":"No se pudo enviar el código. Revisa tu conexión e inténtalo de nuevo.","error");
+  }finally{codigoOcupado=false;botones.forEach(b=>b.disabled=false);}
+}
+function conectaAccesoCodigo(){
+  $("#useEmailCode").addEventListener("click",()=>{abreAccesoCodigo();$("#codeEmail").focus();});
+  $("#emailCodeBack").addEventListener("click",()=>{
+    $("#email").value=$("#codeEmail").value;
+    pasoCodigo();mensajeCodigo("");$("#emailCodeForm").hidden=true;
+    setMode("entrar");$("#email").focus();
+  });
+  $("#emailCodeChange").addEventListener("click",()=>{pasoCodigo();mensajeCodigo("");$("#codeEmail").focus();});
+  $("#emailCodeResend").addEventListener("click",e=>usaCodigo(e,true));
+  $("#emailCodeForm").addEventListener("submit",usaCodigo);
+}
+async function init(){show("#loadingPanel");if(!window.CONFIG||!window.supabase){show("#authPanel");message("Falta cargar la conexión de Nuvoor. Intenta actualizar la página.","error");return;}sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);conectaAccesoCodigo();const hint=$("#multiHint");if(hint)hint.textContent="Cada negocio es una cuenta independiente; sus datos no se mezclan.";$$('[data-mode]').forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));$("#authForm").addEventListener("submit",envia);$("#addBusinessForm").addEventListener("submit",agregaNegocio);$$('input[name="producto"]').forEach(x=>x.addEventListener("change",actualizaSeleccion));$("#logout").addEventListener("click",async()=>{try{await sb.auth.signOut();}catch(_){}finally{limpiaSesionLocal();location.replace("./acceso.html");}});
+  const {data,error}=await sb.auth.getSession();if(error){show("#authPanel");message("No pudimos revisar la sesión. Intenta iniciar sesión.","error");return;}if(data.session){await entra(data.session);return;}if(params.get("codigo")==="1")abreAccesoCodigo();show("#authPanel");}
 init();
 })();

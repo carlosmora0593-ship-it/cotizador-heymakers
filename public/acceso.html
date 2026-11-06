@@ -68,7 +68,23 @@
           </div>
           <p class="msg" id="msg" role="status" aria-live="polite"></p>
           <button class="btn" id="submit" type="submit">Iniciar sesión <span aria-hidden="true">→</span></button>
+          <button class="textButton" id="useEmailCode" type="button">Entrar con un código por correo</button>
           <p class="footnote">Tus datos de acceso se protegen con Supabase.</p>
+        </form>
+        <form id="emailCodeForm" autocomplete="off" hidden>
+          <div class="field">
+            <label for="codeEmail">Correo electrónico</label>
+            <span class="inputShell"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="3"></rect><path d="m5 7 7 5 7-5"></path></svg><input id="codeEmail" type="email" autocomplete="email" required placeholder="tu@negocio.com"></span>
+          </div>
+          <div class="field" id="emailCodeField" hidden>
+            <label for="emailCode">Código de verificación</label>
+            <span class="inputShell"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10" rx="2.5"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v2"></path></svg><input id="emailCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="6 dígitos" disabled></span>
+          </div>
+          <p class="msg" id="emailCodeMessage" role="status" aria-live="polite"></p>
+          <button class="btn" id="emailCodeSubmit" type="submit">Enviar código</button>
+          <button class="textButton" id="emailCodeResend" type="button" hidden>Volver a enviar</button>
+          <button class="textButton" id="emailCodeChange" type="button" hidden>Usar otro correo</button>
+          <button class="textButton" id="emailCodeBack" type="button">Entrar con contraseña</button>
         </form>
         <div class="authSwitch" id="authSwitch"><span>¿Primera vez aquí?</span><button class="textButton" type="button" data-mode="alta">Crea una cuenta <span aria-hidden="true">→</span></button></div>
       </section>
@@ -114,6 +130,6 @@
 
 <script src="./config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="./acceso.js?v=20261102-1810"></script>
+<script src="./acceso.js?v=20261105-2043"></script>
 </body>
 </html>

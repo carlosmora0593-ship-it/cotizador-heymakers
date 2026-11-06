@@ -602,6 +602,7 @@ body.sin-acceso .wrap,body.sin-acceso header.top,body.sin-acceso #barra{display:
 .accesoBody{padding:24px}
 .accesoBody h1{font-size:22px;margin:14px 0 5px}
 .accesoBody .sub{color:var(--ink-3);font-size:12.5px;margin:0}
+.restaurantPin{-webkit-text-security:disc}
 .perfiles{display:flex;flex-direction:column;gap:7px;margin-top:18px}
 .perfilBtn{display:flex;align-items:center;gap:11px;cursor:pointer;text-align:left;width:100%;
   background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radio-sm);padding:11px 13px}
@@ -1452,7 +1453,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261105-1707">
+<meta name="nuvoor-build" content="20261105-2043">
 <link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
 </head>
 <body>
@@ -2103,7 +2104,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <div class="claveCaja" id="accesoClave" hidden>
         <label class="f">Clave de <b id="accesoQuien"></b></label>
         <div style="display:flex;gap:8px;margin-top:6px">
-          <input id="accesoPass" type="password" inputmode="numeric" placeholder="Tu clave" autocomplete="current-password">
+          <input id="accesoPass" class="restaurantPin" type="password" inputmode="numeric" placeholder="Tu clave" autocomplete="off" autocapitalize="none" spellcheck="false">
           <button class="btn primary" id="accesoEntrar">Entrar</button>
           <button class="btn" id="accesoVolver">Volver</button>
         </div>
@@ -2320,7 +2321,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <p class="note" id="autoQue" style="margin:0 0 14px"></p>
       <div id="autoLista" style="margin-bottom:14px"></div>
       <label class="f" for="autoPin">Clave de quien autoriza</label>
-      <input id="autoPin" type="password" inputmode="numeric" maxlength="12" autocomplete="off" placeholder="••••">
+      <input id="autoPin" class="restaurantPin" type="password" inputmode="numeric" maxlength="12" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="••••">
       <div class="fila" style="margin-top:16px">
         <button class="btn primary ancho" id="autoOk">Autorizar</button>
       </div>
@@ -6383,20 +6384,17 @@ async function ejecutaTrabajoImpresoraPOS(trabajo){
   if(p.conexion==="bluetooth"){
     if(!puente || !p.impresoraBt) return {ok:false,mensaje:"No está disponible la impresora Bluetooth guardada."};
     const cocina=trabajo.rasterModel?.tipo==="cocina";
-    const textoGrande=cocina&&typeof puente.printKitchenTicket==="function";
-    const imagen=!cocina&&trabajo.rasterModel&&typeof puente.printImage==="function";
-    if(!textoGrande&&!imagen&&typeof puente.printTicket!=="function"&&typeof puente.printText!=="function")
+    const textoGrande=!!trabajo.rasterModel&&typeof puente.printKitchenTicket==="function";
+    if(!textoGrande&&typeof puente.printTicket!=="function"&&typeof puente.printText!=="function")
       return {ok:false,mensaje:"La app necesita actualizarse para imprimir por Bluetooth."};
-    if(p.corteAutomatico&&!textoGrande&&!imagen&&typeof puente.printTicket!=="function")
+    if(p.corteAutomatico&&!textoGrande&&typeof puente.printTicket!=="function")
       return {ok:false,mensaje:"Actualiza la app para usar el cortador automático."};
     const id="imp-bt-"+uid(), esperando=esperaResultadoImpresoraPOS(id,35000), mm=num(p.anchoPapelBt,80)===58?58:80;
     try{
       if(textoGrande){
         const opciones={corte:!!p.corteAutomatico,avance:p.corteAutomatico?3:8};
-        puente.printKitchenTicket(id,p.impresoraBt,mm,JSON.stringify(renglonesComandaPOS(trabajo.rasterModel)),JSON.stringify(opciones));
-      }else if(imagen){
-        const png=await rasterImagenTicketPOS(trabajo.rasterModel,mm),opciones={corte:!!p.corteAutomatico,avance:p.corteAutomatico?3:8,umbral:190};
-        puente.printImage(id,p.impresoraBt,mm,png,JSON.stringify(opciones));
+        const renglones=cocina?renglonesComandaPOS(trabajo.rasterModel):renglonesCuentaPOS(trabajo.rasterModel);
+        puente.printKitchenTicket(id,p.impresoraBt,mm,JSON.stringify(renglones),JSON.stringify(opciones));
       }else if(typeof puente.printTicket==="function"){
         const texto=ticketHtmlATexto(trabajo.titulo,trabajo.cuerpo,mm);
         const opciones={corte:!!p.corteAutomatico,avance:p.corteAutomatico?3:8};
@@ -6517,51 +6515,50 @@ function datosCuentaRasterPOS(c,pagos,propina){
     for(let i=1;i<=n;i++)grupos.push({k:i,titulo:"Comensal "+i});grupos.push({k:0,titulo:"Para compartir"});
   }
   if(c.mesaId!=="llevar")grupos.forEach(g=>{const ls=vivas(c).filter(l=>{const k=num(l.comensal,0);return (k>=1&&k<=n?k:0)===g.k;});if(!ls.length)return;g.items=ls.map(l=>({nombre:l.nombre||"Platillo",cantidad:num(l.cant,1),importe:mx(importeLinea(l)),mods:(l.mods||[]).map(m=>({nombre:m.nombre||"Opción",extra:num(m.extra)})),nota:l.nota||""}));if(n<=1&&g.k!==0)g.titulo="";});
-  return {tipo:"cuenta",negocio:(P.negocio||{}).nombre||"",logo:(P.ticket||{}).mostrarLogo!==false?(P.negocio||{}).logo||"":"",direccion:(P.negocio||{}).dir||"",telefono:(P.negocio||{}).tel||"",encabezado:(P.ticket||{}).encabezado||"",nombre:c.appId?String(c.mesaNombre||c.appNombre||"Pedido por app"):nombreVisibleComandaPOS(c),folio:folioVisualPOS(c.folio),fecha:(c.fecha||hoyISO())+" "+String(c.abre||""),cierre:String(c.cierra||horaAhora()),mesero:c.mesero||"",grupos:grupos.filter(g=>g.items&&g.items.length),consumo:mx(s.sub),servicio:s.serv?mx(s.serv):"",iva:(P.ticket||{}).mostrarIva!==false&&s.iva?mx(s.iva):"",propina:prop?mx(prop):"",total:mx(s.total+prop),pagos:(pagos||c.pagos||[]).map(p=>({nombre:p.tipo||"Pago",importe:mx(p.monto)})),cambio:num(c.cambio)?mx(c.cambio):"",division:n>1?porComensal(c).lista.map(x=>({nombre:"Comensal "+x.comensal,importe:mx(x.total+prop/n)})):[],leyenda:(P.ticket||{}).mostrarPropina!==false?(P.ticket||{}).leyenda||"":"",pie:(P.ticket||{}).pie||""};
+  return {tipo:"cuenta",negocio:(P.negocio||{}).nombre||"",direccion:(P.negocio||{}).dir||"",telefono:(P.negocio||{}).tel||"",encabezado:(P.ticket||{}).encabezado||"",nombre:c.appId?String(c.mesaNombre||c.appNombre||"Pedido por app"):nombreVisibleComandaPOS(c),folio:folioVisualPOS(c.folio),fecha:(c.fecha||hoyISO())+" "+String(c.abre||""),cierre:String(c.cierra||horaAhora()),mesero:c.mesero||"",grupos:grupos.filter(g=>g.items&&g.items.length),consumo:mx(s.sub),servicio:s.serv?mx(s.serv):"",iva:(P.ticket||{}).mostrarIva!==false&&s.iva?mx(s.iva):"",propina:prop?mx(prop):"",total:mx(s.total+prop),pagos:(pagos||c.pagos||[]).map(p=>({nombre:p.tipo||"Pago",importe:mx(p.monto)})),cambio:num(c.cambio)?mx(c.cambio):"",division:n>1?porComensal(c).lista.map(x=>({nombre:"Comensal "+x.comensal,importe:mx(x.total+prop/n)})):[],leyenda:(P.ticket||{}).mostrarPropina!==false?(P.ticket||{}).leyenda||"":"",pie:(P.ticket||{}).pie||""};
 }
-function rasterEnvuelvePOS(ctx,texto,maxWidth,size,weight){
-  ctx.font=weight+" "+size+"px Arial, Roboto, sans-serif";const words=String(texto||"").split(/\s+/).filter(Boolean),lines=[];let current="";
-  words.forEach(word=>{const next=current?current+" "+word:word;if(current&&ctx.measureText(next).width>maxWidth){lines.push(current);current=word;}else current=next;});if(current)lines.push(current);return lines;
-}
-async function rasterImagenTicketPOS(model,mm){
-  const width=mm<=58?384:576,margin=width===384?22:30,inside=width-margin*2,measure=document.createElement("canvas").getContext("2d"),ops=[];
-  let logo=null,logoSize=null,y=20;
-  if(model.logo&&/^data:image\//i.test(model.logo))logo=await new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>resolve(null);image.src=model.logo;});
-  if(logo){const scale=Math.min(inside/logo.width,82/logo.height,1);logoSize={width:Math.max(1,Math.round(logo.width*scale)),height:Math.max(1,Math.round(logo.height*scale))};y+=logoSize.height+14;}
-  const text=(value,size,bold=false,align="left",indent=0,fit=false)=>{
-    const maxWidth=inside-indent,weight=bold?"700":"400",str=String(value||"");if(!str)return;
-    if(fit){measure.font=weight+" "+size+"px Arial, Roboto, sans-serif";const measured=measure.measureText(str).width,actual=measured>maxWidth?Math.max(size*.62,size*maxWidth/measured):size;ops.push({kind:"text",value:str,x:width/2,y:y+actual*.82,size:actual,weight,align:"center",maxWidth});y+=actual*1.16;return;}
-    const lines=rasterEnvuelvePOS(measure,str,maxWidth,size,weight),lineHeight=size*1.18;
-    lines.forEach(line=>{ops.push({kind:"text",value:line,x:margin+indent,y:y+size*.88,size,weight,align:"left",maxWidth});y+=lineHeight;});
-  };
-  const split=(left,right,size=22,bold=false)=>{
-    const weight=bold?"700":"400",leftWidth=inside*.68,rightWidth=inside*.29,lines=rasterEnvuelvePOS(measure,left,leftWidth,size,weight),lineHeight=size*1.2;
-    lines.forEach((line,index)=>{ops.push({kind:"text",value:line,x:margin,y:y+size*.88,size,weight,align:"left",maxWidth:leftWidth});if(index===0&&right)ops.push({kind:"text",value:String(right),x:width-margin,y:y+size*.88,size:Math.min(size,21),weight:"400",align:"right",maxWidth:rightWidth});y+=lineHeight;});
-  };
-  const rule=()=>{y+=8;ops.push({kind:"rule",y});y+=17;};
-  const centered=(value,size,bold=false,fit=true)=>text(value,size,bold,"center",0,fit);
-  if(model.tipo==="cocina"){
-    centered("COCINA",22,true);y+=14;centered(model.folio,48,true);centered(model.cancelacion?"CANCELAR":model.heading,model.cancelacion?52:48,true);
-    if(model.cancelacion)centered(model.heading,43,true);
-    text(model.fecha+" "+model.hora,22,false);if(model.mesero)text((model.cancelacion?"Solicitó: ":"Atiende: ")+model.mesero,22,false);if(model.personas)text(model.personas+" comensales",22,false);
-    rule();centered(model.pedido||"Comer dentro",32,true);rule();
-    (model.grupos||[]).forEach(group=>{if(group.titulo)text(group.titulo,22,true);(group.items||[]).forEach((item,index)=>{text(num(item.cantidad,1)+" x "+item.nombre,34,true);(item.mods||[]).forEach(mod=>text("› "+mod,26,false,"left",18));if(item.nota)text("Nota: "+item.nota,26,true,"left",18);if(index<group.items.length-1)rule();});});
-    if(model.cancelacion){(model.items||[]).forEach(item=>{text(num(item.cantidad,1)+" x "+item.nombre,34,true);if(item.nota)text("Motivo: "+item.nota,26,true,"left",18);});}
-  }else{
-    centered(model.negocio,28,true);if(model.direccion)centered(model.direccion,18,false);if(model.telefono)centered("Tel. "+model.telefono,18,false);if(model.encabezado)String(model.encabezado).split(/\n/).forEach(line=>centered(line,19,false));
-    centered(model.nombre,34,true);centered(model.folio,22,true);text(model.fecha,20,false);if(model.mesero)text("Atendió: "+model.mesero,20,false);if(model.cierre)text("Cerró: "+model.cierre,20,false);rule();
-    (model.grupos||[]).forEach(group=>{if(group.titulo)text(group.titulo,20,true);(group.items||[]).forEach(item=>{split(num(item.cantidad,1)+" x "+item.nombre,item.importe,23,true);(item.mods||[]).forEach(mod=>{if(mod.extra)split("  + "+mod.nombre,"",19,false);else text("  · "+mod.nombre,19,false);});if(item.nota)text("  · "+item.nota,19,false);});});
-    rule();split("Consumo",model.consumo,23,false);if(model.servicio)split("Servicio",model.servicio,20,false);if(model.iva)split("IVA incluido",model.iva,20,false);if(model.propina)split("Propina",model.propina,20,false);rule();split("TOTAL",model.total,42,true);(model.pagos||[]).forEach(p=>split(p.nombre,p.importe,20,false));if(model.cambio)split("Cambio",model.cambio,20,false);
-    if(model.division&&model.division.length){rule();text("Si se divide",20,true);model.division.forEach(row=>split(row.nombre,row.importe,19,false));}
-    if(model.leyenda){rule();centered(model.leyenda,18,false);}if(model.pie){rule();String(model.pie).split(/\n/).forEach(line=>centered(line,18,false));}
+function renglonesCuentaPOS(modelo){
+  const filas=[];
+  const texto=(style,text)=>{if(text||style==="RULE")filas.push({style,text:text||""});};
+  const importe=(nombre,monto,style="DETAIL")=>{if(monto)texto(style,nombre+" | "+monto);};
+  texto("SUBTITLE",modelo.negocio);
+  texto("DETAIL",modelo.direccion);
+  if(modelo.telefono)texto("DETAIL","Tel. "+modelo.telefono);
+  texto("DETAIL",modelo.encabezado);
+  texto("TITLE",modelo.nombre);
+  texto("SUBTITLE",modelo.folio);
+  texto("DETAIL",modelo.fecha);
+  if(modelo.cierre)texto("DETAIL","Cerró: "+modelo.cierre);
+  if(modelo.mesero)texto("DETAIL","Atendió: "+modelo.mesero);
+  texto("RULE");
+  for(const grupo of modelo.grupos){
+    texto("EMPHASIS",grupo.titulo);
+    for(const item of grupo.items){
+      importe(num(item.cantidad,1)+" x "+item.nombre,item.importe,"EMPHASIS");
+      for(const mod of item.mods||[])texto("DETAIL","> "+mod.nombre);
+      if(item.nota)texto("DETAIL","Nota: "+item.nota);
+    }
   }
-  y+=18;if(y>12000)throw new Error("El ticket excede el largo máximo de impresión.");
-  const canvas=document.createElement("canvas");canvas.width=width;canvas.height=Math.max(100,Math.ceil(y));const ctx=canvas.getContext("2d");ctx.fillStyle="#fff";ctx.fillRect(0,0,width,canvas.height);if(logo&&logoSize)ctx.drawImage(logo,(width-logoSize.width)/2,12,logoSize.width,logoSize.height);ctx.fillStyle="#000";ctx.strokeStyle="#000";ctx.lineWidth=1;
-  ops.forEach(op=>{if(op.kind==="rule"){ctx.save();ctx.setLineDash([2,4]);ctx.beginPath();ctx.moveTo(margin,op.y);ctx.lineTo(width-margin,op.y);ctx.stroke();ctx.restore();return;}ctx.font=op.weight+" "+op.size+"px Arial, Roboto, sans-serif";ctx.textAlign=op.align;ctx.textBaseline="alphabetic";ctx.fillText(op.value,op.x,op.y,op.maxWidth);});
-  const image=ctx.getImageData(0,0,width,canvas.height);for(let i=0;i<image.data.length;i+=4){const v=(image.data[i]*299+image.data[i+1]*587+image.data[i+2]*114)/1000<190?0:255;image.data[i]=image.data[i+1]=image.data[i+2]=v;image.data[i+3]=255;}ctx.putImageData(image,0,0);
-  return canvas.toDataURL("image/png").split(",")[1];
+  texto("RULE");
+  importe("Consumo",modelo.consumo);
+  importe("Servicio",modelo.servicio);
+  importe("IVA incluido",modelo.iva);
+  importe("Propina",modelo.propina);
+  importe("TOTAL",modelo.total,"TITLE");
+  for(const pago of modelo.pagos)importe(pago.nombre,pago.importe);
+  importe("Cambio",modelo.cambio);
+  if(modelo.division.length){
+    texto("RULE");
+    texto("EMPHASIS","Si se divide");
+    for(const parte of modelo.division)importe(parte.nombre,parte.importe);
+  }
+  if(modelo.leyenda||modelo.pie){
+    texto("RULE");
+    texto("DETAIL",modelo.leyenda);
+    texto("DETAIL",modelo.pie);
+  }
+  return filas;
 }
-
 function encabezadoTicket(){
   const n = P.negocio || {}, tk = P.ticket || {};
   let s = "";
@@ -7920,8 +7917,7 @@ function renderEditorImpresoraPOS(){
   if(!p){ editor.innerHTML='<header><h3>Editar impresora</h3></header><div class="impPrinterHint">Selecciona una impresora de la lista o agrega una nueva.</div>'; return; }
   const nativa=!!window.MakersPrinter, conexion=nativa?(p.conexion||"bluetooth"):"sistema";
   const soportaCorte=nativa&&(typeof window.MakersPrinter.printTicket==="function"||typeof window.MakersPrinter.printKitchenTicket==="function");
-  const usaCocina=p.cocina||p.cancela||!p.cuenta;
-  const textoSimple=conexion==="bluetooth"&&(usaCocina?typeof window.MakersPrinter.printKitchenTicket!=="function":typeof window.MakersPrinter.printImage!=="function");
+  const textoSimple=conexion==="bluetooth"&&typeof window.MakersPrinter.printKitchenTicket!=="function";
   const dispositivoGuardado=p.impresoraBt?{address:p.impresoraBt,name:p.impresoraNombre||"Impresora guardada"}:null;
   const dispositivos=impresorasEmparejadasPOS.slice();
   if(dispositivoGuardado&&!dispositivos.some(d=>d.address===dispositivoGuardado.address)) dispositivos.unshift(dispositivoGuardado);
@@ -8211,7 +8207,7 @@ function renderEquipo(){
         (u.foto?'<button class="btn sm ghost" type="button" data-fotoquitar>Quitar</button>':'')+'</div></td>' +
       '<td><select data-uk="rol">'+Object.keys(ROLES).map(r=>
         '<option value="'+r+'"'+(r===u.rol?" selected":"")+'>'+ROLES[r].nombre+'</option>').join("")+'</select></td>' +
-      '<td><input data-uk="pin" type="password" inputmode="numeric" maxlength="12" value="'+esc(u.pin||"")+'" placeholder="'+(u.pin_hash?"registrada · escribe para cambiar":"sin clave")+'"></td>' +
+      '<td><input data-uk="pin" class="restaurantPin" type="'+tipoEntradaPinPOS+'" inputmode="numeric" maxlength="12" autocomplete="off" autocapitalize="none" spellcheck="false" value="'+esc(u.pin||"")+'" placeholder="'+(u.pin_hash?"registrada · escribe para cambiar":"sin clave")+'"></td>' +
       '<td style="text-align:center"><input type="checkbox" data-uk="activo" style="width:auto"'+(u.activo!==false?" checked":"")+'></td>' +
       '<td><button class="btn sm ghost" data-delusr="'+esc(u.id)+'"'+(EQUIPO.length<2?" disabled":"")+'>✕</button></td></tr>').join("") +
     '</tbody>';
@@ -8450,6 +8446,8 @@ function aplicaRol(){
 var bloqueado = false, relojInactivo = null;
 var relojBloqueoIntervalo = null;
 const MIN_BLOQUEO = 10;
+const tipoEntradaPinPOS = window.CSS?.supports("-webkit-text-security","disc") ? "text" : "password";
+["#accesoPass","#autoPin"].forEach(id=>$(id).type=tipoEntradaPinPOS);
 const tieneClave = u => !!(String((u||{}).pin||"").trim()||String((u||{}).pin_hash||(u||{}).pinHash||"").trim());
 async function validaClavePerfil(u,clave){if(!u)return false;const hash=u.pin_hash||u.pinHash;if(hash){try{return await nubeSha256((REST_NUBE.pinSalt||localStorage.getItem(LS_BASE+"_nube_pin_salt_v1")||"")+String(clave||""))===hash;}catch(_){return false;}}return String(clave||"")===String(u.pin||"");}
 const minutosBloqueo = () => { const n = num(P.bloqueoMin, MIN_BLOQUEO); return n > 0 ? n : 0; };
@@ -8579,6 +8577,7 @@ function cierraAcceso(){
   paraAnuncioBloqueo();
   activaRelojBloqueo(false);
   $("#acceso").hidden = true;
+  $("#accesoPass").value = "";
   document.body.classList.remove("sin-acceso");
   bloqueado = false;
   reiniciaInactividad();
