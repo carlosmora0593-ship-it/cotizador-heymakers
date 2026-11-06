@@ -856,6 +856,29 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:#57816a;box-shado
 .pageHeading p{margin:0;color:#718073;font-size:12px}
 .pageHeadingMark{width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:15px;background:#f4e8d0;color:#a87b37;font-size:23px;font-weight:600}
 .pageHeadingMark.cajaMark{font-size:18px;font-family:"IBM Plex Mono",monospace;font-weight:700}
+.ajusteGrupo{margin-bottom:24px}
+.ajusteGrupo h2{margin:0 0 10px;color:var(--ink);font-size:15px;font-weight:800}
+.ajusteCuadricula{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,200px),1fr));gap:12px}
+.ajusteTarjeta{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-content:start;align-items:center;gap:10px;
+  min-height:124px;padding:14px 16px;text-align:left;font:inherit;color:var(--ink);cursor:pointer;
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sombra)
+}
+.ajusteTarjeta:hover{border-color:var(--cyan);background:color-mix(in srgb,var(--cyan-soft) 28%,var(--surface))}
+.ajusteTarjeta:focus-visible{outline:2px solid var(--clay);outline-offset:2px}
+.ajusteIcono{
+  width:36px;height:36px;display:grid;place-items:center;border-radius:10px;
+  background:var(--cyan-soft);color:var(--cyan)
+}
+.ajusteIcono svg,.ajusteFlecha svg{width:20px;height:20px}
+.ajusteFlecha{display:flex;color:var(--ink-3)}
+.ajusteTexto{grid-column:1/-1;min-width:0}
+.ajusteTexto strong,.ajusteTexto small{display:block}
+.ajusteTexto strong{font-size:15px;line-height:1.2}
+.ajusteTexto small{margin-top:4px;font-size:12px;line-height:1.35;color:var(--ink-3)}
+.ajusteGrupo[data-tono="cobro"] .ajusteIcono{background:var(--accent-soft);color:var(--clay)}
+.ajusteGrupo[data-tono="negocio"] .ajusteIcono{background:var(--warn-soft);color:var(--warn)}
+.ajusteRegreso{margin:0 0 12px}
 #inTiles{gap:13px}
 .tile{border-radius:16px;padding:16px 17px 17px;min-height:126px;background:linear-gradient(145deg,#fffefa,#fbf9f3);box-shadow:0 5px 17px rgba(45,61,45,.045)}
 .tile .et{font-size:9.5px;letter-spacing:.13em;color:#7c897d}
@@ -1453,7 +1476,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261105-2338">
+<meta name="nuvoor-build" content="20261106-1118">
 <link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
 </head>
 <body>
@@ -1942,12 +1965,16 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 
 <!-- ============ AJUSTES ============ -->
 <section id="tab-set" hidden>
-  <div class="pageHeading"><div><span>CONFIGURACIÓN</span><h1 id="configTitle">Tu restaurante</h1><p id="configDescription">Personaliza la operación, las mesas, el equipo y los tickets.</p></div></div>
-  <div class="card" id="restaurantAccountSettings">
+  <div class="pageHeading"><div><span>CONFIGURACIÓN</span><h1 id="configTitle">Ajustes del restaurante</h1><p id="configDescription">Elige qué quieres configurar.</p></div></div>
+  <div id="ajustesMenu"></div>
+  <div class="ajusteRegreso" id="ajustesRegreso" hidden>
+    <button class="btn ghost" id="ajustesVolver" type="button">← Volver a Ajustes</button>
+  </div>
+  <div class="card" id="restaurantAccountSettings" data-ajuste-panel hidden>
     <header><h2>Cuenta Nuvoor</h2><span class="hint">datos separados por negocio</span></header>
     <div class="body"><p>Este Restaurant está conectado a <strong id="restaurantAccountNameSettings"></strong>. Los datos de esta cuenta se conservan en este dispositivo.</p><div class="fila"><button class="btn sm ghost" id="restaurantChangePOSSettings" type="button">Cambiar de POS</button><button class="btn sm ghost" id="restaurantSignOutSettings" type="button">Cerrar sesión</button></div></div>
   </div>
-  <div class="card">
+  <div class="card" id="ajusteNegocio" data-ajuste-panel hidden>
     <header><h2>Tu negocio</h2></header>
     <div class="body">
       <div class="grid g3">
@@ -1961,7 +1988,12 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
           <div class="fila"><button class="btn sm" id="e_logoBtn" type="button">Subir logo</button><button class="btn sm ghost" id="e_logoQuita" type="button" hidden>Quitar</button><input id="e_logoFile" type="file" accept="image/png,image/jpeg,image/webp" hidden></div>
         </div>
       </div>
-      <div class="grid g3" style="margin-top:12px">
+    </div>
+  </div>
+  <div class="card" id="ajusteCobro" data-ajuste-panel hidden>
+    <header><h2>Impuestos y servicio</h2></header>
+    <div class="body">
+      <div class="grid g3">
         <div><label class="f" for="p_iva">IVA %</label><input id="p_iva" type="number" min="0" step="1"></div>
         <div><label class="f" for="p_propina">Propina sugerida %</label><input id="p_propina" type="number" min="0" step="1"></div>
         <div><label class="f" for="p_servicio">Cargo por servicio %</label><input id="p_servicio" type="number" min="0" step="1"></div>
@@ -1970,8 +2002,8 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
         y se reparte. No son lo mismo y por eso van aparte: mezclarlos es de donde salen los pleitos con los meseros.</p>
     </div>
   </div>
-  <div class="card">
-    <header><h2>Tickets e impresión</h2><span class="hint">lo que sale en papel</span></header>
+  <div class="card" id="ajusteTickets" data-ajuste-panel hidden>
+    <header><h2>Formato de tickets</h2><span class="hint">lo que sale en papel</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Se imprime con la impresora que ya tengas instalada en la
         computadora o la tableta — toda térmica trae su driver. <b>El panel de cocina y el papel conviven</b>:
@@ -1993,13 +2025,13 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
         <label class="sw"><input type="checkbox" id="tk_iva"> Desglosar el IVA</label>
         <label class="sw"><input type="checkbox" id="tk_propina"> Poner la leyenda de propina</label>
       </div>
-      <p class="note" style="margin-top:14px">Configura cada impresora en el apartado siguiente y usa su botón de prueba para comprobarla.</p>
+      <button class="btn sm ghost" style="margin-top:14px" type="button" data-abrir-ajuste="impresorasCard">Ir a Impresoras</button>
       <p class="note" style="margin-top:14px"><b>El ticket de cocina no lleva precios</b> — en la cocina estorban.
         Lleva mesa o PARA LLEVAR, el folio en grande (el mismo del recibo, para que cuadren), el comensal de cada
         platillo y lo que le quitan, en letra grande.</p>
     </div>
   </div>
-  <div class="card" id="restaurantAppsSettings">
+  <div class="card" id="restaurantAppsSettings" data-ajuste-panel hidden>
     <header><h2>Pedidos por app</h2><span class="hint">comisiones por plataforma</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Captura la comisión que te cobra cada plataforma. Cada pedido conserva el porcentaje que tenía al crearlo, aunque después cambies este ajuste.</p>
@@ -2007,7 +2039,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <div class="fila" style="margin-top:12px"><button class="btn sm" id="appsAgrega" type="button">+ Agregar plataforma</button></div>
     </div>
   </div>
-  <div class="card" id="restaurantFiscalSettings">
+  <div class="card" id="restaurantFiscalSettings" data-ajuste-panel hidden>
     <header><h2>Facturación</h2><span class="hint">datos del negocio para preparar CFDI</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Estos son los datos del emisor. Los datos de cada cliente se capturan en Ventas. El Nuvoor Restaurant prepara el paquete para el PAC o contador; no guarda sellos y no timbra por sí solo.</p>
@@ -2033,8 +2065,8 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <p class="note" style="border-left-color:var(--warn)"><b>No subas tus archivos .cer/.key ni la contraseña aquí.</b> Solo tu PAC debe recibirlos.</p>
     </div>
   </div>
-  <div class="card" id="impresorasCard">
-    <header><h2>Impresoras de esta tablet</h2><button class="btn sm primary" id="impAgregar" type="button">+ Agregar impresora</button></header>
+  <div class="card" id="impresorasCard" data-ajuste-panel hidden>
+    <header><h2>Impresoras de este dispositivo</h2><button class="btn sm primary" id="impAgregar" type="button">+ Agregar impresora</button></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Elige qué imprime cada impresora. Las Bluetooth imprimen directo desde Nuvoor y cada una conserva su configuración en este dispositivo.</p>
       <div class="note fila" id="impFondoPanel" hidden style="margin:0 0 14px">
@@ -2052,8 +2084,8 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <p class="note" id="impAvisoWeb" hidden style="margin-top:12px">En este navegador, la impresión pide confirmación. Para usar impresoras Bluetooth directamente, abre Nuvoor en la app de Android.</p>
     </div>
   </div>
-  <div class="card">
-    <header><h2>Respaldo</h2><span class="hint" id="respHint"></span></header>
+  <div class="card" id="ajusteRespaldo" data-ajuste-panel hidden>
+    <header><h2>Respaldos</h2><span class="hint" id="respHint"></span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px;border-left-color:var(--warn)">Todo tu negocio vive <b>en este
         navegador, en esta computadora</b>. Así cobra aunque se caiga el internet, pero también significa que si
@@ -2069,11 +2101,11 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
         <b>reemplaza todo</b> lo que haya en esta pantalla — por eso pregunta dos veces.</p>
     </div>
   </div>
-  <div class="card">
+  <div class="card" id="ajusteMesas" data-ajuste-panel hidden>
     <header><h2 id="mesasSetTitle">Mesas y zonas</h2><button class="btn sm ghost" id="mesaNueva" style="margin-left:auto">+ Mesa</button></header>
     <div class="body"><p class="note" id="mesasScopeNote" hidden style="margin:0 0 12px">Esta lista solo pertenece a este evento. Agregar, mover o quitar mesas aquí no cambia las del restaurante ni las de otros eventos.</p><div class="tbl-wrap"><table id="t_mesas"></table></div></div>
   </div>
-  <div class="card">
+  <div class="card" id="ajusteBloqueo" data-ajuste-panel hidden>
     <header><h2>Bloqueo de pantalla</h2></header>
     <div class="body">
       <div class="grid g3">
@@ -2088,7 +2120,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <p class="note" id="bloqueoNota" style="margin-top:10px"></p>
     </div>
   </div>
-  <div class="card">
+  <div class="card" id="ajusteFolios" data-ajuste-panel hidden>
     <header><h2>Folios</h2><span class="hint">las letras de tu negocio en cada cuenta</span></header>
     <div class="body">
       <div class="grid g3">
@@ -3394,7 +3426,10 @@ function vaA(k){
   if(cambioVista && (k === "caja" || k === "ventas")) sincronizaCortesCaja();
   if(k === "personal") renderPersonal();
   if(k === "costos")   renderCostos();
-  if(k === "set")      renderSet();
+  if(k === "set"){
+    if(cambioVista) ajusteAbierto = "";
+    renderSet();
+  }
   if(cambioVista) animaCambioVista(k, anterior ? anterior.k : null);
   window.scrollTo(0,0);
 }
@@ -8019,15 +8054,63 @@ async function registraCheca(){
 /* ===================================================================
    AJUSTES
    =================================================================== */
+const ajustesGrupos = [
+  {titulo:"Operación", tono:"operacion", tarjetas:[
+    {id:"ajusteMesas", titulo:"Mesas y zonas", detalle:"Salones, mesas y lugares", icono:ICO.mesas},
+    {id:"impresorasCard", titulo:"Impresoras", detalle:"Cocina, caja y pruebas", icono:'<path d="M6 8V3h12v5M6 17H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7" rx="1"/><path d="M17 12h2"/>'},
+    {id:"ajusteTickets", titulo:"Formato de tickets", detalle:"Papel, textos y datos impresos", icono:'<path d="M5 3h14v18l-3.5-2-3.5 2-3.5-2L5 21V3zM9 8h6M9 12h6"/>'},
+    {id:"restaurantAppsSettings", titulo:"Pedidos por app", detalle:"Plataformas y comisiones", icono:ICO.eventos, soloRestaurante:true}
+  ]},
+  {titulo:"Cobro y facturación", tono:"cobro", tarjetas:[
+    {id:"ajusteCobro", titulo:"Impuestos y servicio", detalle:"IVA, propina y cargo por servicio", icono:ICO.costos},
+    {id:"restaurantFiscalSettings", titulo:"Facturación", detalle:"Datos fiscales del negocio", icono:'<path d="M13 3H5v18h14V9zM13 3v6h6M8 13h8M8 16h5"/>', soloRestaurante:true},
+    {id:"ajusteFolios", titulo:"Folios", detalle:"Numeración de cuentas y turnos", icono:'<path d="M10 3 6 21M18 3l-4 18M4 9h17M3 15h17"/>'}
+  ]},
+  {titulo:"Negocio y acceso", tono:"negocio", tarjetas:[
+    {id:"ajusteNegocio", titulo:"Tu negocio", detalle:"Nombre, dirección y logo", icono:ICO.inicio},
+    {id:"restaurantAccountSettings", titulo:"Cuenta Nuvoor", detalle:"Negocio conectado y sesión", icono:ICO.personal},
+    {id:"ajusteBloqueo", titulo:"Bloqueo de pantalla", detalle:"Tiempo de inactividad", icono:'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/>'},
+    {id:"ajusteRespaldo", titulo:"Respaldos", detalle:"Descargar o restaurar una copia", icono:'<path d="M12 3v12m-4-4 4 4 4-4M4 15v5h16v-5"/>'}
+  ]}
+];
+const iconoAjuste = trazos=>'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+trazos+'</svg>';
+let ajusteAbierto = "";
+
+$("#ajustesMenu").innerHTML = ajustesGrupos.map(({titulo,tono,tarjetas})=>
+  '<section class="ajusteGrupo" data-tono="'+tono+'"><h2>'+titulo+'</h2><div class="ajusteCuadricula">'+
+  tarjetas.filter(t=>!POS_EVENTO || !t.soloRestaurante).map(({id,titulo,detalle,icono})=>
+    '<button type="button" class="ajusteTarjeta" data-abrir-ajuste="'+id+'" aria-controls="'+id+'">'+
+    '<span class="ajusteIcono">'+iconoAjuste(icono)+'</span>'+
+    '<span class="ajusteFlecha">'+iconoAjuste('<path d="m9 6 6 6-6 6"/>')+'</span>'+
+    '<span class="ajusteTexto"><strong>'+titulo+'</strong><small>'+detalle+'</small></span></button>'
+  ).join("")+'</div></section>'
+).join("");
+
+function pintaVistaAjustes(){
+  $("#ajustesMenu").hidden = !!ajusteAbierto;
+  $("#ajustesRegreso").hidden = !ajusteAbierto;
+  $$("#tab-set [data-ajuste-panel]").forEach(panel=>{ panel.hidden = panel.id !== ajusteAbierto; });
+}
+$("#tab-set").addEventListener("click",e=>{
+  const abrir = e.target.closest("[data-abrir-ajuste]");
+  const volver = e.target.closest("#ajustesVolver");
+  if((!abrir && !volver) || !puedeVer("set")) return;
+  const anterior = ajusteAbierto;
+  ajusteAbierto = abrir ? abrir.dataset.abrirAjuste : "";
+  pintaVistaAjustes();
+  window.scrollTo(0,0);
+  const foco = abrir ? $("#ajustesVolver") : $("#ajustesMenu [data-abrir-ajuste='"+anterior+"']");
+  foco?.focus({preventScroll:true});
+});
+
 function renderSet(){
-  $("#configTitle").textContent=POS_EVENTO?"Configuración del evento":"Tu restaurante";
+  pintaVistaAjustes();
+  $("#configTitle").textContent=POS_EVENTO?"Ajustes del evento":"Ajustes del restaurante";
   $("#configDescription").textContent=POS_EVENTO
-    ?"Ajusta las mesas y el salón de «"+POS_EVENTO.nombre+"». Estos cambios solo afectan este evento."
-    :"Personaliza la operación, las mesas, el equipo y los tickets.";
+    ?"Configura el punto móvil de «"+POS_EVENTO.nombre+"»."
+    :"Elige qué quieres configurar.";
   $("#mesasSetTitle").textContent=POS_EVENTO?"Mesas de «"+POS_EVENTO.nombre+"»":"Mesas y zonas";
   $("#mesasScopeNote").hidden=!POS_EVENTO;
-  $("#restaurantAppsSettings").hidden=!!POS_EVENTO;
-  $("#restaurantFiscalSettings").hidden=!!POS_EVENTO;
   $("#e_nombre").value = P.negocio.nombre||""; $("#e_tel").value = P.negocio.tel||"";
   $("#e_dir").value = P.negocio.dir||"";
   $("#p_iva").value = num(P.iva,16); $("#p_propina").value = num(P.propina,10);
