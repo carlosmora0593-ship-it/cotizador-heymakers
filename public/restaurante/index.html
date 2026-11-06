@@ -1453,7 +1453,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261105-2148">
+<meta name="nuvoor-build" content="20261105-2338">
 <link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
 </head>
 <body>
@@ -1833,6 +1833,18 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     <header><h2>Movimientos del turno</h2></header>
     <div class="body"><div class="tbl-wrap"><table id="t_movs"></table></div></div>
   </div>
+  <div class="card" id="cajaHistorial">
+    <header><h2>Historial de cortes</h2><span class="hint" id="cajaHistorialEstado" aria-live="polite"></span></header>
+    <div class="body">
+      <div class="fila" style="margin-bottom:12px">
+        <label>Fecha del corte <input id="cajaHistorialFecha" type="date"></label>
+        <button class="btn sm ghost" type="button" id="cajaHistorialTodas">Todas las fechas</button>
+        <button class="btn sm ghost" type="button" id="cajaHistorialActualizar">Actualizar</button>
+        <button class="btn sm ghost" type="button" id="cajaVerVentas" hidden>Ver ventas del día</button>
+      </div>
+      <div class="tbl-wrap"><table id="cajaHistorialTabla"></table></div>
+    </div>
+  </div>
   <div class="card" id="cajaEventosCard" hidden>
     <header><h2>Cajas de eventos</h2><span class="hint">separadas de la caja física</span></header>
     <div class="body"><p class="note" style="margin:0 0 12px">Cada evento tiene su propio fondo, cobros y corte. Estas cantidades no se suman al efectivo del restaurante.</p><div id="cajaEventosBody"></div></div>
@@ -1857,6 +1869,10 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     </div>
   </div>
   <div class="tiles" id="venTiles"></div>
+  <div class="card">
+    <header><h2>Detalle de cobros y cancelaciones</h2><span class="hint" id="venCobrosPeriodo"></span></header>
+    <div class="body"><div class="tbl-wrap"><table id="venCobrosDetalle"></table></div></div>
+  </div>
   <div class="card">
     <header><h2>Artículos vendidos</h2><span class="hint" id="venPeriodoTexto" aria-live="polite"></span></header>
     <div class="body">
@@ -2990,6 +3006,8 @@ async function iniciaNubeRestaurant(){
 let consultaNubeEnCurso=null;
 function recargaCambiosNube(){
   if(!REST_NUBE.enabled||!navigator.onLine)return;
+  if((!document.hidden && (!$("#tab-caja").hidden || !$("#tab-ventas").hidden)) ||
+     TURNOS.some(t=>t.id && !t.abierto && !cortesNube.has(nubeId("corte",t.id)))) sincronizaCortesCaja();
   if(!consultaNubeEnCurso)consultaNubeEnCurso=consultaCambiosNube().finally(()=>{consultaNubeEnCurso=null;});
   return consultaNubeEnCurso;
 }
@@ -3026,7 +3044,14 @@ function escuchaNubeRestaurant(){
   try{
     REST_NUBE.channel=RESTAURANT_SB.channel("restaurant-"+restaurantSafeId(RESTAURANT_ACCOUNT.accountId)+"-"+REST_NUBE.deviceId)
       .on("postgres_changes",{event:"*",schema:"public",table:"documentos",filter:"cuenta_id=eq."+RESTAURANT_ACCOUNT.accountId},payload=>{
-        const row=payload.new;if(!row||!String(row.coleccion||"").startsWith("rest_"))return;
+        const row=payload.new;
+        if(row?.coleccion===COLECCION_CORTES){
+          if(puedeVer("caja")){
+            recibeCorteCaja(row); nubeGuarda(CORTES_CACHE,Object.fromEntries(cortesNube)); pintaHistorialCortes();
+          }
+          return;
+        }
+        if(!row||!String(row.coleccion||"").startsWith("rest_"))return;
         const key=nubeClave(row.coleccion,row.doc_id);REST_NUBE.serverDocs[key]=row;
         // El sondeo conserva su propio cursor para recuperar mensajes perdidos en segundo plano.
         if(row.coleccion==="rest_lineas"&&row.cuerpo&&row.cuerpo.enviada&&!REST_NUBE.queue.some(q=>q.key===key))REST_NUBE.incomingLines.add(row.cuerpo.id||row.doc_id.replace(/^linea_/,""));
@@ -3366,6 +3391,7 @@ function vaA(k){
   if(k === "menu")     renderMenu();
   if(k === "caja")     renderCaja();
   if(k === "ventas")   renderVentas();
+  if(cambioVista && (k === "caja" || k === "ventas")) sincronizaCortesCaja();
   if(k === "personal") renderPersonal();
   if(k === "costos")   renderCostos();
   if(k === "set")      renderSet();
@@ -4442,7 +4468,7 @@ function anotaCancelacion(c, l, cant, motivo, nota, merma, autorizo){
   c.cancelaciones = c.cancelaciones || [];
   const cancelacion={id:uid(), linId:l.id, comandaId:c.id,nombre:l.nombre, categoria:l.categoria||((MENU.plats||[]).find(p=>p.id===l.platId)||{}).catId||"",cant:cant,
     importe:importeLinea(Object.assign({},l,{cant:cant})),motivo:motivo,nota:nota||"",merma:!!merma,
-    quien:usuarioActual().nombre||"",hora:horaAhora(),estadoAlCancelar:l.estado||"pedido",autorizo:autorizo||null};
+    quien:usuarioActual().nombre||"",fecha:hoyISO(),hora:horaAhora(),estadoAlCancelar:l.estado||"pedido",autorizo:autorizo||null};
   /* A la cocina se le avisa en papel solo si ya estaba preparandolo: una
      linea que nunca salio de la comanda no le interesa a nadie alla. */
   if(merma && IMPRESORAS.some(p=>p.cancela))
@@ -4538,7 +4564,8 @@ $("#comCancelar").addEventListener("click", ()=>{
       l.cancelada = true; l.motivo = motivo;
     });
     c.estado = "cerrada"; c.cancelada = true; c.motivo = motivo;
-    c.cierra = horaAhora(); c.total = 0;
+    c.cierra = horaAhora(); c.fechaCierre = hoyISO(); c.total = 0;
+    c.turnoId = turnoAbierto()?.id || "";
     c.autorizo = quien || null;
     persist(); vaA("mesas");
     toast("Mesa cancelada · " + motivo +
@@ -4767,15 +4794,16 @@ $("#apAppCerrar").addEventListener("click",()=>{$("#modalApp").hidden=true;});
 $("#apAppOk").addEventListener("click",async()=>{
   if(!soyAutoridad()){toast("Sólo un gerente o cajero puede cerrar un pedido por app.");return;}
   let c=comandaActual(); if(!c||!c.appId) return;
-  const id=c.id;
+  const id=c.id, turnoId=turnoAbierto()?.id;
   if(c.folioPendiente)await reservaFolioNube(c,false);
-  c=COMANDAS.find(x=>x.id===id)||c;
+  c=COMANDAS.find(x=>x.id===id);
+  if(!validaCuentaParaCobro(c,turnoId)) return;
   const s=sumaComanda(c);
   c.estado="cerrada"; c.cierra=horaAhora(); c.subtotal=s.sub; c.servicio=s.serv;
   c.propina=0; c.total=s.total; c.pagos=[{tipo:"app",monto:s.total}];
   registraAnaliticaVenta(c,s);
   c.cambio=0; c.efectivoCaja=0; c.comision=s.total*num(c.comisionPct)/100;
-  c.neto=s.total-c.comision; c.turnoId=(turnoAbierto()||{}).id||"";
+  c.neto=s.total-c.comision; c.turnoId=turnoId;
   c.cobro=usuarioActual().nombre||""; persist();
   if(IMPRESORAS.some(p=>p.cuenta&&p.cuentaAuto)) imprimeCuenta(c,c.pagos,0,true);
   $("#modalApp").hidden=true; comandaId=null; vaA("mesas");
@@ -4930,16 +4958,21 @@ $("#modalCobro").addEventListener("click", e=>{
   imprimeCuenta(c, cobroPagos, prop, false);
 });
 $("#cobroOk").addEventListener("click", async()=>{
+  if(!soyAutoridad()) return;
   let c = comandaActual(); if(!c) return;
-  const id=c.id;
+  const id=c.id, turnoId=turnoAbierto()?.id;
   if(c.folioPendiente)await reservaFolioNube(c,false);
-  c=COMANDAS.find(x=>x.id===id)||c;
+  c=COMANDAS.find(x=>x.id===id);
+  if(!validaCuentaParaCobro(c,turnoId)) return;
   const s = sumaComanda(c);
-  const prop = cobroPropPct === null ? num($("#cobroPropMonto").value) : s.sub * cobroPropPct/100;
+  const prop = cobroPropPct === null ? Math.max(0,num($("#cobroPropMonto").value)) : s.sub * cobroPropPct/100;
   const total = s.total + prop;
   const efec = cobroPagos.filter(p=>p.tipo==="efectivo").reduce((x,p)=>x+num(p.monto),0);
   const pagado = cobroPagos.reduce((x,p)=>x+num(p.monto),0);
   const cambio = Math.max(0, pagado - total);
+  if(pagado <= 0 || pagado + 0.004 < total || cambio > efec + 0.004){
+    actualizaBalanceCobro(); toast("Revisa el importe. La cuenta o el pago cambiaron."); return;
+  }
 
   c.estado = "cerrada"; c.cierra = horaAhora();
   c.subtotal = s.sub; c.servicio = s.serv; c.propina = prop; c.total = total;
@@ -4949,7 +4982,7 @@ $("#cobroOk").addEventListener("click", async()=>{
   c.cambio = cambio;
   if(!c.cfdi)c.cfdi=nvFiscalRestSnapshot(c);
   c.efectivoCaja = Math.max(0, efec - cambio);
-  c.turnoId = (turnoAbierto()||{}).id || "";
+  c.turnoId = turnoId;
   c.cobro = usuarioActual().nombre || "";
   persist();
 
@@ -4960,28 +4993,213 @@ $("#cobroOk").addEventListener("click", async()=>{
   toast("Cobrado " + mx(total) + (cambio ? " · cambio " + mx(cambio) : "") + " · " + c.folio);
 });
 
+function validaCuentaParaCobro(c,turnoId){
+  if(!c || c.estado === "cerrada" || c.cancelada || !vivas(c).length ||
+      !turnoId || turnoAbierto()?.id !== turnoId){
+    toast("La cuenta o el turno cambiaron. Vuelve a revisar antes de cobrar.");
+    return false;
+  }
+  return true;
+}
+
 /* ===================================================================
    TURNO DE CAJA
    =================================================================== */
 const turnoAbierto = () => TURNOS.find(t=>t.abierto);
-const comandasDeTurno = id => COMANDAS.filter(c=>c.estado === "cerrada" && !c.cancelada && c.turnoId === id);
+const cuentaCobrada = c => c.estado === "cerrada" && !c.cancelada;
+const formasCaja = {efectivo:"Efectivo neto",tarjeta:"Tarjeta",transferencia:"Transferencia",app:"Apps de reparto"};
 
-function sumaTurno(t){
-  const cs = comandasDeTurno(t.id);
-  const por = {efectivo:0, tarjeta:0, transferencia:0, app:0};
-  let propinas = 0, total = 0, efectivoCaja = 0, apps = 0, comisionApps = 0;
-  cs.forEach(c=>{
-    total += num(c.total); propinas += num(c.propina); efectivoCaja += num(c.efectivoCaja);
+function totalizaCobrosCaja(cuentas){
+  const por = {efectivo:0, tarjeta:0, transferencia:0, app:0, otros:0};
+  let propinas = 0, total = 0, apps = 0, comisionApps = 0, sinDesglose = 0, cobros = 0;
+  for(const c of cuentas){
+    if(!cuentaCobrada(c)) continue;
+    cobros++; total += num(c.total); propinas += num(c.propina);
     if(c.appId){apps+=num(c.total);comisionApps+=comisionDe(c);}
-    (c.pagos||[]).forEach(p=>{ por[p.tipo] = num(por[p.tipo]) + num(p.monto); });
+    let recibido = 0;
+    for(const pago of c.pagos||[]){
+      if(pago.tipo==="efectivo") recibido += num(pago.monto);
+      else por[Object.keys(formasCaja).includes(pago.tipo)?pago.tipo:"otros"] += num(pago.monto);
+    }
+    por.efectivo += c.efectivoCaja == null ? Math.max(0,recibido-num(c.cambio)) : num(c.efectivoCaja);
+    if(!(c.pagos||[]).length) sinDesglose++;
+  }
+  return {cuentas:cobros, total, venta:total-propinas, propinas, por, efectivoCaja:por.efectivo, sinDesglose,
+    apps,comisionApps,netoApps:apps-comisionApps,propio:total-apps};
+}
+function sumaMovimientosCaja(movs){
+  const entradas = (movs||[]).filter(m=>m.tipo==="entrada").reduce((s,m)=>s+num(m.monto),0);
+  const retiros = (movs||[]).filter(m=>m.tipo==="salida").reduce((s,m)=>s+num(m.monto),0);
+  return {entradas,retiros,movs:entradas-retiros};
+}
+function sumaTurno(t){
+  const cuentas = COMANDAS.filter(c=>c.turnoId === t.id);
+  const cobros = totalizaCobrosCaja(cuentas), movimientos = sumaMovimientosCaja(t.movs);
+  const anulaciones = cuentas.flatMap(c=>c.cancelaciones||[]);
+  return {...cobros,...movimientos,
+    cuentasCanceladas:cuentas.filter(c=>c.cancelada).length,
+    cancelado:anulaciones.reduce((s,x)=>s+num(x.importe),0),
+    enCaja:num(t.fondo)+cobros.efectivoCaja+movimientos.movs};
+}
+
+// Colección separada del flujo de comandas. Las versiones anteriores no la
+// proyectan ni la pueden confundir con datos eliminados de la caja de hoy.
+const COLECCION_CORTES = "caja_cortes_v1";
+const CORTES_CACHE = LS_BASE + "_cortes_v1";
+const cortesNube = new Map(Object.entries(nubeLee(CORTES_CACHE,{})));
+let consultaCortes = null, consultaCortesEn = 0, estadoCortes = "";
+const fechaDelCorte = t => t.fechaCierre || t.fecha || "";
+
+function cortesDelPOS(){
+  const evento = nubeEventoId(), cortes = new Map();
+  for(const t of TURNOS) if(!t.abierto && t.id) cortes.set(nubeId("corte",t.id),t);
+  for(const [id,t] of cortesNube) if(t.eventoId === evento) cortes.set(id,t);
+  return [...cortes.values()].sort((a,b)=>(fechaDelCorte(b)+(b.cierra||"")).localeCompare(fechaDelCorte(a)+(a.cierra||"")));
+}
+function pintaHistorialCortes(){
+  if(!$("#tab-caja").hidden && puedeVer("caja")) renderHistorialCortes();
+  if(!$("#tab-ventas").hidden && puedeVer("ventas")) renderHistorialCortesVentas();
+}
+function recibeCorteCaja(row){
+  if(!row.cuerpo?.id || row.cuerpo.abierto || row.cuerpo._eliminado) return;
+  cortesNube.set(row.doc_id,row.cuerpo);
+}
+function sincronizaCortesCaja(forzar=false){
+  if(!RESTAURANT_SB || !REST_NUBE.enabled || !REST_NUBE.ready ||
+      REST_NUBE.localOnly || !navigator.onLine || !puedeVer("caja")) return;
+  if(consultaCortes) return consultaCortes;
+  if(!forzar && Date.now()-consultaCortesEn < 45000) return;
+  consultaCortesEn = Date.now();
+  estadoCortes = "Sincronizando cortes…"; pintaHistorialCortes();
+  consultaCortes = (async()=>{
+    const cuenta = RESTAURANT_ACCOUNT.accountId;
+    let cursor = "";
+    while(true){
+      let consulta = RESTAURANT_SB.from("documentos").select("doc_id,cuerpo").eq("cuenta_id",cuenta)
+        .eq("coleccion",COLECCION_CORTES).order("doc_id",{ascending:true}).limit(250);
+      if(cursor) consulta = consulta.gt("doc_id",cursor);
+      const {data,error} = await consulta;
+      if(error) throw error;
+      const filas = data||[];
+      filas.forEach(recibeCorteCaja);
+      if(filas.length < 250) break;
+      cursor = filas[filas.length-1].doc_id;
+    }
+    const pendientes = TURNOS.filter(t=>t.id && !t.abierto && !cortesNube.has(nubeId("corte",t.id))).map(t=>({
+      cuenta_id:cuenta,coleccion:COLECCION_CORTES,doc_id:nubeId("corte",t.id),
+      cuerpo:{...t,eventoId:nubeEventoId()}
+    }));
+    for(let i=0;i<pendientes.length;i+=30){
+      const {data,error} = await RESTAURANT_SB.from("documentos")
+        .upsert(pendientes.slice(i,i+30),{onConflict:"cuenta_id,coleccion,doc_id",ignoreDuplicates:true})
+        .select("doc_id,cuerpo");
+      if(error) throw error;
+      (data||[]).forEach(recibeCorteCaja);
+    }
+    estadoCortes = "Cortes sincronizados";
+  })().catch(()=>{
+    estadoCortes = "No se pudo sincronizar. Se muestran los cortes guardados.";
+  }).finally(()=>{
+    nubeGuarda(CORTES_CACHE,Object.fromEntries(cortesNube));
+    consultaCortes = null; pintaHistorialCortes();
   });
-  const movs = (t.movs||[]).reduce((s,m)=> s + (m.tipo==="entrada" ? num(m.monto) : -num(m.monto)), 0);
-  return {cuentas:cs.length, total, propinas, por, efectivoCaja,
-          apps,comisionApps,netoApps:apps-comisionApps,propio:total-apps,
-          movs, enCaja: num(t.fondo) + efectivoCaja + movs};
+  return consultaCortes;
+}
+
+function detalleCorte(t){
+  const r = t.resumen || {}, movs = sumaMovimientosCaja(t.movs);
+  const efectivo = r.efectivoCaja ?? (t.deberia == null ? r.por?.efectivo : num(t.deberia)-num(t.fondo)-movs.movs);
+  return [
+    ["Tickets cobrados",String(num(r.cuentas))],
+    ["Venta neta",mx(r.venta ?? num(r.total)-num(r.propinas))],
+    ["Propinas",mx(r.propinas)], ["Total cobrado",mx(r.total)],
+    ...filasFormasCaja({...r.por,efectivo}),
+    ["Cuentas canceladas",r.cuentasCanceladas == null ? "—" : String(r.cuentasCanceladas)],
+    ["Importe cancelado (fuera de ventas)",r.cancelado == null ? "—" : mx(r.cancelado)],
+    ["Fondo inicial",mx(t.fondo)], ["Ingresos de caja (sin ventas)",mx(movs.entradas)],
+    ["Egresos de caja",mx(movs.retiros)], ["Efectivo esperado",mx(t.deberia)],
+    ["Efectivo contado",mx(t.contado)], ["Diferencia",mx(t.diferencia)]
+  ];
+}
+function filasFormasCaja(por){
+  return Object.entries(formasCaja).map(([k,nombre])=>[nombre,mx(por[k])])
+    .concat(por.otros ? [["Otros medios",mx(por.otros)]] : []);
+}
+function tablaDetalleCaja(filas){
+  return '<tbody>'+filas.map(([clave,valor])=>'<tr><td>'+esc(clave)+'</td><td class="der mono">'+esc(valor)+'</td></tr>').join("")+'</tbody>';
+}
+function pintaTablaCortes(tabla,cortes){
+  tabla.innerHTML = '<thead><tr><th>Turno</th><th>Cajero</th><th>Fecha de corte</th><th>Horario</th>'+
+    '<th class="der">Venta neta</th><th class="der">Diferencia</th><th></th></tr></thead><tbody>'+
+    (cortes.length ? cortes.map(t=>'<tr><td class="mono">'+esc(folioVisualPOS(t.folio))+'</td><td>'+esc(t.cajero||"—")+
+      '</td><td>'+esc(fechaDelCorte(t))+'</td><td>'+esc(t.abre||"")+'–'+esc(t.cierra||"")+
+      '</td><td class="der mono">'+mx(t.resumen?.venta ?? num(t.resumen?.total)-num(t.resumen?.propinas))+
+      '</td><td class="der mono">'+mx(t.diferencia)+'</td><td><button class="btn sm" type="button" data-ver-corte="'+esc(t.id)+
+      '">Ver corte</button></td></tr>').join("") :
+      '<tr><td colspan="7"><div class="empty">No hay cortes para estas fechas.</div></td></tr>')+'</tbody>';
+}
+function renderHistorialCortes(){
+  const fecha = $("#cajaHistorialFecha").value, cortes = cortesDelPOS();
+  $("#cajaVerVentas").hidden = !puedeVer("ventas");
+  $("#cajaHistorialEstado").textContent = !navigator.onLine || !REST_NUBE.enabled || REST_NUBE.localOnly
+    ? "Cortes guardados en este aparato" : estadoCortes;
+  pintaTablaCortes($("#cajaHistorialTabla"),fecha ? cortes.filter(t=>fechaDelCorte(t)===fecha) : cortes);
+}
+function renderHistorialCortesVentas(){
+  const desde = $("#venDesde").value, hasta = $("#venHasta").value;
+  pintaTablaCortes($("#t_turnos"),cortesDelPOS().filter(t=>{
+    const fecha = fechaDelCorte(t);
+    return (!desde || fecha>=desde) && (!hasta || fecha<=hasta);
+  }));
+}
+function muestraCorteCaja(t){
+  $("#turnoTitulo").textContent = "Corte "+folioVisualPOS(t.folio);
+  const movimientos = (t.movs||[]).map(m=>[
+    [m.hora,m.tipo==="entrada"?"Ingreso":"Egreso",m.nota].filter(Boolean).join(" · "),
+    (m.tipo==="entrada"?"+":"−")+mx(m.monto)
+  ]);
+  $("#turnoCuerpo").innerHTML = '<p class="note" style="margin-top:0">'+esc(fechaDelCorte(t))+' · '+esc(t.abre||"")+'–'+esc(t.cierra||"")+
+    ' · '+esc(t.cajero||"")+'</p><div class="fila" style="margin-bottom:12px"><button class="btn primary" id="imprimeCorteCaja">Imprimir ticket</button>'+
+    '<button class="btn ghost" id="turList">Listo</button></div><div class="tbl-wrap"><table>'+tablaDetalleCaja(detalleCorte(t))+'</table></div>'+
+    (movimientos.length?'<h3>Movimientos</h3><div class="tbl-wrap"><table>'+tablaDetalleCaja(movimientos)+'</table></div>':"")+
+    '<p class="note">La venta neta excluye propinas. El efectivo neto descuenta el cambio entregado.</p>';
+  $("#imprimeCorteCaja").onclick = ()=>imprimeTicketCorteCaja(t,movimientos);
+  $("#turList").onclick = ()=>{ $("#modalTurno").hidden = true; };
+  $("#modalTurno").hidden = false;
+}
+function imprimeTicketCorteCaja(t,movimientos){
+  if(!puedeVer("caja") && !puedeVer("ventas")) return;
+  const titulo = "Corte "+folioVisualPOS(t.folio);
+  const filas = (lista)=>lista.map(([nombre,valor])=>lineaPar(esc(nombre),esc(valor))).join("");
+  const cuerpo = encabezadoTicket()+'<div class="c g">'+esc(titulo)+'</div><div>'+
+    esc(fechaDelCorte(t)+" · "+(t.abre||"")+"–"+(t.cierra||""))+'</div><div>'+esc(t.cajero||"")+'</div><hr>'+
+    filas(detalleCorte(t))+(movimientos.length?'<hr><div class="b">Movimientos</div>'+filas(movimientos):"");
+  const impresora = impresorasParaTicketPOS("cuenta",false)[0] ||
+    {nombre:"Impresión del sistema",conexion:"sistema",anchoPapelBt:num(P.ticket.ancho,80)};
+  imprimeHoja(titulo,cuerpo,{impresora});
+}
+$("#cajaHistorialFecha").addEventListener("change",renderHistorialCortes);
+$("#cajaHistorialTodas").onclick = ()=>{ $("#cajaHistorialFecha").value = ""; renderHistorialCortes(); };
+$("#cajaHistorialActualizar").onclick = ()=>sincronizaCortesCaja(true);
+$("#cajaVerVentas").onclick = ()=>{
+  if(!puedeVer("ventas")) return;
+  const fecha = $("#cajaHistorialFecha").value;
+  periodoVentas = fecha ? "personalizado" : "hoy";
+  if(fecha) $("#venDesde").value = $("#venHasta").value = fecha;
+  vaA("ventas");
+};
+for(const tabla of [$("#cajaHistorialTabla"),$("#t_turnos")]){
+  tabla.addEventListener("click",e=>{
+    if(!puedeVer("caja") && !puedeVer("ventas")) return;
+    const b = e.target.closest("[data-ver-corte]");
+    if(!b) return;
+    const t = cortesDelPOS().find(x=>String(x.id)===b.dataset.verCorte);
+    if(t) muestraCorteCaja(t);
+  });
 }
 
 function renderCaja(){
+  renderHistorialCortes();
   const eventosCard=$("#cajaEventosCard");
   if(eventosCard) eventosCard.hidden=!!POS_EVENTO || !puedeVer("caja");
   if(!POS_EVENTO && puedeVer("caja")) renderCajaEventos();
@@ -4994,7 +5212,7 @@ function renderCaja(){
   const w = $("#cajaCuerpo");
   if(!t){
     $("#cajaHint").textContent = "sin turno abierto";
-    const ult = TURNOS.find(x=>!x.abierto);
+    const ult = cortesDelPOS()[0];
     w.innerHTML = '<div class="empty" style="padding:14px 0">' +
       '<p style="margin:0 0 14px">' + (POS_EVENTO ? 'La caja de este evento está cerrada. Abre un turno para registrar su fondo y poder cobrar.' : 'La caja está cerrada. Sin turno abierto no se puede cobrar: así se sabe quién tenía el dinero cuando faltó.') + '</p>' +
       '<button class="btn primary lg" id="cajaAbrir">' + (POS_EVENTO ? 'Abrir caja del evento' : 'Abrir turno') + '</button></div>' +
@@ -5015,7 +5233,7 @@ function renderCaja(){
         (s.movs ? (s.movs > 0 ? ' + ' : ' − ') + mx(Math.abs(s.movs)) : '') + '</span></div>' +
       '<div class="tile"><span class="et">Cuentas cobradas</span><span class="v">' + s.cuentas + '</span>' +
         '<span class="sub">' + (s.cuentas ? "ticket promedio " + mx(s.total/s.cuentas) : "ninguna todavía") + '</span></div>' +
-      '<div class="tile"><span class="et">Vendido</span><span class="v">' + mx(s.total) + '</span>' +
+      '<div class="tile"><span class="et">Venta neta</span><span class="v">' + mx(s.venta) + '</span>' +
         '<span class="sub">efectivo ' + mx(s.por.efectivo) + ' · tarjeta ' + mx(s.por.tarjeta) +
           (s.apps ? ' · apps ' + mx(s.apps) : '') + '</span></div>' +
       '<div class="tile"><span class="et">Propinas</span><span class="v">' + mx(s.propinas) + '</span>' +
@@ -5094,6 +5312,7 @@ $("#cajaCuerpo").addEventListener("click", e=>{
   if(e.target.closest("#cajaCerrar")) { cierraTurno(); return; }
 });
 function abreTurno(){
+  if(!puedeVer("caja") || turnoAbierto()) return;
   $("#turnoTitulo").textContent = "Abrir turno";
   $("#turnoCuerpo").innerHTML =
     '<p class="note" style="margin:0 0 14px">El <b>fondo</b> es el dinero con el que empieza la caja ' +
@@ -5104,6 +5323,7 @@ function abreTurno(){
   $("#modalTurno").hidden = false;
   setTimeout(()=>{ const f = $("#turFondo"); if(f){ f.focus(); f.select(); } }, 60);
   $("#turOk").onclick = ()=>{
+    if(!puedeVer("caja") || turnoAbierto()) return;
     const t = {id:uid(), folio:folioNuevo("tur"), abre:horaAhora(), fecha:hoyISO(),
                cajero: usuarioActual().nombre||"", cajeroId: usuarioActual().id||"",
                fondo: num($("#turFondo").value), movs:[], abierto:true, ts:Date.now()};
@@ -5125,6 +5345,7 @@ function movimiento(tipo){
   $("#modalTurno").hidden = false;
   setTimeout(()=>{ const f = $("#movMonto"); if(f) f.focus(); }, 60);
   $("#movOk").onclick = ()=>{
+    if(!puedeVer("caja") || turnoAbierto() !== t) return;
     const m = num($("#movMonto").value);
     if(m <= 0){ toast("Escribe el monto"); return; }
     const nota = $("#movNota").value.trim();
@@ -5153,33 +5374,18 @@ function cierraTurno(){
   $("#modalTurno").hidden = false;
   setTimeout(()=>{ const f = $("#turContado"); if(f) f.focus(); }, 60);
   $("#turCierra").onclick = ()=>{
-    const contado = num($("#turContado").value);
+    if(!puedeVer("caja") || turnoAbierto() !== t) return;
+    if(abiertas().length){ toast("Hay comandas abiertas. Ciérralas antes de hacer el corte."); return; }
+    const campo = $("#turContado"), contado = campo.valueAsNumber;
+    if(!Number.isFinite(contado) || contado<0){ toast("Escribe el efectivo contado, aunque sea cero."); campo.focus(); return; }
     const s = sumaTurno(t);
-    const dif = contado - s.enCaja;
-    t.abierto = false; t.cierra = horaAhora(); t.contado = contado;
-    t.deberia = s.enCaja; t.diferencia = dif;
-    t.resumen = {cuentas:s.cuentas, total:s.total, propinas:s.propinas, por:s.por, movs:s.movs};
-    persist();
-    $("#turnoTitulo").textContent = "Corte de " + t.folio;
-    $("#turnoCuerpo").innerHTML =
-      '<div class="tiles" style="margin-bottom:8px">' +
-        '<div class="tile"><span class="et">Debía haber</span><span class="v">' + mx(s.enCaja) + '</span></div>' +
-        '<div class="tile"><span class="et">Contaste</span><span class="v">' + mx(contado) + '</span></div>' +
-        '<div class="tile ' + (Math.abs(dif) < 0.01 ? '' : 'destacada') + '"><span class="et">Diferencia</span>' +
-          '<span class="v" style="color:' + (Math.abs(dif) < 0.01 ? "var(--good)" : dif < 0 ? "var(--mal)" : "var(--warn)") + '">' +
-          (dif > 0 ? "+" : "") + mx(dif) + '</span>' +
-          '<span class="sub">' + (Math.abs(dif) < 0.01 ? "cuadró" : dif < 0 ? "faltó dinero" : "sobró dinero") + '</span></div>' +
-      '</div>' +
-      '<div class="tbl-wrap"><table><tbody>' +
-        '<tr><td>Cuentas cobradas</td><td class="der mono">' + s.cuentas + '</td></tr>' +
-        '<tr><td>Vendido</td><td class="der mono">' + mx(s.total) + '</td></tr>' +
-        '<tr><td>Efectivo</td><td class="der mono">' + mx(s.por.efectivo) + '</td></tr>' +
-        '<tr><td>Tarjeta</td><td class="der mono">' + mx(s.por.tarjeta) + '</td></tr>' +
-        '<tr><td>Transferencia</td><td class="der mono">' + mx(s.por.transferencia) + '</td></tr>' +
-        '<tr><td>Propinas</td><td class="der mono">' + mx(s.propinas) + '</td></tr>' +
-      '</tbody></table></div>' +
-      '<div class="fila" style="margin-top:16px"><button class="btn primary ancho" id="turList">Listo</button></div>';
-    $("#turList").onclick = ()=>{ $("#modalTurno").hidden = true; renderCaja(); };
+    t.abierto = false; t.cierra = horaAhora(); t.fechaCierre = hoyISO(); t.contado = contado;
+    t.deberia = s.enCaja; t.diferencia = Math.round((contado-s.enCaja)*100)/100;
+    t.resumen = s;
+    guardaYa();
+    renderCaja(); muestraCorteCaja(t);
+    if(consultaCortes) consultaCortes.then(()=>sincronizaCortesCaja(true));
+    else sincronizaCortesCaja(true);
   };
 }
 $("#turnoCerrarX").addEventListener("click", ()=>{ $("#modalTurno").hidden = true; });
@@ -5516,7 +5722,7 @@ function renderInsightsVentas(rango, textoPeriodo){
 }
 
 let periodoVentas="hoy";
-const fechaVenta=c=>c.analiticaVenta?.fecha||c.fecha||"";
+const fechaVenta=c=>c.fechaCierre||c.analiticaVenta?.fecha||c.fecha||"";
 const cantidadVendida=l=>Math.max(0,num(l.cant,1));
 const unidadesVenta=n=>n.toLocaleString("es-MX",{maximumFractionDigits:3});
 function aplicaPeriodoVentas(){
@@ -5529,7 +5735,10 @@ function aplicaPeriodoVentas(){
   $("#venHasta").value=periodoVentas==="todo"?"":hoy;
 }
 function enPeriodoVentas(c){
-  const desde=$("#venDesde").value, hasta=$("#venHasta").value, fecha=fechaVenta(c);
+  return fechaEnPeriodoVentas(fechaVenta(c));
+}
+function fechaEnPeriodoVentas(fecha){
+  const desde=$("#venDesde").value, hasta=$("#venHasta").value;
   return (!desde||fecha>=desde)&&(!hasta||fecha&&fecha<=hasta);
 }
 function textoPeriodoVentas(){
@@ -5650,6 +5859,22 @@ function pintaResumenVentas(datos, textoPeriodo){
     (r.estimada?" Los tickets sin costo o IVA guardado al cobrar se estiman con la carta y el IVA actuales.":"");
 }
 
+function renderCobrosDelPeriodo(tickets,textoPeriodo){
+  const cobros = totalizaCobrosCaja(tickets);
+  const canceladas = tickets.filter(c=>c.cancelada).length;
+  const anulaciones = todasLasCancelaciones().filter(z=>fechaEnPeriodoVentas(z.x.fecha||fechaVenta(z.c)));
+  const cancelado = anulaciones.reduce((s,z)=>s+num(z.x.importe),0);
+  $("#venCobrosPeriodo").textContent = textoPeriodo;
+  $("#venCobrosDetalle").innerHTML = tablaDetalleCaja([
+    ["Tickets cobrados",String(cobros.cuentas)], ["Venta neta",mx(cobros.venta)],
+    ["Venta promedio por ticket",cobros.cuentas ? mx(cobros.venta/cobros.cuentas) : "—"],
+    ["Propinas",mx(cobros.propinas)], ["Total cobrado",mx(cobros.total)],
+    ...filasFormasCaja(cobros.por),
+    ...(cobros.sinDesglose ? [["Tickets sin método registrado",String(cobros.sinDesglose)]] : []),
+    ["Cuentas canceladas",String(canceladas)], ["Cancelaciones de artículos",String(anulaciones.length)],
+    ["Importe cancelado (fuera de ventas)",mx(cancelado)]
+  ]);
+}
 function renderVentas(){
   const eventosCard=$("#venEventosCard");
   if(eventosCard) eventosCard.hidden=!!POS_EVENTO;
@@ -5661,10 +5886,12 @@ function renderVentas(){
     ?"Consulta únicamente las ventas y cortes de «"+POS_EVENTO.nombre+"»; el restaurante conserva sus propios totales."
     :"Consulta los tickets y cortes del restaurante. Los puntos móviles aparecen aparte en Reportes de eventos.";
   aplicaPeriodoVentas();
-  const todas=cerradasTodas(), rango=todas.filter(c=>!c.cancelada&&enPeriodoVentas(c));
+  const todas=cerradasTodas(), cerradasPeriodo=todas.filter(enPeriodoVentas);
+  const rango=cerradasPeriodo.filter(cuentaCobrada);
   const textoPeriodo=textoPeriodoVentas(), datos=datosVentasPeriodo(rango);
   $("#venCanalPeriodo").textContent=textoPeriodo;
   pintaResumenVentas(datos,textoPeriodo);
+  renderCobrosDelPeriodo(cerradasPeriodo,textoPeriodo);
   pintaPorCanal(datos);
   renderInsightsVentas(rango,textoPeriodo);
   const lista = ventasFiltradas(todas);
@@ -5690,16 +5917,7 @@ function renderVentas(){
   renderFacturas();
   renderReportesEventos();
 
-  const cerrados = TURNOS.filter(t=>!t.abierto);
-  $("#t_turnos").innerHTML = '<thead><tr><th>Turno</th><th>Cajero</th><th>Fecha</th><th>Horario</th>' +
-    '<th class="der">Vendido</th><th class="der">Diferencia</th></tr></thead><tbody>' +
-    cerrados.slice(0,60).map(t=>
-      '<tr><td class="mono">'+esc(t.folio)+'</td><td>'+esc(t.cajero||"")+'</td>' +
-      '<td class="mono">'+esc(t.fecha)+'</td><td class="mono">'+esc(t.abre)+'–'+esc(t.cierra||"")+'</td>' +
-      '<td class="der mono">'+mx((t.resumen||{}).total)+'</td>' +
-      '<td class="der mono" style="color:'+(Math.abs(num(t.diferencia))<0.01?"var(--good)":num(t.diferencia)<0?"var(--mal)":"var(--warn)")+'">' +
-      (num(t.diferencia)>0?"+":"")+mx(t.diferencia)+'</td></tr>').join("") + '</tbody>';
-  if(!cerrados.length) $("#t_turnos").innerHTML += '<tbody><tr><td colspan="6"><div class="empty">Sin turnos cerrados.</div></td></tr></tbody>';
+  renderHistorialCortesVentas();
 }
 
 /* Captura manual de datos fiscales ligados a cada venta. El PAC realiza el
@@ -5956,7 +6174,8 @@ $("#tkCuerpo").addEventListener("click", e=>{
 function todasLasCancelaciones(){
   const out = [];
   COMANDAS.forEach(c=>(c.cancelaciones||[]).forEach(x=> out.push({c, x})));
-  return out.sort((a,b)=> (b.c.fecha + (b.x.hora||"")) < (a.c.fecha + (a.x.hora||"")) ? -1 : 1);
+  const momento = z => (z.x.fecha||fechaVenta(z.c))+(z.x.hora||"");
+  return out.sort((a,b)=>momento(b).localeCompare(momento(a)));
 }
 function renderCancelaciones(){
   const tb = $("#t_cancela"); if(!tb) return;
@@ -5970,7 +6189,7 @@ function renderCancelaciones(){
     '<th>Qué</th><th>Motivo</th><th>Pidió</th><th>Autorizó</th>' +
     '<th style="width:85px">Merma</th><th class="der" style="width:95px">Importe</th></tr></thead><tbody>' +
     (cs.length ? cs.slice(0,200).map(z=>
-      '<tr><td class="mono">'+esc(z.c.fecha)+'</td><td class="mono">'+esc(z.x.hora||"")+'</td>' +
+      '<tr><td class="mono">'+esc(z.x.fecha||fechaVenta(z.c))+'</td><td class="mono">'+esc(z.x.hora||"")+'</td>' +
       '<td>'+num(z.x.cant,1)+'× <b>'+esc(z.x.nombre)+'</b><br>' +
         '<span style="font-size:11px;color:var(--ink-3)">'+esc(z.c.folio)+' · '+esc(z.c.mesaNombre)+'</span></td>' +
       '<td>'+esc(z.x.motivo||"")+(z.x.nota?'<br><span style="font-size:11px;color:var(--ink-3)">'+esc(z.x.nota)+'</span>':'')+'</td>' +
@@ -8864,7 +9083,7 @@ function start(){
 async function iniciaRestaurant(){
   actualizaPantallaCocinaPOS();
   try{await iniciaNubeRestaurant();}catch(e){REST_NUBE.localOnly=true;REST_NUBE.error="No se pudo revisar SQL 20";actualizaEstadoNube();}
-  start();cargaAnuncios();
+  start();cargaAnuncios();sincronizaCortesCaja();
 }
 iniciaRestaurant();
 })();
