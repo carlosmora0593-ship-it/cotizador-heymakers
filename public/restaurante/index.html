@@ -1453,7 +1453,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261105-2043">
+<meta name="nuvoor-build" content="20261105-2148">
 <link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
 </head>
 <body>
@@ -1622,6 +1622,13 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 <!-- ============ PERSONAL ============ -->
 <section id="tab-personal" hidden>
   <div class="pageHeading"><div><span>EQUIPO</span><h1>Personas y turnos</h1><p>Asistencia, horarios y control del equipo de servicio.</p></div></div>
+  <div class="card" id="cardEquipoPersonal" hidden>
+    <header><h2>Equipo y claves</h2><button class="btn sm primary" type="button" id="userNuevo" style="margin-left:auto">+ Agregar persona</button></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">El mismo PIN sirve para entrar al perfil y checar entrada o salida.</p>
+      <div class="tbl-wrap"><table id="t_equipo"></table></div>
+    </div>
+  </div>
   <div class="card" id="cardCoberturaPersonal">
     <header><h2>Cobertura de turnos</h2><label class="coverageDate">Fecha <input id="personalFecha" type="date" aria-label="Fecha de la cobertura"></label></header>
     <div class="body"><div class="coverageStats" id="personalCoberturaStats"></div><div class="coverageGrid" id="personalCobertura"></div>
@@ -1631,9 +1638,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
   <div class="card">
     <header><h2>Reloj checador</h2><span class="hint" id="chHoy"></span></header>
     <div class="body">
-      <p class="note" style="margin:0 0 14px">Cada quien checa con <b>su clave</b> y una foto. La foto no es desconfianza:
-        es lo que resuelve el día que alguien dice que sí llegó a las ocho. Sin clave no se puede checar — se pone en
-        <b>Ajustes → Equipo</b>.</p>
+      <p class="note" style="margin:0 0 14px">Elige tu nombre y usa el <b>PIN de tu perfil</b>. Si está activada la foto, tómala antes de registrar tu hora.</p>
       <div class="chGente" id="chGente"></div>
     </div>
   </div>
@@ -2053,12 +2058,9 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     <div class="body"><p class="note" id="mesasScopeNote" hidden style="margin:0 0 12px">Esta lista solo pertenece a este evento. Agregar, mover o quitar mesas aquí no cambia las del restaurante ni las de otros eventos.</p><div class="tbl-wrap"><table id="t_mesas"></table></div></div>
   </div>
   <div class="card">
-    <header><h2>Equipo y claves</h2><button class="btn sm ghost" id="userNuevo" style="margin-left:auto">+ Persona</button></header>
+    <header><h2>Bloqueo de pantalla</h2></header>
     <div class="body">
-      <p class="note" style="margin:0 0 14px"><b>Gerente:</b> todo.&nbsp; <b>Cajero:</b> cobra, abre y cierra turno, no edita el menú.&nbsp;
-        <b>Mesero:</b> sólo mesas y comandas; no ve ventas ni caja.</p>
-      <div class="tbl-wrap"><table id="t_equipo"></table></div>
-      <div class="grid g3" style="margin-top:18px">
+      <div class="grid g3">
         <div><label class="f" for="p_bloqueo">Bloquear la pantalla si nadie la toca</label>
           <select id="p_bloqueo">
             <option value="0">Nunca</option><option value="2">A los 2 minutos</option>
@@ -2359,6 +2361,29 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     <header><h2 id="corrTitulo">Corregir</h2><button class="btn sm" id="corrCerrar" style="margin-left:auto">Cerrar</button></header>
     <div class="body" id="corrCuerpo"></div>
   </div>
+</div>
+
+<div class="modal" id="modalClavePersonal" hidden role="dialog" aria-modal="true" aria-labelledby="clavePersonalTitulo">
+  <form class="card" id="formClavePersonal" autocomplete="off">
+    <header><h2 id="clavePersonalTitulo">Agregar persona</h2></header>
+    <div class="body">
+      <div id="clavePersonalAlta">
+        <label class="f" for="clavePersonalNombre">Nombre</label>
+        <input id="clavePersonalNombre" maxlength="100" autocomplete="off">
+        <label class="f" for="clavePersonalRol" style="margin-top:12px">Rol</label>
+        <select id="clavePersonalRol"></select>
+      </div>
+      <label class="f" for="clavePersonalPin" style="margin-top:12px">PIN de acceso y asistencia</label>
+      <input id="clavePersonalPin" class="restaurantPin" inputmode="numeric" pattern="[0-9]{4,12}" maxlength="12"
+        autocomplete="off" autocapitalize="none" spellcheck="false" title="Usa de 4 a 12 dígitos" required>
+      <p class="note" style="margin:12px 0">Usa de 4 a 12 dígitos. Este PIN también se usa en el reloj checador.</p>
+      <p class="note" id="clavePersonalError" role="alert" hidden></p>
+      <div class="fila" style="margin-top:16px;justify-content:flex-end">
+        <button class="btn ghost" type="button" id="clavePersonalCancelar">Cancelar</button>
+        <button class="btn primary" type="submit" id="clavePersonalGuardar">Guardar persona</button>
+      </div>
+    </div>
+  </form>
 </div>
 
 <div class="modal" id="modalCheca" hidden>
@@ -2701,6 +2726,7 @@ const REST_NUBE_PROJECTION_KEY=LS_BASE+"_nube_proyeccion_v1";
 const REST_NUBE_MIGRATION_FIELD="_nuvoorMigracion";
 const REST_NUBE_MIGRATION_FLAG=LS_BASE+"_nube_migracion_v1";
 const REST_NUBE_SYNCED_KEY=LS_BASE+"_nube_sync_ok_v1";
+const REST_NUBE_PIN_SALT_KEY=LS_BASE+"_nube_pin_salt_v1";
 const REST_NUBE_MIGRATION_BACKUP_KEY=LS_BASE+"_respaldo_migracion_v1";
 const REST_NUBE_MIGRATION_LOCK_ID="migracion_inicial";
 let DB = null, laNube = false;
@@ -2755,7 +2781,19 @@ function nubeId(tipo,id){const base=String(id||"general");return POS_EVENTO?"ev_
 function nubeClona(v){return v==null?v:JSON.parse(JSON.stringify(v));}
 function nubeFotoLocal(list,id,key){const found=(list||[]).find(x=>x&&x.id===id);return found&&found[key]||"";}
 async function nubeSha256(texto){const bytes=new TextEncoder().encode(texto);const hash=await crypto.subtle.digest("SHA-256",bytes);return Array.from(new Uint8Array(hash),b=>b.toString(16).padStart(2,"0")).join("");}
-function nubePinSalt(){if(REST_NUBE.pinSalt)return REST_NUBE.pinSalt;try{REST_NUBE.pinSalt=localStorage.getItem(LS_BASE+"_nube_pin_salt_v1")||"";}catch(_){}if(!REST_NUBE.pinSalt){const bytes=new Uint8Array(24);crypto.getRandomValues(bytes);REST_NUBE.pinSalt=Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");try{localStorage.setItem(LS_BASE+"_nube_pin_salt_v1",REST_NUBE.pinSalt);}catch(_){}}return REST_NUBE.pinSalt;}
+function guardaSalPinRestaurant(sal){
+  if(!sal || REST_NUBE.pinSalt === sal) return;
+  REST_NUBE.pinSalt = sal;
+  try{localStorage.setItem(REST_NUBE_PIN_SALT_KEY,sal);}catch(_){}
+}
+function nubePinSalt(){
+  if(REST_NUBE.pinSalt) return REST_NUBE.pinSalt;
+  const guardada = localStorage.getItem(REST_NUBE_PIN_SALT_KEY);
+  if(guardada) return REST_NUBE.pinSalt = guardada;
+  const bytes = crypto.getRandomValues(new Uint8Array(24));
+  guardaSalPinRestaurant(Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join(""));
+  return REST_NUBE.pinSalt;
+}
 async function proyectaRestaurant(){
   const out={},ev=nubeEventoId();
   const f=P.fiscal||{},allowedConfig={nombre:P.negocio&&P.negocio.nombre||"Mi restaurante",tel:P.negocio&&P.negocio.tel||"",dir:P.negocio&&P.negocio.dir||"",iva:num(P.iva),propina:num(P.propina),servicio:num(P.servicio),apps:(P.apps||[]).map(a=>({id:a.id,nombre:a.nombre,comision:num(a.comision),color:a.color,activa:a.activa!==false})),fiscal:{razon:f.razon||"",rfc:f.rfc||"",regimen:f.regimen||"612",cpFiscal:f.cpFiscal||"",pac:f.pac||"",serie:f.serie||"A",folioFactura:num(f.folioFactura,1),sellosAlta:!!f.sellosAlta},ticket:{ancho:num(P.ticket&&P.ticket.ancho,80),encabezado:P.ticket&&P.ticket.encabezado||"",pie:P.ticket&&P.ticket.pie||"¡Gracias por su visita!",mostrarIva:P.ticket&&P.ticket.mostrarIva!==false,mostrarPropina:P.ticket&&P.ticket.mostrarPropina!==false,imprimeCocina:P.ticket&&P.ticket.imprimeCocina!==false,imprimeCuenta:P.ticket&&P.ticket.imprimeCuenta!==false,leyenda:P.ticket&&P.ticket.leyenda||""},folios:nubeClona(P.folios||{}),pinSalt:nubePinSalt()};
@@ -2918,7 +2956,7 @@ async function iniciaNubeRestaurant(){
   REST_NUBE.verified=true;REST_NUBE.error="";
   let rows=[];try{rows=await nubeLeeFilasRestaurant();}catch(e){REST_NUBE.localOnly=true;REST_NUBE.error=String(e&&e.message||"No se pudo leer la nube").slice(0,90);actualizaEstadoNube();return;}
   (rows||[]).forEach(row=>{if(row.coleccion==="rest_tickets")REST_NUBE.ticketIds.add(row.doc_id);});
-  const rawCloud=nubeDocsDesdeServidor(),cloud=nubeDocsDeContexto(rawCloud),remoteCfg=Object.values(cloud).find(d=>d.coleccion==="rest_config");if(remoteCfg&&remoteCfg.cuerpo.pinSalt){REST_NUBE.pinSalt=remoteCfg.cuerpo.pinSalt;try{localStorage.setItem(LS_BASE+"_nube_pin_salt_v1",REST_NUBE.pinSalt);}catch(_){}}
+  const rawCloud=nubeDocsDesdeServidor(),cloud=nubeDocsDeContexto(rawCloud),remoteCfg=Object.values(cloud).find(d=>d.coleccion==="rest_config");guardaSalPinRestaurant(remoteCfg?.cuerpo.pinSalt);
   const local=await proyectaRestaurant(),esDemo=restauranteEsEjemploSinCambios(),hasMigration=REST_NUBE.queue.some(q=>q&&q.migracion===true&&String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)),migrationElegida=localStorage.getItem(REST_NUBE_MIGRATION_FLAG)==="si",hasLocal=REST_LOCAL_START_KEYS.size>0||Object.keys(REST_NUBE.projection).length>0||REST_NUBE.queue.length>0||esDemo;
   REST_NUBE.enabled=true;REST_NUBE.ready=true;
   const hayNube=Object.keys(cloud).length>0;
@@ -3009,7 +3047,7 @@ function escuchaNubeRestaurant(){
 
 function aplicaDocumentosRestaurant(docs){
   docs=nubeDocsDeContexto(docs);docs=Object.fromEntries(Object.entries(docs).map(([k,d])=>[k,Object.assign({},d,{cuerpo:nubeSinMarcaMigracion(d.cuerpo)})]));const raw=Object.values(docs),has=(col)=>raw.some(d=>d&&d.coleccion===col),ev=nubeEventoId(),all=raw.filter(d=>d&&d.cuerpo&&!d.cuerpo._eliminado),mine=all.filter(d=>d.coleccion!=="rest_eventos"&&(d.cuerpo.eventoId||"")===ev),by=(col)=>mine.filter(d=>d.coleccion===col).map(d=>d.cuerpo),oldMenu=MENU||{},oldMesas=MESAS||[],oldEquipo=EQUIPO||[],oldP=P||paramsPorDefecto();
-  const cfg=by("rest_config")[0];if(cfg){P=Object.assign(paramsPorDefecto(),P,{negocio:Object.assign({},P.negocio,{nombre:cfg.nombre||P.negocio.nombre,tel:cfg.tel||"",dir:cfg.dir||""}),iva:num(cfg.iva,P.iva),propina:num(cfg.propina,P.propina),servicio:num(cfg.servicio,P.servicio),apps:Array.isArray(cfg.apps)?cfg.apps:P.apps,fiscal:cfg.fiscal||P.fiscal,ticket:Object.assign({},P.ticket,cfg.ticket||{}),folios:cfg.folios||P.folios});REST_NUBE.pinSalt=cfg.pinSalt||REST_NUBE.pinSalt;}
+  const cfg=by("rest_config")[0];if(cfg){P=Object.assign(paramsPorDefecto(),P,{negocio:Object.assign({},P.negocio,{nombre:cfg.nombre||P.negocio.nombre,tel:cfg.tel||"",dir:cfg.dir||""}),iva:num(cfg.iva,P.iva),propina:num(cfg.propina,P.propina),servicio:num(cfg.servicio,P.servicio),apps:Array.isArray(cfg.apps)?cfg.apps:P.apps,fiscal:cfg.fiscal||P.fiscal,ticket:Object.assign({},P.ticket,cfg.ticket||{}),folios:cfg.folios||P.folios});guardaSalPinRestaurant(cfg.pinSalt);}
   const carta=by("rest_carta"),cats=carta.filter(x=>x.tipo==="categoria").map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;return y;}),groups=carta.filter(x=>x.tipo==="grupo").map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;return y;}),plats=carta.filter(x=>x.tipo==="platillo").map(x=>{const y=Object.assign({},x),foto=nubeFotoLocal(oldMenu.plats,y.id,"foto");delete y.tipo;delete y.eventoId;if(foto)y.foto=foto;return y;});if(has("rest_carta"))MENU={cats,grupos:groups,plats};
   const mesaDocs=by("rest_mesas"),mesaRows=mesaDocs.filter(x=>x.tipo==="mesa").map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;delete y.croquis;return y;});if(has("rest_mesas"))MESAS=mesaRows;
   DECOR=mesaDocs.filter(x=>x.tipo==="decor").map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;return y;});
@@ -7103,6 +7141,7 @@ function renderCoberturaPersonal(){
     '<div class="coverageEmpty">No hay turnos asignados para esta fecha. Abre el expediente de una persona para configurar sus días y horarios.</div>';
 }
 function renderPersonal(){
+  renderEquipo();
   const gente = EQUIPO.filter(u=>u.activo !== false);
   const dentro = gente.filter(u=>estaDentro(u.id)).length;
   $("#chHoy").textContent = dentro + " de " + gente.length + " dentro";
@@ -7628,14 +7667,15 @@ function imprimeCarta(titulo, cuerpo){
 
 /* ---------------- la ventana de checar ---------------- */
 let chQuien = null, chFoto = null, chTecleado = "", chCamara = null;
+let chValidando = false, chAbriendoCamara = false;
 function abreCheca(id){
-  const u = EQUIPO.find(x=>x.id === id); if(!u) return;
+  const u = EQUIPO.find(x=>x.id === id && x.activo !== false); if(!u) return;
   if(!tieneClave(u)){
-    toast("A " + (u.nombre||"esta persona") + " le falta su clave. Se la pone el gerente en Ajustes → Equipo.");
+    toast("A " + (u.nombre||"esta persona") + " le falta su PIN. El gerente lo configura en Personal → Equipo y claves.");
     return;
   }
-  chQuien = u; chFoto = null; chTecleado = "";
   const d = estaDentro(id);
+  chQuien = {id, dentro:d}; chFoto = null; chTecleado = "";
   $("#chTitulo").textContent = (d ? "Salida · " : "Entrada · ") + (u.nombre||"");
   $("#chOk").textContent = d ? "Registrar salida" : "Registrar entrada";
   $("#chEstado").innerHTML = d
@@ -7655,10 +7695,15 @@ function abreCheca(id){
 }
 async function abreCamara(){
   if(!P.fotoCheca){ $("#chVideo").hidden = true; $("#chTomar").hidden = true; revisaChOk(); return; }
+  const intento = chQuien;
+  chAbriendoCamara = true; revisaChOk();
   try{
-    chCamara = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user", width:480}});
+    const camara = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user", width:480}});
+    if(chQuien !== intento){ camara.getTracks().forEach(t=>t.stop()); return; }
+    chCamara = camara;
     $("#chVideo").srcObject = chCamara;
   }catch(e){
+    if(chQuien !== intento) return;
     /* Sin cámara —una caja vieja, el permiso negado— se checa igual. Es
        preferible un registro sin foto que una persona que no puede checar. */
     chCamara = null;
@@ -7667,7 +7712,8 @@ async function abreCamara(){
     toast(permisoDenegado
       ? "La app no tiene permiso de cámara: actívalo en Ajustes de Android → Apps → Nuvoor → Permisos. Se registrará sin foto."
       : "No se pudo abrir la cámara. Se registrará sin foto.");
-    revisaChOk();
+  }finally{
+    if(chQuien === intento){ chAbriendoCamara = false; revisaChOk(); }
   }
 }
 function cierraCamara(){
@@ -7675,7 +7721,7 @@ function cierraCamara(){
 }
 function cierraCheca(){
   cierraCamara(); $("#modalCheca").hidden = true;
-  chQuien = null; chFoto = null; chTecleado = "";
+  chQuien = null; chFoto = null; chTecleado = ""; chAbriendoCamara = false;
 }
 function pintaChPin(){
   const largo = Math.max(4, chTecleado.length);
@@ -7684,7 +7730,7 @@ function pintaChPin(){
 }
 function revisaChOk(){
   const hayFoto = !!chFoto || !chCamara;   /* sin cámara no se exige foto */
-  $("#chOk").disabled = !(hayFoto && chTecleado.length >= 1);
+  $("#chOk").disabled = chValidando || chAbriendoCamara || !(hayFoto && chTecleado.length >= 1);
 }
 $("#chTomar").addEventListener("click", ()=>{
   const v = $("#chVideo"); if(!v || !chCamara) return;
@@ -7703,6 +7749,7 @@ $("#chOtra").addEventListener("click", ()=>{
   revisaChOk();
 });
 $("#chTeclado").addEventListener("click", e=>{
+  if(chValidando) return;
   const b = e.target.closest("[data-tecla]"); if(!b) return;
   const k = b.dataset.tecla;
   if(k === "←") chTecleado = chTecleado.slice(0,-1);
@@ -7712,15 +7759,30 @@ $("#chTeclado").addEventListener("click", e=>{
 });
 $("#chCerrar").addEventListener("click", cierraCheca);
 $("#chOk").addEventListener("click", registraCheca);
-function registraCheca(){
-  const u = chQuien; if(!u) return;
-  if(String(chTecleado) !== String(u.pin||"")){
-    toast("Esa no es la clave de " + (u.nombre||""));
+async function registraCheca(){
+  if(chValidando || $("#chOk").disabled || !chQuien) return;
+  const intento = chQuien;
+  const u = EQUIPO.find(x=>x.id === intento.id && x.activo !== false);
+  if(!tieneClave(u)){
+    cierraCheca(); toast("El perfil cambió. Vuelve a elegir a la persona."); return;
+  }
+  const hash = u.pin_hash || u.pinHash, pinAnterior = u.pin;
+  chValidando = true; revisaChOk();
+  let valida;
+  try{ valida = await validaClavePerfil(u,chTecleado); }
+  finally{ chValidando = false; revisaChOk(); }
+  if(chQuien !== intento) return;
+  const actual = EQUIPO.find(x=>x.id === intento.id && x.activo !== false);
+  const dentro = estaDentro(u.id);
+  if(!actual || (actual.pin_hash || actual.pinHash) !== hash || (!hash && actual.pin !== pinAnterior) || dentro !== intento.dentro){
+    cierraCheca(); toast("Los datos cambiaron. Vuelve a abrir el checador."); return;
+  }
+  if(!valida){
+    toast("PIN incorrecto");
     chTecleado = ""; pintaChPin(); revisaChOk(); return;
   }
-  const dentro = estaDentro(u.id);
   ASISTENCIAS.push({
-    id: uid(), uid: u.id, nombre: u.nombre||"", fecha: hoyISO(), hora: horaAhora(),
+    id: uid(), uid: actual.id, nombre: actual.nombre||"", fecha: hoyISO(), hora: horaAhora(),
     tipo: dentro ? "salida" : "entrada", foto: chFoto || "",
     desde: usuarioActual().nombre || "", ts: Date.now()
   });
@@ -7729,7 +7791,7 @@ function registraCheca(){
   const corte = tope.getFullYear()+"-"+dos(tope.getMonth()+1)+"-"+dos(tope.getDate());
   ASISTENCIAS.forEach(a=>{ if(a.fecha < corte) a.foto = ""; });
   persist();
-  toast((dentro ? "Salida" : "Entrada") + " de " + (u.nombre||"") + " a las " + horaAhora());
+  toast((dentro ? "Salida" : "Entrada") + " de " + (actual.nombre||"") + " a las " + horaAhora());
   cierraCheca();
   if(!$("#tab-personal").hidden) renderPersonal();
   if(!$("#acceso").hidden) pintaAccesoReloj();
@@ -7768,7 +7830,7 @@ function renderSet(){
     borradorImpresoraPOS=JSON.parse(JSON.stringify(IMPRESORAS[0]));
   }
   renderImpresorasPOS(); pintaNotaRespaldo();
-  pintaNotaBloqueo(); pintaNotaFolio(); renderMesasSet(); renderEquipo(); aplicaMarca();
+  pintaNotaBloqueo(); pintaNotaFolio(); renderMesasSet(); aplicaMarca();
 }
 function pintaAppsEdit(){
   const host=$("#appsEdit"); if(!host) return;
@@ -7838,6 +7900,7 @@ function armaRespaldo(){
   const d = {_app:"makers-restaurant", _version:1, _fecha:new Date().toISOString(),
              _negocio: (P.negocio||{}).nombre || "", datos:{}};
   LLAVES_RESPALDO.forEach(k=>{ d.datos[k] = lsGet(k, null); });
+  d._pinSalt = REST_NUBE.pinSalt || localStorage.getItem(REST_NUBE_PIN_SALT_KEY) || "";
   return d;
 }
 function pintaNotaRespaldo(){
@@ -7872,6 +7935,7 @@ function restauraRespaldo(texto){
   restaurando = true;
   clearTimeout(guardaT);
   LLAVES_RESPALDO.forEach(k=>{ if(d.datos[k] != null) lsSet(k, d.datos[k]); });
+  if(typeof d._pinSalt === "string") guardaSalPinRestaurant(d._pinSalt);
   toast("Restaurado. Recargando…");
   setTimeout(()=> location.reload(), 700);
 }
@@ -8198,20 +8262,131 @@ function renderMesasSet(){
     '</tbody><datalist id="listaZonas">' + zonas().map(z=>'<option value="'+esc(z)+'">').join("") + '</datalist>';
 }
 function renderEquipo(){
-  $("#t_equipo").innerHTML = '<thead><tr><th>Nombre</th><th>Foto</th><th style="width:150px">Rol</th>' +
-    '<th style="width:160px">Clave</th><th style="width:80px">Activo</th><th style="width:60px"></th></tr></thead><tbody>' +
+  const gerente = esGerente();
+  $("#cardEquipoPersonal").hidden = !gerente;
+  $("#t_equipo").innerHTML = gerente ? '<thead><tr><th>Nombre</th><th>Acceso</th><th>Rol</th><th>Foto</th>' +
+    '<th style="width:80px">Activo</th><th style="width:60px"></th></tr></thead><tbody>' +
     EQUIPO.map(u=>'<tr data-usr="'+esc(u.id)+'">' +
-      '<td><input data-uk="nombre" value="'+esc(u.nombre)+'"></td>' +
+      '<td><input data-uk="nombre" aria-label="Nombre" value="'+esc(u.nombre)+'"></td>' +
+      '<td><button class="btn sm ghost" type="button" data-cambiar-pin style="white-space:nowrap">'+
+        (tieneClave(u)?"Cambiar PIN":"Configurar PIN")+'</button></td>' +
+      '<td><select data-uk="rol" aria-label="Rol">'+opcionesRolesPersonal(u.rol)+'</select></td>' +
       '<td><div class="fotoUsuarioControl">'+avatarHTML(u)+'<button class="btn sm ghost" type="button" data-foto>Subir foto</button>' +
         '<input data-fotofile type="file" accept="image/png,image/jpeg,image/webp" hidden>' +
         (u.foto?'<button class="btn sm ghost" type="button" data-fotoquitar>Quitar</button>':'')+'</div></td>' +
-      '<td><select data-uk="rol">'+Object.keys(ROLES).map(r=>
-        '<option value="'+r+'"'+(r===u.rol?" selected":"")+'>'+ROLES[r].nombre+'</option>').join("")+'</select></td>' +
-      '<td><input data-uk="pin" class="restaurantPin" type="'+tipoEntradaPinPOS+'" inputmode="numeric" maxlength="12" autocomplete="off" autocapitalize="none" spellcheck="false" value="'+esc(u.pin||"")+'" placeholder="'+(u.pin_hash?"registrada · escribe para cambiar":"sin clave")+'"></td>' +
-      '<td style="text-align:center"><input type="checkbox" data-uk="activo" style="width:auto"'+(u.activo!==false?" checked":"")+'></td>' +
-      '<td><button class="btn sm ghost" data-delusr="'+esc(u.id)+'"'+(EQUIPO.length<2?" disabled":"")+'>✕</button></td></tr>').join("") +
-    '</tbody>';
+      '<td style="text-align:center"><input type="checkbox" aria-label="Perfil activo" data-uk="activo" style="width:auto"'+(u.activo!==false?" checked":"")+'></td>' +
+      '<td><button class="btn sm ghost" type="button" aria-label="Quitar persona" data-delusr'+(EQUIPO.length<2?" disabled":"")+'>✕</button></td></tr>').join("") +
+    '</tbody>' : "";
 }
+function opcionesRolesPersonal(rol){
+  return Object.keys(ROLES).map(r=>'<option value="'+r+'"'+(r===rol?" selected":"")+'>'+ROLES[r].nombre+'</option>').join("");
+}
+
+let editorClavePersonal = null;
+function abreClavePersonal(persona, boton){
+  if(!esGerente() || editorClavePersonal) return;
+  const alta = !persona;
+  editorClavePersonal = {id:persona?.id, boton};
+  $("#clavePersonalTitulo").textContent = alta ? "Agregar persona" : (tieneClave(persona)?"Cambiar PIN · ":"Configurar PIN · ")+persona.nombre;
+  $("#clavePersonalAlta").hidden = !alta;
+  const nombre = $("#clavePersonalNombre");
+  nombre.value = ""; nombre.required = alta;
+  $("#clavePersonalRol").innerHTML = opcionesRolesPersonal("mesero");
+  $("#clavePersonalPin").value = "";
+  $("#clavePersonalError").hidden = true;
+  $("#clavePersonalGuardar").textContent = alta ? "Guardar persona" : "Guardar PIN";
+  $("#modalClavePersonal").hidden = false;
+  (alta ? nombre : $("#clavePersonalPin")).focus();
+}
+function cierraClavePersonal(){
+  const boton = editorClavePersonal?.boton;
+  editorClavePersonal = null;
+  $("#clavePersonalPin").value = "";
+  $("#modalClavePersonal").hidden = true;
+  if(boton?.isConnected) boton.focus();
+}
+$("#userNuevo").addEventListener("click", e=>abreClavePersonal(null,e.currentTarget));
+$("#clavePersonalCancelar").addEventListener("click", cierraClavePersonal);
+$("#modalClavePersonal").addEventListener("keydown", e=>{ if(e.key==="Escape") cierraClavePersonal(); });
+$("#formClavePersonal").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const editor = editorClavePersonal, guardar = $("#clavePersonalGuardar");
+  if(!editor || !esGerente() || guardar.disabled) return;
+  const nombre = $("#clavePersonalNombre").value.trim(), rol = $("#clavePersonalRol").value;
+  const pin = $("#clavePersonalPin").value, error = $("#clavePersonalError");
+  if(!editor.id && (!nombre || !Object.keys(ROLES).includes(rol))){
+    error.textContent = "Escribe el nombre y elige un rol.";
+    error.hidden = false; return;
+  }
+  if(!/^[0-9]{4,12}$/.test(pin)) return;
+  error.hidden = true;
+  guardar.disabled = true;
+  try{
+    const sal = nubePinSalt();
+    const hash = await nubeSha256(sal+pin);
+    if(editorClavePersonal !== editor || !esGerente() || !$("#acceso").hidden) return;
+    if(sal !== nubePinSalt()) throw new Error();
+    const persona = editor.id ? EQUIPO.find(u=>u.id === editor.id) : {id:uid(), nombre, rol, activo:true};
+    if(!persona){
+      cierraClavePersonal(); toast("Este perfil ya no está en el equipo."); return;
+    }
+    persona.pin_hash = hash;
+    delete persona.pin;
+    delete persona.pinHash;
+    if(!editor.id) EQUIPO.push(persona);
+    REST_NUBE.localDirty = REST_NUBE.enabled;
+    guardaYa();
+    cierraClavePersonal(); renderPersonal();
+    toast(editor.id ? "PIN actualizado" : "Persona agregada con su PIN");
+  }catch(_){
+    if(editorClavePersonal === editor){
+      error.textContent = "No se pudo guardar el PIN. Inténtalo de nuevo.";
+      error.hidden = false;
+    }
+  }finally{ guardar.disabled = false; }
+});
+
+$("#cardEquipoPersonal").addEventListener("input", e=>{
+  if(!esGerente() || e.target.dataset.uk !== "nombre") return;
+  const u = EQUIPO.find(x=>x.id === e.target.closest("[data-usr]")?.dataset.usr);
+  if(u){ u.nombre = e.target.value; persist(); }
+});
+$("#cardEquipoPersonal").addEventListener("change", e=>{
+  const t = e.target, fila = t.closest("[data-usr]");
+  if(!esGerente() || !fila) return;
+  const id = fila.dataset.usr, u = EQUIPO.find(x=>x.id === id);
+  if(!u) return;
+  if(t.matches("[data-fotofile]")){
+    const f=t.files?.[0]; t.value="";
+    if(!f) return;
+    prepararImagen(f,{maxKB:160,maxLado:512}).then(data=>{
+      const actual=EQUIPO.find(x=>x.id===id); if(!actual || !esGerente()) return;
+      actual.foto=data; persist(); aplicaRol();
+      toast("Foto de usuario guardada");
+    }).catch(()=>toast("No se pudo cargar la foto. Prueba con una imagen PNG, JPG o WEBP más ligera."));
+    return;
+  }
+  if(t.dataset.uk === "nombre") return;
+  if(t.dataset.uk === "activo") u.activo = t.checked;
+  if(t.dataset.uk === "rol" && Object.keys(ROLES).includes(t.value)) u.rol = t.value;
+  persist(); aplicaRol();
+});
+$("#cardEquipoPersonal").addEventListener("click", e=>{
+  if(!esGerente()) return;
+  const b = e.target.closest("button"), fila = b?.closest("[data-usr]");
+  const u = fila && EQUIPO.find(x=>x.id===fila.dataset.usr);
+  if(!u) return;
+  if(b.matches("[data-cambiar-pin]")){ abreClavePersonal(u,b); return; }
+  if(b.matches("[data-foto]")){ fila.querySelector("[data-fotofile]").click(); return; }
+  if(b.matches("[data-delusr]")){
+    if(EQUIPO.length < 2) return;
+    if(u.id === usuarioId){ toast("No puedes borrar al usuario con el que estás trabajando"); return; }
+    EQUIPO = EQUIPO.filter(x=>x.id !== u.id);
+  }else if(b.matches("[data-fotoquitar]")) delete u.foto;
+  else return;
+  persist(); aplicaRol();
+});
+
 $("#tab-set").addEventListener("input", e=>{
   const t = e.target;
   if(t.id === "e_nombre"){ P.negocio.nombre = t.value; aplicaMarca(); persist(); return; }
@@ -8233,11 +8408,6 @@ $("#tab-set").addEventListener("input", e=>{
     if(m){ m[t.dataset.mk] = t.dataset.mk === "lugares" ? num(t.value) : t.value; persist(); }
     return;
   }
-  const tru = t.closest("[data-usr]");
-  if(tru && t.dataset.uk){
-    const u = EQUIPO.find(x=>x.id === tru.dataset.usr);
-    if(u){ if(t.dataset.uk==="pin"){delete u.pin_hash;delete u.pinHash;}u[t.dataset.uk] = t.value; pintaNotaBloqueo(); persist(); }
-  }
 });
 $("#tab-set").addEventListener("change", e=>{
   const t = e.target;
@@ -8247,17 +8417,6 @@ $("#tab-set").addEventListener("change", e=>{
     prepararImagen(f,{maxKB:280,maxLado:720,transparente:true}).then(data=>{
       P.negocio.logo=data; persist(); renderSet(); toast("Logo del negocio actualizado");
     }).catch(()=>toast("No se pudo cargar el logo. Prueba con una imagen PNG, JPG o WEBP más ligera."));
-    return;
-  }
-  if(t.matches("[data-fotofile]")){
-    const f=t.files&&t.files[0], row=t.closest("[data-usr]"), id=row&&row.dataset.usr; t.value="";
-    if(!f||!id) return;
-    prepararImagen(f,{maxKB:160,maxLado:512}).then(data=>{
-      const u=EQUIPO.find(x=>x.id===id); if(!u) return;
-      u.foto=data; persist(); renderEquipo(); renderPersonal(); renderExpedientes();
-      if(id===usuarioId) aplicaRol();
-      toast("Foto de usuario guardada");
-    }).catch(()=>toast("No se pudo cargar la foto. Prueba con una imagen PNG, JPG o WEBP más ligera."));
     return;
   }
   if(t.id === "f_digitos"){ P.folios.digitos = num(t.value,5); pintaNotaFolio(); persist(); return; }
@@ -8288,34 +8447,12 @@ $("#tab-set").addEventListener("change", e=>{
     if(m){ m.forma = t.value; persist(); }
     return;
   }
-  const tru = t.closest("[data-usr]");
-  if(tru && t.dataset.uk){
-    const u = EQUIPO.find(x=>x.id === tru.dataset.usr); if(!u) return;
-    if(t.dataset.uk === "activo") u.activo = t.checked;
-    if(t.dataset.uk === "rol"){ u.rol = t.value; pintaTabs(); }
-    persist(); aplicaRol();
-  }
 });
 $("#tab-set").addEventListener("click", e=>{
   const dm = e.target.closest("[data-delmesa]");
   if(dm){
     if(comandaDe(dm.dataset.delmesa)){ toast("Esa mesa tiene una cuenta abierta"); return; }
     MESAS = MESAS.filter(m=>m.id !== dm.dataset.delmesa); persist(); renderMesasSet(); return;
-  }
-  const du = e.target.closest("[data-delusr]");
-  if(du){
-    if(EQUIPO.length < 2) return;
-    if(du.dataset.delusr === usuarioId){ toast("No puedes borrar al usuario con el que estás trabajando"); return; }
-    EQUIPO = EQUIPO.filter(u=>u.id !== du.dataset.delusr); persist(); renderEquipo(); return;
-  }
-  const subirFoto=e.target.closest("[data-foto]");
-  if(subirFoto){ subirFoto.closest("[data-usr]").querySelector("[data-fotofile]").click(); return; }
-  const quitarFoto=e.target.closest("[data-fotoquitar]");
-  if(quitarFoto){
-    const row=quitarFoto.closest("[data-usr]"), u=EQUIPO.find(x=>x.id===row.dataset.usr); if(!u) return;
-    delete u.foto; persist(); renderEquipo(); renderPersonal(); renderExpedientes();
-    if(u.id===usuarioId) aplicaRol();
-    return;
   }
   if(e.target.closest("#bloqueoProbar")){ bloqueaPantalla(true); return; }
   if(e.target.closest("#e_logoBtn")){ $("#e_logoFile").click(); return; }
@@ -8328,10 +8465,6 @@ $("#mesaNueva").addEventListener("click", ()=>{
   MESAS.push({id:uid(), nombre:"Mesa "+(MESAS.length+1), zona:z, lugares:4, activa:true,
               x:50, y:50, forma:"cuadrada"});
   persist(); renderMesasSet();
-});
-$("#userNuevo").addEventListener("click", ()=>{
-  EQUIPO.push({id:uid(), nombre:"Nueva persona", rol:"mesero", pin:"", activo:true});
-  persist(); renderEquipo();
 });
 
 /* Un ticket de mentiras para ver cómo quedó antes de cobrarle a alguien. */
@@ -8447,9 +8580,9 @@ var bloqueado = false, relojInactivo = null;
 var relojBloqueoIntervalo = null;
 const MIN_BLOQUEO = 10;
 const tipoEntradaPinPOS = window.CSS?.supports("-webkit-text-security","disc") ? "text" : "password";
-["#accesoPass","#autoPin"].forEach(id=>$(id).type=tipoEntradaPinPOS);
+["#accesoPass","#autoPin","#clavePersonalPin"].forEach(id=>$(id).type=tipoEntradaPinPOS);
 const tieneClave = u => !!(String((u||{}).pin||"").trim()||String((u||{}).pin_hash||(u||{}).pinHash||"").trim());
-async function validaClavePerfil(u,clave){if(!u)return false;const hash=u.pin_hash||u.pinHash;if(hash){try{return await nubeSha256((REST_NUBE.pinSalt||localStorage.getItem(LS_BASE+"_nube_pin_salt_v1")||"")+String(clave||""))===hash;}catch(_){return false;}}return String(clave||"")===String(u.pin||"");}
+async function validaClavePerfil(u,clave){if(!u)return false;const hash=u.pin_hash||u.pinHash;if(hash){try{return await nubeSha256((REST_NUBE.pinSalt||localStorage.getItem(REST_NUBE_PIN_SALT_KEY)||"")+String(clave||""))===hash;}catch(_){return false;}}return String(clave||"")===String(u.pin||"");}
 const minutosBloqueo = () => { const n = num(P.bloqueoMin, MIN_BLOQUEO); return n > 0 ? n : 0; };
 const puedeBloquear = () => minutosBloqueo() > 0;
 
@@ -8493,11 +8626,12 @@ function pintaNotaBloqueo(){
   nb.innerHTML = tieneClave(yo)
     ? 'Al bloquearse te va a pedir <b>tu clave</b>. En un restaurante conviene: la caja queda sola todo el tiempo.'
     : '<b>' + esc(yo.nombre||"Tu usuario") + '</b> no tiene clave, así que al bloquearse la pantalla se limpia ' +
-      'y hay que volver a elegir perfil, pero cualquiera puede entrar con un clic. Ponle una clave arriba.';
+      'y hay que volver a elegir perfil. Configura su PIN en Personal → Equipo y claves.';
 }
 
 let perfilPendiente = null;
 function pideAcceso(opc){
+  if(editorClavePersonal) cierraClavePersonal();
   const bloq = !!(opc && opc.bloqueo);
   bloqueado = bloq;
   activaRelojBloqueo(bloq);
