@@ -1,0 +1,124 @@
+/* Crema, borgoña y amarillo para Nuvoor Restaurant. */
+:root{
+ --bg:#FDEFD6;--surface:#FFFAF0;--surface-2:#F6EAD6;--line:#E8D7BE;--line-soft:#E8D7BE;
+ --ink:#2D1820;--ink-2:#5A3840;--ink-3:#735D59;
+ --accent:#FEC408;--accent-soft:#FFF0B9;--accent-ink:#2D1820;
+ --cyan:#731328;--cyan-soft:#F6E5E7;--forest:#731328;--forest-2:#89344A;
+ --cream:#FDEFD6;--clay:#731328;--gold:#F1CD75;--olive:#93606C;
+ --good:#286653;--good-soft:#E1EDE6;--warn:#865D15;--warn-soft:#FFF7DA;--mal:#A0394B;
+ --focus:rgba(115,19,40,.35);--heading-ring-rgb:115,19,40;--heading-ring-accent-rgb:254,196,8;
+ --sombra:0 4px 20px rgba(115,19,40,.07);color-scheme:light;
+}
+body{background:var(--bg);color:var(--ink)}
+#barra{background:#731328;color:#FDEFD6;border-color:#89344A;box-shadow:none}
+.barraTop{border-bottom-color:#AB5265}.barraTop b{color:#FDEFD6}.barraTop small,.barraGrupo,.barraPie{color:#F5D9C5}
+.barraTop .plaque{background:#FDEFD6;color:#731328;box-shadow:none}.barraPie{border-top-color:#AB5265}
+.barraCmyk i:nth-child(1){background:#FDEFD6}.barraCmyk i:nth-child(2){background:#FEC408}.barraCmyk i:nth-child(3){background:#AB5265}.barraCmyk i:nth-child(4){background:#E9BCAD}
+nav.tabs button{color:#FDEFD6}nav.tabs button:hover{background:#89344A;color:#FFF9F0}
+nav.tabs button[aria-selected=true]{background:#FDEFD6;color:#731328;box-shadow:inset 4px 0 #FEC408}
+nav.tabs .mbadge{background:#FEC408;color:#2D1820}
+header.top{background:#FFFAF0;color:#731328;border-color:#E8D7BE;box-shadow:none}
+header.top .btn.ghost{background:transparent;color:#731328;border-color:#E8D7BE}header.top .btn.ghost:hover{background:#F6E5E7;color:#731328}
+#restaurantAccountName,#restaurantCloudStatus,header.top #restaurantSync,header.top #restaurantSyncText{color:#735D59}
+.userChip,.candadoBtn{background:#F6E5E7;color:#731328;border-color:#E4C4C6}
+.userChip .av{background:#FEC408;color:#2D1820}.userChip .rolTxt,.turnoChip{color:#735D59}.turnoChip b{color:#731328}
+#pwaInstall{background:#FDEFD6;color:#731328;border-color:#FDEFD6}
+input,select,textarea{background:#FFFAF0;border-color:#C5AFA3;color:#2D1820}input::placeholder,textarea::placeholder{color:#735D59}
+input:focus,select:focus,textarea:focus{border-color:#731328;box-shadow:0 0 0 3px var(--focus)}
+.btn{background:#FFFAF0;border-color:#E8D7BE;color:#731328;box-shadow:none}
+.btn:hover:not(:disabled){background:#FAEAD3;border-color:#731328;box-shadow:0 4px 14px rgba(115,19,40,.1)}
+.btn.primary,.btn.acento{background:#FEC408;border-color:#FEC408;color:#2D1820;box-shadow:0 5px 14px rgba(141,96,10,.15)}
+.btn.primary:hover:not(:disabled),.btn.acento:hover:not(:disabled){background:#FFD445;border-color:#FFD445;color:#2D1820}
+.btn.bien{background:#286653;border-color:#286653;color:#FFFAF0}.btn.mal{background:#FFF1EE;color:#A0394B;border-color:#D4A2A4}
+.btn.ghost{color:#5A3840;border-color:#E8D7BE}.btn.ghost:hover{background:#FAEAD3}
+.card{background:#FFFAF0;border-color:#E8D7BE;box-shadow:var(--sombra)}.card>header{background:#FAF0DF;border-bottom-color:#E8D7BE}
+.card>header h2,.wrap>section>.fila:first-child h2{color:#2D1820}.card>header .hint{color:#735D59}
+.note{background:#F6E5E7;color:#5A3840;border-left-color:#731328}.empty{background:#FAF0DF;border-color:#E8D7BE;color:#735D59}
+.heroR{background:#731328;color:#FDEFD6;border-left-color:#FEC408;box-shadow:0 12px 28px rgba(115,19,40,.12)}
+.heroR h1{color:#FDEFD6}.heroR p,.heroR .sub{color:#F5D9C5}.heroR:before{border-color:#AB5265;box-shadow:0 0 0 24px rgba(115,19,40,.07),0 0 0 48px rgba(115,19,40,.04)}
+.heroAction{background:#89344A;color:#FDEFD6;border-color:#AB5265}.heroAction:hover{background:#984459;border-color:#FEC408}
+.heroAction.destacado,.heroAction.destacado:hover{background:#FEC408;border-color:#FEC408;color:#2D1820}
+.heroActionIcon{background:#AB5265;color:#FDEFD6}.heroAction.destacado .heroActionIcon{background:rgba(45,24,32,.1);color:#2D1820}
+.heroAction small,.heroAction.destacado small{color:inherit;opacity:.9}.heroRBadge{color:#FDEFD6;border-color:#AB5265;background:#89344A}
+.heroAction.destacado small{color:#2D1820;opacity:1}.androidApkCopy small{color:#5A3840}
+.heroAction.destacado .heroActionCopy small,body.modoEvento .heroAction.destacado .heroActionCopy small{color:#2D1820;opacity:1}
+#tab-inicio .tile{border-top-color:#E8D7BE}
+.androidApkLink{background:#FDEFD6;color:#731328;border-color:#E8D7BE}.androidApkIcon{background:#F0D6DC;color:#731328}
+.tile{background:#FFFAF0;border-color:#E8D7BE}.tile .v{color:#731328}.tile:after{background:radial-gradient(circle,rgba(115,19,40,.1),transparent 68%)}
+.seg,.zonas button,.catFila button{background:#F6EAD6;border-color:#E8D7BE;color:#5A3840}
+.seg button[aria-pressed=true]{background:#FFFAF0;color:#731328}
+.zonas button[aria-pressed=true],.catFila button[aria-pressed=true]{background:#731328;border-color:#731328;color:#FDEFD6}
+.mesa,.mesa.libre{background:#FFFAF0;border-color:#E8D7BE}.mesa b,.mesa.libre b{color:#2D1820}
+.mesa small,.mesa .sello{color:#735D59}.mesa .tot{color:#731328}.mesa .pers{background:#F6EAD6;color:#5A3840}
+.mesa .mesaIcon,.mesa.libre .mesaIcon{background:#E5EEE2;color:var(--good);border-color:#CFDED2}
+.mesa.ocupada{background:#FCF1F0;border-color:#E4C4C6}.mesa.ocupada .mesaIcon{background:#F0D6DC;color:#731328;border-color:#E4C4C6}
+.mesa.ocupada .pers{background:#F0D6DC;color:#731328}.mesa.ocupada .tot,.mesa.ocupada .sello{color:#731328}
+.mesa.cuenta{background:#FFF7DA;border-color:#EDD78C}.mesa.cuenta .mesaIcon,.mesa.cuenta .pers{background:#FFE898;color:#754E00;border-color:#EDD78C}
+.mesa.cuenta .tot,.mesa.cuenta .sello{color:#754E00}.mesa:hover{border-color:#731328;box-shadow:0 8px 22px rgba(115,19,40,.12)}
+.mesa:hover .mesaIcon{background:#731328;color:#FDEFD6}.mesa:before{background:radial-gradient(circle,rgba(115,19,40,.1),transparent 68%)}
+.croquis{background:radial-gradient(ellipse at 50% 35%,#FFFAF0,#F6EAD6);border-color:#E8D7BE}
+.cmesa{background:#FDEFD6;color:#2D1820;border-color:#C9AD9F}.cmesa.ocupada{background:#F0D6DC;border-color:#FEC408}.cmesa.cuenta{background:#FFE898;border-color:#B58A3B}
+.cmesa .tot{background:#FFFAF0;color:#731328;border-color:#E8D7BE}
+.silla.libre,.cmesa.ocupada .silla.libre{background:#FFFAF0;color:#731328;border-color:#A78586}
+.silla.ocupada,.cmesa.ocupada .silla.ocupada{background:#731328;color:#FFFAF0;border-color:#731328}
+.silla svg{stroke-width:2.2}
+.plat,.llevarCard,.kdsCard{background:#FFFAF0;border-color:#E8D7BE}.plat:hover,.llevarCard:hover{border-color:#731328}
+.kdsCard header{background:#FAF0DF}.kdsLin button{background:#F6EAD6;color:#731328;border-color:#E8D7BE}
+.teclado button{background:#FFFAF0;color:#2D1820;border-color:#E8D7BE}
+#toast{background:#731328;color:#FDEFD6;border-color:#AB5265}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.mesaCabecera{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:17px}
+.mesaEtiqueta{color:var(--forest);font-size:10px;font-weight:800;letter-spacing:.15em}
+.mesaCabecera h2{margin:4px 0 6px;color:var(--forest);font-size:clamp(29px,4vw,46px);line-height:1;letter-spacing:-.045em}
+#mesasResumen{color:var(--ink-3);font-size:12px}
+#mesaRapida{flex-shrink:0}
+.mesaEstados{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:13px}
+.mesaEstado{display:flex;align-items:center;gap:8px;min-width:0;padding:8px 12px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink-2);font-size:12px;font-weight:700}
+.mesaEstado::before{content:"";width:8px;height:8px;flex-shrink:0;border-radius:50%;background:var(--good)}
+.mesaEstado.ocupada::before{background:var(--forest)}
+.mesaEstado.cuenta::before{background:#a56d00}
+.mesaEstado b{color:var(--forest);font-size:20px;line-height:1}
+.mesasPanel{border:1px solid var(--line);border-radius:16px;padding:13px;background:var(--surface);box-shadow:var(--sombra)}
+.mesasPanel .croqBarra{padding:0 0 5px;margin-bottom:3px;border:0;background:transparent;box-shadow:none}
+.mesasPanel .zonas{margin:0;margin-right:auto}
+.mesasPanel .croqPista{flex-basis:100%}
+.mesaGesto{margin:3px 0 10px;font-size:12px;color:var(--forest);font-weight:700}
+.mesas{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.mesa{min-height:92px;padding:10px 78px 10px 54px;border-radius:12px;border-style:solid;gap:3px}
+.mesa b{font-family:inherit;font-size:15px;line-height:1.2;overflow-wrap:anywhere}
+.mesa .pers,.mesa.ocupada .pers,.mesa.cuenta .pers{position:static;padding:0;background:transparent;color:var(--ink-3);border-radius:0}
+.mesa .tot{font-size:13px;margin-top:0}
+.mesa .sello{left:auto;right:9px;top:11px;bottom:auto;max-width:none;padding:3px 7px;border-radius:99px;font-size:10px;text-transform:none;letter-spacing:0}
+.mesa.libre .sello{background:#E5EEE2;color:var(--good)}
+.mesa.ocupada .sello{background:#EED3DA;color:var(--forest)}
+.mesa.cuenta .sello{background:#FFF0B9;color:#754E00}
+.mesaIcon{left:9px;top:11px;width:35px;height:35px;border-radius:9px}
+.mesaIcon svg{width:22px;height:22px}
+.mesa .cocinaReloj{max-width:100%;white-space:normal}
+.mesaAgarre{position:absolute;right:11px;bottom:10px;color:#906773;font-size:16px;line-height:1}
+.mesa,.cmesa{-webkit-touch-callout:none;user-select:none}
+.mesa:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
+.mesa.mesaDestinoLista{border:2px dashed #a56d00;background:#FFF0B9;box-shadow:none;transform:none}
+.mesaDestinoLista>*{visibility:hidden}
+.mesaDestinoLista::before{display:none}
+.mesaOrigenCroquis{opacity:.3}
+.cmesa.cuadrada,.cmesa.redonda{background:var(--cream);box-shadow:0 4px 12px #73132822}
+.cmesa.ocupada{background:#F0D6DC}
+.cmesa.cuenta{background:#FFE898}
+.cmesa b,.cmesa.ocupada b,.cmesa.cuenta b{color:var(--forest)}
+.cmesaCentro .cmesaConteo{color:var(--ink-3)}
+.croquisEnArrastre::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(to right,#73132822 1px,transparent 1px),linear-gradient(to bottom,#73132822 1px,transparent 1px);background-size:5% 5%}
+.mesaDestinoCroquis{position:absolute;z-index:2;pointer-events:none;transform:translate(-50%,-50%);border:2px dashed #a56d00;border-radius:12px;background:#FFF0B9AA}
+.mesa.mesaEnMano,.cmesa.mesaEnMano{position:fixed;z-index:2000;pointer-events:none;margin:0;border-color:var(--forest);box-shadow:0 12px 28px #4c0c2d34;transform:translate(9px,-10px) rotate(1deg)!important;transition:none;cursor:grabbing}
+@media(max-width:1100px){.mesas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){
+  .mesaCabecera{align-items:center;margin-bottom:12px}
+  .mesaEstados{gap:5px}
+  .mesaEstado{gap:5px;padding:6px;font-size:10px}
+  .mesaEstado b{font-size:17px}
+  .mesasPanel{padding:9px}
+  .mesas{grid-template-columns:1fr;gap:6px}
+  .mesa{min-height:76px}
+}
+@media(prefers-reduced-motion:reduce){.mesa.mesaEnMano,.cmesa.mesaEnMano{transform:none!important}}

@@ -1476,8 +1476,8 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261106-1437">
-<link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
+<meta name="nuvoor-build" content="20261106-1620">
+<link rel="stylesheet" href="./tema-borgona.css?v=20261106-1620">
 </head>
 <body>
 
@@ -1602,14 +1602,19 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 
 <!-- ============ MESAS ============ -->
 <section id="tab-mesas" hidden>
-  <div class="fila" style="margin-bottom:14px">
-    <h2 id="mesasTitulo" style="font-size:19px">Mesas</h2>
-    <span class="hint" id="mesasResumen" style="color:var(--ink-3);font-size:12.5px"></span>
-    <button class="btn sm" id="mesaRapida" style="margin-left:auto">Venta para llevar</button>
+  <div class="mesaCabecera">
+    <div>
+      <span class="mesaEtiqueta">RESTAURANT</span>
+      <h2 id="mesasTitulo">Mesas</h2>
+      <span id="mesasResumen" class="hint"></span>
+    </div>
+    <button class="btn sm primary" id="mesaRapida">Venta para llevar</button>
   </div>
-  <div class="zonas" id="mesaZonas"></div>
+  <div class="mesaEstados" id="mesaEstados"></div>
   <div class="appsFila" id="appsFila" hidden aria-label="Pedidos de plataformas"></div>
+  <div class="mesasPanel">
   <div class="croqBarra">
+    <div class="zonas" id="mesaZonas"></div>
     <div class="seg" id="mesaVista">
       <button type="button" data-mv="croquis" aria-pressed="true">Croquis</button>
       <button type="button" data-mv="lista" aria-pressed="false">Lista</button>
@@ -1619,6 +1624,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     <button class="btn sm ghost" id="croqSeparar" hidden>Separar</button>
     <span class="croqPista" id="croqPista"></span>
   </div>
+  <p class="mesaGesto" id="mesaGesto" hidden></p>
   <div class="decorPaleta" id="decorPaleta" hidden></div>
   <input id="croqPlanoFile" type="file" accept="image/*" hidden>
   <div class="llevarFila" id="llevarFila"></div>
@@ -1627,6 +1633,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     <div class="croqTool" id="croqTool" hidden></div>
   </div>
   <div class="mesas" id="mesaRejilla" hidden></div>
+  </div>
 </section>
 
 <!-- ============ COCINA ============ -->
@@ -3423,6 +3430,7 @@ function animaCambioVista(k, anterior){
 }
 function vaA(k){
   if(!puedeVer(k)) k = PESTANAS.filter(p=>puedeVer(p.k))[0].k;
+  if(k !== "mesas") terminaArrastreMesa(false,false);
   const anterior = PESTANAS.concat([{k:"comanda"}]).find(p=>{ const s=$("#tab-"+p.k); return s && !s.hidden; });
   const cambioVista = !anterior || anterior.k !== k;
   if(k !== "comanda") comandaId = comandaId;   /* la comanda abierta se conserva */
@@ -3650,6 +3658,8 @@ function suelta(){ selId = ""; renderCroquis(); }
 
 function renderCroquis(){
   const caja = $("#mesaCroquis"); if(!caja) return;
+  if(arrastreMesa?.activo && !arrastreMesa.lista) return;
+  $("#mesaGesto").hidden = !esGerente() || modoAcomodo || modoJuntar;
   const mias = MESAS.filter(m=>m.activa !== false && (m.zona||"Salón") === zonaVista);
   const vistos = {};
 
@@ -4045,18 +4055,21 @@ $("#croqTool").addEventListener("click", e=>{
   persist(); renderCroquis();
 });
 $("#croqAcomodar").addEventListener("click", ()=>{
+  terminaArrastreMesa(false,false);
   modoAcomodo = !modoAcomodo;
   modoJuntar = false; elegidas = []; selId = "";
   renderCroquis();
   toast(modoAcomodo ? "Arrástralas para moverlas; tócalas para girarlas o quitarlas." : "Croquis guardado");
 });
 $("#croqJuntar").addEventListener("click", ()=>{
+  terminaArrastreMesa(false,false);
   if(modoJuntar && elegidas.length > 1){ juntaElegidas(); return; }
   modoJuntar = !modoJuntar; elegidas = [];
   renderCroquis();
   if(modoJuntar) toast("Toca las mesas que van juntas");
 });
 $("#croqSeparar").addEventListener("click", ()=>{
+  terminaArrastreMesa(false,false);
   const gs = [...new Set(MESAS.filter(m=>m.grupo && (m.zona||"Salón") === zonaVista).map(m=>m.grupo))];
   if(!gs.length){ toast("No hay mesas juntas en esta zona"); return; }
   if(gs.length === 1){ separaGrupo(gs[0]); return; }
@@ -4065,8 +4078,9 @@ $("#croqSeparar").addEventListener("click", ()=>{
 });
 $("#mesaVista").addEventListener("click", e=>{
   const b = e.target.closest("[data-mv]"); if(!b) return;
+  terminaArrastreMesa(false);
   mesaVista = b.dataset.mv; lsSet("mesaVista", mesaVista);
-  modoAcomodo = false;
+  modoAcomodo = false; modoJuntar = false; elegidas = [];
   renderMesas();
 });
 
@@ -4090,6 +4104,8 @@ function relojCocinaMesa(c){
 }
 
 function renderMesas(){
+  if(arrastreMesa && !$("#tab-mesas").hidden && esGerente()) return;
+  if(arrastreMesa) terminaArrastreMesa(false,false);
   pintaAppsFila();
   const title=$("#mesasTitulo");
   if(title) title.textContent=POS_EVENTO?"Mesas · "+POS_EVENTO.nombre:"Mesas";
@@ -4100,8 +4116,13 @@ function renderMesas(){
     vistaMesaPhoneInicializada = true;
   }
   const zs = zonas();
+  $("#mesaGesto").hidden = !esGerente() || !zs.length;
+  $("#mesaGesto").textContent = mesaVista === "lista"
+    ? "Mantén pulsada una mesa y arrástrala para ordenar la lista."
+    : "Mantén pulsada una mesa para moverla a otra casilla del salón.";
   if(!zs.length){ $("#mesaZonas").innerHTML = ""; $("#mesaRejilla").innerHTML =
-    '<div class="empty">No hay mesas dadas de alta. Ve a <b>Ajustes → Mesas y zonas</b>.</div>'; return; }
+    '<div class="empty">No hay mesas dadas de alta. Ve a <b>Ajustes → Mesas y zonas</b>.</div>';
+    $("#mesaEstados").replaceChildren(); $("#mesaCroquis").hidden = true; $("#mesaRejilla").hidden = false; return; }
   if(!zonaVista || zs.indexOf(zonaVista) < 0) zonaVista = zs[0];
   $("#mesaZonas").innerHTML = zs.map(z=>{
     const n = MESAS.filter(m=>m.activa!==false && (m.zona||"Salón")===z && comandaDe(m.id)).length;
@@ -4114,30 +4135,35 @@ function renderMesas(){
   $("#mesaRejilla").hidden = mesaVista === "croquis";
   $("#croqAcomodar").hidden = mesaVista !== "croquis" || !esGerente();
   if(mesaVista === "croquis") renderCroquis();
+  else { $("#croqJuntar").hidden = true; $("#croqSeparar").hidden = true; $("#croqPista").textContent = ""; $("#decorPaleta").hidden = true; $("#croqTool").hidden = true; }
   renderLlevar();
 
-  const vistos2 = {};
-  const mias = MESAS.filter(m=>m.activa!==false && (m.zona||"Salón") === zonaVista)
-    .filter(m=>{ const g = grupoDe(m); if(!g) return true; if(vistos2[g]) return false; vistos2[g] = true; return true; });
+  const mias = mesasEnLista(zonaVista);
+  const estados = {libre:0, ocupada:0, cuenta:0};
   $("#mesaRejilla").innerHTML = mias.map(m=>{
     const madre = mesaMadre(m);
     const c = comandaDe(madre.id);
     const cl = !c ? "libre" : c.estado === "cuenta" ? "cuenta" : "ocupada";
+    estados[cl]++;
     const s = c ? sumaComanda(c) : null;
     const reloj = c ? relojCocinaMesa(c) : null;
     const desde = c ? horasTxt(minutosDe(horaAhora()) - minutosDe(c.abre)) : "";
     const g = grupoDe(m);
     const titulo = g ? mesasDelGrupo(g).map(x=>x.nombre).join(" + ") : m.nombre;
-    return '<button class="mesa '+cl+'" data-mesa="'+esc(madre.id)+'">'+
+    return '<button type="button" class="mesa '+cl+'" data-mesa="'+esc(madre.id)+'"'+
+      (esGerente() ? ' aria-describedby="mesaGesto" aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"' : '')+'>'+
       '<span class="mesaIcon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="8" width="14" height="16" rx="5"/><path d="M13 4v3M19 4v3M13 25v3M19 25v3M5 12h3M5 20h3M24 12h3M24 20h3"/><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"/></svg></span>'+
       '<b>'+esc(titulo)+'</b>'+
-      '<span class="pers">'+(c ? (c.personas||lugaresDe(m))+" pers" : lugaresDe(m)+" lug")+'</span>'+
-      '<small>'+(c ? esc(c.mesero||"") + " · " + desde : "Libre")+'</small>'+
+      '<span class="pers">'+(c ? (c.personas||lugaresDe(m))+" pers." : lugaresDe(m)+" lugares")+'</span>'+
+      (c ? '<small>'+esc(c.mesero||"")+" · "+desde+'</small>' : '')+
       (reloj ? '<span class="cocinaReloj '+reloj.clase+'"'+(reloj.min!=null?' title="Tiempo desde que se envió el pedido a cocina"':'')+'>'+esc(reloj.texto)+'</span>' : '')+
       '<span class="tot">'+(c ? mx(s.total) : "")+'</span>'+
-      '<span class="sello">'+(!c ? "toca para abrir" : c.estado === "cuenta" ? "cuenta pedida" : "ocupada")+'</span>'+
+      '<span class="sello">'+(!c ? "Libre" : c.estado === "cuenta" ? "Por cobrar" : "Ocupada")+'</span>'+
+      (esGerente() ? '<span class="mesaAgarre" aria-hidden="true">⠿</span>' : '')+
       '</button>';
   }).join("") || '<div class="empty">Esta zona no tiene mesas.</div>';
+  $("#mesaEstados").innerHTML = [["libre","Libres"],["ocupada","Ocupadas"],["cuenta","Por cobrar"]].map(([clave,nombre])=>
+    '<span class="mesaEstado '+clave+'"><b>'+estados[clave]+'</b> '+nombre+'</span>').join("");
 
   const ab = abiertas(), ll = llevarAbiertas().length;
   $("#mesasResumen").textContent = ab.length
@@ -4149,6 +4175,7 @@ function renderMesas(){
 }
 $("#mesaZonas").addEventListener("click", e=>{
   const b = e.target.closest("[data-zona]"); if(!b) return;
+  terminaArrastreMesa(false);
   zonaVista = b.dataset.zona; renderMesas();
 });
 $("#mesaRejilla").addEventListener("click", e=>{
@@ -4156,6 +4183,209 @@ $("#mesaRejilla").addEventListener("click", e=>{
   abreMesa(b.dataset.mesa);
 });
 $("#mesaRapida").addEventListener("click", ()=> abreMesa("llevar"));
+
+/* El orden de la lista va en cada mesa, sin cambiar el orden de MESAS:
+   mesaMadre y sus comandas siguen usando los mismos identificadores. */
+function mesasEnLista(zona){
+  const vistas = new Set();
+  return MESAS.filter(m=>{
+    if(m.activa===false || (m.zona||"Salón")!==zona) return false;
+    const madre = mesaMadre(m);
+    if(vistas.has(madre.id)) return false;
+    vistas.add(madre.id);
+    return true;
+  }).map(m=>mesaMadre(m)).sort((a,b)=>
+    (Number.isFinite(a.ordenLista)?a.ordenLista:Infinity)-(Number.isFinite(b.ordenLista)?b.ordenLista:Infinity) ||
+    String(a.nombre||"").localeCompare(String(b.nombre||""),"es",{numeric:true}) || String(a.id).localeCompare(String(b.id)));
+}
+function guardaOrdenLista(id,destino,despues){
+  const orden = mesasEnLista(zonaVista);
+  const origen = orden.findIndex(m=>m.id===id);
+  if(origen<0 || !orden.some(m=>m.id===destino)) return false;
+  const [mesa] = orden.splice(origen,1);
+  orden.splice(orden.findIndex(m=>m.id===destino)+(despues?1:0),0,mesa);
+  orden.forEach((m,i)=>{ m.ordenLista=i; });
+  return true;
+}
+function posicionGrupoCroquis(m){
+  const miembros = grupoDe(m)
+    ? mesasDelGrupo(m.grupo).filter(h=>(h.zona||"Salón")===zonaVista)
+    : [m];
+  return {
+    miembros,
+    x:miembros.reduce((total,h)=>total+num(h.x,50),0)/miembros.length,
+    y:miembros.reduce((total,h)=>total+num(h.y,50),0)/miembros.length
+  };
+}
+function mueveGrupoCroquis(grupo,punto){
+  const limita = (eje,min,max)=>{
+    const valores = grupo.miembros.map(m=>num(m[eje],50));
+    return Math.max(min-Math.min(...valores),Math.min(max-Math.max(...valores),punto[eje]-grupo[eje]));
+  };
+  const dx = limita("x",3,97), dy = limita("y",5,95);
+  grupo.miembros.forEach(m=>{ m.x=num(m.x,50)+dx; m.y=num(m.y,50)+dy; });
+}
+
+const pantallaMesas = $("#tab-mesas");
+let arrastreMesa = null, ignoraToqueMesaHasta = 0;
+function preparaArrastreMesa(objetivo,x,y){
+  if(arrastreMesa || !esGerente() || modoAcomodo || modoJuntar) return;
+  const lista = mesaVista==="lista";
+  const el = objetivo.closest(lista?"#mesaRejilla [data-mesa]":"#mesaCroquis [data-cm]");
+  if(!el) return;
+  arrastreMesa = {el,lista,id:lista?el.dataset.mesa:el.dataset.cm,zona:zonaVista,x,y,activo:false};
+  arrastreMesa.timer = setTimeout(levantaMesa,350);
+}
+function levantaMesa(){
+  const a = arrastreMesa;
+  if(!a?.el.isConnected || pantallaMesas.hidden || !esGerente()){ terminaArrastreMesa(false,false); return; }
+  const caja = a.el.getBoundingClientRect(), fantasma = a.el.cloneNode(true);
+  a.activo = true;
+  a.ancho = caja.width; a.alto = caja.height;
+  a.offsetX = a.x-caja.left; a.offsetY = a.y-caja.top;
+  a.fantasma = fantasma;
+  fantasma.classList.add("mesaEnMano");
+  fantasma.setAttribute("aria-hidden","true"); fantasma.tabIndex = -1;
+  Object.assign(fantasma.style,{width:caja.width+"px",height:caja.height+"px"});
+  document.body.append(fantasma);
+  if(!a.lista){
+    a.guia = document.createElement("div");
+    a.guia.className = "mesaDestinoCroquis";
+    a.guia.hidden = true;
+    a.guia.setAttribute("aria-hidden","true");
+    Object.assign(a.guia.style,{width:caja.width+"px",height:caja.height+"px"});
+    $("#mesaCroquis").append(a.guia);
+    $("#mesaCroquis").classList.add("croquisEnArrastre");
+  }
+  a.el.classList.add(a.lista?"mesaDestinoLista":"mesaOrigenCroquis");
+  $("#mesaGesto").textContent = "Suelta la mesa en la posición marcada.";
+  actualizaArrastreMesa(a.x,a.y);
+  if(a.lista)requestAnimationFrame(desplazaListaDuranteArrastre);
+}
+function desplazaListaDuranteArrastre(){
+  const a = arrastreMesa;
+  if(!a?.activo || !a.lista) return;
+  const borde = 54, y = a.ultimoY, anterior = window.scrollY;
+  if(y>=0 && y<borde) window.scrollBy(0,(y-borde)/4);
+  if(y<innerHeight && y>innerHeight-borde) window.scrollBy(0,(y-innerHeight+borde)/4);
+  if(window.scrollY!==anterior) actualizaArrastreMesa(a.ultimoX,y);
+  requestAnimationFrame(desplazaListaDuranteArrastre);
+}
+function actualizaArrastreMesa(x,y){
+  const a = arrastreMesa;
+  if(!a) return;
+  if(!a.activo){
+    if(Math.hypot(x-a.x,y-a.y)>9) terminaArrastreMesa(false,false);
+    return;
+  }
+  if(!a.el.isConnected || pantallaMesas.hidden || a.zona!==zonaVista || !esGerente()){ terminaArrastreMesa(false); return; }
+  a.ultimoX=x; a.ultimoY=y;
+  a.fantasma.style.left=(x-a.offsetX)+"px";
+  a.fantasma.style.top=(y-a.offsetY)+"px";
+  const debajo = document.elementFromPoint(x,y);
+  if(a.lista){
+    const sobre = debajo?.closest("#mesaRejilla [data-mesa]");
+    if(!sobre || sobre===a.el) return;
+    const tarjetas = [...$("#mesaRejilla").querySelectorAll("[data-mesa]")];
+    a.destino = sobre.dataset.mesa;
+    a.despues = tarjetas.indexOf(sobre)>tarjetas.indexOf(a.el);
+    const antes = tarjetas.map(t=>t.getBoundingClientRect());
+    if(a.despues) sobre.after(a.el); else sobre.before(a.el);
+    if(!matchMedia("(prefers-reduced-motion: reduce)").matches){
+      tarjetas.forEach((t,i)=>{
+        if(t===a.el) return;
+        t.getAnimations().forEach(anim=>anim.cancel());
+        const nuevo=t.getBoundingClientRect(), dx=antes[i].left-nuevo.left, dy=antes[i].top-nuevo.top;
+        if(dx||dy) t.animate([{transform:"translate("+dx+"px,"+dy+"px)"},{transform:"none"}],{duration:150,easing:"ease-out"});
+      });
+    }
+  }else{
+    const croquis = $("#mesaCroquis");
+    a.guia.hidden = !croquis.contains(debajo);
+    if(a.guia.hidden){ a.punto=null; a.intercambio=null; return; }
+    const sobre = debajo.closest("[data-cm]");
+    const otra = sobre && sobre!==a.el ? MESAS.find(m=>m.id===sobre.dataset.cm) : null;
+    const p = croqXY({clientX:x-a.offsetX+a.ancho/2,clientY:y-a.offsetY+a.alto/2});
+    a.intercambio = otra?.id;
+    a.punto = otra ? posicionGrupoCroquis(otra) : {
+      x:Math.max(5,Math.min(95,Math.round(p.x/5)*5)),
+      y:Math.max(5,Math.min(95,Math.round(p.y/5)*5))
+    };
+    a.guia.style.left=a.punto.x+"%"; a.guia.style.top=a.punto.y+"%";
+  }
+}
+function terminaArrastreMesa(guardar,redibujar=true){
+  const a=arrastreMesa;
+  if(!a) return;
+  arrastreMesa=null;
+  clearTimeout(a.timer);
+  if(!a.activo) return;
+  ignoraToqueMesaHasta=performance.now()+400;
+  a.fantasma.remove(); a.guia?.remove();
+  a.el.classList.remove("mesaDestinoLista","mesaOrigenCroquis");
+  $("#mesaCroquis").classList.remove("croquisEnArrastre");
+  if(guardar && esGerente() && a.zona===zonaVista){
+    if(a.lista && a.destino && guardaOrdenLista(a.id,a.destino,a.despues)) persist();
+    if(!a.lista && a.punto){
+      const mesa=MESAS.find(m=>m.id===a.id && m.activa!==false && (m.zona||"Salón")===a.zona);
+      if(mesa){
+        const origen=posicionGrupoCroquis(mesa);
+        const otra=MESAS.find(m=>m.id===a.intercambio && m.activa!==false && (m.zona||"Salón")===a.zona);
+        const destino=otra ? posicionGrupoCroquis(otra) : a.punto;
+        if(otra && !origen.miembros.includes(otra)) mueveGrupoCroquis(destino,origen);
+        mueveGrupoCroquis(origen,destino);
+        persist();
+      }
+    }
+  }
+  if(redibujar) renderMesas();
+}
+pantallaMesas.addEventListener("pointerdown",e=>{
+  if(e.pointerType!=="touch" && e.button===0) preparaArrastreMesa(e.target,e.clientX,e.clientY);
+});
+window.addEventListener("pointermove",e=>{ if(e.pointerType!=="touch") actualizaArrastreMesa(e.clientX,e.clientY); });
+window.addEventListener("pointerup",e=>{
+  if(e.pointerType!=="touch" && arrastreMesa){
+    const vista=arrastreMesa.lista?"#mesaRejilla":"#mesaCroquis";
+    terminaArrastreMesa($(vista).contains(document.elementFromPoint(e.clientX,e.clientY)));
+  }
+});
+window.addEventListener("pointercancel",e=>{ if(e.pointerType!=="touch") terminaArrastreMesa(false); });
+pantallaMesas.addEventListener("touchstart",e=>{
+  if(e.touches.length!==1){ terminaArrastreMesa(false); return; }
+  const t=e.touches[0]; preparaArrastreMesa(e.target,t.clientX,t.clientY);
+},{passive:true});
+pantallaMesas.addEventListener("touchmove",e=>{
+  if(!arrastreMesa) return;
+  if(arrastreMesa.activo) e.preventDefault();
+  const t=e.touches[0]; actualizaArrastreMesa(t.clientX,t.clientY);
+},{passive:false});
+pantallaMesas.addEventListener("touchend",e=>{
+  if(!arrastreMesa) return;
+  if(arrastreMesa.activo) e.preventDefault();
+  const t=e.changedTouches[0], vista=arrastreMesa.lista?"#mesaRejilla":"#mesaCroquis";
+  terminaArrastreMesa($(vista).contains(document.elementFromPoint(t.clientX,t.clientY)));
+},{passive:false});
+pantallaMesas.addEventListener("touchcancel",()=>terminaArrastreMesa(false));
+pantallaMesas.addEventListener("contextmenu",e=>{
+  if(esGerente() && e.target.closest("[data-mesa],[data-cm]")) e.preventDefault();
+});
+pantallaMesas.addEventListener("click",e=>{
+  if(performance.now()<ignoraToqueMesaHasta && e.target.closest("[data-mesa],[data-cm]")){
+    e.preventDefault(); e.stopPropagation();
+  }
+},true);
+pantallaMesas.addEventListener("keydown",e=>{
+  if(e.key==="Escape" && arrastreMesa){ e.preventDefault(); terminaArrastreMesa(false); return; }
+  const boton=e.target.closest("#mesaRejilla [data-mesa]");
+  if(!boton || !esGerente() || !e.altKey || !["ArrowUp","ArrowDown"].includes(e.key)) return;
+  e.preventDefault();
+  const id=boton.dataset.mesa, tarjetas=mesasEnLista(zonaVista), despues=e.key==="ArrowDown";
+  const vecina=tarjetas[tarjetas.findIndex(m=>m.id===id)+(despues?1:-1)];
+  if(!vecina || !guardaOrdenLista(id,vecina.id,despues)) return;
+  persist(); renderMesas();
+  [...$("#mesaRejilla").querySelectorAll("[data-mesa]")].find(m=>m.dataset.mesa===id)?.focus();
+});
 
 /* ===================================================================
    COMANDA
