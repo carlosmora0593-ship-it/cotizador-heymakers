@@ -1027,6 +1027,15 @@ tr.clic:hover td,#t_ventas tbody tr:hover{background:#edf3e9}
 .mesaResponsable{display:inline-block;width:fit-content;border-radius:6px;background:var(--cyan);color:#fff;padding:2px 6px;font-size:11px;font-weight:800;line-height:1.1}
 #comResponsable{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:5px 9px;border-radius:8px;background:var(--cyan);color:#fff;font-size:12px;overflow-wrap:anywhere}
 #comResponsable[hidden]{display:none}
+#comTrasladar{white-space:nowrap}
+#modalTrasladoMesa{width:min(460px,calc(100% - 24px));max-height:calc(100dvh - 30px);padding:0;border:1px solid var(--line);border-radius:20px;background:var(--surface);color:var(--ink)}
+#modalTrasladoMesa::backdrop{background:#28141d77}
+#modalTrasladoMesa header,#modalTrasladoMesa form{padding:16px 18px}
+#modalTrasladoMesa header{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+#modalTrasladoMesa h2{font-size:18px;margin:0}
+#modalTrasladoMesa label{display:grid;gap:5px;margin:12px 0;color:var(--ink);font-weight:700}
+#modalTrasladoMesa .trasladoNota{font-size:13px;color:var(--ink-3)}
+#modalTrasladoMesa #trasladoMensaje{font-size:13px;color:var(--ink);font-weight:700}
 .cmesa.ocupada .cmesaConteo{color:#326447}
 .cmesa.cuenta .cmesaConteo{color:#805a20}
 .silla{position:absolute;z-index:4;width:27px;height:29px;display:grid;place-items:center;opacity:1;pointer-events:none;border:1px solid #9d8969;border-radius:9px 9px 11px 11px;background:linear-gradient(145deg,#fffdf5,#e4dac5);color:#907d5f;box-shadow:0 3px 7px rgba(68,53,34,.18);transform:translate(-50%,-50%) rotate(var(--giro-silla,0deg));transition:transform .2s,background .2s,color .2s,box-shadow .2s}
@@ -1514,7 +1523,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261106-1650">
+<meta name="nuvoor-build" content="20261106-1736">
 <link rel="stylesheet" href="./tema-borgona.css?v=20261106-1620">
 </head>
 <body>
@@ -1843,6 +1852,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     <span id="comPersonas" style="color:var(--ink-3);font-size:12.5px"></span>
     <strong id="comResponsable" hidden></strong>
     <button class="btn sm ghost" id="comGente" style="margin-left:auto">Comensales</button>
+    <button class="btn sm ghost" id="comTrasladar" type="button" hidden>Transferir mesa</button>
   </div>
   <div class="comanda">
     <div>
@@ -1889,6 +1899,18 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     <div class="body"><p class="note" style="margin:0 0 14px">Cada grupo es una pregunta para el mesero, por ejemplo «¿Término?», «¿Qué le quito?» o «¿Extras?». Puedes asignarlo a los platillos que lo necesiten.</p><div class="menuGroupToolbar"><b>Grupos de opciones</b><button class="btn sm ghost" id="modNuevo" type="button">+ Grupo</button></div><div id="modLista"></div></div>
   </details>
 </section>
+
+<dialog id="modalTrasladoMesa" aria-labelledby="trasladoTitulo">
+  <header><h2 id="trasladoTitulo">Transferir mesa</h2><button class="btn sm ghost" id="trasladoCerrar" type="button">Cerrar</button></header>
+  <form id="trasladoForm">
+    <p class="note" id="trasladoOrigen"></p>
+    <label>Mesa de destino<select id="trasladoDestino" required></select></label>
+    <p class="trasladoNota">Se conserva la misma cuenta, con sus platillos y comensales.</p>
+    <label>Tu PIN de acceso<input id="trasladoPin" class="restaurantPin" type="password" inputmode="numeric" pattern="[0-9]{4,12}" maxlength="12" autocomplete="off" spellcheck="false" required></label>
+    <p id="trasladoMensaje" role="status" hidden></p>
+    <button class="btn primary" id="trasladoConfirmar" type="submit">Transferir cuenta</button>
+  </form>
+</dialog>
 
 <dialog id="menuCatalogDialog" aria-labelledby="menuCatalogTitle">
   <div class="menuCatalogHead"><h2 id="menuCatalogTitle">Catálogo de alimentos</h2><button class="btn sm ghost" id="menuCatalogClose" type="button">Cerrar</button></div>
@@ -3205,7 +3227,8 @@ function aplicaDocumentosRestaurant(docs){
   const remoteTeam=by("rest_equipo").map(x=>{const prev=oldEquipo.find(y=>y.id===x.id)||{},y=Object.assign({},prev,{id:x.id,nombre:x.nombre,rol:x.rol,pin_hash:x.pin_hash||"",activo:x.activo!==false});delete y.pin;return y;});if(has("rest_equipo"))EQUIPO=remoteTeam;
   EVENTOS=Object.values(docs).filter(d=>d&&d.coleccion==="rest_eventos"&&d.cuerpo&&!d.cuerpo._eliminado).map(d=>Object.assign({},d.cuerpo));EVENTOS.forEach(x=>delete x.eventoId);try{localStorage.setItem(EVENTOS_KEY,JSON.stringify(EVENTOS));}catch(_){}
   guardaEstadoLocal();REST_NUBE.projection=Object.fromEntries(Object.entries(docs).filter(([,d])=>d&&d.cuerpo).map(([k,d])=>[k,{cuenta_id:d.cuenta_id,coleccion:d.coleccion,doc_id:d.doc_id,cuerpo:d.cuerpo}]));nubeGuarda(REST_NUBE_PROJECTION_KEY,REST_NUBE.projection);
-  aplicaMarca();aplicaRol();if(typeof renderMesas==="function")renderMesas();if(typeof renderCocina==="function")renderCocina();if(typeof renderComanda==="function"&&comandaActual())renderComanda();pintaTabs();actualizaAvisosReclamosNube();actualizaEstadoNube();procesaLineasEntrantes();
+  aplicaMarca();aplicaRol(true);if(typeof renderMesas==="function")renderMesas();if(typeof renderCocina==="function")renderCocina();if(typeof renderComanda==="function"&&comandaActual())renderComanda();pintaTabs();actualizaAvisosReclamosNube();actualizaEstadoNube();procesaLineasEntrantes();
+  if(!$("#tab-menu").hidden && nubeCanon(oldMenu)!==nubeCanon(MENU)) refrescaMenuDesdeNube();
   if(!$("#tab-ventas").hidden&&puedeVer("ventas"))renderVentas();
 }
 function descargaEventoRestaurant(ev){if(REST_NUBE.localOnly||!REST_NUBE.enabled)return;const doc={cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:"rest_eventos",doc_id:String(ev.id),cuerpo:Object.assign({},nubeClona(ev),{eventoId:""})};nubeQueueDoc(doc);vaciaColaNube();}
@@ -4643,6 +4666,7 @@ function renderComanda(){
   const c = comandaActual(); if(!c){ vaA("mesas"); return; }
   $("#comTitulo").textContent = nombreVisibleComandaPOS(c);
   $("#comClienteEditar").hidden = c.mesaId!=="llevar";
+  $("#comTrasladar").hidden = !puedeTrasladarMesa(c);
   $("#comFolio").textContent = folioVisualPOS(c.folio);
   $("#comPersonas").textContent = (c.mesaId==="llevar"?"Pedido para llevar":""+c.personas+" comensal(es)") + " · abrió " + c.abre;
   const responsable = String(c.mesero||"").trim();
@@ -6617,6 +6641,106 @@ const puedeAutorizar = u => u && u.activo !== false && (u.rol === "gerente" || u
 const jefesConClave = () => EQUIPO.filter(puedeAutorizar);
 const soyAutoridad  = () => rolActual() === "gerente" || rolActual() === "cajero";
 
+const trasladoDialog=$("#modalTrasladoMesa");
+let trasladoSeleccion=null,trasladoEnCurso=false;
+function puedeTrasladarMesa(c){
+  const persona=usuarioActual();
+  return !!c && c.estado==="abierta" && !c.appId && c.mesaId!=="llevar"
+    && persona.activo!==false && ["admin","gerente","cajero"].includes(persona.rol);
+}
+function mesasLibresParaTraslado(c){
+  return MESAS.filter(m=>m.id!==c.mesaId && m.activa!==false && !grupoDe(m) && !comandaDe(m.id))
+    .sort((a,b)=>String(a.zona||"Salón").localeCompare(b.zona||"Salón","es-MX")
+      || String(a.nombre).localeCompare(b.nombre,"es-MX",{numeric:true}));
+}
+function avisoTraslado(texto){
+  $("#trasladoMensaje").textContent=texto;
+  $("#trasladoMensaje").hidden=!texto;
+}
+function pintaDestinoTraslado(c){
+  const select=$("#trasladoDestino"),anterior=select.value;
+  const libres=mesasLibresParaTraslado(c);
+  select.innerHTML='<option value="">'+(libres.length?"Selecciona una mesa libre":"No hay mesas libres disponibles")+'</option>'+
+    libres.map(m=>'<option value="'+esc(m.id)+'">'+esc((m.zona||"Salón")+" · "+m.nombre)+'</option>').join("");
+  select.value=libres.some(m=>m.id===anterior)?anterior:"";
+  $("#trasladoConfirmar").disabled=!libres.length || trasladoEnCurso;
+}
+$("#comTrasladar").addEventListener("click",()=>{
+  const c=comandaActual(),persona=usuarioActual();
+  if(!puedeTrasladarMesa(c) || bloqueado || trasladoEnCurso) return;
+  if(!REST_NUBE.enabled || !navigator.onLine){toast("Conéctate a la nube para comprobar que la mesa esté libre.");return;}
+  if(!tieneClave(persona)){toast("Configura tu PIN en Personal → Equipo y claves para autorizar el traslado.");return;}
+  trasladoSeleccion={id:c.id,origen:c.mesaId,evento:nubeEventoId(),persona:persona.id};
+  const origen=MESAS.find(m=>m.id===c.mesaId);
+  $("#trasladoOrigen").textContent="Desde "+(origen?.zona||"Salón")+" · "+c.mesaNombre+" · "+folioVisualPOS(c.folio);
+  $("#trasladoDestino").value="";
+  $("#trasladoPin").value="";
+  avisoTraslado("");
+  pintaDestinoTraslado(c);
+  trasladoDialog.showModal();
+});
+$("#trasladoCerrar").addEventListener("click",()=>{if(!trasladoEnCurso) trasladoDialog.close();});
+$("#trasladoPin").addEventListener("input",()=>{if(!trasladoEnCurso) avisoTraslado("");});
+trasladoDialog.addEventListener("cancel",e=>{if(trasladoEnCurso) e.preventDefault();});
+trasladoDialog.addEventListener("close",()=>{
+  trasladoSeleccion=null;
+  $("#trasladoPin").value="";
+});
+$("#trasladoForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const solicitud=trasladoSeleccion,persona=usuarioActual(),c=comandaActual();
+  if(trasladoEnCurso || bloqueado || !solicitud || !puedeTrasladarMesa(c)
+     || c.id!==solicitud.id || persona.id!==solicitud.persona) return;
+  const destino=$("#trasladoDestino").value,pin=$("#trasladoPin").value.trim();
+  if(!mesasLibresParaTraslado(c).some(m=>m.id===destino)){
+    avisoTraslado("Elige otra mesa libre.");
+    pintaDestinoTraslado(c);
+    return;
+  }
+  trasladoEnCurso=true;
+  $("#trasladoConfirmar").disabled=true;
+  $("#trasladoCerrar").disabled=true;
+  $("#trasladoPin").value="";
+  avisoTraslado("Comprobando la mesa de destino…");
+  try{
+    if(!REST_NUBE.enabled || !navigator.onLine) throw new Error("Conéctate a la nube para hacer el traslado.");
+    await sincronizaNubeEnSerie(true);
+    if(bloqueado || trasladoSeleccion!==solicitud || usuarioActual().id!==solicitud.persona
+       || nubeEventoId()!==solicitud.evento) return;
+    const docId=nubeId("comanda",solicitud.id),key=nubeClave("rest_comandas",docId);
+    if(REST_NUBE.queue.some(q=>q.key===key)) throw new Error("La cuenta aún se está sincronizando. Intenta de nuevo.");
+    const {data,error}=await RESTAURANT_SB.rpc("rest_traslada_mesa",{
+      p_cuenta:RESTAURANT_ACCOUNT.accountId,p_evento:solicitud.evento,p_comanda:docId,
+      p_origen:solicitud.origen,p_destino:destino,p_persona:solicitud.persona,p_pin:pin
+    });
+    if(error) throw error;
+    if(!data?.cuerpo) throw new Error("No se recibió confirmación del traslado. Actualiza las mesas.");
+    const anterior=REST_NUBE.serverDocs[key];
+    if(!anterior || Date.parse(data.actualizado)>=Date.parse(anterior.actualizado)) REST_NUBE.serverDocs[key]=data;
+    if(REST_NUBE.localDirty) REST_NUBE.applyPending=true;
+    else aplicaDocumentosRestaurant(nubeRebaseMap());
+    if(trasladoDialog.open) trasladoDialog.close();
+    toast("Cuenta transferida a "+data.cuerpo.mesaNombre+".");
+  }catch(err){
+    if(!trasladoDialog.open) return;
+    if(nubeEsErrorPlan(err)) nubeRegistraError(err);
+    avisoTraslado(err.code==="PGRST202"
+      ? "Falta habilitar los traslados en la nube."
+      : (err.message||"No se pudo transferir la cuenta. Intenta de nuevo."));
+    if(/ocupada|no está disponible|cambió de mesa/.test(err.message||"")){
+      await recargaCambiosNube();
+      const actual=comandaActual();
+      if(actual?.id===solicitud.id && actual.mesaId===solicitud.origen) pintaDestinoTraslado(actual);
+      else trasladoDialog.close();
+    }
+    if(trasladoDialog.open) $("#trasladoPin").focus();
+  }finally{
+    trasladoEnCurso=false;
+    $("#trasladoConfirmar").disabled=!$("#trasladoDestino").value && $("#trasladoDestino").options.length<2;
+    $("#trasladoCerrar").disabled=false;
+  }
+});
+
 let autoDestino = null;
 /* alAutorizar recibe {id, nombre}. Si el que opera ya manda, se le llama
    de inmediato con su propio nombre: su firma es el que haya entrado. */
@@ -6910,6 +7034,20 @@ function fotoMenu(file,max=360){
   });
 }
 let menuPlatilloActivo=null,menuCategoriaActiva=null,menuGrupoActivo=null;
+let menuTieneCambiosDeNube=false;
+function refrescaMenuDesdeNube(){
+  if($("#tab-menu").hidden) return;
+  const editando=document.activeElement?.closest("#tab-menu input,#tab-menu select,#tab-menu textarea,#tab-menu button,#tab-menu summary");
+  if(editando || $("#menuCatalogDialog").open){menuTieneCambiosDeNube=true;return;}
+  renderMenu();
+}
+function aplicaCambiosDeMenuPendientes(){
+  if(menuTieneCambiosDeNube) setTimeout(()=>{
+    if(menuTieneCambiosDeNube) refrescaMenuDesdeNube();
+  },0);
+}
+$("#tab-menu").addEventListener("focusout",aplicaCambiosDeMenuPendientes);
+$("#menuCatalogDialog").addEventListener("close",aplicaCambiosDeMenuPendientes);
 const MENU_ICONOS = [
   ["🍽️","Platillo"],["🌮","Tacos"],["🫔","Antojitos"],["🌯","Burritos"],["🍲","Caldos"],["🥣","Sopas"],
   ["🍳","Desayunos"],["🥞","Hot cakes"],["🌶️","Comida mexicana"],["🥑","Botanas"],["🥩","Cortes"],
@@ -6990,6 +7128,7 @@ function iconoSugeridoPlatillo(platillo,categorias){
   return "🍽️";
 }
 function renderMenu(){
+  menuTieneCambiosDeNube=false;
   const cats=(MENU.cats||[]).slice().sort((a,b)=>num(a.orden)-num(b.orden));
   const search=($("#menuBuscar")?.value||"").trim().toLocaleLowerCase(),sel=$("#menuFiltroCategoria")?.value||"";
   $("#menuFiltroCategoria").innerHTML='<option value="">Todas las categorías</option>'+cats.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.nombre)+'</option>').join("");
@@ -9610,7 +9749,7 @@ function aplicaMarca(){
   $("#barraVer").innerHTML = '<img src="../marca/n-64.png" alt=""><span>Nuvoor</span>';
   try{ document.title = "Nuvoor Restaurant"; }catch(e){}
 }
-function aplicaRol(){
+function aplicaRol(desdeNube=false){
   const u = usuarioActual(), r = rolActual();
   $("#userNombre").textContent = u.nombre || "Sin nombre";
   $("#userRol").textContent = (ROLES[r]||ROLES.gerente).nombre;
@@ -9626,7 +9765,7 @@ function aplicaRol(){
   const visible = PESTANAS.filter(p=>puedeVer(p.k)).map(p=>p.k);
   const abierta = PESTANAS.concat([{k:"comanda"}]).find(p=>{ const s=$("#tab-"+p.k); return s && !s.hidden; });
   if(!abierta || !puedeVer(abierta.k)) vaA(visible[0]);
-  else if(abierta.k !== "comanda") vaA(abierta.k);   /* la misma pestaña, pero con los ojos del nuevo */
+  else if(abierta.k !== "comanda" && !(desdeNube && abierta.k === "menu")) vaA(abierta.k);
 }
 
 /* ===================================================================
@@ -9636,7 +9775,7 @@ var bloqueado = false, relojInactivo = null;
 var relojBloqueoIntervalo = null;
 const MIN_BLOQUEO = 10;
 const tipoEntradaPinPOS = window.CSS?.supports("-webkit-text-security","disc") ? "text" : "password";
-["#accesoPass","#autoPin","#clavePersonalPin"].forEach(id=>$(id).type=tipoEntradaPinPOS);
+["#accesoPass","#autoPin","#clavePersonalPin","#trasladoPin"].forEach(id=>$(id).type=tipoEntradaPinPOS);
 const tieneClave = u => !!(String((u||{}).pin||"").trim()||String((u||{}).pin_hash||(u||{}).pinHash||"").trim());
 async function validaClavePerfil(u,clave){if(!u)return false;const hash=u.pin_hash||u.pinHash;if(hash){try{return await nubeSha256((REST_NUBE.pinSalt||localStorage.getItem(REST_NUBE_PIN_SALT_KEY)||"")+String(clave||""))===hash;}catch(_){return false;}}return String(clave||"")===String(u.pin||"");}
 const minutosBloqueo = () => { const n = num(P.bloqueoMin, MIN_BLOQUEO); return n > 0 ? n : 0; };
@@ -9652,6 +9791,7 @@ function bloqueaPantalla(aMano){
   const puerta = $("#acceso"); if(!puerta || !puerta.hidden) return;
   if(!aMano && !puedeBloquear()) return;
   if($("#menuCatalogDialog").open) $("#menuCatalogDialog").close();
+  if($("#modalTrasladoMesa").open) $("#modalTrasladoMesa").close();
   pideAcceso({bloqueo:true});
 }
 function pintaRelojBloqueo(){
