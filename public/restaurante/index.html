@@ -1476,7 +1476,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261106-1118">
+<meta name="nuvoor-build" content="20261106-1335">
 <link rel="stylesheet" href="./tema-petroleo.css?v=20261105-1033">
 </head>
 <body>
@@ -2811,7 +2811,7 @@ function actualizaEstadoNube(){
 function guardaEstadoLocal(){
   if(restaurando)return;
   lsSet("menu",MENU);lsSet("mesas",MESAS);lsSet("comandas",COMANDAS);
-  lsSet("turnos",TURNOS);lsSet("P",P);lsSet("equipo",EQUIPO);
+  lsSet("P",P);lsSet("equipo",EQUIPO);
   lsSet("asistencias",ASISTENCIAS);lsSet("compras",COMPRAS);lsSet("recetas",RECETAS);lsSet("decor",DECOR);
   try{localStorage.setItem(LS+"_latido",String(Date.now()));}catch(_){}
 }
@@ -4444,10 +4444,14 @@ $("#comLineas").addEventListener("click", e=>{
         qui = e.target.closest("[data-quita]");
   const d = (mas||menos||qui||{}).dataset;
   if(!d) return;
-  const l = c.lineas.find(x=>x.id === (d.mas || d.menos || d.quita)); if(!l || l.enviada) return;
+  const l = c.lineas.find(x=>x.id === (d.mas || d.menos || d.quita));
+  if(c.estado === "cerrada" || !l || l.enviada || l.cancelada) return;
+  if(menos || qui){
+    const cantidad = qui ? 0 : Math.max(1,num(l.cant,1)-1);
+    reducePlatilloConAutorizacion(c,l,cantidad,"Corrección antes de enviar","");
+    return;
+  }
   if(mas) l.cant = num(l.cant,1) + 1;
-  if(menos) l.cant = Math.max(1, num(l.cant,1) - 1);
-  if(qui) c.lineas = c.lineas.filter(x=>x.id !== l.id);
   persist(); pintaLineas(); renderComanda();
 });
 
@@ -4510,10 +4514,33 @@ function anotaCancelacion(c, l, cant, motivo, nota, merma, autorizo){
     setTimeout(()=> imprimeCancelacion(c, cancelacion), 60);
   c.cancelaciones.push(cancelacion);
 }
+function reducePlatilloConAutorizacion(c,l,nueva,motivo,nota){
+  const antes = num(l.cant,1), enviada = l.enviada;
+  if(nueva >= antes) return;
+  const accion = nueva === 0 ? "Cancelar" : "Quitar " + (antes-nueva) + " de";
+  pideAutorizacion(accion+' <b>'+esc(l.nombre)+'</b>. Motivo: '+esc(motivo)+'.',quien=>{
+    const actual = comandaActual();
+    const linea = actual?.lineas?.find(x=>x.id===l.id);
+    if(actual?.id!==c.id || actual.estado==="cerrada" || !linea || linea.cancelada ||
+       linea.enviada!==enviada || num(linea.cant,1)!==antes){
+      toast("El pedido cambió. Revísalo antes de autorizar otra vez.");
+      return;
+    }
+    const merma = ["preparando","listo","entregada"].includes(linea.estado);
+    anotaCancelacion(actual,linea,antes-nueva,motivo,nota,merma,quien);
+    if(nueva===0){
+      linea.cancelada = true; linea.motivo = motivo; linea.cancelaHora = horaAhora();
+    }else linea.cant = nueva;
+    guardaYa();
+    $("#modalCorrige").hidden = true; corrigiendo = null;
+    renderComanda(); pintaTabs();
+    toast(nueva===0 ? "Platillo cancelado" : "Cantidad actualizada a " + nueva);
+  });
+}
 $("#corrCerrar").addEventListener("click", ()=>{ $("#modalCorrige").hidden = true; corrigiendo = null; });
 $("#corrCuerpo").addEventListener("click", e=>{
-  const c = comandaActual(); if(!c || !corrigiendo) return;
-  const l = c.lineas.find(x=>x.id === corrigiendo); if(!l) return;
+  const c = comandaActual(); if(!c || c.estado === "cerrada" || !corrigiendo) return;
+  const l = c.lineas.find(x=>x.id === corrigiendo); if(!l || l.cancelada) return;
   const motivo = ($("#corrMotivo")||{}).value || "";
   const nota = (($("#corrNota")||{}).value || "").trim();
   const avanzado = l.estado === "preparando" || l.estado === "listo" || l.estado === "entregada";
@@ -4521,46 +4548,20 @@ $("#corrCuerpo").addEventListener("click", e=>{
   if(e.target.closest("#corrCancela")){
     if(!confirm("¿Cancelar «" + l.nombre + "» completo?" +
         (avanzado ? "\n\nYa estaba " + (ET_EDO[l.estado]||l.estado) + ": se registra como merma." : ""))) return;
-    /* Lo que ya salio a cocina no lo cancela cualquiera: ahi es donde se
-       va el dinero sin que nadie se entere. */
-    const hacerlo = quien=>{
-      anotaCancelacion(c, l, num(l.cant,1), motivo, nota, avanzado, quien);
-      l.cancelada = true; l.motivo = motivo; l.cancelaHora = horaAhora();
-      persist(); $("#modalCorrige").hidden = true; corrigiendo = null;
-      renderComanda(); pintaTabs();
-      toast("Cancelado" + (quien && quien.nombre && !quien.propio ? " · autorizó " + quien.nombre : "") +
-            ". La cocina lo va a ver en su pantalla.");
-    };
-    if(l.enviada)
-      pideAutorizacion('Se va a cancelar <b>' + esc(l.nombre) + '</b>, que ya está en cocina' +
-        (avanzado ? ' y ya lo estaban preparando' : '') + '. Motivo: <b>' + esc(motivo) + '</b>.', hacerlo);
-    else hacerlo({id: usuarioActual().id||"", nombre: usuarioActual().nombre||"", propio:true});
+    reducePlatilloConAutorizacion(c,l,0,motivo,nota);
     return;
   }
   if(e.target.closest("#corrGuarda")){
-    const nueva = Math.max(0, num($("#corrCant").value, 0));
+    const nueva = $("#corrCant").valueAsNumber;
+    if(!Number.isFinite(nueva) || nueva<0){ toast("Escribe una cantidad válida."); return; }
     const antes = num(l.cant,1);
     if(nueva === antes){ $("#modalCorrige").hidden = true; corrigiendo = null; return; }
-    const hacerlo = quien=>{
-      if(nueva === 0){
-        anotaCancelacion(c, l, antes, motivo, nota, avanzado, quien);
-        l.cancelada = true; l.motivo = motivo; l.cancelaHora = horaAhora();
-      }else{
-        if(nueva < antes) anotaCancelacion(c, l, antes - nueva, motivo, nota, avanzado, quien);
-        l.cant = nueva;
-        /* Si crece, lo que se suma todavía no está en cocina. */
-        if(nueva > antes){ l.estado = "pedido"; if(!l.enviada){ l.enviada = horaAhora(); l.enviadaTs = Date.now(); } }
-      }
-      persist(); $("#modalCorrige").hidden = true; corrigiendo = null;
-      renderComanda(); pintaTabs();
-      toast(nueva === 0 ? "Cancelado" : "Quedó en " + nueva);
-    };
-    /* Bajarle la cantidad a algo que ya esta en cocina es cancelar una
-       parte: pide lo mismo. Subirla no le quita nada a nadie. */
-    if(l.enviada && nueva < antes)
-      pideAutorizacion('Se le van a quitar <b>' + (antes - nueva) + '</b> de <b>' + esc(l.nombre) +
-        '</b>, que ya está en cocina. Motivo: <b>' + esc(motivo) + '</b>.', hacerlo);
-    else hacerlo({id: usuarioActual().id||"", nombre: usuarioActual().nombre||"", propio:true});
+    if(nueva < antes){ reducePlatilloConAutorizacion(c,l,nueva,motivo,nota); return; }
+    l.cant = nueva; l.estado = "pedido";
+    if(!l.enviada){ l.enviada = horaAhora(); l.enviadaTs = Date.now(); }
+    persist(); $("#modalCorrige").hidden = true; corrigiendo = null;
+    renderComanda(); pintaTabs();
+    toast("Cantidad actualizada a " + nueva);
   }
 });
 $("#comVolver").addEventListener("click", ()=>{ vaA("mesas"); });
@@ -4586,23 +4587,31 @@ $("#comEnviar").addEventListener("click", ()=>{
     : "") + ". Para cambiarlos ahora se usa Corregir.");
 });
 $("#comCancelar").addEventListener("click", ()=>{
-  const c = comandaActual(); if(!c) return;
-  const enCocina = (c.lineas||[]).filter(l=>l.enviada).length;
+  const c = comandaActual(); if(!c || c.estado === "cerrada") return;
+  const lineas = JSON.stringify(vivas(c).map(l=>[l.id,l.cant,l.enviada]).sort());
+  const enCocina = vivas(c).filter(l=>l.enviada).length;
   if(!confirm("¿Cancelar " + c.mesaNombre + "?\n\n" +
       (enCocina ? "Ya hay " + enCocina + " platillo(s) en cocina: alguien los preparó.\n\n" : "") +
       "La cuenta se cierra en cero y queda registrada como cancelada.")) return;
   const motivo = prompt("¿Por qué se cancela la mesa?", "El cliente se fue");
   if(motivo === null) return;
+  if(!motivo.trim()){ toast("Escribe el motivo de la cancelación."); return; }
   const hacerlo = quien=>{
-    vivas(c).forEach(l=>{
-      anotaCancelacion(c, l, num(l.cant,1), motivo, "", !!l.enviada, quien);
+    const actual = comandaActual();
+    if(actual?.id!==c.id || actual.estado==="cerrada" ||
+       JSON.stringify(vivas(actual).map(l=>[l.id,l.cant,l.enviada]).sort())!==lineas){
+      toast("El pedido cambió. Revísalo antes de autorizar otra vez.");
+      return;
+    }
+    vivas(actual).forEach(l=>{
+      anotaCancelacion(actual, l, num(l.cant,1), motivo, "", !!l.enviada, quien);
       l.cancelada = true; l.motivo = motivo;
     });
-    c.estado = "cerrada"; c.cancelada = true; c.motivo = motivo;
-    c.cierra = horaAhora(); c.fechaCierre = hoyISO(); c.total = 0;
-    c.turnoId = turnoAbierto()?.id || "";
-    c.autorizo = quien || null;
-    persist(); vaA("mesas");
+    actual.estado = "cerrada"; actual.cancelada = true; actual.motivo = motivo;
+    actual.cierra = horaAhora(); actual.fechaCierre = hoyISO(); actual.total = 0;
+    actual.turnoId = turnoAbierto()?.id || "";
+    actual.autorizo = quien;
+    guardaYa(); vaA("mesas");
     toast("Mesa cancelada · " + motivo +
           (quien && quien.nombre && !quien.propio ? " · autorizó " + quien.nombre : ""));
   };
@@ -5044,6 +5053,24 @@ const turnoAbierto = () => TURNOS.find(t=>t.abierto);
 const cuentaCobrada = c => c.estado === "cerrada" && !c.cancelada;
 const formasCaja = {efectivo:"Efectivo neto",tarjeta:"Tarjeta",transferencia:"Transferencia",app:"Apps de reparto"};
 
+function guardaTurnosCaja(lista){
+  if(!nubeGuarda(LS+"_turnos",lista)){
+    toast("No se pudo guardar el cambio de caja en este dispositivo.");
+    return false;
+  }
+  TURNOS = lista;
+  return true;
+}
+
+function revisaTurnoCaja(id){
+  TURNOS = lsGet("turnos",TURNOS);
+  const t = turnoAbierto();
+  if(t?.id === id) return t;
+  toast("El turno de caja cambió. Revisa la caja antes de volver a intentarlo.");
+  renderCaja();
+  return null;
+}
+
 function totalizaCobrosCaja(cuentas){
   const por = {efectivo:0, tarjeta:0, transferencia:0, app:0, otros:0};
   let propinas = 0, total = 0, apps = 0, comisionApps = 0, sinDesglose = 0, cobros = 0;
@@ -5358,11 +5385,15 @@ function abreTurno(){
   $("#modalTurno").hidden = false;
   setTimeout(()=>{ const f = $("#turFondo"); if(f){ f.focus(); f.select(); } }, 60);
   $("#turOk").onclick = ()=>{
-    if(!puedeVer("caja") || turnoAbierto()) return;
+    if(!puedeVer("caja")) return;
+    TURNOS = lsGet("turnos",TURNOS);
+    if(turnoAbierto()){ toast("Ya hay un turno abierto en este dispositivo."); renderCaja(); return; }
+    const fondo = $("#turFondo").valueAsNumber;
+    if(!Number.isFinite(fondo) || fondo<0){ toast("Escribe el fondo de apertura, aunque sea cero."); return; }
     const t = {id:uid(), folio:folioNuevo("tur"), abre:horaAhora(), fecha:hoyISO(),
                cajero: usuarioActual().nombre||"", cajeroId: usuarioActual().id||"",
-               fondo: num($("#turFondo").value), movs:[], abierto:true, ts:Date.now()};
-    TURNOS.unshift(t); persist();
+               fondo, movs:[], abierto:true, ts:Date.now()};
+    if(!guardaTurnosCaja([t,...TURNOS])) return;
     $("#modalTurno").hidden = true;
     renderCaja();
     toast("Turno " + t.folio + " abierto con " + mx(t.fondo));
@@ -5380,14 +5411,16 @@ function movimiento(tipo){
   $("#modalTurno").hidden = false;
   setTimeout(()=>{ const f = $("#movMonto"); if(f) f.focus(); }, 60);
   $("#movOk").onclick = ()=>{
-    if(!puedeVer("caja") || turnoAbierto() !== t) return;
+    if(!puedeVer("caja")) return;
+    const actual = revisaTurnoCaja(t.id); if(!actual) return;
     const m = num($("#movMonto").value);
     if(m <= 0){ toast("Escribe el monto"); return; }
     const nota = $("#movNota").value.trim();
     if(!nota){ toast("Escribe por qué: un movimiento sin razón no se puede auditar"); return; }
-    t.movs = t.movs || [];
-    t.movs.push({tipo, monto:m, nota, hora:horaAhora(), quien: usuarioActual().nombre||""});
-    persist(); $("#modalTurno").hidden = true; renderCaja();
+    const nuevo = {tipo, monto:m, nota, hora:horaAhora(), quien: usuarioActual().nombre||""};
+    const actualizado = {...actual,movs:[...(actual.movs||[]),nuevo]};
+    if(!guardaTurnosCaja(TURNOS.map(x=>x.id===actual.id?actualizado:x))) return;
+    $("#modalTurno").hidden = true; renderCaja();
     toast((tipo==="entrada" ? "Entraron " : "Salieron ") + mx(m));
   };
 }
@@ -5409,16 +5442,17 @@ function cierraTurno(){
   $("#modalTurno").hidden = false;
   setTimeout(()=>{ const f = $("#turContado"); if(f) f.focus(); }, 60);
   $("#turCierra").onclick = ()=>{
-    if(!puedeVer("caja") || turnoAbierto() !== t) return;
+    if(!puedeVer("caja")) return;
+    const actual = revisaTurnoCaja(t.id); if(!actual) return;
     if(abiertas().length){ toast("Hay comandas abiertas. Ciérralas antes de hacer el corte."); return; }
     const campo = $("#turContado"), contado = campo.valueAsNumber;
     if(!Number.isFinite(contado) || contado<0){ toast("Escribe el efectivo contado, aunque sea cero."); campo.focus(); return; }
-    const s = sumaTurno(t);
-    t.abierto = false; t.cierra = horaAhora(); t.fechaCierre = hoyISO(); t.contado = contado;
-    t.deberia = s.enCaja; t.diferencia = Math.round((contado-s.enCaja)*100)/100;
-    t.resumen = s;
+    const s = sumaTurno(actual);
+    const corte = {...actual,abierto:false,cierra:horaAhora(),fechaCierre:hoyISO(),contado,
+      deberia:s.enCaja,diferencia:Math.round((contado-s.enCaja)*100)/100,resumen:s};
+    if(!guardaTurnosCaja(TURNOS.map(x=>x.id===actual.id?corte:x))) return;
     guardaYa();
-    renderCaja(); muestraCorteCaja(t);
+    renderCaja(); muestraCorteCaja(corte);
     if(consultaCortes) consultaCortes.then(()=>sincronizaCortesCaja(true));
     else sincronizaCortesCaja(true);
   };
@@ -6080,17 +6114,18 @@ let autoDestino = null;
 /* alAutorizar recibe {id, nombre}. Si el que opera ya manda, se le llama
    de inmediato con su propio nombre: su firma es el que haya entrado. */
 function pideAutorizacion(queTexto, alAutorizar){
-  if(soyAutoridad()){
-    const u = usuarioActual();
-    alAutorizar({id: u.id || "", nombre: u.nombre || "", propio: true});
+  const operador = usuarioActual();
+  if(operador.activo !== false && soyAutoridad()){
+    alAutorizar({id: operador.id || "", nombre: operador.nombre || "", propio: true});
     return;
   }
+  if(autoDestino) return;
   const jefes = jefesConClave();
   if(!jefes.length){
-    toast("Para autorizarlo, un gerente o cajero debe tener una clave en Ajustes → Equipo.");
+    toast("Un gerente o cajero debe configurar su PIN en Personal → Equipo y claves.");
     return;
   }
-  autoDestino = alAutorizar;
+  autoDestino = {accion:alAutorizar, operador:operador.id};
   $("#autoQue").innerHTML = queTexto;
   $("#autoLista").innerHTML = '<span style="font-size:11.5px;color:var(--ink-3)">Puede autorizar: </span>' +
     jefes.map(u=>'<span class="pill" style="margin-right:5px">'+esc(u.nombre||"")+'</span>').join("");
@@ -6098,16 +6133,37 @@ function pideAutorizacion(queTexto, alAutorizar){
   $("#modalAuto").hidden = false;
   setTimeout(()=>{ const i = $("#autoPin"); if(i) i.focus(); }, 60);
 }
-$("#autoCerrar").addEventListener("click", ()=>{ $("#modalAuto").hidden = true; autoDestino = null; });
+$("#autoCerrar").addEventListener("click", cierraAutorizacion);
+function cierraAutorizacion(){
+  autoDestino = null;
+  $("#autoPin").value = "";
+  $("#modalAuto").hidden = true;
+}
 $("#autoPin").addEventListener("keydown", e=>{ if(e.key === "Enter") $("#autoOk").click(); });
 $("#autoOk").addEventListener("click", async()=>{
+  const solicitud = autoDestino, boton = $("#autoOk");
+  if(!solicitud || boton.disabled) return;
   const pin = String($("#autoPin").value || "").trim();
-  let u = null;for(const posible of jefesConClave()){if(await validaClavePerfil(posible,pin)){u=posible;break;}}
-  if(!u){ toast("Esa clave no es de nadie que pueda autorizar"); $("#autoPin").value = ""; return; }
-  const f = autoDestino; autoDestino = null;
-  $("#modalAuto").hidden = true;
-  toast("Autorizó " + (u.nombre||""));
-  if(f) f({id:u.id, nombre:u.nombre||""});
+  if(!pin) return;
+  boton.disabled = true;
+  try{
+    let u = null;
+    for(const posible of jefesConClave()){
+      if(await validaClavePerfil(posible,pin)){ u = posible; break; }
+    }
+    if(autoDestino !== solicitud) return;
+    if(usuarioActual().id !== solicitud.operador){
+      cierraAutorizacion(); return;
+    }
+    const vigente = u && EQUIPO.find(x=>x.id===u.id);
+    if(!puedeAutorizar(vigente) || (vigente.pin_hash||vigente.pinHash||vigente.pin)!==(u.pin_hash||u.pinHash||u.pin)){
+      toast("El PIN no corresponde a un gerente o cajero activo.");
+      $("#autoPin").value = ""; $("#autoPin").focus();
+      return;
+    }
+    cierraAutorizacion();
+    solicitud.accion({id:vigente.id,nombre:vigente.nombre||""});
+  }finally{ boton.disabled = false; }
 });
 
 /* ===================================================================
@@ -9150,6 +9206,13 @@ function start(){
      enteran una de otra sin red: localStorage avisa a las demás pestañas. */
   window.addEventListener("storage", e=>{
     if(e.key === EVENTOS_KEY){ EVENTOS=leeEventos(); pintaTabs(); if(!$("#tab-eventos").hidden) renderEventos(); return; }
+    if(e.key === LS+"_turnos"){
+      TURNOS = lsGet("turnos",[]);
+      if(!$("#tab-caja").hidden && puedeVer("caja")) renderCaja();
+      if(!$("#tab-ventas").hidden && puedeVer("ventas")) renderHistorialCortesVentas();
+      pintaTurnoChip();
+      return;
+    }
     if(!e.key || e.key.indexOf(LS) !== 0) return;
     MENU     = lsGet("menu", MENU);
     COMANDAS = lsGet("comandas", COMANDAS);

@@ -1,4 +1,4 @@
-const CACHE_NAME = "nuvoor-restaurant-v39-ajustes";
+const CACHE_NAME = "nuvoor-restaurant-v40-cancelaciones-caja";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,
