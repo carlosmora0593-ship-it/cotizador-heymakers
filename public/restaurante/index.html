@@ -1264,6 +1264,44 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 #tab-menu .menuCategoryEdit label,#tab-menu .menuGroupFields label{display:grid;gap:5px;min-width:0}
 #tab-menu .menuCategoryEdit label>span,#tab-menu .menuGroupFields label>span,#tab-menu .menuOptionTile label>span{font-size:9px;font-weight:800;letter-spacing:.065em;text-transform:uppercase;color:var(--ink-3)}
 #tab-menu .menuCategoryEdit input,#tab-menu .menuGroupFields input,#tab-menu .menuOptionTile input{width:100%;min-width:0}
+#tab-menu .menuMosaicIcon{overflow:hidden}
+#tab-menu .menuMosaicIcon img,#comCats .comCategoryPhoto img{width:100%;height:100%;object-fit:cover}
+#tab-menu .menuCategoryVisual{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:12px}
+#tab-menu .menuCategoryVisual .menuCategoryPhotoButton{position:relative;display:inline-flex;align-items:center;text-transform:none;cursor:pointer}
+#tab-menu .menuCategoryPhotoButton input{position:absolute;inset:0;opacity:0;cursor:pointer}
+#tab-menu .menuCategoryPhotoButton:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+#tab-menu .menuCategoryIcons{margin-top:12px}
+#tab-menu .menuCategoryIcons summary{width:fit-content;cursor:pointer;color:var(--ink);font-size:13px;font-weight:750}
+#tab-menu .menuIconGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px;margin-top:10px}
+#tab-menu .menuIconGrid .btn{min-height:44px;padding:4px;font-size:21px}
+#tab-menu .menuIconGrid .btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink,#241609)}
+#comCats button:has(.comCategoryPhoto){display:inline-flex;align-items:center;gap:6px}
+#comCats .comCategoryPhoto{display:grid;place-items:center;overflow:hidden;width:22px;height:22px;border-radius:6px;flex-shrink:0;font-size:16px}
+#menuCatalogOpen{margin-left:auto}
+#menuCatalogDialog{width:min(690px,calc(100% - 24px));max-height:calc(100dvh - 30px);padding:0;border:1px solid var(--line);border-radius:20px;background:var(--surface);color:var(--ink);box-shadow:0 22px 68px #28141d45;overscroll-behavior:contain}
+#menuCatalogDialog::backdrop{background:#28141d77}
+#menuCatalogDialog .menuCatalogHead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+#menuCatalogDialog .menuCatalogHead h2{margin:0;font-size:19px}
+#menuCatalogDialog .menuCatalogBody{padding:16px 18px}
+#menuCatalogDialog .menuCatalogHelp{margin:0 0 14px;color:var(--ink-3);font-size:13px}
+#menuCatalogDialog .menuCatalogFilters,#menuCatalogDialog .menuCatalogFields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#menuCatalogDialog label{display:grid;gap:5px;color:var(--ink);font-size:13px;font-weight:700}
+#menuCatalogDialog input,#menuCatalogDialog select{width:100%;min-width:0;font:inherit}
+#menuCatalogDialog .menuCatalogGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0;max-height:min(45dvh,370px);overflow:auto;overscroll-behavior:contain;padding:3px}
+#menuCatalogDialog .menuCatalogChoice{display:flex;align-items:center;gap:9px;min-width:0;min-height:55px;text-align:left;white-space:normal;justify-content:flex-start;overflow-wrap:anywhere}
+#menuCatalogDialog .menuCatalogChoice span,#menuCatalogDialog .menuCatalogDish span{font-size:23px;line-height:1}
+#menuCatalogDialog .menuCatalogCount{margin:12px 0 0;color:var(--ink-3);font-size:12px}
+#menuCatalogDialog .menuCatalogFooter{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:14px}
+#menuCatalogDialog .menuCatalogDish{display:flex;align-items:center;gap:10px;margin:12px 0 16px}
+#menuCatalogDialog .menuCatalogDish strong{font-size:18px}
+#menuCatalogDialog .menuCatalogFields label:first-child{grid-column:1/-1}
+#menuCatalogDialog #menuCatalogNotice{color:var(--danger,#8b1732);margin:10px 0 0;font-size:13px}
+@media(max-width:530px){
+  #menuCatalogDialog .menuCatalogFilters,#menuCatalogDialog .menuCatalogGrid{grid-template-columns:minmax(0,1fr)}
+  #menuCatalogDialog .menuCatalogBody,#menuCatalogDialog .menuCatalogHead{padding:12px}
+  #tab-menu .menuCategoryEdit{grid-template-columns:minmax(0,1fr)}
+  #tab-menu .menuCategoryEdit [data-delcat]{justify-self:start}
+}
 #tab-menu .menuGroupToolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:14px 0 9px}
 #tab-menu .menuGroupToolbar b{font-size:12px;color:var(--ink)}
 #tab-menu .menuGroupFields{display:grid;grid-template-columns:minmax(0,1.5fr) repeat(2,minmax(90px,.65fr)) auto;gap:10px;align-items:end}
@@ -1476,7 +1514,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261106-1620">
+<meta name="nuvoor-build" content="20261106-1650">
 <link rel="stylesheet" href="./tema-borgona.css?v=20261106-1620">
 </head>
 <body>
@@ -1833,7 +1871,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     <div class="body"><div id="menuCategoryGrid" class="menuCategoryGrid" aria-label="Categorías del menú"></div><div id="menuCategorySelection" class="menuCategorySelection"></div></div>
   </div>
   <div class="card">
-    <header><h2>Platillos</h2><button class="btn sm ghost" id="platNuevo" style="margin-left:auto">+ Platillo</button></header>
+    <header><h2>Platillos</h2><button class="btn sm primary" id="menuCatalogOpen" type="button">Catálogo de alimentos</button><button class="btn sm ghost" id="platNuevo">+ Platillo</button></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">El <b>costo</b> es lo que te cuesta producirlo; con el precio sale tu utilidad por platillo.
         Si no lo sabes todavía, déjalo en cero y lo llenas después — no estorba para cobrar.</p>
@@ -1851,6 +1889,35 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     <div class="body"><p class="note" style="margin:0 0 14px">Cada grupo es una pregunta para el mesero, por ejemplo «¿Término?», «¿Qué le quito?» o «¿Extras?». Puedes asignarlo a los platillos que lo necesiten.</p><div class="menuGroupToolbar"><b>Grupos de opciones</b><button class="btn sm ghost" id="modNuevo" type="button">+ Grupo</button></div><div id="modLista"></div></div>
   </details>
 </section>
+
+<dialog id="menuCatalogDialog" aria-labelledby="menuCatalogTitle">
+  <div class="menuCatalogHead"><h2 id="menuCatalogTitle">Catálogo de alimentos</h2><button class="btn sm ghost" id="menuCatalogClose" type="button">Cerrar</button></div>
+  <div class="menuCatalogBody" id="menuCatalogList">
+    <p class="menuCatalogHelp">Busca un platillo o bebida y agrégalo a tu carta con tu propio precio.</p>
+    <div class="menuCatalogFilters">
+      <label>Buscar alimento<input id="menuCatalogSearch" type="search" placeholder="Ej. menudo, taco de bistec" autocomplete="off"></label>
+      <label>Tipo de comida<select id="menuCatalogGroup"></select></label>
+    </div>
+    <p class="menuCatalogCount" id="menuCatalogCount" aria-live="polite"></p>
+    <div class="menuCatalogGrid" id="menuCatalogResults"></div>
+    <div class="menuCatalogFooter" id="menuCatalogPages">
+      <button class="btn sm ghost" id="menuCatalogPrev" type="button">Anterior</button>
+      <span id="menuCatalogPage"></span>
+      <button class="btn sm ghost" id="menuCatalogNext" type="button">Siguiente</button>
+    </div>
+  </div>
+  <form class="menuCatalogBody" id="menuCatalogForm" hidden>
+    <button class="btn sm ghost" id="menuCatalogBack" type="button">← Volver al catálogo</button>
+    <div class="menuCatalogDish"><span id="menuCatalogIcon" aria-hidden="true"></span><strong id="menuCatalogName"></strong></div>
+    <div class="menuCatalogFields">
+      <label>Categoría en tu menú<select id="menuCatalogDestination" required></select></label>
+      <label>Precio en pesos<input id="menuCatalogPrice" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" required></label>
+      <label>Costo (opcional)<input id="menuCatalogCost" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></label>
+    </div>
+    <p id="menuCatalogNotice" role="status" hidden></p>
+    <div class="menuCatalogFooter"><button class="btn primary" type="submit">Agregar a mi menú</button></div>
+  </form>
+</dialog>
 
 <!-- ============ CAJA ============ -->
 <section id="tab-caja" hidden>
@@ -2499,6 +2566,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 
 <script src="../config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
+<script src="./catalogo-alimentos.js?v=1"></script>
 <script>
 (async function(){
 const RESTAURANT_ACCOUNT_CACHE_KEY="nuvoor_restaurant_account_v1";
@@ -2952,6 +3020,7 @@ function restauranteEsEjemploSinCambios(){
   if((COMANDAS||[]).length||(TURNOS||[]).length||(ASISTENCIAS||[]).length||(COMPRAS||[]).length||Object.keys(RECETAS||{}).length||(EVENTOS||[]).length||(IMPRESORAS||[]).length)return false;
   if((EQUIPO||[]).length!==1||EQUIPO[0].nombre!=="Administrador"||EQUIPO[0].rol!=="gerente"||EQUIPO[0].activo===false||EQUIPO[0].pin||EQUIPO[0].pin_hash)return false;
   const cats=(MENU.cats||[]).map(x=>[x.nombre,x.orden]);
+  if((MENU.cats||[]).some(c=>c.foto||c.icono)||(MENU.plats||[]).some(p=>p.icono))return false;
   const catsDemo=[["Para empezar",10],["Fuertes",20],["Bebidas",30],["Postres",40]];
   if(nubeCanon(cats)!==nubeCanon(catsDemo))return false;
   const groups=(MENU.grupos||[]).map(x=>[x.nombre,x.min,x.max,(x.ops||[]).map(o=>[o.nombre,num(o.extra)])]);
@@ -4594,6 +4663,7 @@ function renderComanda(){
   if(!catVista || !cats.some(x=>x.id===catVista)) catVista = (cats[0]||{}).id || "";
   $("#comCats").innerHTML = cats.map(x=>
     '<button type="button" data-cat="'+esc(x.id)+'" aria-pressed="'+(x.id===catVista)+'">'+
+    (x.foto||x.icono?'<span class="comCategoryPhoto" aria-hidden="true">'+visualCategoria(x)+'</span>':'')+
     esc(x.nombre)+'</button>').join("");
 
   const plats = (MENU.plats||[]).filter(p=>p.catId === catVista);
@@ -6827,12 +6897,12 @@ const SAT_UNIDADES = [
   {clave:"LTR", nombre:"Litro"}, {clave:"MLT", nombre:"Mililitro"},
   {clave:"XPK", nombre:"Paquete"}, {clave:"XBX", nombre:"Caja"}
 ];
-function fotoMenu(file){
+function fotoMenu(file,max=360){
   return new Promise((resolve,reject)=>{
     if(!file||!file.type.startsWith("image/")) return reject(new Error("Elige un archivo de imagen."));
     if(file.size>12*1024*1024) return reject(new Error("La imagen debe pesar menos de 12 MB."));
     const url=URL.createObjectURL(file),img=new Image();
-    img.onload=()=>{try{const max=360,k=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement("canvas");
+    img.onload=()=>{try{const k=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement("canvas");
       c.width=Math.max(1,Math.round(img.naturalWidth*k));c.height=Math.max(1,Math.round(img.naturalHeight*k));c.getContext("2d").drawImage(img,0,0,c.width,c.height);
       let data=c.toDataURL("image/jpeg",.5);if(data.length>100000){const small=document.createElement("canvas");small.width=Math.max(1,Math.round(c.width*.78));small.height=Math.max(1,Math.round(c.height*.78));small.getContext("2d").drawImage(c,0,0,small.width,small.height);data=small.toDataURL("image/jpeg",.36)}URL.revokeObjectURL(url);resolve(data);
     }catch(err){URL.revokeObjectURL(url);reject(err)}};
@@ -6840,13 +6910,54 @@ function fotoMenu(file){
   });
 }
 let menuPlatilloActivo=null,menuCategoriaActiva=null,menuGrupoActivo=null;
+const MENU_ICONOS = [
+  ["🍽️","Platillo"],["🌮","Tacos"],["🫔","Antojitos"],["🌯","Burritos"],["🍲","Caldos"],["🥣","Sopas"],
+  ["🍳","Desayunos"],["🥞","Hot cakes"],["🌶️","Comida mexicana"],["🥑","Botanas"],["🥩","Cortes"],
+  ["🍗","Pollo"],["🐟","Pescado"],["🦐","Mariscos"],["🍔","Hamburguesas"],["🌭","Hot dogs"],
+  ["🥪","Tortas y sándwiches"],["🍕","Pizza"],["🍝","Pastas"],["🍣","Sushi"],["🍜","Fideos"],
+  ["🥗","Ensaladas"],["🌱","Vegetariano"],["🍚","Guarniciones"],["🍟","Papas"],["🥐","Panadería"],
+  ["🍰","Postres"],["🍦","Helados"],["☕","Café"],["🫖","Té"],["🥤","Bebidas"],["🧃","Jugos"],
+  ["🍺","Cerveza"],["🍷","Vino"],["🍹","Cocteles"]
+];
+function claveMenu(texto){
+  return String(texto||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim().replace(/\s+/g," ");
+}
 function iconoSugeridoCategoria(categoria){
-  const nombre=String(categoria?.nombre||"").toLocaleLowerCase();
+  const nombre=claveMenu(categoria?.nombre);
+  if(/hot dogs?|salchicha/.test(nombre)) return "🌭";
+  if(/taco|volcan/.test(nombre)) return "🌮";
+  if(/quesadilla|antojito|tamal/.test(nombre)) return "🫔";
+  if(/menudo|pozole|caldo|sopa/.test(nombre)) return "🍲";
+  if(/hamburguesa|burger/.test(nombre)) return "🍔";
+  if(/pizza/.test(nombre)) return "🍕";
+  if(/marisco|camaron/.test(nombre)) return "🦐";
+  if(/cafe|cafeteria/.test(nombre)) return "☕";
   if(/bebid|refresco|cafe|café/.test(nombre)) return "🥤";
   if(/postre|dulce/.test(nombre)) return "🍰";
   if(/entrada|ensalada/.test(nombre)) return "🥗";
   if(/fuerte|comida|plato|principal/.test(nombre)) return "🍲";
   return "🍽️";
+}
+function visualCategoria(categoria){
+  if(typeof categoria.foto==="string" && categoria.foto.startsWith("data:image/jpeg;base64,")){
+    return '<img src="'+esc(categoria.foto)+'" alt="" loading="lazy">';
+  }
+  return esc(categoria.icono||iconoSugeridoCategoria(categoria));
+}
+function editorCategoria(c){
+  if(!c) return "";
+  const id=esc(c.id);
+  return '<section data-cat="'+id+'"><div class="menuCategoryEdit">'+
+    '<label><span>Nombre de categoría</span><input data-ck="nombre" value="'+esc(c.nombre)+'" placeholder="Ej. Entradas"></label>'+
+    '<button type="button" class="btn sm ghost" data-delcat="'+id+'">Eliminar categoría</button></div>'+
+    '<div class="menuCategoryVisual"><span class="menuMosaicIcon" aria-hidden="true">'+visualCategoria(c)+'</span>'+
+    '<label class="btn sm ghost menuCategoryPhotoButton">'+(c.foto?"Cambiar foto":"Subir foto")+
+    '<input type="file" accept="image/*" aria-label="'+(c.foto?"Cambiar foto":"Subir foto")+' de categoría" data-category-photo></label>'+
+    (c.foto?'<button type="button" class="btn sm ghost" data-category-visual-reset="foto">Quitar foto</button>':'')+
+    (c.icono?'<button type="button" class="btn sm ghost" data-category-visual-reset="icono">Usar icono sugerido</button>':'')+'</div>'+
+    '<details class="menuCategoryIcons"><summary>Elegir icono</summary><div class="menuIconGrid">'+
+    MENU_ICONOS.map(([icono,nombre])=>'<button type="button" class="btn sm ghost" data-category-icon="'+esc(icono)+'" aria-label="'+esc(nombre)+'" title="'+esc(nombre)+'" aria-pressed="'+(!c.foto&&c.icono===icono)+'">'+esc(icono)+'</button>').join("")+
+    '</div></details></section>';
 }
 function iconoSugeridoGrupo(grupo){
   const nombre=String(grupo?.nombre||"").toLocaleLowerCase();
@@ -6857,6 +6968,7 @@ function iconoSugeridoGrupo(grupo){
   return "🧩";
 }
 function iconoSugeridoPlatillo(platillo,categorias){
+  if(platillo.icono && MENU_ICONOS.some(([icono])=>icono===platillo.icono)) return platillo.icono;
   const nombre=String(platillo.nombre||"").toLocaleLowerCase(), categoria=String((categorias||[]).find(c=>c.id===platillo.catId)?.nombre||"").toLocaleLowerCase(), texto=nombre+" "+categoria;
   if(/cafe|café|capuchino|espresso|latte/.test(texto)) return "☕";
   if(/taco|tortilla|pastor/.test(nombre)) return "🌮";
@@ -6885,8 +6997,11 @@ function renderMenu(){
   $("#satProdCatalogo").innerHTML=SAT_PRODUCTOS.map(s=>'<option value="'+esc(s.nombre+' — '+s.clave)+'"></option>').join("");
   if(!cats.some(c=>c.id===menuCategoriaActiva)) menuCategoriaActiva=cats[0]?.id||null;
   const categoriaActiva=cats.find(c=>c.id===menuCategoriaActiva)||null;
-  $("#menuCategoryGrid").innerHTML=cats.map(c=>'<button type="button" class="menuMosaicChoice" data-category-select="'+esc(c.id)+'" aria-pressed="'+(c.id===menuCategoriaActiva?'true':'false')+'"><span class="menuMosaicIcon" aria-hidden="true">'+iconoSugeridoCategoria(c)+'</span><b data-category-name>'+esc(c.nombre)+'</b></button>').join("")||'<div class="menuMosaicEmpty">Aún no hay categorías. Agrega una para organizar el menú.</div>';
-  $("#menuCategorySelection").innerHTML=categoriaActiva?'<div class="menuCategoryEdit" data-cat="'+esc(categoriaActiva.id)+'"><label><span>Nombre de categoría</span><input data-ck="nombre" value="'+esc(categoriaActiva.nombre)+'" placeholder="Ej. Entradas"></label><button type="button" class="btn sm ghost" data-delcat="'+esc(categoriaActiva.id)+'">Eliminar categoría</button></div>':'';
+  $("#menuCategoryGrid").innerHTML=cats.map(c=>'<button type="button" class="menuMosaicChoice" data-category-select="'+esc(c.id)+'" aria-pressed="'+(c.id===menuCategoriaActiva?'true':'false')+'"><span class="menuMosaicIcon" aria-hidden="true">'+visualCategoria(c)+'</span><b data-category-name>'+esc(c.nombre)+'</b></button>').join("")||'<div class="menuMosaicEmpty">Aún no hay categorías. Agrega una para organizar el menú.</div>';
+  const iconosAbiertos=$("#menuCategorySelection [data-cat]")?.dataset.cat===menuCategoriaActiva
+    && $("#menuCategorySelection .menuCategoryIcons")?.open;
+  $("#menuCategorySelection").innerHTML=editorCategoria(categoriaActiva);
+  if(iconosAbiertos) $("#menuCategorySelection .menuCategoryIcons").open=true;
   const all=MENU.plats||[],visible=all.filter(p=>{const cat=cats.find(c=>c.id===p.catId);return(!sel||p.catId===sel)&&(!search||(p.nombre||"").toLocaleLowerCase().includes(search)||(cat?.nombre||"").toLocaleLowerCase().includes(search))});
   $("#menuConteo").textContent=visible.length+" de "+all.length+" platillo"+(all.length===1?"":"s");
   if(!visible.some(p=>p.id===menuPlatilloActivo)) menuPlatilloActivo=visible[0]?.id||null;
@@ -6918,9 +7033,14 @@ function renderMenu(){
   const detalleGrupo=grupoActivo?'<section class="menuGroupSelection" data-grupo="'+esc(grupoActivo.id)+'"><div class="menuGroupFields"><label><span>Pregunta</span><input data-gk="nombre" value="'+esc(grupoActivo.nombre)+'" placeholder="Ej. ¿Qué término deseas?"></label><label><span>Mínimo de opciones</span><input data-gk="min" type="number" min="0" value="'+num(grupoActivo.min)+'"></label><label><span>Máximo de opciones</span><input data-gk="max" type="number" min="1" value="'+num(grupoActivo.max,1)+'"></label><button type="button" class="btn sm ghost" data-delgrupo="'+esc(grupoActivo.id)+'">Quitar grupo</button></div><div class="menuOptionHeading"><b>Opciones disponibles</b><button type="button" class="btn sm" data-addop="'+esc(grupoActivo.id)+'">+ Opción</button></div><div class="menuOptionGrid">'+((grupoActivo.ops||[]).map(o=>'<article class="menuOptionTile" data-op="'+esc(o.id)+'"><div class="menuOptionTitle"><label><span>Opción</span><input data-ok="nombre" value="'+esc(o.nombre)+'" placeholder="Nombre de opción"></label><button type="button" class="btn sm ghost" data-delop="'+esc(o.id)+'" aria-label="Eliminar opción">✕</button></div><label class="menuOptionExtra"><span>Costo adicional</span><input data-ok="extra" type="number" min="0" step="0.5" value="'+num(o.extra)+'" aria-label="Costo adicional"></label></article>').join("")||'<div class="menuMosaicEmpty">Este grupo aún no tiene opciones. Agrega la primera.</div>')+'</div></section>':'';
   $("#modLista").innerHTML='<div class="menuGroupGrid" aria-label="Grupos de opciones">'+mosaicoGrupos+'</div>'+detalleGrupo;
 }
+function creaCategoriaMenu(nombre,icono){
+  const categoria={id:uid(),nombre,orden:Math.max(0,...MENU.cats.map(c=>num(c.orden)))+10};
+  if(icono) categoria.icono=icono;
+  MENU.cats.push(categoria);
+  return categoria;
+}
 $("#catNueva").addEventListener("click", ()=>{
-  const categoria={id:uid(), nombre:"Nueva categoría", orden:(MENU.cats.length+1)*10};
-  MENU.cats.push(categoria); menuCategoriaActiva=categoria.id;
+  menuCategoriaActiva=creaCategoriaMenu("Nueva categoría").id;
   persist(); renderMenu();
 });
 $("#platNuevo").addEventListener("click", ()=>{
@@ -6975,6 +7095,22 @@ $("#tab-menu").addEventListener("input", e=>{
   }
 });
 $("#tab-menu").addEventListener("change", async e=>{
+  const categoriaFoto=e.target.closest("[data-category-photo]");
+  if(categoriaFoto){
+    const file=categoriaFoto.files?.[0],id=categoriaFoto.closest("[data-cat]").dataset.cat;
+    if(!file) return;
+    const contexto=nubeEventoId();
+    categoriaFoto.disabled=true;
+    try{
+      const foto=await fotoMenu(file,192);
+      const categoria=MENU.cats.find(c=>c.id===id);
+      if(contexto!==nubeEventoId() || !categoria || !puedeVer("menu") || bloqueado) return;
+      categoria.foto=foto;
+      persist(); renderMenu(); toast("Foto de categoría guardada");
+    }catch(err){toast(err.message||"No se pudo guardar la foto");}
+    finally{categoriaFoto.disabled=false;categoriaFoto.value="";}
+    return;
+  }
   const fotoInput=e.target.closest("[data-menu-photo]");
   if(fotoInput){const card=fotoInput.closest("[data-plat]"),p=card&&MENU.plats.find(x=>x.id===card.dataset.plat),file=fotoInput.files&&fotoInput.files[0];if(!p||!file)return;
     try{p.foto=await fotoMenu(file);persist();renderMenu();toast("Foto guardada")}catch(err){toast(err.message||"No se pudo guardar la foto");fotoInput.value=""}return}
@@ -7014,6 +7150,18 @@ $("#tab-menu").addEventListener("change", async e=>{
   }
 });
 $("#tab-menu").addEventListener("click", e=>{
+  const visual=e.target.closest("[data-category-icon],[data-category-visual-reset]");
+  if(visual){
+    const c=MENU.cats.find(c=>c.id===visual.closest("[data-cat]").dataset.cat);
+    if(!c) return;
+    if(visual.dataset.categoryIcon){c.icono=visual.dataset.categoryIcon;delete c.foto;}
+    else if(visual.dataset.categoryVisualReset==="foto") delete c.foto;
+    else delete c.icono;
+    persist(); renderMenu();
+    const elegido=$("#menuCategorySelection [data-category-icon][aria-pressed=true]");
+    (elegido||$("#menuCategorySelection summary"))?.focus();
+    return;
+  }
   const elegirCategoria=e.target.closest("[data-category-select]");
   if(elegirCategoria){menuCategoriaActiva=elegirCategoria.dataset.categorySelect;renderMenu();return;}
   const elegirGrupo=e.target.closest("[data-group-select]");
@@ -7062,6 +7210,119 @@ $("#tab-menu").addEventListener("click", e=>{
     if(g){ g.ops = g.ops||[]; g.ops.push({id:uid(), nombre:"Opción", extra:0}); }
     persist(); renderMenu();
   }
+});
+
+const gruposCatalogo=typeof CATALOGO_ALIMENTOS==="undefined"?[]:CATALOGO_ALIMENTOS;
+const platosCatalogo=gruposCatalogo.flatMap(({grupo,icono,platillos})=>
+  platillos.map(nombre=>({nombre,grupo,icono,claveNombre:claveMenu(nombre),claveGrupo:claveMenu(grupo)}))
+).map((plato,id)=>({...plato,id}));
+const TAMANO_PAGINA_CATALOGO=12;
+let paginaCatalogo=0,platilloCatalogo=null;
+
+function renderCatalogoAlimentos(){
+  const dialog=$("#menuCatalogDialog");
+  const grupo=$("#menuCatalogGroup").value;
+  const palabras=claveMenu($("#menuCatalogSearch").value).split(" ").filter(Boolean);
+  const candidatos=grupo?platosCatalogo.filter(p=>p.grupo===grupo):platosCatalogo;
+  const porNombre=candidatos.filter(p=>palabras.every(palabra=>p.claveNombre.includes(palabra)));
+  const filtrados=porNombre.length?porNombre:candidatos.filter(p=>
+    palabras.every(palabra=>p.claveGrupo.includes(palabra)));
+  const paginas=Math.max(1,Math.ceil(filtrados.length/TAMANO_PAGINA_CATALOGO));
+  paginaCatalogo=Math.min(paginaCatalogo,paginas-1);
+  const desde=paginaCatalogo*TAMANO_PAGINA_CATALOGO;
+  $("#menuCatalogCount").textContent=filtrados.length
+    ? (desde+1)+"–"+Math.min(desde+TAMANO_PAGINA_CATALOGO,filtrados.length)+" de "+filtrados.length+" opciones"
+    : "No encontramos platillos. Prueba otra búsqueda o tipo de comida.";
+  $("#menuCatalogResults").innerHTML=filtrados.slice(desde,desde+TAMANO_PAGINA_CATALOGO).map(p=>
+    '<button class="btn ghost menuCatalogChoice" type="button" data-catalog-dish="'+p.id+'"><span aria-hidden="true">'+
+    esc(p.icono)+'</span>'+esc(p.nombre)+'</button>').join("");
+  $("#menuCatalogResults").scrollTop=0;
+  dialog.scrollTop=0;
+  $("#menuCatalogPages").hidden=paginas<=1;
+  $("#menuCatalogPrev").disabled=paginaCatalogo===0;
+  $("#menuCatalogNext").disabled=paginaCatalogo===paginas-1;
+  $("#menuCatalogPage").textContent=(paginaCatalogo+1)+" de "+paginas;
+}
+function vuelveCatalogoAlimentos(){
+  platilloCatalogo=null;
+  $("#menuCatalogList").hidden=false;
+  $("#menuCatalogForm").hidden=true;
+  renderCatalogoAlimentos();
+  $("#menuCatalogSearch").focus();
+}
+$("#menuCatalogOpen").addEventListener("click",()=>{
+  if(!puedeVer("menu")) return;
+  if(!platosCatalogo.length){toast("No se pudo cargar el catálogo de alimentos. Vuelve a abrir Restaurant.");return;}
+  $("#menuCatalogGroup").innerHTML='<option value="">Todos los tipos</option>'+gruposCatalogo.map(({grupo})=>
+    '<option value="'+esc(grupo)+'">'+esc(grupo)+'</option>').join("");
+  $("#menuCatalogSearch").value="";
+  paginaCatalogo=0;
+  $("#menuCatalogDialog").showModal();
+  vuelveCatalogoAlimentos();
+});
+$("#menuCatalogClose").addEventListener("click",()=>$("#menuCatalogDialog").close());
+$("#menuCatalogBack").addEventListener("click",vuelveCatalogoAlimentos);
+$("#menuCatalogSearch").addEventListener("input",()=>{paginaCatalogo=0;renderCatalogoAlimentos();});
+$("#menuCatalogGroup").addEventListener("change",()=>{paginaCatalogo=0;renderCatalogoAlimentos();});
+$("#menuCatalogPrev").addEventListener("click",()=>{paginaCatalogo--;renderCatalogoAlimentos();});
+$("#menuCatalogNext").addEventListener("click",()=>{paginaCatalogo++;renderCatalogoAlimentos();});
+$("#menuCatalogResults").addEventListener("click",e=>{
+  const boton=e.target.closest("[data-catalog-dish]");
+  if(!boton) return;
+  platilloCatalogo=platosCatalogo[Number(boton.dataset.catalogDish)];
+  if(!platilloCatalogo) return;
+  const {nombre,grupo,icono}=platilloCatalogo;
+  const cats=MENU.cats.slice().sort((a,b)=>num(a.orden)-num(b.orden));
+  const coincide=cats.find(c=>claveMenu(c.nombre)===claveMenu(grupo));
+  const destino=$("#menuCatalogDestination");
+  $("#menuCatalogName").textContent=nombre;
+  $("#menuCatalogIcon").textContent=icono;
+  destino.innerHTML='<option value="">Elige una categoría</option>'+cats.map(c=>
+    '<option value="'+esc(c.id)+'">'+esc(c.nombre)+'</option>').join("")+
+    (coincide?'':'<option value="nueva">Crear categoría: '+esc(grupo)+'</option>');
+  destino.value=$("#menuFiltroCategoria").value||coincide?.id||(cats.length?"":"nueva");
+  $("#menuCatalogPrice").value="";
+  $("#menuCatalogCost").value="";
+  $("#menuCatalogNotice").hidden=true;
+  $("#menuCatalogList").hidden=true;
+  $("#menuCatalogForm").hidden=false;
+  $("#menuCatalogDialog").scrollTop=0;
+  destino.focus();
+});
+$("#menuCatalogForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  if(!platilloCatalogo || !puedeVer("menu") || bloqueado) return;
+  const {nombre,grupo,icono}=platilloCatalogo;
+  const destino=$("#menuCatalogDestination").value;
+  const precio=$("#menuCatalogPrice").valueAsNumber;
+  const costo=$("#menuCatalogCost").valueAsNumber;
+  const nota=$("#menuCatalogNotice");
+  if(!Number.isFinite(precio)||precio<=0) return;
+  let categoria=destino==="nueva"
+    ? MENU.cats.find(c=>claveMenu(c.nombre)===claveMenu(grupo))
+    : MENU.cats.find(c=>c.id===destino);
+  if(!categoria && destino!=="nueva"){
+    nota.textContent="Esa categoría ya no está disponible. Vuelve al catálogo y elige otra.";
+    nota.hidden=false;
+    return;
+  }
+  if(categoria && MENU.plats.some(p=>p.catId===categoria.id&&claveMenu(p.nombre)===claveMenu(nombre))){
+    nota.textContent="Este platillo ya existe en esa categoría. Elige otra categoría o edítalo en tu menú.";
+    nota.hidden=false;
+    return;
+  }
+  if(!categoria) categoria=creaCategoriaMenu(grupo,icono);
+  const p={id:uid(),catId:categoria.id,nombre,precio,costo:Number.isFinite(costo)?costo:0,
+    mods:[],activo:true,foto:"",ivaModo:"incluido",icono};
+  MENU.plats.unshift(p);
+  menuPlatilloActivo=p.id;
+  menuCategoriaActiva=categoria.id;
+  $("#menuBuscar").value="";
+  $("#menuFiltroCategoria").value="";
+  $("#menuCatalogDialog").close();
+  persist(); renderMenu();
+  $("#t_plats [data-pk=nombre]")?.focus();
+  toast(nombre+" se agregó a tu menú");
 });
 
 /* ===================================================================
@@ -9390,6 +9651,7 @@ function bloqueaPantalla(aMano){
   if(bloqueado) return;
   const puerta = $("#acceso"); if(!puerta || !puerta.hidden) return;
   if(!aMano && !puedeBloquear()) return;
+  if($("#menuCatalogDialog").open) $("#menuCatalogDialog").close();
   pideAcceso({bloqueo:true});
 }
 function pintaRelojBloqueo(){
