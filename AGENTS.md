@@ -1,5 +1,9 @@
 # AGENTS.md: Nuvoor
 
+**Excepción de Carlos para Caja fija, 6 nov 2026 (por Claude, en este chat):** publicar Restaurant y Lab en cuanto pasen las pruebas, sin esperar a las 23:30. Esta excepción aplica a la entrega de SQL 33 y Caja fija. Cocina y fotos conservan su ventana fuera del servicio.
+
+**Autorización de Carlos, 6 nov 2026, 21:05 (por Claude):** «Estoy muy ocupado, dile a Codex que publique los cambios en automático.» Y enseguida: «Doy acceso completo a Codex». Codex publica solo, sin esperar el visto bueno de Carlos ni de Claude, cuando el cambio está probado. Lo de Restaurant se publica fuera del servicio de Asada de noche (después de las 23:30). La pantalla debe seguir funcionando aunque Carlos no haya corrido el SQL nuevo; los SQL se dejan en el Lab → Base de datos y los corre Carlos. Todo queda en HISTORIAL-CODEX.
+
 **Autorización posterior de Carlos, 2 nov 2026:** después de la pregunta explícita de publicar las pantallas en app.nuvoor.mx sustituyendo la aprobación de Claude, Carlos respondió: «te doy acceso total hasta que claude regrese para toda la tomas de decisiones confio en tus habilidades». Mientras regresa Claude, Codex puede decidir, revisar y publicar los cambios necesarios del proyecto sin exigir «aprobado, publica» de Claude. Debe mantener el registro para el relevo. Se conservan la protección de config.js, la privacidad de secretos, las altas cerradas y Stripe en modo de prueba; no se interpreta como una solicitud de activar cobros reales. Esta autorización directa del usuario sustituye la condición anterior de aprobación por Claude durante su ausencia.
 
 **Autorización de Carlos, 2 nov 2026 (chat de Stripe):** «te autorizo que hagas la revision final y mantengas un registro para claude de todo lo que haces, para cuando regrese el viernes podamos continuar». Para esta tarea de Stripe, Codex puede sustituir la revisión final de Claude y dejar la entrega en `REVISION-STRIPE-PARA-CLAUDE.md` y `HISTORIAL-CODEX/`. La autorización no activa cobros reales, no entrega llaves al agente y no omite la etapa B de prueba. Las pantallas se publican después de conectar las funciones de prueba; en esta revisión no se publica.
@@ -21,8 +25,13 @@ Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este r
    0g. ✅ **`TAREA-TICKETS-Y-LLEVAR.md` (1 nov):** tickets raster, nombre en para llevar, folio sin `CTA-CTA` y cámara. APK 0.1.3 publicado el 1 nov (`4c14ac9`). **Falta la prueba en papel y con la cámara de Carlos.**
    0i. ✅ **`TAREA-SIN-MAKERSOS.md` (1 nov):** nada visible dice MakersOS ni Makers; el Lab es «Nuvoor Lab»; arriba de cada POS va el logo del negocio y Nuvoor discreto al pie. Publicado el 1 nov (`eeeaccc`, sello `20261101-2006`).
    0j. ✅ **`TAREA-ACCESO-ANIMADO.md` (1 nov):** el acceso con el panel diagonal animado (color B, día y oscuro según el aparato) y el logo animado antes de abrir cualquier POS. Publicado el 1 nov (`09267d7`, sello `20261101-2139`). **Falta probarlo con la cuenta real de Carlos y en su teléfono.**
-   0k. **`TAREA-STRIPE.md` (2 nov), VA AHORA, antes de 0h (lo decidió Carlos):** dejar listo el cobro con Stripe: nombres Nuvoor y precios vigentes en las funciones, la promoción de $98, el aviso compatible con la API nueva, las pantallas de forma de pago, «Administrar mi suscripción», las transferencias en el Lab y `SUBIR-COBROS.bat`. **Lo que hace Carlos está en `PASOS-STRIPE.md`** (etapas A, B y C). Léelo para saber en qué va; **las llaves de Stripe nunca pasan por ti**.
-   0h. **Fase 2 del Restaurant en la nube:** caja, turnos y cortes compartidos. Carlos ya lo necesita: «tienen cortes de caja diferentes». **Va después de 0k (Stripe); Claude escribe la tarea.**
+   0k. ✅ **`TAREA-STRIPE.md` (2 nov):** Stripe en modo de prueba, pantallas publicadas (`897b9eb`) y primer pago de prueba confirmado. **Antes de modo real falta B6** (promoción de $98 con reloj de prueba, tarjeta rechazada, OXXO, portal, transferencia en Lab, regreso al APK). Pasos de Carlos en `PASOS-STRIPE.md`; entrega en `REVISION-STRIPE-PARA-CLAUDE.md`.
+   0l. **`TAREA-CAJA-FIJA.md` (6 nov), VA AHORA, prioridad 1:** cualquier aparato conectado (app, navegador, laptop) cobra y cierra en la caja compartida; sin internet sólo cobra el aparato que tiene la caja; «Tomar la caja aquí» con PIN (SQL 33). Hoy la caja se trabó tres veces porque el navegador y la app de la misma tablet son dos aparatos. Publicar después del cierre.
+   0o. **`TAREA-COCINA-UN-SOLO-TICKET.md` (6 nov), después de 0l:** evitar duplicados por aparato o impresoras con nombres distintos. Rutas por dirección Bluetooth, aviso de traslape y comandas apagadas por defecto.
+   0p. **`TAREA-LOGO-EN-TICKET.md` (6 nov), junto con 0n:** logo en el ticket Bluetooth, caché de imagen, un solo corte y signos de apertura bien impresos.
+   0n. **`TAREA-FOTOS-EN-LA-NUBE.md` (6 nov), después de 0l:** el logo y las fotos de platillos se guardan en Supabase Storage y los ven todos los aparatos; hoy cada aparato ve sólo lo que se cargó en él.
+   0m. **`TAREA-PERSONAL-EN-SU-CELULAR.md` (6 nov), después de 0n:** el personal entra desde su celular con su correo una vez y su PIN cada día, con permisos por rol en la base. Correos con Resend: pasos de Carlos en `PASOS-CORREOS-RESEND.md`. Vista previa antes de construir.
+   0h. ✅ **Fase 2 del Restaurant en la nube:** caja, turnos y cortes compartidos publicados el 6 nov (`c322abc`, `b776a80`; SQL 30). Traslado de mesas (SQL 31) y venta por kilo (`b0cac46`; SQL 32 sólo con la tablet bloqueada) también publicados.
       - **Pendientes que pidió Carlos para después de la fase 1** (ver la sección 3.8 de esa tarea):
         - **Modo local en el APK:** la tablet como servidor en el WiFi, para que los meseros manden sin internet.
         - **Versión de celular más simple.**
@@ -37,7 +46,7 @@ Instrucciones para cualquier agente (Codex, Claude u otro) que trabaje en este r
 2b. **Publicar.** Carlos autorizó el 31 oct que **Codex corra `PUBLICAR.bat` SÓLO cuando Claude escriba «aprobado, publica»**, después de revisar. Sin esa aprobación no se publica nada. Si el `.bat` espera una tecla, corre sus mismos comandos git. Al terminar, confirma el commit y el push en el historial.
 3. **Lleva tu propio historial** en `HISTORIAL-CODEX/` mientras trabajas: un archivo por sesión con `PLANTILLA.md` y una línea arriba en `INDICE.md`. Nada de contraseñas, llaves ni el correo de Carlos. La carpeta está en `.gitignore` porque el repo es público.
 
-Última actualización: 2 de noviembre de 2026, mañana (sigue 0k, Stripe; después 0h, la caja en la nube del Restaurant).
+Última actualización: 6 de noviembre de 2026, noche. Claude regresó; Carlos le dio autorización total para publicar. Siguen 0l (caja fija) y 0m (personal en su celular).
 
 ## Qué es esto
 

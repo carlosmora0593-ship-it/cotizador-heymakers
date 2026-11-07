@@ -1530,7 +1530,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261106-1804">
+<meta name="nuvoor-build" content="20261106-2329">
 <link rel="stylesheet" href="./tema-borgona.css?v=20261106-1620">
 </head>
 <body>
@@ -2190,7 +2190,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
         </section>
         <section class="impPrinterColumn" aria-label="Editar impresora" id="impEditor"></section>
       </div>
-      <p class="note" id="impAvisoWeb" hidden style="margin-top:12px">En este navegador, la impresión pide confirmación. Para usar impresoras Bluetooth directamente, abre Nuvoor en la app de Android.</p>
+      <p class="note" id="impAvisoWeb" hidden style="margin-top:12px">Para imprimir directamente en Windows, elige «Impresora de esta computadora» y abre el acceso Nuvoor Caja. Las impresoras Bluetooth se configuran desde la app de Android.</p>
     </div>
   </div>
   <div class="card" id="ajusteRespaldo" data-ajuste-panel hidden>
@@ -2975,6 +2975,13 @@ function nubePinSalt(){
   guardaSalPinRestaurant(Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join(""));
   return REST_NUBE.pinSalt;
 }
+function proyectaTicketRestaurant(c,ev){
+  const ticket={id:c.id,folio:c.folio,fecha:c.fecha||hoyISO(),cierra:c.cierra||"",mesaId:c.mesaId,mesaNombre:c.mesaNombre,cliente:c.cliente||"",personas:c.personas,mesero:c.mesero,meseroId:c.meseroId,subtotal:num(c.subtotal),servicio:num(c.servicio),propina:num(c.propina),total:num(c.total),pagos:nubeClona(c.pagos||[]),cambio:num(c.cambio),cfdi:c.cfdi||null,appId:c.appId||"",appNombre:c.appNombre||"",comisionPct:num(c.comisionPct),comision:num(c.comision),neto:num(c.neto),turnoId:c.turnoId||"",cobro:c.cobro||"",eventoId:ev};
+  if(c.analiticaVenta)ticket.analiticaVenta=nubeClona(c.analiticaVenta);
+  if(c.efectivoCaja != null) ticket.efectivoCaja = num(c.efectivoCaja);
+  if(c.cajaCompartida){ ticket.cajaCompartida = true; ticket.cajaAparato = c.cajaAparato; ticket.cajaNombre = c.cajaNombre; ticket.cobroSolicitud = c.cobroSolicitud; }
+  return ticket;
+}
 async function proyectaRestaurant(){
   const out={},ev=nubeEventoId();
   const f=P.fiscal||{},allowedConfig={nombre:P.negocio&&P.negocio.nombre||"Mi restaurante",tel:P.negocio&&P.negocio.tel||"",dir:P.negocio&&P.negocio.dir||"",iva:num(P.iva),propina:num(P.propina),servicio:num(P.servicio),apps:(P.apps||[]).map(a=>({id:a.id,nombre:a.nombre,comision:num(a.comision),color:a.color,activa:a.activa!==false})),fiscal:{razon:f.razon||"",rfc:f.rfc||"",regimen:f.regimen||"612",cpFiscal:f.cpFiscal||"",pac:f.pac||"",serie:f.serie||"A",folioFactura:num(f.folioFactura,1),sellosAlta:!!f.sellosAlta},ticket:{ancho:num(P.ticket&&P.ticket.ancho,80),encabezado:P.ticket&&P.ticket.encabezado||"",pie:P.ticket&&P.ticket.pie||"¡Gracias por su visita!",mostrarIva:P.ticket&&P.ticket.mostrarIva!==false,mostrarPropina:P.ticket&&P.ticket.mostrarPropina!==false,imprimeCocina:P.ticket&&P.ticket.imprimeCocina!==false,imprimeCuenta:P.ticket&&P.ticket.imprimeCuenta!==false,leyenda:P.ticket&&P.ticket.leyenda||""},folios:nubeClona(P.folios||{}),pinSalt:nubePinSalt()};
@@ -2991,11 +2998,7 @@ async function proyectaRestaurant(){
     nubePut(out,"rest_comandas",nubeId("comanda",c.id),head);
   (c.lineas||[]).forEach(l=>{const item=Object.assign({},nubeClona(l),{id:l.id,comandaId:c.id,eventoId:ev,categoria:l.categoria||((MENU.plats||[]).find(p=>p.id===l.platId)||{}).catId||""});delete item.foto;delete item.imagen;delete item.base64;nubePut(out,"rest_lineas",nubeId("linea",l.id),item);});
     (c.cancelaciones||[]).forEach(x=>nubePut(out,"rest_lineas",nubeId("cancelacion",x.id),Object.assign({tipo:"cancelacion",comandaId:c.id,eventoId:ev},nubeClona(x))));
-    if(c.estado==="cerrada"&&!c.cancelada){const ticket={id:c.id,folio:c.folio,fecha:c.fecha||hoyISO(),cierra:c.cierra||"",mesaId:c.mesaId,mesaNombre:c.mesaNombre,cliente:c.cliente||"",personas:c.personas,mesero:c.mesero,meseroId:c.meseroId,subtotal:num(c.subtotal),servicio:num(c.servicio),propina:num(c.propina),total:num(c.total),pagos:nubeClona(c.pagos||[]),cambio:num(c.cambio),cfdi:c.cfdi||null,appId:c.appId||"",appNombre:c.appNombre||"",comisionPct:num(c.comisionPct),comision:num(c.comision),neto:num(c.neto),turnoId:c.turnoId||"",cobro:c.cobro||"",eventoId:ev};if(c.analiticaVenta)ticket.analiticaVenta=nubeClona(c.analiticaVenta);
-      if(c.efectivoCaja != null) ticket.efectivoCaja = num(c.efectivoCaja);
-      if(c.cajaCompartida){ ticket.cajaCompartida = true; ticket.cajaAparato = c.cajaAparato; }
-      nubePut(out,"rest_tickets",nubeId("ticket",c.id),ticket);
-    }
+    if(c.estado==="cerrada"&&!c.cancelada) nubePut(out,"rest_tickets",nubeId("ticket",c.id),proyectaTicketRestaurant(c,ev));
   });
   for(const u of EQUIPO||[]){const pin=String(u.pin||"").trim(),hash=u.pin_hash||u.pinHash|| (pin?nubeSha256(nubePinSalt()+pin):null);const pin_hash=hash&&typeof hash.then==="function"?await hash:hash;nubePut(out,"rest_equipo",nubeId("persona",u.id),{id:u.id,nombre:u.nombre||"",rol:u.rol||"mesero",pin_hash:pin_hash||null,activo:u.activo!==false,eventoId:ev});}
   (EVENTOS||[]).forEach(x=>nubePut(out,"rest_eventos",String(x.id),Object.assign({},nubeClona(x),{eventoId:""})));
@@ -3176,7 +3179,7 @@ async function iniciaNubeRestaurant(){
 let consultaNubeEnCurso=null;
 function recargaCambiosNube(){
   if(!REST_NUBE.enabled||!navigator.onLine)return;
-  if(puedeVer("caja")) recargaCajaCompartida();
+  if(puedeVer("caja") || cajaEsDeAqui(cajaEstado?.turno)) recargaCajaCompartida();
   if((!document.hidden && (!$("#tab-caja").hidden || !$("#tab-ventas").hidden)) ||
      TURNOS.some(t=>t.id && !t.abierto && !cortesNube.has(nubeId("corte",t.id)))) sincronizaCortesCaja();
   if(!consultaNubeEnCurso)consultaNubeEnCurso=consultaCambiosNube().finally(()=>{consultaNubeEnCurso=null;});
@@ -5297,7 +5300,7 @@ $("#apAppOk").addEventListener("click",async()=>{
   c.cambio=0; c.efectivoCaja=0; c.comision=s.total*num(c.comisionPct)/100;
   c.neto=s.total-c.comision; c.turnoId=turnoId;
   c.cobro=usuarioActual().nombre||"";
-  if(!guardaCobroConTurno(c,anterior)) return;
+  if(!await guardaCobroConTurno(c,anterior)) return;
   if(IMPRESORAS.some(p=>p.cuenta&&p.cuentaAuto)) imprimeCuenta(c,c.pagos,0,true);
   $("#modalApp").hidden=true; comandaId=null; vaA("mesas");
   toast((c.appNombre||"Pedido por app")+" · te depositan "+mx(c.neto)+" · "+c.folio);
@@ -5479,7 +5482,7 @@ $("#cobroOk").addEventListener("click", async()=>{
   c.efectivoCaja = Math.max(0, efec - cambio);
   c.turnoId = turnoId;
   c.cobro = usuarioActual().nombre || "";
-  if(!guardaCobroConTurno(c,anterior)) return;
+  if(!await guardaCobroConTurno(c,anterior)) return;
 
   if(IMPRESORAS.some(p=>p.cuenta && p.cuentaAuto)) imprimeCuenta(c, c.pagos, prop, true);
   $("#modalCobro").hidden = true;
@@ -5531,6 +5534,15 @@ const CAJA_PENDIENTE_KEY = LS + "_caja_pendiente_v1";
 let cajaEstado = nubeLee(CAJA_ESTADO_KEY,null);
 let cajaInstalada = cajaEstado ? true : null, consultaCaja = null, envioCaja = null;
 let cajaError = "", cajaRevisadaEn = 0;
+let cajaFijaInstalada = false, cajaFijaRevisadaEn = 0, cambioCajaFijaEnCurso = false;
+const cobrosEnCurso = new Set(), solicitudesCobro = new Map();
+const nombreAparatoCaja = () => {
+  const agente = navigator.userAgent;
+  const aparato = /iPad|Tablet/i.test(agente) || (/Android/i.test(agente) && !/Mobile/i.test(agente))
+    ? "Tablet" : /Mobile|iPhone/i.test(agente) ? "Celular" : "Computadora";
+  return aparato + (window.MakersPrinter ? " · app Nuvoor" : " · navegador");
+};
+const nombreRespaldoCaja = t => t?.aparatoNombre || (cajaEsDeAqui(t) ? nombreAparatoCaja() : "Dispositivo que abrió la caja");
 const cajasEventos = new Map();
 const cajaPendiente = () => nubeLee(CAJA_PENDIENTE_KEY,null);
 const cajaEsDeAqui = t => t?.aparato === REST_NUBE.deviceId;
@@ -5547,16 +5559,76 @@ function cajaPuedeCobrarAqui(){
     toast(turnoLocalAbierto() ? "Confirma el turno con conexión antes de cobrar." : "Abre un turno en Caja antes de cobrar.");
     return false;
   }
-  if(cajaEstado?.turno && !cajaEsDeAqui(cajaEstado.turno)){
-    toast("Cobra desde el dispositivo que abrió el turno de caja.");
+  const t = turnoAbierto();
+  const respaldo = nubeLee(CAJA_ESTADO_KEY,null);
+  const turnoConfirmado = respaldo?.revision >= (cajaEstado?.revision||0) ? respaldo.turno : cajaEstado?.turno;
+  if(t?.espera || turnoConfirmado?.espera){
+    toast("La caja está esperando un cambio. Revisa Caja antes de cobrar.");
+    return false;
+  }
+  if(cajaEstado?.turno && !cajaEsDeAqui(turnoConfirmado) && (!cajaFijaInstalada || !navigator.onLine)){
+    toast(cajaFijaInstalada ? "Conéctate para cobrar." : "Por ahora, cobra en el dispositivo de caja.");
     return false;
   }
   return true;
 }
-function guardaCobroConTurno(c,anterior){
+async function guardaCobroConTurno(c,anterior){
   if(!cajaEstado){ persist(); return true; }
   c.cajaCompartida = true;
   c.cajaAparato = REST_NUBE.deviceId;
+  if(cajaFijaInstalada) c.cajaNombre = nombreAparatoCaja();
+  if(cajaFijaInstalada && navigator.onLine){
+    const id = c.id, evento = nubeEventoId();
+    COMANDAS[COMANDAS.indexOf(c)] = anterior;
+    if(cobrosEnCurso.has(id)) return false;
+    cobrosEnCurso.add(id);
+    const solicitud = solicitudesCobro.get(id) || uid();
+    solicitudesCobro.set(id,solicitud);
+    try{
+      await sincronizaNubeEnSerie(true);
+      if(nubeEventoId()!==evento || !soyAutoridad()) return false;
+      if(REST_NUBE.queue.some(q=>q.cuerpo?.comandaId===id ||
+        (q.coleccion==="rest_comandas" && q.doc_id===nubeId("comanda",id)))){
+        throw new Error("La cuenta todavía tiene cambios por subir. Espera a que se sincronicen.");
+      }
+      const datosCobro = {
+        id:restaurantSafeId(id),turnoId:c.turnoId,mesaId:c.mesaId,folio:c.folio,
+        solicitud,ticket:proyectaTicketRestaurant(c,evento),
+        lineas:Object.fromEntries(vivas(c).map(l=>[l.id,[l.cant??null,l.precio??null,l.mods||[],l.ivaModo||"incluido"]]))
+      };
+      let data;
+      try{ data = await operaCajaNube("cobrar",datosCobro); }
+      catch(err){
+        if(err.code && !/^5[0-9]{2}$/.test(err.code)) throw err;
+        // La respuesta puede perderse después de guardar. La misma solicitud recupera el ticket.
+        data = await operaCajaNube("cobrar",datosCobro);
+      }
+      for(const doc of [data.comanda,data.ticket]){
+        const key = nubeClave(doc.coleccion,doc.doc_id);
+        REST_NUBE.serverDocs[key] = doc;
+        REST_NUBE.projection[key] = doc;
+      }
+      REST_NUBE.ticketIds.add(data.ticket.doc_id);
+      solicitudesCobro.delete(id);
+      if(nubeEventoId()!==evento) return false;
+      Object.assign(c,data.ticket.cuerpo);
+      const ix=COMANDAS.findIndex(x=>x.id===id);
+      if(ix>=0) COMANDAS[ix]=c;
+      guardaEstadoLocal();
+      return true;
+    }catch(err){
+      if(["P0001","22023","42501","22P02"].includes(err.code)) solicitudesCobro.delete(id);
+      toast(err.message || "La nube no confirmó el cobro. Revisa la cuenta antes de volver a cobrar.");
+      recargaCambiosNube();
+      return false;
+    }finally{ cobrosEnCurso.delete(id); }
+  }
+  const vigente=nubeLee(CAJA_ESTADO_KEY,cajaEstado)?.turno;
+  if(!cajaEsDeAqui(vigente) || vigente.id!==c.turnoId || vigente.espera){
+    COMANDAS[COMANDAS.indexOf(c)] = anterior;
+    toast("Conéctate para cobrar.");
+    return false;
+  }
   if(!nubeGuarda(LS+"_comandas",COMANDAS)){
     COMANDAS[COMANDAS.indexOf(c)] = anterior;
     toast("No se guardó el cobro en este dispositivo. El pedido sigue pendiente.");
@@ -5595,6 +5667,11 @@ function recargaCajaCompartida(){
       cajaInstalada = cajaInstalada || data === true;
       cajaRevisadaEn = Date.now();
     }
+    if(!cajaFijaInstalada && Date.now()-cajaFijaRevisadaEn >= 60000){
+      const {data} = await restaurantWithTimeout(RESTAURANT_SB.rpc("nuvoor_rest_caja_fija_disponible"),4000);
+      cajaFijaInstalada = data === true;
+      cajaFijaRevisadaEn = Date.now();
+    }
     if(cajaInstalada){
       const consulta = RESTAURANT_SB.from("documentos").select("cuerpo")
         .eq("cuenta_id",RESTAURANT_ACCOUNT.accountId).eq("coleccion","caja_turno_v1");
@@ -5603,6 +5680,7 @@ function recargaCajaCompartida(){
       if(error) throw error;
       (data||[]).forEach(row=>recibeCajaCompartida(row.cuerpo));
       if(cajaPendiente()) await enviaCajaPendiente(false);
+      if(cajaFijaInstalada) await confirmaRespaldoCaja();
     }
     if(!cajaPendiente() && !envioCaja) cajaError = "";
   })().catch(e=>{ cajaError = e.message || "No se pudo consultar la caja."; })
@@ -5630,12 +5708,77 @@ function solicitaCajaNube(accion,datos,mostrarResultado=true){
 async function operaCajaNube(accion,datos){
   const {data,error} = await restaurantWithTimeout(RESTAURANT_SB.rpc("rest_caja_operar",{
     p_cuenta:RESTAURANT_ACCOUNT.accountId,p_evento:nubeEventoId(),p_aparato:REST_NUBE.deviceId,
-    p_accion:accion,p_datos:datos
+    p_accion:accion,p_datos:{...datos,aparatoNombre:nombreAparatoCaja()}
   }),12000);
   if(error) throw error;
   if(!data?.estado) throw new Error("La nube todavía no confirmó el cambio de caja.");
   recibeCajaCompartida(data.estado);
   return data;
+}
+function pendientesRespaldoCaja(t){
+  const pendientes = REST_NUBE.queue.filter(q=>q.cuenta_id===RESTAURANT_ACCOUNT.accountId && String(q.cuerpo?.eventoId||"")===nubeEventoId());
+  const ids = new Set(pendientes.filter(q=>q.cuerpo?.turnoId===t.id &&
+    (q.coleccion==="rest_tickets" || q.cuerpo.estado==="cobrada")).map(q=>q.cuerpo.id));
+  // Un cambio pendiente de la cuenta también puede alterar el corte.
+  return ids.size || pendientes.length;
+}
+async function confirmaRespaldoCaja(){
+  const t = cajaEstado?.turno;
+  if(!t?.espera || t.espera.confirmada || !cajaEsDeAqui(t) || cobrosEnCurso.size) return;
+  await sincronizaNubeEnSerie(true);
+  if(cajaEstado?.turno?.id!==t.id || !cajaEstado.turno.espera || cobrosEnCurso.size) return;
+  const pendientes = pendientesRespaldoCaja(t);
+  if(t.espera.pendientes!==pendientes) await operaCajaNube("confirmar_aparato",{id:t.id,pendientes});
+}
+function avisoRespaldoCaja(t){
+  const n = t.espera?.pendientes;
+  return n ? "Espera a "+nombreRespaldoCaja(t)+". Tiene "+n+" cambio(s) de caja por subir."
+    : "Deja "+nombreRespaldoCaja(t)+" en línea hasta que confirme sus cobros.";
+}
+async function confirmaCambioCajaFija(t,accion,pin,contado){
+  if(cambioCajaFijaEnCurso) return;
+  cambioCajaFijaEnCurso = true;
+  try{
+    if(!navigator.onLine) throw new Error("Conéctate para confirmar este cambio de caja.");
+    if(!/^[0-9]{4,12}$/.test(pin)) throw new Error("Escribe tu PIN de Personal.");
+    const persona = usuarioActual().id;
+    await sincronizaNubeEnSerie(true);
+    if(pendientesRespaldoCaja(t) || cobrosEnCurso.size) throw new Error("Hay cambios por subir en este dispositivo. Vuelve a intentar cuando se sincronicen.");
+    if(bloqueado || persona!==usuarioActual().id) return;
+    const datos = {id:t.id,persona,pin,contado};
+    if(!cajaEsDeAqui(t) && !turnoAbierto()?.espera?.confirmada){
+      const {estado} = await operaCajaNube("preparar",{...datos,accionFinal:accion});
+      if(!estado.turno.espera.confirmada){
+        toast(avisoRespaldoCaja(estado.turno));
+        $("#modalTurno").hidden = true;
+        return;
+      }
+    }
+    const data = await operaCajaNube(accion,datos);
+    $("#modalTurno").hidden = true;
+    if(data.corte){
+      recibeCorteCaja({doc_id:nubeId("corte",data.corte.id),cuerpo:data.corte});
+      nubeGuarda(CORTES_CACHE,Object.fromEntries(cortesNube));
+      muestraCorteCaja(data.corte);
+    }else toast("Este dispositivo quedó como respaldo de caja sin conexión.");
+  }catch(err){
+    toast(err.message || "No se pudo confirmar el cambio de caja.");
+    recargaCajaCompartida();
+  }finally{ cambioCajaFijaEnCurso = false; }
+}
+function tomarCajaAqui(){
+  const t = turnoAbierto();
+  if(!t || !cajaFijaInstalada || rolActual()!=="gerente") return;
+  $("#turnoTitulo").textContent = "Tomar la caja aquí";
+  $("#turnoCuerpo").innerHTML = '<p class="note">Este dispositivo quedará como respaldo cuando se vaya internet.</p>'+
+    '<label class="f" for="turClaveCaja">Tu PIN</label><input id="turClaveCaja" type="password" inputmode="numeric" maxlength="12" autocomplete="off">'+
+    '<div class="fila" style="margin-top:16px"><button class="btn primary ancho" id="turToma">Confirmar cambio</button></div>';
+  $("#modalTurno").hidden=false;
+  $("#turToma").onclick=()=>{
+    const pin=$("#turClaveCaja").value.trim();
+    $("#turClaveCaja").value="";
+    confirmaCambioCajaFija(t,"tomar",pin);
+  };
 }
 function enviaCajaPendiente(mostrarResultado){
   const operacion = cajaPendiente();
@@ -5781,6 +5924,8 @@ function detalleCorte(t){
   const efectivo = r.efectivoCaja ?? (t.deberia == null ? r.por?.efectivo : num(t.deberia)-num(t.fondo)-movs.movs);
   return [
     ["Tickets cobrados",String(num(r.cuentas))],
+    ...(t.cerradoPor ? [["Cerró el turno",t.cerradoPor]] : []),
+    ...(t.aparatosCobro||[]).map(a=>["Cobros · "+(a.nombre||"Dispositivo")+" ("+a.cuentas+")",mx(a.total)]),
     ["Venta neta",mx(r.venta ?? num(r.total)-num(r.propinas))],
     ["Propinas",mx(r.propinas)], ["Total cobrado",mx(r.total)],
     ...filasFormasCaja({...r.por,efectivo}),
@@ -5881,6 +6026,10 @@ function renderCaja(){
       "El turno se compartirá al abrirlo desde el dispositivo de caja.";
   }else if(local && cajaEstado.turno?.id !== local.id){
     aviso = "Caja compartida. El turno local "+local.folio+" se conservó aparte.";
+  }else if(cajaEstado.turno && cajaFijaInstalada){
+    const t=cajaEstado.turno;
+    aviso = t.espera ? (t.espera.confirmada ? "El respaldo confirmó que subió sus cobros. Termina el cambio en el dispositivo que lo pidió." : avisoRespaldoCaja(t)) :
+      "Respaldo sin internet · "+nombreRespaldoCaja(t)+". Con conexión, puedes cobrar desde cualquier dispositivo.";
   }else if(cajaEstado.turno && !cajaEsDeAqui(cajaEstado.turno)){
     aviso = "Caja compartida. Este turno se cobra y se cierra desde el dispositivo que lo abrió.";
   }
@@ -5933,7 +6082,11 @@ function renderCaja(){
       '<button class="btn" id="cajaEntrada"'+(turnoPorConfirmar||pendiente||sinConexion?' disabled':'')+'>Meter dinero</button>' +
       '<button class="btn" id="cajaSalida"'+(turnoPorConfirmar||pendiente||sinConexion?' disabled':'')+'>Sacar dinero</button>' +
       '<button class="btn acento" id="cajaCerrar" style="margin-left:auto"'+
-        (turnoPorConfirmar||pendiente||sinConexion||compartida&&!cajaEsDeAqui(t)?' disabled':'')+'>Cerrar turno</button>' +
+        (turnoPorConfirmar||pendiente||sinConexion||compartida&&!cajaFijaInstalada&&!cajaEsDeAqui(t)||t.espera&&t.espera.solicitante!==REST_NUBE.deviceId?' disabled':'')+'>Cerrar turno</button>' +
+      (compartida && cajaFijaInstalada && !cajaEsDeAqui(t) && rolActual()==="gerente" ?
+        '<button class="btn" id="cajaTomar"'+(sinConexion||t.espera&&t.espera.solicitante!==REST_NUBE.deviceId?' disabled':'')+'>Tomar la caja aquí</button>' : '') +
+      (t.espera && (t.espera.solicitante===REST_NUBE.deviceId || cajaEsDeAqui(t)) ?
+        '<button class="btn" id="cajaReanudar"'+(sinConexion?' disabled':'')+'>Cancelar cambio de caja</button>' : '') +
     '</div>';
 
   $("#t_movs").innerHTML = '<thead><tr><th>Hora</th><th>Qué</th><th>Nota</th><th class="der">Monto</th></tr></thead><tbody>' +
@@ -6000,6 +6153,10 @@ $("#cajaCuerpo").addEventListener("click", e=>{
   if(e.target.closest("#cajaEntrada")){ movimiento("entrada"); return; }
   if(e.target.closest("#cajaSalida")) { movimiento("salida"); return; }
   if(e.target.closest("#cajaCerrar")) { cierraTurno(); return; }
+  if(e.target.closest("#cajaTomar")) { tomarCajaAqui(); return; }
+  if(e.target.closest("#cajaReanudar")) {
+    operaCajaNube("reanudar",{id:turnoAbierto()?.id}).catch(err=>toast(err.message));
+  }
 });
 function abreTurno(){
   if(!puedeVer("caja") || turnoAbierto()) return;
@@ -6062,7 +6219,7 @@ function movimiento(tipo){
 }
 function cierraTurno(){
   const t = turnoAbierto(); if(!t) return;
-  if(cajaEstado && !cajaEsDeAqui(t)){ toast("Cierra este turno desde el dispositivo que lo abrió."); return; }
+  if(cajaEstado && !cajaFijaInstalada && !cajaEsDeAqui(t)){ toast("Por ahora, cierra el turno en el dispositivo de caja."); return; }
   const ab = abiertas();
   if(ab.length){
     toast("Hay " + ab.length + " comanda(s) abierta(s). Ciérralas antes de cerrar " + (POS_EVENTO ? "la caja móvil." : "el turno de caja."));
@@ -6075,6 +6232,7 @@ function cierraTurno(){
     'no para confirmarlo.</p>' +
     '<label class="f" for="turContado">Dinero contado</label>' +
     '<input id="turContado" type="number" min="0" step="0.01" value="">' +
+    (cajaEstado && cajaFijaInstalada ? '<label class="f" for="turClaveCaja">Tu PIN</label><input id="turClaveCaja" type="password" inputmode="numeric" maxlength="12" autocomplete="off">' : '') +
     '<div class="fila" style="margin-top:16px"><button class="btn acento ancho" id="turCierra">Cerrar y ver el corte</button></div>';
   $("#modalTurno").hidden = false;
   setTimeout(()=>{ const f = $("#turContado"); if(f) f.focus(); }, 60);
@@ -6083,6 +6241,12 @@ function cierraTurno(){
     if(abiertas().length){ toast("Hay comandas abiertas. Ciérralas antes de hacer el corte."); return; }
     const campo = $("#turContado"), contado = campo.valueAsNumber;
     if(!Number.isFinite(contado) || contado<0){ toast("Escribe el efectivo contado, aunque sea cero."); campo.focus(); return; }
+    if(cajaEstado && cajaFijaInstalada){
+      const pin=$("#turClaveCaja").value.trim();
+      $("#turClaveCaja").value="";
+      confirmaCambioCajaFija(t,"cerrar",pin,contado);
+      return;
+    }
     if(cajaEstado){ solicitaCajaNube("cerrar",{id:t.id,contado}); return; }
     if(cajaUsaNube()) return;
     const actual = revisaTurnoCaja(t.id); if(!actual) return;
@@ -7736,6 +7900,7 @@ async function ejecutaTrabajoImpresoraPOS(trabajo){
     return await esperando;
   }
   const mm=num(p.anchoPapelBt,80)===58?58:80;
+  if(p.conexion==="computadora") return imprimeEnComputadora(trabajo,mm);
   if(puente && typeof puente.printHtmlSystem==="function"){
     const id="imp-sys-"+uid(), esperando=esperaResultadoImpresoraPOS(id,120000);
     try{ puente.printHtmlSystem(id,trabajo.titulo,mm,trabajo.cuerpo,hojaTicket(mm)); }
@@ -7750,6 +7915,33 @@ async function ejecutaTrabajoImpresoraPOS(trabajo){
     w.document.close(); w.focus(); w.print();
     return {ok:true,mensaje:""};
   }catch(e){ try{w.close();}catch(_){} return {ok:false,mensaje:"No se pudo abrir la impresión."}; }
+}
+function imprimeEnComputadora(trabajo,mm){
+  return new Promise(resolve=>{
+    const marco=document.createElement("iframe");
+    marco.title="Impresión de Nuvoor";
+    marco.style.cssText="position:fixed;bottom:0;right:0;width:1px;height:1px;border:0;opacity:0;pointer-events:none";
+    marco.setAttribute("aria-hidden","true");
+    marco.tabIndex=-1;
+    const termina=(ok,mensaje="")=>{
+      clearTimeout(limite);
+      marco.remove();
+      resolve({ok,mensaje});
+    };
+    let limite=setTimeout(()=>termina(false,"No se pudo preparar el ticket para imprimir."),10000);
+    marco.onload=()=>{
+      clearTimeout(limite);
+      try{
+        const destino=marco.contentWindow;
+        limite=setTimeout(()=>termina(true),120000);
+        destino.addEventListener("afterprint",()=>termina(true),{once:true});
+        destino.print();
+      }catch(_){termina(false,"No se pudo enviar el ticket a la impresora de esta computadora.");}
+    };
+    marco.srcdoc='<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>'+esc(trabajo.titulo)+
+      '</title><style>'+hojaTicket(mm)+'</style></head><body>'+trabajo.cuerpo+'</body></html>';
+    document.body.append(marco);
+  });
 }
 async function procesaColaImpresionPOS(){
   if(procesandoColaImpresionPOS) return;
@@ -7778,7 +7970,7 @@ function reintentaTrabajoImpresoraPOS(indice){
 }
 function impresorasParaTicketPOS(tipo,automatico){
   return IMPRESORAS.filter(p=> tipo==="cuenta" ? p.cuenta && (!automatico || p.cuentaAuto)
-    : tipo==="comanda" ? p.cocina : tipo==="cancelacion" ? p.cancela : false);
+    : p.conexion!=="computadora" && (tipo==="comanda" ? p.cocina : tipo==="cancelacion" ? p.cancela : false));
 }
 function imprimeHoja(titulo,cuerpo,opciones={}){
   const destinos=opciones.impresora ? [opciones.impresora] : opciones.impresoraId
@@ -9310,7 +9502,7 @@ function renderListaImpresorasPOS(){
   }
   lista.innerHTML=IMPRESORAS.map(p=>{
     const emparejada=etiquetaImpresoraBluetoothPOS(p.impresoraNombre,p.impresoraBt);
-    const conexion=p.conexion==="bluetooth"?emparejada:"Otra impresora · pide confirmar";
+    const conexion=p.conexion==="bluetooth"?emparejada:p.conexion==="computadora"?"Impresora de esta computadora":"Otra impresora · pide confirmar";
     return '<button class="impPrinterChoice" type="button" data-imp-editar="'+esc(p.id)+'" aria-pressed="'+(p.id===impresoraEnEdicionPOS)+'">'+
       '<span class="impPrinterChoiceTop"><span class="impPrinterGlyph" aria-hidden="true">▤</span><strong>'+esc(p.nombre||"Impresora")+'</strong><span class="impPrinterState">Configurada</span></span>'+
       '<span class="impPrinterMeta">'+esc(conexion)+' · '+num(p.anchoPapelBt,80)+' mm</span>'+
@@ -9321,7 +9513,7 @@ function renderEditorImpresoraPOS(){
   const editor=$("#impEditor"); if(!editor) return;
   const p=borradorImpresoraPOS;
   if(!p){ editor.innerHTML='<header><h3>Editar impresora</h3></header><div class="impPrinterHint">Selecciona una impresora de la lista o agrega una nueva.</div>'; return; }
-  const nativa=!!window.MakersPrinter, conexion=nativa?(p.conexion||"bluetooth"):"sistema";
+  const nativa=!!window.MakersPrinter, conexion=nativa?(p.conexion||"bluetooth"):(p.conexion==="computadora"?"computadora":"sistema");
   const soportaCorte=nativa&&(typeof window.MakersPrinter.printTicket==="function"||typeof window.MakersPrinter.printKitchenTicket==="function");
   const textoSimple=conexion==="bluetooth"&&typeof window.MakersPrinter.printKitchenTicket!=="function";
   const dispositivoGuardado=p.impresoraBt?{address:p.impresoraBt,name:p.impresoraNombre||"Impresora guardada"}:null;
@@ -9333,18 +9525,18 @@ function renderEditorImpresoraPOS(){
     '<span class="hint">'+esc(p.nombre||"Nueva")+'</span></header><div class="impPrinterEditor">'+
     '<div class="impPrinterFields"><div class="impPrinterField"><label class="f" for="impNombre">Nombre de la impresora</label><input id="impNombre" data-imp-campo="nombre" value="'+esc(p.nombre||"")+'" maxlength="40" placeholder="Caja, Taqueros, Barra…"></div>'+
     '<div class="impPrinterField"><label class="f" for="impConexion">Conexión</label><select id="impConexion" data-imp-campo="conexion">'+
-      (nativa?'<option value="bluetooth"'+(conexion==="bluetooth"?' selected':'')+'>Bluetooth</option><option value="sistema"'+(conexion==="sistema"?' selected':'')+'>Otra impresora (pide confirmar)</option>':'<option value="sistema" selected>Otra impresora (pide confirmar)</option>')+
-    '</select>'+(nativa?'':'<small class="hint">Esta opción pide confirmar cada impresión.</small>')+'</div></div>'+
+      (nativa?'<option value="bluetooth"'+(conexion==="bluetooth"?' selected':'')+'>Bluetooth</option><option value="sistema"'+(conexion==="sistema"?' selected':'')+'>Otra impresora (pide confirmar)</option>':'<option value="sistema"'+(conexion==="sistema"?' selected':'')+'>Otra impresora (pide confirmar)</option><option value="computadora"'+(conexion==="computadora"?' selected':'')+'>Impresora de esta computadora</option>')+
+    '</select>'+(conexion==="computadora"?'<small class="hint">Usa la impresora predeterminada de Windows. <a href="../descargas/CAJA-LAPTOP.bat" download>Descargar acceso Nuvoor Caja</a> para imprimir sin confirmar.</small>':'')+'</div></div>'+
     (nativa&&conexion==="bluetooth"?'<div class="impPrinterField"><label class="f" for="impEmparejada">Impresora Bluetooth emparejada</label><div class="impPrinterConnection"><select id="impEmparejada" data-imp-campo="impresoraBt"><option value="">Busca impresoras emparejadas</option>'+opciones+'</select><button class="btn sm" type="button" id="impBuscar">Buscar emparejadas</button></div></div>':'')+
     '<div class="impPrinterFields"><div class="impPrinterField"><span class="f">Ancho de papel</span><div class="impPrinterPaper" role="group" aria-label="Ancho de papel">'+
       '<button type="button" data-imp-ancho="58" aria-pressed="'+(num(p.anchoPapelBt,80)===58)+'">58 mm</button><button type="button" data-imp-ancho="80" aria-pressed="'+(num(p.anchoPapelBt,80)!==58)+'">80 mm</button></div></div>'+
-      '<div class="impPrinterField"><span class="f">Impresora seleccionada</span><div class="impPrinterHint">'+esc(conexion==="bluetooth"?etiquetaImpresoraBluetoothPOS(p.impresoraNombre,p.impresoraBt):"Otra impresora · confirmación al imprimir")+'</div></div></div>'+
+      '<div class="impPrinterField"><span class="f">Impresora seleccionada</span><div class="impPrinterHint">'+esc(conexion==="bluetooth"?etiquetaImpresoraBluetoothPOS(p.impresoraNombre,p.impresoraBt):conexion==="computadora"?"Predeterminada de Windows":"Otra impresora · confirmación al imprimir")+'</div></div></div>'+
     '<div class="impPrinterSwitches"><label class="impPrinterSwitch"><span>Cuentas y recibos<small>Imprime la cuenta final.</small></span><input type="checkbox" data-imp-check="cuenta"'+(p.cuenta?' checked':'')+'></label>'+
     (p.cuenta?'<label class="impPrinterSwitch"><span>Imprimir la cuenta automáticamente al cobrar<small>Se manda a esta impresora al terminar el cobro.</small></span><input type="checkbox" data-imp-check="cuentaAuto"'+(p.cuentaAuto?' checked':'')+'></label>':'')+
-    '<label class="impPrinterSwitch"><span>Comandas de cocina<small>Imprime los pedidos nuevos que se mandan a cocina.</small></span><input type="checkbox" data-imp-check="cocina"'+(p.cocina?' checked':'')+'></label>'+
-    '<label class="impPrinterSwitch"><span>Cancelaciones<small>Avisa a cocina de lo que se cancela después de enviarlo.</small></span><input type="checkbox" data-imp-check="cancela"'+(p.cancela?' checked':'')+'></label>'+
+    (conexion==="computadora"?'':'<label class="impPrinterSwitch"><span>Comandas de cocina<small>Imprime los pedidos nuevos que se mandan a cocina.</small></span><input type="checkbox" data-imp-check="cocina"'+(p.cocina?' checked':'')+'></label>'+
+    '<label class="impPrinterSwitch"><span>Cancelaciones<small>Avisa a cocina de lo que se cancela después de enviarlo.</small></span><input type="checkbox" data-imp-check="cancela"'+(p.cancela?' checked':'')+'></label>')+
      '<label class="impPrinterSwitch"><span>Corta el papel sola (cortador automático)<small>'+(conexion!=="bluetooth"?"Disponible con impresora Bluetooth en la app de Android.":!soportaCorte?"Actualiza Nuvoor para controlar el cortador.":p.corteAutomatico?"Avanza unas líneas y corta cada ticket por separado.":"No manda el corte y deja más papel para cortar a mano.")+'</small></span><input type="checkbox" data-imp-check="corteAutomatico"'+(p.corteAutomatico?' checked':'')+((conexion!=="bluetooth"||!soportaCorte)?' disabled':'')+'></label></div>'+
-    (p.cocina?'<div class="impPrinterCategory"><label class="impPrinterSwitch"><span>Imprime todas las categorías<small>Desactívalo para elegir qué platillos salen aquí.</small></span><input type="checkbox" data-imp-todas-cats'+(todas?' checked':'')+'></label>'+
+    (p.cocina&&conexion!=="computadora"?'<div class="impPrinterCategory"><label class="impPrinterSwitch"><span>Imprime todas las categorías<small>Desactívalo para elegir qué platillos salen aquí.</small></span><input type="checkbox" data-imp-todas-cats'+(todas?' checked':'')+'></label>'+
       (!todas?'<div class="impPrinterCategoryList">'+cats.map(c=>'<label><input type="checkbox" data-imp-cat="'+esc(c.id)+'"'+(elegidas.includes(c.id)?' checked':'')+'> '+esc(c.nombre)+'</label>').join("")+'</div>':'')+'</div>':'')+
     (textoSimple?'<p class="note">Esta versión de Android imprime con letra normal. Para usar letra grande, <a href="../descargas/">descarga la actualización de Nuvoor</a>.</p>':'')+
     '<div class="impPrinterActions"><button class="btn sm" type="button" id="impPrueba">Impresión de prueba</button>'+
@@ -9392,7 +9584,8 @@ function guardaBorradorImpresoraPOS(){
   if(!borradorImpresoraPOS) return;
   const p=Object.assign({},borradorImpresoraPOS,{nombre:String(borradorImpresoraPOS.nombre||"").trim()});
   if(!p.nombre){toast("Escribe un nombre para la impresora.");$("#impNombre")?.focus();return;}
-  if(!window.MakersPrinter) p.conexion="sistema";
+  if(!window.MakersPrinter && p.conexion!=="computadora") p.conexion="sistema";
+  if(p.conexion==="computadora"){p.cocina=false;p.cancela=false;p.corteAutomatico=false;p.cuenta=true;}
   if(p.conexion==="bluetooth"&&!p.impresoraBt){toast("Busca y elige una impresora Bluetooth emparejada.");return;}
   if(!p.cuenta) p.cuentaAuto=false;
   if(!p.cocina) p.categorias=[];
@@ -9402,7 +9595,7 @@ function guardaBorradorImpresoraPOS(){
     if(ix>=0) IMPRESORAS[ix]=p; else IMPRESORAS.push(p);
   }else{ p.id=uid(); IMPRESORAS.push(p); impresoraEnEdicionPOS=p.id; }
   guardaImpresorasPOS(); borradorImpresoraPOS=JSON.parse(JSON.stringify(p));
-  renderImpresorasPOS(); toast("Impresora guardada en esta tablet.");
+  renderImpresorasPOS(); toast("Impresora guardada en este dispositivo.");
 }
 function imprimePruebaImpresoraPOS(){
   const p=borradorImpresoraPOS; if(!p) return;
