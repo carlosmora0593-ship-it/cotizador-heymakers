@@ -1,11 +1,11 @@
-const CACHE_NAME = "nuvoor-restaurant-v50-guardar-configuracion";
+const CACHE_NAME = "nuvoor-restaurant-v51-colores-invertidos";
 const MEDIOS_CACHE = "nuvoor-restaurant-medios-v1";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,
   new URL("index.html", APP_SCOPE).href,
   new URL("manifest.webmanifest", APP_SCOPE).href,
-  new URL("tema-borgona.css?v=20261106-1620", APP_SCOPE).href,
+  new URL("tema-borgona.css?v=20261107-1300", APP_SCOPE).href,
   new URL("catalogo-alimentos.js?v=1", APP_SCOPE).href,
   new URL("../config.js", APP_SCOPE).href,
   new URL("../facturacion-pos.js?v=20261104-2206", APP_SCOPE).href,
