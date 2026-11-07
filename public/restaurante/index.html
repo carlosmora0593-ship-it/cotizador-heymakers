@@ -1530,7 +1530,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261106-2329">
+<meta name="nuvoor-build" content="20261106-2346">
 <link rel="stylesheet" href="./tema-borgona.css?v=20261106-1620">
 </head>
 <body>
@@ -2513,6 +2513,14 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
   </div>
 </div>
 
+<div class="modal" id="modalCocinaTraslape" style="z-index:9750" hidden>
+  <div class="card"><header><h2>Otro equipo ya imprime en cocina</h2></header><div class="body">
+    <p>Estas categorías ya tienen una impresora activa. Confirma si quieres una segunda copia en otra impresora.</p>
+    <p class="note" id="cocinaTraslapeLista" style="white-space:pre-line"></p>
+    <div class="fila"><button class="btn primary" id="cocinaSoloOtra">Dejar solo la otra</button>
+      <button class="btn" id="cocinaDos">Imprimir en las dos (son impresoras distintas)</button></div>
+  </div></div>
+</div>
 <div class="modal ancho" id="modalExp" hidden>
   <div class="card">
     <header><h2 id="expTitulo">Expediente</h2><button class="btn sm" id="expCerrar" style="margin-left:auto">Cerrar</button></header>
@@ -3148,6 +3156,7 @@ async function iniciaNubeRestaurant(){
   const rawCloud=nubeDocsDesdeServidor(),cloud=nubeDocsDeContexto(rawCloud),remoteCfg=Object.values(cloud).find(d=>d.coleccion==="rest_config");guardaSalPinRestaurant(remoteCfg?.cuerpo.pinSalt);
   const local=await proyectaRestaurant(),esDemo=restauranteEsEjemploSinCambios(),hasMigration=REST_NUBE.queue.some(q=>q&&q.migracion===true&&String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)),migrationElegida=localStorage.getItem(REST_NUBE_MIGRATION_FLAG)==="si",hasLocal=REST_LOCAL_START_KEYS.size>0||Object.keys(REST_NUBE.projection).length>0||REST_NUBE.queue.length>0||esDemo;
   REST_NUBE.enabled=true;REST_NUBE.ready=true;
+  await iniciaRegistroCocinaPOS();
   const hayNube=Object.keys(cloud).length>0;
   const teniaContexto=Object.values(REST_NUBE.projection).some(d=>d.coleccion==="rest_config"&&String(d.cuerpo?.eventoId||"")===nubeEventoId());
   if(hayNube&&!hasMigration&&teniaContexto&&nubeTieneBaseSincronizada()&&tieneCocinaBluetoothPOS()){
@@ -3268,7 +3277,105 @@ function aplicaDocumentosRestaurant(docs){
 function descargaEventoRestaurant(ev){if(REST_NUBE.localOnly||!REST_NUBE.enabled)return;const doc={cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:"rest_eventos",doc_id:String(ev.id),cuerpo:Object.assign({},nubeClona(ev),{eventoId:""})};nubeQueueDoc(doc);vaciaColaNube();}
 function guardaEventosNube(){if(!restaurando&&REST_NUBE.enabled)sincronizaNubeEnSerie(true);}
 function nubeResumenImpresion(c,lineas){return (lineas||[]).map(l=>Object.assign({},l,{comandaId:c.id,categoria:l.categoria||((MENU.plats||[]).find(p=>p.id===l.platId)||{}).catId||""}));}
-function rutaImpresoraNube(p){const cats=(p.categorias||[]).slice().sort().join(",")||"todas",norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");return norm(p.nombre||"cocina")+"|"+cats;}
+function rutaImpresoraAnteriorPOS(p){const cats=(p.categorias||[]).slice().sort().join(",")||"todas",norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");return norm(p.nombre||"cocina")+"|"+cats;}
+function rutaImpresoraNube(p){return p.rutaNube||rutaImpresoraAnteriorPOS(p);}
+const macImpresoraPOS = p => p.conexion==="bluetooth" ? String(p.impresoraBt||"").replace(/[^a-f0-9]/gi,"").toLowerCase() : "";
+const categoriasSeCruzanPOS = (a,b) => !a.categorias?.length || !b.categorias?.length || a.categorias.some(x=>b.categorias.includes(x));
+let estacionesCocinaPOS=[], registroCocinaDisponible=false, cocinaRegistroPendiente=false, guardandoImpresoraPOS=false;
+function identidadImpresoraPOS(p){
+  const mac=macImpresoraPOS(p);
+  return mac.length===12 ? "bt-"+mac : "sistema-"+restaurantSafeId(REST_NUBE.deviceId+"-"+p.id).slice(0,120);
+}
+function registroImpresorasPOS(lista){
+  return lista.map(p=>({id:p.id,nombre:p.nombre,ruta:identidadImpresoraPOS(p),
+    categorias:p.categorias||[],cocina:!!p.cocina,cancela:!!p.cancela,
+    aliases:[...new Set([rutaImpresoraAnteriorPOS(p),p.rutaNube,...(p.rutasAnteriores||[])].filter(Boolean))]}));
+}
+async function consultaEstacionesCocinaPOS(){
+  if(!REST_NUBE.enabled || !navigator.onLine || !RESTAURANT_SB) return false;
+  const {data,error}=await restaurantWithTimeout(RESTAURANT_SB.rpc("rest_cocina_estaciones",{
+    p_cuenta:RESTAURANT_ACCOUNT.accountId,p_evento:nubeEventoId()
+  }),5000);
+  if(error?.code==="PGRST202") return false;
+  if(error) throw error;
+  if(!Array.isArray(data)) return false;
+  registroCocinaDisponible=true; estacionesCocinaPOS=data;
+  return true;
+}
+function aplicaRegistroImpresorasPOS(lista,registro){
+  for(const p of lista){
+    const dato=registro.find(r=>r.ruta===identidadImpresoraPOS(p));
+    if(dato){p.rutaNube=dato.ruta;p.rutasAnteriores=dato.aliases;}
+  }
+}
+async function registraCocinaPOS(lista,confirmar=false){
+  const {data,error}=await RESTAURANT_SB.rpc("rest_cocina_configurar",{
+    p_cuenta:RESTAURANT_ACCOUNT.accountId,p_aparato:REST_NUBE.deviceId,p_evento:nubeEventoId(),
+    p_nombre:nombreAparatoCaja(),p_impresoras:registroImpresorasPOS(lista),p_confirmar:confirmar
+  });
+  if(error) throw error;
+  if(!data || !Array.isArray(data.conflictos)) throw new Error("No se pudo confirmar la configuración de cocina.");
+  if(data.guardado) aplicaRegistroImpresorasPOS(lista,data.impresoras||[]);
+  return data;
+}
+async function iniciaRegistroCocinaPOS(){
+  try{
+    if(!await consultaEstacionesCocinaPOS()) return;
+    const actual=estacionesCocinaPOS.find(e=>e.aparato===REST_NUBE.deviceId);
+    if(actual){aplicaRegistroImpresorasPOS(IMPRESORAS,actual.impresoras||[]);lsSet("impresoras",IMPRESORAS);return;}
+    if(!IMPRESORAS.some(p=>p.cocina||p.cancela)) return;
+    const data=await registraCocinaPOS(destinosUnicosImpresoraPOS(IMPRESORAS));
+    cocinaRegistroPendiente=!data.guardado;
+    if(cocinaRegistroPendiente){
+      await detieneCocinaFondoPOS();
+      toast("Otro equipo ya imprime estas categorías. Revisa Impresoras antes de activar esta cocina.");
+    }else{aplicaRegistroImpresorasPOS(IMPRESORAS,data.impresoras||[]);lsSet("impresoras",IMPRESORAS);}
+  }catch(err){
+    // La configuración local sigue disponible si todavía no se instaló la migración.
+    if(registroCocinaDisponible){cocinaRegistroPendiente=true;toast(err.message||"Revisa la conexión de cocina en Ajustes.");}
+  }
+}
+function conflictosCocinaLocalesPOS(lista){
+  const filas=Object.values(REST_NUBE.serverDocs).filter(r=>r.coleccion==="rest_lineas");
+  const conflictos=[];
+  for(const row of filas){
+    for(const [ruta,marca] of Object.entries(row.cuerpo.impreso||{})){
+      if(marca.por===REST_NUBE.deviceId || Date.now()-Date.parse(marca.en||"")>86400000) continue;
+      const cats=ruta.split("|")[1],categorias=!cats||cats==="todas"?[]:cats.split(",");
+      if(lista.some(p=>(p.cocina||p.cancela)&&categoriasSeCruzanPOS(p,{categorias})) && !conflictos.some(c=>c.aparato===marca.por)){
+        conflictos.push({aparato:marca.por,nombre:"Otro equipo · "+String(marca.por||"").slice(-6),impresora:ruta.split("|")[0],categorias});
+      }
+    }
+  }
+  return conflictos;
+}
+function confirmaTraslapeCocinaPOS(conflictos){
+  return new Promise(resolve=>{
+    const modal=$("#modalCocinaTraslape");
+    $("#cocinaTraslapeLista").textContent=conflictos.map(c=>{
+      const cats=(c.categorias||[]).map(id=>MENU.cats.find(x=>x.id===id)?.nombre||id);
+      return c.nombre+" · "+c.impresora+" · "+(cats.join(", ")||"todas las categorías");
+    }).join("\n");
+    modal.hidden=false;
+    const termina=doble=>{modal.hidden=true;resolve(doble);};
+    $("#cocinaSoloOtra").onclick=()=>termina(false);
+    $("#cocinaDos").onclick=()=>termina(true);
+  });
+}
+function destinosUnicosImpresoraPOS(lista){
+  const out=new Map();
+  for(const p of lista){
+    const mac=macImpresoraPOS(p),clave=mac.length===12?mac:p.id;
+    const previo=out.get(clave);
+    if(!previo){out.set(clave,{...p,categorias:(p.categorias||[]).slice()});continue;}
+    previo.categorias=!previo.categorias.length||!p.categorias?.length?[]:[...new Set([...previo.categorias,...p.categorias])];
+    previo.cuentaAuto=previo.cuentaAuto||p.cuentaAuto;
+    previo.cocina=previo.cocina||p.cocina; previo.cancela=previo.cancela||p.cancela;
+    previo.rutasAnteriores=[...new Set([...(previo.rutasAnteriores||[]),rutaImpresoraAnteriorPOS(p),p.rutaNube,...(p.rutasAnteriores||[])].filter(Boolean))];
+  }
+  return [...out.values()];
+}
+
 function claveFallaImpresionNube(linea,ruta){return String(linea&&linea.id||linea||"")+"|"+String(ruta||"");}
 async function reclamaLineasNube(lineas,ruta,tipo){if(!REST_NUBE.enabled||!navigator.onLine)return {lineas,offline:true};const pre=tipo==="cancelacion"?"cancelacion":"linea",ids=(lineas||[]).map(x=>String(x.id));const {data,error}=await RESTAURANT_SB.rpc("rest_reclama_impresion",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_lineas:ids.map(id=>nubeId(pre,id)),p_ruta:ruta,p_aparato:REST_NUBE.deviceId});if(error)throw error;const claimed=new Set((data||[]).map(x=>String(x).replace(new RegExp("^"+pre+"_"),"")));return {lineas:(lineas||[]).filter(x=>claimed.has(String(x.id))),offline:false};}
 async function confirmaLineasNube(lineas,ruta,tipo){const pre=tipo==="cancelacion"?"cancelacion":"linea",ids=(lineas||[]).map(x=>nubeId(pre,x.id)),{data,error}=await RESTAURANT_SB.rpc("rest_confirma_impresion",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_lineas:ids,p_ruta:ruta,p_aparato:REST_NUBE.deviceId});if(error)throw error;const ok=new Set(data||[]);if(ids.some(id=>!ok.has(id))){const rows=ids.map(id=>REST_NUBE.serverDocs[nubeClave("rest_lineas",id)]).filter(Boolean);if(ids.length===1&&rows[0]&&rows[0].cuerpo&&((rows[0].cuerpo.impreso||{})[ruta]||{}).ok)return true;throw new Error("El reclamo ya no pertenece a este aparato.");}return true;}
@@ -3462,10 +3569,6 @@ async function detieneCocinaFondoPOS(){
   try{await RESTAURANT_SB.rpc("rest_bt_apaga",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_aparato:REST_NUBE.deviceId});}catch(_){}
 }
 function guardaImpresorasPOS(){
-  if(window.MakersPrinter?.kitchenBackgroundActive?.()){
-    detieneCocinaFondoPOS();
-    $("#impFondoEstado").textContent="Cambió la impresora. Activa de nuevo la impresión con pantalla apagada.";
-  }
   lsSet("impresoras", IMPRESORAS); actualizaPantallaCocinaPOS();
 }
 let impresorasEmparejadasPOS = [];
@@ -4749,7 +4852,19 @@ function renderComanda(){
 }
 const ET_EDO = {pedido:"en cocina", preparando:"preparando", listo:"listo", entregada:"entregado"};
 const reimpresionesEnCursoPOS = new Set();
-function lineaImpresionEstado(linea){const entries=Object.entries(linea.impreso||{});if(!entries.length)return "";const nombres=entries.map(([ruta])=>{const p=IMPRESORAS.find(x=>rutaImpresoraNube(x)===ruta);return p?p.nombre:(ruta.split("|")[0]||"cocina").replace(/-/g," ");});return '<small class="impresoEstado">Impreso en '+esc([...new Set(nombres)].join(", "))+' ✓</small>';}
+function lineaImpresionEstado(linea){
+  const marcas=Object.entries(linea.impreso||{}).filter(([,m])=>m.ok===true);
+  if(!marcas.length)return Object.keys(linea.impreso||{}).length?'<small class="impresoEstado">Impresión pendiente</small>':"";
+  const nombres=marcas.map(([ruta,marca])=>{
+    const equipo=estacionesCocinaPOS.find(e=>e.aparato===marca.por);
+    const p=IMPRESORAS.find(x=>rutaImpresoraNube(x)===ruta||x.rutasAnteriores?.includes(ruta))||
+      equipo?.impresoras?.find(x=>x.ruta===ruta||x.aliases?.includes(ruta));
+    const nombre=p?.nombre||(ruta.startsWith("bt-")?"Impresora Bluetooth":ruta.split("|")[0].replace(/-/g," "));
+    const aparato=marca.por===REST_NUBE.deviceId?nombreAparatoCaja():equipo?.nombre||"Equipo · "+String(marca.por||"").slice(-6);
+    return nombre+" · "+aparato;
+  });
+  return '<small class="impresoEstado">Impreso en '+esc([...new Set(nombres)].join(", "))+' ✓</small>';
+}
 function pintaLineas(){
   const c = comandaActual(); if(!c) return;
   const n = Math.max(1, num(c.personas,1));
@@ -7969,8 +8084,8 @@ function reintentaTrabajoImpresoraPOS(indice){
   colaImpresionPOS.unshift(fallido.trabajo); muestraErroresImpresoraPOS(); procesaColaImpresionPOS();
 }
 function impresorasParaTicketPOS(tipo,automatico){
-  return IMPRESORAS.filter(p=> tipo==="cuenta" ? p.cuenta && (!automatico || p.cuentaAuto)
-    : p.conexion!=="computadora" && (tipo==="comanda" ? p.cocina : tipo==="cancelacion" ? p.cancela : false));
+  return destinosUnicosImpresoraPOS(IMPRESORAS.filter(p=> tipo==="cuenta" ? p.cuenta && (!automatico || p.cuentaAuto)
+    : !cocinaRegistroPendiente && p.conexion!=="computadora" && (tipo==="comanda" ? p.cocina : tipo==="cancelacion" ? p.cancela : false)));
 }
 function imprimeHoja(titulo,cuerpo,opciones={}){
   const destinos=opciones.impresora ? [opciones.impresora] : opciones.impresoraId
@@ -8236,7 +8351,7 @@ async function imprimeComandaRutaNube(c,p,lineas,tipo,contenido,forzado,reclamoY
 }
 async function imprimeComandaCocina(c,lineas,yaEnNube){
   if(!c||!lineas||!lineas.length)return;
-  const destinos=IMPRESORAS.filter(p=>p.cocina&&lineasParaImpresoraPOS(lineas,p).length);
+  const destinos=impresorasParaTicketPOS("comanda",false).filter(p=>lineasParaImpresoraPOS(lineas,p).length);
   if(!destinos.length)return;
   if(REST_NUBE.enabled&&navigator.onLine&&!yaEnNube)await sincronizaNubeEnSerie(true);
   const jobs=destinos.map(async p=>{const filtradas=lineasParaImpresoraPOS(lineas,p);if(filtradas.length)await imprimeComandaRutaNube(c,p,filtradas,"comanda");});
@@ -9547,6 +9662,10 @@ function renderImpresorasPOS(){
   actualizaPantallaCocinaPOS();
   renderListaImpresorasPOS(); renderEditorImpresoraPOS();
   const aviso=$("#impAvisoWeb"); if(aviso) aviso.hidden=!!window.MakersPrinter;
+  let alerta=$("#cocinaRegistroAviso");
+  if(!alerta){alerta=document.createElement("p");alerta.id="cocinaRegistroAviso";alerta.className="note";$("#impresorasCard").append(alerta);}
+  alerta.hidden=!cocinaRegistroPendiente;
+  alerta.textContent="Otro equipo ya atiende estas categorías. Guarda esta impresora para confirmar si quieres imprimir aquí también.";
   muestraErroresImpresoraPOS();
 }
 function nuevoBorradorImpresoraPOS(){
@@ -9555,7 +9674,7 @@ function nuevoBorradorImpresoraPOS(){
   borradorImpresoraPOS={id:"nueva-"+uid(),nombre:primera?"Caja":"Nueva impresora",
     conexion:native?"bluetooth":"sistema",impresoraBt:"",impresoraNombre:"",
     anchoPapelBt:num(P.ticket.ancho,80),cuenta:primera,cuentaAuto:primera,
-    cocina:!primera,cancela:!primera,categorias:[],corteAutomatico:false};
+    cocina:false,cancela:false,categorias:[],corteAutomatico:false};
   renderImpresorasPOS();
 }
 function buscaEmparejadasImpresorasPOS(){
@@ -9580,8 +9699,8 @@ function buscaEmparejadasImpresorasPOS(){
   const status=$("#impTestEstado");
   if(status) status.textContent=impresorasEmparejadasPOS.length?"Elige la impresora correcta de la lista.":"No hay impresoras emparejadas. Vincúlala en Ajustes de Android y vuelve a buscar.";
 }
-function guardaBorradorImpresoraPOS(){
-  if(!borradorImpresoraPOS) return;
+async function guardaBorradorImpresoraPOS(){
+  if(!borradorImpresoraPOS || guardandoImpresoraPOS) return;
   const p=Object.assign({},borradorImpresoraPOS,{nombre:String(borradorImpresoraPOS.nombre||"").trim()});
   if(!p.nombre){toast("Escribe un nombre para la impresora.");$("#impNombre")?.focus();return;}
   if(!window.MakersPrinter && p.conexion!=="computadora") p.conexion="sistema";
@@ -9590,12 +9709,36 @@ function guardaBorradorImpresoraPOS(){
   if(!p.cuenta) p.cuentaAuto=false;
   if(!p.cocina) p.categorias=[];
   p.anchoPapelBt=num(p.anchoPapelBt,80)===58?58:80;
-  if(impresoraEnEdicionPOS){
-    const ix=IMPRESORAS.findIndex(x=>x.id===impresoraEnEdicionPOS);
-    if(ix>=0) IMPRESORAS[ix]=p; else IMPRESORAS.push(p);
-  }else{ p.id=uid(); IMPRESORAS.push(p); impresoraEnEdicionPOS=p.id; }
-  guardaImpresorasPOS(); borradorImpresoraPOS=JSON.parse(JSON.stringify(p));
-  renderImpresorasPOS(); toast("Impresora guardada en este dispositivo.");
+  if(!impresoraEnEdicionPOS) p.id=uid();
+  const anterior=IMPRESORAS.find(x=>x.id===impresoraEnEdicionPOS);
+  const mismaFisica=anterior && identidadImpresoraPOS(anterior)===identidadImpresoraPOS(p);
+  p.rutaNube=mismaFisica?(anterior.rutaNube||rutaImpresoraAnteriorPOS(anterior)):rutaImpresoraAnteriorPOS(p);
+  if(!mismaFisica) p.rutasAnteriores=[];
+  const lista=impresoraEnEdicionPOS?IMPRESORAS.map(x=>x.id===impresoraEnEdicionPOS?p:x):[...IMPRESORAS,p];
+  if((p.cocina||p.cancela) && lista.some(x=>x.id!==p.id&&(x.cocina||x.cancela)&&macImpresoraPOS(x).length===12&&macImpresoraPOS(x)===macImpresoraPOS(p)&&categoriasSeCruzanPOS(x,p))){
+    toast("Esa impresora Bluetooth ya está configurada para las mismas categorías. Edita la configuración existente.");
+    return;
+  }
+  guardandoImpresoraPOS=true;
+  const fondo=!!window.MakersPrinter?.kitchenBackgroundActive?.();
+  try{
+    const habilitada=REST_NUBE.enabled && await consultaEstacionesCocinaPOS();
+    let data=habilitada?await registraCocinaPOS(lista):{guardado:false,conflictos:conflictosCocinaLocalesPOS(lista)};
+    if(!data.guardado && data.conflictos.length){
+      const doble=await confirmaTraslapeCocinaPOS(data.conflictos);
+      if(!doble){p.cocina=false;p.cancela=false;}
+      if(habilitada) data=await registraCocinaPOS(lista,true);
+    }
+    if(habilitada && !data.guardado) throw new Error("No se confirmó la configuración de cocina.");
+    if(fondo) await detieneCocinaFondoPOS();
+    IMPRESORAS=lista; cocinaRegistroPendiente=false;
+    impresoraEnEdicionPOS=p.id;
+    guardaImpresorasPOS(); borradorImpresoraPOS=JSON.parse(JSON.stringify(p));
+    if(fondo && IMPRESORAS.some(x=>x.cocina && x.conexion==="bluetooth")) await iniciaCocinaFondoPOS();
+    renderImpresorasPOS(); toast("Impresora guardada en este dispositivo.");
+    if(habilitada) consultaEstacionesCocinaPOS().catch(()=>{});
+  }catch(err){toast(err.message||"Conéctate para confirmar qué equipo imprime en cocina.");}
+  finally{guardandoImpresoraPOS=false;}
 }
 function imprimePruebaImpresoraPOS(){
   const p=borradorImpresoraPOS; if(!p) return;
@@ -9620,14 +9763,26 @@ function imprimePruebaImpresoraPOS(){
   const status=$("#impTestEstado"); if(status) status.textContent="Enviando prueba…";
   imprimeHoja("Prueba · "+p.nombre,cuerpo,{impresora:destino,esPrueba:true,rasterModel});
 }
-function borraImpresoraPOS(){
-  if(!impresoraEnEdicionPOS) return;
+async function borraImpresoraPOS(){
+  if(!impresoraEnEdicionPOS || guardandoImpresoraPOS) return;
   const p=IMPRESORAS.find(x=>x.id===impresoraEnEdicionPOS); if(!p) return;
-  if(!confirm("¿Eliminar la impresora «"+(p.nombre||"Impresora")+"» de esta tablet?")) return;
-  IMPRESORAS=IMPRESORAS.filter(x=>x.id!==p.id); guardaImpresorasPOS();
-  impresoraEnEdicionPOS=IMPRESORAS[0]?.id||"";
-  borradorImpresoraPOS=IMPRESORAS[0]?JSON.parse(JSON.stringify(IMPRESORAS[0])):null;
-  renderImpresorasPOS(); toast("Impresora eliminada.");
+  if(!confirm("¿Eliminar la impresora «"+(p.nombre||"Impresora")+"» de este dispositivo?")) return;
+  guardandoImpresoraPOS=true;
+  try{
+    const lista=IMPRESORAS.filter(x=>x.id!==p.id);
+    if(registroCocinaDisponible){
+      const data=await registraCocinaPOS(lista,true);
+      if(!data.guardado) throw new Error("No se pudo actualizar la estación de cocina.");
+    }
+    const fondo=!!window.MakersPrinter?.kitchenBackgroundActive?.();
+    if(fondo) await detieneCocinaFondoPOS();
+    IMPRESORAS=lista; guardaImpresorasPOS();
+    impresoraEnEdicionPOS=IMPRESORAS[0]?.id||"";
+    borradorImpresoraPOS=IMPRESORAS[0]?JSON.parse(JSON.stringify(IMPRESORAS[0])):null;
+    if(fondo && IMPRESORAS.some(x=>x.cocina&&x.conexion==="bluetooth")) await iniciaCocinaFondoPOS();
+    renderImpresorasPOS(); toast("Impresora eliminada.");
+  }catch(err){toast(err.message||"No se pudo guardar el cambio.");}
+  finally{guardandoImpresoraPOS=false;}
 }
 function actualizaBorradorPorCampoPOS(target){
   if(!borradorImpresoraPOS) return;
@@ -9654,7 +9809,14 @@ $("#impFondo").addEventListener("click",async()=>{
     puente.openKitchenBackgroundSettings(paso);
     return;
   }
-  const impresoras=IMPRESORAS.filter(p=>p.cocina&&p.conexion==="bluetooth"&&p.impresoraBt);
+  await iniciaCocinaFondoPOS();
+});
+async function iniciaCocinaFondoPOS(){
+  const puente=window.MakersPrinter, estado=$("#impFondoEstado");
+  if(cocinaRegistroPendiente || !puente?.startKitchenBackground || !navigator.onLine) return;
+  for(let i=0;i<20&&puente.kitchenBackgroundActive();i++)await new Promise(r=>setTimeout(r,100));
+  if(puente.kitchenBackgroundActive()){toast("La estación anterior todavía está terminando. Intenta de nuevo.");return;}
+  const impresoras=destinosUnicosImpresoraPOS(IMPRESORAS.filter(p=>p.cocina&&p.conexion==="bluetooth"&&p.impresoraBt));
   const rutas=Object.fromEntries(impresoras.map(p=>[rutaImpresoraNube(p),p.categorias]));
   if(!impresoras.length)return;
   activandoCocinaFondoPOS=true;
@@ -9666,14 +9828,15 @@ $("#impFondo").addEventListener("click",async()=>{
       estado.textContent=error?.code==="PGRST202"?"Falta habilitar la impresión con pantalla apagada en la nube de Nuvoor.":"No se pudo autorizar la estación. Revisa la conexión y el acceso de administrador.";
       return;
     }
-    if(!impresoras.every(p=>IMPRESORAS.includes(p)))return;
+    if(!impresoras.every(p=>IMPRESORAS.some(x=>x.id===p.id&&identidadImpresoraPOS(x)===identidadImpresoraPOS(p))))return;
     const printers=impresoras.map(p=>({ruta:rutaImpresoraNube(p),mac:p.impresoraBt,papel:num(p.anchoPapelBt,80),corte:!!p.corteAutomatico}));
     puente.startKitchenBackground(JSON.stringify({url:CONFIG.SUPABASE_URL,key:CONFIG.SUPABASE_ANON_KEY,token:data,printers}));
     for(let i=0;i<12&&!puente.kitchenBackgroundActive();i++)await new Promise(r=>setTimeout(r,250));
     estado.textContent=puente.kitchenBackgroundActive()?"Activa hasta por 18 horas. Mira el aviso de Cocina en Android.":"Android no inició la estación. Vuelve a intentar con Nuvoor abierto.";
   }catch(_){estado.textContent="No se pudo iniciar la estación de cocina.";}
   finally{activandoCocinaFondoPOS=false;actualizaPantallaCocinaPOS();}
-});
+}
+
 $("#impresorasCard").addEventListener("input",e=>{
   const campo=e.target.closest("[data-imp-campo]"); if(campo) actualizaBorradorPorCampoPOS(campo);
 });
