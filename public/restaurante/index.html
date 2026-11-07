@@ -1530,7 +1530,24 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 @media(max-width:720px){#comAcciones{display:grid!important;grid-template-columns:1fr;position:sticky;bottom:8px;z-index:2;background:var(--surface);padding-top:8px!important}#comAcciones .btn,#comCancelar{width:100%;min-height:48px}}
 </style>
 <script src="../facturacion-pos.js?v=20261104-2206"></script>
-<meta name="nuvoor-build" content="20261107-0738">
+<style>
+.configSaveBar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 20px;border-top:1px solid var(--line);flex-wrap:wrap}
+.configSaveBar>span{flex:1;min-width:190px;font-size:12px;line-height:1.5;color:var(--ink-3)}
+.configSaveBar [data-estado=error]{color:var(--danger,#a52a32);font-weight:600}
+.configSaveBar [data-estado=guardado]{color:var(--ok,#277249);font-weight:600}
+.configSaveBar>.btn{min-height:42px;flex-shrink:0}
+.menuSaveBar{background:var(--surface,#fffaf2);border:1px solid var(--line);border-radius:14px;box-shadow:0 4px 16px #00000008;margin-bottom:16px}
+#modalMods .modGrupo{padding:14px 0;border-bottom:1px solid var(--line)}
+#modalMods .modGrupo:first-child{padding-top:0}
+#modalMods .modChips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#modalMods .modChip{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;min-height:58px;min-width:0;box-sizing:border-box;padding:11px 13px;border-radius:12px;white-space:normal;line-height:1.35}
+#modalMods .modOptionName{font-size:13px;font-weight:650;overflow-wrap:anywhere}
+#modalMods .modChip i{font-size:11px;white-space:normal;line-height:1.3;opacity:.85}
+#modalMods .modChip.si{box-shadow:inset 0 0 0 1px currentColor}
+#modalMods .modIncomplete{font-size:11px;color:var(--ink-3);margin:8px 0 0}
+@media(max-width:450px){.configSaveBar{padding:13px}.configSaveBar>.btn{width:100%}#modalMods .modChips{gap:7px}#modalMods .modChip{padding:10px}}
+</style>
+<meta name="nuvoor-build" content="20261107-1233">
 <link rel="stylesheet" href="./tema-borgona.css?v=20261106-1620">
 </head>
 <body>
@@ -1883,6 +1900,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 <!-- ============ MENÚ ============ -->
 <section id="tab-menu" hidden>
   <div class="pageHeading"><div><span>CATÁLOGO</span><h1>Menú del restaurante</h1><p>Organiza categorías, platillos, precios y opciones del cliente.</p></div><span class="pageHeadingMark" aria-hidden="true">✳</span></div>
+  <div class="configSaveBar menuSaveBar"><span data-config-status="menu" role="status">Los cambios se comparten con tu negocio.</span><button type="button" class="btn primary" data-save-config="menu">Guardar cambios</button></div>
   <div class="card">
     <header><h2>Categorías</h2><button class="btn sm ghost" id="catNueva" style="margin-left:auto">+ Categoría</button></header>
     <div class="body"><div id="menuCategoryGrid" class="menuCategoryGrid" aria-label="Categorías del menú"></div><div id="menuCategorySelection" class="menuCategorySelection"></div></div>
@@ -1905,6 +1923,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     <summary><span><b>Preguntas y opciones</b><small>Configura términos, extras y cambios de ingredientes</small></span></summary>
     <div class="body"><p class="note" style="margin:0 0 14px">Cada grupo es una pregunta para el mesero, por ejemplo «¿Término?», «¿Qué le quito?» o «¿Extras?». Puedes asignarlo a los platillos que lo necesiten.</p><div class="menuGroupToolbar"><b>Grupos de opciones</b><button class="btn sm ghost" id="modNuevo" type="button">+ Grupo</button></div><div id="modLista"></div></div>
   </details>
+  <div class="configSaveBar menuSaveBar"><span data-config-status="menu" role="status">Los cambios se comparten con tu negocio.</span><button type="button" class="btn primary" data-save-config="menu">Guardar cambios</button></div>
 </section>
 
 <dialog id="modalTrasladoMesa" aria-labelledby="trasladoTitulo">
@@ -2197,13 +2216,11 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
   <div class="card" id="ajusteRespaldo" data-ajuste-panel hidden>
     <header><h2>Respaldos</h2><span class="hint" id="respHint"></span></header>
     <div class="body">
-      <p class="note" style="margin:0 0 14px;border-left-color:var(--warn)">Todo tu negocio vive <b>en este
-        navegador, en esta computadora</b>. Así cobra aunque se caiga el internet, pero también significa que si
-        alguien le da «limpiar datos de navegación», o se formatea la máquina, <b>no queda nada</b>.
-        <b>Baja un respaldo cada semana</b> y guárdalo en una USB o en tu correo. Toma cinco segundos.</p>
+      <p class="note" style="margin:0 0 14px">El menú, las mesas y los pedidos se comparten con tu negocio cuando hay conexión. Este aparato también conserva una copia para trabajar sin internet. Descarga un respaldo para conservar los datos adicionales y los cambios que aún estén pendientes de enviar.</p>
       <div class="fila">
         <button class="btn primary" id="respBaja">Bajar respaldo</button>
         <button class="btn" id="respSube">Restaurar desde un respaldo</button>
+        <button class="btn" id="respCopiaConfig" type="button" hidden>Descargar copia anterior del menú y ajustes</button>
         <input id="respFile" type="file" accept="application/json,.json" hidden>
       </div>
       <p class="note" style="margin-top:14px">El respaldo trae el menú, las mesas, el croquis, las comandas, los
@@ -2929,14 +2946,14 @@ const REST_NUBE_MIGRATION_LOCK_ID="migracion_inicial";
 let DB = null, laNube = false;
 let guardaT = null;
 let restaurando = false;
-const REST_NUBE={enabled:false,localOnly:false,ready:false,verified:false,deviceId:"",queue:[],serverDocs:{},projection:{},cursor:"1970-01-01T00:00:00.000Z",channel:null,poll:null,realtimeTimer:null,flushPromise:null,localDirty:false,applyPending:false,pinSalt:"",error:"",retryTimer:null,subscriptionBlocked:false,migrandoInicial:false,migrationClaimed:false,migrationConflictOpen:false,conflictResolver:null,claimedLines:new Set(),failedPrints:new Set(),ticketIds:new Set(),incomingLines:new Set(),claimAlerts:[],claimBusy:new Set()};
+const REST_NUBE={enabled:false,localOnly:false,ready:false,verified:false,deviceId:"",queue:[],serverDocs:{},projection:{},cursor:"1970-01-01T00:00:00.000Z",channel:null,poll:null,realtimeTimer:null,flushPromise:null,localDirty:false,serializando:false,revision:0,applyPending:false,pinSalt:"",error:"",retryTimer:null,subscriptionBlocked:false,migrandoInicial:false,migrationClaimed:false,migrationConflictOpen:false,conflictResolver:null,claimedLines:new Set(),failedPrints:new Set(),ticketIds:new Set(),incomingLines:new Set(),claimAlerts:[],claimBusy:new Set()};
 function nubeLee(key,defecto){try{const value=localStorage.getItem(key);return value?JSON.parse(value):defecto;}catch(_){return defecto;}}
 function nubeGuarda(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true;}catch(_){return false;}}
 function nubeTieneBaseSincronizada(){try{return localStorage.getItem(REST_NUBE_SYNCED_KEY)==="si"||localStorage.getItem(REST_NUBE_MIGRATION_FLAG)==="hecho";}catch(_){return false;}}
 function nubeMarcaBaseSincronizada(){try{localStorage.setItem(REST_NUBE_SYNCED_KEY,"si");}catch(_){}}
 function nubeConOrigenMigracion(cuerpo,aparato){const body=Object.assign({},cuerpo||{});body[REST_NUBE_MIGRATION_FIELD]={aparato:String(aparato||"")};return body;}
 function nubeOrigenMigracion(cuerpo){return String(cuerpo&&cuerpo[REST_NUBE_MIGRATION_FIELD]&&cuerpo[REST_NUBE_MIGRATION_FIELD].aparato||"");}
-function nubeSinMarcaMigracion(cuerpo){const body=Object.assign({},cuerpo||{});delete body[REST_NUBE_MIGRATION_FIELD];return body;}
+function nubeSinMarcaMigracion(cuerpo){const body=nubeClona(cuerpo||{});delete body[REST_NUBE_MIGRATION_FIELD];return body;}
 function nubeDeviceId(){let id="";try{id=localStorage.getItem(REST_NUBE_DEVICE_KEY)||"";if(!id){id=uid();localStorage.setItem(REST_NUBE_DEVICE_KEY,id);}}catch(_){id=uid();}return id;}
 REST_NUBE.deviceId=nubeDeviceId();
 REST_NUBE.queue=nubeLee(REST_NUBE_QUEUE_KEY,[]);
@@ -2965,7 +2982,11 @@ function guardaEstadoLocal(){
   try{localStorage.setItem(LS+"_latido",String(Date.now()));}catch(_){}
 }
 function guardaYa(){clearTimeout(guardaT);if(restaurando)return;guardaEstadoLocal();if(REST_NUBE.enabled)sincronizaNubeEnSerie(true);}
-function persist(){clearTimeout(guardaT);if(restaurando)return;REST_NUBE.localDirty=true;guardaT=setTimeout(()=>{guardaEstadoLocal();REST_NUBE.localDirty=false;if(REST_NUBE.enabled)sincronizaNubeEnSerie(false);},500);}
+function persist(){
+  clearTimeout(guardaT);if(restaurando)return;
+  REST_NUBE.revision++;REST_NUBE.localDirty=true;marcaGuardadoConfiguracionPendiente();
+  guardaT=setTimeout(()=>{guardaEstadoLocal();if(REST_NUBE.enabled)sincronizaNubeEnSerie(false);},500);
+}
 window.addEventListener("pagehide",guardaYa);
 document.addEventListener("visibilitychange",()=>{if(document.hidden)guardaYa();else recargaCambiosNube();});
 window.addEventListener("nuvoor:restaurant-resume",recargaCambiosNube);
@@ -3002,11 +3023,11 @@ function proyectaImagenMenuRestaurant(item){
   const safe={...item};
   delete safe.foto;delete safe.imagen;delete safe.base64;delete safe.fotoRef;
   if(esRutaMedioRestaurant(item.fotoRef)||item.fotoRef==="")safe.foto=item.fotoRef;
-  return safe;
+  return nubeClona(safe);
 }
 async function proyectaRestaurant(){
   const out={},ev=nubeEventoId();
-  const f=P.fiscal||{},allowedConfig={nombre:P.negocio&&P.negocio.nombre||"Mi restaurante",tel:P.negocio&&P.negocio.tel||"",dir:P.negocio&&P.negocio.dir||"",iva:num(P.iva),propina:num(P.propina),servicio:num(P.servicio),apps:(P.apps||[]).map(a=>({id:a.id,nombre:a.nombre,comision:num(a.comision),color:a.color,activa:a.activa!==false})),fiscal:{razon:f.razon||"",rfc:f.rfc||"",regimen:f.regimen||"612",cpFiscal:f.cpFiscal||"",pac:f.pac||"",serie:f.serie||"A",folioFactura:num(f.folioFactura,1),sellosAlta:!!f.sellosAlta},ticket:{mostrarLogo:P.ticket&&P.ticket.mostrarLogo!==false,ancho:num(P.ticket&&P.ticket.ancho,80),encabezado:P.ticket&&P.ticket.encabezado||"",pie:P.ticket&&P.ticket.pie||"¡Gracias por su visita!",mostrarIva:P.ticket&&P.ticket.mostrarIva!==false,mostrarPropina:P.ticket&&P.ticket.mostrarPropina!==false,imprimeCocina:P.ticket&&P.ticket.imprimeCocina!==false,imprimeCuenta:P.ticket&&P.ticket.imprimeCuenta!==false,leyenda:P.ticket&&P.ticket.leyenda||""},folios:nubeClona(P.folios||{}),pinSalt:nubePinSalt()};
+  const f=P.fiscal||{},allowedConfig={nombre:P.negocio&&P.negocio.nombre||"Mi restaurante",tel:P.negocio&&P.negocio.tel||"",dir:P.negocio&&P.negocio.dir||"",iva:num(P.iva),propina:num(P.propina),servicio:num(P.servicio),apps:(P.apps||[]).map(a=>({id:a.id,nombre:a.nombre,comision:num(a.comision),color:a.color,activa:a.activa!==false})),fiscal:{razon:f.razon||"",rfc:f.rfc||"",regimen:f.regimen||"612",cpFiscal:f.cpFiscal||"",pac:f.pac||"",serie:f.serie||"A",folioFactura:num(f.folioFactura,1),sellosAlta:!!f.sellosAlta},bloqueoMin:num(P.bloqueoMin,10),ticket:{mostrarLogo:P.ticket&&P.ticket.mostrarLogo!==false,ancho:num(P.ticket&&P.ticket.ancho,80),encabezado:P.ticket&&P.ticket.encabezado||"",pie:P.ticket&&P.ticket.pie||"¡Gracias por su visita!",mostrarIva:P.ticket&&P.ticket.mostrarIva!==false,mostrarPropina:P.ticket&&P.ticket.mostrarPropina!==false,imprimeCocina:P.ticket&&P.ticket.imprimeCocina!==false,imprimeCuenta:P.ticket&&P.ticket.imprimeCuenta!==false,leyenda:P.ticket&&P.ticket.leyenda||""},folios:nubeClona(P.folios||{}),pinSalt:nubePinSalt()};
   if(esRutaMedioRestaurant(P.negocio.logoRef)||P.negocio.logoRef==="")allowedConfig.logo=P.negocio.logoRef;
   nubePut(out,"rest_config",nubeId("config","general"),Object.assign({eventoId:ev},allowedConfig));
   (MENU.cats||[]).forEach(x=>nubePut(out,"rest_carta",nubeId("cat",x.id),Object.assign({tipo:"categoria",eventoId:ev},proyectaImagenMenuRestaurant(x))));
@@ -3027,23 +3048,30 @@ async function proyectaRestaurant(){
   (EVENTOS||[]).forEach(x=>nubePut(out,"rest_eventos",String(x.id),Object.assign({},nubeClona(x),{eventoId:""})));
   return out;
 }
-function nubeQueueDoc(doc){const key=nubeClave(doc.coleccion,doc.doc_id),idx=REST_NUBE.queue.findIndex(x=>x.key===key),old=idx>=0?REST_NUBE.queue[idx]:{},entry=Object.assign({key,creado:new Date().toISOString(),intentos:0},doc);if(idx>=0){entry.creado=old.creado;entry.intentos=old.intentos||0;if(!Object.prototype.hasOwnProperty.call(doc,"impresionOffline")&&old.impresionOffline)entry.impresionOffline=old.impresionOffline;if(!Object.prototype.hasOwnProperty.call(doc,"confirmarImpresion")&&old.confirmarImpresion)entry.confirmarImpresion=old.confirmarImpresion;}const aparato=entry.aparato||old.aparato||REST_NUBE.deviceId;if(entry.migracion||old.migracion||REST_NUBE.migrandoInicial){entry.migracion=true;entry.aparato=aparato;entry.cuerpo=nubeConOrigenMigracion(entry.cuerpo,aparato);}else{const origen=nubeOrigenMigracion(old.cuerpo)||nubeOrigenMigracion(REST_NUBE.serverDocs[key]&&REST_NUBE.serverDocs[key].cuerpo);if(origen)entry.cuerpo=nubeConOrigenMigracion(entry.cuerpo,origen);}if(idx>=0)REST_NUBE.queue[idx]=entry;else REST_NUBE.queue.push(entry);nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);}
+function nubeQueueDoc(doc){const key=nubeClave(doc.coleccion,doc.doc_id),idx=REST_NUBE.queue.findIndex(x=>x.key===key),old=idx>=0?REST_NUBE.queue[idx]:{},entry=Object.assign({key,creado:new Date().toISOString(),intentos:0},nubeClona(doc));if(idx>=0){entry.creado=old.creado;entry.intentos=old.intentos||0;if(!Object.prototype.hasOwnProperty.call(doc,"impresionOffline")&&old.impresionOffline)entry.impresionOffline=old.impresionOffline;if(!Object.prototype.hasOwnProperty.call(doc,"confirmarImpresion")&&old.confirmarImpresion)entry.confirmarImpresion=old.confirmarImpresion;}const aparato=entry.aparato||old.aparato||REST_NUBE.deviceId;if(entry.migracion||old.migracion||REST_NUBE.migrandoInicial){entry.migracion=true;entry.aparato=aparato;entry.cuerpo=nubeConOrigenMigracion(entry.cuerpo,aparato);}else{const origen=nubeOrigenMigracion(old.cuerpo)||nubeOrigenMigracion(REST_NUBE.serverDocs[key]&&REST_NUBE.serverDocs[key].cuerpo);if(origen)entry.cuerpo=nubeConOrigenMigracion(entry.cuerpo,origen);}if(idx>=0)REST_NUBE.queue[idx]=entry;else REST_NUBE.queue.push(entry);nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);}
 function nubeCanon(v){if(v===null||typeof v!=="object")return JSON.stringify(v);if(Array.isArray(v))return "["+v.map(nubeCanon).join(",")+"]";return "{"+Object.keys(v).sort().map(k=>JSON.stringify(k)+":"+nubeCanon(v[k])).join(",")+"}";}
-function nubeDocsDesdeServidor(){return Object.fromEntries(Object.entries(REST_NUBE.serverDocs).map(([k,v])=>[k,{cuenta_id:v.cuenta_id,coleccion:v.coleccion,doc_id:v.doc_id,cuerpo:v.cuerpo}]));}
+function nubeDocsDesdeServidor(){return Object.fromEntries(Object.entries(REST_NUBE.serverDocs).map(([k,v])=>[k,{cuenta_id:v.cuenta_id,coleccion:v.coleccion,doc_id:v.doc_id,cuerpo:nubeClona(v.cuerpo)}]));}
 function nubeRebaseMap(){const out=nubeDocsDesdeServidor();REST_NUBE.queue.filter(q=>String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)).forEach(q=>out[q.key]={cuenta_id:q.cuenta_id,coleccion:q.coleccion,doc_id:q.doc_id,cuerpo:q.cuerpo});return out;}
 function nubeDocsDeContexto(docs){const ev=nubeEventoId();return Object.fromEntries(Object.entries(docs).filter(([,d])=>d&&d.coleccion!=="rest_contadores"&&d.coleccion!=="rest_locks"&&(d.coleccion==="rest_eventos"||(d.cuerpo&&String(d.cuerpo.eventoId||"")===ev))));}
 async function sincronizaNubeLocal(){
-  if(!REST_NUBE.enabled||REST_NUBE.localOnly||REST_NUBE.localDirty||REST_NUBE.subscriptionBlocked||restaurando)return;
-  const current=await proyectaRestaurant(),previous=REST_NUBE.projection||{};
-  Object.keys(current).forEach(key=>{const old=previous[key];if(!old||nubeCanon(old.cuerpo)!==nubeCanon(current[key].cuerpo)){if(current[key].coleccion==="rest_tickets"&&(REST_NUBE.ticketIds.has(current[key].doc_id)||REST_NUBE.queue.some(q=>q.key===key)))return;nubeQueueDoc(current[key]);}});
-  Object.keys(previous).forEach(key=>{if(current[key])return;const old=previous[key];if(!old||old.cuerpo&&old.cuerpo._eliminado)return;nubeQueueDoc({cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:old.coleccion,doc_id:old.doc_id,cuerpo:{_eliminado:true,eventoId:nubeEventoId(),borradoEn:new Date().toISOString()}});});
-  REST_NUBE.projection=current;nubeGuarda(REST_NUBE_PROJECTION_KEY,current);actualizaEstadoNube();
-  if(REST_NUBE.applyPending){REST_NUBE.applyPending=false;aplicaDocumentosRestaurant(nubeRebaseMap());}
+  if(!REST_NUBE.enabled||REST_NUBE.localOnly||REST_NUBE.subscriptionBlocked||restaurando)return;
+  const revision=REST_NUBE.revision;
+  REST_NUBE.serializando=true;
+  try{
+    const current=await proyectaRestaurant(),previous=REST_NUBE.projection||{};
+    // Una edición nueva nunca queda tapada por un eco recibido mientras se calcula la instantánea.
+    if(revision!==REST_NUBE.revision){REST_NUBE.localDirty=true;return;}
+    Object.keys(current).forEach(key=>{const old=previous[key];if(!old||nubeCanon(old.cuerpo)!==nubeCanon(current[key].cuerpo)){if(current[key].coleccion==="rest_tickets"&&(REST_NUBE.ticketIds.has(current[key].doc_id)||REST_NUBE.queue.some(q=>q.key===key)))return;nubeQueueDoc(current[key]);}});
+    Object.keys(previous).forEach(key=>{if(current[key])return;const old=previous[key];if(!old||old.cuerpo&&old.cuerpo._eliminado)return;nubeQueueDoc({cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:old.coleccion,doc_id:old.doc_id,cuerpo:{_eliminado:true,eventoId:nubeEventoId(),borradoEn:new Date().toISOString()}});});
+    REST_NUBE.projection=nubeClona(current);nubeGuarda(REST_NUBE_PROJECTION_KEY,REST_NUBE.projection);
+    REST_NUBE.localDirty=false;actualizaEstadoNube();
+  }finally{REST_NUBE.serializando=false;}
+  if(REST_NUBE.applyPending&&!REST_NUBE.localDirty){REST_NUBE.applyPending=false;aplicaDocumentosRestaurant(nubeRebaseMap());}
   await vaciaColaNube();
 }
 function sincronizaNubeEnSerie(inmediato){
   if(!REST_NUBE.enabled||REST_NUBE.localOnly)return Promise.resolve();
-  const run=()=>{if(inmediato){clearTimeout(guardaT);guardaEstadoLocal();REST_NUBE.localDirty=false;}return sincronizaNubeLocal();};
+  const run=()=>{if(inmediato)clearTimeout(guardaT);guardaEstadoLocal();return sincronizaNubeLocal();};
   REST_NUBE.flushPromise=(REST_NUBE.flushPromise||Promise.resolve()).catch(()=>{}).then(run);return REST_NUBE.flushPromise;
 }
 function vaciaColaNube(){
@@ -3061,11 +3089,14 @@ function vaciaColaNube(){
         let result;
         if(q.impresionOffline){result=await RESTAURANT_SB.rpc("rest_subir_impresion_offline",{p_cuenta:q.cuenta_id,p_doc_id:q.doc_id,p_cuerpo:q.cuerpo,p_ruta:q.impresionOffline.ruta,p_aparato:q.impresionOffline.aparato});if(result.error)throw result.error;}
         else if(q.confirmarImpresion){result=await RESTAURANT_SB.rpc("rest_confirma_impresion",{p_cuenta:q.cuenta_id,p_lineas:[q.doc_id],p_ruta:q.confirmarImpresion.ruta,p_aparato:q.confirmarImpresion.aparato});if(result.error)throw result.error;if(!(result.data||[]).includes(q.doc_id)){REST_NUBE.error="No se pudo confirmar el reclamo de impresión";actualizaEstadoNube();break;}}
-        else{result=await RESTAURANT_SB.from("documentos").upsert([payload],{onConflict:"cuenta_id,coleccion,doc_id"});if(result.error)throw result.error;}
-        const actualizado=new Date().toISOString();
+        else{result=await RESTAURANT_SB.from("documentos").upsert([payload],{onConflict:"cuenta_id,coleccion,doc_id"}).select("cuenta_id,coleccion,doc_id,cuerpo,actualizado");if(result.error)throw result.error;}
+        const respuesta=Array.isArray(result.data)?result.data.find(d=>d.doc_id===q.doc_id&&d.coleccion===q.coleccion):null;
+        const actualizado=respuesta?.actualizado||new Date().toISOString();
         const body=q.impresionOffline?Object.assign({},q.cuerpo,{impreso:Object.assign({},q.cuerpo.impreso,{[q.impresionOffline.ruta]:{por:q.impresionOffline.aparato,en:actualizado,ok:true,confirmado:actualizado,sinRed:true}})}):q.cuerpo;
-        REST_NUBE.serverDocs[q.key]={cuenta_id:q.cuenta_id,coleccion:q.coleccion,doc_id:q.doc_id,cuerpo:body};if(q.coleccion==="rest_tickets")REST_NUBE.ticketIds.add(q.doc_id);if(!q.impresionOffline&&!q.confirmarImpresion&&q.coleccion==="rest_lineas"&&q.cuerpo&&q.cuerpo.enviada)REST_NUBE.incomingLines.add(q.cuerpo.id||q.doc_id.replace(/^linea_/,""));
-        REST_NUBE.queue.splice(idx,1);nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);REST_NUBE.subscriptionBlocked=false;clearTimeout(REST_NUBE.retryTimer);REST_NUBE.retryTimer=null;REST_NUBE.error="";actualizaEstadoNube();
+        if(!respuesta||!(Date.parse(REST_NUBE.serverDocs[q.key]?.actualizado)>Date.parse(respuesta.actualizado)))REST_NUBE.serverDocs[q.key]=respuesta?nubeClona(respuesta):{cuenta_id:q.cuenta_id,coleccion:q.coleccion,doc_id:q.doc_id,cuerpo:body};if(q.coleccion==="rest_tickets")REST_NUBE.ticketIds.add(q.doc_id);if(!q.impresionOffline&&!q.confirmarImpresion&&q.coleccion==="rest_lineas"&&q.cuerpo&&q.cuerpo.enviada)REST_NUBE.incomingLines.add(q.cuerpo.id||q.doc_id.replace(/^linea_/,""));
+        // Puede haberse reemplazado esta entrada por otra más nueva durante la petición.
+        const confirmado=REST_NUBE.queue.indexOf(q);if(confirmado>=0)REST_NUBE.queue.splice(confirmado,1);
+        nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);REST_NUBE.subscriptionBlocked=false;clearTimeout(REST_NUBE.retryTimer);REST_NUBE.retryTimer=null;REST_NUBE.error="";actualizaEstadoNube();
       }catch(e){
         const current=REST_NUBE.queue.find(x=>x.key===q.key);
         if(current)current.intentos=(current.intentos||0)+1;
@@ -3230,7 +3261,7 @@ async function consultaCambiosNube(){
       }
     }
     if(changed){
-      if(REST_NUBE.localDirty)REST_NUBE.applyPending=true;
+      if(REST_NUBE.localDirty||REST_NUBE.serializando)REST_NUBE.applyPending=true;
       else if(nubeHayMigracionPendienteActual())await nubeVigilaCambioDuranteMigracion();
       else aplicaDocumentosRestaurant(nubeRebaseMap());
     }
@@ -3255,15 +3286,17 @@ function escuchaNubeRestaurant(){
           return;
         }
         if(!row||!String(row.coleccion||"").startsWith("rest_"))return;
-        const key=nubeClave(row.coleccion,row.doc_id);REST_NUBE.serverDocs[key]=row;
+        const key=nubeClave(row.coleccion,row.doc_id);
+        if(Date.parse(REST_NUBE.serverDocs[key]?.actualizado)>Date.parse(row.actualizado))return;
+        REST_NUBE.serverDocs[key]=row;
         // El sondeo conserva su propio cursor para recuperar mensajes perdidos en segundo plano.
         if(row.coleccion==="rest_lineas"&&row.cuerpo&&row.cuerpo.enviada&&!REST_NUBE.queue.some(q=>q.key===key))REST_NUBE.incomingLines.add(row.cuerpo.id||row.doc_id.replace(/^linea_/,""));
-        if(REST_NUBE.localDirty){REST_NUBE.applyPending=true;return;}
+        if(REST_NUBE.localDirty||REST_NUBE.serializando){REST_NUBE.applyPending=true;return;}
         if(nubeHayMigracionPendienteActual()){nubeVigilaCambioDuranteMigracion().catch(nubeRegistraError);return;}
         clearTimeout(REST_NUBE.realtimeTimer);
         REST_NUBE.realtimeTimer=setTimeout(()=>{
           REST_NUBE.realtimeTimer=null;
-          if(REST_NUBE.localDirty){REST_NUBE.applyPending=true;return;}
+          if(REST_NUBE.localDirty||REST_NUBE.serializando){REST_NUBE.applyPending=true;return;}
           aplicaDocumentosRestaurant(nubeRebaseMap());
         },80);
       });
@@ -3276,6 +3309,7 @@ function escuchaNubeRestaurant(){
 function aplicaDocumentosRestaurant(docs){
   docs=nubeDocsDeContexto(docs);docs=Object.fromEntries(Object.entries(docs).map(([k,d])=>[k,Object.assign({},d,{cuerpo:nubeSinMarcaMigracion(d.cuerpo)})]));const raw=Object.values(docs),has=(col)=>raw.some(d=>d&&d.coleccion===col),ev=nubeEventoId(),all=raw.filter(d=>d&&d.cuerpo&&!d.cuerpo._eliminado),mine=all.filter(d=>d.coleccion!=="rest_eventos"&&(d.cuerpo.eventoId||"")===ev),by=(col)=>mine.filter(d=>d.coleccion===col).map(d=>d.cuerpo),oldMenu=MENU||{},oldMesas=MESAS||[],oldEquipo=EQUIPO||[],oldP=P||paramsPorDefecto();
   const cfg=by("rest_config")[0];if(cfg){P=Object.assign(paramsPorDefecto(),P,{negocio:Object.assign({},P.negocio,{nombre:cfg.nombre||P.negocio.nombre,tel:cfg.tel||"",dir:cfg.dir||""}),iva:num(cfg.iva,P.iva),propina:num(cfg.propina,P.propina),servicio:num(cfg.servicio,P.servicio),apps:Array.isArray(cfg.apps)?cfg.apps:P.apps,fiscal:cfg.fiscal||P.fiscal,ticket:Object.assign({},P.ticket,cfg.ticket||{}),folios:cfg.folios||P.folios});guardaSalPinRestaurant(cfg.pinSalt);
+    if(Object.prototype.hasOwnProperty.call(cfg,"bloqueoMin"))P.bloqueoMin=num(cfg.bloqueoMin,10);
     if(Object.prototype.hasOwnProperty.call(cfg,"logo")){
       P.negocio.logoRef=cfg.logo||"";
       P.negocio.logo=imagenMedioRestaurant("logo","general",cfg.logo||"");
@@ -3290,9 +3324,10 @@ function aplicaDocumentosRestaurant(docs){
   if(has("rest_comandas")||has("rest_lineas")||has("rest_tickets")){COMANDAS=headers.map(h=>{const c=Object.assign({},h);delete c.eventoId;c.estado=h.estado==="cobrada"||h.estado==="cancelada"?"cerrada":h.estado;if(h.estado==="cancelada")c.cancelada=true;c.lineas=(linesBy[c.id]||[]).filter(l=>l.comandaId===c.id);if(ticketBy[c.id])Object.assign(c,ticketBy[c.id]);c.cancelaciones=lineDocs.filter(x=>x.tipo==="cancelacion"&&x.comandaId===c.id).map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;delete y.comandaId;return y;});return c;});}
   const remoteTeam=by("rest_equipo").map(x=>{const prev=oldEquipo.find(y=>y.id===x.id)||{},y=Object.assign({},prev,{id:x.id,nombre:x.nombre,rol:x.rol,pin_hash:x.pin_hash||"",activo:x.activo!==false});delete y.pin;return y;});if(has("rest_equipo"))EQUIPO=remoteTeam;
   EVENTOS=Object.values(docs).filter(d=>d&&d.coleccion==="rest_eventos"&&d.cuerpo&&!d.cuerpo._eliminado).map(d=>Object.assign({},d.cuerpo));EVENTOS.forEach(x=>delete x.eventoId);try{localStorage.setItem(EVENTOS_KEY,JSON.stringify(EVENTOS));}catch(_){}
-  guardaEstadoLocal();REST_NUBE.projection=Object.fromEntries(Object.entries(docs).filter(([,d])=>d&&d.cuerpo).map(([k,d])=>[k,{cuenta_id:d.cuenta_id,coleccion:d.coleccion,doc_id:d.doc_id,cuerpo:d.cuerpo}]));nubeGuarda(REST_NUBE_PROJECTION_KEY,REST_NUBE.projection);
+  guardaEstadoLocal();REST_NUBE.projection=nubeClona(Object.fromEntries(Object.entries(docs).filter(([,d])=>d&&d.cuerpo).map(([k,d])=>[k,{cuenta_id:d.cuenta_id,coleccion:d.coleccion,doc_id:d.doc_id,cuerpo:d.cuerpo}])));nubeGuarda(REST_NUBE_PROJECTION_KEY,REST_NUBE.projection);
   aplicaMarca();aplicaRol(true);if(typeof renderMesas==="function")renderMesas();if(typeof renderCocina==="function")renderCocina();if(typeof renderComanda==="function"&&comandaActual())renderComanda();pintaTabs();actualizaAvisosReclamosNube();actualizaEstadoNube();procesaLineasEntrantes();
   if(!$("#tab-menu").hidden && nubeCanon(oldMenu)!==nubeCanon(MENU)) refrescaMenuDesdeNube();
+  if(!$("#tab-set").hidden && nubeCanon(oldP)!==nubeCanon(P)) refrescaAjustesDesdeNube();
   if(!$("#tab-ventas").hidden&&puedeVer("ventas"))renderVentas();
 }
 function descargaEventoRestaurant(ev){if(REST_NUBE.localOnly||!REST_NUBE.enabled)return;const doc={cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:"rest_eventos",doc_id:String(ev.id),cuerpo:Object.assign({},nubeClona(ev),{eventoId:""})};nubeQueueDoc(doc);vaciaColaNube();}
@@ -5171,10 +5206,10 @@ function pideModificadores(platId){
     '<div class="modGrupo" data-grupo="'+esc(g.id)+'"><b>'+esc(g.nombre)+'</b>'+
     '<small>'+(num(g.min) ? "Escoge al menos "+num(g.min) : "Opcional")+
       (num(g.max) ? " · hasta "+num(g.max) : "")+'</small>'+
-    '<div class="modChips">'+ g.ops.map(o=>
-      '<label class="modChip" data-op="'+esc(o.id)+'"><input type="checkbox">'+
-      esc(o.nombre)+(num(o.extra) ? ' <i>+'+mx(o.extra)+(porPeso?" / kg":"")+'</i>' : '')+'</label>').join("") +
-    '</div></div>').join("");
+    '<div class="modChips">'+ (g.ops||[]).filter(o=>String(o.nombre||"").trim()).map(o=>
+      '<label class="modChip" data-op="'+esc(o.id)+'"><input type="checkbox"><span class="modOptionName">'+
+      esc(String(o.nombre).trim())+'</span><i>'+(num(o.extra) ? '+'+mx(o.extra)+(porPeso?" / kg":"") : 'Sin costo extra')+'</i></label>').join("") +
+    '</div>'+((g.ops||[]).some(o=>!String(o.nombre||"").trim())?'<p class="modIncomplete">Hay opciones sin nombre pendientes de completar en El menú.</p>':'')+'</div>').join("");
   pintaModsImporte();
   $("#modalMods").hidden = false;
 }
@@ -5184,7 +5219,7 @@ function modsElegidos(){
     const gid = ch.closest("[data-grupo]").dataset.grupo;
     const g = (MENU.grupos||[]).find(x=>x.id===gid); if(!g) return;
     const o = g.ops.find(x=>x.id === ch.dataset.op); if(!o) return;
-    out.push({nombre:o.nombre, extra:num(o.extra)});
+    if(String(o.nombre||"").trim())out.push({nombre:String(o.nombre).trim(), extra:num(o.extra)});
   });
   return out;
 }
@@ -7139,7 +7174,7 @@ $("#trasladoForm").addEventListener("submit",async e=>{
     if(!data?.cuerpo) throw new Error("No se recibió confirmación del traslado. Actualiza las mesas.");
     const anterior=REST_NUBE.serverDocs[key];
     if(!anterior || Date.parse(data.actualizado)>=Date.parse(anterior.actualizado)) REST_NUBE.serverDocs[key]=data;
-    if(REST_NUBE.localDirty) REST_NUBE.applyPending=true;
+    if(REST_NUBE.localDirty||REST_NUBE.serializando) REST_NUBE.applyPending=true;
     else aplicaDocumentosRestaurant(nubeRebaseMap());
     if(trasladoDialog.open) trasladoDialog.close();
     toast("Cuenta transferida a "+data.cuerpo.mesaNombre+".");
@@ -7551,6 +7586,8 @@ function iconoSugeridoPlatillo(platillo,categorias){
 }
 function renderMenu(){
   menuTieneCambiosDeNube=false;
+  const problema=problemaMenuRestaurant();
+  if(problema)estadoGuardadoConfiguracion("menu",problema.mensaje,"error");
   const cats=(MENU.cats||[]).slice().sort((a,b)=>num(a.orden)-num(b.orden));
   const search=($("#menuBuscar")?.value||"").trim().toLocaleLowerCase(),sel=$("#menuFiltroCategoria")?.value||"";
   $("#menuFiltroCategoria").innerHTML='<option value="">Todas las categorías</option>'+cats.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.nombre)+'</option>').join("");
@@ -9483,6 +9520,94 @@ async function registraCheca(){
 /* ===================================================================
    AJUSTES
    =================================================================== */
+let ajustesTienenCambiosDeNube=false;
+function refrescaAjustesDesdeNube(){
+  if($("#tab-set").hidden)return;
+  if(document.activeElement?.closest("#tab-set input,#tab-set textarea,#tab-set select")){
+    ajustesTienenCambiosDeNube=true;return;
+  }
+  ajustesTienenCambiosDeNube=false;renderSet();
+}
+$("#tab-set").addEventListener("focusout",()=>setTimeout(()=>{if(ajustesTienenCambiosDeNube)refrescaAjustesDesdeNube();},0));
+function estadoGuardadoConfiguracion(ambito,texto,estado="pendiente"){
+  $$('[data-config-status="'+ambito+'"]').forEach(el=>{el.textContent=texto;el.dataset.estado=estado;});
+}
+function marcaGuardadoConfiguracionPendiente(){
+  const ambito=!$("#tab-menu").hidden?"menu":!$("#tab-set").hidden?document.activeElement?.closest("[data-ajuste-panel]")?.id:"";
+  if(ambito)estadoGuardadoConfiguracion(ambito,"Cambios pendientes de confirmar.");
+}
+function problemaMenuRestaurant(){
+  for(const c of MENU.cats||[])if(!String(c.nombre||"").trim())return {mensaje:"Escribe el nombre de la categoría.",categoria:c.id};
+  for(const p of MENU.plats||[])if(!String(p.nombre||"").trim())return {mensaje:"Escribe el nombre del platillo.",platillo:p.id};
+  for(const g of MENU.grupos||[]){
+    if(!String(g.nombre||"").trim())return {mensaje:"Escribe la pregunta del grupo.",grupo:g.id};
+    const vacia=(g.ops||[]).find(o=>!String(o.nombre||"").trim());
+    if(vacia)return {mensaje:'Completa o elimina la opción sin nombre en «'+g.nombre+'».',grupo:g.id,opcion:vacia.id};
+    if(!(g.ops||[]).length)return {mensaje:'Agrega al menos una opción en «'+g.nombre+'».',grupo:g.id};
+    if(num(g.min)<0||num(g.max)<1||num(g.min)>num(g.max)||num(g.min)>(g.ops||[]).length)return {mensaje:'Revisa el mínimo y máximo en «'+g.nombre+'».',grupo:g.id};
+  }
+  return null;
+}
+function muestraProblemaMenuRestaurant(problema){
+  if(problema.grupo){menuGrupoActivo=problema.grupo;$("#menuGruposAdvanced").open=true;}
+  if(problema.categoria)menuCategoriaActiva=problema.categoria;
+  if(problema.platillo){menuPlatilloActivo=problema.platillo;$("#menuFiltroCategoria").value="";}
+  renderMenu();
+  const campo=problema.opcion?$('[data-op="'+problema.opcion+'"] [data-ok="nombre"]')
+    :problema.grupo?$('#modLista [data-gk="nombre"]'):problema.categoria?$('#menuCategorySelection [data-ck="nombre"]'):$('#t_plats [data-pk="nombre"]');
+  campo?.focus();campo?.scrollIntoView({block:"center",behavior:"smooth"});
+}
+async function guardaConfiguracionRestaurant(ambito){
+  if(!esGerente()||bloqueado)return;
+  const botones=$$('[data-save-config="'+ambito+'"]');
+  if(botones.some(b=>b.disabled))return;
+  if(ambito==="menu"){
+    const problema=problemaMenuRestaurant();
+    if(problema){muestraProblemaMenuRestaurant(problema);estadoGuardadoConfiguracion(ambito,problema.mensaje,"error");toast(problema.mensaje);return;}
+  }
+  botones.forEach(b=>{b.disabled=true;b.textContent="Guardando…";});
+  estadoGuardadoConfiguracion(ambito,"Comprobando el guardado…");
+  try{
+    if(ambito==="impresorasCard"){
+      const ok=await guardaBorradorImpresoraPOS();
+      if(!ok)throw new Error("Revisa los datos de la impresora antes de guardar.");
+      estadoGuardadoConfiguracion(ambito,"Impresora guardada en este dispositivo.","guardado");return;
+    }
+    clearTimeout(guardaT);guardaEstadoLocal();
+    if(!navigator.onLine){
+      estadoGuardadoConfiguracion(ambito,"Guardado en este aparato. Pendiente de enviar cuando vuelva internet.");return;
+    }
+    if(!REST_NUBE.enabled||REST_NUBE.localOnly||!REST_NUBE.verified){
+      if(!RESTAURANT_ACCOUNT.localOnly)await iniciaNubeRestaurant();
+      if(!REST_NUBE.enabled||REST_NUBE.localOnly||!REST_NUBE.verified)throw new Error("Conservamos tus cambios en este aparato. La conexión a la nube no está activa; revisa el aviso de conexión de arriba.");
+    }
+    await sincronizaNubeEnSerie(true);
+    if(REST_NUBE.uploadPromise)await REST_NUBE.uploadPromise;
+    await sincronizaNubeEnSerie(true);
+    if(REST_NUBE.error||REST_NUBE.subscriptionBlocked||REST_NUBE.queue.some(q=>q.cuenta_id===RESTAURANT_ACCOUNT.accountId))throw new Error(REST_NUBE.error||"Los cambios siguen pendientes de confirmar. Vuelve a guardar.");
+    const revision=REST_NUBE.revision,coleccion=ambito==="menu"?"rest_carta":ambito==="ajusteMesas"?"rest_mesas":"rest_config";
+    const esperados=Object.values(nubeDocsDeContexto(await proyectaRestaurant())).filter(d=>d.coleccion===coleccion);
+    const {data,error}=await RESTAURANT_SB.from("documentos").select("doc_id,cuerpo").eq("cuenta_id",RESTAURANT_ACCOUNT.accountId).eq("coleccion",coleccion).limit(2000);
+    if(error)throw error;
+    const remotos=new Map((data||[]).map(d=>[d.doc_id,d.cuerpo]));
+    if(esperados.some(d=>nubeCanon(nubeSinMarcaMigracion(remotos.get(d.doc_id)))!==nubeCanon(nubeSinMarcaMigracion(d.cuerpo))))throw new Error("La nube aún no coincide con esta edición. Tus cambios se conservan aquí; vuelve a guardar.");
+    if(revision!==REST_NUBE.revision||REST_NUBE.localDirty){estadoGuardadoConfiguracion(ambito,"Se confirmó la edición anterior. Hay cambios nuevos: vuelve a guardar.");return;}
+    await procesaMediosRestaurant();
+    const pendientes=[...mediosPendientes.values()].filter(r=>r.evento===nubeEventoId()).length;
+    estadoGuardadoConfiguracion(ambito,pendientes?"Datos confirmados en la nube. Hay "+pendientes+" imagen(es) pendientes de compartir.":"Guardado en la nube · disponible en todos los perfiles de este negocio.",pendientes?"pendiente":"guardado");
+    toast(pendientes?"Datos guardados; imágenes pendientes.":"Cambios confirmados en la nube.");
+  }catch(err){estadoGuardadoConfiguracion(ambito,err.message||"No se confirmó el guardado. Tus cambios se conservan en este aparato.","error");}
+  finally{botones.forEach(b=>{b.disabled=false;b.textContent="Guardar cambios";});}
+}
+$$('#tab-set [data-ajuste-panel]').forEach(panel=>{
+  const soloConsulta=["restaurantAccountSettings","ajusteRespaldo"].includes(panel.id);
+  const pie=document.createElement("div");pie.className="configSaveBar";
+  const mensaje=document.createElement("span");mensaje.dataset.configStatus=panel.id;mensaje.setAttribute("role","status");
+  mensaje.textContent=soloConsulta?"Esta tarjeta no tiene cambios por guardar.":panel.id==="impresorasCard"?"La conexión de la impresora se guarda en este dispositivo.":"Confirma los cambios para compartirlos con tu negocio.";
+  const b=document.createElement("button");b.type="button";b.className="btn primary";b.dataset.saveConfig=panel.id;b.textContent="Guardar cambios";b.disabled=soloConsulta;
+  pie.append(mensaje,b);panel.append(pie);
+});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-save-config]");if(b)guardaConfiguracionRestaurant(b.dataset.saveConfig);});
 const ajustesGrupos = [
   {titulo:"Operación", tono:"operacion", tarjetas:[
     {id:"ajusteMesas", titulo:"Mesas y zonas", detalle:"Salones, mesas y lugares", icono:ICO.mesas},
@@ -9636,6 +9761,7 @@ function armaRespaldo(){
   return d;
 }
 function pintaNotaRespaldo(){
+  $("#respCopiaConfig").hidden=!localStorage.getItem(LS+"_config_antes_guardado_v2");
   const n = $("#respHint"); if(!n) return;
   const cu = COMANDAS.length, dias = [...new Set(COMANDAS.map(c=>c.fecha))].length;
   n.textContent = cu ? cu + " cuenta(s) en " + dias + " día(s)" : "todavía sin movimientos";
@@ -9820,7 +9946,8 @@ async function guardaBorradorImpresoraPOS(){
     if(fondo && IMPRESORAS.some(x=>x.cocina && x.conexion==="bluetooth")) await iniciaCocinaFondoPOS();
     renderImpresorasPOS(); toast("Impresora guardada en este dispositivo.");
     if(habilitada) consultaEstacionesCocinaPOS().catch(()=>{});
-  }catch(err){toast(err.message||"Conéctate para confirmar qué equipo imprime en cocina.");}
+    return true;
+  }catch(err){toast(err.message||"Conéctate para confirmar qué equipo imprime en cocina.");return false;}
   finally{guardandoImpresoraPOS=false;}
 }
 function imprimePruebaImpresoraPOS(){
@@ -10238,6 +10365,11 @@ $("#tab-set").addEventListener("click", e=>{
   if(e.target.closest("#bloqueoProbar")){ bloqueaPantalla(true); return; }
   if(e.target.closest("#e_logoBtn")){ $("#e_logoFile").click(); return; }
   if(e.target.closest("#e_logoQuita")){ quitaFotoCompartidaRestaurant("logo","general").catch(err=>toast(err.message)); return; }
+  if(e.target.closest("#respCopiaConfig")){
+    const copia=localStorage.getItem(LS+"_config_antes_guardado_v2");if(!copia)return;
+    const url=URL.createObjectURL(new Blob([copia],{type:"application/json"})),a=document.createElement("a");
+    a.href=url;a.download="nuvoor-menu-ajustes-anterior-"+hoyISO()+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);return;
+  }
   if(e.target.closest("#respBaja")){ bajaRespaldo(); return; }
   if(e.target.closest("#respSube")){ $("#respFile").click(); return; }
 });
@@ -10447,7 +10579,7 @@ function procesaMediosRestaurant(){
       }
       const objeto=elementoMedioRestaurant(registro.tipo,registro.id),campo=registro.tipo==="logo"?"logo":"foto";
       if(objeto){objeto[campo+"Ref"]=doc.cuerpo[campo]||"";objeto[campo]=imagenMedioRestaurant(registro.tipo,registro.id,doc.cuerpo[campo]||"");}
-      if(REST_NUBE.localDirty){REST_NUBE.applyPending=true;guardaEstadoLocal();}
+      if(REST_NUBE.localDirty||REST_NUBE.serializando){REST_NUBE.applyPending=true;guardaEstadoLocal();}
       else aplicaDocumentosRestaurant(nubeRebaseMap());
       await guardaBorradoMedioRestaurant(data.anterior);
     }
@@ -10540,7 +10672,7 @@ function aplicaRol(desdeNube=false){
   const visible = PESTANAS.filter(p=>puedeVer(p.k)).map(p=>p.k);
   const abierta = PESTANAS.concat([{k:"comanda"}]).find(p=>{ const s=$("#tab-"+p.k); return s && !s.hidden; });
   if(!abierta || !puedeVer(abierta.k)) vaA(visible[0]);
-  else if(abierta.k !== "comanda" && !(desdeNube && abierta.k === "menu")) vaA(abierta.k);
+  else if(abierta.k !== "comanda" && !(desdeNube && ["menu","set"].includes(abierta.k))) vaA(abierta.k);
 }
 
 /* ===================================================================
@@ -10843,6 +10975,8 @@ function start(){
   });
 }
 async function iniciaRestaurant(){
+  // Conservar los textos anteriores antes de cargar la nube: algunas ediciones antiguas no se enviaban.
+  try{const key=LS+"_config_antes_guardado_v2";if(!localStorage.getItem(key)&&(REST_LOCAL_START_KEYS.has("menu")||REST_LOCAL_START_KEYS.has("P")))localStorage.setItem(key,JSON.stringify({_app:"nuvoor-config-copia",fecha:new Date().toISOString(),menu:MENU,ajustes:P}));}catch(_){}
   actualizaPantallaCocinaPOS();
   await cargaMediosPendientesRestaurant();
   try{await iniciaNubeRestaurant();}catch(e){REST_NUBE.localOnly=true;REST_NUBE.error="No se pudo revisar SQL 20";actualizaEstadoNube();}

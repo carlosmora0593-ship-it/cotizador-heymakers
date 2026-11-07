@@ -1,4 +1,4 @@
-const CACHE_NAME = "nuvoor-restaurant-v49-fotos-logo";
+const CACHE_NAME = "nuvoor-restaurant-v50-guardar-configuracion";
 const MEDIOS_CACHE = "nuvoor-restaurant-medios-v1";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
