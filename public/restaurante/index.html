@@ -1547,8 +1547,8 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 #modalMods .modIncomplete{font-size:11px;color:var(--ink-3);margin:8px 0 0}
 @media(max-width:450px){.configSaveBar{padding:13px}.configSaveBar>.btn{width:100%}#modalMods .modChips{gap:7px}#modalMods .modChip{padding:10px}}
 </style>
-<meta name="nuvoor-build" content="20261107-1300">
-<link rel="stylesheet" href="./tema-borgona.css?v=20261107-1300">
+<meta name="nuvoor-build" content="20261109-1510">
+<link rel="stylesheet" href="./tema-borgona.css?v=20261109-1510">
 </head>
 <body>
 
@@ -2139,7 +2139,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <div class="grid g3">
         <div><label class="f" for="tk_ancho">Ancho del papel</label>
           <select id="tk_ancho"><option value="80">80 mm (lo normal)</option><option value="58">58 mm (chica)</option></select></div>
-        <p class="note" style="grid-column:span 2;margin:0">El logo se imprime en las cuentas. Para Bluetooth, usa la app actualizada de Nuvoor; las comandas de cocina llevan sólo texto.</p>
+        <p class="note" style="grid-column:span 2;margin:0">El logo se imprime en las cuentas. En impresoras Bluetooth, además, actívalo en cada impresora (Ajustes → Impresoras) después de una impresión de prueba; las comandas de cocina llevan sólo texto.</p>
       </div>
       <div class="grid g2" style="margin-top:14px">
         <div><label class="f" for="tk_enc">Arriba del ticket</label>
@@ -3594,7 +3594,7 @@ if(!Array.isArray(IMPRESORAS)){
 IMPRESORAS = IMPRESORAS.map(p=>Object.assign({
   id:uid(), nombre:"Impresora", conexion:"bluetooth", impresoraBt:"", impresoraNombre:"",
   anchoPapelBt:80, cuenta:false, cuentaAuto:false, cocina:false, cancela:false,
-  categorias:[], corteAutomatico:false
+  categorias:[], corteAutomatico:false, logoBt:false
 },p||{}, {categorias:Array.isArray((p||{}).categorias)?p.categorias:[]}));
 if(!window.MakersPrinter && IMPRESORAS.some(p=>p.conexion==="bluetooth")){
   IMPRESORAS = IMPRESORAS.map(p=>Object.assign({},p,{conexion:"sistema"}));
@@ -8054,7 +8054,7 @@ async function logoTicketBitmapPOS(origen,mm){
   const promesa=(async()=>{
     let cache;
     try{
-      cache=await caches.open("nuvoor-logo-ticket-v1");
+      cache=await caches.open("nuvoor-logo-ticket-v2");
       const guardado=await cache.match(clave);
       if(guardado)return await blobBase64Restaurant(await guardado.blob());
     }catch(_){}
@@ -8069,12 +8069,20 @@ async function logoTicketBitmapPOS(origen,mm){
     const ctx=canvas.getContext("2d");
     ctx.fillStyle="#fff";ctx.fillRect(0,0,ancho,canvas.height);
     ctx.drawImage(img,Math.round((ancho-w)/2),8,w,h);
-    const pixeles=ctx.getImageData(0,0,ancho,canvas.height);
+    const pixeles=ctx.getImageData(0,0,ancho,canvas.height),x0=Math.round((ancho-w)/2),hist=new Array(256).fill(0);
+    for(let y=8;y<8+h;y++)for(let x=x0;x<x0+w;x++){const i=(y*ancho+x)*4;hist[Math.round(.299*pixeles.data[i]+.587*pixeles.data[i+1]+.114*pixeles.data[i+2])]++;}
+    // Umbral automático (Otsu): un logo amarillo o claro también sale en negro.
+    const total=w*h;let suma=0;for(let t=0;t<256;t++)suma+=t*hist[t];
+    let sB=0,wB=0,mejor=0,umbral=200;
+    for(let t=0;t<256;t++){wB+=hist[t];if(!wB)continue;const wF=total-wB;if(!wF)break;sB+=t*hist[t];const dif=sB/wB-(suma-sB)/wF,v=wB*wF*dif*dif;if(v>mejor){mejor=v;umbral=t;}}
+    if(mejor/(total*total)<25)umbral=235;
+    let negros=0;
     for(let i=0;i<pixeles.data.length;i+=4){
       const gris=.299*pixeles.data[i]+.587*pixeles.data[i+1]+.114*pixeles.data[i+2];
-      const tono=gris<190?0:255;
+      const tono=gris<=umbral?0:255;if(!tono)negros++;
       pixeles.data[i]=pixeles.data[i+1]=pixeles.data[i+2]=tono;pixeles.data[i+3]=255;
     }
+    if(negros<20)throw new Error("El logo queda en blanco en una impresora de un solo color.");
     ctx.putImageData(pixeles,0,0);
     const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
     if(!blob)throw new Error("No se pudo convertir el logo para imprimir.");
@@ -8090,17 +8098,22 @@ function blobBase64Restaurant(blob){
     reader.onload=()=>resolve(String(reader.result).split(",")[1]);reader.readAsDataURL(blob);
   });
 }
+const logoBtAvisadoPOS=new Set();
+// El logo es opcional: si no se prepara o la impresora no responde, la cuenta sale sin logo.
 async function imprimeLogoBluetoothPOS(trabajo,mm){
-  const logo=trabajo.rasterModel?.logo,puente=window.MakersPrinter;
-  if(!logo||trabajo.logoEnviado||typeof puente?.printImage!=="function")return {ok:true};
+  const logo=trabajo.rasterModel?.logo,puente=window.MakersPrinter,p=trabajo.impresora||{};
+  if(!logo||!p.logoBt||trabajo.logoEnviado||typeof puente?.printImage!=="function")return {ok:true};
+  const avisa=m=>{if(trabajo.esPrueba&&$("#impTestEstado"))$("#impTestEstado").textContent=m;else if(!logoBtAvisadoPOS.has(p.impresoraBt)){logoBtAvisadoPOS.add(p.impresoraBt);toast(m);}};
   let png;
-  try{png=await logoTicketBitmapPOS(logo,mm);}catch(err){return {ok:false,mensaje:err.message};}
-  const id="logo-bt-"+uid(),respuesta=esperaResultadoImpresoraPOS(id,35000);
-  try{puente.printImage(id,trabajo.impresora.impresoraBt,mm,png,JSON.stringify({corte:false,avance:0}));}
+  try{png=await restaurantWithTimeout(logoTicketBitmapPOS(logo,mm),6000);}
+  catch(err){avisa((err&&err.message||"El logo no se pudo preparar.")+" La cuenta sale sin logo.");return {ok:true,sinLogo:true};}
+  const id="logo-bt-"+uid(),respuesta=esperaResultadoImpresoraPOS(id,12000);
+  try{puente.printImage(id,p.impresoraBt,mm,png,JSON.stringify({corte:false,avance:0}));}
   catch(err){resuelveResultadoImpresoraPOS(id,false,err.message||"No se pudo enviar el logo.");}
   const resultado=await respuesta;
-  if(resultado.ok)trabajo.logoEnviado=true;
-  return resultado;
+  if(resultado.ok){trabajo.logoEnviado=true;return {ok:true};}
+  avisa("El logo no se imprimió ("+(resultado.mensaje||"sin respuesta")+"). La cuenta sale sin logo; puedes apagarlo en Ajustes → Impresoras.");
+  return {ok:true,sinLogo:true};
 }
 const textoBluetoothPOS=texto=>String(texto||"").replace(/[¡¿]/g,"");
 
@@ -8115,7 +8128,7 @@ async function ejecutaTrabajoImpresoraPOS(trabajo){
     if(p.corteAutomatico&&!textoGrande&&typeof puente.printTicket!=="function")
       return {ok:false,mensaje:"Actualiza la app para usar el cortador automático."};
     const mm=num(p.anchoPapelBt,80)===58?58:80;
-    if(!cocina){const logo=await imprimeLogoBluetoothPOS(trabajo,mm);if(!logo.ok)return logo;}
+    if(!cocina)await imprimeLogoBluetoothPOS(trabajo,mm);
     const id="imp-bt-"+uid(), esperando=esperaResultadoImpresoraPOS(id,35000);
     try{
       if(textoGrande){
@@ -9857,6 +9870,7 @@ function renderEditorImpresoraPOS(){
       '<div class="impPrinterField"><span class="f">Impresora seleccionada</span><div class="impPrinterHint">'+esc(conexion==="bluetooth"?etiquetaImpresoraBluetoothPOS(p.impresoraNombre,p.impresoraBt):conexion==="computadora"?"Predeterminada de Windows":"Otra impresora · confirmación al imprimir")+'</div></div></div>'+
     '<div class="impPrinterSwitches"><label class="impPrinterSwitch"><span>Cuentas y recibos<small>Imprime la cuenta final.</small></span><input type="checkbox" data-imp-check="cuenta"'+(p.cuenta?' checked':'')+'></label>'+
     (p.cuenta?'<label class="impPrinterSwitch"><span>Imprimir la cuenta automáticamente al cobrar<small>Se manda a esta impresora al terminar el cobro.</small></span><input type="checkbox" data-imp-check="cuentaAuto"'+(p.cuentaAuto?' checked':'')+'></label>':'')+
+    (p.cuenta&&conexion==="bluetooth"?'<label class="impPrinterSwitch"><span>Imprimir el logo en las cuentas<small>Actívalo y haz una impresión de prueba. Si el logo no sale bien, apágalo: la cuenta saldrá sin logo.</small></span><input type="checkbox" data-imp-check="logoBt"'+(p.logoBt?' checked':'')+'></label>':'')+
     (conexion==="computadora"?'':'<label class="impPrinterSwitch"><span>Comandas de cocina<small>Imprime los pedidos nuevos que se mandan a cocina.</small></span><input type="checkbox" data-imp-check="cocina"'+(p.cocina?' checked':'')+'></label>'+
     '<label class="impPrinterSwitch"><span>Cancelaciones<small>Avisa a cocina de lo que se cancela después de enviarlo.</small></span><input type="checkbox" data-imp-check="cancela"'+(p.cancela?' checked':'')+'></label>')+
      '<label class="impPrinterSwitch"><span>Corta el papel sola (cortador automático)<small>'+(conexion!=="bluetooth"?"Disponible con impresora Bluetooth en la app de Android.":!soportaCorte?"Actualiza Nuvoor para controlar el cortador.":p.corteAutomatico?"Avanza unas líneas y corta cada ticket por separado.":"No manda el corte y deja más papel para cortar a mano.")+'</small></span><input type="checkbox" data-imp-check="corteAutomatico"'+(p.corteAutomatico?' checked':'')+((conexion!=="bluetooth"||!soportaCorte)?' disabled':'')+'></label></div>'+
@@ -9883,7 +9897,7 @@ function nuevoBorradorImpresoraPOS(){
   borradorImpresoraPOS={id:"nueva-"+uid(),nombre:primera?"Caja":"Nueva impresora",
     conexion:native?"bluetooth":"sistema",impresoraBt:"",impresoraNombre:"",
     anchoPapelBt:num(P.ticket.ancho,80),cuenta:primera,cuentaAuto:primera,
-    cocina:false,cancela:false,categorias:[],corteAutomatico:false};
+    cocina:false,cancela:false,categorias:[],corteAutomatico:false,logoBt:false};
   renderImpresorasPOS();
 }
 function buscaEmparejadasImpresorasPOS(){
@@ -10322,7 +10336,9 @@ $("#tab-set").addEventListener("change", e=>{
   if(t.id === "e_logoFile"){
     const f = t.files && t.files[0]; t.value = "";
     if(!f) return;
-    guardaFotoCompartidaRestaurant("logo","general",f).then(()=>toast("Logo del negocio guardado"))
+    guardaFotoCompartidaRestaurant("logo","general",f).then(async()=>{toast("Subiendo el logo a la nube…");try{await procesaMediosRestaurant();}catch(_){}
+      const pendiente=mediosPendientes.has(claveMedioRestaurant("logo","general"));
+      toast(!pendiente?"Logo compartido: ya se ve en todos tus aparatos.":mediosSinNube?"El logo quedó sólo en este aparato: falta el SQL 35 en Lab.":!navigator.onLine?"Sin internet: el logo se subirá solo al reconectar.":"El logo sigue subiendo. Revisa el aviso abajo del logo.");})
       .catch(err=>toast(err.message||"No se pudo guardar el logo."));
     return;
   }
@@ -10426,7 +10442,7 @@ function avatarHTML(u, clase="av"){
     (u&&u.foto?'<img src="'+esc(u.foto)+'" alt="Foto de '+esc(nombre)+'">':inicial)+'</span>';
 }
 const MEDIOS_BUCKET="restaurant-medios",mediosPendientes=new Map();
-let mediosDBPromise,mediosEnvio=null,mediosDisponibles=false,mediosConsultaEn=0,mediosError="",mediosSinNube=false;
+let mediosDBPromise,mediosEnvio=null,mediosDisponibles=false,mediosConsultaEn=0,mediosError="",mediosSinNube=false,mediosMigrables=0;
 const claveMedioRestaurant=(tipo,id,evento=nubeEventoId())=>RESTAURANT_ACCOUNT.accountId+"|"+evento+"|"+tipo+"|"+id;
 const esRutaMedioRestaurant=ruta=>typeof ruta==="string"&&ruta.startsWith(RESTAURANT_ACCOUNT.accountId+"/")&&/\/(logo|platillos|categorias)\/[a-f0-9-]+\.webp$/i.test(ruta);
 function urlMedioRestaurant(ruta){
@@ -10479,6 +10495,7 @@ async function cargaMediosPendientesRestaurant(){
       if(r.cuenta!==RESTAURANT_ACCOUNT.accountId||!["subir","quitar"].includes(r.op))continue;
       r.preview=r.blob?URL.createObjectURL(r.blob):"";mediosPendientes.set(r.clave,r);aplicaVistaMedioRestaurant(r);
     }
+    mediosMigrables=(await archivoMediosRestaurant("getAll")).filter(r=>r.cuenta===RESTAURANT_ACCOUNT.accountId&&r.op==="migracion").length;
   }catch(err){mediosError=err.message;}
 }
 function rutaActualMedioRestaurant(tipo,id){
@@ -10515,11 +10532,13 @@ function refrescaVistasMediosRestaurant(){
 function pintaMediosPendientesRestaurant(){
   let aviso=$("#restaurantMediosEstado");
   if(!aviso){aviso=document.createElement("p");aviso.id="restaurantMediosEstado";aviso.className="note";$("#ajusteNegocio .body").append(aviso);}
-  aviso.hidden=!mediosPendientes.size&&!mediosError;
+  const logoEnNube=esRutaMedioRestaurant(rutaActualMedioRestaurant("logo","general"));
+  const estadoNube=mediosDisponibles?(logoEnNube?"Logo en la nube ✓ Se ve en todos tus aparatos.":"Todavía no hay logo en la nube. Súbelo aquí y aparecerá en todos tus aparatos."):"";
+  aviso.hidden=!mediosPendientes.size&&!mediosError&&!estadoNube;
   let migrar=$("#restaurantMediosMigrar");
   if(!migrar){migrar=document.createElement("button");migrar.id="restaurantMediosMigrar";migrar.type="button";migrar.className="btn sm ghost";migrar.textContent="Compartir imágenes guardadas en este equipo";migrar.onclick=()=>muestraMigracionMediosRestaurant(true).catch(err=>toast(err.message));$("#ajusteNegocio .body").append(migrar);}
-  migrar.hidden=!mediosDisponibles;
-  aviso.textContent=[...mediosPendientes.values()].find(r=>r.conflicto)?.conflicto||mediosError|| (mediosPendientes.size?(mediosSinNube?"Falta activar las fotos en la nube: corre el SQL 35 en Lab → Base de datos. Mientras tanto "+mediosPendientes.size+" imagen(es) se ven sólo en este aparato y se subirán solas en cuanto se active.":mediosPendientes.size+" imagen(es) pendiente(s). Se conservan en este dispositivo y se compartirán al conectar la nube."):"");
+  migrar.hidden=!mediosDisponibles||!mediosMigrables;
+  aviso.textContent=[...mediosPendientes.values()].find(r=>r.conflicto)?.conflicto||mediosError|| (mediosPendientes.size?(mediosSinNube?"Falta activar las fotos en la nube: corre el SQL 35 en Lab → Base de datos. Mientras tanto "+mediosPendientes.size+" imagen(es) se ven sólo en este aparato y se subirán solas en cuanto se active.":mediosPendientes.size+" imagen(es) pendiente(s). Se conservan en este dispositivo y se compartirán al conectar la nube."):estadoNube);
 }
 async function eliminaArchivoMedioRestaurant(ruta){
   if(!esRutaMedioRestaurant(ruta))return true;
@@ -10609,7 +10628,7 @@ async function muestraMigracionMediosRestaurant(manual=false){
     $("#mediosMigracionSubir").disabled=true;
     try{
       for(const r of fotos){await guardaFotoCompartidaRestaurant(r.tipo,r.id,r.blob);await archivoMediosRestaurant("delete",r.clave);}
-      localStorage.setItem(flag,"subido");modal.hidden=true;
+      localStorage.setItem(flag,"subido");modal.hidden=true;mediosMigrables=0;pintaMediosPendientesRestaurant();
     }catch(err){toast(err.message||"Se conservaron las imágenes locales.");}
     finally{$("#mediosMigracionSubir").disabled=false;}
   };
