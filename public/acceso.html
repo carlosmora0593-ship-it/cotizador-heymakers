@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./acceso.css?v=20261102-1810">
+<link rel="stylesheet" href="./acceso.css?v=20261110-1015">
 </head>
 <body>
 <header class="top">
@@ -40,10 +40,16 @@
         </div>
         <div class="closedSignup" id="closedSignup" hidden>
           <p class="closedNotice" id="altaPronto">Las cuentas nuevas abren muy pronto. Si ya tienes cuenta, entra con tu correo.</p>
+          <div class="inviteBox">
+            <label class="inviteLabel" for="inviteCode">¿Te dieron un código de invitación?</label>
+            <div class="inviteRow"><span class="inputShell"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 9V6.5h17V9a3 3 0 0 0 0 6v2.5h-17V15a3 3 0 0 0 0-6Z"></path><path d="M14 6.5v11"></path></svg><input id="inviteCode" placeholder="HM-XXXXXX" autocomplete="off" spellcheck="false" autocapitalize="characters"></span><button class="btn inviteBtn" type="button" id="inviteCheck">Usar código</button></div>
+            <p class="msg" id="inviteMsg" role="status" aria-live="polite"></p>
+          </div>
           <button class="btn secondaryBtn" type="button" data-mode="entrar">Entra a tu cuenta <span aria-hidden="true">→</span></button>
         </div>
         <form id="authForm" autocomplete="on">
           <div id="signupFields" hidden>
+            <p class="inviteActive" id="inviteActive" hidden></p>
             <div class="two">
               <div class="field"><label for="personName">Tu nombre</label><input id="personName" autocomplete="name" placeholder="Nombre completo"></div>
               <div class="field"><label for="businessName">Negocio</label><input id="businessName" autocomplete="organization" placeholder="Nombre del negocio"></div>
@@ -130,6 +136,6 @@
 
 <script src="./config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="./acceso.js?v=20261105-2043"></script>
+<script src="./acceso.js?v=20261110-1015"></script>
 </body>
 </html>
