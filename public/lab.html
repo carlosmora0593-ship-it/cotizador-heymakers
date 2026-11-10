@@ -3627,16 +3627,28 @@ document.addEventListener("click", e=>{
    Un código por curso. Lo dictas en clase y con él tus alumnos entran a
    una prueba de verdad; sin él, quien se registre tendrá que contratar.
    Eso es lo que evita que alguien abra un correo nuevo cada quince días. */
+/* La fecha en que se cierra un código, en la hora de quien mira el Lab.
+   Un «solo hoy» vence a las 11:59 p.m. de aquí, que en UTC ya es mañana:
+   por eso no basta con cortar la fecha del texto. */
+function fVenceCodigo(v) {
+  const d = new Date(v);
+  if (isNaN(d)) return fFecha(String(v).slice(0,10));
+  const hoy = new Date();
+  if (d.toDateString() === hoy.toDateString())
+    return "hoy, " + d.toLocaleTimeString("es-MX", {hour: "numeric", minute: "2-digit"});
+  return d.toLocaleDateString("es-MX", {day: "numeric", month: "short", year: "numeric"});
+}
+
 function vCodigos() {
   const cs = ficheros.codigos || [];
-  const vivos = cs.filter(c => c.activo && (!c.vence || c.vence >= iso(HOY)));
+  const vivos = cs.filter(c => c.activo && (!c.vence || new Date(c.vence) >= new Date()));
   const cuentasPorCodigo = c => ficheros.cuentas.filter(x => x.codigo === c.codigo).length;
 
   return '<div class="tarjeta"><header><h2>Abrir un curso</h2>' +
       '<span class="pista">el código que vas a dictar en clase</span></header>' +
       '<div class="cuerpo">' +
-      '<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;align-items:end">' +
-        '<div class="campo"><label class="f" for="cgCurso">Qué curso es</label>' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;align-items:end">' +
+        '<div class="campo" style="grid-column:span 2"><label class="f" for="cgCurso">Qué curso es</label>' +
           '<input id="cgCurso" placeholder="Serigrafía · octubre 2026"></div>' +
         '<div class="campo"><label class="f" for="cgLugares">Lugares</label>' +
           '<input id="cgLugares" type="number" min="0" value="30"></div>' +
@@ -3646,9 +3658,14 @@ function vCodigos() {
           '<option value="maker" selected>Maker</option>' +
           '<option value="basico">Básico</option>' +
           '<option value="pro">Pro</option></select></div>' +
+        '<div class="campo"><label class="f" for="cgValido">El código sirve</label><select id="cgValido">' +
+          '<option value="hoy">Solo hoy</option>' +
+          '<option value="7">7 días</option>' +
+          '<option value="60" selected>60 días</option></select></div>' +
       '</div>' +
-      '<p class="nota" style="margin:12px 0 0">Lugares en 0 es sin tope. El código sirve 60 días ' +
-        'para registrarse; los días de prueba empiezan a contar cuando cada alumno lo usa.</p>' +
+      '<p class="nota" style="margin:12px 0 0">Lugares en 0 es sin tope. «El código sirve» es el tiempo para ' +
+        'registrarse con él: <b>Solo hoy</b> se cierra solo a las 11:59 p.m. Los días de prueba empiezan a contar ' +
+        'cuando cada persona lo usa.</p>' +
       '<button class="btn p" id="cgCrear" style="margin-top:12px">Generar el código</button>' +
       '<div id="cgResultado"></div>' +
       '</div></div>' +
@@ -3663,7 +3680,7 @@ function vCodigos() {
           '<td>' + esc(planDe(c).nombre) + ' · ' + c.dias + ' días</td>' +
           '<td>' + c.usos + (c.usos_max ? ' de ' + c.usos_max : ' · sin tope') + '</td>' +
           '<td>' + cuentasPorCodigo(c) + '</td>' +
-          '<td>' + (c.vence ? fFecha(String(c.vence).slice(0,10)) : "siempre") + '</td>' +
+          '<td>' + (c.vence ? fVenceCodigo(c.vence) : "siempre") + '</td>' +
           '<td><button class="btn sm" data-cg="' + esc(c.codigo) + '">' +
             (c.activo ? 'Cerrar' : 'Reabrir') + '</button></td></tr>').join("") +
         '</tbody></table>'
@@ -3677,16 +3694,30 @@ document.addEventListener("click", async e => {
     const curso = ($("#cgCurso").value || "").trim();
     if (!curso) { aviso("Escribe de qué curso es, para que sepas cuál es cuál después."); return; }
     const b = e.target.closest("#cgCrear");
+    const valido = ($("#cgValido") && $("#cgValido").value) || "60";
     b.disabled = true; b.textContent = "Generando…";
     try {
       const r = await SB.rpc("nuevo_codigo", {
         p_curso: curso,
         p_lugares: Math.max(0, parseInt($("#cgLugares").value || "0", 10)),
         p_dias: Math.max(1, parseInt($("#cgDias").value || "15", 10)),
-        p_plan: $("#cgPlan").value
+        p_plan: $("#cgPlan").value,
+        p_valido_dias: valido === "hoy" ? 1 : Math.max(1, parseInt(valido, 10) || 60)
       });
       if (r.error) throw new Error(r.error.message);
       const d = r.data || {};
+      /* «Solo hoy»: la función da por lo menos un día completo, así que
+         aquí se recorta al final de hoy (11:59 p.m. de esta computadora).
+         Si la base no deja recortarlo, el código igual se cierra solo en
+         24 horas y se avisa para cerrarlo a mano en la noche. */
+      let vigencia = valido === "hoy" ? "Sirve solo hoy, hasta las 11:59 p.m."
+                   : "Sirve " + valido + " días para registrarse.";
+      if (valido === "hoy" && d.codigo) {
+        const fin = new Date(); fin.setHours(23, 59, 59, 0);
+        const u = await SB.from("codigos").update({vence: fin.toISOString()}).eq("codigo", d.codigo).select("codigo");
+        if (u.error || !(u.data && u.data.length))
+          vigencia = "Sirve 24 horas. Si quieres que deje de servir hoy, dale «Cerrar» en la noche.";
+      }
       $("#cgCurso").value = "";
       // Primero repintamos la lista, porque eso rehace la tarjeta entera y
       // borraría el código recién generado si lo escribiéramos antes.
@@ -3696,8 +3727,8 @@ document.addEventListener("click", async e => {
         '<h3>Listo, dicta este código</h3>' +
         '<p style="font-family:ui-monospace,monospace;font-size:30px;font-weight:600;' +
         'letter-spacing:.1em;margin:8px 0">' + esc(d.codigo) + '</p>' +
-        '<p class="porque">Para ' + esc(d.curso) + '. Cada alumno que lo use entra con plan ' +
-        esc((PLANES[d.plan] || {}).nombre || d.plan) + ' por ' + d.dias + ' días.</p>' +
+        '<p class="porque">Para ' + esc(d.curso) + '. Cada persona que lo use entra con plan ' +
+        esc((PLANES[d.plan] || {}).nombre || d.plan) + ' por ' + d.dias + ' días. ' + esc(vigencia) + '</p>' +
         '<button class="btn sm" id="cgCopiar">Copiar</button></div>';
       const bc = $("#cgCopiar");
       if (bc) bc.addEventListener("click", () => {
