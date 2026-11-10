@@ -457,6 +457,34 @@ tr.urge td{background:color-mix(in srgb, var(--mal,#D6127F) 7%, transparent)}
 .chip.prod-restaurant{background:#D6127F;color:#fff}
 .chip.prod-tiendita{background:#BC8417;color:#fff}
 
+/* ---- registro de visitas de nuvoor.mx ---- */
+.rvControles{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-bottom:16px}
+.rvFechas{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:12.5px;color:var(--ink-2)}
+.rvFechas label{display:inline-flex;align-items:center;gap:6px}
+.rvFechas input{padding:5px 8px;font-size:12.5px;width:auto;min-width:0}
+.rvOps{margin:18px 0 12px}
+#regVisitas .tiles{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+#regVisitas .tile .v{font-size:27px}
+.rvMarco{max-height:540px;overflow:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:10px}
+.rvMarco table{min-width:540px}
+.rvCelda{display:grid;grid-template-columns:30px minmax(60px,1fr);gap:9px;align-items:center}
+.rvBarra{display:block;height:8px;border-radius:4px;background:var(--surface-3)}
+.rvBarra>i{display:block;height:100%;border-radius:4px;background:var(--acento)}
+tr.rvCero td{color:var(--ink-3)}
+tr.rvAbierto td{background:var(--acento-suave)}
+tr.rvDetalle>td{background:var(--surface-2);padding:12px 14px 14px}
+.rvDetalle table{min-width:560px;font-size:12.5px;background:var(--surface)}
+.rvDetalle th{position:static;background:var(--surface)}
+.rvId{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12px;color:var(--ink-2)}
+.rvHoras{display:grid;grid-template-columns:repeat(24,minmax(0,1fr));gap:3px;align-items:end;height:150px;
+  border-bottom:1px solid var(--line-2);padding-top:6px}
+.rvHoras span{display:block;background:var(--acento);border-radius:4px 4px 0 0;min-height:2px}
+.rvHoras span.cero{background:var(--surface-3)}
+.rvHorasEt{display:grid;grid-template-columns:repeat(24,minmax(0,1fr));gap:3px;font-size:10.5px;color:var(--ink-3);
+  margin-top:5px;font-variant-numeric:tabular-nums}
+.rvHorasEt span{white-space:nowrap;overflow:visible}
+@media (max-width:620px){ .rvControles .seg{width:100%} .rvFechas{width:100%} }
+
 /* ---- la puerta de Nuvoor Lab ---- */
 body.sin-sesion .app,
 body.sin-sesion .ficha,
@@ -1922,7 +1950,7 @@ function urlEditorSQL(){
 }
 
 /* ================= vistas ================= */
-function vTablero(){ return NuvoorLab.tablero(nlDatos()) + vVisitasWeb(); }
+function vTablero(){ return NuvoorLab.tablero(nlDatos()) + vVisitasWeb() + vRegistroVisitas(); }
 function vCuentas(){
   const d=nlDatos(),t=filtro.texto.toLowerCase();
   const ls=ficheros.cuentas.filter(c=>(!filtroProducto||productoDe(c)===filtroProducto)&&(!filtro.estado||c.estado===filtro.estado)&&(!filtro.plan||c.plan===filtro.plan)&&(!nlEspecial||NuvoorLab.faltan(c,d))&&(!t||[c.taller,c.correo,c.sitio,c.contacto,c.pais,c.ciudad,NuvoorLab.nombre(NuvoorLab.persona(c,d))].join(' ').toLowerCase().includes(t)));
@@ -3689,7 +3717,8 @@ function vAltasLab() {
 function vVisitasWeb() {
   if (!visitasWeb.cargado || Date.now() - visitasWeb.cuando > 120000) cargaVisitasWeb();
   const cab = '<div class="tarjeta" style="margin-top:20px"><header><h2>Visitas a nuvoor.mx</h2>' +
-    '<span class="pista">personas distintas por día</span></header><div class="cuerpo">';
+    '<span class="pista">personas distintas por día</span>' +
+    '<button class="btn sm" type="button" data-rv-ir>Registro completo ↓</button></header><div class="cuerpo">';
   if (!visitasWeb.cargado) return cab + '<div class="vacio">Cargando…</div></div></div>';
   if (visitasWeb.falta) return cab + '<div class="vacio" style="text-align:left">El contador empieza a contar cuando corras ' +
     '<b>36-altas-y-visitas.sql</b> (Base de datos → Copiar SQL) y se publique la página nuvoor.mx con el contador. ' +
@@ -3719,6 +3748,290 @@ function vVisitasWeb() {
     '<p class="nota" style="margin:10px 0 0">Una persona = un navegador en un día. No se guarda nombre, correo ni IP.</p>' +
     '</div></div>';
 }
+
+/* ---------- Registro de visitas de nuvoor.mx (lee visitas_web · sql/36) ----------
+   Una tarjeta con fechas y «opciones». Cada opción es una pestaña.
+   PARA AGREGAR OTRA OPCIÓN (celular o computadora, clics en «Crea tu
+   cuenta», etc.): suma un objeto a RV_OPCIONES. Recibe los datos del rango
+   ya agrupados (rvAgrupa) y regresa el HTML. No hay que tocar nada más. */
+const RV_ZONA = "America/Mexico_City";
+const RV_INICIO = "2026-11-10";            // el día que nuvoor.mx empezó a contar
+const RV_MAX_FILAS = 20000;
+let regVis = {rango: "30", desde: "", hasta: "", op: "dias", abierto: null,
+  cargado: false, cargando: false, error: "", filas: [], llave: "", cuando: 0, recortado: false, pide: 0, agr: null, agrLlave: ""};
+const RV_FMT_DIA = new Intl.DateTimeFormat("en-CA", {timeZone: RV_ZONA, year: "numeric", month: "2-digit", day: "2-digit"});
+const rvHoy = () => RV_FMT_DIA.format(new Date());
+const rvSuma = (k, n) => { const d = new Date(k + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const rvFecha = (k, largo) => new Date(k + "T12:00:00Z").toLocaleDateString("es-MX", largo
+  ? {weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "UTC"}
+  : {weekday: "short", day: "numeric", month: "short", timeZone: "UTC"});
+const RV_FMT_HORA = new Intl.DateTimeFormat("es-MX", {timeZone: RV_ZONA, hour: "numeric", minute: "2-digit"});
+const RV_FMT_H24 = new Intl.DateTimeFormat("en-US", {timeZone: RV_ZONA, hour: "numeric", hourCycle: "h23"});
+const rvHora = t => { const d = new Date(t); return isNaN(d) ? "—" : RV_FMT_HORA.format(d); };
+const rvHoraNum = t => { const d = new Date(t); if (isNaN(d)) return null;
+  const h = parseInt(RV_FMT_H24.format(d), 10); return isNaN(h) ? null : h % 24; };
+const rvHoraEt = h => (h % 12 || 12) + (h < 12 ? " a.m." : " p.m.");
+const rvId = v => "#" + String(v || "").slice(0, 6);
+const rvPagina = p => (!p || p === "/" || p === "/index.html") ? "Inicio" : p;
+const rvPct = (n, t) => t ? Math.round(n / t * 100) + "%" : "—";
+function rvOrigen(o) {
+  const h = String(o || "").toLowerCase();
+  if (!h) return "Directo";
+  const tabla = [[/(^|\.)google\./, "Google"], [/facebook\.com$|(^|\.)fb\.(com|me)$/, "Facebook"], [/instagram\.com$/, "Instagram"],
+    [/(^|\.)t\.co$|(^|\.)x\.com$|twitter\.com$/, "X (Twitter)"], [/linkedin\.com$|lnkd\.in$/, "LinkedIn"],
+    [/youtube\.com$|youtu\.be$/, "YouTube"], [/tiktok\.com$/, "TikTok"], [/bing\.com$/, "Bing"], [/duckduckgo\.com$/, "DuckDuckGo"],
+    [/chatgpt\.com$|openai\.com$/, "ChatGPT"], [/whatsapp\.com$|(^|\.)wa\.me$/, "WhatsApp"], [/nuvoor\.mx$/, "La app de Nuvoor"]];
+  for (const [re, n] of tabla) if (re.test(h)) return n;
+  return h;
+}
+function rvRango() {
+  const hoy = rvHoy(); let d = hoy, h = hoy;
+  switch (regVis.rango) {
+    case "hoy": break;
+    case "ayer": d = h = rvSuma(hoy, -1); break;
+    case "7": d = rvSuma(hoy, -6); break;
+    case "30": d = rvSuma(hoy, -29); break;
+    case "mes": d = hoy.slice(0, 8) + "01"; break;
+    case "mesPasado": h = rvSuma(hoy.slice(0, 8) + "01", -1); d = h.slice(0, 8) + "01"; break;
+    case "todo": d = RV_INICIO; break;
+    default: d = regVis.desde || hoy; h = regVis.hasta || hoy;
+  }
+  if (d > h) { const x = d; d = h; h = x; }
+  return {desde: d, hasta: h};
+}
+async function cargaRegVis(forzar) {
+  const sb = sbLab(); if (!sb) return;
+  const {desde, hasta} = rvRango(); const llave = desde + "|" + hasta;
+  if (regVis.cargando && regVis.llave === llave) return;
+  if (!forzar && regVis.cargado && regVis.llave === llave && Date.now() - regVis.cuando < 120000) return;
+  const pide = ++regVis.pide;
+  regVis.cargando = true; regVis.llave = llave; regVis.error = "";
+  let filas = [], error = "", recortado = false;
+  try {
+    for (let i = 0; ; i += 1000) {
+      const r = await sb.from("visitas_web").select("dia,visitante,pagina,origen,vistas,primera,ultima")
+        .gte("dia", desde).lte("dia", hasta)
+        .order("dia", {ascending: false}).order("visitante").order("pagina").range(i, i + 999);
+      if (r.error) { error = r.error.message || "no se pudo leer"; break; }
+      filas = filas.concat(r.data || []);
+      if (!r.data || r.data.length < 1000) break;
+      if (filas.length >= RV_MAX_FILAS) { recortado = true; break; }
+    }
+  } catch (e) { error = (e && e.message) || "sin conexión"; }
+  if (pide !== regVis.pide) return;             // mientras, pidieron otras fechas
+  Object.assign(regVis, {cargado: true, cargando: false, filas, error, recortado, cuando: Date.now()});
+  pintaRegVis();
+}
+function pintaRegVis() {
+  const el = document.getElementById("regVisitas");
+  if (!el || vista !== "tablero") return;
+  const m = el.querySelector(".rvMarco"); const arriba = m ? m.scrollTop : 0;
+  el.outerHTML = vRegistroVisitas();
+  const m2 = document.querySelector("#regVisitas .rvMarco"); if (m2 && arriba) m2.scrollTop = arriba;
+}
+
+/* Agrupa las filas (una por visitante, día y página) en todo lo que piden las opciones. */
+function rvAgrupa(filas, desde, hasta) {
+  const hoy = rvHoy();
+  const dias = {}, personas = new Map(), origenes = {}, paginas = {}, horas = Array(24).fill(0);
+  let vistas = 0;
+  filas.forEach(f => {
+    const k = String(f.dia).slice(0, 10), n = +f.vistas || 1;
+    const d = dias[k] || (dias[k] = {k, gente: new Map(), vistas: 0, origenes: {}});
+    let g = d.gente.get(f.visitante);
+    if (!g) { g = {v: f.visitante, primera: f.primera, ultima: f.ultima, origen: f.origen || "", paginas: [], vistas: 0}; d.gente.set(f.visitante, g); }
+    if (f.primera < g.primera) { g.primera = f.primera; if (f.origen) g.origen = f.origen; }
+    if (f.ultima > g.ultima) g.ultima = f.ultima;
+    if (!g.origen && f.origen) g.origen = f.origen;
+    g.paginas.push({p: f.pagina, n}); g.vistas += n; d.vistas += n; vistas += n;
+    const p = personas.get(f.visitante) || {v: f.visitante, dias: new Set(), vistas: 0, primera: f.primera, ultima: f.ultima};
+    p.dias.add(k); p.vistas += n;
+    if (f.primera < p.primera) p.primera = f.primera;
+    if (f.ultima > p.ultima) p.ultima = f.ultima;
+    personas.set(f.visitante, p);
+    const pg = paginas[f.pagina] || (paginas[f.pagina] = {p: f.pagina, gente: new Set(), vistas: 0});
+    pg.gente.add(f.visitante); pg.vistas += n;
+  });
+  Object.values(dias).forEach(d => d.gente.forEach(g => {
+    const o = rvOrigen(g.origen);
+    d.origenes[o] = (d.origenes[o] || 0) + 1;
+    (origenes[o] || (origenes[o] = {o, gente: new Set(), visitas: 0})).gente.add(g.v);
+    origenes[o].visitas++;
+    const h = rvHoraNum(g.primera); if (h != null) horas[h]++;
+  }));
+  const lista = [];
+  const conDatos = Object.keys(dias).sort(), piso = conDatos.length && conDatos[0] < RV_INICIO ? conDatos[0] : RV_INICIO;
+  const ini = desde < piso ? piso : desde, fin = hasta > hoy ? hoy : hasta;
+  for (let k = fin; k >= ini && lista.length < 4000; k = rvSuma(k, -1)) lista.push(dias[k] || {k, gente: new Map(), vistas: 0, origenes: {}});
+  const visitas = lista.reduce((t, d) => t + d.gente.size, 0);
+  const mejor = lista.reduce((m, d) => (!m || d.gente.size > m.gente.size) ? d : m, null);
+  return {desde, hasta, ini, fin, lista, personas, origenes, paginas, horas, vistas, visitas, mejor};
+}
+
+/* ---- las opciones (pestañas) ---- */
+const RV_OPCIONES = [
+  {id: "dias", nombre: "Por día", pinta: d => {
+    const max = Math.max(1, ...d.lista.map(x => x.gente.size));
+    const filas = d.lista.map(x => {
+      const n = x.gente.size, abierto = regVis.abierto === x.k;
+      const top = Object.entries(x.origenes).sort((a, b) => b[1] - a[1]).slice(0, 3).map(o => esc(o[0]) + " " + o[1]).join(" · ");
+      let h = '<tr class="' + (n ? "clic" : "rvCero") + (abierto ? " rvAbierto" : "") + '"' + (n ? ' data-rv-dia="' + x.k + '" title="Ver quién entró ese día"' : '') + '>' +
+        '<td style="white-space:nowrap">' + (n ? (abierto ? "▾ " : "▸ ") : '<span style="visibility:hidden">▸ </span>') + esc(rvFecha(x.k)) +
+          (x.k === rvHoy() ? ' <span class="chip info">hoy</span>' : '') + '</td>' +
+        '<td><span class="rvCelda"><b class="num" style="text-align:right">' + n + '</b>' +
+          '<span class="rvBarra"><i style="width:' + Math.round(n / max * 100) + '%"></i></span></span></td>' +
+        '<td class="der">' + (x.vistas || "—") + '</td>' +
+        '<td style="color:var(--ink-2);white-space:nowrap">' + (top || "—") + '</td></tr>';
+      if (abierto) {
+        const gente = [...x.gente.values()].sort((a, b) => String(a.primera).localeCompare(String(b.primera)));
+        h += '<tr class="rvDetalle"><td colspan="4"><p class="nota" style="margin:0 0 8px"><b>' + esc(rvFecha(x.k, true)) + '</b> · ' +
+          n + (n === 1 ? ' persona' : ' personas') + ' · ' + x.vistas + ' páginas vistas</p>' +
+          '<div class="marco"><table><thead><tr><th>Llegó</th><th>Visitante</th><th>De dónde</th><th>Qué vio</th><th class="der">Vistas</th></tr></thead><tbody>' +
+          gente.map(g => {
+            const p = d.personas.get(g.v), volvio = p && p.dias.size > 1;
+            return '<tr><td style="white-space:nowrap">' + esc(rvHora(g.primera)) + '</td>' +
+              '<td style="white-space:nowrap"><span class="rvId">' + esc(rvId(g.v)) + '</span>' +
+                (volvio ? ' <span class="chip info" title="Entró ' + p.dias.size + ' días distintos en estas fechas">volvió</span>' : '') + '</td>' +
+              '<td>' + esc(rvOrigen(g.origen)) + '</td>' +
+              '<td>' + g.paginas.map(q => esc(rvPagina(q.p)) + (q.n > 1 ? ' ×' + q.n : '')).join(" · ") + '</td>' +
+              '<td class="der">' + g.vistas + '</td></tr>';
+          }).join("") + '</tbody></table></div></td></tr>';
+      }
+      return h;
+    }).join("");
+    return '<div class="rvMarco"><table><thead><tr><th>Día</th><th>Personas</th><th class="der">Páginas vistas</th><th>De dónde llegaron</th></tr></thead>' +
+      '<tbody>' + filas + '</tbody></table></div>' +
+      '<p class="nota" style="margin:10px 0 0">Toca un día para ver quién entró: a qué hora, de dónde llegó y qué vio.</p>';
+  }},
+  {id: "origen", nombre: "De dónde llegan", pinta: d => {
+    const lista = Object.values(d.origenes).sort((a, b) => b.gente.size - a.gente.size);
+    if (!lista.length) return '<div class="vacio">Nadie entró en estas fechas.</div>';
+    const max = lista[0].gente.size, tot = d.personas.size;
+    return '<div class="marco"><table style="min-width:480px"><thead><tr><th>Llegaron de</th><th>Personas</th><th class="der">Del total</th><th class="der">Visitas</th></tr></thead><tbody>' +
+      lista.map(o => '<tr><td><b>' + esc(o.o) + '</b></td>' +
+        '<td><span class="rvCelda"><b class="num" style="text-align:right">' + o.gente.size + '</b><span class="rvBarra"><i style="width:' + Math.round(o.gente.size / max * 100) + '%"></i></span></span></td>' +
+        '<td class="der">' + rvPct(o.gente.size, tot) + '</td><td class="der">' + o.visitas + '</td></tr>').join("") +
+      '</tbody></table></div>' +
+      '<p class="nota" style="margin:10px 0 0"><b>Directo</b> = escribieron la dirección, la tenían guardada o la abrieron desde WhatsApp ' +
+      '(WhatsApp no dice de dónde viene la gente). Una misma persona puede llegar por dos caminos en días distintos.</p>';
+  }},
+  {id: "paginas", nombre: "Qué páginas ven", pinta: d => {
+    const lista = Object.values(d.paginas).sort((a, b) => b.gente.size - a.gente.size || b.vistas - a.vistas);
+    if (!lista.length) return '<div class="vacio">Nadie entró en estas fechas.</div>';
+    const max = lista[0].gente.size;
+    return '<div class="marco"><table style="min-width:440px"><thead><tr><th>Página</th><th>Personas</th><th class="der">Veces vista</th></tr></thead><tbody>' +
+      lista.map(p => '<tr><td><b>' + esc(rvPagina(p.p)) + '</b>' + (rvPagina(p.p) !== p.p ? ' <span class="rvId">' + esc(p.p) + '</span>' : '') + '</td>' +
+        '<td><span class="rvCelda"><b class="num" style="text-align:right">' + p.gente.size + '</b><span class="rvBarra"><i style="width:' + Math.round(p.gente.size / max * 100) + '%"></i></span></span></td>' +
+        '<td class="der">' + p.vistas + '</td></tr>').join("") +
+      '</tbody></table></div>';
+  }},
+  {id: "horas", nombre: "A qué hora llegan", pinta: d => {
+    const tot = d.horas.reduce((t, n) => t + n, 0);
+    if (!tot) return '<div class="vacio">Nadie entró en estas fechas.</div>';
+    const max = Math.max(...d.horas), pico = d.horas.indexOf(max);
+    return '<p class="nota" style="margin:0 0 6px">Llegan más entre las <b>' + rvHoraEt(pico) + '</b> y las <b>' + rvHoraEt((pico + 1) % 24) +
+        '</b> (' + max + (max === 1 ? ' visita' : ' visitas') + '). Hora del centro de México.</p>' +
+      '<div class="rvHoras" role="img" aria-label="Visitas por hora del día">' + d.horas.map((n, h) =>
+        '<span class="' + (n ? "" : "cero") + '" style="height:' + (n ? Math.max(4, Math.round(n / max * 100)) : 2) + '%" title="' +
+        rvHoraEt(h) + ' a ' + rvHoraEt((h + 1) % 24) + ' · ' + n + (n === 1 ? ' visita' : ' visitas') + '"></span>').join("") + '</div>' +
+      '<div class="rvHorasEt">' + d.horas.map((n, h) => '<span>' + (h % 3 === 0 ? h + "h" : "") + '</span>').join("") + '</div>' +
+      '<p class="nota" style="margin:10px 0 0">Cuenta la hora en que cada persona abrió la página por primera vez ese día.</p>';
+  }},
+  {id: "regresan", nombre: "Quién regresa", cuenta: d => [...d.personas.values()].filter(p => p.dias.size > 1).length, pinta: d => {
+    const lista = [...d.personas.values()].filter(p => p.dias.size > 1).sort((a, b) => b.dias.size - a.dias.size || String(b.ultima).localeCompare(String(a.ultima)));
+    const tot = d.personas.size;
+    const intro = '<p class="nota" style="margin:0 0 10px"><b>' + lista.length + ' de ' + tot + '</b> ' + (tot === 1 ? 'persona' : 'personas') +
+      ' entraron más de un día en estas fechas (' + rvPct(lista.length, tot) + ').</p>';
+    if (!lista.length) return intro + '<div class="vacio">Todavía nadie ha regresado en estas fechas.</div>';
+    return intro + '<div class="marco"><table style="min-width:520px"><thead><tr><th>Visitante</th><th class="der">Días que entró</th><th>Primera vez</th><th>Última vez</th><th class="der">Páginas vistas</th></tr></thead><tbody>' +
+      lista.map(p => {
+        const ds = [...p.dias].sort();
+        return '<tr><td><span class="rvId">' + esc(rvId(p.v)) + '</span></td><td class="der">' + p.dias.size + '</td>' +
+          '<td>' + esc(rvFecha(ds[0])) + '</td><td>' + esc(rvFecha(ds[ds.length - 1])) + ' · ' + esc(rvHora(p.ultima)) + '</td>' +
+          '<td class="der">' + p.vistas + '</td></tr>';
+      }).join("") + '</tbody></table></div>';
+  }}
+];
+
+function vRegistroVisitas() {
+  cargaRegVis();
+  const {desde, hasta} = rvRango(), hoy = rvHoy();
+  const rangos = [["hoy", "Hoy"], ["ayer", "Ayer"], ["7", "7 días"], ["30", "30 días"], ["mes", "Este mes"], ["mesPasado", "Mes pasado"], ["todo", "Todo"]];
+  const cab = '<div class="tarjeta" id="regVisitas" style="margin-top:20px"><header><h2>Registro de visitas</h2>' +
+    '<span class="pista">nuvoor.mx · día por día</span>' +
+    '<button class="btn sm" type="button" id="rvActualiza">Actualizar</button>' +
+    '<button class="btn sm" type="button" id="rvCsv"' + (regVis.filas.length && !regVis.cargando ? '' : ' disabled') + '>Descargar</button></header><div class="cuerpo">' +
+    '<div class="rvControles"><div class="seg" role="group" aria-label="Fechas">' +
+      rangos.map(r => '<button type="button" data-rv-rango="' + r[0] + '" aria-pressed="' + (regVis.rango === r[0]) + '">' + r[1] + '</button>').join("") +
+    '</div><div class="rvFechas"><label>Del <input type="date" id="rvDesde" value="' + desde + '" max="' + hoy + '"></label>' +
+      '<label>al <input type="date" id="rvHasta" value="' + hasta + '" max="' + hoy + '"></label></div></div>';
+  const pie = '</div></div>';
+  if (!regVis.cargado || regVis.cargando) return cab + '<div class="vacio">Cargando las visitas…</div>' + pie;
+  if (regVis.error) return cab + '<div class="vacio" style="text-align:left">No se pudo leer el registro (' + esc(regVis.error) + '). ' +
+    'Si dice que no existe <b>visitas_web</b>, falta correr <b>36-altas-y-visitas.sql</b> en Base de datos.</div>' + pie;
+  if (hasta < RV_INICIO) return cab + '<div class="vacio">El contador empezó el ' + esc(rvFecha(RV_INICIO, true)) +
+    '. Antes de esa fecha no hay registro: nadie estaba contando.</div>' + pie;
+  if (regVis.agrLlave !== regVis.llave + "|" + regVis.cuando) { regVis.agr = rvAgrupa(regVis.filas, desde, hasta); regVis.agrLlave = regVis.llave + "|" + regVis.cuando; }
+  const d = regVis.agr;
+  const dias = Math.max(1, d.lista.length);
+  const prom = Math.round(d.visitas / dias * 10) / 10;
+  const op = RV_OPCIONES.find(o => o.id === regVis.op) || RV_OPCIONES[0];
+  return cab +
+    '<div class="tiles">' +
+      tile("Personas distintas", d.personas.size, d.lista.length === 1 ? "ese día" : "en " + d.lista.length + " días", true) +
+      tile("Visitas", d.visitas, "una por persona cada día") +
+      tile("Páginas vistas", d.vistas, d.visitas ? (Math.round(d.vistas / d.visitas * 10) / 10) + " por visita" : "—") +
+      tile("Promedio al día", prom, d.mejor && d.mejor.gente.size ? "mejor día: " + rvFecha(d.mejor.k) + " · " + d.mejor.gente.size : "sin visitas todavía") +
+    '</div>' +
+    '<div class="seg rvOps" role="tablist" aria-label="Qué ver">' + RV_OPCIONES.map(o => {
+      const c = o.cuenta ? o.cuenta(d) : 0;
+      return '<button type="button" role="tab" data-rv-op="' + o.id + '" aria-pressed="' + (o.id === op.id) + '">' + esc(o.nombre) +
+        (c ? ' <span class="cuenta">' + c + '</span>' : '') + '</button>';
+    }).join("") + '</div>' +
+    op.pinta(d) +
+    (desde < RV_INICIO ? '<p class="nota" style="margin:10px 0 0">El contador empezó el ' + esc(rvFecha(RV_INICIO, true)) + '; antes no hay datos.</p>' : '') +
+    (regVis.recortado ? '<p class="nota" style="margin:10px 0 0;color:var(--aviso)">Son muchas visitas: se muestran las primeras ' +
+      RV_MAX_FILAS.toLocaleString("es-MX") + ' filas. Elige menos días para verlas todas.</p>' : '') +
+    '<p class="nota" style="margin:10px 0 0">Una persona = un navegador. No se guarda nombre, correo ni IP; el visitante es un número al azar ' +
+      '(por eso aparece como ' + esc(rvId("3f9a2c")) + '). La misma persona en celular y computadora cuenta como dos.</p>' +
+    pie;
+}
+
+function rvDescarga() {
+  const {desde, hasta} = rvRango();
+  const cab = ["Fecha", "Llegó (hora)", "Visitante", "Página", "De dónde llegó", "Veces que la vio", "Última vez (hora)"];
+  const origen = o => { const n = rvOrigen(o); return (!o || n === o) ? n : n + " (" + o + ")"; };
+  const filas = regVis.filas.slice()
+    .sort((a, b) => (String(a.dia) + String(a.primera)).localeCompare(String(b.dia) + String(b.primera)))
+    .map(f => [String(f.dia).slice(0, 10), rvHora(f.primera), rvId(f.visitante), rvPagina(f.pagina), origen(f.origen), f.vistas, rvHora(f.ultima)]);
+  const csv = "﻿" + [cab].concat(filas).map(f => f.map(v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"').join(",")).join("\r\n");
+  try {
+    const url = URL.createObjectURL(new Blob([csv], {type: "text/csv;charset=utf-8"}));
+    const a = document.createElement("a"); a.href = url; a.download = "visitas-nuvoor-" + desde + "-a-" + hasta + ".csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    aviso("Archivo listo: " + filas.length + (filas.length === 1 ? " fila" : " filas"));
+  } catch (e) { aviso("No se pudo descargar el archivo."); }
+}
+
+document.addEventListener("click", e => {
+  const ir = e.target.closest("[data-rv-ir]");
+  if (ir) { const c = document.getElementById("regVisitas"); if (c) c.scrollIntoView({behavior: "smooth", block: "start"}); return; }
+  const r = e.target.closest("[data-rv-rango]");
+  if (r) { regVis.rango = r.dataset.rvRango; regVis.abierto = null; cargaRegVis(); pintaRegVis(); return; }
+  const o = e.target.closest("[data-rv-op]");
+  if (o) { regVis.op = o.dataset.rvOp; pintaRegVis(); return; }
+  const d = e.target.closest("[data-rv-dia]");
+  if (d) { regVis.abierto = regVis.abierto === d.dataset.rvDia ? null : d.dataset.rvDia; pintaRegVis(); return; }
+  if (e.target.closest("#rvCsv")) { rvDescarga(); return; }
+  if (e.target.closest("#rvActualiza")) { cargaRegVis(true); pintaRegVis(); return; }
+});
+document.addEventListener("change", e => {
+  if (e.target.id !== "rvDesde" && e.target.id !== "rvHasta") return;
+  const ahora = rvRango(), de = document.getElementById("rvDesde"), a = document.getElementById("rvHasta");
+  regVis.desde = (de && de.value) || ahora.desde; regVis.hasta = (a && a.value) || ahora.hasta;
+  regVis.rango = "otro"; regVis.abierto = null; cargaRegVis(); pintaRegVis();
+});
 
 function vCodigos() {
   const cs = ficheros.codigos || [];
