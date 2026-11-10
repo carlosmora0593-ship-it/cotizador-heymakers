@@ -457,6 +457,17 @@ tr.urge td{background:color-mix(in srgb, var(--mal,#D6127F) 7%, transparent)}
 .chip.prod-restaurant{background:#D6127F;color:#fff}
 .chip.prod-tiendita{background:#BC8417;color:#fff}
 
+/* ---- Uso y visitas ---- */
+.usoSeccion{display:flex;flex-direction:column;gap:20px}
+.usoSeccion .rejilla2{gap:20px}
+.usoGrupo{display:flex;flex-direction:column;gap:3px;padding:2px 2px 0}
+.usoGrupo h2{margin:0;font-size:21px;letter-spacing:-.01em}
+.usoGrupo p{margin:0;font-size:13px;color:var(--ink-2)}
+.usoEt{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+#tiempoWeb .tiles,#usoSistemas .tiles{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+#visitasWeb .tiles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+#regVisitas td.der{white-space:nowrap}
+#visitasWeb .tile .v,#tiempoWeb .tile .v,#usoSistemas .tile .v{font-size:25px}
 /* ---- registro de visitas de nuvoor.mx ---- */
 .rvControles{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin-bottom:16px}
 .rvFechas{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:12.5px;color:var(--ink-2)}
@@ -543,6 +554,7 @@ body.sin-sesion .telon{display:none!important}
       <button data-v="cuentas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v13H3ZM7 8V3h10v5M3 13h18"/></svg>Negocios y cuentas <span class="cuenta" id="n_cuentas">0</span></button>
       <button data-v="agenda"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v16H4ZM8 2v6m8-6v6M4 11h16"/></svg>Agenda <span class="cuenta" id="n_agenda">0</span></button>
       <button data-v="soporte"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14V9a8 8 0 0 1 16 0v5M4 10H2v7h4v-7Zm16 0h2v7h-4v-7"/></svg>Soporte <span class="cuenta" id="n_soporte">0</span></button>
+      <button data-v="uso"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M6 16v-5M11 16V6M16 16v-8M21 16v-3"/></svg>Uso y visitas <span class="cuenta" id="n_uso" title="Personas en nuvoor.mx hoy">·</span></button>
       <p>COBROS</p><button data-v="cobros"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5h20v14H2ZM12 8a3 3 0 1 0 0 6 3 3 0 0 0 0-6"/></svg>Cobros <span class="cuenta" id="n_cobros">0</span></button>
       <button data-v="facturas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h10l4 4v14H5ZM14 3v5h5M8 12h8M8 16h6"/></svg>Facturas <span class="cuenta" id="n_facturas">·</span></button>
       <button data-v="transferencias"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h17m-4-4 4 4-4 4M21 17H4m4-4-4 4 4 4"/></svg>Transferencias <span class="cuenta" id="n_transferencias">0</span></button>
@@ -1856,7 +1868,8 @@ const REVISA_RPC_MIG = {
   "21-negocio-con-prueba.sql": "nuvoor_negocio_prueba_disponible",
   "22-stripe-planes.sql": "nuvoor_stripe_planes_disponible",
   "30-restaurant-caja-compartida.sql": "nuvoor_rest_caja_disponible",
-  "36-altas-y-visitas.sql": "nuvoor_altas_disponible"
+  "36-altas-y-visitas.sql": "nuvoor_altas_disponible",
+  "37-tiempo-y-uso.sql": "nuvoor_uso_disponible"
 };
 let estadoMig = {};          /* archivo -> true | false | undefined */
 
@@ -1950,7 +1963,7 @@ function urlEditorSQL(){
 }
 
 /* ================= vistas ================= */
-function vTablero(){ return NuvoorLab.tablero(nlDatos()) + vVisitasWeb() + vRegistroVisitas(); }
+function vTablero(){ return NuvoorLab.tablero(nlDatos()); }
 function vCuentas(){
   const d=nlDatos(),t=filtro.texto.toLowerCase();
   const ls=ficheros.cuentas.filter(c=>(!filtroProducto||productoDe(c)===filtroProducto)&&(!filtro.estado||c.estado===filtro.estado)&&(!filtro.plan||c.plan===filtro.plan)&&(!nlEspecial||NuvoorLab.faltan(c,d))&&(!t||[c.taller,c.correo,c.sitio,c.contacto,c.pais,c.ciudad,NuvoorLab.nombre(NuvoorLab.persona(c,d))].join(' ').toLowerCase().includes(t)));
@@ -3142,7 +3155,7 @@ function pinta() {
   const titulos = { usuarios:"Personas y accesos", tablero: "Tablero", cuentas: "Negocios y cuentas", agenda: "Agenda", soporte: "Soporte",
     cobros: "Cobros y facturación", transferencias: "Transferencias por confirmar", equipo: "Equipo y alianzas", numeros: "Números",
     facturas:"Facturas de suscripciones", anuncios: "Publicidad", tips: "Tips del tablero", base: "Base de datos",
-    codigos: "Códigos de curso", diagnosticos: "Qué necesita cada taller" };
+    codigos: "Códigos de curso", diagnosticos: "Qué necesita cada taller", uso: "Uso y visitas" };
   $("#titulo").textContent = titulos[vista];
   $("#n_cuentas").textContent = ficheros.cuentas.length;
   $("#n_usuarios").textContent = nlUsuariosListos ? nlUsuarios.length : "—";
@@ -3161,6 +3174,7 @@ function pinta() {
   const nb = $("#n_base");
   if(nb){ nb.textContent = faltanMig || "·"; nb.className = "cuenta" + (faltanMig ? " urge" : ""); }
   $("#avisoDemo").hidden = !esEjemplo;
+  if (!visitasWeb.cargado && !visitasWeb.cargando && sbLab()) cargaVisitasWeb(); else ponGloboUso();
   ["busca", "filtroEstado", "filtroPlan", "btnNueva"].forEach(i => { $("#" + i).hidden = vista !== "cuentas"; });
   $("#busca").hidden = !["cuentas","usuarios"].includes(vista);
   $("#busca").value = vista === "usuarios" ? nlTextoUsuarios : filtro.texto;
@@ -3179,6 +3193,7 @@ function pinta() {
        dibujando otra cosa". */
     : vista === "codigos" ? vCodigos()
     : vista === "diagnosticos" ? vDiagnosticos()
+    : vista === "uso" ? vUso()
     : vista === "base" ? vBase() : vNumeros();
   ponGlobos();
   if(vista==="anuncios"||vista==="facturas") NuvoorLabOperacion.montar(vista);
@@ -3686,15 +3701,25 @@ async function cargaVisitasWeb() {
   const sb = sbLab(); if (!sb || visitasWeb.cargando) return;
   visitasWeb.cargando = true;
   try {
-    const [d, o] = await Promise.all([
-      sb.from("v_visitas_dia").select("dia,personas,vistas").order("dia", {ascending: false}).limit(30),
-      sb.from("v_visitas_origen").select("origen,personas").order("personas", {ascending: false}).limit(6)
-    ]);
+    let tiempo = true;
+    let d = await sb.from("v_visitas_dia").select("dia,personas,vistas,segundos").order("dia", {ascending: false}).limit(30);
+    if (d.error && /segundos/i.test(d.error.message || "")) {
+      tiempo = false;
+      d = await sb.from("v_visitas_dia").select("dia,personas,vistas").order("dia", {ascending: false}).limit(30);
+    }
+    const o = await sb.from("v_visitas_origen").select("origen,personas").order("personas", {ascending: false}).limit(6);
     visitasWeb = {cargado: true, cargando: false, dias: d.error ? [] : (d.data || []), origen: o.error ? [] : (o.data || []),
-                  falta: !!d.error, cuando: Date.now()};
-  } catch (e) { visitasWeb = {cargado: true, cargando: false, dias: [], origen: [], falta: true, cuando: Date.now()}; }
-  if (vista === "tablero") pinta();
+                  falta: !!d.error, tiempo, cuando: Date.now()};
+  } catch (e) { visitasWeb = {cargado: true, cargando: false, dias: [], origen: [], falta: true, tiempo: false, cuando: Date.now()}; }
+  pintaTarjeta("visitasWeb", vVisitasWeb);
+  ponGloboUso();
 }
+function hoyPersonasWeb() {
+  if (!visitasWeb.cargado || visitasWeb.falta) return "·";
+  const h = visitasWeb.dias.find(d => String(d.dia).slice(0, 10) === rvHoy());
+  return h ? h.personas : 0;
+}
+function ponGloboUso() { const n = document.getElementById("n_uso"); if (n) n.textContent = hoyPersonasWeb(); }
 function vAltasLab() {
   if (!altasLab.cargado) { cargaAltasLab(); return '<div class="tarjeta"><header><h2>Cuentas nuevas en Nuvoor</h2></header><div class="cuerpo"><div class="vacio">Revisando…</div></div></div>'; }
   const a = altasLab.abiertas;
@@ -3716,7 +3741,7 @@ function vAltasLab() {
 }
 function vVisitasWeb() {
   if (!visitasWeb.cargado || Date.now() - visitasWeb.cuando > 120000) cargaVisitasWeb();
-  const cab = '<div class="tarjeta" style="margin-top:20px"><header><h2>Visitas a nuvoor.mx</h2>' +
+  const cab = '<div class="tarjeta" id="visitasWeb"><header><h2>Visitas a nuvoor.mx</h2>' +
     '<span class="pista">personas distintas por día</span>' +
     '<button class="btn sm" type="button" data-rv-ir>Registro completo ↓</button></header><div class="cuerpo">';
   if (!visitasWeb.cargado) return cab + '<div class="vacio">Cargando…</div></div></div>';
@@ -3724,27 +3749,26 @@ function vVisitasWeb() {
     '<b>36-altas-y-visitas.sql</b> (Base de datos → Copiar SQL) y se publique la página nuvoor.mx con el contador. ' +
     'Las visitas de antes no se pueden recuperar: nadie las estaba contando.</div></div></div>';
   const porDia = {}; visitasWeb.dias.forEach(d => { porDia[String(d.dia).slice(0, 10)] = d; });
-  const hoy = new Date(); hoy.setHours(12, 0, 0, 0);
-  const lista = [];
-  for (let i = 0; i < 14; i++) { const d = new Date(hoy); d.setDate(d.getDate() - i); const k = diaLocal(d);
-    lista.push({k, d, p: porDia[k] ? porDia[k].personas : 0, v: porDia[k] ? porDia[k].vistas : 0}); }
+  const hoyK = rvHoy(), lista = [];
+  for (let i = 0; i < 14; i++) { const k = rvSuma(hoyK, -i);
+    lista.push({k, p: porDia[k] ? porDia[k].personas : 0, v: porDia[k] ? porDia[k].vistas : 0, s: porDia[k] ? (+porDia[k].segundos || 0) : 0}); }
   const max = Math.max(1, ...lista.map(x => x.p));
-  const semana = lista.slice(0, 7).reduce((t, x) => t + x.p, 0);
-  const nombreDia = d => d.toLocaleDateString("es-MX", {weekday: "short", day: "numeric", month: "short"});
+  const semana = lista.slice(0, 7), sp = semana.reduce((t, x) => t + x.p, 0), ss = semana.reduce((t, x) => t + x.s, 0);
   return cab +
     '<div class="tiles">' +
       tile("Hoy", lista[0].p, lista[0].v + " páginas vistas", true) +
       tile("Ayer", lista[1].p, lista[1].v + " páginas vistas") +
-      tile("Últimos 7 días", semana, "suma de cada día") +
+      tile("Últimos 7 días", sp, "suma de cada día") +
+      tile("Tiempo promedio", visitasWeb.tiempo ? (sp ? fSeg(ss / sp) : "—") : "—", visitasWeb.tiempo ? "por visita · 7 días" : "falta el SQL 37") +
     '</div>' +
     '<div style="display:flex;flex-direction:column;gap:6px;margin-top:16px">' +
-      lista.map(x => '<div style="display:grid;grid-template-columns:110px minmax(0,1fr) 44px;gap:10px;align-items:center;font-size:12.5px">' +
-        '<span style="color:var(--ink-2)">' + esc(nombreDia(x.d)) + '</span>' +
+      lista.map(x => '<div style="display:grid;grid-template-columns:96px minmax(0,1fr) 34px;gap:10px;align-items:center;font-size:12.5px">' +
+        '<span style="color:var(--ink-2)">' + esc(rvFecha(x.k)) + '</span>' +
         '<span style="height:10px;border-radius:5px;background:var(--surface-3)"><span style="display:block;height:100%;border-radius:5px;background:var(--acento);width:' + Math.round(x.p / max * 100) + '%"></span></span>' +
         '<b style="text-align:right;font-variant-numeric:tabular-nums">' + x.p + '</b></div>').join("") +
     '</div>' +
     (visitasWeb.origen.length ? '<p class="nota" style="margin:14px 0 0">De dónde llegan (30 días): ' +
-      visitasWeb.origen.map(o => esc(o.origen) + ' ' + o.personas).join(" · ") + '</p>' : '') +
+      visitasWeb.origen.map(o => esc(rvOrigen(o.origen === "directo" ? "" : o.origen)) + ' ' + o.personas).join(" · ") + '</p>' : '') +
     '<p class="nota" style="margin:10px 0 0">Una persona = un navegador en un día. No se guarda nombre, correo ni IP.</p>' +
     '</div></div>';
 }
@@ -3809,9 +3833,10 @@ async function cargaRegVis(forzar) {
   let filas = [], error = "", recortado = false;
   try {
     for (let i = 0; ; i += 1000) {
-      const r = await sb.from("visitas_web").select("dia,visitante,pagina,origen,vistas,primera,ultima")
+      const r = await sb.from("visitas_web").select(regVis.sinTiempo ? "dia,visitante,pagina,origen,vistas,primera,ultima" : "dia,visitante,pagina,origen,vistas,primera,ultima,segundos")
         .gte("dia", desde).lte("dia", hasta)
         .order("dia", {ascending: false}).order("visitante").order("pagina").range(i, i + 999);
+      if (r.error && !regVis.sinTiempo && /segundos/i.test(r.error.message || "")) { regVis.sinTiempo = true; filas = []; i = -1000; continue; }
       if (r.error) { error = r.error.message || "no se pudo leer"; break; }
       filas = filas.concat(r.data || []);
       if (!r.data || r.data.length < 1000) break;
@@ -3824,7 +3849,7 @@ async function cargaRegVis(forzar) {
 }
 function pintaRegVis() {
   const el = document.getElementById("regVisitas");
-  if (!el || vista !== "tablero") return;
+  if (!el || vista !== "uso") return;
   const m = el.querySelector(".rvMarco"); const arriba = m ? m.scrollTop : 0;
   el.outerHTML = vRegistroVisitas();
   const m2 = document.querySelector("#regVisitas .rvMarco"); if (m2 && arriba) m2.scrollTop = arriba;
@@ -3834,23 +3859,24 @@ function pintaRegVis() {
 function rvAgrupa(filas, desde, hasta) {
   const hoy = rvHoy();
   const dias = {}, personas = new Map(), origenes = {}, paginas = {}, horas = Array(24).fill(0);
-  let vistas = 0;
+  let vistas = 0, seg = 0;
   filas.forEach(f => {
     const k = String(f.dia).slice(0, 10), n = +f.vistas || 1;
-    const d = dias[k] || (dias[k] = {k, gente: new Map(), vistas: 0, origenes: {}});
+    const d = dias[k] || (dias[k] = {k, gente: new Map(), vistas: 0, seg: 0, origenes: {}});
     let g = d.gente.get(f.visitante);
-    if (!g) { g = {v: f.visitante, primera: f.primera, ultima: f.ultima, origen: f.origen || "", paginas: [], vistas: 0}; d.gente.set(f.visitante, g); }
+    if (!g) { g = {v: f.visitante, primera: f.primera, ultima: f.ultima, origen: f.origen || "", paginas: [], vistas: 0, seg: 0}; d.gente.set(f.visitante, g); }
     if (f.primera < g.primera) { g.primera = f.primera; if (f.origen) g.origen = f.origen; }
     if (f.ultima > g.ultima) g.ultima = f.ultima;
     if (!g.origen && f.origen) g.origen = f.origen;
-    g.paginas.push({p: f.pagina, n}); g.vistas += n; d.vistas += n; vistas += n;
+    const sg = +f.segundos || 0;
+    g.paginas.push({p: f.pagina, n}); g.vistas += n; d.vistas += n; vistas += n; g.seg += sg; d.seg += sg; seg += sg;
     const p = personas.get(f.visitante) || {v: f.visitante, dias: new Set(), vistas: 0, primera: f.primera, ultima: f.ultima};
     p.dias.add(k); p.vistas += n;
     if (f.primera < p.primera) p.primera = f.primera;
     if (f.ultima > p.ultima) p.ultima = f.ultima;
     personas.set(f.visitante, p);
-    const pg = paginas[f.pagina] || (paginas[f.pagina] = {p: f.pagina, gente: new Set(), vistas: 0});
-    pg.gente.add(f.visitante); pg.vistas += n;
+    const pg = paginas[f.pagina] || (paginas[f.pagina] = {p: f.pagina, gente: new Set(), vistas: 0, seg: 0, visitas: 0});
+    pg.gente.add(f.visitante); pg.vistas += n; pg.seg += sg; pg.visitas++;
   });
   Object.values(dias).forEach(d => d.gente.forEach(g => {
     const o = rvOrigen(g.origen);
@@ -3862,10 +3888,10 @@ function rvAgrupa(filas, desde, hasta) {
   const lista = [];
   const conDatos = Object.keys(dias).sort(), piso = conDatos.length && conDatos[0] < RV_INICIO ? conDatos[0] : RV_INICIO;
   const ini = desde < piso ? piso : desde, fin = hasta > hoy ? hoy : hasta;
-  for (let k = fin; k >= ini && lista.length < 4000; k = rvSuma(k, -1)) lista.push(dias[k] || {k, gente: new Map(), vistas: 0, origenes: {}});
+  for (let k = fin; k >= ini && lista.length < 4000; k = rvSuma(k, -1)) lista.push(dias[k] || {k, gente: new Map(), vistas: 0, seg: 0, origenes: {}});
   const visitas = lista.reduce((t, d) => t + d.gente.size, 0);
   const mejor = lista.reduce((m, d) => (!m || d.gente.size > m.gente.size) ? d : m, null);
-  return {desde, hasta, ini, fin, lista, personas, origenes, paginas, horas, vistas, visitas, mejor};
+  return {desde, hasta, ini, fin, lista, personas, origenes, paginas, horas, vistas, visitas, mejor, seg};
 }
 
 /* ---- las opciones (pestañas) ---- */
@@ -3881,12 +3907,13 @@ const RV_OPCIONES = [
         '<td><span class="rvCelda"><b class="num" style="text-align:right">' + n + '</b>' +
           '<span class="rvBarra"><i style="width:' + Math.round(n / max * 100) + '%"></i></span></span></td>' +
         '<td class="der">' + (x.vistas || "—") + '</td>' +
+        '<td class="der">' + (regVis.sinTiempo || !n ? "—" : fSeg(x.seg / n)) + '</td>' +
         '<td style="color:var(--ink-2);white-space:nowrap">' + (top || "—") + '</td></tr>';
       if (abierto) {
         const gente = [...x.gente.values()].sort((a, b) => String(a.primera).localeCompare(String(b.primera)));
-        h += '<tr class="rvDetalle"><td colspan="4"><p class="nota" style="margin:0 0 8px"><b>' + esc(rvFecha(x.k, true)) + '</b> · ' +
+        h += '<tr class="rvDetalle"><td colspan="5"><p class="nota" style="margin:0 0 8px"><b>' + esc(rvFecha(x.k, true)) + '</b> · ' +
           n + (n === 1 ? ' persona' : ' personas') + ' · ' + x.vistas + ' páginas vistas</p>' +
-          '<div class="marco"><table><thead><tr><th>Llegó</th><th>Visitante</th><th>De dónde</th><th>Qué vio</th><th class="der">Vistas</th></tr></thead><tbody>' +
+          '<div class="marco"><table><thead><tr><th>Llegó</th><th>Visitante</th><th>De dónde</th><th>Qué vio</th><th class="der">Vistas</th><th class="der">Se quedó</th></tr></thead><tbody>' +
           gente.map(g => {
             const p = d.personas.get(g.v), volvio = p && p.dias.size > 1;
             return '<tr><td style="white-space:nowrap">' + esc(rvHora(g.primera)) + '</td>' +
@@ -3894,12 +3921,12 @@ const RV_OPCIONES = [
                 (volvio ? ' <span class="chip info" title="Entró ' + p.dias.size + ' días distintos en estas fechas">volvió</span>' : '') + '</td>' +
               '<td>' + esc(rvOrigen(g.origen)) + '</td>' +
               '<td>' + g.paginas.map(q => esc(rvPagina(q.p)) + (q.n > 1 ? ' ×' + q.n : '')).join(" · ") + '</td>' +
-              '<td class="der">' + g.vistas + '</td></tr>';
+              '<td class="der">' + g.vistas + '</td><td class="der">' + (regVis.sinTiempo ? "—" : fSeg(g.seg)) + '</td></tr>';
           }).join("") + '</tbody></table></div></td></tr>';
       }
       return h;
     }).join("");
-    return '<div class="rvMarco"><table><thead><tr><th>Día</th><th>Personas</th><th class="der">Páginas vistas</th><th>De dónde llegaron</th></tr></thead>' +
+    return '<div class="rvMarco"><table><thead><tr><th>Día</th><th>Personas</th><th class="der">Páginas vistas</th><th class="der">Tiempo prom.</th><th>De dónde llegaron</th></tr></thead>' +
       '<tbody>' + filas + '</tbody></table></div>' +
       '<p class="nota" style="margin:10px 0 0">Toca un día para ver quién entró: a qué hora, de dónde llegó y qué vio.</p>';
   }},
@@ -3915,14 +3942,15 @@ const RV_OPCIONES = [
       '<p class="nota" style="margin:10px 0 0"><b>Directo</b> = escribieron la dirección, la tenían guardada o la abrieron desde WhatsApp ' +
       '(WhatsApp no dice de dónde viene la gente). Una misma persona puede llegar por dos caminos en días distintos.</p>';
   }},
-  {id: "paginas", nombre: "Qué páginas ven", pinta: d => {
+  {id: "paginas", nombre: "Páginas y tiempo", pinta: d => {
     const lista = Object.values(d.paginas).sort((a, b) => b.gente.size - a.gente.size || b.vistas - a.vistas);
     if (!lista.length) return '<div class="vacio">Nadie entró en estas fechas.</div>';
     const max = lista[0].gente.size;
-    return '<div class="marco"><table style="min-width:440px"><thead><tr><th>Página</th><th>Personas</th><th class="der">Veces vista</th></tr></thead><tbody>' +
+    return '<div class="marco"><table style="min-width:600px"><thead><tr><th>Página</th><th>Personas</th><th class="der">Veces vista</th><th class="der">Tiempo prom.</th><th class="der">Tiempo total</th></tr></thead><tbody>' +
       lista.map(p => '<tr><td><b>' + esc(rvPagina(p.p)) + '</b>' + (rvPagina(p.p) !== p.p ? ' <span class="rvId">' + esc(p.p) + '</span>' : '') + '</td>' +
         '<td><span class="rvCelda"><b class="num" style="text-align:right">' + p.gente.size + '</b><span class="rvBarra"><i style="width:' + Math.round(p.gente.size / max * 100) + '%"></i></span></span></td>' +
-        '<td class="der">' + p.vistas + '</td></tr>').join("") +
+        '<td class="der">' + p.vistas + '</td><td class="der">' + (regVis.sinTiempo ? "—" : fSeg(p.seg / Math.max(1, p.visitas))) + '</td>' +
+        '<td class="der">' + (regVis.sinTiempo ? "—" : fSeg(p.seg)) + '</td></tr>').join("") +
       '</tbody></table></div>';
   }},
   {id: "horas", nombre: "A qué hora llegan", pinta: d => {
@@ -3957,7 +3985,7 @@ function vRegistroVisitas() {
   cargaRegVis();
   const {desde, hasta} = rvRango(), hoy = rvHoy();
   const rangos = [["hoy", "Hoy"], ["ayer", "Ayer"], ["7", "7 días"], ["30", "30 días"], ["mes", "Este mes"], ["mesPasado", "Mes pasado"], ["todo", "Todo"]];
-  const cab = '<div class="tarjeta" id="regVisitas" style="margin-top:20px"><header><h2>Registro de visitas</h2>' +
+  const cab = '<div class="tarjeta" id="regVisitas"><header><h2>Registro de visitas</h2>' +
     '<span class="pista">nuvoor.mx · día por día</span>' +
     '<button class="btn sm" type="button" id="rvActualiza">Actualizar</button>' +
     '<button class="btn sm" type="button" id="rvCsv"' + (regVis.filas.length && !regVis.cargando ? '' : ' disabled') + '>Descargar</button></header><div class="cuerpo">' +
@@ -3981,6 +4009,7 @@ function vRegistroVisitas() {
       tile("Personas distintas", d.personas.size, d.lista.length === 1 ? "ese día" : "en " + d.lista.length + " días", true) +
       tile("Visitas", d.visitas, "una por persona cada día") +
       tile("Páginas vistas", d.vistas, d.visitas ? (Math.round(d.vistas / d.visitas * 10) / 10) + " por visita" : "—") +
+      tile("Tiempo promedio", regVis.sinTiempo ? "—" : (d.visitas ? fSeg(d.seg / d.visitas) : "—"), regVis.sinTiempo ? "falta el SQL 37" : "por visita") +
       tile("Promedio al día", prom, d.mejor && d.mejor.gente.size ? "mejor día: " + rvFecha(d.mejor.k) + " · " + d.mejor.gente.size : "sin visitas todavía") +
     '</div>' +
     '<div class="seg rvOps" role="tablist" aria-label="Qué ver">' + RV_OPCIONES.map(o => {
@@ -3992,6 +4021,7 @@ function vRegistroVisitas() {
     (desde < RV_INICIO ? '<p class="nota" style="margin:10px 0 0">El contador empezó el ' + esc(rvFecha(RV_INICIO, true)) + '; antes no hay datos.</p>' : '') +
     (regVis.recortado ? '<p class="nota" style="margin:10px 0 0;color:var(--aviso)">Son muchas visitas: se muestran las primeras ' +
       RV_MAX_FILAS.toLocaleString("es-MX") + ' filas. Elige menos días para verlas todas.</p>' : '') +
+    (regVis.sinTiempo ? '<p class="nota" style="margin:10px 0 0">El tiempo en cada página aparece cuando se corra <b>37-tiempo-y-uso.sql</b>.</p>' : '') +
     '<p class="nota" style="margin:10px 0 0">Una persona = un navegador. No se guarda nombre, correo ni IP; el visitante es un número al azar ' +
       '(por eso aparece como ' + esc(rvId("3f9a2c")) + '). La misma persona en celular y computadora cuenta como dos.</p>' +
     pie;
@@ -3999,11 +4029,11 @@ function vRegistroVisitas() {
 
 function rvDescarga() {
   const {desde, hasta} = rvRango();
-  const cab = ["Fecha", "Llegó (hora)", "Visitante", "Página", "De dónde llegó", "Veces que la vio", "Última vez (hora)"];
+  const cab = ["Fecha", "Llegó (hora)", "Visitante", "Página", "De dónde llegó", "Veces que la vio", "Última vez (hora)", "Segundos en la página"];
   const origen = o => { const n = rvOrigen(o); return (!o || n === o) ? n : n + " (" + o + ")"; };
   const filas = regVis.filas.slice()
     .sort((a, b) => (String(a.dia) + String(a.primera)).localeCompare(String(b.dia) + String(b.primera)))
-    .map(f => [String(f.dia).slice(0, 10), rvHora(f.primera), rvId(f.visitante), rvPagina(f.pagina), origen(f.origen), f.vistas, rvHora(f.ultima)]);
+    .map(f => [String(f.dia).slice(0, 10), rvHora(f.primera), rvId(f.visitante), rvPagina(f.pagina), origen(f.origen), f.vistas, rvHora(f.ultima), regVis.sinTiempo ? "" : (+f.segundos || 0)]);
   const csv = "﻿" + [cab].concat(filas).map(f => f.map(v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"').join(",")).join("\r\n");
   try {
     const url = URL.createObjectURL(new Blob([csv], {type: "text/csv;charset=utf-8"}));
@@ -4031,6 +4061,191 @@ document.addEventListener("change", e => {
   const ahora = rvRango(), de = document.getElementById("rvDesde"), a = document.getElementById("rvHasta");
   regVis.desde = (de && de.value) || ahora.desde; regVis.hasta = (a && a.value) || ahora.hasta;
   regVis.rango = "otro"; regVis.abierto = null; cargaRegVis(); pintaRegVis();
+});
+
+/* ---------- Lab › Uso y visitas (sql/36 + sql/37) ----------
+   Una sección con tarjetas: lo de nuvoor.mx arriba y el tiempo de uso de
+   los tres sistemas abajo. Cada tarjeta se vuelve a pintar sola cuando
+   llegan sus datos, sin redibujar las demás. */
+const fSeg = s => { s = Math.round(+s || 0); if (s < 60) return s + " s";
+  if (s < 3600) { const m = Math.floor(s / 60), r = s % 60; return m + " min" + (r && m < 10 ? " " + r + " s" : ""); }
+  const tm = Math.round(s / 60), h = Math.floor(tm / 60), m = tm % 60; return h + " h" + (m ? " " + m + " min" : ""); };
+const fSegCorto = s => { s = Math.round(+s || 0); return s < 60 ? s + "s" : s < 3600 ? Math.round(s / 60) + "m" : (Math.round(s / 360) / 10) + "h"; };
+function pintaTarjeta(id, fn) {
+  const el = document.getElementById(id);
+  if (el && vista === "uso") el.outerHTML = fn();
+}
+/* Lee una tabla o vista de 1000 en 1000 (el tope de Supabase por consulta). */
+async function leeTodo(arma, tope) {
+  let filas = [];
+  for (let i = 0; ; i += 1000) {
+    const r = await arma().range(i, i + 999);
+    if (r.error) return { filas, error: r.error.message || "no se pudo leer" };
+    filas = filas.concat(r.data || []);
+    if (!r.data || r.data.length < 1000) return { filas, error: "" };
+    if (filas.length >= (tope || 20000)) return { filas, error: "", recortado: true };
+  }
+}
+const faltaSql = msg => /does not exist|could not find|schema cache|column/i.test(String(msg || ""));
+
+/* ---- Tiempo en nuvoor.mx ---- */
+let tiempoWeb = { cargado: false, cargando: false, filas: [], error: "", falta: false, cuando: 0, rango: "7" };
+async function cargaTiempoWeb() {
+  const sb = sbLab(); if (!sb || tiempoWeb.cargando) return;
+  tiempoWeb.cargando = true;
+  const desde = rvSuma(rvHoy(), -29);
+  const r = await leeTodo(() => sb.from("visitas_web").select("dia,visitante,pagina,segundos").gte("dia", desde)
+    .order("dia", { ascending: false }).order("visitante").order("pagina"));
+  Object.assign(tiempoWeb, { cargado: true, cargando: false, filas: r.filas, error: r.error, falta: !!r.error && faltaSql(r.error), cuando: Date.now() });
+  pintaTarjeta("tiempoWeb", vTiempoWeb);
+}
+function vTiempoWeb() {
+  if (!tiempoWeb.cargado || Date.now() - tiempoWeb.cuando > 120000) cargaTiempoWeb();
+  const rangos = [["hoy", "Hoy"], ["7", "7 días"], ["30", "30 días"]];
+  const cab = '<div class="tarjeta" id="tiempoWeb"><header><h2>Cuánto se quedan en nuvoor.mx</h2>' +
+    '<div class="seg">' + rangos.map(r => '<button type="button" data-tw-rango="' + r[0] + '" aria-pressed="' + (tiempoWeb.rango === r[0]) + '">' + r[1] + '</button>').join("") +
+    '</div></header><div class="cuerpo">';
+  if (!tiempoWeb.cargado) return cab + '<div class="vacio">Cargando…</div></div></div>';
+  if (tiempoWeb.falta) return cab + '<div class="vacio" style="text-align:left">Para medir el tiempo falta correr <b>37-tiempo-y-uso.sql</b> ' +
+    '(Base de datos → Copiar SQL → pégalo en Supabase → Run). Desde ese momento nuvoor.mx empieza a mandar cuánto tiempo se queda cada persona.</div></div></div>';
+  if (tiempoWeb.error) return cab + '<div class="vacio">No se pudo leer (' + esc(tiempoWeb.error) + ').</div></div></div>';
+  const hoy = rvHoy(), desde = tiempoWeb.rango === "hoy" ? hoy : rvSuma(hoy, tiempoWeb.rango === "7" ? -6 : -29);
+  const filas = tiempoWeb.filas.filter(f => String(f.dia).slice(0, 10) >= desde);
+  const visitas = new Map(), paginas = {};
+  filas.forEach(f => {
+    const k = String(f.dia).slice(0, 10) + "|" + f.visitante, s = +f.segundos || 0;
+    visitas.set(k, (visitas.get(k) || 0) + s);
+    const p = paginas[f.pagina] || (paginas[f.pagina] = { p: f.pagina, visitas: 0, seg: 0 });
+    p.visitas++; p.seg += s;
+  });
+  const lista = [...visitas.values()], n = lista.length, total = lista.reduce((t, s) => t + s, 0);
+  const rapidos = lista.filter(s => s < 10).length, largos = lista.filter(s => s >= 60).length;
+  const pct = x => n ? Math.round(x / n * 100) + "%" : "—";
+  const pags = Object.values(paginas).sort((a, b) => b.seg / Math.max(1, b.visitas) - a.seg / Math.max(1, a.visitas));
+  const max = Math.max(1, ...pags.map(p => p.seg / Math.max(1, p.visitas)));
+  return cab +
+    '<div class="tiles">' +
+      tile("Tiempo promedio", n ? fSeg(total / n) : "—", "por visita", true) +
+      tile("Se van rápido", pct(rapidos), "menos de 10 segundos") +
+      tile("Se quedan a leer", pct(largos), "más de 1 minuto") +
+    '</div>' +
+    (pags.length
+      ? '<div class="marco" style="margin-top:16px"><table style="min-width:520px"><thead><tr><th>Página</th><th>Tiempo promedio</th><th class="der">Visitas</th><th class="der">Tiempo total</th></tr></thead><tbody>' +
+        pags.map(p => { const prom = p.seg / Math.max(1, p.visitas);
+          return '<tr><td><b>' + esc(rvPagina(p.p)) + '</b>' + (rvPagina(p.p) !== p.p && p.p !== "/" ? ' <span class="rvId">' + esc(p.p) + '</span>' : '') + '</td>' +
+            '<td><span class="rvCelda" style="grid-template-columns:78px minmax(60px,1fr)"><b class="num" style="text-align:right;white-space:nowrap">' + fSeg(prom) + '</b>' +
+            '<span class="rvBarra"><i style="width:' + Math.round(prom / max * 100) + '%"></i></span></span></td>' +
+            '<td class="der">' + p.visitas + '</td><td class="der">' + fSeg(p.seg) + '</td></tr>'; }).join("") +
+        '</tbody></table></div>'
+      : '<div class="vacio">Todavía no hay visitas en estas fechas.</div>') +
+    '<p class="nota" style="margin:12px 0 0">Sólo cuenta el tiempo con la pestaña al frente. Una visita = una persona en un día; si entró dos veces ese día, se suma. ' +
+      'El tiempo se empezó a medir al correr el SQL 37: las visitas de antes salen en 0 s.</p>' +
+    '</div></div>';
+}
+
+/* ---- Tiempo de uso de Imprenta, Restaurant y Store ---- */
+const USO_PRODUCTOS = [["imprenta", "Nuvoor Imprenta"], ["restaurant", "Nuvoor Restaurant"], ["store", "Nuvoor Store"]];
+let usoApps = { cargado: false, cargando: false, filas: [], error: "", falta: false, cuando: 0, rango: "7", producto: "" };
+async function cargaUsoApps() {
+  const sb = sbLab(); if (!sb || usoApps.cargando) return;
+  usoApps.cargando = true;
+  const desde = rvSuma(rvHoy(), -29);
+  const r = await leeTodo(() => sb.from("v_uso_apps").select("dia,cuenta_id,negocio,usuario_id,producto,segundos,ultima").gte("dia", desde)
+    .order("dia", { ascending: false }).order("cuenta_id").order("usuario_id").order("producto"));
+  Object.assign(usoApps, { cargado: true, cargando: false, filas: r.filas, error: r.error, falta: !!r.error && faltaSql(r.error), cuando: Date.now() });
+  pintaTarjeta("usoSistemas", vUsoSistemas); pintaTarjeta("usoNegocios", vUsoNegocios);
+}
+function usoFiltrado() {
+  const hoy = rvHoy(), desde = usoApps.rango === "hoy" ? hoy : rvSuma(hoy, usoApps.rango === "7" ? -6 : -29);
+  return { hoy, desde, filas: usoApps.filas.filter(f => String(f.dia).slice(0, 10) >= desde) };
+}
+function usoEspera(id, titulo) {
+  if (!usoApps.cargado || Date.now() - usoApps.cuando > 120000) cargaUsoApps();
+  const cab = '<div class="tarjeta" id="' + id + '"><header><h2>' + titulo + '</h2>' +
+    '<div class="seg">' + [["hoy", "Hoy"], ["7", "7 días"], ["30", "30 días"]].map(r => '<button type="button" data-uso-rango="' + r[0] + '" aria-pressed="' + (usoApps.rango === r[0]) + '">' + r[1] + '</button>').join("") +
+    '</div></header><div class="cuerpo">';
+  if (!usoApps.cargado) return { cab, html: cab + '<div class="vacio">Cargando…</div></div></div>' };
+  if (usoApps.falta) return { cab, html: cab + '<div class="vacio" style="text-align:left">Para medir cuánto usan los sistemas falta correr <b>37-tiempo-y-uso.sql</b> ' +
+    '(Base de datos → Copiar SQL → pégalo en Supabase → Run). Desde ese momento Imprenta, Restaurant y Store mandan su tiempo de uso cada par de minutos.</div></div></div>' };
+  if (usoApps.error) return { cab, html: cab + '<div class="vacio">No se pudo leer (' + esc(usoApps.error) + ').</div></div></div>' };
+  return { cab, html: "" };
+}
+function vUsoSistemas() {
+  const e = usoEspera("usoSistemas", "Cuánto usan los sistemas"); if (e.html) return e.html;
+  const { hoy, desde, filas } = usoFiltrado();
+  const dias = Math.max(1, Math.round((new Date(hoy + "T12:00:00Z") - new Date(desde + "T12:00:00Z")) / 864e5) + 1);
+  const por = {}; USO_PRODUCTOS.forEach(([k]) => por[k] = { seg: 0, negocios: new Set(), usuarios: new Set(), negDia: new Set() });
+  filas.forEach(f => { const p = por[f.producto]; if (!p) return; p.seg += +f.segundos || 0; p.negocios.add(f.cuenta_id); p.usuarios.add(f.usuario_id); p.negDia.add(f.cuenta_id + "|" + f.dia); });
+  const tiles = USO_PRODUCTOS.map(([k, nom], i) => { const p = por[k];
+    return '<div class="tile' + (i === 0 ? " destacada" : "") + '"><span class="et">' + esc(nom) + '</span><span class="v">' + (p.seg ? fSeg(p.seg) : "—") + '</span>' +
+      '<span class="sub">' + p.negocios.size + (p.negocios.size === 1 ? " negocio" : " negocios") + ' · ' + p.usuarios.size + (p.usuarios.size === 1 ? " persona" : " personas") +
+      (p.negDia.size ? ' · ' + fSeg(p.seg / p.negDia.size) + ' por negocio al día' : '') + '</span></div>'; }).join("");
+  // Por día: últimos 14 días (o el rango, si es más corto)
+  const n = Math.min(14, dias), lista = [];
+  for (let i = 0; i < n; i++) { const k = rvSuma(hoy, -i); const fila = { k }; USO_PRODUCTOS.forEach(([p]) => fila[p] = 0); lista.push(fila); }
+  const idx = {}; lista.forEach(x => idx[x.k] = x);
+  filas.forEach(f => { const x = idx[String(f.dia).slice(0, 10)]; if (x && f.producto in x) x[f.producto] += +f.segundos || 0; });
+  const max = Math.max(1, ...lista.flatMap(x => USO_PRODUCTOS.map(([p]) => x[p])));
+  const celda = s => '<td><span class="rvCelda" style="grid-template-columns:82px minmax(50px,1fr)"><b class="num" style="text-align:right;white-space:nowrap;' + (s ? '' : 'color:var(--ink-3);font-weight:500') + '">' + (s ? fSeg(s) : "—") + '</b>' +
+    '<span class="rvBarra"><i style="width:' + Math.round(s / max * 100) + '%"></i></span></span></td>';
+  return e.cab + '<div class="tiles">' + tiles + '</div>' +
+    '<div class="rvMarco" style="margin-top:16px;max-height:420px"><table style="min-width:620px"><thead><tr><th>Día</th>' +
+      USO_PRODUCTOS.map(([, nom]) => '<th>' + esc(nom.replace("Nuvoor ", "")) + '</th>').join("") + '</tr></thead><tbody>' +
+      lista.map(x => '<tr><td style="white-space:nowrap">' + esc(rvFecha(x.k)) + (x.k === hoy ? ' <span class="chip info">hoy</span>' : '') + '</td>' +
+        USO_PRODUCTOS.map(([p]) => celda(x[p])).join("") + '</tr>').join("") +
+    '</tbody></table></div>' +
+    '<p class="nota" style="margin:12px 0 0">Cuenta el tiempo con el sistema al frente y alguien moviéndose (clic, tecla o toque) en los últimos 3 minutos. ' +
+      'Una pantalla que se queda prendida sin que nadie la toque no suma. Empezó a contar al publicar esta versión; antes no hay datos.</p>' +
+    '</div></div>';
+}
+function vUsoNegocios() {
+  const e = usoEspera("usoNegocios", "Qué negocios lo usan más"); if (e.html) return e.html;
+  const { filas } = usoFiltrado();
+  const por = new Map();
+  filas.forEach(f => {
+    if (usoApps.producto && f.producto !== usoApps.producto) return;
+    const k = f.cuenta_id + "|" + f.producto;
+    const x = por.get(k) || { negocio: f.negocio, producto: f.producto, seg: 0, dias: new Set(), usuarios: new Set(), ultima: "" };
+    x.seg += +f.segundos || 0; x.dias.add(String(f.dia).slice(0, 10)); x.usuarios.add(f.usuario_id);
+    if (String(f.ultima) > x.ultima) x.ultima = String(f.ultima);
+    por.set(k, x);
+  });
+  const lista = [...por.values()].sort((a, b) => b.seg - a.seg);
+  const nombre = k => (USO_PRODUCTOS.find(p => p[0] === k) || [k, k])[1].replace("Nuvoor ", "");
+  const max = Math.max(1, ...lista.map(x => x.seg));
+  const filtros = '<div class="seg" style="margin-bottom:14px">' + [["", "Todos"]].concat(USO_PRODUCTOS.map(([k, n]) => [k, n.replace("Nuvoor ", "")]))
+    .map(([k, n]) => '<button type="button" data-uso-prod="' + k + '" aria-pressed="' + (usoApps.producto === k) + '">' + esc(n) + '</button>').join("") + '</div>';
+  const ultimo = t => { const d = new Date(t); if (isNaN(d)) return "—"; const k = RV_FMT_DIA.format(d);
+    return (k === rvHoy() ? "hoy" : rvFecha(k)) + " · " + rvHora(t); };
+  return e.cab + filtros +
+    (lista.length
+      ? '<div class="rvMarco" style="max-height:460px"><table style="min-width:680px"><thead><tr><th>Negocio</th><th>Sistema</th><th>Tiempo</th><th class="der">Días que entró</th><th class="der">Personas</th><th>Último uso</th></tr></thead><tbody>' +
+        lista.slice(0, 50).map(x => '<tr><td><b>' + esc(x.negocio) + '</b></td><td>' + esc(nombre(x.producto)) + '</td>' +
+          '<td><span class="rvCelda" style="grid-template-columns:86px minmax(60px,1fr)"><b class="num" style="text-align:right;white-space:nowrap">' + fSeg(x.seg) + '</b>' +
+          '<span class="rvBarra"><i style="width:' + Math.round(x.seg / max * 100) + '%"></i></span></span></td>' +
+          '<td class="der">' + x.dias.size + '</td><td class="der">' + x.usuarios.size + '</td><td style="white-space:nowrap">' + esc(ultimo(x.ultima)) + '</td></tr>').join("") +
+        '</tbody></table></div>'
+      : '<div class="vacio">Nadie ha usado ' + (usoApps.producto ? esc(nombre(usoApps.producto)) : "los sistemas") + ' en estas fechas todavía.</div>') +
+    '<p class="nota" style="margin:12px 0 0">Sólo se guarda el tiempo: nada de lo que capturan, venden o cotizan sale de su cuenta.</p>' +
+    '</div></div>';
+}
+
+function vUso() {
+  return '<div class="usoSeccion">' +
+    '<div class="usoGrupo"><span class="usoEt">La página</span><h2>nuvoor.mx</h2><p>Cuánta gente entra, de dónde llega y cuánto se queda.</p></div>' +
+    '<div class="rejilla2">' + vVisitasWeb() + vTiempoWeb() + '</div>' +
+    vRegistroVisitas() +
+    '<div class="usoGrupo" style="margin-top:14px"><span class="usoEt">Los sistemas</span><h2>Imprenta, Restaurant y Store</h2><p>Cuánto tiempo trabajan los negocios en cada sistema.</p></div>' +
+    vUsoSistemas() + vUsoNegocios() +
+  '</div>';
+}
+document.addEventListener("click", e => {
+  const tw = e.target.closest("[data-tw-rango]");
+  if (tw) { tiempoWeb.rango = tw.dataset.twRango; pintaTarjeta("tiempoWeb", vTiempoWeb); return; }
+  const ur = e.target.closest("[data-uso-rango]");
+  if (ur) { usoApps.rango = ur.dataset.usoRango; pintaTarjeta("usoSistemas", vUsoSistemas); pintaTarjeta("usoNegocios", vUsoNegocios); return; }
+  const up = e.target.closest("[data-uso-prod]");
+  if (up) { usoApps.producto = up.dataset.usoProd; pintaTarjeta("usoNegocios", vUsoNegocios); return; }
 });
 
 function vCodigos() {
@@ -4306,5 +4521,6 @@ function vDiagnosticos() {
 <script>window.__MIGRACIONES.push({"archivo":"34-restaurant-impresoras-identidad.sql","titulo":"Restaurant · una sola comanda por impresora física (después de 20, 29 y 32)","sql":"-- Después de SQL 20, 29 y 32. Conserva los reclamos de impresión anteriores.\nbegin;\n\ncreate table if not exists public.rest_cocina_equipos (\n  cuenta_id uuid not null references public.cuentas(id) on delete cascade,\n  aparato text not null,\n  evento text not null,\n  nombre text not null,\n  impresoras jsonb not null,\n  actualizado timestamptz not null default clock_timestamp(),\n  primary key(cuenta_id,aparato,evento)\n);\nalter table public.rest_cocina_equipos enable row level security;\nrevoke all on public.rest_cocina_equipos from public,anon,authenticated;\n\ncreate or replace function public.rest_cocina_estaciones(p_cuenta uuid,p_evento text)\nreturns jsonb language plpgsql security definer set search_path=public as $$\nbegin\n  if not public.es_miembro(p_cuenta) then\n    raise exception 'No tienes acceso a este restaurante.' using errcode='42501';\n  end if;\n  return coalesce((select jsonb_agg(to_jsonb(e)) from public.rest_cocina_equipos e\n    where e.cuenta_id=p_cuenta and e.evento=coalesce(p_evento,'')),'[]'::jsonb) ||\n    coalesce((select jsonb_agg(jsonb_build_object('aparato',b.aparato,'nombre','Tablet de cocina',\n      'evento',b.evento,'impresoras',(select jsonb_agg(jsonb_build_object('nombre',split_part(r.key,'|',1),\n        'ruta',r.key,'categorias',r.value,'cocina',true,'cancela',false)) from jsonb_each(b.rutas) r)))\n      from public.rest_estaciones_bt b where b.cuenta_id=p_cuenta and b.evento=coalesce(p_evento,'')\n        and b.vence>clock_timestamp() and not exists(select 1 from public.rest_cocina_equipos e\n          where e.cuenta_id=b.cuenta_id and e.aparato=b.aparato and e.evento=b.evento)),'[]'::jsonb);\nend $$;\n\ncreate or replace function public.rest_ruta_impresora(p_cuenta uuid,p_aparato text,p_ruta text)\nreturns text language sql stable security definer set search_path=public as $$\n  select coalesce((select p->>'ruta' from public.rest_cocina_equipos e\n    cross join lateral jsonb_array_elements(e.impresoras) p\n    where e.cuenta_id=p_cuenta and e.aparato=p_aparato\n      and (p->>'ruta'=regexp_replace(p_ruta,'\\|cancelacion$','')\n        or p->'aliases' ? regexp_replace(p_ruta,'\\|cancelacion$',''))\n    order by e.actualizado desc limit 1) || case when right(p_ruta,12)='|cancelacion' then '|cancelacion' else '' end,p_ruta)\n$$;\n\ncreate or replace function public.rest_cocina_configurar(\n  p_cuenta uuid,p_aparato text,p_evento text,p_nombre text,p_impresoras jsonb,p_confirmar boolean default false\n)\nreturns jsonb language plpgsql security definer set search_path=public as $$\ndeclare\n  v_evento text:=coalesce(p_evento,'');\n  v_prev jsonb;\n  v_lista jsonb:='[]'::jsonb;\n  v_p jsonb;\n  v_ant jsonb;\n  v_conflictos jsonb;\n  v_alias text;\n  v_ruta text;\n  v_sufijo text;\nbegin\n  if public.rol_en(p_cuenta) is distinct from 'admin' then\n    raise exception 'Se necesita un administrador del negocio.' using errcode='42501';\n  end if;\n  if coalesce(p_aparato,'') !~ '^[a-zA-Z0-9_-]{1,120}$' or v_evento !~ '^[a-zA-Z0-9_-]{0,120}$'\n    or jsonb_typeof(p_impresoras) is distinct from 'array' or jsonb_array_length(p_impresoras)>16\n    or octet_length(p_impresoras::text)>20000 then\n    raise exception 'Configuración de cocina inválida.' using errcode='22023';\n  end if;\n  perform pg_advisory_xact_lock(hashtextextended('rest_impresoras:'||p_cuenta::text,0));\n  select impresoras into v_prev from public.rest_cocina_equipos\n    where cuenta_id=p_cuenta and aparato=p_aparato and evento=v_evento;\n  for v_p in select value from jsonb_array_elements(p_impresoras) loop\n    if coalesce(v_p->>'id','') !~ '^[a-zA-Z0-9_-]{1,120}$'\n      or coalesce(v_p->>'ruta','') !~ '^(bt-[a-f0-9]{12}|sistema-[a-zA-Z0-9_-]{1,120})$'\n      or jsonb_typeof(v_p->'categorias') is distinct from 'array'\n      or jsonb_typeof(v_p->'aliases') is distinct from 'array'\n      or jsonb_array_length(v_p->'aliases')>64 then\n      raise exception 'Identidad de impresora inválida.' using errcode='22023';\n    end if;\n    select p into v_ant from jsonb_array_elements(coalesce(v_prev,'[]'::jsonb)) p where p->>'id'=v_p->>'id';\n    if v_ant->>'ruta' is distinct from v_p->>'ruta' then v_ant:=null; end if;\n    -- Los nombres viejos siguen resolviendo la misma impresora física.\n    v_p:=v_p||jsonb_build_object('aliases',(select coalesce(jsonb_agg(distinct a),'[]'::jsonb)\n      from jsonb_array_elements(coalesce(v_ant->'aliases','[]'::jsonb)||(v_p->'aliases')) a));\n    v_lista:=v_lista||jsonb_build_array(v_p);\n  end loop;\n  if exists(select 1 from jsonb_array_elements(v_lista) a cross join jsonb_array_elements(v_lista) b\n    where a->>'id'<b->>'id' and a->>'ruta'=b->>'ruta'\n      and (a->>'cocina'='true' or a->>'cancela'='true') and (b->>'cocina'='true' or b->>'cancela'='true')\n      and (a->'categorias'='[]'::jsonb or b->'categorias'='[]'::jsonb or exists(\n        select 1 from jsonb_array_elements_text(a->'categorias') c where b->'categorias' ? c))) then\n    raise exception 'Esa impresora Bluetooth ya está configurada para las mismas categorías.' using errcode='22023';\n  end if;\n  select coalesce(jsonb_agg(distinct jsonb_build_object('aparato',e->>'aparato','nombre',e->>'nombre',\n    'impresora',b->>'nombre','categorias',b->'categorias','ruta',b->>'ruta')),'[]'::jsonb)\n    into v_conflictos from jsonb_array_elements(public.rest_cocina_estaciones(p_cuenta,v_evento)) e\n    cross join lateral jsonb_array_elements(e->'impresoras') b cross join jsonb_array_elements(v_lista) a\n    where e->>'aparato'<>p_aparato\n      and not exists(select 1 from jsonb_array_elements(coalesce(v_prev,'[]'::jsonb)) previo\n        where (previo-'aliases'-'nombre')=(a-'aliases'-'nombre'))\n      and (a->>'cocina'='true' and b->>'cocina'='true' or a->>'cancela'='true' and b->>'cancela'='true')\n      and (a->'categorias'='[]'::jsonb or b->'categorias'='[]'::jsonb or exists(\n        select 1 from jsonb_array_elements_text(a->'categorias') c where b->'categorias' ? c));\n  if v_conflictos<>'[]'::jsonb and v_lista is distinct from v_prev and not coalesce(p_confirmar,false) then\n    return jsonb_build_object('guardado',false,'conflictos',v_conflictos);\n  end if;\n  insert into public.rest_cocina_equipos(cuenta_id,aparato,evento,nombre,impresoras)\n    values(p_cuenta,p_aparato,v_evento,left(coalesce(nullif(btrim(p_nombre),''),'Dispositivo de cocina'),80),v_lista)\n    on conflict(cuenta_id,aparato,evento) do update set nombre=excluded.nombre,\n      impresoras=excluded.impresoras,actualizado=clock_timestamp();\n  perform set_config('makers.rest_reclamo_autorizado','si',true);\n  for v_p in select value from jsonb_array_elements(v_lista) loop\n    for v_alias in select jsonb_array_elements_text(v_p->'aliases') loop\n      foreach v_sufijo in array array['','|cancelacion'] loop\n        v_ruta:=(v_p->>'ruta')||v_sufijo;\n        update public.documentos d set cuerpo=jsonb_set(d.cuerpo,array['impreso',v_ruta],\n          d.cuerpo #> array['impreso',v_alias||v_sufijo],true)\n          where d.cuenta_id=p_cuenta and d.coleccion='rest_lineas'\n            and coalesce(d.cuerpo->>'eventoId','')=v_evento\n            and d.cuerpo #>> array['impreso',v_alias||v_sufijo,'por']=p_aparato\n            and not exists(select 1 from jsonb_array_elements(coalesce(v_prev,'[]'::jsonb)) anterior\n              where anterior->>'id'=v_p->>'id' and anterior->>'ruta' is distinct from v_p->>'ruta')\n            and (d.cuerpo #> array['impreso',v_ruta] is null\n              or d.cuerpo #>> array['impreso',v_ruta,'ok'] is distinct from 'true'\n                and d.cuerpo #>> array['impreso',v_alias||v_sufijo,'ok']='true');\n      end loop;\n    end loop;\n  end loop;\n  return jsonb_build_object('guardado',true,'conflictos',v_conflictos,'impresoras',v_lista);\nend $$;\n\nrevoke all on function public.rest_ruta_impresora(uuid,text,text) from public,anon,authenticated;\nrevoke all on function public.rest_cocina_estaciones(uuid,text),public.rest_cocina_configurar(uuid,text,text,text,jsonb,boolean) from public,anon,authenticated;\ngrant execute on function public.rest_cocina_estaciones(uuid,text),public.rest_cocina_configurar(uuid,text,text,text,jsonb,boolean) to authenticated;\n\n-- Las funciones de reclamo que siguen conservan sus permisos y la lógica de peso del SQL 32.\n\ncreate or replace function public.rest_reclama_impresion(\n  p_cuenta uuid,\n  p_lineas text[],\n  p_ruta text,\n  p_aparato text\n)\nreturns text[]\nlanguage plpgsql\nsecurity definer\nset search_path = public\nas $$\ndeclare\n  v_lineas text[];\nbegin\n  perform pg_advisory_xact_lock(hashtextextended('rest_impresoras:'||p_cuenta::text,0));\n  p_ruta := public.rest_ruta_impresora(p_cuenta,p_aparato,p_ruta);\n  if p_cuenta is null or not public.es_miembro(p_cuenta) then\n    raise exception 'No tienes acceso a este Restaurant.' using errcode = '42501';\n  end if;\n  if nullif(btrim(p_ruta), '') is null or nullif(btrim(p_aparato), '') is null then\n    raise exception 'Falta la ruta o el identificador del aparato.' using errcode = '22023';\n  end if;\n\n  perform set_config('makers.rest_reclamo_autorizado', 'si', true);\n  with reclamadas as (\n    update public.documentos d\n       set cuerpo = jsonb_set(\n         coalesce(d.cuerpo, '{}'::jsonb),\n         '{impreso}',\n         coalesce(d.cuerpo->'impreso', '{}'::jsonb) || jsonb_build_object(\n           p_ruta,\n           jsonb_build_object('por', p_aparato, 'en', clock_timestamp(), 'ok', false)\n         ),\n         true\n       )\n     where d.cuenta_id = p_cuenta\n       and d.coleccion = 'rest_lineas'\n       and d.doc_id = any(coalesce(p_lineas, '{}'::text[]))\n       and coalesce(d.cuerpo #> array['impreso', p_ruta], 'null'::jsonb) = 'null'::jsonb\n    returning d.doc_id\n  )\n  select coalesce(array_agg(doc_id order by doc_id), '{}'::text[])\n    into v_lineas\n    from reclamadas;\n\n  return v_lineas;\nend $$;\n\ncreate or replace function public.rest_subir_impresion_offline(\n  p_cuenta uuid,\n  p_doc_id text,\n  p_cuerpo jsonb,\n  p_ruta text,\n  p_aparato text\n)\nreturns boolean\nlanguage plpgsql\nsecurity definer\nset search_path = public\nas $$\ndeclare\n  v_guardada text;\nbegin\n  perform pg_advisory_xact_lock(hashtextextended('rest_impresoras:'||p_cuenta::text,0));\n  p_ruta := public.rest_ruta_impresora(p_cuenta,p_aparato,p_ruta);\n  if p_cuenta is null or not public.es_miembro(p_cuenta) then\n    raise exception 'No tienes acceso a este Restaurant.' using errcode = '42501';\n  end if;\n  if nullif(btrim(p_doc_id), '') is null\n     or (left(p_doc_id, 6) <> 'linea_' and left(p_doc_id, 12) <> 'cancelacion_')\n     or nullif(btrim(p_ruta), '') is null or nullif(btrim(p_aparato), '') is null then\n    raise exception 'La línea, ruta o aparato no son válidos.' using errcode = '22023';\n  end if;\n\n  perform set_config('makers.rest_reclamo_autorizado', 'si', true);\n  insert into public.documentos as d (cuenta_id, coleccion, doc_id, cuerpo)\n  values (\n    p_cuenta,\n    'rest_lineas',\n    p_doc_id,\n    jsonb_set(\n      coalesce(p_cuerpo, '{}'::jsonb),\n      '{impreso}',\n      coalesce(p_cuerpo->'impreso', '{}'::jsonb) || jsonb_build_object(\n        p_ruta,\n        jsonb_build_object('por', p_aparato, 'en', clock_timestamp(), 'ok', true, 'confirmado', clock_timestamp(), 'sinRed', true)\n      ),\n      true\n    )\n  )\n  on conflict (cuenta_id, coleccion, doc_id) do update\n     set cuerpo = jsonb_set(\n       coalesce(excluded.cuerpo, '{}'::jsonb),\n       '{impreso}',\n       coalesce(d.cuerpo->'impreso', '{}'::jsonb) || jsonb_build_object(\n         p_ruta,\n         jsonb_build_object('por', p_aparato, 'en', clock_timestamp(), 'ok', true, 'confirmado', clock_timestamp(), 'sinRed', true)\n       ),\n       true\n     )\n   where coalesce(d.cuerpo #> array['impreso', p_ruta], 'null'::jsonb) = 'null'::jsonb\n  returning d.doc_id into v_guardada;\n\n  return v_guardada is not null;\nend $$;\n\ncreate or replace function public.rest_confirma_impresion(\n  p_cuenta uuid,\n  p_lineas text[],\n  p_ruta text,\n  p_aparato text\n)\nreturns text[]\nlanguage plpgsql\nsecurity definer\nset search_path = public\nas $$\ndeclare\n  v_lineas text[];\nbegin\n  perform pg_advisory_xact_lock(hashtextextended('rest_impresoras:'||p_cuenta::text,0));\n  p_ruta := public.rest_ruta_impresora(p_cuenta,p_aparato,p_ruta);\n  if p_cuenta is null or not public.es_miembro(p_cuenta) then\n    raise exception 'No tienes acceso a este Restaurant.' using errcode = '42501';\n  end if;\n  if nullif(btrim(p_ruta), '') is null or nullif(btrim(p_aparato), '') is null then\n    raise exception 'Falta la ruta o el identificador del aparato.' using errcode = '22023';\n  end if;\n\n  perform set_config('makers.rest_reclamo_autorizado', 'si', true);\n  with confirmadas as (\n    update public.documentos d\n       set cuerpo = jsonb_set(\n         coalesce(d.cuerpo, '{}'::jsonb),\n         array['impreso', p_ruta],\n         coalesce(d.cuerpo #> array['impreso', p_ruta], '{}'::jsonb) || jsonb_build_object('ok', true, 'confirmado', clock_timestamp()),\n         true\n       )\n     where d.cuenta_id = p_cuenta\n       and d.coleccion = 'rest_lineas'\n       and d.doc_id = any(coalesce(p_lineas, '{}'::text[]))\n       and d.cuerpo #>> array['impreso', p_ruta, 'por'] = p_aparato\n       and coalesce((d.cuerpo #>> array['impreso', p_ruta, 'ok'])::boolean, false) = false\n    returning d.doc_id\n  )\n  select coalesce(array_agg(doc_id order by doc_id), '{}'::text[])\n    into v_lineas\n    from confirmadas;\n\n  return v_lineas;\nend $$;\n\ncreate or replace function public.rest_reasigna_impresion(\n  p_cuenta uuid,\n  p_lineas text[],\n  p_ruta text,\n  p_aparato text\n)\nreturns text[]\nlanguage plpgsql\nsecurity definer\nset search_path = public\nas $$\ndeclare\n  v_lineas text[];\nbegin\n  perform pg_advisory_xact_lock(hashtextextended('rest_impresoras:'||p_cuenta::text,0));\n  p_ruta := public.rest_ruta_impresora(p_cuenta,p_aparato,p_ruta);\n  if p_cuenta is null or not public.es_miembro(p_cuenta) then\n    raise exception 'No tienes acceso a este Restaurant.' using errcode = '42501';\n  end if;\n  if nullif(btrim(p_ruta), '') is null or nullif(btrim(p_aparato), '') is null then\n    raise exception 'Falta la ruta o el identificador del aparato.' using errcode = '22023';\n  end if;\n\n  perform set_config('makers.rest_reclamo_autorizado', 'si', true);\n  with reasignadas as (\n    update public.documentos d\n       set cuerpo = jsonb_set(\n         coalesce(d.cuerpo, '{}'::jsonb),\n         array['impreso', p_ruta],\n         jsonb_build_object('por', p_aparato, 'en', clock_timestamp(), 'ok', false, 'reasignada', true),\n         true\n       )\n     where d.cuenta_id = p_cuenta\n       and d.coleccion = 'rest_lineas'\n       and d.doc_id = any(coalesce(p_lineas, '{}'::text[]))\n       and coalesce((d.cuerpo #>> array['impreso', p_ruta, 'ok'])::boolean, false) = false\n       and (d.cuerpo #>> array['impreso', p_ruta, 'en'])::timestamptz < clock_timestamp() - interval '2 minutes'\n    returning d.doc_id\n  )\n  select coalesce(array_agg(doc_id order by doc_id), '{}'::text[])\n    into v_lineas\n    from reasignadas;\n\n  return v_lineas;\nend $$;\n\ncreate or replace function public.rest_libera_impresion(\n  p_cuenta uuid,\n  p_lineas text[],\n  p_ruta text,\n  p_aparato text\n)\nreturns text[]\nlanguage plpgsql\nsecurity definer\nset search_path = public\nas $$\ndeclare\n  v_lineas text[];\nbegin\n  perform pg_advisory_xact_lock(hashtextextended('rest_impresoras:'||p_cuenta::text,0));\n  p_ruta := public.rest_ruta_impresora(p_cuenta,p_aparato,p_ruta);\n  if p_cuenta is null or not public.es_miembro(p_cuenta) then\n    raise exception 'No tienes acceso a este Restaurant.' using errcode = '42501';\n  end if;\n  if nullif(btrim(p_ruta), '') is null or nullif(btrim(p_aparato), '') is null then\n    raise exception 'Falta la ruta o el identificador del aparato.' using errcode = '22023';\n  end if;\n\n  perform set_config('makers.rest_reclamo_autorizado', 'si', true);\n  with liberadas as (\n    update public.documentos d\n       set cuerpo = jsonb_set(\n         coalesce(d.cuerpo, '{}'::jsonb),\n         '{impreso}',\n         coalesce(d.cuerpo->'impreso', '{}'::jsonb) - p_ruta,\n         true\n       )\n     where d.cuenta_id = p_cuenta\n       and d.coleccion = 'rest_lineas'\n       and d.doc_id = any(coalesce(p_lineas, '{}'::text[]))\n       and d.cuerpo #>> array['impreso', p_ruta, 'por'] = p_aparato\n       and coalesce((d.cuerpo #>> array['impreso', p_ruta, 'ok'])::boolean, false) = false\n    returning d.doc_id\n  )\n  select coalesce(array_agg(doc_id order by doc_id), '{}'::text[])\n    into v_lineas\n    from liberadas;\n\n  return v_lineas;\nend $$;\n\ncreate or replace function public.rest_bt_toma(p_token text, p_ruta text)\nreturns jsonb\nlanguage plpgsql security definer set search_path = pg_catalog, public\nas $$\ndeclare\n  v public.rest_estaciones_bt := public.rest_bt_estacion(p_token,p_ruta);\n  v_cats jsonb := v.rutas->p_ruta;\n  v_envio text;\n  v_comanda jsonb;\n  v_lineas jsonb;\nbegin\n  perform pg_advisory_xact_lock(hashtextextended('rest_impresoras:'||v.cuenta_id::text,0));\n  p_ruta := public.rest_ruta_impresora(v.cuenta_id,v.aparato,p_ruta);\n  -- Espera el lote completo, incluso si esta impresora sólo recibe una categoría.\n  select l.cuerpo->>'envioId', c.cuerpo into v_envio, v_comanda\n  from public.documentos l\n  join public.documentos c on c.cuenta_id=l.cuenta_id and c.coleccion='rest_comandas'\n    and c.cuerpo->>'id'=l.cuerpo->>'comandaId' and c.cuerpo->>'eventoId'=v.evento and c.cuerpo->>'estado'='abierta'\n  where l.cuenta_id=v.cuenta_id and l.coleccion='rest_lineas' and l.cuerpo ? 'envioId'\n    and l.cuerpo->>'eventoId'=v.evento and l.actualizado>=v.desde\n    and l.cuerpo->>'enviadaTs' ~ '^[0-9]{1,16}$'\n    and (case when l.cuerpo->>'enviadaTs' ~ '^[0-9]{1,16}$' then (l.cuerpo->>'enviadaTs')::bigint end)\n        >= extract(epoch from v.desde - interval '2 minutes')*1000\n    and nullif(l.cuerpo->>'enviada','') is not null and l.cuerpo->>'cancelada' is distinct from 'true'\n    and l.cuerpo #> array['impreso',p_ruta] is null\n    and (v_cats='[]'::jsonb or v_cats ? (l.cuerpo->>'categoria'))\n    and (select count(*) from public.documentos b where b.cuenta_id=l.cuenta_id and b.coleccion='rest_lineas'\n          and b.cuerpo ? 'envioId' and b.cuerpo->>'comandaId'=l.cuerpo->>'comandaId'\n          and b.cuerpo->>'envioId'=l.cuerpo->>'envioId')\n        >= (case when l.cuerpo->>'envioTotal' ~ '^[1-9][0-9]{0,3}$' then (l.cuerpo->>'envioTotal')::int else 1 end)\n  order by l.actualizado,l.doc_id limit 1;\n  if not found then return null; end if;\n\n  perform set_config('makers.rest_reclamo_autorizado', 'si', true);\n  with tomadas as (\n    update public.documentos d\n      set cuerpo=jsonb_set(d.cuerpo,'{impreso}',coalesce(d.cuerpo->'impreso','{}'::jsonb)\n        || jsonb_build_object(p_ruta,jsonb_build_object('por',v.aparato,'en',clock_timestamp(),'ok',false)),true)\n    where d.cuenta_id=v.cuenta_id and d.coleccion='rest_lineas' and d.cuerpo->>'eventoId'=v.evento\n      and d.cuerpo->>'comandaId'=v_comanda->>'id' and d.cuerpo->>'envioId'=v_envio\n      and nullif(d.cuerpo->>'enviada','') is not null and d.cuerpo->>'cancelada' is distinct from 'true'\n      and d.cuerpo #> array['impreso',p_ruta] is null\n      and (v_cats='[]'::jsonb or v_cats ? (d.cuerpo->>'categoria'))\n    returning d.doc_id, d.cuerpo\n  )\n  select jsonb_agg(jsonb_build_object(\n    'doc_id',t.doc_id,\n    -- La estación Android ya instalada imprime cantidades enteras. Una línea\n    -- de peso es un pedido completo y lleva los gramos o kilos en su rótulo.\n    'nombre',case when t.peso is null then t.cuerpo->'nombre' else to_jsonb(\n      (case when t.peso < 1 then trim_scale(t.peso * 1000)::text || ' g'\n            else trim_scale(t.peso)::text || ' kg' end) || ' ' ||\n      coalesce(nullif(t.cuerpo->>'nombre',''),'Platillo')\n    ) end,\n    'cant',case when t.peso is null then t.cuerpo->'cant' else to_jsonb(1) end,\n    'comensal',t.cuerpo->'comensal','mods',t.cuerpo->'mods','nota',t.cuerpo->'nota',\n    'enviada',t.cuerpo->'enviada'\n    ) order by t.doc_id) into v_lineas\n  from (\n    select doc_id,cuerpo,case when cuerpo->>'unidadVenta'='kg'\n      and jsonb_typeof(cuerpo->'cant')='number' then (cuerpo->>'cant')::numeric end as peso\n    from tomadas\n  ) t;\n  if v_lineas is null then return null; end if;\n  return jsonb_build_object(\n    'mesa',v_comanda->'mesaNombre','folio',v_comanda->'folio','fecha',v_comanda->'fecha',\n    'llevar',v_comanda->>'mesaId'='llevar',\n    'app',case when nullif(v_comanda->>'appId','') is not null then coalesce(nullif(v_comanda->>'appNombre',''),'Plataforma') end,\n    'mesero',v_comanda->'mesero','personas',v_comanda->'personas','lineas',v_lineas\n  );\nend $$;\n\ncreate or replace function public.rest_bt_confirma(p_token text, p_ruta text, p_lineas text[])\nreturns void\nlanguage plpgsql security definer set search_path = pg_catalog, public\nas $$\ndeclare v public.rest_estaciones_bt := public.rest_bt_estacion(p_token,p_ruta);\nbegin\n  perform pg_advisory_xact_lock(hashtextextended('rest_impresoras:'||v.cuenta_id::text,0));\n  p_ruta := public.rest_ruta_impresora(v.cuenta_id,v.aparato,p_ruta);\n  perform set_config('makers.rest_reclamo_autorizado', 'si', true);\n  update public.documentos d set cuerpo=jsonb_set(d.cuerpo,array['impreso',p_ruta],\n    (d.cuerpo #> array['impreso',p_ruta]) || jsonb_build_object('ok',true,'confirmado',clock_timestamp()),true)\n  where d.cuenta_id=v.cuenta_id and d.coleccion='rest_lineas' and d.doc_id=any(p_lineas)\n    and d.cuerpo->>'eventoId'=v.evento and d.cuerpo #>> array['impreso',p_ruta,'por']=v.aparato\n    and d.cuerpo #>> array['impreso',p_ruta,'ok']='false';\nend $$;\n\nnotify pgrst, 'reload schema';\ncommit;\n"});</script>
 <script>window.__MIGRACIONES.push({"archivo":"35-restaurant-medios.sql","titulo":"Restaurant · logo y fotos compartidas en la nube (después de 20)","sql":"-- Logos y fotografías del menú. Ejecutar después del SQL 20.\nbegin;\n\ninsert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)\nvalues('restaurant-medios','restaurant-medios',true,204800,array['image/webp'])\non conflict(id) do update set public=true,file_size_limit=excluded.file_size_limit,\n  allowed_mime_types=excluded.allowed_mime_types;\n\ncreate or replace function public.rest_medio_cuenta(p_ruta text)\nreturns uuid language sql immutable as $$\n  select case when p_ruta ~ '^[a-fA-F0-9-]{36}/(logo|platillos|categorias)/[a-fA-F0-9-]{36}\\.webp$'\n    and split_part(p_ruta,'/',1) ~ '^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$'\n    then split_part(p_ruta,'/',1)::uuid end\n$$;\ndrop policy if exists restaurant_medios_leer on storage.objects;\ncreate policy restaurant_medios_leer on storage.objects for select to anon,authenticated\n  using(bucket_id='restaurant-medios');\ndrop policy if exists restaurant_medios_subir on storage.objects;\ncreate policy restaurant_medios_subir on storage.objects for insert to authenticated\n  with check(bucket_id='restaurant-medios' and public.rol_en(public.rest_medio_cuenta(name))='admin');\ndrop policy if exists restaurant_medios_cambiar on storage.objects;\ncreate policy restaurant_medios_cambiar on storage.objects for update to authenticated\n  using(bucket_id='restaurant-medios' and public.rol_en(public.rest_medio_cuenta(name))='admin')\n  with check(bucket_id='restaurant-medios' and public.rol_en(public.rest_medio_cuenta(name))='admin');\ndrop policy if exists restaurant_medios_borrar on storage.objects;\ncreate policy restaurant_medios_borrar on storage.objects for delete to authenticated\n  using(bucket_id='restaurant-medios' and public.rol_en(public.rest_medio_cuenta(name))='admin');\n\ncreate or replace function public.rest_protege_medios()\nreturns trigger language plpgsql set search_path=public as $$\ndeclare v_campo text;\nbegin\n  if new.coleccion='rest_config' then v_campo:='logo';\n  elsif new.coleccion='rest_carta' and new.cuerpo->>'tipo' in ('platillo','categoria') then v_campo:='foto';\n  else return new;\n  end if;\n  if current_setting('nuvoor.medio_autorizado',true)=new.cuenta_id::text then return new; end if;\n  -- Las versiones anteriores omiten estas propiedades al guardar el resto del menú.\n  new.cuerpo:=new.cuerpo-v_campo;\n  if tg_op='UPDATE' and old.cuerpo ? v_campo then\n    new.cuerpo:=jsonb_set(new.cuerpo,array[v_campo],old.cuerpo->v_campo,true);\n  end if;\n  return new;\nend $$;\ndrop trigger if exists rest_protege_medios on public.documentos;\ncreate trigger rest_protege_medios before insert or update on public.documentos\n  for each row execute function public.rest_protege_medios();\n\ncreate or replace function public.rest_medios_confirmar(\n  p_cuenta uuid,p_evento text,p_tipo text,p_id text,p_ruta text,p_anterior text\n)\nreturns jsonb language plpgsql security definer set search_path=public as $$\ndeclare\n  v_evento text:=coalesce(p_evento,'');\n  v_prefijo text;\n  v_col text;\n  v_id text;\n  v_campo text;\n  v_doc public.documentos%rowtype;\nbegin\n  if public.rol_en(p_cuenta) is distinct from 'admin' then\n    raise exception 'Se necesita un administrador del negocio.' using errcode='42501';\n  end if;\n  if v_evento !~ '^[a-zA-Z0-9_-]{0,120}$' or coalesce(p_id,'') !~ '^[a-zA-Z0-9_-]{1,120}$'\n    or coalesce(p_tipo,'') not in ('logo','platillos','categorias') then\n    raise exception 'La imagen no corresponde a un elemento válido.' using errcode='22023';\n  end if;\n  if coalesce(p_ruta,'')<>'' and (public.rest_medio_cuenta(p_ruta) is distinct from p_cuenta\n    or split_part(p_ruta,'/',2)<>p_tipo or not exists(select 1 from storage.objects\n      where bucket_id='restaurant-medios' and name=p_ruta)) then\n    raise exception 'La imagen aún no está guardada en la nube de este negocio.' using errcode='22023';\n  end if;\n  v_prefijo:=case when v_evento='' then '' else 'ev_'||v_evento||'_' end;\n  v_col:=case when p_tipo='logo' then 'rest_config' else 'rest_carta' end;\n  v_id:=v_prefijo||case p_tipo when 'logo' then 'config_general' when 'platillos' then 'plat_'||p_id else 'cat_'||p_id end;\n  v_campo:=case when p_tipo='logo' then 'logo' else 'foto' end;\n  select * into v_doc from public.documentos where cuenta_id=p_cuenta and coleccion=v_col and doc_id=v_id for update;\n  if not found or v_doc.cuerpo->>'_eliminado'='true' then\n    raise exception 'El elemento cambió o ya fue eliminado.' using errcode='P0001';\n  end if;\n  if coalesce(v_doc.cuerpo->>v_campo,'')=coalesce(p_ruta,'') then\n    return jsonb_build_object('documento',to_jsonb(v_doc),'anterior',p_anterior);\n  end if;\n  if coalesce(v_doc.cuerpo->>v_campo,'') is distinct from coalesce(p_anterior,'') then\n    raise exception 'Otro equipo cambió esta imagen. Conservamos tu copia pendiente para que la revises.' using errcode='P0001';\n  end if;\n  perform set_config('nuvoor.medio_autorizado',p_cuenta::text,true);\n  update public.documentos set cuerpo=jsonb_set(cuerpo,array[v_campo],to_jsonb(coalesce(p_ruta,'')),true)\n    where cuenta_id=p_cuenta and coleccion=v_col and doc_id=v_id returning * into v_doc;\n  return jsonb_build_object('documento',to_jsonb(v_doc),'anterior',p_anterior);\nend $$;\n\ncreate or replace function public.rest_medio_sin_uso(p_cuenta uuid,p_ruta text)\nreturns boolean language sql stable security definer set search_path=public as $$\n  select public.rol_en(p_cuenta)='admin' and public.rest_medio_cuenta(p_ruta)=p_cuenta and not exists(\n    select 1 from public.documentos where cuenta_id=p_cuenta and coleccion in ('rest_config','rest_carta')\n      and (cuerpo->>'logo'=p_ruta or cuerpo->>'foto'=p_ruta) and cuerpo->>'_eliminado' is distinct from 'true')\n$$;\ncreate or replace function public.nuvoor_rest_medios_disponible()\nreturns boolean language sql immutable as $$ select true $$;\nrevoke all on function public.rest_medios_confirmar(uuid,text,text,text,text,text),\n  public.rest_medio_sin_uso(uuid,text),public.nuvoor_rest_medios_disponible() from public,anon,authenticated;\ngrant execute on function public.rest_medios_confirmar(uuid,text,text,text,text,text),\n  public.rest_medio_sin_uso(uuid,text),public.nuvoor_rest_medios_disponible() to authenticated;\n\nnotify pgrst,'reload schema';\ncommit;\n"});</script>
 <script>window.__MIGRACIONES.push({"archivo": "36-altas-y-visitas.sql", "titulo": "Cuentas nuevas desde Lab y visitas de nuvoor.mx", "sql": "-- ============================================================\n--  36 · CUENTAS NUEVAS DESDE LAB Y VISITAS DE NUVOOR.MX\n--  Correr después de 07-codigos.sql y 08-lab-manda.sql.\n--  Es seguro repetirlo. No toca cuentas, planes, cotizaciones ni\n--  datos de ningún negocio.\n-- ============================================================\n--  1. Un interruptor que se prende y apaga desde Lab › Códigos:\n--     «Cuentas nuevas: abiertas / cerradas». Lo leen nuvoor.mx y la\n--     pantalla de acceso de la app. Cerradas, sólo entra quien trae\n--     un código de Lab.\n--     Ojo: en Supabase, «Allow new users to sign up» se queda PRENDIDO;\n--     quien decide es este interruptor. Sin código y con las cuentas\n--     cerradas, la pantalla no deja crear cuenta; y aun si alguien se\n--     da de alta por fuera, nace sin plan y no puede guardar nada.\n--\n--  2. El contador de visitas de nuvoor.mx. Cada navegador recibe un\n--     número al azar (no se guarda nombre, correo ni IP) y se cuenta\n--     una persona por día. Sólo el equipo de Nuvoor lo puede leer.\n-- ============================================================\n\nbegin;\n\n-- ---------- 1. Interruptores públicos ----------\ncreate table if not exists public.ajustes_publicos (\n  clave       text primary key,\n  valor       jsonb not null default '{}'::jsonb,\n  actualizado timestamptz not null default now(),\n  quien       uuid references auth.users(id)\n);\nalter table public.ajustes_publicos enable row level security;\n\n-- Cualquiera puede leerlos (son públicos a propósito); nadie los escribe\n-- directo: sólo con staff_altas(), que revisa que seas del equipo.\ndrop policy if exists ajustes_publicos_leer on public.ajustes_publicos;\ncreate policy ajustes_publicos_leer on public.ajustes_publicos for select using (true);\n\ninsert into public.ajustes_publicos (clave, valor)\nvalues ('altas', '{\"abiertas\": false}'::jsonb)\non conflict (clave) do nothing;\n\ncreate or replace function public.altas_abiertas()\nreturns boolean\nlanguage sql stable security definer set search_path = public\nas $$\n  select coalesce((select (valor->>'abiertas')::boolean\n                     from public.ajustes_publicos where clave = 'altas'), false)\n$$;\nrevoke all on function public.altas_abiertas() from public;\ngrant execute on function public.altas_abiertas() to anon, authenticated;\n\ncreate or replace function public.staff_altas(p_abiertas boolean)\nreturns jsonb\nlanguage plpgsql security definer set search_path = public\nas $$\ndeclare antes jsonb; nuevo boolean := coalesce(p_abiertas, false);\nbegin\n  if not public.es_staff() then raise exception 'Solo el equipo de Nuvoor'; end if;\n  select valor into antes from public.ajustes_publicos where clave = 'altas';\n  insert into public.ajustes_publicos (clave, valor, actualizado, quien)\n  values ('altas', jsonb_build_object('abiertas', nuevo), now(), auth.uid())\n  on conflict (clave) do update\n    set valor = excluded.valor, actualizado = now(), quien = auth.uid();\n  insert into public.lab_bitacora (quien, que, antes, despues)\n  values (auth.uid(),\n          case when nuevo then 'Abrió las cuentas nuevas' else 'Cerró las cuentas nuevas' end,\n          antes, jsonb_build_object('abiertas', nuevo));\n  return jsonb_build_object('ok', true, 'abiertas', nuevo);\nend $$;\nrevoke all on function public.staff_altas(boolean) from public, anon;\ngrant execute on function public.staff_altas(boolean) to authenticated;\n\n\n-- ---------- 2. Visitas de nuvoor.mx ----------\ncreate table if not exists public.visitas_web (\n  dia       date not null,\n  visitante text not null,\n  pagina    text not null default '/',\n  origen    text,\n  vistas    int  not null default 1,\n  primera   timestamptz not null default now(),\n  ultima    timestamptz not null default now(),\n  primary key (dia, visitante, pagina)\n);\nalter table public.visitas_web enable row level security;\n\ndrop policy if exists visitas_staff on public.visitas_web;\ncreate policy visitas_staff on public.visitas_web for select using (public.es_staff());\n\n-- La página llama a esto al abrirse. Recorta todo lo que llega y no\n-- acepta cualquier cosa como visitante.\ncreate or replace function public.cuenta_visita(p_visitante text, p_pagina text default '/', p_origen text default null)\nreturns void\nlanguage plpgsql security definer set search_path = public\nas $$\ndeclare v text; pg text; og text; hoy date;\nbegin\n  v  := left(regexp_replace(coalesce(p_visitante, ''), '[^A-Za-z0-9_-]', '', 'g'), 40);\n  if length(v) < 8 then return; end if;\n  pg := left(coalesce(nullif(btrim(p_pagina), ''), '/'), 80);\n  og := left(nullif(btrim(coalesce(p_origen, '')), ''), 80);\n  hoy := (now() at time zone 'America/Mexico_City')::date;\n  insert into public.visitas_web (dia, visitante, pagina, origen)\n  values (hoy, v, pg, og)\n  on conflict (dia, visitante, pagina) do update\n    set vistas = least(public.visitas_web.vistas + 1, 500), ultima = now();\nend $$;\nrevoke all on function public.cuenta_visita(text, text, text) from public;\ngrant execute on function public.cuenta_visita(text, text, text) to anon, authenticated;\n\n-- Personas distintas y páginas vistas por día. Sólo el equipo.\ncreate or replace view public.v_visitas_dia as\nselect dia,\n       count(distinct visitante)::int as personas,\n       sum(vistas)::int               as vistas\n  from public.visitas_web\n where public.es_staff()\n group by dia;\ngrant select on public.v_visitas_dia to authenticated;\n\n-- De dónde llegan (últimos 30 días): google.com, facebook.com, directo…\ncreate or replace view public.v_visitas_origen as\nselect coalesce(origen, 'directo') as origen,\n       count(distinct visitante)::int as personas\n  from public.visitas_web\n where public.es_staff()\n   and dia >= (now() at time zone 'America/Mexico_City')::date - 29\n group by 1;\ngrant select on public.v_visitas_origen to authenticated;\n\n-- Para que Lab › Base de datos sepa que ya está puesto.\ncreate or replace function public.nuvoor_altas_disponible()\nreturns boolean language sql immutable as $$ select true $$;\nrevoke all on function public.nuvoor_altas_disponible() from public;\ngrant execute on function public.nuvoor_altas_disponible() to authenticated;\n\nnotify pgrst, 'reload schema';\ncommit;\n\nselect public.altas_abiertas() as cuentas_nuevas_abiertas,\n       (select count(*) from public.visitas_web) as visitas_guardadas;\n"});</script>
+<script>window.__MIGRACIONES.push({"archivo": "37-tiempo-y-uso.sql", "titulo": "Tiempo en nuvoor.mx y tiempo de uso de los sistemas", "sql": "-- ============================================================\n--  37 · CUÁNTO TIEMPO SE QUEDAN EN NUVOOR.MX Y CUÁNTO USAN\n--       IMPRENTA, RESTAURANT Y STORE\n--  Correr después de 36-altas-y-visitas.sql. Es seguro repetirlo.\n--  No toca cuentas, planes, cotizaciones ni datos de ningún negocio.\n-- ============================================================\n--  1. nuvoor.mx: cada página manda cuántos segundos estuvo a la vista\n--     (sólo con la pestaña al frente). Se suma al renglón de la visita\n--     de ese día. Sigue sin guardarse nombre, correo ni IP.\n--\n--  2. Los sistemas: mientras alguien trabaja en Imprenta, Restaurant o\n--     Store (pantalla al frente y moviéndose en los últimos minutos),\n--     el sistema manda cada par de minutos los segundos de uso. Se\n--     guarda por día, negocio, usuario y sistema. Sólo cuenta tiempo;\n--     no guarda qué hicieron ni nada de lo que capturan.\n--\n--  Sólo el equipo de Nuvoor puede leer ambas cosas (Lab › Uso y visitas).\n-- ============================================================\n\nbegin;\n\n-- ---------- 1. Tiempo en nuvoor.mx ----------\nalter table public.visitas_web add column if not exists segundos int not null default 0;\n\ncreate or replace function public.suma_tiempo_visita(p_visitante text, p_pagina text default '/', p_segundos int default 0)\nreturns void\nlanguage plpgsql security definer set search_path = public\nas $$\ndeclare v text; pg text; s int; hoy date;\nbegin\n  v  := left(regexp_replace(coalesce(p_visitante, ''), '[^A-Za-z0-9_-]', '', 'g'), 40);\n  if length(v) < 8 then return; end if;\n  s  := least(greatest(coalesce(p_segundos, 0), 0), 1800);   -- nunca más de 30 min por envío\n  if s = 0 then return; end if;\n  pg := left(coalesce(nullif(btrim(p_pagina), ''), '/'), 80);\n  hoy := (now() at time zone 'America/Mexico_City')::date;\n  update public.visitas_web\n     set segundos = least(segundos + s, 4 * 3600), ultima = now()\n   where dia = hoy and visitante = v and pagina = pg;\nend $$;\nrevoke all on function public.suma_tiempo_visita(text, text, int) from public;\ngrant execute on function public.suma_tiempo_visita(text, text, int) to anon, authenticated;\n\n-- Por día ahora también trae el tiempo (columna nueva al final).\ncreate or replace view public.v_visitas_dia as\nselect dia,\n       count(distinct visitante)::int as personas,\n       sum(vistas)::int               as vistas,\n       sum(segundos)::int             as segundos\n  from public.visitas_web\n where public.es_staff()\n group by dia;\ngrant select on public.v_visitas_dia to authenticated;\n\n\n-- ---------- 2. Tiempo de uso de los sistemas ----------\ncreate table if not exists public.uso_apps (\n  dia        date not null,\n  cuenta_id  uuid not null,\n  usuario_id uuid not null,\n  producto   text not null check (producto in ('imprenta', 'restaurant', 'store')),\n  segundos   int  not null default 0,\n  envios     int  not null default 0,\n  primera    timestamptz not null default now(),\n  ultima     timestamptz not null default now(),\n  primary key (dia, cuenta_id, usuario_id, producto)\n);\ncreate index if not exists uso_apps_dia_idx on public.uso_apps (dia);\nalter table public.uso_apps enable row level security;\n\ndrop policy if exists uso_apps_staff on public.uso_apps;\ncreate policy uso_apps_staff on public.uso_apps for select using (public.es_staff());\n\n-- Lo llama cada sistema mientras se usa. El negocio que manda se revisa:\n-- si el usuario no es miembro, se usa su negocio activo.\ncreate or replace function public.suma_uso(p_producto text, p_segundos int, p_cuenta uuid default null)\nreturns void\nlanguage plpgsql security definer set search_path = public\nas $$\ndeclare u uuid := auth.uid(); c uuid; s int; hoy date; pr text := lower(coalesce(p_producto, ''));\nbegin\n  if u is null then return; end if;\n  if pr not in ('imprenta', 'restaurant', 'store') then return; end if;\n  s := least(greatest(coalesce(p_segundos, 0), 0), 900);      -- nunca más de 15 min por envío\n  if s = 0 then return; end if;\n  if p_cuenta is not null and public.es_miembro(p_cuenta) then c := p_cuenta; else c := public.mi_cuenta(); end if;\n  if c is null then return; end if;\n  hoy := (now() at time zone 'America/Mexico_City')::date;\n  insert into public.uso_apps (dia, cuenta_id, usuario_id, producto, segundos, envios)\n  values (hoy, c, u, pr, s, 1)\n  on conflict (dia, cuenta_id, usuario_id, producto) do update\n    set segundos = least(public.uso_apps.segundos + excluded.segundos, 18 * 3600),\n        envios   = public.uso_apps.envios + 1,\n        ultima   = now();\nend $$;\nrevoke all on function public.suma_uso(text, int, uuid) from public, anon;\ngrant execute on function public.suma_uso(text, int, uuid) to authenticated;\n\n-- Para Lab: el uso con el nombre del negocio. Sólo el equipo.\ncreate or replace view public.v_uso_apps as\nselect u.dia, u.cuenta_id, coalesce(c.nombre, 'Negocio sin nombre') as negocio,\n       u.usuario_id, u.producto, u.segundos, u.envios, u.primera, u.ultima\n  from public.uso_apps u\n  left join public.cuentas c on c.id = u.cuenta_id\n where public.es_staff();\ngrant select on public.v_uso_apps to authenticated;\n\n-- Para que Lab › Base de datos sepa que ya está puesto.\ncreate or replace function public.nuvoor_uso_disponible()\nreturns boolean language sql immutable as $$ select true $$;\nrevoke all on function public.nuvoor_uso_disponible() from public;\ngrant execute on function public.nuvoor_uso_disponible() to authenticated;\n\nnotify pgrst, 'reload schema';\ncommit;\n\nselect (select count(*) from public.visitas_web) as visitas_guardadas,\n       (select count(*) from public.uso_apps)    as registros_de_uso;\n"});</script>
 </body>
 </html>
