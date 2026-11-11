@@ -3328,6 +3328,20 @@ body.rol-produccion #btnPrint{display:none!important}
 .svRollo svg{width:100%;height:auto;display:block;max-height:170px;min-width:280px}
 .svRollo p{margin:8px 0 0;font-size:12px;color:var(--ink-2)}
 .svRollo:empty{display:none}
+.svArm{border:1px solid var(--line-soft);border-radius:16px;padding:12px;background:var(--surface-2)}
+.svMatInfo{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:12px;border:1px solid var(--line-soft);border-radius:14px;padding:10px 12px;background:var(--surface-2)}
+.svMatInfo b{display:block;font-size:13.5px}
+.svMatInfo span{font-size:12px;color:var(--ink-2)}
+.svMatForm{margin-top:12px;border:1.5px dashed var(--accent);border-radius:14px;padding:12px;background:var(--accent-soft)}
+.svMatForm p{margin:0 0 10px;font-size:12.5px;color:var(--ink-2)}
+.svMatForm input{width:120px}
+.svMatForm .svMedidas input{width:80px}
+.svMatBtns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.svMatOtro{display:flex;gap:8px;margin-top:8px}
+.svMatOtro input{flex:1;min-width:0}
+.svChipMas{border-style:dashed}
+.svCapaPct{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.svCapaPct input{width:70px;text-align:center}
 .rRollo{fill:var(--surface);stroke:var(--line)}
 .rPieza{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.2}
 .rOrilla{fill:var(--line-soft)}
@@ -6414,8 +6428,8 @@ function normalizaCat(){
 
 /* ============ CONSUMIBLES ============ */
 const UNIDADES_INS = [["ml","mililitros"],["g","gramos"],["m","metros"],
-                      ["m2","metros cuadrados"],["pza","piezas"],["kg","kilos"],["l","litros"]];
-const abrevIns = u => u === "m2" ? "m²" : (u || "pza");
+                      ["m2","metros cuadrados"],["pza","piezas"],["kg","kilos"],["l","litros"],["lamina","láminas"]];
+const abrevIns = u => u === "m2" ? "m²" : u === "lamina" ? "lámina" : (u || "pza");
 function insumoDe(id){ return (cat.insumos||[]).find(i=>i.id===id) || null; }
 function consumosDe(ancla, anclaId){
   if(!anclaId) return [];
@@ -22385,7 +22399,7 @@ const SV_ICONOS = (function(){
       '<circle cx="23" cy="48" r="4" fill="#334155"/><circle cx="44" cy="48" r="4" fill="#334155"/>'
   };
 })();
-const svIco = id => '<svg class="svIco" viewBox="0 0 64 64" aria-hidden="true">' + (SV_ICONOS[id] || SV_ICONOS.gran) + '</svg>';
+const svIco = id => '<svg class="svIco" viewBox="0 0 64 64" aria-hidden="true">' + (SV_ICONOS[id] || SV_ICONOS[{uvcama:"uv", camauv:"router", hibrido:"gran"}[id]] || SV_ICONOS.gran) + '</svg>';
 /* Los degradados viven una sola vez, en un <svg> que no se ve pero sí se
    pinta: uno con display:none los dejaría sin color en Chrome. */
 function svDefs(){
@@ -22416,7 +22430,7 @@ function svDefs(){
 const SV_LAM_CARAS = {id:"lamCaras", nom:"Laminado por", modo:"nada", res:"a {v}", si:{g:"lam", no:"sin"}, ops:[
   {id:"una", nom:"Una cara", n:1}, {id:"dos", nom:"Las dos caras", n:2}]};
 const SV_DEF = {
-  version: 1,
+  version: 2,
   archivo: {id:"arch", nom:"Archivo", modo:"pedido", res:"{v}", ops:[
     {id:"listo", nom:"Lo trae listo", p:0, c:0}, {id:"ajuste", nom:"Ajustar su archivo", p:80, c:25}, {id:"diseno", nom:"Diseño desde cero", p:250, c:80}]},
   secciones: [
@@ -22424,8 +22438,11 @@ const SV_DEF = {
     {id:"digital", nom:"Impresión digital",      sub:"Copias, tabloides, tarjetas", det:"Impresoras multifuncionales · por hoja o por pieza", prods:["copias","tabloide","tarjetas","volantes","etiquetas"]},
     {id:"subli",   nom:"Sublimación",            sub:"Impresión, plancha y calandra", det:"En impresora o en plóter, con prensa si el cliente trae sus piezas", prods:["subImp","subPieza"]},
     {id:"seri",    nom:"Serigrafía",             sub:"Tinta en prenda del cliente", det:"Marcos, tintas y tiraje", prods:["seriPrenda"]},
-    {id:"dtf",     nom:"DTF",                    sub:"Película por metro",          det:"Maquila por metro lineal", prods:["dtfMetro"]},
-    {id:"uv",      nom:"Impresión UV",           sub:"Rígidos y especiales",        det:"DTF UV para termos, madera y acrílico", prods:["uvMetro"]},
+    {id:"dtf",     nom:"DTF Textil",             sub:"Película por metro",          det:"Maquila por metro lineal · o por piezas con armado", prods:["dtfMetro"]},
+    {id:"uv",      nom:"DTF UV rollo a rollo",   sub:"Película UV por metro",       det:"DTF UV en rollo para termos, madera y acrílico", prods:["uvMetro"]},
+    {id:"uvcama",  nom:"DTF UV cama plana",      sub:"Hojas a la medida de tu máquina", det:"Cama plana · se cobra por hoja de película", prods:["uvHoja"]},
+    {id:"camauv",  nom:"Cama plana UV",          sub:"Impresión directa en rígidos", det:"Directo sobre trovicel, coroplast, estireno, acrílico…", prods:["uvRigido"]},
+    {id:"hibrido", nom:"Plotter híbrido",        sub:"Impresión directa de rígidos", det:"Rollo y rígidos en el mismo plóter", prods:["hibRigido"]},
     {id:"vinil",   nom:"Corte de vinil",         sub:"Textil y adhesivo",           det:"Plóter de corte · se cobra por m²", prods:["vinCorte"]},
     {id:"laser",   nom:"Grabado láser",          sub:"Madera, acrílico, metal",     det:"Por minuto de máquina", prods:["laserPieza"]},
     {id:"rotul",   nom:"Rotulación vehicular",   sub:"Cobertura y materiales", bloq:true},
@@ -22514,7 +22531,7 @@ const SV_DEF = {
         {id:"papel", nom:"Papel", modo:"porUnidad", ops:[
           {id:"b90", nom:"Bond 90 g", p:0, c:0}, {id:"c130", nom:"Couché 130 g", p:0.3, c:0.12}, {id:"c150", nom:"Couché 150 g", p:0.45, c:0.18}]}
       ]},
-    etiquetas:{nom:"Etiquetas en hoja", cobro:"hoja", rapidos:[5,10,20,50], sat:"82121500", def:{q:20},
+    etiquetas:{nom:"Etiquetas en hoja", cobro:"hoja", hojaCm:[21.6,27.9], rapidos:[5,10,20,50], sat:"82121500", def:{q:20},
       grupos:[
         {id:"mat", nom:"Material", modo:"base", ops:[
           {id:"pbri", nom:"Papel adhesivo brillante", p:14, c:4.5}, {id:"pmate", nom:"Papel adhesivo mate", p:14, c:4.5},
@@ -22522,7 +22539,7 @@ const SV_DEF = {
         {id:"corte", nom:"Corte", modo:"porUnidad", ops:[{id:"sin", nom:"Sin corte", p:0, c:0}, {id:"medio", nom:"Medio corte a contorno", p:12, c:2}]},
         {id:"lam", nom:"Laminado", modo:"porUnidad", ops:[{id:"sin", nom:"Sin laminado", p:0, c:0}, {id:"bri", nom:"Brillante", p:6, c:2}]}
       ]},
-    subImp:{nom:"Impresión para sublimar", cobro:"hoja", sat:"82121510", def:{q:5, sel:{formato:"plo", medida:"p111", prensa:"cal"}},
+    subImp:{nom:"Impresión para sublimar", cobro:"hoja", armMin:0.5, armMinHoja:1, sat:"82121510", def:{q:5, sel:{formato:"plo", medida:"p111", prensa:"cal"}},
       grupos:[
         {id:"formato", nom:"¿En qué se imprime?", modo:"nada", ops:[{id:"imp", nom:"Impresora (hojas)"}, {id:"plo", nom:"Plóter (rollo)"}]},
         {id:"modelo", nom:"Modelo de impresora", modo:"base", si:{g:"formato", es:"imp"}, ops:[
@@ -22558,12 +22575,12 @@ const SV_DEF = {
           {id:"nuevos", nom:"Marcos nuevos", p:120, c:45}, {id:"taller", nom:"Reusar marcos del taller", p:40, c:10},
           {id:"cliente", nom:"El cliente trae los suyos", p:0, c:0}]}
       ]},
-    dtfMetro:{nom:"DTF por metro", cobro:"ml", minQ:0.5, rapidos:[1,3,5,10], sat:"82121510", def:{q:3},
+    dtfMetro:{nom:"DTF por metro", cobro:"ml", minQ:0.5, armMin:0.5, rapidos:[1,3,5,10], sat:"82121510", def:{q:3},
       grupos:[
         {id:"ancho", nom:"Ancho de la película", modo:"base", ops:[{id:"a30", nom:"30 cm", p:36, c:21}, {id:"a60", nom:"60 cm", p:62, c:38}]},
         {id:"plancha", nom:"Piezas a planchar", tipo:"num", por:"pedido", p:12, c:3, uni:"piezas", nota:"si el cliente trae sus prendas"}
       ]},
-    uvMetro:{nom:"DTF UV por metro", cobro:"ml", minQ:0.3, rapidos:[0.5,1,2,5], sat:"82121500", def:{q:1},
+    uvMetro:{nom:"DTF UV por metro", cobro:"ml", minQ:0.3, armMin:0.3, rapidos:[0.5,1,2,5], sat:"82121500", def:{q:1},
       grupos:[
         {id:"ancho", nom:"Ancho", modo:"base", ops:[{id:"a30", nom:"30 cm", p:58, c:34}, {id:"a60", nom:"60 cm", p:105, c:62}]},
         {id:"aplica", nom:"Piezas a aplicar", tipo:"num", por:"pedido", p:10, c:2, uni:"piezas", nota:"termos, fundas o placas del cliente"}
@@ -22579,6 +22596,30 @@ const SV_DEF = {
         {id:"dep", nom:"Depilado", modo:"porM2", ops:[{id:"sen", nom:"Sencillo", p:0, c:0}, {id:"det", nom:"Detallado (letra chica)", p:60, c:20}]},
         {id:"transfer", nom:"Transfer", modo:"porM2", ops:[{id:"sin", nom:"Sin transfer", p:0, c:0}, {id:"con", nom:"Con transfer", p:30, c:12}]},
         {id:"aplica", nom:"Aplicación", modo:"porUnidad", ops:[{id:"no", nom:"Sólo el corte", p:0, c:0}, {id:"si", nom:"Planchado o aplicado", p:12, c:3}]}
+      ]},
+    uvHoja:{nom:"DTF UV en hoja", cobro:"hoja", hojaCm:[30,50], hojaEditable:true, armMinHoja:1, rapidos:[1,5,10,20], sat:"82121500",
+      def:{q:5, arm:{on:true, w:6, h:6, n:40, cobra:"completo"}},
+      grupos:[
+        {id:"pel", nom:"Película", modo:"base", ops:[{id:"hoja", nom:"Hoja de DTF UV", p:140, c:55}]},
+        {id:"aplica", nom:"Piezas a aplicar", tipo:"num", por:"pedido", p:10, c:2, uni:"piezas", nota:"termos, fundas o placas del cliente"}
+      ]},
+    uvRigido:{nom:"Impresión UV en rígido", cobro:"m2", medida:"cm", rigido:true, minPieza:0, rapidos:[1,5,10,25], sat:"82121500", def:{w:60, h:40, q:1, sel:{corte:"no"}},
+      grupos:[
+        {id:"imp", nom:"Impresión CMYK", modo:"base", ops:[{id:"cmyk", nom:"CMYK", p:380, c:110}]},
+        {id:"rmat", nom:"Material", tipo:"material"},
+        {id:"blanco", nom:"Tinta blanca", tipo:"capa", p:120, c:35},
+        {id:"barniz", nom:"Barniz", tipo:"capa", p:90, c:25},
+        {id:"corte", nom:"Corte", modo:"perim", ops:[{id:"no", nom:"Sin corte", p:0, c:0}, {id:"navaja", nom:"Con navaja", p:18, c:5},
+          {id:"suaje", nom:"Suaje CNC", p:35, c:10}, {id:"router", nom:"Router", p:45, c:14}]}
+      ]},
+    hibRigido:{nom:"Impresión directa en rígido", cobro:"m2", medida:"cm", rigido:true, minPieza:0, rapidos:[1,5,10,25], sat:"82121500", def:{w:60, h:40, q:1, sel:{corte:"no"}},
+      grupos:[
+        {id:"imp", nom:"Impresión CMYK", modo:"base", ops:[{id:"cmyk", nom:"CMYK", p:320, c:95}]},
+        {id:"rmat", nom:"Material", tipo:"material"},
+        {id:"blanco", nom:"Tinta blanca", tipo:"capa", p:110, c:32},
+        {id:"barniz", nom:"Barniz", tipo:"capa", p:80, c:22},
+        {id:"corte", nom:"Corte", modo:"perim", ops:[{id:"no", nom:"Sin corte", p:0, c:0}, {id:"navaja", nom:"Con navaja", p:18, c:5},
+          {id:"suaje", nom:"Suaje CNC", p:35, c:10}, {id:"router", nom:"Router", p:45, c:14}]}
       ]},
     laserPieza:{nom:"Grabado en pieza del cliente", cobro:"pieza", rapidos:[10,25,50,100], sat:"82121500", def:{q:25},
       grupos:[
@@ -22599,8 +22640,20 @@ function svCat(){
     const c = cat.svcCat;
     if(!c.archivo) c.archivo = JSON.parse(JSON.stringify(SV_DEF.archivo));
     if(!Array.isArray(c.secciones)) c.secciones = JSON.parse(JSON.stringify(SV_DEF.secciones));
-    SV_DEF.secciones.forEach(s=>{ if(!c.secciones.some(x=>x.id === s.id)) c.secciones.push(JSON.parse(JSON.stringify(s))); });
+    SV_DEF.secciones.forEach((s, i)=>{
+      if(c.secciones.some(x=>x.id === s.id)) return;
+      const prev = i > 0 ? c.secciones.findIndex(x=>x.id === SV_DEF.secciones[i-1].id) : -1;
+      c.secciones.splice(prev >= 0 ? prev + 1 : c.secciones.length, 0, JSON.parse(JSON.stringify(s)));
+    });
+    if(!(c.version >= 2)){
+      const viejo = {dtf:"DTF", uv:"Impresión UV"};
+      Object.keys(viejo).forEach(id=>{ const s = c.secciones.find(x=>x.id === id), d = SV_DEF.secciones.find(x=>x.id === id);
+        if(s && d && s.nom === viejo[id]){ s.nom = d.nom; s.sub = d.sub; s.det = d.det; } });
+      c.version = 2;
+    }
     Object.keys(SV_DEF.productos).forEach(k=>{ if(!c.productos[k]) c.productos[k] = JSON.parse(JSON.stringify(SV_DEF.productos[k])); });
+    Object.keys(SV_DEF.productos).forEach(k=>{ const d = SV_DEF.productos[k], p = c.productos[k];
+      ["armMin","armMinHoja","hojaCm"].forEach(f=>{ if(p && d[f] != null && p[f] == null) p[f] = JSON.parse(JSON.stringify(d[f])); }); });
   }
   return cat.svcCat;
 }
@@ -22656,16 +22709,18 @@ function svMejorRollo(pr, st){
 }
 function svNormaliza(pr, st){
   svGruposVis(pr, st).forEach(g=>{
-    if(g.tipo === "num" || g.modo === "rollo") return;
+    if(g.tipo === "num" || g.tipo === "capa" || g.tipo === "material" || g.modo === "rollo") return;
     const ops = svOpsVis(g, st, pr);
     if(!ops.some(o=>o.id === st.sel[g.id])) st.sel[g.id] = ops[0] ? ops[0].id : null;
   });
 }
 function svStDefault(pid){
   const pr = svProd(pid), d = pr.def || {};
-  const st = {sel:{}, num:{}, w:d.w||0, h:d.h||0, q:d.q||1, notas:""};
+  const st = {sel:{}, num:{}, w:d.w||0, h:d.h||0, q:d.q||1, notas:"", arm: d.arm ? JSON.parse(JSON.stringify(d.arm)) : {on:false, w:5, h:5, n:20, cobra: pr.cobro === "hoja" ? "completo" : "ocupa"}};
   svGrupos(pr).forEach(g=>{
     if(g.tipo === "num") st.num[g.id] = (d.num && d.num[g.id] != null) ? d.num[g.id] : (g.def || 0);
+    else if(g.tipo === "capa"){ st.capas = st.capas || {}; st.capas[g.id] = {on:false, pct:100}; }
+    else if(g.tipo === "material") st.rmat = svMatInicial();
     else if(g.modo === "rollo") st.sel[g.id] = null;
     else st.sel[g.id] = (d.sel && d.sel[g.id]) || (g.ops[0] && g.ops[0].id);
   });
@@ -22676,6 +22731,7 @@ function svStDefault(pid){
 function svCalc(pid, st){
   const pr = svProd(pid);
   if(!pr || !st) return {total:0, costo:0, q:0, cobro:"pieza", U:SV_UNI.pieza, ren:[], avisos:[], acomodo:null, w:0, h:0, A:0, per:0, porPieza:0};
+  if(pr.rigido) return svCalcRigido(pid, st, pr);
   const G = svGruposVis(pr, st);
   const opt = g => svOpsVis(g, st, pr).find(o=>o.id === st.sel[g.id]) || null;
   const nDe = gid => { const g = G.find(x=>x.id === gid); const o = g ? opt(g) : null; return o && o.n ? o.n : 1; };
@@ -22687,7 +22743,8 @@ function svCalc(pid, st){
     if(g.modo === "x"){ const o = opt(g); if(o && num(o.p) !== 1){ xp *= num(o.p); xc *= (o.cx != null ? num(o.cx) : num(o.p)); xs.push(o.nom.toLowerCase()); } }
     if(g.tipo === "num" && g.por === "base"){ const v = Math.max(0, num(st.num[g.id])); xp *= v; xc *= v; numBase.push([g, v]); }
   });
-  const q = Math.max(0, num(st.q));
+  let q = Math.max(0, num(st.q));
+  const arm = svArmCalc(pr, st, base, cobro); if(arm) q = arm.cobrado;
   const [w, h] = svMedidas(pr, st);
   const A = w*h, Acob = Math.max(A, pr.minPieza || 0), per = 2*(w + h);
   const up = num(base.p)*xp, uc = num(base.c)*xc, U = SV_UNI[cobro];
@@ -22702,8 +22759,8 @@ function svCalc(pid, st){
     const minTxt = (A > 0 && A < (pr.minPieza||0)) ? " (se cobra el mínimo de " + svN0(pr.minPieza) + " m²)" : "";
     ren.push({t: etq + " · " + svN2(Acob) + " m² c/u × " + mx(up) + "/m²" + minTxt, m: up*Acob*q});
   } else {
-    pU += up; cMat = uc*q;
-    ren.push({t: etq + " · " + svN0(q) + " " + U.pl + " × " + mx(up), m: up*q});
+    pU += up; cMat = uc*(arm ? arm.usado : q);
+    ren.push({t: etq + " · " + svN0(q) + " " + U.pl + " × " + mx(up) + (arm && arm.txt ? " (" + arm.txt + ")" : ""), m: up*q});
   }
   G.forEach(g=>{
     if(g.tipo === "num"){
@@ -22733,7 +22790,8 @@ function svCalc(pid, st){
   if(pr.minQ && q > 0 && q < pr.minQ) avisos.push("El mínimo para " + pr.nom.toLowerCase() + " es " + svN0(pr.minQ) + " " + U.pl + ".");
   if(pr.minPedido && q > 0 && total > 0 && total < pr.minPedido){ ren.push({t:"Ajuste al mínimo de pedido de " + mx(pr.minPedido), m: pr.minPedido - total}); total = pr.minPedido; }
   if(acomodo && acomodo.tramos > 1) avisos.push("La pieza no cabe en el rollo de " + svFmtRollo(acomodo.rollo) + ": sale en " + acomodo.tramos + " tramos que se empalman.");
-  return {total, costo, q, cobro, U, ren, avisos, acomodo, w, h, A, per, porPieza: q > 0 ? total/q : 0};
+  if(arm && arm.aviso) avisos.push(arm.aviso);
+  return {total, costo, q, cobro, U, ren, avisos, acomodo, arm, w, h, A, per, porPieza: q > 0 ? total/q : 0};
 }
 function svResTxt(g, o){
   if(g.res) return g.res.replace("{v}", o.nom.toLowerCase());
@@ -22747,7 +22805,10 @@ function svDetalle(pid, st){
   const pr = svProd(pid), r = svCalc(pid, st), d = [];
   if(!pr) return d;
   if(pr.medida) d.push({k:"Medida", v: svN0(num(st.w)) + " × " + svN0(num(st.h)) + " " + pr.medida});
+  if(r.arm && r.arm.n){ const t = r.arm.n + " piezas de " + svN0(num(st.arm.w)) + " × " + svN0(num(st.arm.h)) + " cm"; d.push({k:"Armado", v:t, r:t}); }
   svGruposVis(pr, st).forEach(g=>{
+    if(g.tipo === "material"){ const m = svMatSel(st); if(m) d.push({k:"Material", v:m.nombre, r:m.nombre}); return; }
+    if(g.tipo === "capa"){ const c = (st.capas || {})[g.id]; if(c && c.on){ const p = svN0(num(c.pct) || 100); d.push({k:g.nom, v:p + "% del diseño", r:g.nom.toLowerCase() + " al " + p + "%"}); } return; }
     if(g.tipo === "num"){ const v = num(st.num[g.id]); if(v){ const t = svN0(v) + " " + (g.uni||"") + (g.por === "unidad" ? " por " + r.U.uno : ""); d.push({k:g.nom, v:t, r:t}); } return; }
     if(g.modo === "rollo"){ if(st.sel.rollo) d.push({k:"Rollo", v: svFmtRollo(num(st.sel.rollo)), interna:true}); return; }
     const o = svOpsVis(g, st, pr).find(x=>x.id === st.sel[g.id]); if(!o) return;
@@ -23017,8 +23078,8 @@ function svPista(pr, g, o, cobro){
   return "+" + mx(o.p) + (u.charAt(0) === "/" ? "" : " ") + u;
 }
 function svTablaPrecios(pr, g, cobro){
-  const filas = g.tipo === "num"
-    ? [{nom:g.nom, ref:g.id+"::", p:g.p, c:g.c, u:"c/u"}]
+  const filas = (g.tipo === "num" || g.tipo === "capa")
+    ? [{nom:g.nom, ref:g.id+"::", p:g.p, c:g.c, u: g.tipo === "capa" ? "/m²" : "c/u"}]
     : (g.ops||[]).filter(o=> g.modo !== "nada" || o.m).map(o=>({nom:o.nom, ref:g.id+":"+o.id, p:o.p, c:(g.modo==="x" && o.cx!=null ? o.cx : (o.c||0)), u:svUnidadPrecio(pr, g, o, cobro)}));
   if(!filas.length) return "";
   return '<table class="svPrecios"><thead><tr><th>Opción</th><th>Precio</th><th>Costo</th></tr></thead><tbody>' +
@@ -23028,6 +23089,8 @@ function svTablaPrecios(pr, g, cobro){
     '</tbody></table>';
 }
 function svGrupoHTML(pr, g, st, cobro){
+  if(g.tipo === "material") return svMaterialHTML(g, st);
+  if(g.tipo === "capa") return svCapaHTML(pr, g, st);
   let h = '<section class="svGrp" data-grp="'+g.id+'"><h3>'+esc(g.nom) + (g.nota ? ' <span class="gn">· '+esc(g.nota)+'</span>' : '') +
           ' <span class="gn" id="svgn_'+g.id+'"></span></h3>';
   if(g.tipo === "num"){
@@ -23056,6 +23119,270 @@ function svRefHTML(art, etq){
       (art ? '<button class="btn sm" type="button" data-svquitaref="1">Quitar</button>' : '') + '</div>' +
     '</div><p class="svAvisoFoto" id="svAvisoFoto" hidden></p></div>';
 }
+/* ---------- armado de material en todos los servicios (nov 2026) ----------
+   · Servicios por metro u hoja: «Por piezas» acomoda medida × cantidad en
+     el ancho de la película o en la hoja, y el vendedor escoge si cobra lo
+     que se ocupa (con el mínimo que pone el dueño) o el metro/hoja completo.
+   · Rígidos (Cama plana UV, Plotter híbrido): impresión por m² + material
+     del inventario por m² + capas de tinta blanca y barniz con su propia
+     cobertura + corte. El armado en la lámina dice cuántas láminas se van.
+   ------------------------------------------------------------------ */
+const SV_SOP = {a30:{r:0.30}, a60:{r:0.60}, p61:{r:0.61}, p111:{r:1.11}, p162:{r:1.62},
+  carta:{h:[21.6,27.9]}, oficio:{h:[21.6,35.6]}, doble:{h:[27.9,43.2]},
+  t1117:{h:[27.9,43.2]}, t1218:{h:[30.5,45.7]}, t1319:{h:[33,48.3]},
+  f170:{h:[21.6,27.9]}, sg500:{h:[21.6,27.9]}, sg1000:{h:[27.9,43.2]}};
+function svBaseDe(pr, st){
+  let cobro = pr.cobro, base = null;
+  svGruposVis(pr, st).forEach(g=>{ if(g.modo === "base"){ const o = svOpsVis(g, st, pr).find(x=>x.id === st.sel[g.id]); if(o){ base = o; if(o.cobro) cobro = o.cobro; } } });
+  return {base, cobro};
+}
+function svSoporte(pr, base, cobro){
+  if(cobro === "ml"){ const r = base && (base.r || (SV_SOP[base.id] || {}).r); return r ? {r:+r} : null; }
+  if(cobro === "hoja"){ const h = (base && (base.hw || (SV_SOP[base.id] || {}).h)) || pr.hojaCm; return h ? {h:[+h[0], +h[1]]} : null; }
+  return null;
+}
+const svArmable = (pr, base, cobro) => !pr.rigido && (cobro === "ml" || cobro === "hoja") && !!svSoporte(pr, base, cobro);
+const svArmMin = (pr, cobro) => cobro === "ml" ? (pr.armMin != null ? num(pr.armMin) : 0.5) : (pr.armMinHoja != null ? num(pr.armMinHoja) : 1);
+/* Cuántas piezas caben en una hoja o lámina: prueba las dos orientaciones. */
+function svAcomodaHoja(w, h, n, HW, HH, orilla, sep){
+  if(!(w > 0 && h > 0 && n > 0 && HW > 0 && HH > 0)) return null;
+  const uw = HW - 2*orilla, uh = HH - 2*orilla; let mejor = null;
+  [[w,h],[h,w]].forEach(([a,l])=>{
+    const cols = Math.floor((uw + sep)/(a + sep) + 1e-9), rows = Math.floor((uh + sep)/(l + sep) + 1e-9), por = cols*rows;
+    if(por >= 1 && (!mejor || por > mejor.por)) mejor = {a, l, cols, rows, por};
+  });
+  if(!mejor) return {cabe:false, n, HW, HH};
+  const enteras = Math.ceil(n/mejor.por - 1e-9);
+  return Object.assign(mejor, {cabe:true, n, hojas: n/mejor.por, hojasEnteras: enteras, HW, HH, orilla, sep, aprovecha: (w*h*n)/(enteras*HW*HH)});
+}
+function svArmCalc(pr, st, base, cobro){
+  if(!st.arm || !st.arm.on || !svArmable(pr, base, cobro)) return null;
+  const sop = svSoporte(pr, base, cobro), ml = cobro === "ml";
+  const pw = Math.max(0, num(st.arm.w))/100, ph = Math.max(0, num(st.arm.h))/100, n = Math.max(0, Math.round(num(st.arm.n)));
+  const min = svArmMin(pr, cobro), completo = st.arm.cobra === "completo";
+  const fmt = v => ml ? svN2(v) + " m" : svN2(v) + (Math.abs(v - 1) < 1e-9 ? " hoja" : " hojas");
+  if(!(pw > 0 && ph > 0 && n > 0)) return {sop, a:null, usado:0, cobrado:0, min, n, completo, cobro, txt:"", aviso:"Escribe la medida de la pieza y cuántas piezas son."};
+  let a = null, usado = 0, aviso = "";
+  if(sop.r){
+    a = svAcomoda(pw, ph, n, sop.r, pr.orilla != null ? pr.orilla : 0.01, pr.sep != null ? pr.sep : 0.005, 0.02);
+    usado = a ? a.largo : 0;
+    if(a && a.tramos > 1) aviso = "La pieza no cabe a lo ancho de " + svFmtRollo(sop.r) + ": sale en " + a.tramos + " tramos.";
+  } else {
+    a = svAcomodaHoja(pw, ph, n, sop.h[0]/100, sop.h[1]/100, 0.005, 0.003);
+    if(a && a.cabe) usado = a.hojas; else aviso = "La pieza no cabe en la hoja de " + svN0(sop.h[0]) + " × " + svN0(sop.h[1]) + " cm.";
+  }
+  let cobrado = 0;
+  if(usado > 0) cobrado = completo ? Math.max(Math.ceil(usado - 1e-9), min) : Math.max(Math.ceil(usado*100 - 1e-6)/100, min);
+  const txt = n + " piezas de " + svN0(num(st.arm.w)) + " × " + svN0(num(st.arm.h)) + " cm usan " + fmt(usado) +
+    (cobrado > usado + 0.004 ? "; se cobra" + (completo ? " completo" : " el mínimo") : "");
+  return {sop, a, usado, cobrado, min, n, completo, cobro, txt, aviso};
+}
+
+/* ---- rígidos: el material vive en el inventario (cat.insumos con «rig») ---- */
+const SV_RIG_MATS = ["Trovicel", "Coroplast", "Estireno", "Acrílico"];
+const SV_RIG_ESP = [3, 6, 9, 10, 12, 16, 20];
+const svRigidos = () => (typeof cat === "object" && cat && Array.isArray(cat.insumos) ? cat.insumos : []).filter(i=>i && i.rig);
+function svMatInicial(){ const r = svRigidos()[0]; return r ? {mat:r.rig.mat, esp:num(r.rig.esp)} : {mat:"Trovicel", esp:3}; }
+function svMatSel(st){ const m = st.rmat || {}; return svRigidos().find(i=>i.rig.mat === m.mat && num(i.rig.esp) === num(m.esp)) || null; }
+const svLamina = i => ({w: num(i.rig.w) || 122, h: num(i.rig.h) || 244});
+function svCalcRigido(pid, st, pr){
+  const G = svGrupos(pr);
+  const opt = g => (g.ops || []).find(o=>o.id === st.sel[g.id]) || (g.ops || [])[0] || null;
+  const q = Math.max(0, num(st.q)), [w, h] = svMedidas(pr, st), A = w*h, per = 2*(w + h), U = SV_UNI.pieza;
+  const ren = [], avisos = []; let total = 0, costo = 0;
+  const gImp = G.find(g=>g.modo === "base"), imp = gImp ? opt(gImp) : null;
+  if(imp){ const m = num(imp.p)*A*q; total += m; costo += num(imp.c)*A*q;
+    ren.push({t: gImp.nom + " · " + svN2(A) + " m² c/u × " + mx(imp.p) + "/m²", m}); }
+  G.filter(g=>g.tipo === "capa").forEach(g=>{
+    const c = (st.capas || {})[g.id]; if(!c || !c.on) return;
+    const pct = Math.min(100, Math.max(1, num(c.pct) || 100)), ar = A*q*pct/100, m = num(g.p)*ar;
+    total += m; costo += num(g.c)*ar;
+    ren.push({t: g.nom + " · cubre " + svN0(pct) + "% · " + svN2(ar) + " m² × " + mx(g.p) + "/m²", m});
+  });
+  const mat = svMatSel(st); let lamina = null;
+  if(mat){
+    const lam = svLamina(mat), lamM2 = lam.w*lam.h/10000, completo = st.rcobra === "completo";
+    lamina = (A > 0 && q > 0) ? svAcomodaHoja(w, h, q, lam.w/100, lam.h/100, 0.005, 0.004) : null;
+    if(lamina && !lamina.cabe) avisos.push("La pieza no cabe en la lámina de " + svN0(lam.w) + " × " + svN0(lam.h) + " cm.");
+    const ok = lamina && lamina.cabe, enteras = ok ? lamina.hojasEnteras : 0, frac = ok ? lamina.hojas : 0;
+    const m2 = completo ? enteras*lamM2 : A*q, m = num(mat.rig.pm2)*m2;
+    total += m; costo += num(mat.costo)*(completo ? enteras : frac);
+    ren.push({t: mat.nombre + " · " + (completo ? enteras + (enteras === 1 ? " lámina completa" : " láminas completas") + " (" + svN2(m2) + " m²)" : svN2(m2) + " m²") +
+      " × " + mx(mat.rig.pm2) + "/m²", m});
+  } else avisos.push("Escoge el material o agrégalo a tu inventario aquí mismo.");
+  G.forEach(g=>{
+    if(g.modo !== "perim" && g.modo !== "pedido" && g.modo !== "porUnidad") return;
+    const o = opt(g); if(!o || (!num(o.p) && !num(o.c))) return;
+    if(g.modo === "perim"){ const L = per*q, m = num(o.p)*L; total += m; costo += num(o.c)*L;
+      ren.push({t: g.nom + ": " + o.nom.toLowerCase() + " · " + svN2(per) + " m c/u × " + mx(o.p) + "/m", m}); }
+    else if(g.modo === "porUnidad"){ const m = num(o.p)*q; total += m; costo += num(o.c)*q; ren.push({t: g.nom + ": " + o.nom.toLowerCase(), m}); }
+    else { total += num(o.p); costo += num(o.c); ren.push({t: g.nom + ": " + o.nom.toLowerCase() + " · una sola vez", m: num(o.p)}); }
+  });
+  if(!(q > 0)) avisos.push("Escribe la cantidad.");
+  if(!(A > 0)) avisos.push("Escribe el ancho y el alto de la pieza.");
+  return {total, costo, q, cobro:"m2", U, ren, avisos, acomodo:null, lamina, mat, arm:null, w, h, A, per, porPieza: q > 0 ? total/q : 0};
+}
+
+/* ---- lo que se ve en la ventana ---- */
+function svDibujaHoja(a){
+  const s = Math.min(300 / a.HW, 150 / a.HH), ww = a.HW*s, hh = a.HH*s, o = (a.orilla || 0)*s;
+  let r = '<svg viewBox="0 0 '+(ww+64).toFixed(1)+' '+(hh+6).toFixed(1)+'" role="img" aria-label="Cómo se acomodan las piezas">' +
+    '<rect class="rRollo" x="1" y="1" width="'+ww.toFixed(1)+'" height="'+hh.toFixed(1)+'" rx="3"/>';
+  const n = Math.min(a.n, a.por, 400);
+  for(let i = 0; i < n; i++){
+    const c = i % a.cols, f = Math.floor(i / a.cols);
+    r += '<rect class="rPieza" x="'+(1 + o + c*(a.a + a.sep)*s).toFixed(1)+'" y="'+(1 + o + f*(a.l + a.sep)*s).toFixed(1)+'" width="'+Math.max(1, a.a*s).toFixed(1)+'" height="'+Math.max(1, a.l*s).toFixed(1)+'" rx="1.5"/>';
+  }
+  return r + '<text class="rTxt" x="'+(ww+8).toFixed(1)+'" y="16">× '+a.hojasEnteras+'</text></svg>';
+}
+function svArmHTML(pr, st, cobro){
+  const a = st.arm || (st.arm = {on:false, w:5, h:5, n:20, cobra:"ocupa"});
+  const ml = cobro === "ml", min = svArmMin(pr, cobro);
+  let h = '<section class="svGrp svArm"><h3>¿Cómo lo pide? <span class="gn">· el armado calcula cuánto material se gasta</span></h3><div class="svChips">' +
+    '<button type="button" class="svChip" data-svarm="0" aria-pressed="'+!a.on+'"><span>'+(ml ? "Por metros" : "Por hojas")+'</span><small>tú escribes '+(ml ? "los metros" : "las hojas")+'</small></button>' +
+    '<button type="button" class="svChip" data-svarm="1" aria-pressed="'+!!a.on+'"><span>Por piezas</span><small>medida y cantidad</small></button></div>';
+  if(a.on){
+    h += '<div class="svFila" style="margin-top:12px">' +
+      '<div><label class="f" for="svArmW">Medida de la pieza (cm)</label><div class="svMedidas">' +
+        '<input id="svArmW" type="number" min="0" step="0.5" value="'+num(a.w)+'" aria-label="Ancho de la pieza"><span>×</span>' +
+        '<input id="svArmH" type="number" min="0" step="0.5" value="'+num(a.h)+'" aria-label="Alto de la pieza"></div></div>' +
+      '<div><label class="f" for="svArmN">¿Cuántas piezas?</label><div class="svStep"><button type="button" data-svarmn="-1" aria-label="Menos">−</button>' +
+        '<input id="svArmN" type="number" min="0" step="1" value="'+num(a.n)+'"><button type="button" data-svarmn="1" aria-label="Más">+</button></div></div>' +
+      (pr.hojaEditable ? '<div><label class="f" for="svHojaW">Hoja de tu máquina (cm)</label><div class="svMedidas">' +
+        '<input id="svHojaW" type="number" min="1" step="0.5" value="'+num((pr.hojaCm||[30,50])[0])+'" aria-label="Ancho de la hoja"><span>×</span>' +
+        '<input id="svHojaH" type="number" min="1" step="0.5" value="'+num((pr.hojaCm||[30,50])[1])+'" aria-label="Largo de la hoja"></div></div>' : '') +
+      '</div>' +
+      '<h3 style="margin-top:12px">Se cobra</h3><div class="svChips">' +
+      '<button type="button" class="svChip" data-svcobra="ocupa" aria-pressed="'+(a.cobra !== "completo")+'"><span>Lo que se ocupa</span><small>mínimo '+(ml ? svN2(min) + " m" : svN0(min) + (min === 1 ? " hoja" : " hojas"))+'</small></button>' +
+      '<button type="button" class="svChip" data-svcobra="completo" aria-pressed="'+(a.cobra === "completo")+'"><span>'+(ml ? "Metro completo" : "Hojas completas")+'</span><small>se redondea hacia arriba</small></button></div>' +
+      (svPrecios ? '<div class="svNumFila" style="margin-top:10px"><label class="f" for="svArmMin" style="margin:0">Mínimo a cobrar ('+(ml ? "metros" : "hojas")+')</label>' +
+        '<input id="svArmMin" type="number" min="0" step="'+(ml ? 0.1 : 1)+'" value="'+min+'" style="width:90px"></div>' : '') +
+      '<div class="svRollo" id="svArmDib"></div>';
+  }
+  return h + '</section>';
+}
+function svCapaHTML(pr, g, st){
+  const c = (st.capas || {})[g.id] || {on:false, pct:100};
+  let h = '<section class="svGrp" data-grp="'+g.id+'"><h3>'+esc(g.nom)+' <span class="gn">· otra capa, con su propia cobertura y precio por m²</span></h3>' +
+    '<div class="svNumFila"><div class="svChips">' +
+      '<button type="button" class="svChip" data-svcapa="'+g.id+'" data-on="0" aria-pressed="'+!c.on+'"><span>No lleva</span><small>sin costo</small></button>' +
+      '<button type="button" class="svChip" data-svcapa="'+g.id+'" data-on="1" aria-pressed="'+!!c.on+'"><span>Sí lleva</span><small data-svhn="'+g.id+'">+'+mx(g.p)+'/m²</small></button></div>' +
+      (c.on ? '<label class="svCapaPct">Cubre <input type="number" min="1" max="100" step="5" data-svcapapct="'+g.id+'" value="'+(num(c.pct) || 100)+'" aria-label="Porcentaje del diseño que cubre"> % del diseño</label>' +
+              '<span class="gn" id="svcapam_'+g.id+'"></span>' : '') +
+    '</div>';
+  if(svPrecios) h += svTablaPrecios(pr, g, "m2");
+  return h + '</section>';
+}
+function svMaterialHTML(g, st){
+  const rs = svRigidos(), m = st.rmat || (st.rmat = svMatInicial());
+  const mats = [...new Set(SV_RIG_MATS.concat(rs.map(i=>i.rig.mat)).concat([m.mat]))];
+  const esps = [...new Set(SV_RIG_ESP.concat(rs.filter(i=>i.rig.mat === m.mat).map(i=>num(i.rig.esp))))].sort((a,b)=>a-b);
+  const sel = svMatSel(st), tiene = e => rs.some(i=>i.rig.mat === m.mat && num(i.rig.esp) === e);
+  let h = '<section class="svGrp" data-grp="'+g.id+'"><h3>'+esc(g.nom)+' <span class="gn">· sale de tu inventario con su precio por m²</span></h3>' +
+    '<div class="svChips">' + mats.map(x=>{ const k = rs.filter(i=>i.rig.mat === x).length;
+      return '<button type="button" class="svChip" data-svmat="'+esc(x)+'" aria-pressed="'+(m.mat === x)+'"><span>'+esc(x)+'</span><small>'+(k ? k + " en inventario" : "sin agregar")+'</small></button>'; }).join("") +
+      '<button type="button" class="svChip svChipMas" data-svmatotro="1"><span>+ Otro material</span><small>escribe el nombre</small></button></div>' +
+    (SVV.matOtro ? '<div class="svMatOtro"><input id="svMatOtroNom" placeholder="Ej. MDF, PVC espumado, aluminio compuesto" aria-label="Nombre del material">' +
+      '<button class="btn sm" type="button" data-svmatotrok="1">Usar</button></div>' : '') +
+    '<h3 style="margin-top:12px">Espesor</h3><div class="svChips">' + esps.map(e=>
+      '<button type="button" class="svChip" data-svesp="'+e+'" aria-pressed="'+(num(m.esp) === e)+'"><span>'+svN0(e)+' mm</span><small>'+(tiene(e) ? "en inventario" : "agregar")+'</small></button>').join("") + '</div>';
+  if(sel && !SVV.matEdita){
+    const l = svLamina(sel);
+    h += '<div class="svMatInfo"><div><b>'+esc(sel.nombre)+'</b><span>Lámina de '+svN0(l.w)+' × '+svN0(l.h)+' cm · te cuesta '+mx(sel.costo)+' · la vendes a '+mx(sel.rig.pm2)+'/m² · '+svN0(sel.existencia || 0)+' en existencia</span></div>' +
+      '<button class="btn sm" type="button" data-svmatedita="1">Editar</button></div>' +
+      '<h3 style="margin-top:12px">Material que se cobra</h3><div class="svChips">' +
+      '<button type="button" class="svChip" data-svrcobra="ocupa" aria-pressed="'+(st.rcobra !== "completo")+'"><span>Lo que se ocupa</span><small>los m² de las piezas</small></button>' +
+      '<button type="button" class="svChip" data-svrcobra="completo" aria-pressed="'+(st.rcobra === "completo")+'"><span>Lámina completa</span><small>las láminas que se abren</small></button></div>' +
+      '<div class="svRollo" id="svLam"></div>';
+  } else {
+    const r = sel ? sel.rig : {};
+    h += '<div class="svMatForm"><p><b>'+esc(m.mat)+' '+svN0(m.esp)+' mm</b> '+(sel ? "· cambia sus datos" : "no está en tu inventario. Captúralo aquí y queda guardado en Inventario de producción.")+'</p>' +
+      '<div class="svFila">' +
+        '<div><label class="f" for="svMatW">Medida de la lámina (cm)</label><div class="svMedidas"><input id="svMatW" type="number" min="1" value="'+(num(r.w) || 122)+'" aria-label="Ancho de la lámina"><span>×</span>' +
+          '<input id="svMatH" type="number" min="1" value="'+(num(r.h) || 244)+'" aria-label="Largo de la lámina"></div></div>' +
+        '<div><label class="f" for="svMatCosto">Te cuesta la lámina</label><input id="svMatCosto" type="number" min="0" step="0.01" value="'+(sel ? num(sel.costo) : "")+'" placeholder="$"></div>' +
+        '<div><label class="f" for="svMatPm2">La vendes a (por m²)</label><input id="svMatPm2" type="number" min="0" step="0.01" value="'+(r.pm2 != null ? num(r.pm2) : "")+'" placeholder="$"></div>' +
+        '<div><label class="f" for="svMatExis">Láminas en existencia</label><input id="svMatExis" type="number" min="0" step="1" value="'+(sel ? num(sel.existencia) : 0)+'"></div>' +
+      '</div><p class="gn" id="svMatSug"></p>' +
+      '<div class="svMatBtns"><button class="btn primary sm" type="button" data-svmatguarda="1">'+(sel ? "Guardar cambios" : "Guardar en inventario")+'</button>' +
+        (sel ? '<button class="btn sm" type="button" data-svmatcancela="1">Cancelar</button>' : '') + '</div></div>';
+  }
+  return h + '</section>';
+}
+function svMatGuarda(){
+  const st = SVV.st, m = st.rmat || {}, sel = svMatSel(st);
+  const w = Math.max(1, num($("#svMatW").value)), h = Math.max(1, num($("#svMatH").value));
+  const costo = Math.max(0, num($("#svMatCosto").value)), pm2 = Math.max(0, num($("#svMatPm2").value)), ex = Math.max(0, num($("#svMatExis").value));
+  if(!(pm2 > 0)){ toast("Escribe a cuánto vendes el m² de " + m.mat + "."); return; }
+  const nombre = m.mat + " " + svN0(m.esp) + " mm";
+  if(sel){ sel.nombre = nombre; sel.costo = costo; sel.existencia = ex; sel.unidad = "lamina"; Object.assign(sel.rig, {w, h, pm2}); }
+  else {
+    if(!Array.isArray(cat.insumos)) cat.insumos = [];
+    cat.insumos.push({id: (typeof uid === "function" ? uid() : "rg" + Date.now().toString(36)), nombre, unidad:"lamina", costo, existencia:ex, minimo:0,
+                      rig:{mat:m.mat, esp:num(m.esp), w, h, pm2}});
+  }
+  SVV.matEdita = false;
+  if(typeof persist === "function") persist();
+  try{ if(typeof renderInsumos === "function") renderInsumos(); }catch(_){}
+  svPintaForm();
+  toast(nombre + (sel ? " actualizado" : " quedó en tu inventario"));
+}
+function svGuardaPronto(){ clearTimeout(svGuardaT); svGuardaT = setTimeout(()=>{ if(typeof persist === "function") persist(); }, 700); }
+function svRefrescaArmado(pr, st, r){
+  const d = $("#svArmDib");
+  if(d && r.arm){
+    const a = r.arm;
+    d.innerHTML = !a.a ? '<p>'+esc(a.aviso || "Escribe la medida de la pieza y cuántas piezas son.")+'</p>'
+      : a.sop.r ? svDibujaRollo(a.a) + '<p>Película de ' + svFmtRollo(a.sop.r) + ' · caben ' + a.a.fila + ' a lo ancho · ' + a.n + ' piezas usan <b>' + svN2(a.usado) +
+          ' m</b> · se cobran <b>' + svN2(a.cobrado) + ' m</b></p>'
+      : a.a.cabe ? svDibujaHoja(a.a) + '<p>Hoja de ' + svN0(a.sop.h[0]) + ' × ' + svN0(a.sop.h[1]) + ' cm · caben <b>' + a.a.por + ' por hoja</b> · ' + a.n +
+          ' piezas = ' + svN2(a.usado) + ' hojas · se cobran <b>' + svN2(a.cobrado) + '</b></p>'
+      : '<p>'+esc(a.aviso)+'</p>';
+  }
+  const l = $("#svLam");
+  if(l && r.mat){
+    const a = r.lamina, lam = svLamina(r.mat);
+    l.innerHTML = !a ? '<p>Escribe la medida y la cantidad para ver el armado en la lámina.</p>'
+      : !a.cabe ? '<p>La pieza no cabe en la lámina de ' + svN0(lam.w) + ' × ' + svN0(lam.h) + ' cm.</p>'
+      : svDibujaHoja(a) + '<p>Lámina de ' + svN0(lam.w) + ' × ' + svN0(lam.h) + ' cm · caben <b>' + a.por + '</b> · ' + svN0(r.q) + ' piezas usan ' + svN2(a.hojas) +
+          ' láminas (se abren ' + a.hojasEnteras + ') · aprovechas ' + Math.round(a.aprovecha*100) + '%</p>';
+  }
+  document.querySelectorAll('[id^="svcapam_"]').forEach(el=>{
+    const c = (st.capas || {})[el.id.slice(8)];
+    el.textContent = c && c.on && r.A > 0 && r.q > 0 ? svN2(r.A*r.q*(num(c.pct) || 100)/100) + " m² en total" : "";
+  });
+}
+document.addEventListener("click", e=>{
+  if(!SVV || SVV.modo !== "svc" || !e.target.closest("#svVelo")) return;
+  const st = SVV.st, en = s => e.target.closest(s); let b;
+  if((b = en("[data-svarm]"))){ st.arm = st.arm || {w:5, h:5, n:20, cobra:"ocupa"}; st.arm.on = b.dataset.svarm === "1"; svPintaForm(); return; }
+  if((b = en("[data-svcobra]"))){ st.arm.cobra = b.dataset.svcobra; svPintaForm(); return; }
+  if((b = en("[data-svarmn]"))){ st.arm.n = Math.max(0, Math.round(num(st.arm.n) + num(b.dataset.svarmn))); const i = $("#svArmN"); if(i) i.value = st.arm.n; svRefresca(); return; }
+  if((b = en("[data-svcapa]"))){ st.capas = st.capas || {}; const c = st.capas[b.dataset.svcapa] || (st.capas[b.dataset.svcapa] = {pct:100}); c.on = b.dataset.on === "1"; svPintaForm(); return; }
+  if((b = en("[data-svmat]"))){ st.rmat = {mat:b.dataset.svmat, esp:(st.rmat || {}).esp || 3}; SVV.matEdita = false; SVV.matOtro = false; svPintaForm(); return; }
+  if((b = en("[data-svesp]"))){ st.rmat = {mat:(st.rmat || {}).mat || "Trovicel", esp:num(b.dataset.svesp)}; SVV.matEdita = false; svPintaForm(); return; }
+  if(en("[data-svmatotro]")){ SVV.matOtro = true; svPintaForm(); const i = $("#svMatOtroNom"); if(i) i.focus(); return; }
+  if(en("[data-svmatotrok]")){ const v = (($("#svMatOtroNom") || {}).value || "").trim(); if(!v) return;
+    st.rmat = {mat: v.charAt(0).toUpperCase() + v.slice(1), esp:(st.rmat || {}).esp || 3}; SVV.matOtro = false; svPintaForm(); return; }
+  if(en("[data-svmatedita]")){ SVV.matEdita = true; svPintaForm(); return; }
+  if(en("[data-svmatcancela]")){ SVV.matEdita = false; svPintaForm(); return; }
+  if(en("[data-svmatguarda]")){ svMatGuarda(); return; }
+  if((b = en("[data-svrcobra]"))){ st.rcobra = b.dataset.svrcobra; svPintaForm(); return; }
+});
+document.addEventListener("input", e=>{
+  if(!SVV || SVV.modo !== "svc" || !e.target.closest("#svVForm")) return;
+  const t = e.target, st = SVV.st, pr = svProd(SVV.pid);
+  if(t.id === "svArmW"){ st.arm.w = t.value; svRefresca(); return; }
+  if(t.id === "svArmH"){ st.arm.h = t.value; svRefresca(); return; }
+  if(t.id === "svArmN"){ st.arm.n = t.value; svRefresca(); return; }
+  if(t.id === "svArmMin"){ const bc = svBaseDe(pr, st); pr[bc.cobro === "ml" ? "armMin" : "armMinHoja"] = Math.max(0, num(t.value)); svGuardaPronto(); svRefresca(); return; }
+  if(t.id === "svHojaW" || t.id === "svHojaH"){ pr.hojaCm = [Math.max(1, num($("#svHojaW").value)), Math.max(1, num($("#svHojaH").value))]; svGuardaPronto(); svRefresca(); return; }
+  if(t.dataset.svcapapct){ const c = (st.capas || {})[t.dataset.svcapapct]; if(c) c.pct = t.value; svRefresca(); return; }
+  if(t.id === "svMatCosto" || t.id === "svMatW" || t.id === "svMatH"){
+    const w = num($("#svMatW").value), h = num($("#svMatH").value), c = num($("#svMatCosto").value), s = $("#svMatSug");
+    if(s) s.textContent = c > 0 && w > 0 && h > 0 ? "Te sale en " + mx(c/(w*h/10000)) + " el m²." : "";
+  }
+});
 function svPintaForm(){
   if(SVV.modo === "app") return cv2PintaFormApp();
   const pr = svProd(SVV.pid), st = SVV.st, r = svCalc(SVV.pid, st);
@@ -23066,12 +23393,15 @@ function svPintaForm(){
          '<input id="svW" type="number" min="0" step="'+paso+'" value="'+num(st.w)+'" aria-label="Ancho"><span>×</span>' +
          '<input id="svH" type="number" min="0" step="'+paso+'" value="'+num(st.h)+'" aria-label="Alto"></div></div>';
   }
+  const bc = svBaseDe(pr, st), arma = svArmable(pr, bc.base, bc.cobro), armOn = arma && st.arm && st.arm.on;
+  if(armOn) h += '</div>'; else
   h += '<div><label class="f" for="svQ" id="svQlbl">'+SV_QLBL[r.cobro]+'</label><div class="svNumFila">' +
        '<div class="svStep"><button type="button" data-svq="-1" aria-label="Menos">−</button>' +
        '<input id="svQ" type="number" min="0" step="'+(r.cobro==="ml"?0.5:1)+'" value="'+num(st.q)+'">' +
        '<button type="button" data-svq="1" aria-label="Más">+</button></div>' +
        (pr.rapidos ? '<div class="svRap">'+pr.rapidos.map(v=>'<button type="button" data-svqv="'+v+'">'+svN0(v)+'</button>').join("")+'</div>' : '') +
        '</div></div></div>';
+  if(arma) h += svArmHTML(pr, st, bc.cobro);
   svGruposVis(pr, st).forEach(g=> h += svGrupoHTML(pr, g, st, r.cobro));
   h += svRefHTML(SVV.art, "Imagen de referencia");
   h += '<div><label class="f" for="svNotas">Notas para producción</label><textarea id="svNotas" rows="2" placeholder="Ej. ojillos reforzados en las esquinas">'+esc(st.notas||"")+'</textarea></div>';
@@ -23114,8 +23444,9 @@ function svRefresca(){
   $("#svVTotal").textContent = mx(r.total);
   $("#svVPorPieza").textContent = r.q > 0 ? mx(r.porPieza) + " por " + r.U.uno : "";
   $("#svVUtil").textContent = (r.total > 0 && svVer()) ? "costo " + mx(r.costo) + " · utilidad " + Math.round((r.total - r.costo)/r.total*100) + "%" : "";
-  $("#svVAgregar").disabled = !(r.q > 0) || (r.cobro === "m2" && !(r.A > 0));
+  $("#svVAgregar").disabled = !(r.q > 0) || (r.cobro === "m2" && !(r.A > 0)) || (pr.rigido && !r.mat);
   const ql = $("#svQlbl"); if(ql) ql.textContent = SV_QLBL[r.cobro];
+  svRefrescaArmado(pr, st, r);
   if(pr.rollos){
     const best = svMejorRollo(pr, st);
     pr.rollos.forEach(ro=>{
@@ -23150,7 +23481,7 @@ function svEditaPrecio(ref, val){
   const pr = svProd(SVV.pid);
   const g = svGrupos(pr).find(x=>x.id === gid); if(!g) return;
   const v = Math.max(0, num(val));
-  if(!oid){ g[campo] = v; const hn = document.querySelector('[data-svhn="'+gid+'"]'); if(hn) hn.textContent = mx(g.p) + " c/u"; }
+  if(!oid){ g[campo] = v; const hn = document.querySelector('[data-svhn="'+gid+'"]'); if(hn) hn.textContent = g.tipo === "capa" ? "+" + mx(g.p) + "/m²" : mx(g.p) + " c/u"; }
   else {
     const o = (g.ops||[]).find(x=>x.id === oid); if(!o) return;
     if(campo === "c" && g.modo === "x") o.cx = v; else o[campo] = v;
@@ -24966,10 +25297,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261110-1700";</script>
+<script>window.BUILD="20261111-1200";</script>
 <script>
 (function(){
-  var mio = "20261110-1700";
+  var mio = "20261111-1200";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
