@@ -12557,13 +12557,7 @@ async function mandaAProduccion(folio){
   g.estado = "confirmada";
   g.op = {folio: folioOP(), fecha: hoyISO(), cotizacion: g.folio, estatus:"Pendiente",
           historial:[{estatus:"Pendiente", fecha:hoyISO(), hora:horaAhora()}]};
-  const rG = calcDe(g);
-  for(const p of rG.partes){
-    const a = (cat.articulos||[]).find(a=>a.id===p.q.articuloId);
-    if(a && (num(a.existencia)>0||(a.invVariantes||[]).length))
-      await nvVarSalida(a,p.q,p.r.qty,"Salida por pedido cobrado",{folio:g.op.folio,archivo:null});
-  }
-  descuentaInsumos(g, rG, g.op.folio);
+  await salidasDeOrden(g, "Salida por pedido cobrado");
   renderInvInsumos();
   if(cot && cot.folio === folio){ cot.estado = g.estado; cot.op = g.op; renderEstado(); }
   await guardaOrden(folio);
@@ -17534,6 +17528,112 @@ $("#btnTerminar").addEventListener("click", async ()=>{
 });
 $("#btnNew").addEventListener("click", ()=>{ cotizacionNueva(false); toast("Cotización nueva"); });
 
+/* ---------- lo que sale del inventario por una orden, y su regreso (nov 2026) ----------
+   · Al confirmar (o al mandar a producción desde el cobro) la orden guarda
+     en op.salidas lo que sacó: artículos con su talla y color, insumos y
+     materiales de los servicios.
+   · Si se cancela la confirmación (o se borra el pedido) mientras producción
+     no ha empezado, eso mismo regresa al inventario.
+   · Producción empezó si la orden pasó de «Pendiente» (o «Detenida») o si
+     ya palomearon del «Archivo impreso» en adelante. Entonces ya no se cancela.
+   · Las órdenes confirmadas antes de esto no traen op.salidas: se toma de la
+     bitácora de movimientos con el folio de la orden.
+   ------------------------------------------------------------------ */
+function opEmpezada(op, checklist){
+  if(!op) return "";
+  const sinEmpezar = ["Pendiente", "Detenida"];
+  if(op.estatus && sinEmpezar.indexOf(op.estatus) < 0) return "va en «" + op.estatus + "»";
+  const h = (op.historial || []).find(x=> x && x.estatus && sinEmpezar.indexOf(x.estatus) < 0);
+  if(h) return "ya pasó por «" + h.estatus + "»";
+  const ck = checklist || {};
+  for(let i = 2; i < CHECKS.length; i++) if(ck[i]) return "ya palomearon «" + CHECKS[i] + "»";
+  return "";
+}
+async function salidasDeOrden(g, nota){
+  const folio = g.op.folio, antes = new Set((cat.invMovs || []).map(m=>m.id));
+  const rG = calcDe(g);
+  for(const p of rG.partes){
+    const a = (cat.articulos || []).find(a=>a.id === p.q.articuloId);
+    if(a && (num(a.existencia) > 0 || (a.invVariantes || []).length))
+      await nvVarSalida(a, p.q, p.r.qty, nota, {folio, archivo:null});
+  }
+  const cons = descuentaInsumos(g, rG, folio);
+  const consSv = typeof svDescuentaServicios === "function" ? svDescuentaServicios(g, folio) : [];
+  const ins = {};
+  cons.lista.forEach(x=>{ ins[x.insumo.id] = (ins[x.insumo.id] || 0) + num(x.cant); });
+  consSv.forEach(c=>{ ins[c.ins.id] = (ins[c.ins.id] || 0) + num(c.cant); });
+  g.op.salidas = {
+    arts: (cat.invMovs || []).filter(m=> !antes.has(m.id) && m.artId && m.req && m.req.folio === folio && num(m.delta) < 0)
+            .map(m=>({id:m.artId, nom:m.articulo || "", cant:-num(m.delta), variante:m.variante || null})),
+    ins: Object.keys(ins).map(id=>({id, nom:(insumoDe(id) || {}).nombre || "", cant:ins[id]}))
+  };
+  if(cons.lista.length || consSv.length) renderInvInsumos();
+  return {cons, consSv, rG};
+}
+function salidasDeBitacora(op){
+  const folio = op.folio, arts = {}, ins = {};
+  const nuestra = nota => /^(Salida por |Regreso por cancelación)/.test(String(nota || ""));
+  (cat.invMovs || []).forEach(m=>{
+    if(!m.artId || !m.req || m.req.folio !== folio || !nuestra(m.nota)) return;
+    const v = m.variante || null, k = m.artId + "|" + (v ? (v.talla || "") + "|" + (v.color || "") : "");
+    if(!arts[k]) arts[k] = {id:m.artId, nom:m.articulo || "", cant:0, variante:v};
+    arts[k].cant -= num(m.delta);
+  });
+  (cat.insumoMovs || []).forEach(m=>{
+    if(!m.insumoId || m.folio !== folio || !nuestra(m.nota)) return;
+    if(!ins[m.insumoId]) ins[m.insumoId] = {id:m.insumoId, nom:m.insumo || "", cant:0};
+    ins[m.insumoId].cant -= num(m.delta);
+  });
+  const hay = x => x.cant > 0.0005;
+  return {arts:Object.values(arts).filter(hay), ins:Object.values(ins).filter(hay), bitacora:true};
+}
+function salidasLineas(sal){
+  const l = [];
+  (sal.arts || []).forEach(x=>{
+    const a = (cat.articulos || []).find(a=>a.id === x.id), v = x.variante ? [x.variante.talla, x.variante.color].filter(Boolean).join(" ") : "";
+    l.push("· " + (a ? a.nombre : x.nom) + (v ? " (" + v + ")" : "") + ": " + cantIns(x.cant) + " pza");
+  });
+  (sal.ins || []).forEach(x=>{
+    const i = insumoDe(x.id);
+    l.push("· " + (i ? i.nombre : x.nom) + ": " + cantIns(x.cant) + " " + abrevIns(i ? i.unidad : ""));
+  });
+  return l.length > 12 ? l.slice(0, 11).concat("· …y " + (l.length - 11) + " más") : l;
+}
+function avisoRegreso(op, sal){
+  const l = salidasLineas(sal);
+  if(!l.length) return "\n\nEsta orden no sacó material del inventario.";
+  return "\n\nRegresa al inventario:\n" + l.join("\n") +
+    (sal.bitacora ? "\n\n(Esta orden se confirmó antes de que el sistema guardara sus salidas; lo tomé de la bitácora de movimientos con el folio " + op.folio + ".)" : "");
+}
+async function regresaSalidas(op, sal){
+  const folio = op.folio, nota = "Regreso por cancelación de " + folio;
+  let n = 0;
+  for(const x of (sal.arts || [])){
+    if(!(num(x.cant) > 0) || !(cat.articulos || []).some(a=>a.id === x.id)) continue;
+    if(await moverInventario(x.id, "entrada", num(x.cant), nota, true, {folio, archivo:null}, x.variante || null)) n++;
+  }
+  let ins = 0;
+  (sal.ins || []).forEach(x=>{ if(num(x.cant) > 0 && insumoDe(x.id)){ mueveInsumo(x.id, num(x.cant), nota, folio); ins++; } });
+  if(ins){ persist(); renderInvInsumos(); try{ if(typeof renderInsumos === "function") renderInsumos(); }catch(_){} }
+  return n + ins;
+}
+/* La orden más reciente que se conoce: la de la nube si se puede leer. */
+async function opAlDia(folio, op, checklist){
+  const g = guardadas.find(x=>x.folio === folio);
+  if(g && g.op && op && g.op.folio === op.folio){ op = g.op; checklist = g.checklist || checklist; }
+  if(DB){
+    try{
+      const d = await DB.collection("cotizaciones").doc(folio).get();
+      const fr = d && d.exists ? (d.data() || {}).cot : null;
+      if(fr){
+        if(fr.estado !== "confirmada" || !fr.op || !op || fr.op.folio !== op.folio) return {cambio:true};
+        op = fr.op; checklist = fr.checklist || checklist;
+      }
+    }catch(_){}
+  }
+  return {op, checklist};
+}
+
 /* ---------- confirmar pedido ---------- */
 function renderEstado(){
   const e = $("#estadoPedido");
@@ -17548,6 +17648,9 @@ function renderEstado(){
       '<span style="color:var(--ink-2);font-size:12px">La orden de producción se genera al confirmar el pedido.</span>';
   }
   $("#btnConfirmar").textContent = confirmada ? "Cancelar confirmación" : "Confirmar pedido";
+  { const emp = confirmada ? opEmpezada(cot.op, cot.checklist) : "";
+    $("#btnConfirmar").title = emp ? "Producción ya empezó (" + emp + "): ya no se puede cancelar la confirmación." : "";
+    $("#btnConfirmar").style.opacity = emp ? ".5" : ""; }
   $("#btnConfirmar").classList.toggle("primary", !confirmada);
   $("#btnOrden").disabled = !confirmada;
   $("#btnOrden").title = confirmada ? "" : "Primero confirma el pedido";
@@ -17556,9 +17659,26 @@ function renderEstado(){
 $("#btnConfirmar").addEventListener("click", async ()=>{
   if(cot.nexusPricingStatus === "pending"){ toast("Revisa el importe guardado de esta solicitud Nexus antes de confirmar el pedido."); return; }
   if(cot.estado === "confirmada"){
-    if(!confirm("¿Cancelar la confirmación? La orden "+cot.op.folio+" deja de ser válida.")) return;
+    const al = cot.op ? await opAlDia(cot.folio, cot.op, cot.checklist) : {op:null};
+    if(al.cambio){ toast("Esta orden cambió en otro equipo. Ábrela de nuevo desde Cotizaciones y pedidos antes de cancelarla."); return; }
+    const op = al.op;
+    const empezo = op ? opEmpezada(op, al.checklist) : "";
+    if(empezo){
+      if(op !== cot.op){ cot.op = op; cot.checklist = al.checklist || cot.checklist; renderEstado(); }
+      toast("Producción ya empezó con la orden " + op.folio + " (" + empezo + "). Ya no se puede cancelar la confirmación.");
+      return;
+    }
+    const sal = op ? (op.salidas || salidasDeBitacora(op)) : {arts:[], ins:[]};
+    if(op && !confirm("¿Cancelar la confirmación? La orden " + op.folio + " deja de ser válida." + avisoRegreso(op, sal))) return;
+    const antes = {estado:cot.estado, op:cot.op};
     cot.estado = "borrador"; cot.op = null;
-    renderEstado(); if(await guardaCot() === false) return; toast("El pedido volvió a borrador");
+    renderEstado();
+    let ok = false;
+    try{ ok = (await guardaCot()) !== false; }catch(e){ toast(e && e.message ? e.message : "No se pudo guardar"); }
+    if(!ok){ cot.estado = antes.estado; cot.op = antes.op; renderEstado(); return; }
+    const n = op ? await regresaSalidas(op, sal) : 0;
+    renderSaved();
+    toast("El pedido volvió a borrador" + (n ? " · el material regresó al inventario" : ""));
     return;
   }
   const faltaConf = (typeof cv2FaltaConfirmar === "function") ? cv2FaltaConfirmar() : "";
@@ -17569,15 +17689,7 @@ $("#btnConfirmar").addEventListener("click", async ()=>{
   cot.op = {folio: folioOP(), fecha: hoyISO(), cotizacion: cot.folio, estatus:"Pendiente",
             historial:[{estatus:"Pendiente", fecha:hoyISO(), hora:horaAhora()}]};
   guardaItemActivo(cot);
-  const rC = calcDe(cot);
-  for(const p of rC.partes){
-    const art = cat.articulos.find(a=>a.id===p.q.articuloId);
-    if(art && (num(art.existencia)>0||(art.invVariantes||[]).length))
-      await nvVarSalida(art,p.q,p.r.qty,"Salida por pedido confirmado",{folio:cot.op.folio,archivo:null});
-  }
-  const cons = descuentaInsumos(cot, rC, cot.op.folio);
-  const consSv = typeof svDescuentaServicios === "function" ? svDescuentaServicios(cot, cot.op.folio) : [];
-  if(cons.lista.length || consSv.length) renderInvInsumos();
+  const {cons} = await salidasDeOrden(cot, "Salida por pedido confirmado");
   const art = cat.articulos.find(a=>a.id===cot.articuloId);
   renderEstado(); if(await guardaCot() === false) return; renderSaved();
   if(cot.pago && !cot.pago.registrado && typeof cv2RegistraPago === "function"){ await cv2RegistraPago(cot); if(await guardaCot() === false) return; renderEstado(); }
@@ -17637,7 +17749,26 @@ $("#tab-sav").addEventListener("click", async e=>{
   const cb = e.target.closest("[data-cobrar]");
   if(cb){ const g = guardadas.find(g=>g.folio===cb.dataset.cobrar); if(g) abrirCobro(g); return; }
   const d = e.target.closest("[data-delcot]");
-  if(d){ const f=d.dataset.delcot; guardadas = guardadas.filter(g=>g.folio!==f);
+  if(d){ const f=d.dataset.delcot;
+    const gd = guardadas.find(g=>g.folio===f);
+    if(gd && gd.estado === "confirmada" && gd.op){
+      /* Borrar un pedido confirmado es cancelarlo: mismas reglas y el material regresa. */
+      if(typeof cierraMenusCot === "function") cierraMenusCot();
+      const al = await opAlDia(f, gd.op, gd.checklist);
+      if(al.cambio){ toast("Este pedido cambió en otro equipo. Actualiza la lista y vuelve a intentarlo."); return; }
+      const op = al.op, empezo = opEmpezada(op, al.checklist);
+      if(empezo){ toast("La orden " + op.folio + " ya está en producción (" + empezo + "). Ya no se puede borrar el pedido."); return; }
+      const sal = op.salidas || salidasDeBitacora(op);
+      if(!confirm("¿Borrar el pedido " + f + "? Se cancela la orden " + op.folio + "." + avisoRegreso(op, sal))) return;
+      guardadas = guardadas.filter(g=>g.folio!==f);
+      if(DB){ try{ await DB.collection("cotizaciones").doc(f).delete(); }catch(err){} } else lsSet("cots",guardadas);
+      if(cot && cot.folio === f){ cot.estado = "borrador"; cot.op = null; renderEstado(); }
+      const n = await regresaSalidas(op, sal);
+      renderSaved(); if(typeof renderProduccion === "function") renderProduccion();
+      toast("Pedido borrado" + (n ? " · el material regresó al inventario" : ""));
+      return;
+    }
+    guardadas = guardadas.filter(g=>g.folio!==f);
     if(DB){ try{ await DB.collection("cotizaciones").doc(f).delete(); }catch(err){} } else lsSet("cots",guardadas);
     renderSaved(); }
 });
@@ -25547,10 +25678,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261111-1700";</script>
+<script>window.BUILD="20261111-1830";</script>
 <script>
 (function(){
-  var mio = "20261111-1700";
+  var mio = "20261111-1830";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
