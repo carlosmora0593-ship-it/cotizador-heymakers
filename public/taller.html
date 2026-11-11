@@ -3342,6 +3342,14 @@ body.rol-produccion #btnPrint{display:none!important}
 .svChipMas{border-style:dashed}
 .svCapaPct{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
 .svCapaPct input{width:70px;text-align:center}
+.svNuevaOp{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-top:10px;padding:10px 12px;border:1.5px dashed var(--accent);border-radius:14px;background:var(--accent-soft)}
+.svNuevaOp input{width:100px}
+.svNuevaOp #svNoNom{flex:1 1 200px;width:auto;min-width:0}
+.svNuevaOp label{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.svNuevaOp .u{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;color:var(--ink-3)}
+.svNuevaOp #svNoInv{width:auto}
+.svLleva{margin-left:auto;font:inherit;font-size:11px;font-weight:700;letter-spacing:0;text-transform:none;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:3px 10px;cursor:pointer;color:var(--accent)}
+.svInvOk{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:0;text-transform:none;color:var(--good)}
 .rRollo{fill:var(--surface);stroke:var(--line)}
 .rPieza{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.2}
 .rOrilla{fill:var(--line-soft)}
@@ -6428,8 +6436,8 @@ function normalizaCat(){
 
 /* ============ CONSUMIBLES ============ */
 const UNIDADES_INS = [["ml","mililitros"],["g","gramos"],["m","metros"],
-                      ["m2","metros cuadrados"],["pza","piezas"],["kg","kilos"],["l","litros"],["lamina","láminas"]];
-const abrevIns = u => u === "m2" ? "m²" : u === "lamina" ? "lámina" : (u || "pza");
+                      ["m2","metros cuadrados"],["pza","piezas"],["kg","kilos"],["l","litros"],["lamina","láminas"],["hoja","hojas"]];
+const abrevIns = u => u === "m2" ? "m²" : u === "lamina" ? "lámina" : u === "hoja" ? "hoja" : (u || "pza");
 function insumoDe(id){ return (cat.insumos||[]).find(i=>i.id===id) || null; }
 function consumosDe(ancla, anclaId){
   if(!anclaId) return [];
@@ -17560,7 +17568,8 @@ $("#btnConfirmar").addEventListener("click", async ()=>{
       await nvVarSalida(art,p.q,p.r.qty,"Salida por pedido confirmado",{folio:cot.op.folio,archivo:null});
   }
   const cons = descuentaInsumos(cot, rC, cot.op.folio);
-  if(cons.lista.length) renderInvInsumos();
+  const consSv = typeof svDescuentaServicios === "function" ? svDescuentaServicios(cot, cot.op.folio) : [];
+  if(cons.lista.length || consSv.length) renderInvInsumos();
   const art = cat.articulos.find(a=>a.id===cot.articuloId);
   renderEstado(); if(await guardaCot() === false) return; renderSaved();
   if(cot.pago && !cot.pago.registrado && typeof cv2RegistraPago === "function"){ await cv2RegistraPago(cot); if(await guardaCot() === false) return; renderEstado(); }
@@ -23092,7 +23101,7 @@ function svGrupoHTML(pr, g, st, cobro){
   if(g.tipo === "material") return svMaterialHTML(g, st);
   if(g.tipo === "capa") return svCapaHTML(pr, g, st);
   let h = '<section class="svGrp" data-grp="'+g.id+'"><h3>'+esc(g.nom) + (g.nota ? ' <span class="gn">· '+esc(g.nota)+'</span>' : '') +
-          ' <span class="gn" id="svgn_'+g.id+'"></span></h3>';
+          ' <span class="gn" id="svgn_'+g.id+'"></span>' + svInvBoton(g) + '</h3>';
   if(g.tipo === "num"){
     h += '<div class="svNumFila"><div class="svStep chico"><button type="button" data-svnm="'+g.id+'" data-d="-1" aria-label="Menos">−</button>' +
          '<input type="number" min="0" step="'+(g.paso||1)+'" data-svnum="'+g.id+'" value="'+num(st.num[g.id])+'" aria-label="'+esc(g.nom)+'">' +
@@ -23104,7 +23113,9 @@ function svGrupoHTML(pr, g, st, cobro){
   }
   h += '<div class="svChips">' + svOpsVis(g, st, pr).map(o=>
     '<button type="button" class="svChip" data-svg="'+g.id+'" data-svo="'+esc(o.id)+'" aria-pressed="'+(st.sel[g.id]===o.id)+'">' +
-      '<span>'+esc(o.nom)+'</span><small data-svh="'+g.id+':'+esc(o.id)+'">'+esc(svPista(pr, g, o, cobro))+'</small></button>').join("") + '</div>';
+      '<span>'+esc(o.nom)+'</span><small data-svh="'+g.id+':'+esc(o.id)+'">'+esc(svPista(pr, g, o, cobro))+'</small></button>').join("") +
+    (g.modo !== "rollo" ? '<button type="button" class="svChip svChipMas" data-svnuevo="'+g.id+'"><span>+ Agregar</span><small>nombre y precio</small></button>' : '') +
+    '</div>' + (SVV.nuevoEn === g.id ? svNuevaOpHTML(pr, g, cobro) : '');
   if(g.modo === "rollo") h += '<div class="svRollo" id="svRollo"></div>';
   if(svPrecios && g.modo !== "rollo") h += svTablaPrecios(pr, g, cobro);
   return h + '</section>';
@@ -23383,6 +23394,112 @@ document.addEventListener("input", e=>{
     if(s) s.textContent = c > 0 && w > 0 && h > 0 ? "Te sale en " + mx(c/(w*h/10000)) + " el m²." : "";
   }
 });
+/* ---------- materiales en todos los servicios + inventario (nov 2026) ----------
+   · Cada grupo de opciones trae «+ Agregar»: nombre, precio y costo, y
+     queda en el catálogo del taller.
+   · Los grupos que son material (lona, vinil, película, papel…) pueden
+     llevar inventario: cada opción se liga a un insumo con su unidad.
+   · Al confirmar el pedido se descuenta lo que gastó el armado: m² de
+     rollo, metros de película, hojas o láminas.
+   ------------------------------------------------------------------ */
+const SV_INV = {lona:{tipo:"m2"}, vinil:{tipo:"m2"}, vinCorte:{vin:"m2"}, dtfMetro:{ancho:"ml"}, uvMetro:{ancho:"ml"},
+  uvHoja:{pel:"hoja"}, etiquetas:{mat:"hoja"}, copias:{papel:"hoja"}, tabloide:{papel:"hoja"}, subImp:{medida:"ml", modelo:"hoja"}};
+const svInvDe = (pid, g) => (g && (g.inv || (SV_INV[pid] || {})[g.id])) || null;
+const svInvUni = inv => inv === "ml" ? "m" : inv;
+const svInvTxt = inv => ({m2:"m²", ml:"metros", hoja:"hojas"})[inv] || inv;
+function svLlevaInv(pid, g){
+  const pr = svProd(pid), inv = svInvDe(pid, g); if(!pr || !inv) return 0;
+  if(!Array.isArray(cat.insumos)) cat.insumos = [];
+  let n = 0;
+  (g.ops || []).forEach(o=>{
+    if(o.ins && insumoDe(o.ins)) return;
+    const id = typeof uid === "function" ? uid() : "sv" + Date.now().toString(36) + n;
+    cat.insumos.push({id, nombre: pr.nom + " · " + o.nom, unidad: svInvUni(inv), costo: num(o.c), existencia: 0, minimo: 0, svc:{pid, gid:g.id}});
+    o.ins = id; n++;
+  });
+  return n;
+}
+function svNuevaOpHTML(pr, g, cobro){
+  const inv = svInvDe(SVV.pid, g), x = g.modo === "x";
+  const u = x ? "×" : svUnidadPrecio(pr, g, {}, cobro);
+  return '<div class="svNuevaOp">' +
+    '<input id="svNoNom" placeholder="Nombre, ej. ' + esc(x ? "Tinta metálica" : inv === "m2" ? "Lona 18 oz" : inv === "hoja" ? "Opalina 300 g" : "Nueva opción") + '" aria-label="Nombre de la opción">' +
+    '<label>' + (x ? "Multiplica" : "Precio") + ' <input id="svNoP" type="number" min="0" step="0.01" placeholder="' + (x ? "1.5" : "$") + '"> <span class="u">' + esc(u) + '</span></label>' +
+    (x ? '' : '<label>Costo <input id="svNoC" type="number" min="0" step="0.01" placeholder="$"></label>') +
+    (inv ? '<label class="svNoInv"><input type="checkbox" id="svNoInv" checked> También en inventario</label>' +
+           '<label>Existencia <input id="svNoEx" type="number" min="0" step="0.01" value="0"> <span class="u">' + esc(svInvTxt(inv)) + '</span></label>' : '') +
+    '<button class="btn primary sm" type="button" data-svnuevook="' + esc(g.id) + '">Agregar</button>' +
+    '<button class="btn sm" type="button" data-svnuevocancela="1">Cancelar</button></div>';
+}
+function svNuevaOpGuarda(gid){
+  const pr = svProd(SVV.pid), g = svGrupos(pr).find(x=>x.id === gid); if(!g) return;
+  const nom = (($("#svNoNom") || {}).value || "").trim(), p = Math.max(0, num(($("#svNoP") || {}).value)), c = Math.max(0, num(($("#svNoC") || {}).value));
+  if(!nom){ toast("Escribe el nombre de la opción."); return; }
+  if(g.modo === "x" && !(p > 0)){ toast("Escribe por cuánto multiplica el precio (1 = igual)."); return; }
+  const id = "u" + Date.now().toString(36);
+  const op = g.modo === "x" ? {id, nom, p} : {id, nom, p, c};
+  g.ops = g.ops || []; g.ops.push(op);
+  const inv = svInvDe(SVV.pid, g), conInv = inv && $("#svNoInv") && $("#svNoInv").checked;
+  if(conInv){
+    if(!Array.isArray(cat.insumos)) cat.insumos = [];
+    const iid = typeof uid === "function" ? uid() : "sv" + id;
+    cat.insumos.push({id: iid, nombre: pr.nom + " · " + nom, unidad: svInvUni(inv), costo: c, existencia: Math.max(0, num(($("#svNoEx") || {}).value)), minimo: 0, svc:{pid:SVV.pid, gid}});
+    op.ins = iid;
+  }
+  SVV.st.sel[gid] = id; SVV.nuevoEn = null;
+  if(typeof persist === "function") persist();
+  try{ if(conInv && typeof renderInsumos === "function") renderInsumos(); }catch(_){}
+  svPintaForm();
+  toast(nom + " quedó en " + pr.nom.toLowerCase() + (conInv ? " y en tu inventario" : ""));
+}
+/* Lo que gasta un concepto de servicio, en la unidad de su insumo. */
+function svConsumoServicio(svc){
+  const pr = svProd(svc.pid); if(!pr || !svc.st) return [];
+  const r = svCalc(svc.pid, svc.st), out = [];
+  if(pr.rigido && r.mat && r.lamina && r.lamina.cabe){
+    const cant = svc.st.rcobra === "completo" ? r.lamina.hojasEnteras : Math.round(r.lamina.hojas*100)/100;
+    if(cant > 0) out.push({ins: r.mat, cant});
+  }
+  svGruposVis(pr, svc.st).forEach(g=>{
+    const inv = svInvDe(svc.pid, g); if(!inv || !g.ops) return;
+    const o = g.ops.find(x=>x.id === svc.st.sel[g.id]); if(!o || !o.ins) return;
+    const ins = insumoDe(o.ins); if(!ins) return;
+    let cant = 0;
+    if(inv === "m2") cant = r.acomodo ? r.acomodo.consumo : r.A*r.q;
+    else if(inv === "ml") cant = r.arm ? r.arm.usado : r.q;
+    else cant = r.arm ? (r.arm.completo && r.arm.a && r.arm.a.hojasEnteras ? r.arm.a.hojasEnteras : r.arm.usado) : r.q;
+    if(cant > 0) out.push({ins, cant: Math.round(cant*1000)/1000});
+  });
+  return out;
+}
+function svDescuentaServicios(q, folio){
+  const lista = (Array.isArray(q.items) && q.items.length ? q.items : [q]).filter(x=>x && x.modo === "impresion" && x.svc);
+  const hechos = [];
+  lista.forEach(x=> svConsumoServicio(x.svc).forEach(c=>{
+    mueveInsumo(c.ins.id, -c.cant, "Salida por " + (q.folio || "pedido"), folio || ""); hechos.push(c); }));
+  if(hechos.length && typeof persist === "function") persist();
+  return hechos;
+}
+document.addEventListener("click", e=>{
+  if(!SVV || SVV.modo !== "svc" || !e.target.closest("#svVelo")) return;
+  let b;
+  if((b = e.target.closest("[data-svnuevo]"))){ SVV.nuevoEn = b.dataset.svnuevo; svPintaForm(); const i = $("#svNoNom"); if(i) i.focus(); return; }
+  if(e.target.closest("[data-svnuevocancela]")){ SVV.nuevoEn = null; svPintaForm(); return; }
+  if((b = e.target.closest("[data-svnuevook]"))){ svNuevaOpGuarda(b.dataset.svnuevook); return; }
+  if((b = e.target.closest("[data-svllevainv]"))){
+    const pr = svProd(SVV.pid), g = svGrupos(pr).find(x=>x.id === b.dataset.svllevainv);
+    const n = g ? svLlevaInv(SVV.pid, g) : 0;
+    if(n){ if(typeof persist === "function") persist(); try{ if(typeof renderInsumos === "function") renderInsumos(); }catch(_){}
+      toast(n + (n === 1 ? " material quedó" : " materiales quedaron") + " en Inventario de producción, con existencia 0. Captura lo que tienes."); }
+    svPintaForm(); return;
+  }
+});
+function svInvBoton(g){
+  const inv = svInvDe(SVV.pid, g); if(!inv || !(g.ops || []).length) return "";
+  const faltan = g.ops.filter(o=> !(o.ins && insumoDe(o.ins))).length;
+  return faltan ? '<button type="button" class="svLleva" data-svllevainv="'+esc(g.id)+'">Llevar en inventario</button>'
+                : '<span class="svInvOk">en inventario · se descuenta al confirmar</span>';
+}
 function svPintaForm(){
   if(SVV.modo === "app") return cv2PintaFormApp();
   const pr = svProd(SVV.pid), st = SVV.st, r = svCalc(SVV.pid, st);
@@ -25297,10 +25414,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261111-1200";</script>
+<script>window.BUILD="20261111-1700";</script>
 <script>
 (function(){
-  var mio = "20261111-1200";
+  var mio = "20261111-1700";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
