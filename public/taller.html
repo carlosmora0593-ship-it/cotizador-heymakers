@@ -3246,6 +3246,20 @@ body.rol-produccion #btnPrint{display:none!important}
 .svTile:hover .svIco{transform:scale(1.08) translateY(-2px)}
 .svTile b{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:14px;line-height:1.2}
 .svTile small{font-size:11px;color:var(--ink-3);line-height:1.3}
+.tpRej{margin-top:4px}
+.tpRevisa{position:absolute;top:8px;left:8px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;background:#FEF3C7;color:#92400E}
+.tpIntro,.tpNota{font-size:13px;color:var(--ink-2);margin:0 0 12px;line-height:1.45}
+.tpNota{margin-top:12px}
+.tpNota .btn{margin-left:6px}
+.tpConf{border:1.5px dashed #D97706;background:#FFFBEB;color:#78350F;border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.tpConf p{margin:0 0 10px;font-size:13px;line-height:1.45}
+.tpTipoSel{display:flex;gap:10px;align-items:center;font-size:13px;font-weight:600;margin:0 0 12px;flex-wrap:wrap}
+.tpTipoSel select{max-width:280px}
+.moNota{font-size:12.5px;color:var(--ink-3);align-self:end;padding-bottom:10px}
+.svVelo.catModo #svVAgregar{display:none}
+.svVelo.tecModo .svVTot{visibility:hidden}
+.svVelo.tecModo .svVPie::before{content:"Los cambios se guardan solos.";font-size:12.5px;color:var(--ink-3);align-self:center}
+@media (max-width:760px){ #svVForm .tecTop{flex-wrap:wrap} #svVForm .tecTop .tecNombre{flex:1 1 100%;width:100%} .svVelo.tecModo .svVPie{padding-top:10px;padding-bottom:max(10px,env(safe-area-inset-bottom,0px))} }
 .svTile.bloq{cursor:default;background:var(--surface-2);border-style:dashed}
 .svTile.bloq .svIco{filter:grayscale(.85);opacity:.55}
 .svTile.bloq b,.svTile.bloq small{opacity:.6}
@@ -4115,14 +4129,14 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
     </div>
   </div>
   <div class="card secOculta" data-cat="tecnicas">
-    <header><h2>Técnicas de decorado</h2><button class="btn sm ghost" data-add="tecnicas" style="margin-left:auto">+ Técnica</button></header>
+    <header><h2>Tipos de impresión</h2><button class="btn sm ghost" data-add="tecnicas" style="margin-left:auto">+ Tipo propio</button></header>
     <div class="body">
-      <p class="note" style="margin:0 0 12px">Cada técnica enseña nada más lo suyo. La <b>mano de obra</b> es lo que te cuesta prensar, acomodar y revisar <i>una</i> aplicación, y aplica siempre. Si la técnica tiene un <b>material amarrado</b> arriba, el material lo calcula el armado con lo que de verdad se gasta del rollo y aquí ya no aparece el cobro por cm². Si no lo tiene, el cm² sigue de respaldo. Serigrafía cobra por tinta y bordado por puntada, que es como de verdad se miden. El <b>setup</b> se cobra una sola vez por pedido.</p>
+      <p class="note" style="margin:0 0 12px">Cada tarjeta es un <b>tipo de impresión</b>, con su icono, igual que en el cotizador. Ábrela para cambiar lo que vendes suelto y, en <b>En artículos</b>, cómo se cobra cuando va sobre una playera, gorra o taza: mano de obra por aplicación, setup y lo propio de cada tipo. El precio por metro del material es uno solo para los dos.</p>
       <div class="pricebar">
         <button class="btn" id="btnLlenarPrecios">Llenar precios públicos con mi utilidad</button>
         <span style="font-size:12px;color:var(--ink-3);align-self:center">Toma cada costo, le aplica tu utilidad y lo escribe en la columna de precio.</span>
       </div>
-      <div id="t_tecnicas"></div>
+      <div id="t_tipos" class="svRej tpRej"></div>
     </div>
   </div>
   <div class="card secOculta" data-cat="servicios">
@@ -4742,7 +4756,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
           <label class="sw"><input type="checkbox" id="p_nuevaCobrar"> Al <b>cerrar el cobro</b>, empezar una cotización nueva</label>
           <p class="note" style="margin:8px 0 0">Lo que estás capturando se guarda solo en este navegador, así que si se recarga la página no se pierde. Eso es un <b>borrador</b>: para que la cotización exista de verdad hay que darle Guardar.</p>
           </div>
-        <div><label class="f" for="p_mo">Mano de obra por aplicación ($)</label><input id="p_mo" type="number" min="0" step="0.5"></div>
+        <div hidden><label class="f" for="p_mo">Mano de obra de arranque ($)</label><input id="p_mo" type="number" min="0" step="0.5"></div><div class="moNota">La mano de obra por aplicación ahora va en cada <b>tipo de impresión</b>, en Catálogo.</div>
       </div>
       <div class="grid g4" style="margin-top:12px">
         <div><label class="f" for="p_iva">IVA (%)</label><input id="p_iva" type="number" min="0" step="1"></div>
@@ -7325,7 +7339,7 @@ function calc(){
     } else {
       const min = num(t.minimo);
       aplicoMin = c < min; if(aplicoMin) c = min;
-      c += t.modo === "tiempo" ? manoDeObraDe(t, "costo") : num(P.manoObra);
+      c += manoDeObraDe(t, "costo");
       if(pv < num(t.precioMin)) pv = num(t.precioMin);
     }
     // Si la técnica no tiene precio público capturado, se calcula con la utilidad.
@@ -7679,7 +7693,7 @@ function renderAlertaPrecio(r){
     (arreglables
       ? '<div class="alAcc"><button class="btn sm" id="btnSanea">Subir esos precios con tu utilidad ('+
         (P.modo==="margen" ? "margen " : "markup ")+num(P.margen)+'%)</button></div>'
-      : '<p class="alPie">Revisa los precios en el Catálogo o sube la mano de obra en Ajustes.</p>');
+      : '<p class="alPie">Revisa los precios en el Catálogo o sube la mano de obra en Catálogo › Tipos de impresión.</p>');
 }
 
 /* Sube lo que esté bajo su costo, y lo deja escrito en el catálogo para que no
@@ -9432,6 +9446,7 @@ function renderTabla(key){
 
 /* ---------- las técnicas, una ficha cada una ---------- */
 function renderTecnicas(){
+  if(typeof renderTipos === "function") renderTipos();
   const w = $("#t_tecnicas"); if(!w) return;
   normalizaCat();
   const lista = cat.tecnicas || [];
@@ -9439,7 +9454,9 @@ function renderTecnicas(){
     w.innerHTML = '<div class="empty">Sin técnicas. Presiona <b>+ Técnica</b>.</div>';
     return;
   }
-  w.innerHTML = lista.map(t=>{
+  w.innerHTML = lista.map(tecCardHTML).join("");
+}
+function tecCardHTML(t){
     const mat = svcParaTecnica(t.id);
     const porRollo = t.modo==="area" && !!mat;
     const faltaMO  = porRollo && !num(t.costoMO);
@@ -9513,7 +9530,7 @@ function renderTecnicas(){
             ? '<div class="tecMat"><span class="pill pend">sin material</span>'+
               '<small>Amárrale un rollo en <b>Servicios y material por medida</b> y deja de cobrar por cm².</small></div>'
             : ''))+
-      (faltaMO ? '<div class="tecAviso">Falta capturar la mano de obra. Mientras tanto se usa la general de Ajustes ('+mx(num(P.manoObra))+').</div>' : '')+
+      (faltaMO ? '<div class="tecAviso">Falta capturar la mano de obra. Mientras tanto se usa la de arranque ('+mx(num(P.manoObra))+').</div>' : '')+
       '<div class="tecBloque"><div class="tecTit">Mano de obra'+
         '<span class="hint"> — por cada aplicación, en cada pieza</span></div>'+
         '<div class="tecRejilla">'+campo("costoMO","Costo")+campo("precioMO","Precio")+'</div></div>'+
@@ -9522,8 +9539,222 @@ function renderTecnicas(){
         '<span class="hint"> — una sola vez por pedido</span></div>'+
         '<div class="tecRejilla">'+campo("setup","Costo de setup")+campo("precioSetup","Precio de setup")+'</div></div>'+
     '</div>';
-  }).join("");
 }
+
+/* ============ TIPOS DE IMPRESIÓN (nov 2026) ============
+   Una sola lista. Cada tipo de impresión es una tarjeta con su icono, la
+   misma del cotizador, y trae todo lo suyo:
+   · lo que se vende suelto (los productos del cotizador de servicios), y
+   · «En artículos»: cómo se cobra cuando va sobre una playera, gorra o taza
+     (mano de obra por aplicación, setup y lo propio de cada técnica).
+   El material por metro de DTF, DTF UV y sublimación es UNO: el de la venta
+   suelta y el que usa el armado de los artículos se mantienen iguales.
+   La mano de obra vive sólo aquí; en Ajustes ya no hay una general.
+   ======================================================== */
+const TP_EXTRA = {bordado:{nom:"Bordado", sub:"Por puntadas, en prenda", ico:"bordado"},
+                  dtg:{nom:"DTG", sub:"Directo a prenda", ico:"dtg"}};
+const TP_MODO = {area:"por área", tintas:"por tinta", puntadas:"por puntada", tiempo:"por minuto"};
+const TP_MAT = {dtf:["dtfMetro", "ancho"], uv:["uvMetro", "ancho"], subli:["subImp", "medida"]};
+function tecTipo(t){
+  if(!t) return "";
+  const secs = svCat().secciones;
+  if(t.tipo && (secs.some(s=>s.id === t.tipo) || TP_EXTRA[t.tipo] || t.tipo === "tec:" + t.id)) return t.tipo;
+  const n = String(t.nombre || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  if(/\buv\b/.test(n)) return "uv";
+  if(/\bdtg\b|directo a (la )?prenda/.test(n)) return "dtg";
+  if(/dtf/.test(n)) return "dtf";
+  if(/subli/.test(n)) return "subli";
+  if(/serigraf/.test(n)) return "seri";
+  if(/vinil/.test(n)) return "vinil";
+  if(/laser|grabado/.test(n)) return "laser";
+  if(/bordad/.test(n) || t.modo === "puntadas") return "bordado";
+  return "tec:" + t.id;
+}
+const tpTecnicasDe = id => (cat.tecnicas || []).filter(t=> tecTipo(t) === id);
+const tpIcoDe = t => !t ? "playera" : t.modo === "tintas" ? "seri" : t.modo === "puntadas" ? "bordado" : t.modo === "tiempo" ? "laser" : "playera";
+/* Las tarjetas: los tipos abiertos del cotizador, más los que sólo existen en artículos. */
+function tpLista(){
+  const out = [];
+  svCat().secciones.forEach(s=>{
+    if(!(s.prods || []).length || !svSeccionAbierta(s)) return;
+    out.push({id:s.id, nom:s.nom, sub:s.sub || "", ico:s.id, prods:s.prods.length, tecs:tpTecnicasDe(s.id)});
+  });
+  const vistos = new Set(out.map(x=>x.id));
+  (cat.tecnicas || []).forEach(t=>{
+    const id = tecTipo(t); if(vistos.has(id)) return; vistos.add(id);
+    const ex = TP_EXTRA[id];
+    out.push({id, nom: ex ? ex.nom : (t.nombre || "Tipo propio"), sub: ex ? ex.sub : (TP_MODO[t.modo] || ""),
+              ico: ex ? ex.ico : tpIcoDe(t), prods:0, tecs:tpTecnicasDe(id)});
+  });
+  return out;
+}
+/* ---------- el material por metro: una sola lista ----------
+   Cada rollo de artículos (Materiales) de DTF, DTF UV o sublimación se liga a
+   la opción del mismo ancho en la venta suelta. Si no existe ese ancho, se
+   agrega. Si existe con otro precio, se pregunta cuál se queda: nada cambia
+   de golpe. Ya ligados, si cambia uno cambia el otro. */
+function tpAnchoCm(o){
+  const m = String((o && o.nom) || "").replace(",", ".").match(/(\d+(?:\.\d+)?)\s*(cm|m)\b/i);
+  return m ? (m[2].toLowerCase() === "m" ? num(m[1])*100 : num(m[1])) : 0;
+}
+function tpLigaMateriales(){
+  const conf = []; let cambio = false;
+  (cat.servicios || []).forEach(s=>{
+    const t = (cat.tecnicas || []).find(x=>x.id === s.tecnicaId);
+    if(!t || (s.unidad || "ml") !== "ml") return;
+    const ruta = TP_MAT[tecTipo(t)]; if(!ruta) return;
+    const pr = svProd(ruta[0]), g = pr && svGrupos(pr).find(x=>x.id === ruta[1]); if(!g) return;
+    g.ops = g.ops || [];
+    let o = s.sv && s.sv.pid === ruta[0] && s.sv.gid === ruta[1] ? g.ops.find(x=>x.id === s.sv.op) : null;
+    if(!o){
+      o = g.ops.find(x=> (!x.cobro || x.cobro === "ml") && Math.abs(tpAnchoCm(x) - num(s.ancho)) <= 3);
+      if(!o){
+        o = {id:"m" + s.id, nom: svN0(num(s.ancho)) + " cm", p: num(s.precio), c: num(s.costo)};
+        if(ruta[0] === "subImp") o.cobro = "ml";
+        g.ops.push(o); cambio = true;
+      } else if(Math.abs(num(o.p) - num(s.precio)) > 0.004 || Math.abs(num(o.c) - num(s.costo)) > 0.004){
+        conf.push({s, t, o, pr}); return;
+      }
+      s.sv = {pid:ruta[0], gid:ruta[1], op:o.id, p:num(o.p), c:num(o.c)}; cambio = true;
+    }
+    const lp = num(s.sv.p), lc = num(s.sv.c);
+    if(num(o.p) !== lp || num(o.c) !== lc){ s.precio = num(o.p); s.costo = num(o.c); cambio = true; }        // cambió la venta suelta
+    else if(num(s.precio) !== lp || num(s.costo) !== lc){ o.p = num(s.precio); o.c = num(s.costo); cambio = true; } // cambió en Materiales
+    s.sv.p = num(o.p); s.sv.c = num(o.c);
+  });
+  if(cambio) svGuardaPronto();
+  return {conf, cambio};
+}
+function tpResuelve(sid, cual){
+  const {conf} = tpLigaMateriales(), c = conf.find(x=>x.s.id === sid); if(!c) return;
+  if(cual === "venta"){ c.s.precio = num(c.o.p); c.s.costo = num(c.o.c); }
+  else { c.o.p = num(c.s.precio); c.o.c = num(c.s.costo); }
+  c.s.sv = {pid:TP_MAT[tecTipo(c.t)][0], gid:TP_MAT[tecTipo(c.t)][1], op:c.o.id, p:num(c.o.p), c:num(c.o.c)};
+  persist(); toast("Listo: " + c.s.nombre + " queda en " + mx(c.o.p) + " por metro, en la venta suelta y en artículos.");
+}
+/* ---------- la mano de obra en un solo lugar ---------- */
+function tpMigra(){
+  let cambio = false;
+  if(!cat.moUnica){
+    const mo = num(P.manoObra);
+    (cat.tecnicas || []).forEach(t=>{ if(!num(t.costoMO) && mo > 0){ t.costoMO = mo; cambio = true; } });
+    cat.moUnica = true; cambio = true;
+  }
+  if(tpLigaMateriales().cambio) cambio = true;
+  if(cambio && typeof persist === "function") persist();
+}
+/* ---------- la rejilla en Catálogo ---------- */
+function renderTipos(){
+  const w = $("#t_tipos"); if(!w) return;
+  const {conf} = tpLigaMateriales();
+  const lista = tpLista();
+  w.innerHTML = lista.map(x=>{
+    const rev = conf.filter(c=>tecTipo(c.t) === x.id).length;
+    const sub = [x.prods ? x.prods + (x.prods === 1 ? " producto" : " productos") : "", x.tecs.length ? "en artículos" : ""].filter(Boolean).join(" · ") || x.sub;
+    return '<button type="button" class="svTile" data-tipocat="'+esc(x.id)+'">' +
+      (rev ? '<span class="tpRevisa">' + rev + (rev === 1 ? ' precio por revisar' : ' precios por revisar') + '</span>' : '') +
+      svIco(x.ico) + '<b>'+esc(x.nom)+'</b><small>'+esc(sub)+'</small></button>';
+  }).join("") || '<div class="empty">Sin tipos de impresión.</div>';
+}
+function tpRefrescaCat(){
+  try{ renderTipos(); }catch(_){}
+  try{ if(typeof pintaLanzadorSec === "function") pintaLanzadorSec("cat"); }catch(_){}
+}
+/* ---------- la ventana: la misma del cotizador, en modo catálogo ---------- */
+function tpAbre(id, tecId){
+  tpLigaMateriales();
+  /* La ventana vive dentro de Cotizar; desde Catálogo se saca a la página
+     mientras está abierta y al cerrarse regresa a su lugar. */
+  const v = $("#svVelo"), tc = $("#tab-cot");
+  if(v && tc && tc.hidden && tc.contains(v)){ window.__svCasa = v.parentElement; document.body.appendChild(v); }
+  const s = svCat().secciones.find(x=>x.id === id && (x.prods || []).length);
+  const tecs = tpTecnicasDe(id);
+  if(s) svAbre(id);
+  else {
+    const ex = TP_EXTRA[id], t0 = tecs.find(t=>t.id === tecId) || tecs[0];
+    SVV = {modo:"tec", sec:id, pid:null, st:{}, tec: t0 ? t0.id : null};
+    $("#svVIco").innerHTML = svIco(ex ? ex.ico : tpIcoDe(t0));
+    $("#svVTit").textContent = ex ? ex.nom : (t0 ? t0.nombre : "Tipo de impresión");
+    $("#svVSub").textContent = ex ? ex.sub : "Cómo se cobra en tus artículos";
+    svMuestra();
+  }
+  if(!SVV) return;
+  SVV.catalogo = true; svPrecios = true;
+  if(tecId && tecs.some(t=>t.id === tecId)) SVV.tec = tecId;
+  $("#svVPrecios").hidden = false;
+  $("#svVPrecios").setAttribute("aria-pressed", "true"); $("#svVPrecios").textContent = "Listo";
+  $("#svVelo").classList.add("catModo");
+  svPintaProds(); svPintaForm();
+}
+function tpNavTec(sec){
+  const tecs = tpTecnicasDe(sec); if(!tecs.length) return "";
+  return '<span class="k">En artículos</span>' + tecs.map(t=>
+    '<button type="button" class="svProd" data-svtec="'+esc(t.id)+'"'+(SVV.tec === t.id ? ' aria-current="true"' : '')+'>' +
+    '<b>'+esc(t.nombre || "Sin nombre")+'</b><small>'+esc(TP_MODO[t.modo] || "")+' · en artículos</small></button>').join("");
+}
+function tpPintaTec(){
+  const f = $("#svVForm"), t = (cat.tecnicas || []).find(x=>x.id === SVV.tec);
+  $("#svVelo").classList.add("tecModo");
+  if(!t){ f.innerHTML = '<p class="tpIntro">Este tipo todavía no tiene cómo cobrarse en artículos.</p>'; return; }
+  const {conf} = tpLigaMateriales(), mios = conf.filter(c=>c.t.id === t.id);
+  let h = '<p class="tpIntro">Así se cobra <b>'+esc(t.nombre || "este tipo")+'</b> cuando va sobre un artículo: playera, gorra, taza… ' +
+          'La <b>mano de obra</b> por aplicación vive aquí y en ningún otro lado.</p>';
+  h += mios.map(c=> '<div class="tpConf"><p><b>'+esc(c.s.nombre)+'</b> tiene dos precios por metro: en la venta suelta (' + esc(c.pr.nom) + ') ' +
+       '<b>'+mx(c.o.p)+'</b> con costo '+mx(c.o.c)+', y en artículos <b>'+mx(c.s.precio)+'</b> con costo '+mx(c.s.costo)+'. ¿Cuál se queda para los dos?</p>' +
+       '<button type="button" class="btn sm" data-tpusa="'+esc(c.s.id)+'|venta">'+mx(c.o.p)+' · el de venta suelta</button> ' +
+       '<button type="button" class="btn sm" data-tpusa="'+esc(c.s.id)+'|art">'+mx(c.s.precio)+' · el de artículos</button></div>').join("");
+  h += '<label class="tpTipoSel">Va en la tarjeta <select data-tptipo="'+esc(t.id)+'">' +
+       tpLista().map(x=>'<option value="'+esc(x.id)+'"'+(x.id === tecTipo(t) ? ' selected' : '')+'>'+esc(x.nom)+'</option>').join("") +
+       (tecTipo(t).indexOf("tec:") === 0 ? '' : '<option value="tec:'+esc(t.id)+'">Su propia tarjeta</option>') + '</select></label>';
+  h += tecCardHTML(t);
+  const lig = svcsParaTecnica(t.id).filter(s=>s.sv), prL = lig.length ? svProd(lig[0].sv.pid) : null;
+  if(prL) h += '<p class="tpNota">El precio por metro del material es el mismo de <b>'+esc(prL.nom)+'</b>, en la venta suelta. ' +
+               'Si lo cambias ahí o en Materiales, cambia en los dos. <button type="button" class="btn sm" data-svprod="'+esc(lig[0].sv.pid)+'">Ir a '+esc(prL.nom)+'</button></p>';
+  f.innerHTML = h;
+}
+document.addEventListener("click", e=>{
+  if(!SVV || !e.target.closest("#svVelo")) return;
+  let b;
+  if((b = e.target.closest("[data-svtec]"))){ SVV.tec = b.dataset.svtec; svPintaProds(); svPintaForm(); $("#svVForm").scrollTop = 0; return; }
+  if((b = e.target.closest("[data-tpusa]"))){ const [sid, cual] = b.dataset.tpusa.split("|"); tpResuelve(sid, cual); svPintaForm(); tpRefrescaCat(); return; }
+  if((b = e.target.closest("#svVForm .tecCard [data-delrow]"))){
+    const box = b.closest("[data-id]"), t = (cat.tecnicas || []).find(x=>x.id === box.dataset.id); if(!t) return;
+    if(!confirm("¿Quitar «" + (t.nombre || "este tipo") + "» de los artículos? Las cotizaciones que ya lo usan pierden su precio.")) return;
+    cat.tecnicas = cat.tecnicas.filter(x=>x.id !== t.id); persist(); tpRefrescaCat();
+    const resto = tpTecnicasDe(SVV.sec);
+    if(resto.length){ SVV.tec = resto[0].id; svPintaProds(); svPintaForm(); }
+    else if(SVV.modo === "tec") svCierra();
+    else { SVV.tec = null; svPintaProds(); svPintaForm(); }
+  }
+});
+document.addEventListener("input", e=>{
+  if(!SVV || !SVV.tec || e.target.tagName === "SELECT") return;
+  const box = e.target.closest("#svVForm .tecCard[data-id]"); if(!box) return;
+  const t = (cat.tecnicas || []).find(x=>x.id === box.dataset.id), f = e.target.dataset.f; if(!t || !f) return;
+  t[f] = e.target.type === "number" ? num(e.target.value) : e.target.value;
+  if(f === "nombre"){ const n = document.querySelector('[data-svtec="'+t.id+'"] b'); if(n) n.textContent = t.nombre || "Sin nombre";
+    if(SVV.modo === "tec" && !TP_EXTRA[SVV.sec]) $("#svVTit").textContent = t.nombre || "Tipo de impresión"; }
+  svGuardaPronto(); tpRefrescaCat();
+});
+document.addEventListener("change", e=>{
+  if(!SVV || !SVV.tec) return;
+  const ts = e.target.closest("[data-tptipo]");
+  if(ts){
+    const t = (cat.tecnicas || []).find(x=>x.id === ts.dataset.tptipo); if(!t) return;
+    t.tipo = ts.value; persist(); tpRefrescaCat();
+    const nuevo = tecTipo(t); svCierra(); tpAbre(nuevo, t.id);
+    toast((t.nombre || "Este tipo") + " ahora va en " + ((tpLista().find(x=>x.id === nuevo) || {}).nom || "su propia tarjeta"));
+    return;
+  }
+  const box = e.target.closest("#svVForm .tecCard[data-id]"); if(!box || e.target.tagName !== "SELECT") return;
+  const t = (cat.tecnicas || []).find(x=>x.id === box.dataset.id); if(!t) return;
+  t[e.target.dataset.f] = e.target.value; persist(); svPintaProds(); svPintaForm(); tpRefrescaCat();
+});
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-tipocat]"); if(!b) return;
+  if(typeof puedeVer === "function" && !puedeVer("cat")) return;
+  tpAbre(b.dataset.tipocat);
+});
 
 /* ============ LANZADOR DE SECCIONES ============ */
 /* Una sección declara sus tarjetas; esto hace el resto. */
@@ -9748,7 +9979,7 @@ registraLanzador("set", [
   {id:"precio", nombre:"Parámetros de precio", sub:"utilidad, IVA y redondeo", color:"#0680AB",
    icono:'<path d="M12 2v20"/><path d="M17 6.5c0-1.9-2.2-3-5-3s-5 1.1-5 3 2.2 2.8 5 3.3 5 1.4 5 3.4-2.2 3.3-5 3.3-5-1.4-5-3.3"/>',
    card:'[data-set="precio"]'},
-  {id:"cobro", nombre:"Material y mano de obra", sub:"cómo se cobra la impresión", color:"#0E7C57",
+  {id:"cobro", visible:()=>false, nombre:"Material y mano de obra", sub:"cómo se cobra la impresión", color:"#0E7C57",
    icono:'<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M3 13h18"/>',
    card:'[data-set="cobro"]'},
   {id:"folios", nombre:"Folios", sub:"las letras de tus documentos", color:"#B26A00", soloAdmin:true,
@@ -10165,16 +10396,16 @@ function arranqueSiEsNuevo(){
 }
 
 registraLanzador("cat", [
-  {id:"traer", nombre:"Traer ejemplos", sub:"técnicas y artículos que no cargaste", color:"#D2541F",
+  {id:"traer", nombre:"Traer ejemplos", sub:"tipos de impresión y artículos que no cargaste", color:"#D2541F",
    icono:'<path d="M12 3v12"/><path d="M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>',
    card:'[data-cat="articulos"]',
    accion:()=> abreArranque("agregar")},
   {id:"articulos", nombre:"Artículos", sub:"lo que vendes", color:"#06B6D4",
    icono:'<path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0l-7.2-7.2a2 2 0 0 1-.6-1.4V4.4A1.4 1.4 0 0 1 4.4 3h7.6a2 2 0 0 1 1.4.6l7.2 7.2a2 2 0 0 1 0 2.6Z"/><circle cx="7.5" cy="7.5" r="1.3"/>',
    card:'[data-cat="articulos"]', cuenta:()=>(cat.articulos||[]).length},
-  {id:"tecnicas", nombre:"Técnicas", sub:"cómo se decora", color:"#D6127F",
+  {id:"tecnicas", nombre:"Tipos de impresión", sub:"precios por tarjeta", color:"#D6127F",
    icono:'<path d="M3 21h4l11-11a2.8 2.8 0 0 0-4-4L3 17Z"/><path d="M14.5 6.5 17.5 9.5"/>',
-   card:'[data-cat="tecnicas"]', cuenta:()=>(cat.tecnicas||[]).length},
+   card:'[data-cat="tecnicas"]', cuenta:()=>{ try{ return tpLista().length; }catch(_){ return (cat.tecnicas||[]).length; } }},
   {id:"servicios", nombre:"Materiales", sub:"rollos y por medida", color:"#A855F7",
    icono:'<rect x="3" y="7" width="18" height="10" rx="2"/><path d="M7 7V5M12 7V5M17 7V5M7 19v-2M12 19v-2M17 19v-2"/>',
    card:'[data-cat="servicios"]', cuenta:()=>(cat.servicios||[]).length},
@@ -17443,6 +17674,10 @@ $("#tab-cat").addEventListener("click", e=>{
   const add = e.target.closest("[data-add]");
   if(add){ const k=add.dataset.add;
     if(k==="articulos"&&!esTiendita()){ceAbre(null,null,add);return;}
+    if(k==="tecnicas"){
+      const t = {id:uid(), nombre:"Nuevo tipo de impresión", modo:"area", costoCm2:0, costoTinta:0, costoPuntada:0, minimo:0, setup:0, costoMO:num(P.manoObra), precioMO:0};
+      t.tipo = "tec:" + t.id; cat.tecnicas.push(t); persist(); renderTabla(k); tpAbre(t.tipo, t.id); return;
+    }
     const blank = {articulos:{nombre:"Nuevo artículo",cat:"Otros",costo:0},
       tecnicas:{nombre:"Nueva técnica",modo:"area",costoCm2:0,costoTinta:0,costoPuntada:0,minimo:0,setup:0},
       servicios:{nombre:"Nuevo servicio por medida",cat:"Maquila",tecnicaId:"",unidad:"ml",ancho:60,costo:0,precio:0,minimo:0.5,incremento:0.1,separacion:0.5,orilla:1,gramaje:0},
@@ -22544,6 +22779,24 @@ const SV_ICONOS = (function(){
       '<rect x="5" y="29" width="7" height="24" rx="1" fill="#23262D"/><rect x="52" y="29" width="7" height="24" rx="1" fill="#23262D"/><path d="M10 38L54 38" stroke="#CBD5E1" stroke-width="1.6" stroke-linecap="round"/><path d="M10 43L54 43" stroke="#E2E8F0" stroke-width="1.3" stroke-linecap="round"/><path d="M3 14 6 11 61 11 61 14z" fill="#3A3F4A"/><rect x="3" y="14" width="58" height="16" rx="1.6" fill="#23262D"/><rect x="13" y="17.5" width="38" height="6.5" rx="1" fill="#B91C1C"/><rect x="13" y="22" width="38" height="2" fill="#EF4444"/><rect x="30" y="18.6" width="5" height="2.6" rx=".6" fill="#3A3F4A"/><rect x="3" y="25.6" width="58" height="1.7" fill="#8B5CF6"/><rect x="52.5" y="16.5" width="6.5" height="6.5" rx="1" fill="#64748B"/><rect x="53.6" y="17.6" width="4.3" height="2.6" rx=".5" fill="#7CC0FF"/><rect x="5" y="6.5" width="11" height="5" rx="1" fill="#2B303A"/><rect x="6.3" y="4.8" width="2.4" height="2.4" rx=".7" fill="#22D3EE"/><rect x="9.6" y="4.8" width="2.4" height="2.4" rx=".7" fill="#E879F9"/><rect x="12.9" y="4.8" width="2.4" height="2.4" rx=".7" fill="#FDE047"/><path d="M18 31 46 31 54 43 10 43z" fill="#2B303A"/><path d="M10 43 54 43 54 45.3 10 45.3z" fill="#15181E"/><ellipse cx="19.2" cy="33" rx="1.1" ry=".65" fill="#6B7280"/><ellipse cx="24.3" cy="33" rx="1.1" ry=".65" fill="#6B7280"/><ellipse cx="29.4" cy="33" rx="1.1" ry=".65" fill="#6B7280"/><ellipse cx="34.6" cy="33" rx="1.1" ry=".65" fill="#6B7280"/><ellipse cx="39.7" cy="33" rx="1.1" ry=".65" fill="#6B7280"/><ellipse cx="44.8" cy="33" rx="1.1" ry=".65" fill="#6B7280"/><ellipse cx="17.7" cy="35.7" rx="1.2" ry=".65" fill="#6B7280"/><ellipse cx="23.4" cy="35.7" rx="1.2" ry=".65" fill="#6B7280"/><ellipse cx="29.1" cy="35.7" rx="1.2" ry=".65" fill="#6B7280"/><ellipse cx="34.9" cy="35.7" rx="1.2" ry=".65" fill="#6B7280"/><ellipse cx="40.6" cy="35.7" rx="1.2" ry=".65" fill="#6B7280"/><ellipse cx="46.3" cy="35.7" rx="1.2" ry=".65" fill="#6B7280"/><ellipse cx="16.1" cy="38.5" rx="1.3" ry=".65" fill="#6B7280"/><ellipse cx="22.5" cy="38.5" rx="1.3" ry=".65" fill="#6B7280"/><ellipse cx="28.8" cy="38.5" rx="1.3" ry=".65" fill="#6B7280"/><ellipse cx="35.2" cy="38.5" rx="1.3" ry=".65" fill="#6B7280"/><ellipse cx="41.5" cy="38.5" rx="1.3" ry=".65" fill="#6B7280"/><ellipse cx="47.9" cy="38.5" rx="1.3" ry=".65" fill="#6B7280"/><ellipse cx="14.6" cy="41.3" rx="1.3" ry=".65" fill="#6B7280"/><ellipse cx="21.6" cy="41.3" rx="1.3" ry=".65" fill="#6B7280"/><ellipse cx="28.5" cy="41.3" rx="1.3" ry=".65" fill="#6B7280"/><ellipse cx="35.5" cy="41.3" rx="1.3" ry=".65" fill="#6B7280"/><ellipse cx="42.4" cy="41.3" rx="1.3" ry=".65" fill="#6B7280"/><ellipse cx="49.4" cy="41.3" rx="1.3" ry=".65" fill="#6B7280"/><rect x="11" y="45" width="2.4" height="9" rx="1" fill="#1F232B"/><rect x="50.6" y="45" width="2.4" height="9" rx="1" fill="#1F232B"/><circle cx="8.5" cy="55.68" r="1.7" fill="#334155"/><circle cx="8.5" cy="55.68" r="0.7" fill="#CBD5E1"/><circle cx="12.2" cy="55.68" r="1.7" fill="#334155"/><circle cx="12.2" cy="55.68" r="0.7" fill="#CBD5E1"/><circle cx="51.8" cy="55.68" r="1.7" fill="#334155"/><circle cx="51.8" cy="55.68" r="0.7" fill="#CBD5E1"/><circle cx="55.5" cy="55.68" r="1.7" fill="#334155"/><circle cx="55.5" cy="55.68" r="0.7" fill="#CBD5E1"/>',
     hibRollo: PISO(32,28) +
       '<rect x="5" y="29" width="7" height="24" rx="1" fill="#23262D"/><rect x="52" y="29" width="7" height="24" rx="1" fill="#23262D"/><path d="M10 37L54 37" stroke="#CBD5E1" stroke-width="1.6" stroke-linecap="round"/><path d="M3 14 6 11 61 11 61 14z" fill="#3A3F4A"/><rect x="3" y="14" width="58" height="16" rx="1.6" fill="#23262D"/><rect x="13" y="17.5" width="38" height="6.5" rx="1" fill="#B91C1C"/><rect x="13" y="22" width="38" height="2" fill="#EF4444"/><rect x="30" y="18.6" width="5" height="2.6" rx=".6" fill="#3A3F4A"/><rect x="3" y="25.6" width="58" height="1.7" fill="#8B5CF6"/><rect x="52.5" y="16.5" width="6.5" height="6.5" rx="1" fill="#64748B"/><rect x="53.6" y="17.6" width="4.3" height="2.6" rx=".5" fill="#7CC0FF"/><rect x="5" y="6.5" width="11" height="5" rx="1" fill="#2B303A"/><rect x="6.3" y="4.8" width="2.4" height="2.4" rx=".7" fill="#22D3EE"/><rect x="9.6" y="4.8" width="2.4" height="2.4" rx=".7" fill="#E879F9"/><rect x="12.9" y="4.8" width="2.4" height="2.4" rx=".7" fill="#FDE047"/><path d="M15 28h34v15.5c0 1.6-1.3 2.9-2.9 2.9H17.9c-1.6 0-2.9-1.3-2.9-2.9z" fill="#F8FAFC" stroke="#CBD5E1" stroke-width=".7"/><rect x="18" y="31" width="28" height="9" rx="1.2" fill="url(#svgRosa)"/><path d="M18 37.5c5-3.5 9 1.5 14-1s9-2.4 14-.6V40H18z" fill="#7C3AED"/><circle cx="41" cy="33.8" r="1.7" fill="#FDE047"/><rect x="18" y="42" width="12" height="1.4" rx=".7" fill="#CBD5E1"/><path d="M10 49L54 49" stroke="#CBD5E1" stroke-width="2.4" stroke-linecap="round"/><path d="M10 48.5L54 48.5" stroke="#fff" stroke-width="0.7" stroke-linecap="round" opacity=".7"/><rect x="11" y="46.5" width="2.4" height="5" rx=".8" fill="#1F232B"/><rect x="50.6" y="46.5" width="2.4" height="5" rx=".8" fill="#1F232B"/><circle cx="6.8" cy="55.68" r="1.7" fill="#334155"/><circle cx="6.8" cy="55.68" r="0.7" fill="#CBD5E1"/><circle cx="10.4" cy="55.68" r="1.7" fill="#334155"/><circle cx="10.4" cy="55.68" r="0.7" fill="#CBD5E1"/><circle cx="53.6" cy="55.68" r="1.7" fill="#334155"/><circle cx="53.6" cy="55.68" r="0.7" fill="#CBD5E1"/><circle cx="57.2" cy="55.68" r="1.7" fill="#334155"/><circle cx="57.2" cy="55.68" r="0.7" fill="#CBD5E1"/>',
+    bordado: PISO(31,23) +
+      '<path d="M51 30l7-1.6v6.2L51 33z" fill="url(#svgGrisO)"/><rect x="54" y="27.4" width="3.4" height="8.4" rx="1.2" fill="#64748B"/>' +
+      '<ellipse cx="30" cy="34" rx="23" ry="20.5" fill="url(#svgMadera)"/><ellipse cx="30" cy="34" rx="19.5" ry="17" fill="#B98249"/>' +
+      '<ellipse cx="30" cy="34" rx="18" ry="15.6" fill="#F8FAFC"/><ellipse cx="30" cy="34" rx="18" ry="15.6" fill="none" stroke="#E2E8F0" stroke-width="1.4"/>' +
+      '<path d="M30 45.5c-7.5-5-11.5-8.6-11.5-13.2a5.3 5.3 0 0 1 11.5-1.8 5.3 5.3 0 0 1 11.5 1.8c0 4.6-4 8.2-11.5 13.2z" fill="url(#svgRosa)"/>' +
+      '<path d="M22 31.5l3 3M24.5 29l4 4M30 30.5l4.5 4.5M33.5 28.7l4.5 4.5M23.5 36l4.5 4.5M29 38l3.6 3.6" stroke="#fff" stroke-opacity=".55" stroke-width="1.1" stroke-linecap="round"/>' +
+      '<path d="M30 45.5c-7.5-5-11.5-8.6-11.5-13.2a5.3 5.3 0 0 1 11.5-1.8 5.3 5.3 0 0 1 11.5 1.8c0 4.6-4 8.2-11.5 13.2z" fill="none" stroke="#9D174D" stroke-width="1.1" stroke-dasharray="2 1.4"/>' +
+      '<path d="M46 6 37.5 22" stroke="#94A3B8" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="46.3" cy="5.6" rx="1.2" ry="1.9" transform="rotate(28 46.3 5.6)" fill="none" stroke="#64748B" stroke-width="1"/>' +
+      '<path d="M46.3 5.6c7 1.5 9.5 8.5 4 13.5s-11 4-12.8 8" fill="none" stroke="#EC4899" stroke-width="1.3" stroke-linecap="round"/>',
+    dtg: PISO(32,26) +
+      '<rect x="9" y="12" width="46" height="24" rx="4.5" fill="url(#svgBlanco)" stroke="#C5CEDA" stroke-width=".8"/>' +
+      '<rect x="9" y="12" width="46" height="7" rx="3.5" fill="#334155"/><rect x="12" y="13.6" width="22" height="2.4" rx="1.2" fill="#fff" opacity=".18"/>' +
+      '<circle cx="49" cy="15.5" r="1.4" fill="#22C55E"/><rect x="40" y="23" width="11" height="6" rx="1.5" fill="url(#svgAzulO)"/><rect x="41.3" y="24.3" width="8" height="1.8" rx=".9" fill="#7CC0FF"/>' +
+      '<rect x="13" y="29" width="25" height="4" rx="2" fill="#1F2937"/>' +
+      '<path d="M8 40h48l4 10H4z" fill="url(#svgGris)" stroke="#C5CEDA" stroke-width=".8"/><path d="M4 50h56v2.4H4z" fill="#94A3B8"/>' +
+      '<path d="M26.5 35.5l-6 2.6 1.8 4.8 2.7-1v8.6h14v-8.6l2.7 1 1.8-4.8-6-2.6c-.9 1.8-2.8 2.8-5.5 2.8s-4.6-1-5.5-2.8z" fill="url(#svgVerde)"/>' +
+      '<rect x="28.5" y="40.5" width="7" height="5" rx="1" fill="#fff" opacity=".92"/><rect x="29.4" y="41.6" width="5.2" height="1.4" rx=".7" fill="url(#svgCMY)"/>' +
+      '<rect x="12" y="52" width="3.4" height="4" rx="1" fill="#64748B"/><rect x="48.6" y="52" width="3.4" height="4" rx="1" fill="#64748B"/>',
     vinil: PISO(34,24) +
       '<g transform="rotate(-8 40 38)"><rect x="22" y="24" width="34" height="26" rx="3" fill="#fff" stroke="#CBD5E1"/>' +
       '<path d="M39 28l2.6 5.4 5.9.8-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" fill="url(#svgNaranja)" stroke="#9A3412" stroke-dasharray="2 1.6" stroke-width=".8"/></g>' +
@@ -22867,7 +23120,7 @@ function svPintaSwitch(s, nav){
         (edita && id !== SVV.pid ? ' disabled' : '') + '><b>' + esc(pr.tab || pr.nom) + '</b><small>' + como + '</small></button>';
     }).join("");
   } else if(actual === "Rígidos") h += '<p class="svNota">Directo sobre la lámina: trovicel, coroplast, estireno, acrílico…</p>';
-  nav.innerHTML = h;
+  nav.innerHTML = h + ((SVV.catalogo || svPrecios) && typeof tpNavTec === "function" ? tpNavTec(s.id) : "");
   const vi = $("#svVIco"); if(vi) vi.innerHTML = svIco(SV_TRAMO_ICO[actual] || "hibrido");
   SVV.ladoSw = lado;
   if(antes !== lado) requestAnimationFrame(()=>requestAnimationFrame(()=>{ const sw = $("#svSwitch"); if(sw) sw.dataset.lado = String(lado); }));
@@ -23280,14 +23533,16 @@ function svMuestra(){
   setTimeout(()=>{ const c = $("#svVCerrar"); if(c) c.focus(); }, 40);
 }
 function svCierra(){
-  $("#svVelo").classList.remove("caVentana");
+  $("#svVelo").classList.remove("caVentana", "catModo", "tecModo");
   $("#svVelo").hidden = true; SVV = null; svPrecios = false;
+  if(window.__svCasa){ window.__svCasa.appendChild($("#svVelo")); window.__svCasa = null; }
   $("#svVPrecios").setAttribute("aria-pressed","false"); $("#svVPrecios").textContent = "Editar precios";
   document.body.style.overflow = "";
   if(svOrigen && document.body.contains(svOrigen)) svOrigen.focus();
 }
 function svAbre(secId, pid, accion, origen){
   const s = svCat().secciones.find(x=>x.id === secId); if(!s) return;
+  if(typeof tpLigaMateriales === "function") tpLigaMateriales();
   svOrigen = origen || null;
   pid = pid || s.prods[0];
   const edita = accion === "edita" && cot.svc;
@@ -23307,22 +23562,24 @@ function svPintaProds(){
   if(SVV.modo === "app"){
     cu.classList.remove("solo"); nav.hidden = false;
     const sub = {area:"por medida", tintas:"por tinta", puntadas:"por puntadas", tiempo:"por minuto"};
-    nav.innerHTML = '<span class="k">Técnica</span>' + (cat.tecnicas||[]).map(t=>
+    nav.innerHTML = '<span class="k">Tipo de impresión</span>' + (cat.tecnicas||[]).map(t=>
       '<button type="button" class="svProd" data-svprod="'+esc(t.id)+'"'+(t.id===SVV.app.tecnicaId?' aria-current="true"':'')+'>' +
       '<b>'+esc(t.nombre)+'</b><small>'+(sub[t.modo]||"")+'</small></button>').join("");
     return;
   }
+  if(SVV.modo === "tec"){ cu.classList.remove("solo"); nav.hidden = false; nav.innerHTML = tpNavTec(SVV.sec); return; }
   const s = svCat().secciones.find(x=>x.id === SVV.sec);
-  const solo = s.prods.length === 1;
+  const navTec = (SVV.catalogo || svPrecios) && typeof tpNavTec === "function" ? tpNavTec(SVV.sec) : "";
+  const solo = s.prods.length === 1 && !navTec;
   cu.classList.toggle("solo", solo); nav.hidden = solo;
   if(s.prods.some(id=>SV_TRAMO[id])) return svPintaSwitch(s, nav);
   nav.innerHTML = '<span class="k">Productos</span>' + s.prods.map(id=>{
     const pr = svProd(id); if(!pr) return "";
     const como = {m2:"por m²", hoja:"por hoja", pieza:"por pieza", ml:"por metro"}[pr.cobro];
     const sub = id === "subImp" ? "por hoja o por metro" : id === "laserPieza" ? "por minuto" : como;
-    return '<button type="button" class="svProd" data-svprod="'+id+'"'+(id===SVV.pid?' aria-current="true"':'')+
+    return '<button type="button" class="svProd" data-svprod="'+id+'"'+(id===SVV.pid && !SVV.tec?' aria-current="true"':'')+
       (SVV.accion === "edita" && id !== SVV.pid ? ' disabled' : '')+'><b>'+esc(pr.tab || pr.nom)+'</b><small>'+sub+'</small></button>';
-  }).join("");
+  }).join("") + navTec;
 }
 function svUnidadPrecio(pr, g, o, cobro){
   const m = (o && o.m) || g.modo;
@@ -23801,6 +24058,8 @@ function svInvBoton(g){
 }
 function svPintaForm(){
   if(SVV.modo === "app") return cv2PintaFormApp();
+  if(SVV.tec || SVV.modo === "tec") return tpPintaTec();
+  $("#svVelo").classList.remove("tecModo");
   const pr = svProd(SVV.pid), st = SVV.st, r = svCalc(SVV.pid, st);
   let h = '<div class="svFila">';
   if(pr.medida){
@@ -23851,6 +24110,7 @@ function svDibujaRollo(a){
 function svRefresca(){
   if(!SVV) return;
   if(SVV.modo === "app") return cv2RefrescaApp();
+  if(SVV.tec || SVV.modo === "tec") return;
   const pr = svProd(SVV.pid), st = SVV.st, r = svCalc(SVV.pid, st);
   const vis = r.ren.filter(x=> Math.abs(x.m) > 0.004);
   $("#svRen").innerHTML = vis.length ? vis.map(x=>'<li><span>'+esc(x.t)+'</span><b>'+mx(x.m)+'</b></li>').join("") +
@@ -23905,6 +24165,7 @@ function svEditaPrecio(ref, val){
     if(el) el.textContent = svPista(pr, g, o, svCalc(SVV.pid, SVV.st).cobro);
   }
   clearTimeout(svGuardaT); svGuardaT = setTimeout(()=>{ if(typeof persist === "function") persist(); }, 700);
+  if(typeof tpLigaMateriales === "function") tpLigaMateriales();
 }
 
 /* ---------- la imagen de referencia: al almacén si lo hay; si no, achicada ---------- */
@@ -23945,16 +24206,18 @@ document.addEventListener("click", e=>{
   if(e.target.id === "svVelo"){ svCierra(); return; }
   if(e.target.closest("#svVCerrar")){ svCierra(); return; }
   if(e.target.closest("#svVPrecios")){
-    svPrecios = !svPrecios;
+    if(SVV.catalogo){ svCierra(); return; }
+    svPrecios = !svPrecios; if(!svPrecios) SVV.tec = null;
     $("#svVPrecios").setAttribute("aria-pressed", svPrecios);
     $("#svVPrecios").textContent = svPrecios ? "Listo con los precios" : "Editar precios";
-    svPintaForm(); return;
+    svPintaProds(); svPintaForm(); return;
   }
   const pb = e.target.closest("[data-svprod]");
   if(pb){
     if(pb.disabled) return;
     if(SVV.modo === "app"){ cv2CambiaTecnica(pb.dataset.svprod); return; }
-    if(pb.dataset.svprod === SVV.pid) return;
+    if(pb.dataset.svprod === SVV.pid){ if(SVV.tec){ SVV.tec = null; svPintaProds(); svPintaForm(); $("#svVForm").scrollTop = 0; } return; }
+    SVV.tec = null;
     const notas = SVV.st.notas;
     SVV.pid = pb.dataset.svprod; SVV.st = svStDefault(SVV.pid); SVV.st.notas = notas; SVV.rolloManual = false;
     svPintaProds(); svPintaForm(); $("#svVForm").scrollTop = 0; return;
@@ -24523,6 +24786,7 @@ window.__arranca = () => initStore().then(async ()=>{
     cot.apps[0].tecnicaId = cat.tecnicas[0].id;
   if(habia) setTimeout(()=>toast("Recuperé lo que estabas capturando"), 900);
   arrancaEquipo();
+  try{ tpMigra(); }catch(e){ console.warn("tipos de impresión", e); }
   await cargaAsistencias(); renderAsistencia();
   cargaTipsLab();          /* sin await: el tablero ya tiene sus tips de fábrica */
   if(rolActual()==="admin"){
@@ -25713,10 +25977,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261114-1100";</script>
+<script>window.BUILD="20261114-1400";</script>
 <script>
 (function(){
-  var mio = "20261114-1100";
+  var mio = "20261114-1400";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
