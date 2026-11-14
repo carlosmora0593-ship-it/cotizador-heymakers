@@ -3288,6 +3288,13 @@ body.rol-produccion #btnPrint{display:none!important}
 .icRegArt input{width:80px}
 .icRegArt .k2{color:var(--ink-3);font-weight:700}
 .icNuevo [hidden]{display:none!important}
+.icCarpInfo{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed var(--line-soft)}
+.icCarpInfo small{color:var(--ink-3);font-size:11.5px}
+.icPasa input[type=text]{width:180px;padding:5px 8px;font-size:12.5px}
+.icPasa [hidden]{display:none}
+.icDato{font-size:12.5px;color:var(--ink-2)}
+.icArt .icCab{margin-bottom:4px}
+.icCarp .svIco{width:64px;height:64px}
 .icChecks .icCheck{flex-direction:column!important;align-items:stretch!important;flex-wrap:nowrap!important;gap:8px!important;cursor:default}
 .icChecks .icChkNom{display:flex!important;flex-direction:row!important;align-items:center;gap:10px!important;cursor:pointer;margin:0}
 .icChecks .icChkNom input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:var(--accent)}
@@ -4507,14 +4514,21 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
     </div>
   </div>
 
+  <div class="card secOculta" data-inv="todo" id="cardInvTodo">
+    <header><h2>Mi inventario</h2></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Todo lo que tienes, en carpetas: los insumos de impresión por tipo de material y los artículos por
+        su categoría. Toca una carpeta para ver qué hay, cargar lo que llegó o contar.</p>
+      <div id="icCarpetas"></div>
+    </div>
+  </div>
   <div class="card secOculta" data-inv="ins" id="cardInvIns">
     <header><h2>Consumibles por equipo</h2><span class="hint" id="invInsHint"></span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Toca un equipo para cargar lo que compras y decir cuánto gasta. Baja solo
         cuando confirmas un pedido, con lo que de verdad calculó el acomodo, y regresa si se cancela.</p>
       <div id="icRej" class="svRej icRej"></div>
-      <h3 class="icTitResumen">Lo que vigilas</h3>
-      <div class="tbl-wrap"><table id="t_invIns"></table></div>
+      <div hidden><table id="t_invIns"></table></div>
     </div>
   </div>
   <div class="card secOculta" data-inv="sol">
@@ -10441,7 +10455,7 @@ function icCierra(){
   const o = IC && IC.origen, fn = IC && IC.alCerrar; IC = null;
   const sv = $("#svVelo"); document.body.style.overflow = sv && !sv.hidden ? "hidden" : "";
   if(fn){ try{ fn(); }catch(_){} }
-  icPintaRej(); try{ renderInvInsumos(); }catch(_){}
+  icPintaRej(); icPintaCarpetas(); try{ renderInvInsumos(); }catch(_){}
   try{ if(typeof pintaLanzadorSec === "function") pintaLanzadorSec("inv"); }catch(_){}
   if(o && document.body.contains(o)) o.focus();
 }
@@ -10497,7 +10511,20 @@ function icNuevoHTML(T, yaIds){
     (icAdmin() ? '<label class="icSoloNuevo">Costo por unidad <input id="icNCosto" type="number" min="0" step="0.0001" placeholder="$"></label>' : '') + '</div>' +
     '<div class="svNpBtns"><button type="button" class="btn primary sm" data-icnok="1">Agregar</button><button type="button" class="btn sm" data-icncancela="1">Cancelar</button></div></section>';
 }
+/* Repintar quita el campo que tiene el cursor; si ese campo traía un cambio,
+   el navegador dispara otro «change» a media pintada. Se suelta el cursor
+   antes y no se pinta dos veces encimado. */
+let icPintando = false;
 function icPinta(){
+  if(!IC || icPintando) return;
+  icPintando = true;
+  try{
+    const a = document.activeElement, f = $("#icForm");
+    if(a && f && f.contains(a) && a.blur) a.blur();
+    if(IC) (IC.carpeta ? icPintaCarpeta() : icPintaEquipo());
+  } finally { icPintando = false; }
+}
+function icPintaEquipo(){
   if(!IC) return;
   const f = $("#icForm"), T = IC.tipo, top = f.scrollTop;
   let h = "", todos = [];
@@ -10561,6 +10588,8 @@ function icNuevoGuarda(){
 document.addEventListener("click", e=>{
   const tile = e.target.closest("[data-ictipo]");
   if(tile){ icAbre(tile.dataset.ictipo); return; }
+  const carp = e.target.closest("[data-iccarpeta]");
+  if(carp){ icAbreCarpeta(carp.dataset.iccarpeta); return; }
   if(!IC || !e.target.closest("#icVelo")) return;
   if(e.target.id === "icVelo" || e.target.closest("[data-iccierra]")){ icCierra(); return; }
   let b;
@@ -10664,6 +10693,132 @@ document.addEventListener("change", e=>{
   }
 });
 document.addEventListener("keydown", e=>{ if(e.key === "Escape" && IC && $("#icVelo") && !$("#icVelo").hidden){ e.stopPropagation(); icCierra(); } }, true);
+/* ============ MI INVENTARIO: TODO EN CARPETAS (nov 2026) ============
+   Insumos de impresión por tipo de material (Lonas, Viniles, Film, Tintas…)
+   y artículos por su categoría. Cada insumo cae solo en su carpeta y se
+   puede pasar a otra o a una carpeta nueva (i.cat). */
+const IC_CARP_ORDEN = ["Lonas", "Viniles", "Film DTF", "Film DTF UV", "Papel de sublimación", "Papel y hojas", "Láminas y rígidos", "Tintas", "Polvos y adhesivos", "Hilos", "Empaque", "Otros insumos"];
+const IC_CARP_PROD = {lona:"Lonas", hibLona:"Lonas", vinil:"Viniles", hibVinil:"Viniles", vinCorte:"Viniles", dtfMetro:"Film DTF", uvMetro:"Film DTF UV", uvHoja:"Film DTF UV",
+                      subImp:"Papel de sublimación", etiquetas:"Papel y hojas", copias:"Papel y hojas", tabloide:"Papel y hojas"};
+const IC_CARP_COLOR = ["#F59E0B", "#3B82F6", "#14B8A6", "#A855F7", "#EC4899", "#22C55E", "#64748B", "#EF4444", "#0EA5E9", "#D97706", "#8B5CF6", "#10B981"];
+function icCarpetaAuto(i){
+  if(i.rig) return "Láminas y rígidos";
+  if(i.svc && IC_CARP_PROD[i.svc.pid]) return IC_CARP_PROD[i.svc.pid];
+  if(i.svc){ const pr = svProd(i.svc.pid); if(pr) return String(pr.nom || "").replace(/\s*\(h[ií]brido\)/i, ""); }
+  const n = icNorm(i.nombre);
+  if(i.canal || /tinta|barniz|pretrat/.test(n)){
+    const m = n.match(/tinta\s+(?:de\s+)?([^·]+?)\s*(?:·|$)/);
+    if(m && m[1]) return "Tintas " + (/^subli/.test(m[1]) ? "de sublimación" : String(i.nombre).match(/tinta\s+(?:de\s+)?([^·]+?)\s*(?:·|$)/i)[1].trim());
+    if(/\buv\b/.test(n)) return "Tintas UV";
+    if(/dtg/.test(n)) return "Tintas DTG";
+    return "Tintas";
+  }
+  if(/polvo|adhesiv/.test(n)) return "Polvos y adhesivos";
+  if(/\bhilo/.test(n)) return "Hilos";
+  if(/bolsa|etiqueta|caja|empaque|celofan/.test(n)) return "Empaque";
+  return "Otros insumos";
+}
+const icCarpetaDe = i => (i.cat && String(i.cat).trim()) || icCarpetaAuto(i);
+const icArtEx = a => num(a.existencia);
+function icArtEstado(a){
+  const e = icArtEx(a), m = num(a.minimo_inv);
+  if(e <= 0) return {txt:"Sin existencia", cls:"insFalta"};
+  if(m > 0 && e <= m) return {txt:"Por acabarse", cls:"insPoco"};
+  return {txt:"Suficiente", cls:""};
+}
+function icCarpetas(){
+  const ins = {}, arts = {};
+  (cat.insumos || []).forEach(i=>{ const c = icCarpetaDe(i); (ins[c] = ins[c] || []).push(i); });
+  (cat.articulos || []).forEach(a=>{ const c = (a.cat && String(a.cat).trim()) || "Sin categoría"; (arts[c] = arts[c] || []).push(a); });
+  const orden = n => { const k = IC_CARP_ORDEN.indexOf(/^Tintas/.test(n) ? "Tintas" : n); return k < 0 ? 99 : k; };
+  return {
+    ins: Object.keys(ins).sort((a, b)=> orden(a) - orden(b) || a.localeCompare(b, "es")).map(n=>({tipo:"ins", nom:n, items:ins[n]})),
+    arts: Object.keys(arts).sort((a, b)=> a.localeCompare(b, "es")).map(n=>({tipo:"art", nom:n, items:arts[n]}))
+  };
+}
+function icCarpIco(nom, n){
+  const c = IC_CARP_COLOR[Math.abs([...String(nom)].reduce((s, ch)=> s + ch.charCodeAt(0), n || 0)) % IC_CARP_COLOR.length];
+  return '<svg class="svIco" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="55" rx="20" ry="2.6" fill="rgba(0,0,0,.12)"/>' +
+    '<path d="M9 18a4 4 0 0 1 4-4h12l5 5h21a4 4 0 0 1 4 4v4H9Z" fill="'+c+'" opacity=".7"/>' +
+    '<rect x="9" y="23" width="46" height="29" rx="4" fill="'+c+'"/><rect x="9" y="23" width="46" height="6" rx="3" fill="rgba(255,255,255,.22)"/></svg>';
+}
+function icCarpTile(g){
+  const malos = g.items.map(x=> g.tipo === "art" ? icArtEstado(x) : estadoIns(Object.assign({}, x, {existencia:num(x.existencia)})));
+  const sinEx = g.items.filter(x=> num(x.existencia) <= 0).length, poco = malos.filter(e=> e.txt === "Por acabarse").length;
+  const n = g.items.length;
+  return '<button type="button" class="svTile icCarp" data-iccarpeta="'+g.tipo+'|'+esc(g.nom)+'">' +
+    (sinEx ? '<span class="icAgota">' + sinEx + ' sin existencia</span>' : poco ? '<span class="tpRevisa">' + poco + ' por resurtir</span>' : '') +
+    icCarpIco(g.nom) + '<b>'+esc(g.nom)+'</b><small>' + n + (g.tipo === "art" ? (n === 1 ? " artículo" : " artículos") : (n === 1 ? " insumo" : " insumos")) + '</small></button>';
+}
+function icPintaCarpetas(){
+  const w = $("#icCarpetas"); if(!w) return;
+  if(typeof icMigra === "function") icMigra();
+  const c = icCarpetas();
+  w.innerHTML = '<h3 class="icTitResumen">Insumos de impresión</h3>' +
+    (c.ins.length ? '<div class="svRej icRej">' + c.ins.map(icCarpTile).join("") + '</div>' : '<p class="tpIntro">Todavía no cargas insumos. Empieza en «Consumibles por equipo».</p>') +
+    '<h3 class="icTitResumen">Artículos</h3>' +
+    (c.arts.length ? '<div class="svRej icRej">' + c.arts.map(icCarpTile).join("") + '</div>' : '<p class="tpIntro">Todavía no tienes artículos en tu catálogo.</p>');
+}
+function icAbreCarpeta(key){
+  const [tipo, ...r] = String(key).split("|"), nom = r.join("|");
+  IC = {carpeta:{tipo, nom}, origen:document.activeElement};
+  const v = icVelo();
+  $("#icIco").innerHTML = icCarpIco(nom);
+  $("#icTit").textContent = nom;
+  $("#icSub").textContent = tipo === "art" ? "Artículos · existencia de cada uno" : "Insumos de impresión · carga lo que llega y cuenta lo que hay";
+  icPinta(); v.hidden = false; document.body.style.overflow = "hidden";
+  setTimeout(()=>{ const c = v.querySelector("[data-iccierra]"); if(c) c.focus(); }, 40);
+}
+function icUsadoEn(i){
+  return icTipos().filter(x=> icDeTipo(x.id).todos.some(y=> y.id === i.id)).map(x=> x.nom);
+}
+function icCarpSel(i){
+  const actual = icCarpetaDe(i), nombres = [...new Set(IC_CARP_ORDEN.concat((cat.insumos || []).map(icCarpetaDe)))];
+  return '<label class="icPasa">Carpeta <select data-iccarp="'+esc(i.id)+'" aria-label="Carpeta de '+esc(i.nombre)+'">' +
+    nombres.map(n=>'<option'+(n === actual ? ' selected' : '')+'>'+esc(n)+'</option>').join("") + '<option value="__nueva">Carpeta nueva…</option></select>' +
+    '<input type="text" data-iccarpnueva="'+esc(i.id)+'" placeholder="Nombre de la carpeta" hidden aria-label="Nombre de la carpeta nueva"></label>';
+}
+function icPintaCarpeta(){
+  const f = $("#icForm"), top = f.scrollTop, {tipo, nom} = IC.carpeta;
+  const g = (tipo === "art" ? icCarpetas().arts : icCarpetas().ins).find(x=> x.nom === nom) || {items:[]};
+  let h = "";
+  if(tipo === "art"){
+    h = '<section class="svGrp icSec">' + (g.items.length ? g.items.map(a=>{
+      const e = icArtEstado(a), vs = (a.invVariantes || []).filter(v=> num(v.existencia) !== 0);
+      return '<div class="icFila icArt"><div class="icCab"><b>'+esc(a.nombre)+'</b>' +
+        (vs.length ? '<small>' + vs.slice(0, 8).map(v=> esc([v.talla, v.color].filter(Boolean).join(" ")) + ': ' + cantIns(v.existencia)).join(" · ") + (vs.length > 8 ? ' · …' : '') + '</small>' : '') + '</div>' +
+        '<div class="icCampos"><span class="icDato">Existencia <b>'+cantIns(icArtEx(a))+' pza</b></span>' +
+        (num(a.minimo_inv) > 0 ? '<span class="icDato">Mínimo <b>'+cantIns(a.minimo_inv)+'</b></span>' : '') +
+        '<span class="icEstado '+e.cls+'">'+esc(e.txt)+'</span></div></div>';
+    }).join("") : '<p class="tpIntro">Esta carpeta está vacía.</p>') +
+    '<p class="svCapaNota">Las entradas y salidas de artículos se hacen en Catálogo › Existencias, por talla y color.</p></section>';
+  } else {
+    h = '<section class="svGrp icSec">' + (g.items.length ? g.items.map(i=>{
+      const usa = icUsadoEn(i);
+      const cab = '<div class="icCarpInfo">' + (usa.length ? '<small>Se usa en: ' + esc(usa.join(", ")) + '</small>' : '<small>Todavía no lo usa ningún equipo</small>') + icCarpSel(i) + '</div>';
+      if(icEsRollo(i)) return icFilaMaterial(i).replace('<div class="icCab">', cab + '<div class="icCab">');
+      return '<div class="icFila" data-icins="'+esc(i.id)+'">' + cab + '<div class="icCab"><b>'+esc(i.nombre)+'</b><small>'+esc(icUni(i))+'</small></div>' + icCampos(i) + '</div>';
+    }).join("") : '<p class="tpIntro">Esta carpeta está vacía.</p>') + '</section>';
+  }
+  f.innerHTML = h; f.scrollTop = top;
+  const items = g.items, sinEx = items.filter(x=> num(x.existencia) <= 0).length;
+  $("#icPie").textContent = items.length + (tipo === "art" ? (items.length === 1 ? " artículo" : " artículos") : (items.length === 1 ? " insumo" : " insumos")) +
+    (sinEx ? " · " + sinEx + " sin existencia" : "") + (tipo === "art" ? "" : " · los cambios se guardan solos");
+}
+document.addEventListener("change", e=>{
+  if(!IC || !IC.carpeta || !e.target.closest("#icForm")) return;
+  const t = e.target;
+  if(t.dataset.iccarp){
+    const i = insumoDe(t.dataset.iccarp); if(!i) return;
+    if(t.value === "__nueva"){ const n = t.parentElement.querySelector("[data-iccarpnueva]"); if(n){ n.hidden = false; n.focus(); } return; }
+    if(t.value === icCarpetaAuto(i)) delete i.cat; else i.cat = t.value;
+    persist(); icPinta(); toast(i.nombre + " pasó a la carpeta " + t.value + "."); return;
+  }
+  if(t.dataset.iccarpnueva){
+    const i = insumoDe(t.dataset.iccarpnueva), v = String(t.value || "").trim(); if(!i || !v) return;
+    i.cat = v; persist(); icPinta(); toast(i.nombre + " pasó a la carpeta nueva " + v + ".");
+  }
+});
 
 /* ============ LANZADOR DE SECCIONES ============ */
 /* Una sección declara sus tarjetas; esto hace el resto. */
@@ -10817,6 +10972,10 @@ registraLanzador("calc", [
 ], "Calculadora");
 
 registraLanzador("inv", [
+  {id:"todo", nombre:"Mi inventario", sub:"todo en carpetas", color:"#F59E0B",
+   icono:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M3 10h18"/>',
+   card:'[data-inv="todo"]', cuenta:()=>(cat.insumos||[]).length + (cat.articulos||[]).length,
+   alAbrir:()=>{ if(typeof icPintaCarpetas === "function") icPintaCarpetas(); }},
   {id:"taller", nombre:"Inventario del taller", sub:"qué hay y qué falta", color:"#22C55E",
    icono:'<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>',
    card:'[data-inv="taller"]',
@@ -26978,10 +27137,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261115-1000";</script>
+<script>window.BUILD="20261115-1100";</script>
 <script>
 (function(){
-  var mio = "20261115-1000";
+  var mio = "20261115-1100";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
