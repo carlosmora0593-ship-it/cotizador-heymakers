@@ -3357,6 +3357,11 @@ body.rol-produccion #btnPrint{display:none!important}
 .svChipMas{border-style:dashed}
 .svCapaPct{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
 .svCapaPct input{width:70px;text-align:center}
+.svCapaMed{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.svCapaMed label{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600}
+.svCapaMed input{width:78px;text-align:center}
+.svCapaMed .u{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;color:var(--ink-3)}
+.svCapaNota{margin:6px 0 0;font-size:12px;color:var(--ink-3)}
 .svNuevaOp{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-top:10px;padding:10px 12px;border:1.5px dashed var(--accent);border-radius:14px;background:var(--accent-soft)}
 .svNuevaOp input{width:100px}
 .svNuevaOp #svNoNom{flex:1 1 200px;width:auto;min-width:0}
@@ -22617,7 +22622,7 @@ function svDefs(){
 const SV_LAM_CARAS = {id:"lamCaras", nom:"Laminado por", modo:"nada", res:"a {v}", si:{g:"lam", no:"sin"}, ops:[
   {id:"una", nom:"Una cara", n:1}, {id:"dos", nom:"Las dos caras", n:2}]};
 const SV_DEF = {
-  version: 3,
+  version: 4,
   archivo: {id:"arch", nom:"Archivo", modo:"pedido", res:"{v}", ops:[
     {id:"listo", nom:"Lo trae listo", p:0, c:0}, {id:"ajuste", nom:"Ajustar su archivo", p:80, c:25}, {id:"diseno", nom:"Diseño desde cero", p:250, c:80}]},
   secciones: [
@@ -22825,6 +22830,21 @@ const SV_HIB_ROLLO = {hibLona:["lona", "Lona (híbrido)", "Lona"], hibVinil:["vi
                       hibRollup:["rollup", "Roll up y araña (híbrido)", "Roll up y araña"]};
 Object.keys(SV_HIB_ROLLO).forEach(k=>{ const [de, nom, tab] = SV_HIB_ROLLO[k];
   SV_DEF.productos[k] = Object.assign(JSON.parse(JSON.stringify(SV_DEF.productos[de])), {nom, tab}); });
+/* El híbrido UV imprime blanco y barniz también en rollo (referencia: Mimaki
+   UJ330H-160, tinta CMYK + blanco + transparente, hasta 1.61 m de ancho en rollo).
+   Lona y vinil del híbrido llevan las mismas dos capas que los rígidos y sus
+   anchos de rollo se quedan en lo que cabe en la máquina. */
+const SV_CAPAS_ROLLO = [{id:"blanco", nom:"Tinta blanca", tipo:"capa", p:110, c:32}, {id:"barniz", nom:"Barniz", tipo:"capa", p:80, c:22}];
+function svHibAdapta(p){
+  if(!p || !Array.isArray(p.grupos)) return;
+  const i = Math.max(0, p.grupos.findIndex(g=>g.modo === "base"));
+  SV_CAPAS_ROLLO.slice().reverse().forEach(c=>{ if(!p.grupos.some(g=>g.id === c.id)) p.grupos.splice(i + 1, 0, JSON.parse(JSON.stringify(c))); });
+  if(Array.isArray(p.rollos) && p.rollos.some(r=>num(r) > 1.62)){
+    const r = p.rollos.filter(x=>num(x) <= 1.62); if(r.indexOf(1.6) < 0) r.push(1.6);
+    p.rollos = r.sort((a, b)=>a - b);
+  }
+}
+svHibAdapta(SV_DEF.productos.hibLona); svHibAdapta(SV_DEF.productos.hibVinil);
 const SV_TRAMO = {hibRigido:"Rígidos", hibLona:"Rollo a rollo", hibVinil:"Rollo a rollo", hibRollup:"Rollo a rollo"};
 const SV_GEMELO = {hibLona:"lona", hibVinil:"vinil", lona:"hibLona", vinil:"hibVinil"};
 /* En el híbrido, en lugar de la lista de productos sale un switch:
@@ -22892,6 +22912,10 @@ function svCat(){
         if(h.det === "Rollo y rígidos en el mismo plóter") h.det = d.det;
       }
       c.version = 3;
+    }
+    if(!(c.version >= 4)){
+      ["hibLona", "hibVinil"].forEach(k=> svHibAdapta(c.productos[k]));
+      c.version = 4;
     }
     Object.keys(SV_DEF.productos).forEach(k=>{ if(!c.productos[k]) c.productos[k] = JSON.parse(JSON.stringify(SV_DEF.productos[k])); });
     Object.keys(SV_DEF.productos).forEach(k=>{ const d = SV_DEF.productos[k], p = c.productos[k];
@@ -22961,7 +22985,7 @@ function svStDefault(pid){
   const st = {sel:{}, num:{}, w:d.w||0, h:d.h||0, q:d.q||1, notas:"", arm: d.arm ? JSON.parse(JSON.stringify(d.arm)) : {on:false, w:5, h:5, n:20, cobra: pr.cobro === "hoja" ? "completo" : "ocupa"}};
   svGrupos(pr).forEach(g=>{
     if(g.tipo === "num") st.num[g.id] = (d.num && d.num[g.id] != null) ? d.num[g.id] : (g.def || 0);
-    else if(g.tipo === "capa"){ st.capas = st.capas || {}; st.capas[g.id] = {on:false, pct:100}; }
+    else if(g.tipo === "capa"){ st.capas = st.capas || {}; st.capas[g.id] = {on:false, w:"", h:"", n:1}; }
     else if(g.tipo === "material") st.rmat = svMatInicial();
     else if(g.modo === "rollo") st.sel[g.id] = null;
     else st.sel[g.id] = (d.sel && d.sel[g.id]) || (g.ops[0] && g.ops[0].id);
@@ -23012,6 +23036,14 @@ function svCalc(pid, st){
       else { pF += num(g.p)*v; cF += num(g.c)*v; ren.push({t: g.nom + " · " + svN0(v) + " × " + mx(g.p), m: num(g.p)*v}); }
       return;
     }
+    if(g.tipo === "capa"){
+      const c = (st.capas || {})[g.id]; if(!c || !c.on) return;
+      const k = svCapaMed(pr, c, w, h), a = k.a*k.n;
+      pU += num(g.p)*a; cU += num(g.c)*a;
+      ren.push({t: g.nom + " · " + svCapaTxt(pr, c, k) + " · " + svN2(a) + " m² c/u × " + mx(g.p) + "/m²", m: num(g.p)*a*q});
+      if(k.recorta) avisos.push(g.nom + ": la medida es más grande que la pieza; se cobra la pieza completa.");
+      return;
+    }
     if(g.modo === "base" || g.modo === "x" || g.modo === "rollo") return;
     const o = opt(g); if(!o) return;
     const m = o.m || g.modo;
@@ -23050,7 +23082,7 @@ function svDetalle(pid, st){
   if(r.arm && r.arm.n){ const t = r.arm.n + " piezas de " + svN0(num(st.arm.w)) + " × " + svN0(num(st.arm.h)) + " cm"; d.push({k:"Armado", v:t, r:t}); }
   svGruposVis(pr, st).forEach(g=>{
     if(g.tipo === "material"){ const m = svMatSel(st); if(m) d.push({k:"Material", v:m.nombre, r:m.nombre}); return; }
-    if(g.tipo === "capa"){ const c = (st.capas || {})[g.id]; if(c && c.on){ const p = svN0(num(c.pct) || 100); d.push({k:g.nom, v:p + "% del diseño", r:g.nom.toLowerCase() + " al " + p + "%"}); } return; }
+    if(g.tipo === "capa"){ const c = (st.capas || {})[g.id]; if(c && c.on){ const t = svCapaTxt(pr, c, svCapaMed(pr, c, r.w, r.h)); d.push({k:g.nom, v:t, r:g.nom.toLowerCase() + " " + t}); } return; }
     if(g.tipo === "num"){ const v = num(st.num[g.id]); if(v){ const t = svN0(v) + " " + (g.uni||"") + (g.por === "unidad" ? " por " + r.U.uno : ""); d.push({k:g.nom, v:t, r:t}); } return; }
     if(g.modo === "rollo"){ if(st.sel.rollo) d.push({k:"Rollo", v: svFmtRollo(num(st.sel.rollo)), interna:true}); return; }
     const o = svOpsVis(g, st, pr).find(x=>x.id === st.sel[g.id]); if(!o) return;
@@ -23430,6 +23462,23 @@ const svRigidos = () => (typeof cat === "object" && cat && Array.isArray(cat.ins
 function svMatInicial(){ const r = svRigidos()[0]; return r ? {mat:r.rig.mat, esp:num(r.rig.esp)} : {mat:"Trovicel", esp:3}; }
 function svMatSel(st){ const m = st.rmat || {}; return svRigidos().find(i=>i.rig.mat === m.mat && num(i.rig.esp) === num(m.esp)) || null; }
 const svLamina = i => ({w: num(i.rig.w) || 122, h: num(i.rig.h) || 244});
+/* Blanco y barniz se cobran por su propia medida, base × altura, en las
+   unidades de la pieza (cm en rígidos, m en rollo). Vacía = toda la pieza.
+   «Pasadas» multiplica: blanco doble o relieve con varias capas de barniz.
+   Las cotizaciones de antes traían «% del diseño»; se respetan tal cual. */
+function svCapaMed(pr, c, w, h){
+  const f = pr && pr.medida === "cm" ? 100 : 1, cw0 = num(c && c.w), ch0 = num(c && c.h);
+  const leg = !(cw0 > 0) && !(ch0 > 0) && num(c && c.pct) > 0 && num(c.pct) < 100;
+  const cw = cw0 > 0 ? cw0/f : w, ch = ch0 > 0 ? ch0/f : h, A = w*h;
+  let a = leg ? A*num(c.pct)/100 : cw*ch;
+  const recorta = !leg && A > 0 && a > A + 1e-9; if(recorta) a = A;
+  return {w:cw, h:ch, a, n: Math.max(1, Math.round(num(c && c.n) || 1)), leg, recorta, toda: !leg && !(cw0 > 0) && !(ch0 > 0)};
+}
+function svCapaTxt(pr, c, k){
+  const f = pr && pr.medida === "cm" ? 100 : 1;
+  const t = k.leg ? "cubre " + svN0(num(c.pct)) + "% del diseño" : k.toda ? "toda la pieza" : svN0(k.w*f) + " × " + svN0(k.h*f) + " " + (pr.medida || "m");
+  return t + (k.n > 1 ? " · " + k.n + " pasadas" : "");
+}
 function svCalcRigido(pid, st, pr){
   const G = svGrupos(pr);
   const opt = g => (g.ops || []).find(o=>o.id === st.sel[g.id]) || (g.ops || [])[0] || null;
@@ -23440,9 +23489,10 @@ function svCalcRigido(pid, st, pr){
     ren.push({t: gImp.nom + " · " + svN2(A) + " m² c/u × " + mx(imp.p) + "/m²", m}); }
   G.filter(g=>g.tipo === "capa").forEach(g=>{
     const c = (st.capas || {})[g.id]; if(!c || !c.on) return;
-    const pct = Math.min(100, Math.max(1, num(c.pct) || 100)), ar = A*q*pct/100, m = num(g.p)*ar;
+    const k = svCapaMed(pr, c, w, h), ar = k.a*k.n*q, m = num(g.p)*ar;
     total += m; costo += num(g.c)*ar;
-    ren.push({t: g.nom + " · cubre " + svN0(pct) + "% · " + svN2(ar) + " m² × " + mx(g.p) + "/m²", m});
+    ren.push({t: g.nom + " · " + svCapaTxt(pr, c, k) + " · " + svN2(ar) + " m² × " + mx(g.p) + "/m²", m});
+    if(k.recorta) avisos.push(g.nom + ": la medida es más grande que la pieza; se cobra la pieza completa.");
   });
   const mat = svMatSel(st); let lamina = null;
   if(mat){
@@ -23507,13 +23557,17 @@ function svArmHTML(pr, st, cobro){
   return h + '</section>';
 }
 function svCapaHTML(pr, g, st){
-  const c = (st.capas || {})[g.id] || {on:false, pct:100};
-  let h = '<section class="svGrp" data-grp="'+g.id+'"><h3>'+esc(g.nom)+' <span class="gn">· otra capa, con su propia cobertura y precio por m²</span></h3>' +
+  const c = (st.capas || {})[g.id] || {on:false}, u = pr.medida || "m", paso = u === "cm" ? 1 : 0.01;
+  const val = v => (v == null || v === "") ? "" : esc(String(v));
+  let h = '<section class="svGrp" data-grp="'+g.id+'"><h3>'+esc(g.nom)+' <span class="gn">· otra capa: se cobra por su medida, base × altura, a su precio por m²</span></h3>' +
     '<div class="svNumFila"><div class="svChips">' +
       '<button type="button" class="svChip" data-svcapa="'+g.id+'" data-on="0" aria-pressed="'+!c.on+'"><span>No lleva</span><small>sin costo</small></button>' +
       '<button type="button" class="svChip" data-svcapa="'+g.id+'" data-on="1" aria-pressed="'+!!c.on+'"><span>Sí lleva</span><small data-svhn="'+g.id+'">+'+mx(g.p)+'/m²</small></button></div>' +
-      (c.on ? '<label class="svCapaPct">Cubre <input type="number" min="1" max="100" step="5" data-svcapapct="'+g.id+'" value="'+(num(c.pct) || 100)+'" aria-label="Porcentaje del diseño que cubre"> % del diseño</label>' +
-              '<span class="gn" id="svcapam_'+g.id+'"></span>' : '') +
+      (c.on ? '<div class="svCapaMed"><label>Medida <input type="number" min="0" step="'+paso+'" data-svcapaw="'+g.id+'" value="'+val(c.w)+'" placeholder="'+svN0(num(st.w))+'" aria-label="Base de la capa"> × ' +
+                '<input type="number" min="0" step="'+paso+'" data-svcapah="'+g.id+'" value="'+val(c.h)+'" placeholder="'+svN0(num(st.h))+'" aria-label="Altura de la capa"> <span class="u">'+esc(u)+'</span></label>' +
+                '<label>Pasadas <input type="number" min="1" max="10" step="1" data-svcapan="'+g.id+'" value="'+Math.max(1, Math.round(num(c.n) || 1))+'" aria-label="Pasadas de la capa"></label>' +
+                '<span class="gn" id="svcapam_'+g.id+'"></span></div>' +
+              '<p class="svCapaNota">Vacía = toda la pieza. Usa 2 o más pasadas para blanco doble o relieve.</p>' : '') +
     '</div>';
   if(svPrecios) h += svTablaPrecios(pr, g, "m2");
   return h + '</section>';
@@ -23594,8 +23648,12 @@ function svRefrescaArmado(pr, st, r){
   }
   document.querySelectorAll('[id^="svcapam_"]').forEach(el=>{
     const c = (st.capas || {})[el.id.slice(8)];
-    el.textContent = c && c.on && r.A > 0 && r.q > 0 ? svN2(r.A*r.q*(num(c.pct) || 100)/100) + " m² en total" : "";
+    if(!(c && c.on && r.A > 0 && r.q > 0)){ el.textContent = ""; return; }
+    const k = svCapaMed(pr, c, r.w, r.h);
+    el.textContent = svCapaTxt(pr, c, k) + " · " + svN2(k.a*k.n*r.q) + " m² en total";
   });
+  document.querySelectorAll('[data-svcapaw]').forEach(i=>{ i.placeholder = svN0(num(st.w)); });
+  document.querySelectorAll('[data-svcapah]').forEach(i=>{ i.placeholder = svN0(num(st.h)); });
 }
 document.addEventListener("click", e=>{
   if(!SVV || SVV.modo !== "svc" || !e.target.closest("#svVelo")) return;
@@ -23603,7 +23661,7 @@ document.addEventListener("click", e=>{
   if((b = en("[data-svarm]"))){ st.arm = st.arm || {w:5, h:5, n:20, cobra:"ocupa"}; st.arm.on = b.dataset.svarm === "1"; svPintaForm(); return; }
   if((b = en("[data-svcobra]"))){ st.arm.cobra = b.dataset.svcobra; svPintaForm(); return; }
   if((b = en("[data-svarmn]"))){ st.arm.n = Math.max(0, Math.round(num(st.arm.n) + num(b.dataset.svarmn))); const i = $("#svArmN"); if(i) i.value = st.arm.n; svRefresca(); return; }
-  if((b = en("[data-svcapa]"))){ st.capas = st.capas || {}; const c = st.capas[b.dataset.svcapa] || (st.capas[b.dataset.svcapa] = {pct:100}); c.on = b.dataset.on === "1"; svPintaForm(); return; }
+  if((b = en("[data-svcapa]"))){ st.capas = st.capas || {}; const c = st.capas[b.dataset.svcapa] || (st.capas[b.dataset.svcapa] = {w:"", h:"", n:1}); c.on = b.dataset.on === "1"; svPintaForm(); return; }
   if((b = en("[data-svmat]"))){ st.rmat = {mat:b.dataset.svmat, esp:(st.rmat || {}).esp || 3}; SVV.matEdita = false; SVV.matOtro = false; svPintaForm(); return; }
   if((b = en("[data-svesp]"))){ st.rmat = {mat:(st.rmat || {}).mat || "Trovicel", esp:num(b.dataset.svesp)}; SVV.matEdita = false; svPintaForm(); return; }
   if(en("[data-svmatotro]")){ SVV.matOtro = true; svPintaForm(); const i = $("#svMatOtroNom"); if(i) i.focus(); return; }
@@ -23622,7 +23680,11 @@ document.addEventListener("input", e=>{
   if(t.id === "svArmN"){ st.arm.n = t.value; svRefresca(); return; }
   if(t.id === "svArmMin"){ const bc = svBaseDe(pr, st); pr[bc.cobro === "ml" ? "armMin" : "armMinHoja"] = Math.max(0, num(t.value)); svGuardaPronto(); svRefresca(); return; }
   if(t.id === "svHojaW" || t.id === "svHojaH"){ pr.hojaCm = [Math.max(1, num($("#svHojaW").value)), Math.max(1, num($("#svHojaH").value))]; svGuardaPronto(); svRefresca(); return; }
-  if(t.dataset.svcapapct){ const c = (st.capas || {})[t.dataset.svcapapct]; if(c) c.pct = t.value; svRefresca(); return; }
+  if(t.dataset.svcapaw || t.dataset.svcapah || t.dataset.svcapan){
+    const c = (st.capas || {})[t.dataset.svcapaw || t.dataset.svcapah || t.dataset.svcapan];
+    if(c){ if(t.dataset.svcapaw) c.w = t.value; else if(t.dataset.svcapah) c.h = t.value; else c.n = t.value; delete c.pct; }
+    svRefresca(); return;
+  }
   if(t.id === "svMatCosto" || t.id === "svMatW" || t.id === "svMatH"){
     const w = num($("#svMatW").value), h = num($("#svMatH").value), c = num($("#svMatCosto").value), s = $("#svMatSug");
     if(s) s.textContent = c > 0 && w > 0 && h > 0 ? "Te sale en " + mx(c/(w*h/10000)) + " el m²." : "";
@@ -25784,10 +25846,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261112-1300";</script>
+<script>window.BUILD="20261114-1100";</script>
 <script>
 (function(){
-  var mio = "20261112-1300";
+  var mio = "20261114-1100";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
