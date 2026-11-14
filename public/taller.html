@@ -3257,6 +3257,30 @@ body.rol-produccion #btnPrint{display:none!important}
 .tpTipoSel select{max-width:280px}
 .moNota{font-size:12.5px;color:var(--ink-3);align-self:end;padding-bottom:10px}
 .svVelo.catModo #svVAgregar{display:none}
+.svTile.pausa{background:var(--surface-2);border-style:dashed}
+.svTile.pausa .svIco{filter:grayscale(.85);opacity:.55}
+.svTile.pausa b,.svTile.pausa small{opacity:.65}
+.svEstado{display:flex;flex-direction:column;gap:4px;margin:0 0 10px}
+.svEstado .k{padding:0 6px}
+.svEstado select{font-size:12.5px;padding:7px 10px}
+.svEstadoAviso{margin:-4px 6px 10px;font-size:11.5px;color:#B45309;font-weight:600}
+.svProdFila{position:relative;display:flex;flex-direction:column}
+.svProdFila .svProd{padding-right:34px}
+.svProdX{position:absolute;top:8px;right:6px;width:24px;height:24px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink-3);font-size:11px;cursor:pointer;line-height:1}
+.svProdX:hover{color:#B91C1C;border-color:#FCA5A5}
+.svProdMas{border:1.5px dashed var(--line)!important;color:var(--accent)}
+.svNomProd{display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:700;color:var(--ink-2);margin:0 0 14px}
+.svNomProd input{flex:1;max-width:420px;font-weight:600}
+.svGrpX{margin-left:8px;font:inherit;font-size:11px;font-weight:700;letter-spacing:0;text-transform:none;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:3px 10px;cursor:pointer;color:#B91C1C}
+.svGrupoMas{margin:0 0 16px}
+.svOpX{width:26px;height:26px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink-3);cursor:pointer}
+.svOpX:hover{color:#B91C1C;border-color:#FCA5A5}
+.svNuevoProd .svNpFila{display:flex;flex-wrap:wrap;gap:10px 14px;margin-bottom:10px}
+.svNuevoProd label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700;color:var(--ink-2)}
+.svNuevoProd label.largo{flex:1 1 240px}
+.svNuevoProd input[type=number]{width:110px}
+.svNpBtns{display:flex;gap:8px;margin-top:10px}
+@media (max-width:760px){ .svVProds .svEstado{flex:none;min-width:190px;margin:0} .svVProds .svEstadoAviso{display:none} .svProdFila{flex:none} }
 .svVelo.tecModo .svVTot{visibility:hidden}
 .svVelo.tecModo .svVPie::before{content:"Los cambios se guardan solos.";font-size:12.5px;color:var(--ink-3);align-self:center}
 @media (max-width:760px){ #svVForm .tecTop{flex-wrap:wrap} #svVForm .tecTop .tecNombre{flex:1 1 100%;width:100%} .svVelo.tecModo .svVPie{padding-top:10px;padding-bottom:max(10px,env(safe-area-inset-bottom,0px))} }
@@ -3423,6 +3447,21 @@ body.rol-produccion #btnPrint{display:none!important}
 .svPrecios td{padding:4px 6px;border-top:1px dashed var(--line-soft)}
 .svPrecios input{width:86px;padding:5px 8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px}
 .svPrecios .u{font-size:11px;color:var(--ink-3);margin-left:4px;white-space:nowrap}
+.svPrecios th:first-child{width:46%}
+.svPrecios .svOpNom{width:100%;min-width:130px;font-family:inherit;font-size:13px;font-weight:600}
+.svPrecios td:last-child{text-align:right}
+@media (max-width:760px){
+  .svPrecios,.svPrecios tbody{display:block;width:100%;min-width:0}
+  .svPrecios thead{display:none}
+  .svPrecios tr{display:grid;grid-template-columns:1fr 1fr auto;gap:6px 10px;padding:8px 0;border-top:1px dashed var(--line-soft)}
+  .svPrecios td{border-top:0;padding:0;display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px;min-width:0}
+  .svPrecios td:first-child{grid-column:1/-1}
+  .svPrecios td:nth-child(2)::before,.svPrecios td:nth-child(3)::before{flex-basis:100%;font-size:9.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+  .svPrecios td:nth-child(2)::before{content:"Precio"} .svPrecios td:nth-child(3)::before{content:"Costo"}
+  .svPrecios input{flex:1;min-width:0;width:auto}
+  .svPrecios td:last-child{align-self:end}
+  .svPrecios .svOpNom{min-width:0}
+}
 .svVForm.editando .svGrp{background:var(--surface-2);border:1px solid var(--line-soft);border-radius:14px;padding:12px}
 @media (max-width:760px){
   .svVelo{padding:0;align-items:stretch}
@@ -9560,6 +9599,8 @@ function tecTipo(t){
   const secs = svCat().secciones;
   if(t.tipo && (secs.some(s=>s.id === t.tipo) || TP_EXTRA[t.tipo] || t.tipo === "tec:" + t.id)) return t.tipo;
   const n = String(t.nombre || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  if(/cama plana/.test(n)) return /dtf/.test(n) ? "uvcama" : "camauv";
+  if(/hibrid/.test(n)) return "hibrido";
   if(/\buv\b/.test(n)) return "uv";
   if(/\bdtg\b|directo a (la )?prenda/.test(n)) return "dtg";
   if(/dtf/.test(n)) return "dtf";
@@ -9568,6 +9609,12 @@ function tecTipo(t){
   if(/vinil/.test(n)) return "vinil";
   if(/laser|grabado/.test(n)) return "laser";
   if(/bordad/.test(n) || t.modo === "puntadas") return "bordado";
+  if(/gran formato|\blona|banner/.test(n)) return "gran";
+  if(/impresion digital|\bdigital\b|copias/.test(n)) return "digital";
+  if(/rotul|vehicul/.test(n)) return "rotul";
+  if(/letras? ?3d|corporeo/.test(n)) return "letras";
+  if(/router|\bcnc\b/.test(n)) return "router";
+  if(/\bcaja|empaque/.test(n)) return "caja";
   return "tec:" + t.id;
 }
 const tpTecnicasDe = id => (cat.tecnicas || []).filter(t=> tecTipo(t) === id);
@@ -9609,7 +9656,7 @@ function tpLigaMateriales(){
     if(!o){
       o = g.ops.find(x=> (!x.cobro || x.cobro === "ml") && Math.abs(tpAnchoCm(x) - num(s.ancho)) <= 3);
       if(!o){
-        o = {id:"m" + s.id, nom: svN0(num(s.ancho)) + " cm", p: num(s.precio), c: num(s.costo)};
+        o = {id:"m" + s.id, nom: svN0(num(s.ancho)) + " cm", p: num(s.precio), c: num(s.costo), r: num(s.ancho)/100};
         if(ruta[0] === "subImp") o.cobro = "ml";
         g.ops.push(o); cambio = true;
       } else if(Math.abs(num(o.p) - num(s.precio)) > 0.004 || Math.abs(num(o.c) - num(s.costo)) > 0.004){
@@ -9651,7 +9698,9 @@ function renderTipos(){
   w.innerHTML = lista.map(x=>{
     const rev = conf.filter(c=>tecTipo(c.t) === x.id).length;
     const sub = [x.prods ? x.prods + (x.prods === 1 ? " producto" : " productos") : "", x.tecs.length ? "en artículos" : ""].filter(Boolean).join(" · ") || x.sub;
-    return '<button type="button" class="svTile" data-tipocat="'+esc(x.id)+'">' +
+    const pz = tpPausa(x.id);
+    return '<button type="button" class="svTile'+(pz ? ' pausa' : '')+'" data-tipocat="'+esc(x.id)+'">' +
+      (pz ? '<span class="svCandado">'+esc(TP_MOTIVO[pz.motivo] || "Suspendido")+'</span>' : '') +
       (rev ? '<span class="tpRevisa">' + rev + (rev === 1 ? ' precio por revisar' : ' precios por revisar') + '</span>' : '') +
       svIco(x.ico) + '<b>'+esc(x.nom)+'</b><small>'+esc(sub)+'</small></button>';
   }).join("") || '<div class="empty">Sin tipos de impresión.</div>';
@@ -9754,6 +9803,167 @@ document.addEventListener("click", e=>{
   const b = e.target.closest("[data-tipocat]"); if(!b) return;
   if(typeof puedeVer === "function" && !puedeVer("cat")) return;
   tpAbre(b.dataset.tipocat);
+});
+
+/* ============ TIPOS DE IMPRESIÓN A LA MEDIDA DEL TALLER (nov 2026) ============
+   · Cada tarjeta se puede suspender (sin equipo o en mantenimiento): sigue en
+     Catálogo para reactivarla, pero no se puede usar para cotizar.
+   · Con los precios abiertos se agregan y se quitan productos, grupos de
+     opciones y opciones, y se les cambia el nombre.
+   ======================================================================== */
+const TP_MOTIVO = {equipo:"Sin equipo", mant:"En mantenimiento"};
+const tpPausa = id => { try{ return ((svCat().pausas || {})[id]) || null; }catch(_){ return null; } };
+function tpPausar(id, motivo){
+  const c = svCat(); c.pausas = c.pausas || {};
+  if(motivo) c.pausas[id] = {motivo, desde: hoyISO()}; else delete c.pausas[id];
+  persist();
+}
+function svEstadoHTML(id){
+  const pz = tpPausa(id);
+  return '<label class="svEstado"><span class="k">Estado</span><select data-tppausa="'+esc(id)+'" aria-label="Estado de este tipo de impresión">' +
+    '<option value="">Disponible para cotizar</option>' +
+    '<option value="equipo"'+(pz && pz.motivo === "equipo" ? ' selected' : '')+'>Suspendido · sin equipo</option>' +
+    '<option value="mant"'+(pz && pz.motivo === "mant" ? ' selected' : '')+'>Suspendido · en mantenimiento</option></select></label>' +
+    (pz ? '<p class="svEstadoAviso">No se puede cotizar mientras esté suspendido.</p>' : '');
+}
+/* Las técnicas de artículos caen en la tarjeta de su tipo: si el tipo está
+   suspendido, esa técnica no se puede escoger ni guardar. */
+const tpTecPausada = tid => { const t = (cat.tecnicas || []).find(x=>x.id === tid); return t && typeof tecTipo === "function" ? tpPausa(tecTipo(t)) : null; };
+const tpTecLibre = () => (((cat.tecnicas || []).find(t=>!tpTecPausada(t.id))) || (cat.tecnicas || [])[0] || {}).id || "";
+const tpAvisoPausa = (nom, pz) => nom + " está suspendido (" + (TP_MOTIVO[pz.motivo] || "suspendido").toLowerCase() + "). Para cotizarlo, actívalo en Catálogo › Tipos de impresión.";
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-catecnica],[data-aztec]"); if(!b) return;
+  const tid = b.dataset.catecnica || (b.dataset.aztec || "").split("|")[1], pz = tpTecPausada(tid); if(!pz) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  const t = (cat.tecnicas || []).find(x=>x.id === tid);
+  toast(tpAvisoPausa(t ? t.nombre : "Este tipo de impresión", pz));
+}, true);
+const svTramoDe = id => SV_TRAMO[id] || ((svProd(id) || {}).tramo) || "";
+const svSecActual = () => svCat().secciones.find(x=>x.id === SVV.sec) || null;
+function svGrupoBorrable(g){
+  return g.id !== "arch" && g.modo !== "base" && g.modo !== "rollo" && g.tipo !== "material" && g.tipo !== "capa" && !(g.tipo === "num" && g.por === "base");
+}
+function svProdFila(id, sub, btnExtra, puedeQuitar){
+  const pr = svProd(id); if(!pr) return "";
+  const btn = '<button type="button" class="svProd" data-svprod="'+esc(id)+'"'+(id === SVV.pid && !SVV.tec && !SVV.nuevoProd ? ' aria-current="true"' : '') +
+    (btnExtra || '') + '><b>'+esc(pr.tab || pr.nom)+'</b><small>'+sub+'</small></button>';
+  return '<div class="svProdFila">' + btn + (puedeQuitar ? '<button type="button" class="svProdX" data-svprodx="'+esc(id)+'" aria-label="Quitar '+esc(pr.tab || pr.nom)+'" title="Quitar producto">✕</button>' : '') + '</div>';
+}
+const svProdMasHTML = () => '<button type="button" class="svProd svProdMas" data-svprodnuevo="1"'+(SVV.nuevoProd ? ' aria-current="true"' : '')+'><b>+ Producto</b><small>agrega uno nuevo</small></button>';
+/* ---------- producto nuevo ---------- */
+function svPintaNuevoProd(){
+  const s = svSecActual(), f = $("#svVForm");
+  $("#svVelo").classList.add("tecModo");
+  const hib = s && (s.prods || []).some(id=>svTramoDe(id));
+  f.innerHTML = '<section class="svGrp svNuevoProd"><h3>Producto nuevo en '+esc(s ? s.nom : "este tipo")+'</h3>' +
+    '<div class="svNpFila"><label class="largo">Nombre <input id="svNpNom" placeholder="Ej. Lona blackout, Etiqueta redonda…"></label>' +
+    '<label>Cómo se cobra <select id="svNpCobro"><option value="m2m">Por m² (medidas en metros)</option><option value="m2cm">Por m² (medidas en cm)</option>' +
+      '<option value="pieza">Por pieza</option><option value="hoja">Por hoja</option><option value="ml">Por metro lineal</option></select></label>' +
+    (hib ? '<label>Va en <select id="svNpTramo"><option>Rollo a rollo</option><option>Rígidos</option></select></label>' : '') + '</div>' +
+    '<div class="svNpFila"><label class="largo">Primera opción <input id="svNpOp" placeholder="Estándar"></label>' +
+    '<label>Precio <input id="svNpP" type="number" min="0" step="0.01" placeholder="$"></label>' +
+    '<label>Costo <input id="svNpC" type="number" min="0" step="0.01" placeholder="$"></label></div>' +
+    '<p class="svCapaNota">Después le agregas más opciones con «+ Agregar» y más grupos con «+ Grupo de opciones».</p>' +
+    '<div class="svNpBtns"><button type="button" class="btn primary sm" data-svnpok="1">Agregar producto</button>' +
+    '<button type="button" class="btn sm" data-svnpcancela="1">Cancelar</button></div></section>';
+  $("#svVAgregar").disabled = true;
+  const i = $("#svNpNom"); if(i) i.focus();
+}
+function svNuevoProdGuarda(){
+  const s = svSecActual(); if(!s) return;
+  const nom = (($("#svNpNom") || {}).value || "").trim(); if(!nom){ toast("Escribe el nombre del producto."); return; }
+  const tipo = ($("#svNpCobro") || {}).value || "pieza", op = (($("#svNpOp") || {}).value || "").trim() || "Estándar";
+  const p = Math.max(0, num(($("#svNpP") || {}).value)), c = Math.max(0, num(($("#svNpC") || {}).value));
+  const cobro = tipo.indexOf("m2") === 0 ? "m2" : tipo, id = "p" + Date.now().toString(36);
+  const pr = {nom, cobro, propio:true, sat:"82121500", grupos:[{id:"tipo", nom:"Tipo", modo:"base", ops:[{id:"o1", nom:op, p, c}]}]};
+  if(cobro === "m2"){ pr.medida = tipo === "m2cm" ? "cm" : "m"; pr.minPieza = 0; pr.def = pr.medida === "cm" ? {w:50, h:30, q:1} : {w:1, h:1, q:1}; }
+  else pr.def = {q: cobro === "hoja" ? 10 : 1};
+  const tr = $("#svNpTramo"); if(tr){ pr.tramo = tr.value; pr.tab = nom; }
+  svCat().productos[id] = pr; s.prods = (s.prods || []).concat(id);
+  persist();
+  SVV.nuevoProd = false; SVV.tec = null; SVV.pid = id; SVV.st = svStDefault(id); SVV.rolloManual = false;
+  svPintaProds(); svPintaForm(); tpRefrescaCat();
+  toast(nom + " quedó en " + s.nom.toLowerCase() + ". Agrégale sus opciones.");
+}
+function svQuitaProd(id){
+  const s = svSecActual(), pr = svProd(id); if(!s || !pr) return;
+  const mismos = (s.prods || []).filter(x=> svTramoDe(x) === svTramoDe(id));
+  if(mismos.length <= 1){ toast("Debe quedar al menos un producto. Si no lo usas, suspende este tipo de impresión."); return; }
+  if(!confirm("¿Quitar «" + (pr.tab || pr.nom) + "» de " + s.nom + "? Ya no saldrá para cotizar. Las cotizaciones que ya lo tienen no cambian.")) return;
+  s.prods = s.prods.filter(x=>x !== id);
+  if(pr.propio) delete svCat().productos[id];
+  persist();
+  if(SVV.pid === id){ const sig = s.prods.find(x=> svTramoDe(x) === svTramoDe(id)) || s.prods[0]; SVV.pid = sig; SVV.st = svStDefault(sig); SVV.tec = null; }
+  svPintaProds(); svPintaForm(); tpRefrescaCat();
+  toast("Quitaste " + (pr.tab || pr.nom) + ".");
+}
+/* ---------- grupo de opciones nuevo ---------- */
+function svNuevoGrupoHTML(pr){
+  if(!SVV.nuevoGrupo) return '<button type="button" class="btn sm svGrupoMas" data-svgruponuevo="1">+ Grupo de opciones</button>';
+  const m2 = pr.cobro === "m2";
+  return '<section class="svGrp svNuevoProd"><h3>Grupo de opciones nuevo</h3><div class="svNpFila">' +
+    '<label class="largo">Nombre <input id="svNgNom" placeholder="Ej. Acabado, Entrega, Tamaño…"></label>' +
+    '<label>Cómo cambia el precio <select id="svNgModo"><option value="porUnidad">Se suma por pieza</option>' +
+    (m2 ? '<option value="porM2">Se suma por m²</option>' : '') +
+    '<option value="pedido">Se suma una vez por pedido</option><option value="x">Multiplica el precio</option></select></label></div>' +
+    '<div class="svNpBtns"><button type="button" class="btn primary sm" data-svngok="1">Agregar grupo</button>' +
+    '<button type="button" class="btn sm" data-svngcancela="1">Cancelar</button></div></section>';
+}
+function svNuevoGrupoGuarda(){
+  const pr = svProd(SVV.pid); if(!pr) return;
+  const nom = (($("#svNgNom") || {}).value || "").trim(); if(!nom){ toast("Escribe el nombre del grupo."); return; }
+  const modo = ($("#svNgModo") || {}).value || "porUnidad", id = "g" + Date.now().toString(36);
+  const g = {id, nom, modo, ops: modo === "x" ? [{id:"n", nom:"Normal", p:1}] : [{id:"no", nom:"No lleva", p:0, c:0}]};
+  pr.grupos = (pr.grupos || []).concat(g);
+  SVV.st.sel[id] = g.ops[0].id; SVV.nuevoGrupo = false;
+  persist(); svPintaForm();
+  toast("Listo. Agrégale sus opciones con «+ Agregar».");
+}
+document.addEventListener("click", e=>{
+  if(!SVV || !e.target.closest("#svVelo")) return;
+  let b;
+  if((b = e.target.closest("[data-svprodx]"))){ svQuitaProd(b.dataset.svprodx); return; }
+  if(e.target.closest("[data-svprodnuevo]")){ SVV.nuevoProd = true; SVV.tec = null; svPintaProds(); svPintaForm(); return; }
+  if(e.target.closest("[data-svnpok]")){ svNuevoProdGuarda(); return; }
+  if(e.target.closest("[data-svnpcancela]")){ SVV.nuevoProd = false; svPintaProds(); svPintaForm(); return; }
+  if(e.target.closest("[data-svgruponuevo]")){ SVV.nuevoGrupo = true; svPintaForm(); const i = $("#svNgNom"); if(i) i.focus(); return; }
+  if(e.target.closest("[data-svngok]")){ svNuevoGrupoGuarda(); return; }
+  if(e.target.closest("[data-svngcancela]")){ SVV.nuevoGrupo = false; svPintaForm(); return; }
+  if((b = e.target.closest("[data-svgrpx]"))){
+    const pr = svProd(SVV.pid), g = pr && (pr.grupos || []).find(x=>x.id === b.dataset.svgrpx); if(!g) return;
+    if(!confirm("¿Quitar el grupo «" + g.nom + "» de " + (pr.tab || pr.nom) + "?")) return;
+    pr.grupos = pr.grupos.filter(x=>x.id !== g.id); delete SVV.st.sel[g.id]; if(SVV.st.num) delete SVV.st.num[g.id];
+    persist(); svPintaForm(); return;
+  }
+  if((b = e.target.closest("[data-sveox]"))){
+    const [gid, oid] = b.dataset.sveox.split(":"), pr = svProd(SVV.pid), g = pr && svGrupos(pr).find(x=>x.id === gid);
+    if(!g || (g.ops || []).length <= 1) return;
+    g.ops = g.ops.filter(o=>o.id !== oid);
+    if(SVV.st.sel[gid] === oid) SVV.st.sel[gid] = g.ops[0].id;
+    persist(); svPintaForm(); return;
+  }
+});
+document.addEventListener("input", e=>{
+  if(!SVV || !e.target.closest("#svVForm")) return;
+  const t = e.target, pr = SVV.pid ? svProd(SVV.pid) : null; if(!pr) return;
+  if(t.hasAttribute("data-svprodnom")){
+    pr.nom = t.value; if(pr.tab != null) pr.tab = t.value;
+    const b = document.querySelector('[data-svprod="'+SVV.pid+'"] b'); if(b) b.textContent = t.value;
+    svGuardaPronto(); return;
+  }
+  if(t.dataset.sveon){
+    const [gid, oid] = t.dataset.sveon.split(":"), g = svGrupos(pr).find(x=>x.id === gid), o = g && (g.ops || []).find(x=>x.id === oid); if(!o) return;
+    o.nom = t.value;
+    const ch = document.querySelector('.svChip[data-svg="'+gid+'"][data-svo="'+oid+'"] span'); if(ch) ch.textContent = t.value;
+    svGuardaPronto(); return;
+  }
+});
+document.addEventListener("change", e=>{
+  const s = e.target.closest("[data-tppausa]"); if(!s || !SVV) return;
+  const id = s.dataset.tppausa, nom = (tpLista().find(x=>x.id === id) || {}).nom || "Este tipo";
+  tpPausar(id, s.value);
+  svPintaProds(); tpRefrescaCat(); try{ if(typeof svPintaCard === "function") svPintaCard(); }catch(_){}
+  toast(s.value ? nom + " quedó suspendido: " + TP_MOTIVO[s.value].toLowerCase() + ". No se puede cotizar hasta que lo reactives." : nom + " ya se puede cotizar otra vez.");
 });
 
 /* ============ LANZADOR DE SECCIONES ============ */
@@ -11353,8 +11563,8 @@ function caAbre(key, origen){
   const sel = g.modelos.find(a=>a.id === cot.articuloId) || g.modelos.find(a=>caClave(a.nombre).includes(caClave(AZ.artBusca))) || g.modelos[0];
   const t = cat.tecnicas||[], anterior = (cot.apps||[])[0];
   const s = cv2TamPorUbi("Frente") || {ancho:20,alto:20,id:""};
-  const app = anterior ? JSON.parse(JSON.stringify(anterior)) : {id:uid(),ubic:"Frente",tecnicaId:(t[0]||{}).id||"",tamanoId:s.id||"",ancho:num(s.ancho),alto:num(s.alto),tintas:1,puntadas:8000,art:null};
-  if(!t.some(x=>x.id === app.tecnicaId)) app.tecnicaId = (t[0]||{}).id||"";
+  const app = anterior ? JSON.parse(JSON.stringify(anterior)) : {id:uid(),ubic:"Frente",tecnicaId:tpTecLibre(),tamanoId:s.id||"",ancho:num(s.ancho),alto:num(s.alto),tintas:1,puntadas:8000,art:null};
+  if(!t.some(x=>x.id === app.tecnicaId) || tpTecPausada(app.tecnicaId)) app.tecnicaId = tpTecLibre();
   svOrigen = origen || null;
   SVV = {modo:"app",app,nuevo:!anterior,artSelector:{key,id:sel.id,cuenta:ceCuenta(),folio:cot.folio}};
   caConCopia(()=>{ if(!anterior){ app.ubic = cv2Ubicaciones()[0]; const tam=cv2TamPorUbi(app.ubic); if(tam){app.tamanoId=tam.id;app.ancho=num(tam.ancho);app.alto=num(tam.alto);} } });
@@ -11370,7 +11580,7 @@ function caPintaModelos(){
   $("#svVProds").innerHTML = '<span class="k">Modelos</span>'+(g?g.modelos:[]).map(a=>'<button type="button" class="svProd caModelo" data-camodelo="'+esc(a.id)+'" aria-current="'+(a.id === SVV.artSelector.id)+'">'+miniArt(a)+'<span><b>'+esc(a.nombre)+'</b>'+(svVer()?'<small>'+mx(num(a.costo))+' costo</small>':'')+'</span></button>').join("");
 }
 function caTecnicasHTML(){
-  return '<section class="svGrp"><h3>¿Qué tipo de impresión llevará?</h3><div class="caTecnicas">'+(cat.tecnicas||[]).map(t=>'<button type="button" class="svChip" data-catecnica="'+esc(t.id)+'" aria-pressed="'+(SVV.app.tecnicaId===t.id)+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+azDibujoTec(t)+'</svg><span>'+esc(t.nombre)+'</span></button>').join("")+'</div></section>';
+  return '<section class="svGrp"><h3>¿Qué tipo de impresión llevará?</h3><div class="caTecnicas">'+(cat.tecnicas||[]).map(t=>'<button type="button" class="svChip" data-catecnica="'+esc(t.id)+'" aria-pressed="'+(SVV.app.tecnicaId===t.id)+'"'+(tpTecPausada(t.id) && SVV.app.tecnicaId!==t.id ? ' disabled title="Suspendido"' : '')+'><svg viewBox="0 0 24 24" aria-hidden="true">'+azDibujoTec(t)+'</svg><span>'+esc(t.nombre)+'</span></button>').join("")+'</div></section>';
 }
 function caSinTecnicas(){
   $("#svVForm").innerHTML = nvVarCotHTML()+'<p class="svAviso">Todavía no tienes técnicas de impresión en tu catálogo. Puedes elegir el artículo y agregar la impresión después.</p>';
@@ -11891,7 +12101,7 @@ $("#addApp").addEventListener("click", e=>{
   if(typeof cv2AbreApp === "function"){ cv2AbreApp(null, e.currentTarget); return; }
   const s = cat.tamanos[2] || {ancho:20,alto:20,id:""};
   if(!(cat.tecnicas||[]).length){ toast("Primero da de alta una técnica en Catálogo"); return; }
-  cot.apps.push({id:uid(),ubic:cot.apps.length?"Espalda":"Frente",tecnicaId:cat.tecnicas[0].id,tamanoId:s.id,ancho:s.ancho,alto:s.alto,tintas:1,puntadas:8000});
+  cot.apps.push({id:uid(),ubic:cot.apps.length?"Espalda":"Frente",tecnicaId:tpTecLibre(),tamanoId:s.id,ancho:s.ancho,alto:s.alto,tintas:1,puntadas:8000});
   renderApps(); renderResumen();
 });
 $("#addExtra").addEventListener("click", ()=>{
@@ -22809,12 +23019,8 @@ const SV_ICONOS = (function(){
       '<rect x="23" y="5" width="18" height="13" rx="3.5" fill="url(#svgGrisO)"/><rect x="25" y="7" width="14" height="3" rx="1.5" fill="url(#svgBrillo)"/>' +
       '<path d="M28 18h8l-2 4h-4z" fill="#3F4756"/><path d="M32 22v19" stroke="#EF4444" stroke-width="2.4" stroke-linecap="round"/>' +
       '<circle cx="32" cy="42" r="3.6" fill="#FF6B6B" opacity=".45"/><circle cx="32" cy="42" r="1.4" fill="#FFF1F1"/>',
-    rotul: PISO(32,27) +
-      '<path d="M5 42V25a7 7 0 0 1 7-7h28l11 10h5a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" fill="url(#svgBlanco)" stroke="#C5CEDA"/>' +
-      '<path d="M41 21l8 8h-9z" fill="url(#svgAzul)"/><rect x="10" y="21" width="12" height="7" rx="2" fill="url(#svgAzul)" opacity=".85"/>' +
-      '<rect x="6" y="31" width="53" height="4" fill="url(#svgCMY)"/>' +
-      '<circle cx="17" cy="45" r="5.5" fill="#1F2937"/><circle cx="17" cy="45" r="2.2" fill="#9CA3AF"/>' +
-      '<circle cx="48" cy="45" r="5.5" fill="#1F2937"/><circle cx="48" cy="45" r="2.2" fill="#9CA3AF"/>',
+    rotul: PISO(32,28) +
+      '<g transform="translate(0 4)"><path d="M3.4 42.2C3.2 40.6 4.2 39.6 6 39.2L22 35.4C26 32.6 30 30.6 35.5 30.2C41 29.8 47 31 52 33.2L58.5 35C60.4 35.6 61.2 36.6 61.2 38.2L61 43.4C61 44.9 59.9 46 58.4 46H6C4.6 46 3.6 45 3.4 43.6Z" fill="url(#svgRojo)"/><path d="M54 33.6L60.8 34.3L61.1 35.7L54.6 35.1Z" fill="#991B1B"/><path d="M24.5 35.2C28 32.8 31.5 31.4 35.6 31.1C39.6 30.8 43.6 31.4 46.6 32.6L44 35.6Z" fill="#1F2937"/><path d="M27.6 34.3C30.2 32.8 32.8 32 35.4 31.8L34.4 34.6Z" fill="#fff" opacity=".22"/><path d="M38.4 31.1L37.6 35.5" stroke="#B91C1C" stroke-width="1.3"/><path d="M48.5 33.8L50.5 34.4M50.8 34.4L52.8 35M53.1 35.1L55 35.6" stroke="#7F1D1D" stroke-width=".9" stroke-linecap="round"/><path d="M38.6 37.4L50.2 36.4C51 38.2 50.5 40.2 49.2 41.6L41.4 42Z" fill="#111827"/><path d="M40 38.4L49.4 37.6" stroke="#374151" stroke-width=".8"/><path d="M5.6 39.9L14.8 37.7L14.2 38.9L6.4 40.9Z" fill="#FEF3C7"/><path d="M14 38.6C26 36.6 42 35.8 58.6 36.6" stroke="#fff" stroke-opacity=".32" stroke-width="1.1" fill="none" stroke-linecap="round"/><path d="M4.6 45.9H20M24 45.7H41" stroke="#111827" stroke-width="1.6" stroke-linecap="round"/><path d="M58.6 38.6h2.4" stroke="#FCA5A5" stroke-width="1.6" stroke-linecap="round"/><path d="M7.6 45.6a7.9 7.9 0 0 1 15.8 0z" fill="#1F2937"/><circle cx="15.5" cy="45.6" r="6.6" fill="#111827"/><circle cx="15.5" cy="45.6" r="4.3" fill="#4B5563"/><path d="M15.5 45.6L15.5 41.7" stroke="#9CA3AF" stroke-width=".9"/><path d="M15.5 45.6L19.21 44.4" stroke="#9CA3AF" stroke-width=".9"/><path d="M15.5 45.6L17.79 48.76" stroke="#9CA3AF" stroke-width=".9"/><path d="M15.5 45.6L13.21 48.75" stroke="#9CA3AF" stroke-width=".9"/><path d="M15.5 45.6L11.79 44.39" stroke="#9CA3AF" stroke-width=".9"/><path d="M12.2 44a4 4 0 0 1 3.6-2.2" stroke="#EF4444" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="15.5" cy="45.6" r="1.1" fill="#D1D5DB"/><path d="M41.6 45.6a7.9 7.9 0 0 1 15.8 0z" fill="#1F2937"/><circle cx="49.5" cy="45.6" r="6.6" fill="#111827"/><circle cx="49.5" cy="45.6" r="4.3" fill="#4B5563"/><path d="M49.5 45.6L49.5 41.7" stroke="#9CA3AF" stroke-width=".9"/><path d="M49.5 45.6L53.21 44.4" stroke="#9CA3AF" stroke-width=".9"/><path d="M49.5 45.6L51.79 48.76" stroke="#9CA3AF" stroke-width=".9"/><path d="M49.5 45.6L47.21 48.75" stroke="#9CA3AF" stroke-width=".9"/><path d="M49.5 45.6L45.79 44.39" stroke="#9CA3AF" stroke-width=".9"/><path d="M46.2 44a4 4 0 0 1 3.6-2.2" stroke="#EF4444" stroke-width="1.7" fill="none" stroke-linecap="round"/><circle cx="49.5" cy="45.6" r="1.1" fill="#D1D5DB"/></g>',
     letras: PISO(32,22) +
       '<path d="M17 54 30 12h9l13 42H42l-2.6-9H29.6L27 54zM31.8 37h7.4L35.5 23z" fill="#1E3A8A" fill-rule="evenodd"/>' +
       '<path d="M14 52 27 10h9l13 42H39l-2.6-9H26.6L24 52zM28.8 35h7.4L32.5 21z" fill="url(#svgAzul)" fill-rule="evenodd"/>' +
@@ -22847,7 +23053,7 @@ function svDefs(){
     '<svg id="svgDefs" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>' +
     d("svgAzul","#7CC0FF","#2563EB") + d("svgAzulO","#3B82F6","#1E3A8A") + d("svgGris","#F8FAFC","#C5CEDA") + d("svgGrisO","#A3AEBD","#566072") +
     dd("svgMorado","#C9A3FF","#7C3AED") + dd("svgVerde","#7EE8A8","#16A34A") + dd("svgNaranja","#FDC28A","#EA6A1E") + dd("svgCaja","#E9B57A","#B9773A") +
-    dd("svgRosa","#FBB6DA","#DB2777") + dd("svgMadera","#EBC9A0","#B98249") + d("svgBlanco","#FFFFFF","#DCE3EC") +
+    dd("svgRosa","#FBB6DA","#DB2777") + dd("svgRojo","#FF7B6B","#C81E1E") + dd("svgMadera","#EBC9A0","#B98249") + d("svgBlanco","#FFFFFF","#DCE3EC") +
     '<linearGradient id="svgCMY" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22D3EE"/><stop offset=".5" stop-color="#E879F9"/><stop offset="1" stop-color="#FDE047"/></linearGradient>' +
     '<linearGradient id="svgBrillo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".75"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>' +
     '<symbol id="cv2IcoArt" viewBox="0 0 64 64">' + SV_ICONOS.playera + '</symbol>' +
@@ -22867,7 +23073,7 @@ function svDefs(){
 const SV_LAM_CARAS = {id:"lamCaras", nom:"Laminado por", modo:"nada", res:"a {v}", si:{g:"lam", no:"sin"}, ops:[
   {id:"una", nom:"Una cara", n:1}, {id:"dos", nom:"Las dos caras", n:2}]};
 const SV_DEF = {
-  version: 4,
+  version: 5,
   archivo: {id:"arch", nom:"Archivo", modo:"pedido", res:"{v}", ops:[
     {id:"listo", nom:"Lo trae listo", p:0, c:0}, {id:"ajuste", nom:"Ajustar su archivo", p:80, c:25}, {id:"diseno", nom:"Diseño desde cero", p:250, c:80}]},
   secciones: [
@@ -22882,10 +23088,10 @@ const SV_DEF = {
     {id:"hibrido", nom:"Plotter híbrido",        sub:"Rígidos y rollo a rollo",      det:"Directo en rígidos, o rollo a rollo con las opciones de gran formato", prods:["hibRigido","hibLona","hibVinil","hibRollup"]},
     {id:"vinil",   nom:"Corte de vinil",         sub:"Textil y adhesivo",           det:"Plóter de corte · se cobra por m²", prods:["vinCorte"]},
     {id:"laser",   nom:"Grabado láser",          sub:"Madera, acrílico, metal",     det:"Por minuto de máquina", prods:["laserPieza"]},
-    {id:"rotul",   nom:"Rotulación vehicular",   sub:"Cobertura y materiales", bloq:true},
-    {id:"letras",  nom:"Letras 3D",              sub:"Volumen y anuncios",     bloq:true},
-    {id:"router",  nom:"Corte y router",         sub:"Acrílico, MDF, PVC",     bloq:true},
-    {id:"caja",    nom:"Caja y empaque",         sub:"Troquel y armado",       bloq:true}
+    {id:"rotul",   nom:"Rotulación vehicular",   sub:"Vinil, wraps e instalación", det:"Por m² de vinil o por vehículo completo", prods:["rotVinil","rotWrap"]},
+    {id:"letras",  nom:"Letras 3D",              sub:"Volumen y anuncios",     det:"Por letra, según su altura y material", prods:["let3d"]},
+    {id:"router",  nom:"Corte y router",         sub:"Acrílico, MDF, PVC",     det:"Por minuto de máquina o por metro de corte", prods:["routerMin","routerMetro"]},
+    {id:"caja",    nom:"Caja y empaque",         sub:"Troquel y armado",       det:"Cajas impresas por pieza, con suaje y armado", prods:["cajaImp"]}
   ],
   productos: {
     lona:{nom:"Lona", cobro:"m2", medida:"m", rollos:[1.0,1.5,2.2,3.2], orilla:0.025, sep:0.02, minPieza:1, sat:"82121505",
@@ -23090,6 +23296,51 @@ function svHibAdapta(p){
   }
 }
 svHibAdapta(SV_DEF.productos.hibLona); svHibAdapta(SV_DEF.productos.hibVinil);
+/* Los que decían «Próximamente», ya con productos y precios de ejemplo. */
+Object.assign(SV_DEF.productos, {
+  rotVinil:{nom:"Rotulado con vinil impreso", cobro:"m2", medida:"m", minPieza:0.25, sat:"82121505", def:{w:1.2, h:0.6, q:2},
+    grupos:[
+      {id:"vin", nom:"Vinil", modo:"base", ops:[{id:"cal", nom:"Calandrado (1 a 3 años)", p:260, c:110}, {id:"cast", nom:"Cast (5 a 7 años)", p:420, c:190}, {id:"micro", nom:"Microperforado para vidrio", p:300, c:130}]},
+      {id:"lam", nom:"Laminado", modo:"porM2", ops:[{id:"sin", nom:"Sin laminado", p:0, c:0}, {id:"bri", nom:"Brillante", p:90, c:35}, {id:"mate", nom:"Mate", p:90, c:35}]},
+      {id:"inst", nom:"Instalación", modo:"porM2", ops:[{id:"no", nom:"Sin instalación", p:0, c:0}, {id:"plana", nom:"Superficie plana", p:120, c:45}, {id:"curvas", nom:"Con curvas o remaches", p:220, c:90}]},
+      {id:"retiro", nom:"Retiro de rotulado anterior", modo:"porM2", ops:[{id:"no", nom:"No hace falta", p:0, c:0}, {id:"si", nom:"Retirar y limpiar", p:80, c:30}]}
+    ]},
+  rotWrap:{nom:"Cobertura completa (wrap)", cobro:"pieza", sat:"82121505", def:{q:1},
+    grupos:[
+      {id:"veh", nom:"Vehículo", modo:"base", ops:[{id:"comp", nom:"Auto compacto", p:14500, c:6800}, {id:"sedan", nom:"Sedán", p:17500, c:8200}, {id:"suv", nom:"SUV o pick-up", p:22000, c:10500}, {id:"van", nom:"Van", p:26000, c:12500}]},
+      {id:"mat", nom:"Material", modo:"x", ops:[{id:"imp", nom:"Vinil impreso", p:1}, {id:"color", nom:"Cambio de color", p:1.15}, {id:"prem", nom:"Cast premium", p:1.35}]},
+      {id:"cob", nom:"Cobertura", modo:"x", ops:[{id:"total", nom:"Completa", p:1}, {id:"media", nom:"Media cobertura", p:0.6}, {id:"cofre", nom:"Sólo cofre y techo", p:0.35}]},
+      {id:"dis", nom:"Diseño", modo:"pedido", ops:[{id:"trae", nom:"Lo trae listo", p:0, c:0}, {id:"adap", nom:"Adaptar al vehículo", p:1200, c:400}, {id:"cero", nom:"Diseño desde cero", p:3500, c:1200}]}
+    ]},
+  let3d:{nom:"Letras 3D", cobro:"pieza", rapidos:[5,8,12,20], sat:"82121500", def:{q:8, num:{alto:30}},
+    grupos:[
+      {id:"mat", nom:"Material", modo:"base", ops:[{id:"pvc", nom:"PVC espumado 10 mm", p:9, c:3.5, uni:"cm"}, {id:"acr", nom:"Acrílico 6 mm", p:14, c:5.5, uni:"cm"}, {id:"alu", nom:"Aluminio", p:38, c:16, uni:"cm"}, {id:"inox", nom:"Acero inoxidable", p:45, c:20, uni:"cm"}]},
+      {id:"alto", nom:"Altura de la letra", tipo:"num", por:"base", uni:"cm", paso:1, def:30},
+      {id:"luz", nom:"Iluminación", modo:"porUnidad", ops:[{id:"no", nom:"Sin luz", p:0, c:0}, {id:"front", nom:"LED frontal", p:180, c:70}, {id:"halo", nom:"Retroiluminada (halo)", p:240, c:95}]},
+      {id:"acab", nom:"Acabado", modo:"porUnidad", ops:[{id:"nat", nom:"Natural", p:0, c:0}, {id:"pint", nom:"Pintura automotriz", p:60, c:22}]},
+      {id:"inst", nom:"Instalación", modo:"pedido", ops:[{id:"no", nom:"Sin instalación", p:0, c:0}, {id:"muro", nom:"En muro", p:600, c:200}, {id:"fach", nom:"En fachada con andamio", p:1800, c:700}]}
+    ]},
+  routerMin:{nom:"Corte CNC por tiempo", cobro:"pieza", rapidos:[5,10,25,50], sat:"82121500", def:{q:10},
+    grupos:[
+      {id:"maq", nom:"Máquina", modo:"base", ops:[{id:"router", nom:"Router CNC", p:6, c:1.8, uni:"min"}]},
+      {id:"min", nom:"Minutos por pieza", tipo:"num", por:"base", uni:"min", paso:0.5, def:4},
+      {id:"mat", nom:"Material", modo:"porUnidad", ops:[{id:"cliente", nom:"Lo trae el cliente", p:0, c:0}, {id:"mdf3", nom:"MDF 3 mm, por pieza", p:15, c:7}, {id:"acr3", nom:"Acrílico 3 mm, por pieza", p:40, c:20}]},
+      {id:"mont", nom:"Montaje", modo:"pedido", ops:[{id:"normal", nom:"Normal", p:60, c:20}, {id:"plantilla", nom:"Plantilla para muchas piezas", p:180, c:60}]}
+    ]},
+  routerMetro:{nom:"Corte por metro lineal", cobro:"ml", rapidos:[1,3,5,10], sat:"82121500", def:{q:3},
+    grupos:[
+      {id:"esp", nom:"Espesor", modo:"base", ops:[{id:"e6", nom:"Hasta 6 mm", p:45, c:15}, {id:"e12", nom:"Hasta 12 mm", p:70, c:24}, {id:"e20", nom:"Hasta 20 mm", p:95, c:34}]},
+      {id:"tipo", nom:"Tipo de corte", modo:"x", ops:[{id:"recto", nom:"Recto", p:1}, {id:"cont", nom:"Contorno o letras", p:1.4}, {id:"v", nom:"Grabado en V", p:1.6}]}
+    ]},
+  cajaImp:{nom:"Caja impresa", cobro:"pieza", minQ:50, rapidos:[100,250,500,1000], sat:"82121500", def:{q:250},
+    grupos:[
+      {id:"mat", nom:"Material", modo:"base", ops:[{id:"caple", nom:"Caple 14 pts", p:6, c:2.6}, {id:"micro", nom:"Corrugado microcanal", p:9, c:4}, {id:"kraft", nom:"Kraft", p:7.5, c:3.2}]},
+      {id:"tam", nom:"Tamaño", modo:"porUnidad", ops:[{id:"ch", nom:"Chica (hasta 15 cm)", p:0, c:0}, {id:"med", nom:"Mediana (hasta 25 cm)", p:4, c:1.8}, {id:"gde", nom:"Grande (hasta 40 cm)", p:9, c:4}]},
+      {id:"imp", nom:"Impresión", modo:"porUnidad", ops:[{id:"no", nom:"Sin impresión", p:0, c:0}, {id:"t1", nom:"1 tinta", p:2.5, c:0.9}, {id:"color", nom:"A color", p:5, c:2}, {id:"barniz", nom:"A color con barniz", p:6.5, c:2.6}]},
+      {id:"arm", nom:"Entrega", modo:"porUnidad", ops:[{id:"plana", nom:"Plana, sin armar", p:0, c:0}, {id:"armada", nom:"Armada", p:2, c:0.8}]},
+      {id:"suaje", nom:"Suaje", modo:"pedido", ops:[{id:"taller", nom:"Suaje del taller", p:0, c:0}, {id:"nuevo", nom:"Suaje nuevo a la medida", p:1800, c:900}]}
+    ]}
+});
 const SV_TRAMO = {hibRigido:"Rígidos", hibLona:"Rollo a rollo", hibVinil:"Rollo a rollo", hibRollup:"Rollo a rollo"};
 const SV_GEMELO = {hibLona:"lona", hibVinil:"vinil", lona:"hibLona", vinil:"hibVinil"};
 /* En el híbrido, en lugar de la lista de productos sale un switch:
@@ -23098,27 +23349,29 @@ const SV_GEMELO = {hibLona:"lona", hibVinil:"vinil", lona:"hibLona", vinil:"hibV
 const SV_TRAMO_ICO = {"Rígidos":"hibrido", "Rollo a rollo":"hibRollo"};
 const SV_TRAMO_TXT = {"Rígidos":"Rígidos", "Rollo a rollo":"Rollo"};
 const SV_TRAMO_SUB = {"Rígidos":"Planos", "Rollo a rollo":"Rollo a rollo"};
-const svIcoDe = pid => SV_TRAMO[pid] === "Rollo a rollo" ? "hibRollo" : svSecDe(pid);
+const svIcoDe = pid => svTramoDe(pid) === "Rollo a rollo" ? "hibRollo" : svSecDe(pid);
 function svPintaSwitch(s, nav){
   const tramos = [];
-  s.prods.forEach(id=>{ const t = SV_TRAMO[id]; if(t && svProd(id) && tramos.indexOf(t) < 0) tramos.push(t); });
-  const actual = SV_TRAMO[SVV.pid] || tramos[0], lado = Math.max(0, tramos.indexOf(actual));
+  s.prods.forEach(id=>{ const t = svTramoDe(id); if(t && svProd(id) && tramos.indexOf(t) < 0) tramos.push(t); });
+  const actual = svTramoDe(SVV.pid) || tramos[0], lado = Math.max(0, tramos.indexOf(actual));
+  const edP = SVV.catalogo || svPrecios;
   const antes = SVV.ladoSw != null && SVV.ladoSw < tramos.length ? SVV.ladoSw : lado;
   const edita = SVV.accion === "edita";
-  let h = '<span class="k">Imprimir en</span><div class="svSwitch" id="svSwitch" data-lado="' + antes + '" role="radiogroup" aria-label="Imprimir en">' +
+  let h = (edP ? svEstadoHTML(s.id) : '') + '<span class="k">Imprimir en</span><div class="svSwitch" id="svSwitch" data-lado="' + antes + '" role="radiogroup" aria-label="Imprimir en">' +
     '<span class="cv2Perilla" aria-hidden="true"></span>' +
     tramos.map(t=>{
-      const id = t === actual ? SVV.pid : s.prods.find(x=>SV_TRAMO[x] === t);
+      const id = t === actual ? SVV.pid : s.prods.find(x=>svTramoDe(x) === t);
       return '<button type="button" role="radio" aria-checked="' + (t === actual) + '" data-svprod="' + esc(id) + '"' + (edita && t !== actual ? ' disabled' : '') + '>' +
         svIco(SV_TRAMO_ICO[t] || "hibrido") + '<b>' + esc(SV_TRAMO_TXT[t] || t) + '</b><small>' + esc(SV_TRAMO_SUB[t] || "") + '</small></button>';
     }).join("") + '</div>';
-  const deTramo = s.prods.filter(id=>SV_TRAMO[id] === actual && svProd(id));
-  if(deTramo.length > 1){
+  const deTramo = s.prods.filter(id=>svTramoDe(id) === actual && svProd(id));
+  if(deTramo.length > 1 || edP){
     h += '<span class="k">Producto</span>' + deTramo.map(id=>{
       const pr = svProd(id), como = {m2:"por m²", hoja:"por hoja", pieza:"por pieza", ml:"por metro"}[pr.cobro] || "";
+      if(edP) return svProdFila(id, como, (edita && id !== SVV.pid ? ' disabled' : ''), deTramo.length > 1);
       return '<button type="button" class="svProd" data-svprod="' + esc(id) + '"' + (id === SVV.pid ? ' aria-current="true"' : '') +
         (edita && id !== SVV.pid ? ' disabled' : '') + '><b>' + esc(pr.tab || pr.nom) + '</b><small>' + como + '</small></button>';
-    }).join("");
+    }).join("") + (edP && !edita ? svProdMasHTML() : '');
   } else if(actual === "Rígidos") h += '<p class="svNota">Directo sobre la lámina: trovicel, coroplast, estireno, acrílico…</p>';
   nav.innerHTML = h + ((SVV.catalogo || svPrecios) && typeof tpNavTec === "function" ? tpNavTec(s.id) : "");
   const vi = $("#svVIco"); if(vi) vi.innerHTML = svIco(SV_TRAMO_ICO[actual] || "hibrido");
@@ -23161,6 +23414,13 @@ function svCat(){
     if(!(c.version >= 4)){
       ["hibLona", "hibVinil"].forEach(k=> svHibAdapta(c.productos[k]));
       c.version = 4;
+    }
+    if(!(c.version >= 5)){
+      ["rotul", "letras", "router", "caja"].forEach(id=>{
+        const s = c.secciones.find(x=>x.id === id), d = SV_DEF.secciones.find(x=>x.id === id);
+        if(s && d && !(s.prods || []).length){ s.prods = d.prods.slice(); s.sub = d.sub; s.det = d.det; delete s.bloq; }
+      });
+      c.version = 5;
     }
     Object.keys(SV_DEF.productos).forEach(k=>{ if(!c.productos[k]) c.productos[k] = JSON.parse(JSON.stringify(SV_DEF.productos[k])); });
     Object.keys(SV_DEF.productos).forEach(k=>{ const d = SV_DEF.productos[k], p = c.productos[k];
@@ -23495,9 +23755,9 @@ function svPintaCard(){
       '<p class="svTitRej">¿Otro servicio? Se agrega como otro concepto de la misma cotización.</p>';
   }
   h += '<div class="svRej">' + sec.map(x=>{
-    const abierta = svSeccionAbierta(x);
-    return '<button type="button" class="svTile'+(abierta?'':' bloq')+'" data-svsec="'+esc(x.id)+'">' +
-      (abierta ? '' : '<span class="svCandado">Próximamente</span>') + svIco(x.id) +
+    const pz = typeof tpPausa === "function" ? tpPausa(x.id) : null, abierta = svSeccionAbierta(x) && !pz;
+    return '<button type="button" class="svTile'+(abierta?'':' bloq')+(pz?' pausa':'')+'" data-svsec="'+esc(x.id)+'">' +
+      (abierta ? '' : '<span class="svCandado">'+(pz ? TP_MOTIVO[pz.motivo] || "Suspendido" : "Próximamente")+'</span>') + svIco(x.id) +
       '<b>'+esc(x.nom)+'</b><small>'+esc(x.sub||"")+'</small></button>';
   }).join("") + '</div><p class="svAvisoBloq" id="svAvisoBloq" hidden></p>';
   w.innerHTML = h;
@@ -23507,6 +23767,11 @@ document.addEventListener("click", e=>{
   if(t){
     const x = svCat().secciones.find(s=>s.id === t.dataset.svsec); if(!x) return;
     const av = $("#svAvisoBloq");
+    const pz = typeof tpPausa === "function" ? tpPausa(x.id) : null;
+    if(pz){
+      if(av){ av.hidden = false; av.innerHTML = "<b>" + esc(x.nom) + "</b> está suspendido (" + esc((TP_MOTIVO[pz.motivo] || "suspendido").toLowerCase()) + "). Para cotizarlo, actívalo en Catálogo › Tipos de impresión."; }
+      return;
+    }
     if(!svSeccionAbierta(x)){
       if(av){ av.hidden = false; av.innerHTML = "<b>" + esc(x.nom) + "</b> todavía no está en tu cuenta. Cuando Nuvoor la habilite, aparece aquí sola, con sus opciones y sus precios sugeridos."; }
       return;
@@ -23562,24 +23827,27 @@ function svPintaProds(){
   if(SVV.modo === "app"){
     cu.classList.remove("solo"); nav.hidden = false;
     const sub = {area:"por medida", tintas:"por tinta", puntadas:"por puntadas", tiempo:"por minuto"};
-    nav.innerHTML = '<span class="k">Tipo de impresión</span>' + (cat.tecnicas||[]).map(t=>
-      '<button type="button" class="svProd" data-svprod="'+esc(t.id)+'"'+(t.id===SVV.app.tecnicaId?' aria-current="true"':'')+'>' +
-      '<b>'+esc(t.nombre)+'</b><small>'+(sub[t.modo]||"")+'</small></button>').join("");
+    nav.innerHTML = '<span class="k">Tipo de impresión</span>' + (cat.tecnicas||[]).map(t=>{
+      const pz = typeof tpPausa === "function" ? tpPausa(tecTipo(t)) : null;
+      return '<button type="button" class="svProd" data-svprod="'+esc(t.id)+'"'+(t.id===SVV.app.tecnicaId?' aria-current="true"':'')+(pz && t.id!==SVV.app.tecnicaId?' disabled':'')+'>' +
+      '<b>'+esc(t.nombre)+'</b><small>'+(pz ? 'suspendido · ' + (TP_MOTIVO[pz.motivo] || "").toLowerCase() : (sub[t.modo]||""))+'</small></button>'; }).join("");
     return;
   }
-  if(SVV.modo === "tec"){ cu.classList.remove("solo"); nav.hidden = false; nav.innerHTML = tpNavTec(SVV.sec); return; }
+  if(SVV.modo === "tec"){ cu.classList.remove("solo"); nav.hidden = false; nav.innerHTML = svEstadoHTML(SVV.sec) + tpNavTec(SVV.sec); return; }
   const s = svCat().secciones.find(x=>x.id === SVV.sec);
   const navTec = (SVV.catalogo || svPrecios) && typeof tpNavTec === "function" ? tpNavTec(SVV.sec) : "";
-  const solo = s.prods.length === 1 && !navTec;
+  const edP = SVV.catalogo || svPrecios;
+  const solo = s.prods.length === 1 && !navTec && !edP;
   cu.classList.toggle("solo", solo); nav.hidden = solo;
-  if(s.prods.some(id=>SV_TRAMO[id])) return svPintaSwitch(s, nav);
-  nav.innerHTML = '<span class="k">Productos</span>' + s.prods.map(id=>{
+  if(s.prods.some(id=>svTramoDe(id))) return svPintaSwitch(s, nav);
+  nav.innerHTML = (edP ? svEstadoHTML(s.id) : '') + '<span class="k">Productos</span>' + s.prods.map(id=>{
     const pr = svProd(id); if(!pr) return "";
     const como = {m2:"por m²", hoja:"por hoja", pieza:"por pieza", ml:"por metro"}[pr.cobro];
     const sub = id === "subImp" ? "por hoja o por metro" : id === "laserPieza" ? "por minuto" : como;
-    return '<button type="button" class="svProd" data-svprod="'+id+'"'+(id===SVV.pid && !SVV.tec?' aria-current="true"':'')+
+    const btn = '<button type="button" class="svProd" data-svprod="'+id+'"'+(id===SVV.pid && !SVV.tec && !SVV.nuevoProd?' aria-current="true"':'')+
       (SVV.accion === "edita" && id !== SVV.pid ? ' disabled' : '')+'><b>'+esc(pr.tab || pr.nom)+'</b><small>'+sub+'</small></button>';
-  }).join("") + navTec;
+    return edP ? svProdFila(id, sub, (SVV.accion === "edita" && id !== SVV.pid ? ' disabled' : ''), s.prods.length > 1) : btn;
+  }).join("") + (edP && SVV.accion !== "edita" ? svProdMasHTML() : '') + navTec;
 }
 function svUnidadPrecio(pr, g, o, cobro){
   const m = (o && o.m) || g.modo;
@@ -23604,19 +23872,22 @@ function svPista(pr, g, o, cobro){
 function svTablaPrecios(pr, g, cobro){
   const filas = (g.tipo === "num" || g.tipo === "capa")
     ? [{nom:g.nom, ref:g.id+"::", p:g.p, c:g.c, u: g.tipo === "capa" ? "/m²" : "c/u"}]
-    : (g.ops||[]).filter(o=> g.modo !== "nada" || o.m).map(o=>({nom:o.nom, ref:g.id+":"+o.id, p:o.p, c:(g.modo==="x" && o.cx!=null ? o.cx : (o.c||0)), u:svUnidadPrecio(pr, g, o, cobro)}));
+    : (g.ops||[]).filter(o=> g.modo !== "nada" || o.m).map(o=>({nom:o.nom, ref:g.id+":"+o.id, op:true, p:o.p, c:(g.modo==="x" && o.cx!=null ? o.cx : (o.c||0)), u:svUnidadPrecio(pr, g, o, cobro)}));
   if(!filas.length) return "";
-  return '<table class="svPrecios"><thead><tr><th>Opción</th><th>Precio</th><th>Costo</th></tr></thead><tbody>' +
-    filas.map(f=>'<tr><td>'+esc(f.nom)+'</td>' +
+  const quita = (g.ops || []).length > 1 && g.modo !== "rollo" && g.id !== "arch";
+  return '<table class="svPrecios"><thead><tr><th>Opción</th><th>Precio</th><th>Costo</th><th></th></tr></thead><tbody>' +
+    filas.map(f=>'<tr><td>'+(f.op ? '<input type="text" class="svOpNom" data-sveon="'+esc(f.ref)+'" value="'+esc(f.nom)+'" aria-label="Nombre de la opción">' : esc(f.nom))+'</td>' +
       '<td><input type="number" step="0.01" min="0" data-svep="'+esc(f.ref)+':p" value="'+num(f.p)+'" aria-label="Precio de '+esc(f.nom)+'"><span class="u">'+esc(f.u)+'</span></td>' +
-      '<td><input type="number" step="0.01" min="0" data-svep="'+esc(f.ref)+':c" value="'+num(f.c)+'" aria-label="Costo de '+esc(f.nom)+'"></td></tr>').join("") +
+      '<td><input type="number" step="0.01" min="0" data-svep="'+esc(f.ref)+':c" value="'+num(f.c)+'" aria-label="Costo de '+esc(f.nom)+'"></td>' +
+      '<td>'+(f.op && quita ? '<button type="button" class="svOpX" data-sveox="'+esc(f.ref)+'" aria-label="Quitar '+esc(f.nom)+'" title="Quitar opción">✕</button>' : '')+'</td></tr>').join("") +
     '</tbody></table>';
 }
 function svGrupoHTML(pr, g, st, cobro){
   if(g.tipo === "material") return svMaterialHTML(g, st);
   if(g.tipo === "capa") return svCapaHTML(pr, g, st);
   let h = '<section class="svGrp" data-grp="'+g.id+'"><h3>'+esc(g.nom) + (g.nota ? ' <span class="gn">· '+esc(g.nota)+'</span>' : '') +
-          ' <span class="gn" id="svgn_'+g.id+'"></span>' + svInvBoton(g) + '</h3>';
+          ' <span class="gn" id="svgn_'+g.id+'"></span>' + svInvBoton(g) +
+          (svPrecios && svGrupoBorrable(g) ? '<button type="button" class="svGrpX" data-svgrpx="'+esc(g.id)+'">Quitar grupo</button>' : '') + '</h3>';
   if(g.tipo === "num"){
     h += '<div class="svNumFila"><div class="svStep chico"><button type="button" data-svnm="'+g.id+'" data-d="-1" aria-label="Menos">−</button>' +
          '<input type="number" min="0" step="'+(g.paso||1)+'" data-svnum="'+g.id+'" value="'+num(st.num[g.id])+'" aria-label="'+esc(g.nom)+'">' +
@@ -24059,9 +24330,10 @@ function svInvBoton(g){
 function svPintaForm(){
   if(SVV.modo === "app") return cv2PintaFormApp();
   if(SVV.tec || SVV.modo === "tec") return tpPintaTec();
+  if(SVV.nuevoProd) return svPintaNuevoProd();
   $("#svVelo").classList.remove("tecModo");
   const pr = svProd(SVV.pid), st = SVV.st, r = svCalc(SVV.pid, st);
-  let h = '<div class="svFila">';
+  let h = (svPrecios ? '<label class="svNomProd">Nombre del producto <input type="text" data-svprodnom value="'+esc(pr.tab || pr.nom)+'" aria-label="Nombre del producto"></label>' : '') + '<div class="svFila">';
   if(pr.medida){
     const paso = pr.medida === "cm" ? 1 : 0.05;
     h += '<div><label class="f" for="svW">Ancho × alto de la pieza ('+pr.medida+')</label><div class="svMedidas">' +
@@ -24078,6 +24350,7 @@ function svPintaForm(){
        '</div></div></div>';
   if(arma) h += svArmHTML(pr, st, bc.cobro);
   svGruposVis(pr, st).forEach(g=> h += svGrupoHTML(pr, g, st, r.cobro));
+  if(svPrecios) h += svNuevoGrupoHTML(pr);
   h += svRefHTML(SVV.art, "Imagen de referencia");
   h += '<div><label class="f" for="svNotas">Notas para producción</label><textarea id="svNotas" rows="2" placeholder="Ej. ojillos reforzados en las esquinas">'+esc(st.notas||"")+'</textarea></div>';
   h += '<section class="svDesg"><h3>De dónde sale el precio</h3><ol id="svRen"></ol><div id="svAvisos"></div></section>';
@@ -24120,7 +24393,7 @@ function svRefresca(){
   $("#svVTotal").textContent = mx(r.total);
   $("#svVPorPieza").textContent = r.q > 0 ? mx(r.porPieza) + " por " + r.U.uno : "";
   $("#svVUtil").textContent = (r.total > 0 && svVer()) ? "costo " + mx(r.costo) + " · utilidad " + Math.round((r.total - r.costo)/r.total*100) + "%" : "";
-  $("#svVAgregar").disabled = !(r.q > 0) || (r.cobro === "m2" && !(r.A > 0)) || (pr.rigido && !r.mat);
+  $("#svVAgregar").disabled = !(r.q > 0) || (r.cobro === "m2" && !(r.A > 0)) || (pr.rigido && !r.mat) || !!tpPausa(SVV.sec);
   const ql = $("#svQlbl"); if(ql) ql.textContent = SV_QLBL[r.cobro];
   svRefrescaArmado(pr, st, r);
   if(pr.rollos){
@@ -24280,6 +24553,9 @@ document.addEventListener("keydown", e=>{
 
 /* ---------- agregar o guardar ---------- */
 function svAgrega(){
+  { const pz = SVV.modo === "app" ? tpTecPausada(SVV.app && SVV.app.tecnicaId) : tpPausa(SVV.sec);
+    if(pz){ const s = svCat().secciones.find(x=>x.id === SVV.sec), t = SVV.app && (cat.tecnicas || []).find(x=>x.id === SVV.app.tecnicaId);
+      toast(tpAvisoPausa(SVV.modo === "app" ? (t ? t.nombre : "Este tipo") : (s ? s.nom : "Este tipo"), pz)); return; } }
   if(SVV.modo === "app") return cv2GuardaApp();
   const r = svCalc(SVV.pid, SVV.st); if(!(r.q > 0)) return;
   const accion = SVV.accion;
@@ -24330,7 +24606,7 @@ function cv2AbreApp(id, origen){
     const usadas = cot.apps.map(x=>x.ubic);
     const ubic = cv2Ubicaciones().find(x=>usadas.indexOf(x) < 0) || "Otra ubicación";
     const s = cv2TamPorUbi(ubic) || {ancho:20, alto:20, id:""};
-    app = {id:uid(), ubic, tecnicaId:cat.tecnicas[0].id, tamanoId:s.id||"", ancho:num(s.ancho), alto:num(s.alto), tintas:1, puntadas:8000, art:null};
+    app = {id:uid(), ubic, tecnicaId:tpTecLibre(), tamanoId:s.id||"", ancho:num(s.ancho), alto:num(s.alto), tintas:1, puntadas:8000, art:null};
   }
   SVV = {modo:"app", app, nuevo};
   const art = (cat.articulos||[]).find(x=>x.id === cot.articuloId);
@@ -24438,7 +24714,7 @@ function cv2RefrescaAppBase(){
     $("#svVUtil").textContent = "";
   }
   const medOk = !t || t.modo !== "area" || (num(a.ancho) > 0 && num(a.alto) > 0);
-  $("#svVAgregar").disabled = !(a.ubic||"").trim() || !medOk;
+  $("#svVAgregar").disabled = !(a.ubic||"").trim() || !medOk || !!tpTecPausada(a.tecnicaId);
 }
 function cv2CambiaTecnica(id){
   const a = SVV.app; if(a.tecnicaId === id) return;
@@ -25977,10 +26253,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261114-1400";</script>
+<script>window.BUILD="20261114-1800";</script>
 <script>
 (function(){
-  var mio = "20261114-1400";
+  var mio = "20261114-1800";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
