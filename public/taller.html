@@ -3297,6 +3297,29 @@ body.rol-produccion #btnPrint{display:none!important}
 .icCheck:has(input:checked){border-color:var(--accent);background:var(--surface-2)}
 .icTengo{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--ink-3)}
 .icTengo input{width:76px;padding:5px 8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px}
+.icTengo select{width:auto;padding:5px 8px;font-size:12.5px}
+.icCheck .icTengo{flex:1 1 100%;flex-wrap:wrap;white-space:nowrap}
+.icChecks .icCheck .icTengo input[type=number]{width:64px}
+.icRollos .icConteo input[type=number]{width:62px}
+.icRollos .icLlegaRollo input[type=number]{width:70px}
+.icChecks{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.icTengo [hidden]{display:none}
+.icRollos{border:1px dashed var(--line);border-radius:12px;padding:8px 10px;margin:0 0 10px;background:var(--surface-2)}
+.icRollo{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:6px 2px;border-bottom:1px dashed var(--line-soft)}
+.icRolloMed{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;font-weight:700;min-width:118px;color:var(--ink)}
+.icRolloTxt{flex:1 1 180px;font-size:13px}
+.icRolloTxt small{color:var(--ink-3)}
+.icConteo{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--ink-3)}
+.icConteo input{width:62px;padding:4px 6px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px}
+.icSuelto .icRolloTxt b{color:#92400E}
+.icVacio{margin:4px 2px;font-size:12.5px;color:var(--ink-3)}
+.icLlegaRollo{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:8px 2px 2px;font-size:12.5px;color:var(--ink-2)}
+.icLlegaRollo .k2{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.icLlegaRollo input{width:70px;padding:5px 8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px}
+.icLlegaRollo select{width:auto;padding:5px 8px;font-size:12.5px}
+.icLlegaRollo [hidden]{display:none}
+.icTotRollo{margin:6px 2px 0;font-size:12.5px;color:var(--ink-2)}
+@media (max-width:760px){ .icConteo{flex-wrap:wrap} .icRolloMed{min-width:0} }
 @media (max-width:760px){ .icForm{padding:14px} .icEstado{margin-left:0} .icNum input{width:84px} .icGasta{flex-wrap:wrap} }
 .svTile.pausa{background:var(--surface-2);border-style:dashed}
 .svTile.pausa .svIco{filter:grayscale(.85);opacity:.55}
@@ -6581,11 +6604,12 @@ function consumoDe(q, r){
   if(!q || !r) return [];
   if(typeof icMigra === "function") icMigra();
   const acum = {};
-  const suma = (insumoId, cant, origen) => {
+  const suma = (insumoId, cant, origen, rr) => {
     const c = num(cant);
     if(!insumoId || !(c > 0)) return;
     if(!acum[insumoId]) acum[insumoId] = {cant:0, de:[]};
     acum[insumoId].cant += c;
+    if(rr){ const m = acum[insumoId].rollos || (acum[insumoId].rollos = {}); Object.keys(rr).forEach(k=> m[k] = (m[k] || 0) + num(rr[k])); }
     acum[insumoId].de.push(origen + ": " + cantIns(c));
   };
   const partes = (r.partes && r.partes.length) ? r.partes : [{q:q, r:r}];
@@ -6608,7 +6632,9 @@ function consumoDe(q, r){
       const b = B(T); b.m2mat += num(a.areaCompradaM2); if(s.unidad !== "m2") b.ml += num(a.unidades);
       if(!nomT[T]) nomT[T] = s.nombre;
       const ins = typeof icInsumoDeServicio === "function" ? icInsumoDeServicio(s) : null;
-      if(ins) mats.push({T, ins, cant: s.unidad === "m2" ? num(a.areaCompradaM2) : num(a.unidades), de: s.nombre});
+      if(ins){ const w = num(s.ancho)/100;
+        mats.push({T, ins, cant: s.unidad === "m2" ? num(a.areaCompradaM2) : num(a.unidades), de: s.nombre,
+                   rr: s.unidad === "m2" && w > 0 && typeof icK === "function" ? {[icK(w)]: num(a.areaCompradaM2)/w} : null}); }
     });
     (qi.apps||[]).forEach(ap=>{
       const t = (cat.tecnicas||[]).find(x=>x.id===ap.tecnicaId); if(!t) return;
@@ -6630,7 +6656,7 @@ function consumoDe(q, r){
     });
     /* El rollo mismo: el de la opción ligada en la venta suelta, salvo que
        el equipo ya lo tenga como regla (no se descuenta dos veces). */
-    mats.forEach(m=>{ if(!consumosDe("tipo", m.T).some(cs=>cs.insumoId === m.ins.id)) suma(m.ins.id, m.cant, m.de); });
+    mats.forEach(m=>{ if(!consumosDe("tipo", m.T).some(cs=>cs.insumoId === m.ins.id)) suma(m.ins.id, m.cant, m.de, m.rr); });
     const art = (cat.articulos||[]).find(x=>x.id===qi.articuloId);
     if(art) consumosDe("articulo", art.id).forEach(cs=>{
       suma(cs.insumoId, num(cs.cant) * (cs.por==="pedido" ? 1 : qty), art.nombre);
@@ -6638,24 +6664,29 @@ function consumoDe(q, r){
   });
   return Object.keys(acum).map(id=>{
     const i = insumoDe(id);
-    return i ? {insumo:i, cant:acum[id].cant, de:acum[id].de} : null;
+    return i ? {insumo:i, cant:acum[id].cant, de:acum[id].de, rollos:acum[id].rollos || null} : null;
   }).filter(Boolean).sort((a,b)=> a.insumo.nombre.localeCompare(b.insumo.nombre, "es"));
 }
 
-function mueveInsumo(insumoId, delta, nota, folio){
+/* rollos (opcional): {ancho: metros} de los rollos que se movieron. El
+   material en rollos (lona, vinil, film) lleva la cuenta por ancho. */
+function mueveInsumo(insumoId, delta, nota, folio, rollos){
   const i = insumoDe(insumoId); if(!i) return;
-  i.existencia = num(i.existencia) + num(delta);
+  const rr = (typeof icEsRollo === "function" && icEsRollo(i)) ? icRollosMueve(i, num(delta), rollos || null) : null;
+  if(!(typeof icEsRollo === "function" && icEsRollo(i))) i.existencia = num(i.existencia) + num(delta);
   cat.insumoMovs = cat.insumoMovs || [];
-  cat.insumoMovs.push({id:uid(), fecha:hoyISO()+" "+horaAhora(), insumo:i.nombre, insumoId,
+  const mv = {id:uid(), fecha:hoyISO()+" "+horaAhora(), insumo:i.nombre, insumoId,
                        unidad:i.unidad, delta:num(delta), queda:i.existencia,
-                       nota:nota||"", folio:folio||"", quien:(usuarioActual().nombre||"")});
+                       nota:nota||"", folio:folio||"", quien:(usuarioActual().nombre||"")};
+  if(rr) mv.rollos = rr;
+  cat.insumoMovs.push(mv);
   if(cat.insumoMovs.length > 400) cat.insumoMovs = cat.insumoMovs.slice(-400);
 }
 function descuentaInsumos(q, r, folio){
   const lista = consumoDe(q, r);
   const cortos = [];
   lista.forEach(x=>{
-    mueveInsumo(x.insumo.id, -x.cant, "Salida por " + (q.folio||"pedido"), folio||"");
+    mueveInsumo(x.insumo.id, -x.cant, "Salida por " + (q.folio||"pedido"), folio||"", x.rollos && typeof icNeg === "function" ? icNeg(x.rollos) : null);
     if(num(x.insumo.existencia) < 0) cortos.push(x.insumo.nombre);
   });
   if(lista.length) persist();
@@ -10155,6 +10186,135 @@ function icPintaRej(){
       x.ico + '<b>'+esc(x.nom)+'</b><small>'+esc(sub)+'</small></button>';
   }).join("");
 }
+/* ---------- material en rollos ----------
+   La lona, el vinil y el film se compran en rollos (3.20 × 50 m, 1.60 × 50 m…).
+   Cada material guarda sus rollos por ancho: i.rollos = [{ancho, largo, ml}]
+   (ml = metros que quedan de ese ancho). La existencia en m² (o en m para el
+   film) sale de ahí, y lo que llegó sin decir en qué rollo va en i.suelto.
+   Cada salida baja los metros del ancho que usó el acomodo. */
+const icK = w => String(Math.round(num(w)*1000)/1000);
+const icEsRollo = i => !!(i && i.svc && (i.unidad === "m2" || i.unidad === "m"));
+const icConv = (i, w, ml) => i.unidad === "m2" ? num(w)*num(ml) : num(ml);
+const icFmtAncho = w => svN2(num(w)) + " m";
+const icRed = v => Math.round(num(v)*10000)/10000;
+function icRollosInit(i){ if(!Array.isArray(i.rollos)){ i.rollos = []; i.suelto = num(i.existencia); } }
+function icRollosTotal(i){ return (Array.isArray(i.rollos) ? num(i.suelto) : num(i.existencia)) + (i.rollos || []).reduce((s, e)=> s + icConv(i, e.ancho, e.ml), 0); }
+function icLargoDef(i){ const e = (i.rollos || []).slice(-1)[0]; return e && e.largo ? e.largo : (i.unidad === "m" ? 100 : 50); }
+function icEntrada(i, w, crea){
+  let e = i.rollos.find(x=> icK(x.ancho) === icK(w));
+  if(!e && crea){ e = {ancho:+icK(w), largo:icLargoDef(i), ml:0}; i.rollos.push(e); i.rollos.sort((a, b)=> a.ancho - b.ancho); }
+  return e || null;
+}
+function icRollosMueve(i, delta, rollos){
+  icRollosInit(i);
+  const hecho = {}, anota = (w, d)=>{ hecho[icK(w)] = icRed((hecho[icK(w)] || 0) + d); };
+  let resto = num(delta);
+  if(rollos) Object.keys(rollos).forEach(w=>{
+    const d = num(rollos[w]); if(!d) return;
+    const e = icEntrada(i, w, d > 0); if(!e) return;          // si no tienes ese ancho, sale de lo que haya
+    e.ml = icRed(e.ml + d); anota(w, d); resto -= icConv(i, w, d);
+  });
+  if(resto > 1e-6) i.suelto = icRed(num(i.suelto) + resto);
+  else if(resto < -1e-6){
+    let falta = -resto;
+    const s = Math.min(Math.max(0, num(i.suelto)), falta); i.suelto = icRed(num(i.suelto) - s); falta -= s;
+    while(falta > 1e-6){
+      const e = i.rollos.filter(x=> x.ml > 1e-6).sort((a, b)=> icConv(i, b.ancho, b.ml) - icConv(i, a.ancho, a.ml))[0];
+      if(!e){ i.suelto = icRed(num(i.suelto) - falta); break; }
+      const dml = Math.min(e.ml, i.unidad === "m2" ? falta/e.ancho : falta);
+      e.ml = icRed(e.ml - dml); anota(e.ancho, -dml); falta -= icConv(i, e.ancho, dml);
+    }
+  }
+  i.existencia = icRed(icRollosTotal(i));
+  return Object.keys(hecho).length ? hecho : null;
+}
+const icNeg = m => { if(!m) return null; const o = {}; Object.keys(m).forEach(k=> o[k] = -num(m[k])); return o; };
+/* Los anchos que se pueden escoger: los del cotizador (y su gemelo) y los que ya tienes. */
+function icAnchosDe(i){
+  const s = new Set();
+  [i.svc && i.svc.pid, i.svc && SV_GEMELO[i.svc.pid]].forEach(pid=>{ const pr = pid && svProd(pid); (pr && pr.rollos || []).forEach(r=> s.add(icK(r))); });
+  (i.rollos || []).forEach(e=> s.add(icK(e.ancho)));
+  return [...s].map(Number).sort((a, b)=> a - b);
+}
+/* Un ancho nuevo entra al cotizador para que el acomodo lo pueda usar.
+   El híbrido sólo acepta lo que le cabe. */
+function icAgregaAncho(pid, w){
+  [pid, SV_GEMELO[pid]].forEach((id, n)=>{
+    const pr = id && svProd(id); if(!pr || !Array.isArray(pr.rollos) || !pr.rollos.length) return;
+    if(pr.rollos.some(r=> icK(r) === icK(w))) return;
+    if(n === 1 && num(w) > Math.max.apply(null, pr.rollos) + 1e-6) return;
+    pr.rollos.push(+icK(w)); pr.rollos.sort((a, b)=> a - b);
+  });
+}
+/* Para el acomodo: los anchos con rollos de la opción escogida. */
+function icAnchosConStock(pr, st){
+  if(!pr || !pr.rollos || !st || !st.sel) return null;
+  const g = (pr.grupos || []).find(x=> svInvDe(pr.id, x) === "m2"), o = g && (g.ops || []).find(x=> x.id === st.sel[g.id]);
+  const i = o && o.ins && insumoDe(o.ins); if(!i || !Array.isArray(i.rollos)) return null;
+  const tope = Math.max.apply(null, pr.rollos) + 1e-6;
+  const ws = i.rollos.filter(e=> e.ml > 0.01 && e.ancho <= tope).map(e=> e.ancho);
+  return ws.length ? ws : null;
+}
+const icCerAbi = e => { const cer = e.ml > 0 ? Math.floor(e.ml/e.largo + 1e-6) : 0; return [cer, Math.round((e.ml - cer*e.largo)*100)/100]; };
+function icRolloTxt(i, e){
+  const [cer, abi] = icCerAbi(e);
+  const txt = e.ml <= 0.005 ? (e.ml < -0.005 ? 'faltan ' + cantIns(-e.ml) + ' m' : 'sin rollos')
+    : cer + (cer === 1 ? ' rollo' : ' rollos') + (abi > 0.005 ? (cer ? ' + ' : '') + '1 abierto con ' + cantIns(abi) + ' m' : '');
+  return '<b>' + esc(txt) + '</b>' + (i.unidad === "m2" && e.ml > 0.005 ? '<small> · ' + cantIns(icConv(i, e.ancho, e.ml)) + ' m²</small>' : '');
+}
+const icTotTxt = i => 'Total: <b>' + cantIns(icRollosTotal(i)) + ' ' + esc(icUni(i)) + '</b>';
+/* Después de un conteo no se repinta la ventana: se perdería el cursor del
+   campo siguiente. Sólo se actualizan los textos de ese material. */
+function icRefrescaFila(fila, i){
+  (i.rollos || []).forEach(e=>{ const r = fila.querySelector('[data-icancho="'+icK(e.ancho)+'"] .icRolloTxt'); if(r) r.innerHTML = icRolloTxt(i, e); });
+  const tt = fila.querySelector(".icTotRollo"); if(tt) tt.innerHTML = icTotTxt(i);
+  const es = fila.querySelector(".icEstado"), st = estadoIns(i);
+  if(es){ es.className = "icEstado " + st.cls; es.textContent = num(i.existencia) <= 0 ? "Sin existencia" : st.txt; }
+}
+function icRollosHTML(i){
+  const u = icUni(i), m2 = i.unidad === "m2", suelto = Array.isArray(i.rollos) ? num(i.suelto) : num(i.existencia);
+  let h = '<div class="icRollos">' + (i.rollos || []).map(e=>{
+    const [cer, abi] = icCerAbi(e);
+    return '<div class="icRollo" data-icancho="'+icK(e.ancho)+'">' +
+      '<span class="icRolloMed">' + (m2 ? icFmtAncho(e.ancho) + ' × ' : '') + cantIns(e.largo) + ' m</span>' +
+      '<span class="icRolloTxt">' + icRolloTxt(i, e) + '</span>' +
+      '<span class="icConteo">Conteo: <input type="number" min="0" step="1" data-iccer value="'+cer+'" aria-label="Rollos cerrados"> cerrados + ' +
+      '<input type="number" min="0" step="0.1" data-icabi value="'+(abi > 0.005 ? abi : 0)+'" aria-label="Metros del rollo abierto"> m abierto</span>' +
+      (e.ml <= 0.005 ? '<button type="button" class="svOpX" data-icanchox="1" title="Quitar este ancho" aria-label="Quitar este ancho">✕</button>' : '') + '</div>';
+  }).join("");
+  if(Math.abs(suelto) > 0.005) h += '<div class="icRollo icSuelto"><span class="icRolloMed">Sin rollo</span><span class="icRolloTxt"><b>' +
+    (suelto > 0 ? cantIns(suelto) + ' ' + esc(u) + ' sin decir en qué rollo' : 'se usaron ' + cantIns(-suelto) + ' ' + esc(u) + ' sin rollo cargado') + '</b></span>' +
+    '<button type="button" class="btn sm" data-icsueltox="1">' + (suelto > 0 ? 'Ya lo conté en rollos' : 'Poner en 0') + '</button></div>';
+  if(!(i.rollos || []).length && Math.abs(suelto) <= 0.005) h += '<p class="icVacio">Todavía no tienes rollos cargados.</p>';
+  const anchos = icAnchosDe(i), usual = (i.rollos || []).slice().sort((x, y)=> y.ml - x.ml)[0], wDef = usual ? icK(usual.ancho) : "";
+  h += '<div class="icLlegaRollo"><span class="k2">Llegó</span><input type="number" min="1" step="1" placeholder="0" data-icrn aria-label="Cuántos rollos llegaron"> rollos' +
+    (m2 ? ' de <select data-icrw aria-label="Ancho del rollo">' + anchos.map(w=>'<option value="'+icK(w)+'"'+(icK(w) === wDef ? ' selected' : '')+'>'+icFmtAncho(w)+'</option>').join("") + '<option value="otro">Otro ancho…</option></select>' +
+          '<input type="number" min="0.1" step="0.01" placeholder="m" data-icrwo hidden aria-label="Otro ancho en metros"> ×' : ' de') +
+    ' <input type="number" min="1" step="1" value="'+icLargoDef(i)+'" data-icrl aria-label="Largo del rollo en metros"> m' +
+    '<button type="button" class="btn sm" data-icrsuma="1">Sumar</button></div>';
+  return h + '<p class="icTotRollo">' + icTotTxt(i) + '</p></div>';
+}
+function icRolloLlega(fila, i){
+  const n = num((fila.querySelector("[data-icrn]") || {}).value), L = num((fila.querySelector("[data-icrl]") || {}).value);
+  const sel = fila.querySelector("[data-icrw]");
+  let w = i.unidad === "m2" ? (sel && sel.value === "otro" ? num((fila.querySelector("[data-icrwo]") || {}).value) : num(sel && sel.value)) : icAnchoFijo(i);
+  if(!(n > 0)){ toast("Escribe cuántos rollos llegaron."); return; }
+  if(!(L > 0)){ toast("Escribe el largo del rollo en metros."); return; }
+  if(i.unidad === "m2" && !(w > 0)){ toast("Escribe el ancho del rollo en metros, por ejemplo 1.60."); return; }
+  if(!(w > 0)) w = 1;
+  icRollosInit(i);
+  const e = icEntrada(i, w, true); e.largo = L;
+  mueveInsumo(i.id, icConv(i, w, n*L), "Entrada · llegaron " + n + (n === 1 ? " rollo" : " rollos") + " de " + (i.unidad === "m2" ? icFmtAncho(w) + " × " : "") + cantIns(L) + " m", "", {[icK(w)]: n*L});
+  if(i.unidad === "m2" && i.svc) icAgregaAncho(i.svc.pid, w);
+  persist(); icPinta();
+  toast("Sumaste " + n + (n === 1 ? " rollo" : " rollos") + " a " + i.nombre + ". Ahora hay " + cantIns(i.existencia) + " " + icUni(i) + ".");
+}
+/* El film viene de un solo ancho: el de su opción. */
+function icAnchoFijo(i){
+  const pr = i.svc && svProd(i.svc.pid), g = pr && (pr.grupos || []).find(x=> x.id === i.svc.gid), o = g && (g.ops || []).find(x=> x.ins === i.id);
+  if(!o) return 1;
+  return num(o.r || (SV_SOP[o.id] || {}).r || (typeof tpAnchoCm === "function" ? tpAnchoCm(o)/100 : 0)) || 1;
+}
 /* ---------- material: escoger cuáles se llevan ----------
    La lona y el vinil de gran formato son los mismos del plotter híbrido:
    lo que se palomea en uno queda ligado en los dos, con una sola existencia. */
@@ -10166,12 +10326,17 @@ function icGemeloOp(pid, gid, o){
 function icLlevaHTML(pid, gid){
   const pr = svProd(pid), g = pr && svGrupos(pr).find(x=>x.id === gid); if(!g) return "";
   const inv = svInvDe(pid, g), u = svInvTxt(inv), gem = SV_GEMELO[pid] && svProd(SV_GEMELO[pid]);
-  const ops = (g.ops || []).filter(o=> !(o.ins && insumoDe(o.ins)));
+  const ops = (g.ops || []).filter(o=> !(o.ins && insumoDe(o.ins))), rollo = inv === "m2" || inv === "ml";
+  const anchos = [...new Set([pr, gem].filter(Boolean).flatMap(x=> x.rollos || []).map(icK))].map(Number).sort((a, b)=> a - b);
   return '<section class="svGrp svNuevoProd icLlevaSel" data-icllevasel="'+esc(pid)+'|'+esc(gid)+'"><h3>¿Cuáles manejas? · '+esc(String(pr.nom).replace(/\s*\(h[ií]brido\)/i, ""))+'</h3>' +
-    '<p class="svCapaNota">Palomea sólo lo que sí tienes en el taller. Si ya sabes cuánto tienes, escríbelo; si no, déjalo en blanco y lo cargas con «Llegó».' +
+    '<p class="svCapaNota">Palomea sólo lo que sí tienes en el taller. Si ya sabes cuánto tienes, escríbelo' + (rollo ? ' en rollos' : '') + '; si no, déjalo en blanco y lo cargas con «Llegó».' +
     (gem ? ' Lo que palomees también queda en ' + esc(SV_GEMELO[pid] === "lona" || SV_GEMELO[pid] === "vinil" ? "Impresión gran formato" : "el Plotter híbrido") + ', con la misma existencia.' : '') + '</p>' +
     '<div class="icChecks">' + ops.map(o=>'<label class="icCheck"><input type="checkbox" data-icop="'+esc(o.id)+'"><span class="n">'+esc(o.nom)+'</span>' +
-      '<span class="icTengo">Tengo <input type="number" min="0" step="0.01" data-ictengo="'+esc(o.id)+'" placeholder="0" aria-label="Cuánto tienes de '+esc(o.nom)+'"> '+esc(u)+'</span></label>').join("") + '</div>' +
+      (rollo ? '<span class="icTengo">Tengo <input type="number" min="0" step="1" data-ictengo="'+esc(o.id)+'" placeholder="0" aria-label="Cuántos rollos tienes de '+esc(o.nom)+'"> rollos' +
+          (inv === "m2" ? ' de <select data-ictw="'+esc(o.id)+'" aria-label="Ancho">' + anchos.map(w=>'<option value="'+icK(w)+'">'+icFmtAncho(w)+'</option>').join("") + '<option value="otro">Otro ancho…</option></select>' +
+            '<input type="number" min="0.1" step="0.01" placeholder="m" data-ictwo="'+esc(o.id)+'" hidden aria-label="Otro ancho en metros"> ×' : ' de') +
+          ' <input type="number" min="1" step="1" value="'+(inv === "m2" ? 50 : 100)+'" data-ictl="'+esc(o.id)+'" aria-label="Largo del rollo"> m</span>'
+        : '<span class="icTengo">Tengo <input type="number" min="0" step="0.01" data-ictengo="'+esc(o.id)+'" placeholder="0" aria-label="Cuánto tienes de '+esc(o.nom)+'"> '+esc(u)+'</span>') + '</label>').join("") + '</div>' +
     '<div class="svNpBtns"><button type="button" class="btn primary sm" data-icllevaok="1">Agregar al inventario</button>' +
     '<button type="button" class="btn sm" data-icllevacancela="1">Cancelar</button></div></section>';
 }
@@ -10190,7 +10355,18 @@ function icLlevaGuarda(){
       ins = {id:uid(), nombre:icNomMat(pr, o), unidad:svInvUni(inv), costo:num(o.c), existencia:0, minimo:0, svc:{pid, gid}};
       cat.insumos.push(ins);
       const ex = num((box.querySelector('[data-ictengo="'+oid+'"]') || {}).value);
-      if(ex > 0) mueveInsumo(ins.id, ex, "Existencia inicial", "");
+      if(icEsRollo(ins)){
+        icRollosInit(ins);
+        if(ex > 0){
+          const L = num((box.querySelector('[data-ictl="'+oid+'"]') || {}).value) || (ins.unidad === "m2" ? 50 : 100);
+          const sw = box.querySelector('[data-ictw="'+oid+'"]');
+          let w = ins.unidad === "m2" ? num(sw && sw.value === "otro" ? (box.querySelector('[data-ictwo="'+oid+'"]') || {}).value : (sw || {}).value) : 0;
+          o.ins = ins.id; if(!(w > 0)) w = ins.unidad === "m2" ? 1 : icAnchoFijo(ins);
+          icEntrada(ins, w, true).largo = L;
+          mueveInsumo(ins.id, icConv(ins, w, ex*L), "Existencia inicial · " + ex + (ex === 1 ? " rollo" : " rollos") + (ins.unidad === "m2" ? " de " + icFmtAncho(w) + " ×" : " de") + " " + cantIns(L) + " m", "", {[icK(w)]: ex*L});
+          if(ins.unidad === "m2") icAgregaAncho(pid, w);
+        }
+      } else if(ex > 0) mueveInsumo(ins.id, ex, "Existencia inicial", "");
     }
     o.ins = ins.id;
     if(gem && !(gem.ins && insumoDe(gem.ins))) gem.ins = ins.id;
@@ -10266,7 +10442,14 @@ function icFilaMaterial(i){
   return '<div class="icFila" data-icins="'+esc(i.id)+'"><div class="icCab"><b>'+esc(i.nombre)+'</b><small>'+esc(icUni(i))+
     (i.rig ? ' · lámina de ' + svN0(i.rig.w) + '×' + svN0(i.rig.h) + ' cm' : '')+'</small>' +
     (i.rig ? '' : '<button type="button" class="svOpX" data-icmatx="'+esc(i.id)+'" title="Dejar de llevar en inventario" aria-label="Dejar de llevar '+esc(i.nombre)+' en inventario">✕</button>') +
-    '</div>' + icCampos(i) + '</div>';
+    '</div>' + (icEsRollo(i) ? icRollosHTML(i) + icCamposRollo(i) : icCampos(i)) + '</div>';
+}
+function icCamposRollo(i){
+  const e = estadoIns(i), u = icUni(i);
+  return '<div class="icCampos">' +
+    '<label>Mínimo <span class="icNum"><input type="number" min="0" step="0.01" data-icf="minimo" value="'+num(i.minimo)+'"><span class="u">'+esc(u)+'</span></span></label>' +
+    (icAdmin() ? '<label>Costo por '+esc(u)+' <span class="icNum"><input type="number" min="0" step="0.0001" data-icf="costo" value="'+num(i.costo)+'"></span></label>' : '') +
+    '<span class="icEstado '+e.cls+'">'+esc(num(i.existencia) <= 0 ? "Sin existencia" : e.txt)+'</span></div>';
 }
 function icFilaRegla(c, T){
   const i = insumoDe(c.insumoId);
@@ -10377,6 +10560,17 @@ document.addEventListener("click", e=>{
   if(e.target.closest("[data-icllevaok]")){ icLlevaGuarda(); return; }
   if(e.target.closest("[data-icllevacancela]")){ IC.lleva = null; icPinta(); return; }
   if((b = e.target.closest("[data-icmatx]"))){ icQuitaMaterial(b.dataset.icmatx); return; }
+  if((b = e.target.closest("[data-icrsuma]"))){ const f = b.closest("[data-icins]"), i = f && insumoDe(f.dataset.icins); if(i) icRolloLlega(f, i); return; }
+  if((b = e.target.closest("[data-icanchox]"))){
+    const f = b.closest("[data-icins]"), i = f && insumoDe(f.dataset.icins), w = b.closest("[data-icancho]").dataset.icancho; if(!i) return;
+    i.rollos = (i.rollos || []).filter(x=> icK(x.ancho) !== w); persist(); icPinta(); return;
+  }
+  if((b = e.target.closest("[data-icsueltox]"))){
+    const f = b.closest("[data-icins]"), i = f && insumoDe(f.dataset.icins); if(!i) return;
+    icRollosInit(i); const s = num(i.suelto);
+    if(s) mueveInsumo(i.id, -s, "Ajuste · lo que no estaba en rollos", "", null);
+    i.suelto = 0; i.existencia = icRed(icRollosTotal(i)); persist(); icPinta(); return;
+  }
   if(e.target.closest("[data-icnuevo]")){ IC.nuevo = true; icPinta(); const i = $("#icNDe") || $("#icNNom"); if(i) i.focus(); return; }
   if(e.target.closest("[data-icncancela]")){ IC.nuevo = false; icPinta(); return; }
   if(e.target.closest("[data-icnok]")){ icNuevoGuarda(); return; }
@@ -10410,6 +10604,17 @@ document.addEventListener("change", e=>{
     return;
   }
   if(i && t.dataset.icf === "unidad"){ i.unidad = t.value; persist(); icPinta(); return; }
+  if(t.dataset.ictw){ const o = $('#icForm [data-ictwo="'+t.dataset.ictw+'"]'); if(o){ o.hidden = t.value !== "otro"; if(!o.hidden) o.focus(); } return; }
+  if(t.matches("[data-icrw]")){ const o = fila && fila.querySelector("[data-icrwo]"); if(o){ o.hidden = t.value !== "otro"; if(!o.hidden) o.focus(); } return; }
+  if(i && (t.matches("[data-iccer]") || t.matches("[data-icabi]"))){
+    const r = t.closest("[data-icancho]"), w = r.dataset.icancho; icRollosInit(i);
+    const e = icEntrada(i, w, false); if(!e) return;
+    const nuevo = Math.max(0, num(r.querySelector("[data-iccer]").value))*e.largo + Math.max(0, num(r.querySelector("[data-icabi]").value));
+    const d = icRed(nuevo - e.ml);
+    if(d){ mueveInsumo(i.id, icConv(i, w, d), "Ajuste de existencia (conteo de rollos)", "", {[w]: d}); persist(); icRefrescaFila(fila, i);
+      toast(i.nombre + ": quedó en " + cantIns(i.existencia) + " " + icUni(i) + "."); }
+    return;
+  }
   const rf = t.closest("[data-icr]");
   if(rf && t.dataset.icrf === "por"){ const c = (cat.consumos || []).find(x=>x.id === rf.dataset.icr); if(c){ c.por = t.value; persist(); } return; }
   if(t.dataset.icpasa){
@@ -18472,7 +18677,7 @@ function opEmpezada(op, checklist){
   return "";
 }
 async function salidasDeOrden(g, nota){
-  const folio = g.op.folio, antes = new Set((cat.invMovs || []).map(m=>m.id));
+  const folio = g.op.folio, antes = new Set((cat.invMovs || []).map(m=>m.id)), antesI = new Set((cat.insumoMovs || []).map(m=>m.id));
   const rG = calcDe(g);
   for(const p of rG.partes){
     const a = (cat.articulos || []).find(a=>a.id === p.q.articuloId);
@@ -18481,13 +18686,18 @@ async function salidasDeOrden(g, nota){
   }
   const cons = descuentaInsumos(g, rG, folio);
   const consSv = typeof svDescuentaServicios === "function" ? svDescuentaServicios(g, folio) : [];
+  /* Lo que salió se lee de la bitácora de esta orden: así trae también de
+     qué rollos salió, para regresarlo al mismo ancho. */
   const ins = {};
-  cons.lista.forEach(x=>{ ins[x.insumo.id] = (ins[x.insumo.id] || 0) + num(x.cant); });
-  consSv.forEach(c=>{ ins[c.ins.id] = (ins[c.ins.id] || 0) + num(c.cant); });
+  (cat.insumoMovs || []).filter(m=> !antesI.has(m.id) && m.insumoId && m.folio === folio && num(m.delta) < 0).forEach(m=>{
+    const x = ins[m.insumoId] || (ins[m.insumoId] = {id:m.insumoId, nom:(insumoDe(m.insumoId) || {}).nombre || m.insumo || "", cant:0});
+    x.cant += -num(m.delta);
+    if(m.rollos){ const r = x.rollos || (x.rollos = {}); Object.keys(m.rollos).forEach(k=> r[k] = (r[k] || 0) - num(m.rollos[k])); }
+  });
   g.op.salidas = {
     arts: (cat.invMovs || []).filter(m=> !antes.has(m.id) && m.artId && m.req && m.req.folio === folio && num(m.delta) < 0)
             .map(m=>({id:m.artId, nom:m.articulo || "", cant:-num(m.delta), variante:m.variante || null})),
-    ins: Object.keys(ins).map(id=>({id, nom:(insumoDe(id) || {}).nombre || "", cant:ins[id]}))
+    ins: Object.values(ins)
   };
   if(cons.lista.length || consSv.length) renderInvInsumos();
   return {cons, consSv, rG};
@@ -18505,6 +18715,7 @@ function salidasDeBitacora(op){
     if(!m.insumoId || m.folio !== folio || !nuestra(m.nota)) return;
     if(!ins[m.insumoId]) ins[m.insumoId] = {id:m.insumoId, nom:m.insumo || "", cant:0};
     ins[m.insumoId].cant -= num(m.delta);
+    if(m.rollos){ const r = ins[m.insumoId].rollos || (ins[m.insumoId].rollos = {}); Object.keys(m.rollos).forEach(k=> r[k] = (r[k] || 0) - num(m.rollos[k])); }
   });
   const hay = x => x.cant > 0.0005;
   return {arts:Object.values(arts).filter(hay), ins:Object.values(ins).filter(hay), bitacora:true};
@@ -18535,7 +18746,7 @@ async function regresaSalidas(op, sal){
     if(await moverInventario(x.id, "entrada", num(x.cant), nota, true, {folio, archivo:null}, x.variante || null)) n++;
   }
   let ins = 0;
-  (sal.ins || []).forEach(x=>{ if(num(x.cant) > 0 && insumoDe(x.id)){ mueveInsumo(x.id, num(x.cant), nota, folio); ins++; } });
+  (sal.ins || []).forEach(x=>{ if(num(x.cant) > 0 && insumoDe(x.id)){ mueveInsumo(x.id, num(x.cant), nota, folio, x.rollos || null); ins++; } });
   if(ins){ persist(); renderInvInsumos(); try{ if(typeof renderInsumos === "function") renderInsumos(); }catch(_){} }
   return n + ins;
 }
@@ -23939,7 +24150,9 @@ function svMedidas(pr, st){ const k = pr.medida === "cm" ? 0.01 : 1; return [Mat
 function svMejorRollo(pr, st){
   const [w,h] = svMedidas(pr, st), q = num(st.q);
   let mejor = null, mc = Infinity;
-  (pr.rollos||[]).forEach(r=>{ const a = svAcomoda(w, h, q, r, pr.orilla, pr.sep); if(a && a.consumo < mc - 1e-9){ mc = a.consumo; mejor = r; } });
+  /* Si el material escogido tiene rollos en inventario, se acomoda en los anchos que sí hay. */
+  const hay = typeof icAnchosConStock === "function" ? icAnchosConStock(pr, st) : null;
+  (hay || pr.rollos||[]).forEach(r=>{ const a = svAcomoda(w, h, q, r, pr.orilla, pr.sep); if(a && a.consumo < mc - 1e-9){ mc = a.consumo; mejor = r; } });
   return mejor == null ? (pr.rollos||[])[ (pr.rollos||[]).length-1 ] : mejor;
 }
 function svNormaliza(pr, st){
@@ -24759,7 +24972,8 @@ function svConsumoServicio(svc){
     if(inv === "m2") cant = r.acomodo ? r.acomodo.consumo : r.A*r.q;
     else if(inv === "ml") cant = r.arm ? r.arm.usado : r.q;
     else cant = r.arm ? (r.arm.completo && r.arm.a && r.arm.a.hojasEnteras ? r.arm.a.hojasEnteras : r.arm.usado) : r.q;
-    if(cant > 0) out.push({ins, cant: Math.round(cant*1000)/1000});
+    const rr = inv === "m2" && r.acomodo && typeof icK === "function" ? {[icK(r.acomodo.rollo)]: Math.round(r.acomodo.largo*1000)/1000} : null;
+    if(cant > 0) out.push({ins, cant: Math.round(cant*1000)/1000, rollos: rr});
   });
   if(typeof icMigra === "function"){
     icMigra();
@@ -24779,7 +24993,7 @@ function svDescuentaServicios(q, folio){
   const lista = (Array.isArray(q.items) && q.items.length ? q.items : [q]).filter(x=>x && x.modo === "impresion" && x.svc);
   const hechos = [];
   lista.forEach(x=> svConsumoServicio(x.svc).forEach(c=>{
-    mueveInsumo(c.ins.id, -c.cant, "Salida por " + (q.folio || "pedido"), folio || ""); hechos.push(c); }));
+    mueveInsumo(c.ins.id, -c.cant, "Salida por " + (q.folio || "pedido"), folio || "", c.rollos && typeof icNeg === "function" ? icNeg(c.rollos) : null); hechos.push(c); }));
   if(hechos.length && typeof persist === "function") persist();
   return hechos;
 }
@@ -26732,10 +26946,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261114-2300";</script>
+<script>window.BUILD="20261115-0900";</script>
 <script>
 (function(){
-  var mio = "20261114-2300";
+  var mio = "20261115-0900";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
