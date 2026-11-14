@@ -3257,6 +3257,38 @@ body.rol-produccion #btnPrint{display:none!important}
 .tpTipoSel select{max-width:280px}
 .moNota{font-size:12.5px;color:var(--ink-3);align-self:end;padding-bottom:10px}
 .svVelo.catModo #svVAgregar{display:none}
+.icRej{margin-bottom:22px}
+.icAgota{position:absolute;top:8px;left:8px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;background:#FEE2E2;color:#991B1B}
+.icTitResumen{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:16px;margin:4px 0 8px}
+.icVentana{width:min(920px,100%)}
+.icPieTxt{font-size:12.5px;color:var(--ink-3);align-self:center;margin-right:auto}
+.icSec{margin-bottom:6px}
+.icForm > .btn{align-self:flex-start}
+.icFila{border:1px solid var(--line-soft);background:var(--surface);border-radius:14px;padding:10px 12px;margin-top:10px}
+.icCab{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-bottom:8px}
+.icCab b{font-size:14px}
+.icCab small{font-size:11.5px;color:var(--ink-3)}
+.icCab .icNom{flex:1 1 200px;width:auto;min-width:0;font-weight:700;font-size:13.5px}
+.icCab select,.icRegArt select,.icPasa select{width:auto;font-size:12.5px;padding:6px 8px}
+.icCab .svOpX{margin-left:auto}
+.icGasta{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--ink-2)}
+.icGasta input{width:84px}
+.icCampos{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 14px}
+.icCampos label{display:flex;flex-direction:column;gap:3px;font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.icNum{display:inline-flex;align-items:center;gap:5px;text-transform:none;letter-spacing:0}
+.icNum input{width:96px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:13px}
+.icNum .u{font-size:11px;font-weight:600;color:var(--ink-3)}
+.icEnt input{width:80px}
+.icEstado{font-size:11px;font-weight:800;padding:4px 10px;border-radius:99px;background:#DCFCE7;color:#166534;margin-left:auto;align-self:center}
+.icEstado.insPoco{background:#FEF3C7;color:#92400E}
+.icEstado.insFalta{background:#FEE2E2;color:#991B1B}
+.icLleva{margin:10px 8px 0 0}
+.icPasa{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--ink-2)}
+.icRegArt{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:8px 0;font-size:12.5px}
+.icRegArt input{width:80px}
+.icRegArt .k2{color:var(--ink-3);font-weight:700}
+.icNuevo [hidden]{display:none!important}
+@media (max-width:760px){ .icForm{padding:14px} .icEstado{margin-left:0} .icNum input{width:84px} .icGasta{flex-wrap:wrap} }
 .svTile.pausa{background:var(--surface-2);border-style:dashed}
 .svTile.pausa .svIco{filter:grayscale(.85);opacity:.55}
 .svTile.pausa b,.svTile.pausa small{opacity:.65}
@@ -4433,10 +4465,12 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   </div>
 
   <div class="card secOculta" data-inv="ins" id="cardInvIns">
-    <header><h2>Consumibles</h2><span class="hint" id="invInsHint"></span></header>
+    <header><h2>Consumibles por equipo</h2><span class="hint" id="invInsHint"></span></header>
     <div class="body">
-      <p class="note" style="margin:0 0 14px">Lo que se gasta produciendo. Baja solo cuando confirmas un
-        pedido, con lo que de verdad calculó el armado — no a ojo.</p>
+      <p class="note" style="margin:0 0 14px">Toca un equipo para cargar lo que compras y decir cuánto gasta. Baja solo
+        cuando confirmas un pedido, con lo que de verdad calculó el acomodo, y regresa si se cancela.</p>
+      <div id="icRej" class="svRej icRej"></div>
+      <h3 class="icTitResumen">Lo que vigilas</h3>
       <div class="tbl-wrap"><table id="t_invIns"></table></div>
     </div>
   </div>
@@ -6536,6 +6570,7 @@ function porDe(ancla){
    varios articulos tiene un armado y unas aplicaciones por articulo. */
 function consumoDe(q, r){
   if(!q || !r) return [];
+  if(typeof icMigra === "function") icMigra();
   const acum = {};
   const suma = (insumoId, cant, origen) => {
     const c = num(cant);
@@ -6548,6 +6583,10 @@ function consumoDe(q, r){
   partes.forEach(p=>{
     const qi = p.q || {}, ri = p.r || {};
     const qty = num(ri.qty);
+    /* Lo que mide cada equipo en esta parte: área impresa, material usado,
+       piezas, puntadas. Las reglas de cada equipo se aplican una vez. */
+    const bases = {}, nomT = {}, mats = [];
+    const B = T => bases[T] || (bases[T] = {m2:0, m2mat:0, ml:0, hoja:0, pieza:0, milpuntadas:0, pedido:0});
     (ri.armado||[]).forEach(a=>{
       const s = svcDe(a.servicioId); if(!s) return;
       consumosDe("servicio", a.servicioId).forEach(cs=>{
@@ -6556,6 +6595,11 @@ function consumoDe(q, r){
                    :                         num(a.areaPiezasM2);
         suma(cs.insumoId, num(cs.cant) * base, s.nombre);
       });
+      const T = typeof icTipoDeServicio === "function" ? icTipoDeServicio(s) : null; if(!T) return;
+      const b = B(T); b.m2mat += num(a.areaCompradaM2); if(s.unidad !== "m2") b.ml += num(a.unidades);
+      if(!nomT[T]) nomT[T] = s.nombre;
+      const ins = typeof icInsumoDeServicio === "function" ? icInsumoDeServicio(s) : null;
+      if(ins) mats.push({T, ins, cant: s.unidad === "m2" ? num(a.areaCompradaM2) : num(a.unidades), de: s.nombre});
     });
     (qi.apps||[]).forEach(ap=>{
       const t = (cat.tecnicas||[]).find(x=>x.id===ap.tecnicaId); if(!t) return;
@@ -6567,7 +6611,17 @@ function consumoDe(q, r){
                    :                            qty;
         suma(cs.insumoId, num(cs.cant) * base, t.nombre + " · " + (ap.ubic||"aplicación"));
       });
+      if(typeof tecTipo !== "function") return;
+      const T = tecTipo(t), b = B(T);
+      b.m2 += areaUna * qty; b.pieza += qty; b.milpuntadas += (num(ap.puntadas)/1000) * qty; b.pedido += 1;
+      nomT[T] = t.nombre;
     });
+    Object.keys(bases).forEach(T=>{
+      consumosDe("tipo", T).forEach(cs=> suma(cs.insumoId, num(cs.cant) * num(bases[T][cs.por]), nomT[T] || T));
+    });
+    /* El rollo mismo: el de la opción ligada en la venta suelta, salvo que
+       el equipo ya lo tenga como regla (no se descuenta dos veces). */
+    mats.forEach(m=>{ if(!consumosDe("tipo", m.T).some(cs=>cs.insumoId === m.ins.id)) suma(m.ins.id, m.cant, m.de); });
     const art = (cat.articulos||[]).find(x=>x.id===qi.articuloId);
     if(art) consumosDe("articulo", art.id).forEach(cs=>{
       suma(cs.insumoId, num(cs.cant) * (cs.por==="pedido" ? 1 : qty), art.nombre);
@@ -9966,6 +10020,339 @@ document.addEventListener("change", e=>{
   toast(s.value ? nom + " quedó suspendido: " + TP_MOTIVO[s.value].toLowerCase() + ". No se puede cotizar hasta que lo reactives." : nom + " ya se puede cotizar otra vez.");
 });
 
+/* ============ CONSUMIBLES POR EQUIPO (nov 2026) ============
+   Una sola puerta para lo que se gasta produciendo: Inventario de producción
+   › Consumibles por equipo. Cada equipo (los mismos iconos del cotizador)
+   tiene:
+   · su material (rollo, lona, hojas, láminas), que baja con el acomodo real
+     de cada pedido, en la venta suelta y en los artículos;
+   · sus consumibles (tinta, polvo, hilo…) con la regla de cuánto gastan.
+   Las reglas viejas (amarradas a un Material o a una técnica) se pasan solas
+   a su equipo. Lo que no es de ningún equipo (bolsas, etiquetas) va en
+   «Otros consumibles», con su regla por artículo.
+   ============================================================ */
+const IC_POR = [["m2","por m² impreso"], ["m2mat","por m² de material usado"], ["ml","por metro de rollo usado"],
+                ["hoja","por hoja"], ["pieza","por pieza impresa"], ["milpuntadas","por cada mil puntadas"], ["pedido","una vez por diseño"]];
+const IC_POR_ART = [["pieza","por pieza"], ["pedido","una vez por pedido"]];
+const IC_ICO_OTROS = '<svg class="svIco" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="56" rx="17" ry="2.6" fill="rgba(0,0,0,.12)"/>' +
+  '<path d="M17 23h30l-2.2 30.5a2 2 0 0 1-2 1.8H21.2a2 2 0 0 1-2-1.8Z" fill="url(#svgRosa)"/><path d="M17 23h30l-.5 6H17.5Z" fill="rgba(0,0,0,.08)"/>' +
+  '<path d="M25 27v-8a7 7 0 0 1 14 0v8" fill="none" stroke="#9D174D" stroke-width="3" stroke-linecap="round"/>' +
+  '<circle cx="25" cy="27.5" r="2" fill="#9D174D"/><circle cx="39" cy="27.5" r="2" fill="#9D174D"/></svg>';
+const icNorm = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+const icAdmin = () => typeof veDetalle === "function" ? veDetalle() : true;
+/* El equipo de un Material de artículos: el de su opción ligada en la venta
+   suelta, el de su técnica o, al último, el que dice su nombre. */
+function icTipoDeServicio(s){
+  if(!s) return null;
+  if(s.sv && s.sv.pid && svProd(s.sv.pid)) return svSecDe(s.sv.pid);
+  const t = s.tecnicaId && (cat.tecnicas || []).find(x=>x.id === s.tecnicaId);
+  if(t) return tecTipo(t);
+  const n = icNorm(s.nombre);
+  if(/dtf/.test(n)) return /\buv\b/.test(n) ? "uv" : "dtf";
+  if(/subli/.test(n)) return "subli";
+  if(/vinil (textil|de corte)|\bcorte\b/.test(n)) return "vinil";
+  if(/papel|couche|bond|opalina|cartulina/.test(n)) return "digital";
+  return "gran";
+}
+/* La existencia del rollo de un Material ligado: la misma de su opción. */
+function icInsumoDeServicio(s){
+  if(!s || !s.sv) return null;
+  const pr = svProd(s.sv.pid), g = pr && (pr.grupos || []).find(x=>x.id === s.sv.gid), o = g && (g.ops || []).find(x=>x.id === s.sv.op);
+  return o && o.ins ? insumoDe(o.ins) : null;
+}
+function icMigra(){
+  const ls = cat.consumos || [];
+  if(!ls.some(c=> c.ancla === "servicio" || c.ancla === "tecnica")) return false;
+  const nuevas = [], ya = new Set(ls.filter(c=>c.ancla === "tipo").map(c=>c.anclaId + "|" + c.insumoId + "|" + c.por));
+  const mapaS = {m2:"m2", m2compra:"m2mat"};
+  ls.forEach(c=>{
+    if(c.ancla !== "servicio" && c.ancla !== "tecnica"){ nuevas.push(c); return; }
+    let T = null, por = c.por;
+    if(c.ancla === "servicio"){
+      const s = svcDe(c.anclaId); if(!s) return;
+      T = icTipoDeServicio(s); por = mapaS[c.por] || (s.unidad === "m2" ? "m2mat" : "ml");
+    } else {
+      const t = (cat.tecnicas || []).find(x=>x.id === c.anclaId); if(!t) return;
+      T = tecTipo(t);
+    }
+    if(!T || !insumoDe(c.insumoId)) return;
+    const k = T + "|" + c.insumoId + "|" + por; if(ya.has(k)) return; ya.add(k);
+    nuevas.push({id:c.id, ancla:"tipo", anclaId:T, insumoId:c.insumoId, cant:num(c.cant), por});
+  });
+  cat.consumos = nuevas;
+  try{ persist(); }catch(_){}
+  return true;
+}
+/* Lo que se gasta en un concepto de venta suelta, medido como lo piden las reglas. */
+function icBasesServicio(pr, st, r){
+  const q = num(r.q), cobro = r.cobro, A = num(r.A);
+  const gb = svGruposVis(pr, st).find(g=>g.modo === "base"), base = gb && (gb.ops || []).find(o=>o.id === st.sel[gb.id]);
+  const sop = cobro === "ml" ? (r.arm && r.arm.sop) || svSoporte(pr, base, "ml") : null, anc = sop && sop.r ? num(sop.r) : 0;
+  const usado = r.arm ? num(r.arm.usado) : q;
+  const piezas = r.arm ? num(st.q) : (cobro === "ml" ? 0 : q);
+  const m2 = A > 0 && piezas > 0 ? A*piezas : (cobro === "ml" ? usado*anc : 0);
+  return {m2, m2mat: r.acomodo ? num(r.acomodo.consumo) : (cobro === "ml" ? usado*anc : m2),
+          ml: cobro === "ml" ? usado : (r.acomodo ? num(r.acomodo.largo) : 0),
+          hoja: cobro === "hoja" ? usado : 0, pieza: piezas, milpuntadas: 0, pedido: 1};
+}
+/* ---------- qué es de cada equipo ---------- */
+function icMateriales(T){
+  const s = svCat().secciones.find(x=>x.id === T), vistos = new Set(), lista = [], pend = [];
+  let rig = false;
+  ((s && s.prods) || []).forEach(pid=>{
+    const pr = svProd(pid); if(!pr) return;
+    if(pr.rigido) rig = true;
+    svGrupos(pr).forEach(g=>{
+      if(!svInvDe(pid, g) || !(g.ops || []).length) return;
+      let faltan = 0;
+      g.ops.forEach(o=>{ const i = o.ins && insumoDe(o.ins);
+        if(i){ if(!vistos.has(i.id)){ vistos.add(i.id); lista.push(i); } } else faltan++; });
+      if(faltan) pend.push({pid, gid:g.id, nom:(pr.tab || pr.nom) + " · " + g.nom.toLowerCase(), faltan});
+    });
+  });
+  if(rig) (cat.insumos || []).filter(i=>i.rig).forEach(i=>{ if(!vistos.has(i.id)){ vistos.add(i.id); lista.push(i); } });
+  return {lista, pend};
+}
+const icReglas = T => (cat.consumos || []).filter(c=>c.ancla === "tipo" && c.anclaId === T && insumoDe(c.insumoId));
+function icDeTipo(T){
+  const m = icMateriales(T), reglas = icReglas(T), ids = new Set(m.lista.map(i=>i.id));
+  reglas.forEach(c=> ids.add(c.insumoId));
+  return {mat:m.lista, pend:m.pend, reglas, todos:[...ids].map(insumoDe).filter(Boolean)};
+}
+function icTipos(){ try{ return tpLista(); }catch(_){ return []; } }
+function icOtros(){
+  const usados = new Set();
+  icTipos().forEach(x=> icDeTipo(x.id).todos.forEach(i=>usados.add(i.id)));
+  return (cat.insumos || []).filter(i=>!usados.has(i.id));
+}
+/* ---------- la rejilla de equipos ---------- */
+function icPintaRej(){
+  const w = $("#icRej"); if(!w) return;
+  icMigra();
+  const tiles = icTipos().map(x=>{
+    const d = icDeTipo(x.id);
+    return {id:x.id, nom:x.nom, ico:svIco(x.ico || x.id), todos:d.todos, mat:d.mat.length, cons:new Set(d.reglas.map(c=>c.insumoId)).size, pend:d.pend.length, pz:tpPausa(x.id)};
+  });
+  const ot = icOtros();
+  tiles.push({id:"otros", nom:"Otros consumibles", ico:IC_ICO_OTROS, todos:ot, mat:0, cons:ot.length, pend:0, pz:null});
+  w.innerHTML = tiles.map(x=>{
+    const sinEx = x.todos.filter(i=> num(i.existencia) <= 0).length, poco = x.todos.filter(i=> estadoIns(i).txt === "Por acabarse").length;
+    const sub = x.todos.length
+      ? [x.mat ? x.mat + (x.mat === 1 ? " material" : " materiales") : "", x.cons ? x.cons + (x.cons === 1 ? " consumible" : " consumibles") : "", x.pend && !x.mat ? "falta su material" : ""].filter(Boolean).join(" · ")
+      : (x.pend ? "falta llevar su material" : "nada cargado todavía");
+    return '<button type="button" class="svTile icTile'+(x.pz ? ' pausa' : '')+'" data-ictipo="'+esc(x.id)+'">' +
+      (sinEx ? '<span class="icAgota">' + sinEx + ' sin existencia</span>' : poco ? '<span class="tpRevisa">' + poco + ' por resurtir</span>' : '') +
+      (x.pz ? '<span class="svCandado">' + esc(TP_MOTIVO[x.pz.motivo] || "Suspendido") + '</span>' : '') +
+      x.ico + '<b>'+esc(x.nom)+'</b><small>'+esc(sub)+'</small></button>';
+  }).join("");
+}
+/* ---------- la ventana de un equipo ---------- */
+let IC = null;
+function icVelo(){
+  let v = $("#icVelo"); if(v) return v;
+  document.body.insertAdjacentHTML("beforeend",
+    '<div class="svVelo" id="icVelo" hidden><div class="svVentana icVentana" role="dialog" aria-modal="true" aria-labelledby="icTit">' +
+    '<header class="svVCab"><span id="icIco"></span><div style="min-width:0"><h2 id="icTit"></h2><p id="icSub"></p></div>' +
+    '<div class="der"><button class="btn icon sm" type="button" data-iccierra="1" aria-label="Cerrar">✕</button></div></header>' +
+    '<div class="svVForm icForm" id="icForm"></div>' +
+    '<footer class="svVPie"><span class="icPieTxt" id="icPie"></span><button class="btn primary" type="button" data-iccierra="1">Listo</button></footer></div></div>');
+  return $("#icVelo");
+}
+function icAbre(T){
+  icMigra();
+  const x = T === "otros" ? {id:"otros", nom:"Otros consumibles"} : icTipos().find(t=>t.id === T); if(!x) return;
+  IC = {tipo:T, nuevo:false, origen:document.activeElement};
+  const v = icVelo();
+  $("#icIco").innerHTML = T === "otros" ? IC_ICO_OTROS : svIco(x.ico || x.id);
+  $("#icTit").textContent = T === "otros" ? "Otros consumibles" : "Consumibles · " + x.nom;
+  $("#icSub").textContent = T === "otros" ? "Lo que no es de un equipo: bolsas, etiquetas, empaque." : "Carga lo que compras. Baja solo al confirmar cada pedido y regresa si se cancela.";
+  icPinta(); v.hidden = false; document.body.style.overflow = "hidden";
+  setTimeout(()=>{ const c = v.querySelector("[data-iccierra]"); if(c) c.focus(); }, 40);
+}
+function icCierra(){
+  const v = $("#icVelo"); if(v) v.hidden = true;
+  const o = IC && IC.origen; IC = null; document.body.style.overflow = "";
+  icPintaRej(); try{ renderInvInsumos(); }catch(_){}
+  try{ if(typeof pintaLanzadorSec === "function") pintaLanzadorSec("inv"); }catch(_){}
+  if(o && document.body.contains(o)) o.focus();
+}
+const icUni = i => abrevIns(i.unidad);
+function icCampos(i){
+  const e = estadoIns(i), u = icUni(i);
+  return '<div class="icCampos">' +
+    '<label>Existencia <span class="icNum"><input type="number" step="0.01" data-icf="existencia" data-prev="'+num(i.existencia)+'" value="'+num(i.existencia)+'"><span class="u">'+esc(u)+'</span></span></label>' +
+    '<label>Llegó <span class="icNum icEnt"><input type="number" min="0" step="0.01" placeholder="0" data-icentra aria-label="Cuánto llegó de '+esc(i.nombre)+'"><button type="button" class="btn sm" data-icsuma="1">Sumar</button></span></label>' +
+    '<label>Mínimo <span class="icNum"><input type="number" min="0" step="0.01" data-icf="minimo" value="'+num(i.minimo)+'"><span class="u">'+esc(u)+'</span></span></label>' +
+    (icAdmin() ? '<label>Costo por '+esc(u)+' <span class="icNum"><input type="number" min="0" step="0.0001" data-icf="costo" value="'+num(i.costo)+'"></span></label>' : '') +
+    '<span class="icEstado '+e.cls+'">'+esc(num(i.existencia) <= 0 ? "Sin existencia" : e.txt)+'</span></div>';
+}
+function icPorOpts(T, actual, art){
+  const ops = art ? IC_POR_ART : IC_POR.filter(p=> p[0] !== "milpuntadas" || T === "bordado" || actual === "milpuntadas");
+  return ops.map(p=>'<option value="'+p[0]+'"'+(p[0] === actual ? ' selected' : '')+'>'+p[1]+'</option>').join("");
+}
+function icUniSel(i){
+  return '<select data-icf="unidad" aria-label="Unidad">' + UNIDADES_INS.map(u=>'<option value="'+u[0]+'"'+(i.unidad === u[0] ? ' selected' : '')+'>'+abrevIns(u[0])+'</option>').join("") + '</select>';
+}
+function icFilaMaterial(i){
+  return '<div class="icFila" data-icins="'+esc(i.id)+'"><div class="icCab"><b>'+esc(i.nombre)+'</b><small>'+esc(icUni(i))+
+    (i.rig ? ' · lámina de ' + svN0(i.rig.w) + '×' + svN0(i.rig.h) + ' cm' : '')+'</small></div>' + icCampos(i) + '</div>';
+}
+function icFilaRegla(c, T){
+  const i = insumoDe(c.insumoId);
+  return '<div class="icFila" data-icins="'+esc(i.id)+'" data-icr="'+esc(c.id)+'"><div class="icCab">' +
+    '<input type="text" class="icNom" data-icf="nombre" value="'+esc(i.nombre)+'" aria-label="Nombre del consumible">' + icUniSel(i) +
+    '<span class="icGasta">Gasta <input type="number" min="0" step="0.0001" data-icrf="cant" value="'+num(c.cant)+'" aria-label="Cuánto gasta"><span class="u">'+esc(icUni(i))+'</span>' +
+    '<select data-icrf="por" aria-label="Por">'+icPorOpts(T, c.por)+'</select></span>' +
+    '<button type="button" class="svOpX" data-icquita="'+esc(c.id)+'" title="Quitar de este equipo" aria-label="Quitar '+esc(i.nombre)+' de este equipo">✕</button></div>' + icCampos(i) + '</div>';
+}
+function icNuevoHTML(T, yaIds){
+  const otros = (cat.insumos || []).filter(i=>!yaIds.has(i.id));
+  const otro = T === "otros";
+  return '<section class="svGrp svNuevoProd icNuevo"><h3>'+(otro ? 'Consumible nuevo' : 'Agregar un consumible a este equipo')+'</h3><div class="svNpFila">' +
+    (otro || !otros.length ? '' : '<label class="largo">Cuál <select id="icNDe"><option value="">Uno nuevo</option>' +
+      otros.map(i=>'<option value="'+esc(i.id)+'">'+esc(i.nombre)+' ('+esc(icUni(i))+')</option>').join("") + '</select></label>') +
+    '<label class="largo icSoloNuevo">Nombre <input id="icNNom" placeholder="Tinta, polvo, hilo, bolsa…"></label>' +
+    '<label class="icSoloNuevo">Unidad <select id="icNUni">' + UNIDADES_INS.map(u=>'<option value="'+u[0]+'">'+u[1]+'</option>').join("") + '</select></label></div>' +
+    '<div class="svNpFila">' + (otro ? '' : '<label>Gasta <input id="icNCant" type="number" min="0" step="0.0001" placeholder="0"></label>' +
+      '<label class="largo">Cómo <select id="icNPor">'+icPorOpts(T, "m2")+'</select></label>') +
+    '<label class="icSoloNuevo">Existencia <input id="icNEx" type="number" min="0" step="0.01" placeholder="0"></label>' +
+    (icAdmin() ? '<label class="icSoloNuevo">Costo por unidad <input id="icNCosto" type="number" min="0" step="0.0001" placeholder="$"></label>' : '') + '</div>' +
+    '<div class="svNpBtns"><button type="button" class="btn primary sm" data-icnok="1">Agregar</button><button type="button" class="btn sm" data-icncancela="1">Cancelar</button></div></section>';
+}
+function icPinta(){
+  if(!IC) return;
+  const f = $("#icForm"), T = IC.tipo, top = f.scrollTop;
+  let h = "", todos = [];
+  if(T === "otros"){
+    const ot = icOtros(); todos = ot;
+    h += '<section class="svGrp icSec"><h3>Sin equipo</h3>' +
+      (ot.length ? ot.map(i=>'<div class="icFila" data-icins="'+esc(i.id)+'"><div class="icCab">' +
+        '<input type="text" class="icNom" data-icf="nombre" value="'+esc(i.nombre)+'" aria-label="Nombre del consumible">' + icUniSel(i) +
+        '<label class="icPasa">Llevar a <select data-icpasa="'+esc(i.id)+'"><option value="">— un equipo —</option>' +
+          icTipos().map(x=>'<option value="'+esc(x.id)+'">'+esc(x.nom)+'</option>').join("") + '</select></label></div>' + icCampos(i) + '</div>').join("")
+        : '<p class="tpIntro">Todo lo que tienes ya está en algún equipo.</p>') + '</section>';
+    const reglas = (cat.consumos || []).filter(c=>c.ancla === "articulo" && insumoDe(c.insumoId));
+    const arts = cat.articulos || [];
+    h += '<section class="svGrp icSec"><h3>Por artículo <span class="gn">la bolsa o la etiqueta que lleva cada pieza</span></h3>' +
+      reglas.map(c=>{ const i = insumoDe(c.insumoId);
+        return '<div class="icRegArt" data-icra="'+esc(c.id)+'"><select data-icraf="insumoId" aria-label="Consumible">' +
+          (cat.insumos || []).map(x=>'<option value="'+esc(x.id)+'"'+(x.id === c.insumoId ? ' selected' : '')+'>'+esc(x.nombre)+'</option>').join("") + '</select>' +
+          '<input type="number" min="0" step="0.0001" data-icraf="cant" value="'+num(c.cant)+'" aria-label="Cuánto"><span class="u">'+esc(icUni(i))+'</span>' +
+          '<select data-icraf="por" aria-label="Por">'+icPorOpts(null, c.por, true)+'</select><span class="k2">en</span>' +
+          '<select data-icraf="anclaId" aria-label="Artículo">' + arts.map(a=>'<option value="'+esc(a.id)+'"'+(a.id === c.anclaId ? ' selected' : '')+'>'+esc(a.nombre)+'</option>').join("") + '</select>' +
+          '<button type="button" class="svOpX" data-icrax="'+esc(c.id)+'" aria-label="Quitar regla">✕</button></div>'; }).join("") +
+      ((cat.insumos || []).length && arts.length ? '<button type="button" class="btn sm" data-icranueva="1">+ Regla por artículo</button>' : '') + '</section>';
+    h += IC.nuevo ? icNuevoHTML(T, new Set()) : '<button type="button" class="btn sm svGrupoMas" data-icnuevo="1">+ Consumible</button>';
+  } else {
+    const d = icDeTipo(T); todos = d.todos;
+    if(d.mat.length || d.pend.length){
+      h += '<section class="svGrp icSec"><h3>Material <span class="gn">baja con el acomodo real de cada pedido</span></h3>' +
+        d.mat.map(icFilaMaterial).join("") +
+        d.pend.map(p=>'<button type="button" class="btn sm icLleva" data-icllevar="'+esc(p.pid)+'|'+esc(p.gid)+'">Llevar en inventario · '+esc(p.nom)+' ('+p.faltan+(p.faltan === 1 ? ' opción' : ' opciones')+')</button>').join("") +
+        '</section>';
+    }
+    h += '<section class="svGrp icSec"><h3>Consumibles <span class="gn">tinta, polvo, hilo… con lo que gasta cada uno</span></h3>' +
+      (d.reglas.length ? d.reglas.map(c=>icFilaRegla(c, T)).join("") : '<p class="tpIntro">Este equipo todavía no tiene consumibles. Agrega lo que gasta al imprimir.</p>') + '</section>';
+    h += IC.nuevo ? icNuevoHTML(T, new Set(d.reglas.map(c=>c.insumoId))) : '<button type="button" class="btn sm svGrupoMas" data-icnuevo="1">+ Consumible</button>';
+  }
+  f.innerHTML = h; f.scrollTop = top;
+  const sinEx = todos.filter(i=>num(i.existencia) <= 0).length, poco = todos.filter(i=>estadoIns(i).txt === "Por acabarse").length;
+  $("#icPie").textContent = !todos.length ? "Los cambios se guardan solos." : sinEx ? sinEx + " sin existencia · los cambios se guardan solos" : poco ? poco + " por resurtir · los cambios se guardan solos" : "Todo con existencia · los cambios se guardan solos";
+  const sel = $("#icNDe"); if(sel) sel.dispatchEvent(new Event("change", {bubbles:true}));
+}
+function icNuevoGuarda(){
+  const T = IC.tipo, de = ($("#icNDe") || {}).value || "";
+  let i = de ? insumoDe(de) : null;
+  if(!i){
+    const nom = (($("#icNNom") || {}).value || "").trim(); if(!nom){ toast("Escribe el nombre del consumible."); return; }
+    i = {id:uid(), nombre:nom, unidad:($("#icNUni") || {}).value || "pza", costo:Math.max(0, num(($("#icNCosto") || {}).value)), existencia:0, minimo:0};
+    cat.insumos = (cat.insumos || []).concat([i]);
+    const ex = Math.max(0, num(($("#icNEx") || {}).value)); if(ex > 0) mueveInsumo(i.id, ex, "Existencia inicial", "");
+  }
+  if(T !== "otros"){
+    cat.consumos = (cat.consumos || []).concat([{id:uid(), ancla:"tipo", anclaId:T, insumoId:i.id, cant:Math.max(0, num(($("#icNCant") || {}).value)), por:($("#icNPor") || {}).value || "m2"}]);
+  }
+  IC.nuevo = false; persist(); icPinta();
+  toast(i.nombre + (T === "otros" ? " quedó en tu inventario." : " quedó en este equipo."));
+}
+document.addEventListener("click", e=>{
+  const tile = e.target.closest("[data-ictipo]");
+  if(tile){ icAbre(tile.dataset.ictipo); return; }
+  if(!IC || !e.target.closest("#icVelo")) return;
+  if(e.target.id === "icVelo" || e.target.closest("[data-iccierra]")){ icCierra(); return; }
+  let b;
+  if((b = e.target.closest("[data-icsuma]"))){
+    const fila = b.closest("[data-icins]"), inp = fila && fila.querySelector("[data-icentra]"), i = fila && insumoDe(fila.dataset.icins);
+    const n = inp ? num(inp.value) : 0; if(!i) return;
+    if(!(n > 0)){ toast("Escribe cuánto llegó."); if(inp) inp.focus(); return; }
+    mueveInsumo(i.id, n, "Entrada · llegó material", ""); persist(); icPinta();
+    toast("Sumaste " + cantIns(n) + " " + icUni(i) + " de " + i.nombre + ". Ahora hay " + cantIns(i.existencia) + ".");
+    return;
+  }
+  if((b = e.target.closest("[data-icquita]"))){
+    const c = (cat.consumos || []).find(x=>x.id === b.dataset.icquita); if(!c) return;
+    const i = insumoDe(c.insumoId);
+    cat.consumos = cat.consumos.filter(x=>x.id !== c.id); persist(); icPinta();
+    const sigue = icTipos().some(x=> icDeTipo(x.id).todos.some(y=>y.id === c.insumoId));
+    toast((i ? i.nombre : "El consumible") + " ya no se descuenta en este equipo." + (sigue ? "" : " Sigue en Otros consumibles con su existencia."));
+    return;
+  }
+  if((b = e.target.closest("[data-icllevar]"))){
+    const [pid, gid] = b.dataset.icllevar.split("|"), pr = svProd(pid), g = pr && svGrupos(pr).find(x=>x.id === gid);
+    const n = g ? svLlevaInv(pid, g) : 0;
+    if(n){ persist(); icPinta(); toast(n + (n === 1 ? " material quedó" : " materiales quedaron") + " en tu inventario con existencia 0. Captura lo que tienes en «Llegó»."); }
+    return;
+  }
+  if(e.target.closest("[data-icnuevo]")){ IC.nuevo = true; icPinta(); const i = $("#icNDe") || $("#icNNom"); if(i) i.focus(); return; }
+  if(e.target.closest("[data-icncancela]")){ IC.nuevo = false; icPinta(); return; }
+  if(e.target.closest("[data-icnok]")){ icNuevoGuarda(); return; }
+  if(e.target.closest("[data-icranueva]")){
+    const i0 = (cat.insumos || []).find(i=>/bolsa|etiqueta|empaque|caja/i.test(i.nombre)) || cat.insumos[0], a0 = (cat.articulos || [])[0];
+    if(!i0 || !a0) return;
+    cat.consumos = (cat.consumos || []).concat([{id:uid(), ancla:"articulo", anclaId:a0.id, insumoId:i0.id, cant:1, por:"pieza"}]);
+    persist(); icPinta(); return;
+  }
+  if((b = e.target.closest("[data-icrax]"))){ cat.consumos = (cat.consumos || []).filter(x=>x.id !== b.dataset.icrax); persist(); icPinta(); return; }
+});
+document.addEventListener("input", e=>{
+  if(!IC || !e.target.closest("#icForm")) return;
+  const t = e.target, fila = t.closest("[data-icins]"), i = fila && insumoDe(fila.dataset.icins);
+  if(i && t.dataset.icf && t.dataset.icf !== "existencia" && t.tagName !== "SELECT"){
+    i[t.dataset.icf] = t.dataset.icf === "nombre" ? t.value : Math.max(0, num(t.value)); svGuardaPronto(); return;
+  }
+  const rf = t.closest("[data-icr]");
+  if(rf && t.dataset.icrf === "cant"){ const c = (cat.consumos || []).find(x=>x.id === rf.dataset.icr); if(c){ c.cant = Math.max(0, num(t.value)); svGuardaPronto(); } return; }
+  const ra = t.closest("[data-icra]");
+  if(ra && t.dataset.icraf === "cant"){ const c = (cat.consumos || []).find(x=>x.id === ra.dataset.icra); if(c){ c.cant = Math.max(0, num(t.value)); svGuardaPronto(); } }
+});
+document.addEventListener("change", e=>{
+  if(!IC || !e.target.closest("#icForm")) return;
+  const t = e.target, fila = t.closest("[data-icins]"), i = fila && insumoDe(fila.dataset.icins);
+  if(t.id === "icNDe"){ const nuevo = !t.value; document.querySelectorAll("#icForm .icSoloNuevo").forEach(x=> x.hidden = !nuevo); return; }
+  if(i && t.dataset.icf === "existencia"){
+    const ahora = num(t.value), d = Math.round((ahora - num(i.existencia))*10000)/10000;
+    if(d){ mueveInsumo(i.id, d, "Ajuste de existencia (conteo)", ""); persist(); icPinta(); toast(i.nombre + ": quedó en " + cantIns(i.existencia) + " " + icUni(i) + "."); }
+    return;
+  }
+  if(i && t.dataset.icf === "unidad"){ i.unidad = t.value; persist(); icPinta(); return; }
+  const rf = t.closest("[data-icr]");
+  if(rf && t.dataset.icrf === "por"){ const c = (cat.consumos || []).find(x=>x.id === rf.dataset.icr); if(c){ c.por = t.value; persist(); } return; }
+  if(t.dataset.icpasa){
+    const ins = insumoDe(t.dataset.icpasa), T = t.value; if(!ins || !T) return;
+    cat.consumos = (cat.consumos || []).concat([{id:uid(), ancla:"tipo", anclaId:T, insumoId:ins.id, cant:0, por: T === "bordado" ? "milpuntadas" : "pieza"}]);
+    persist(); icPinta();
+    toast(ins.nombre + " pasó a " + ((icTipos().find(x=>x.id === T) || {}).nom || "ese equipo") + ". Ábrelo para decir cuánto gasta.");
+    return;
+  }
+  const ra = t.closest("[data-icra]");
+  if(ra && t.dataset.icraf){
+    const c = (cat.consumos || []).find(x=>x.id === ra.dataset.icra); if(!c) return;
+    c[t.dataset.icraf] = t.dataset.icraf === "cant" ? Math.max(0, num(t.value)) : t.value; persist();
+    if(t.dataset.icraf === "insumoId") icPinta();
+  }
+});
+document.addEventListener("keydown", e=>{ if(e.key === "Escape" && IC && $("#icVelo") && !$("#icVelo").hidden){ e.stopPropagation(); icCierra(); } }, true);
+
 /* ============ LANZADOR DE SECCIONES ============ */
 /* Una sección declara sus tarjetas; esto hace el resto. */
 const SEC_LZ = {};
@@ -10122,10 +10509,10 @@ registraLanzador("inv", [
    icono:'<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>',
    card:'[data-inv="taller"]',
    cuenta:()=>{ try{ return faltantesInv().length; }catch(e){ return 0; } }},
-  {id:"ins", nombre:"Consumibles", sub:"tinta, polvo, hilo", color:"#14B8A6",
+  {id:"ins", nombre:"Consumibles por equipo", sub:"tinta, film, lona, polvo", color:"#14B8A6",
    icono:'<path d="M12 3s6 6.4 6 10a6 6 0 0 1-12 0c0-3.6 6-10 6-10Z"/>',
    card:'[data-inv="ins"]', cuenta:()=>(cat.insumos||[]).length,
-   alAbrir:()=>{ if(typeof renderInvInsumos === "function") renderInvInsumos(); }},
+   alAbrir:()=>{ if(typeof icPintaRej === "function") icPintaRej(); if(typeof renderInvInsumos === "function") renderInvInsumos(); }},
   {id:"sol", nombre:"Lo que ya pediste", sub:"tus solicitudes a compras", color:"#B26A00",
    icono:'<path d="M12 5v14M5 12h14"/>',
    card:'[data-inv="sol"]',
@@ -10628,10 +11015,12 @@ registraLanzador("cat", [
   {id:"extras", nombre:"Cargos extra", sub:"urgencia, empaque", color:"#F59E0B",
    icono:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
    card:'[data-cat="extras"]', cuenta:()=>(cat.extras||[]).length},
-  {id:"insumos", nombre:"Consumibles", sub:"tinta, polvo, hilo", color:"#14B8A6",
+  /* Consumibles y «Qué gasta cada cosa» se mudaron a Inventario de producción
+     › Consumibles por equipo. Las tarjetas siguen en la página, sin azulejo. */
+  {id:"insumos", nombre:"Consumibles", sub:"tinta, polvo, hilo", color:"#14B8A6", visible:()=>false,
    icono:'<path d="M12 3s6 6.4 6 10a6 6 0 0 1-12 0c0-3.6 6-10 6-10Z"/>',
    card:'[data-cat="insumos"]', cuenta:()=>(cat.insumos||[]).length},
-  {id:"consumos", nombre:"Qué gasta cada cosa", sub:"los amarres", color:"#8B5CF6",
+  {id:"consumos", nombre:"Qué gasta cada cosa", sub:"los amarres", color:"#8B5CF6", visible:()=>false,
    icono:'<path d="M9.5 14.5 14.5 9.5"/><path d="M7.8 11.2 6 13a3.5 3.5 0 0 0 5 5l1.8-1.8"/><path d="M16.2 12.8 18 11a3.5 3.5 0 0 0-5-5l-1.8 1.8"/>',
    card:'[data-cat="consumos"]', cuenta:()=>(cat.consumos||[]).length},
   {id:"inv", nombre:"Existencias", sub:"mover inventario", color:"#22C55E",
@@ -24297,6 +24686,18 @@ function svConsumoServicio(svc){
     else cant = r.arm ? (r.arm.completo && r.arm.a && r.arm.a.hojasEnteras ? r.arm.a.hojasEnteras : r.arm.usado) : r.q;
     if(cant > 0) out.push({ins, cant: Math.round(cant*1000)/1000});
   });
+  if(typeof icMigra === "function"){
+    icMigra();
+    const reglas = consumosDe("tipo", svSecDe(svc.pid));
+    if(reglas.length){
+      const b = icBasesServicio(pr, svc.st, r);
+      reglas.forEach(cs=>{
+        const ins = insumoDe(cs.insumoId); if(!ins || out.some(x=>x.ins.id === ins.id)) return;
+        const cant = num(cs.cant) * num(b[cs.por]);
+        if(cant > 0) out.push({ins, cant: Math.round(cant*1000)/1000});
+      });
+    }
+  }
   return out;
 }
 function svDescuentaServicios(q, folio){
@@ -26253,10 +26654,10 @@ async function accionAyuda(e) {
 }
 </script>
 
-<script>window.BUILD="20261114-1800";</script>
+<script>window.BUILD="20261114-2100";</script>
 <script>
 (function(){
-  var mio = "20261114-1800";
+  var mio = "20261114-2100";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
