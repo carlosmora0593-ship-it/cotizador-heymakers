@@ -3288,6 +3288,15 @@ body.rol-produccion #btnPrint{display:none!important}
 .icRegArt input{width:80px}
 .icRegArt .k2{color:var(--ink-3);font-weight:700}
 .icNuevo [hidden]{display:none!important}
+.icFila .icCab .svOpX{margin-left:auto}
+.icLlevaSel{margin-top:12px}
+.icChecks{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin:6px 0 4px}
+.icCheck{flex-direction:row!important;align-items:center;flex-wrap:wrap;gap:6px 10px!important;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 12px;cursor:pointer}
+.icCheck input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:var(--accent)}
+.icCheck .n{font-size:13.5px;font-weight:700;color:var(--ink);flex:1 1 auto}
+.icCheck:has(input:checked){border-color:var(--accent);background:var(--surface-2)}
+.icTengo{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--ink-3)}
+.icTengo input{width:76px;padding:5px 8px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px}
 @media (max-width:760px){ .icForm{padding:14px} .icEstado{margin-left:0} .icNum input{width:84px} .icGasta{flex-wrap:wrap} }
 .svTile.pausa{background:var(--surface-2);border-style:dashed}
 .svTile.pausa .svIco{filter:grayscale(.85);opacity:.55}
@@ -10151,6 +10160,64 @@ function icPintaRej(){
       x.ico + '<b>'+esc(x.nom)+'</b><small>'+esc(sub)+'</small></button>';
   }).join("");
 }
+/* ---------- material: escoger cuáles se llevan ----------
+   La lona y el vinil de gran formato son los mismos del plotter híbrido:
+   lo que se palomea en uno queda ligado en los dos, con una sola existencia. */
+const icNomMat = (pr, o) => String(pr.nom || "").replace(/\s*\(h[ií]brido\)/i, "") + " · " + o.nom;
+function icGemeloOp(pid, gid, o){
+  const gp = SV_GEMELO[pid] && svProd(SV_GEMELO[pid]), g = gp && svGrupos(gp).find(x=>x.id === gid), n = icNorm(o.nom).trim();
+  return g ? (g.ops || []).find(x=> icNorm(x.nom).trim() === n) || null : null;
+}
+function icLlevaHTML(pid, gid){
+  const pr = svProd(pid), g = pr && svGrupos(pr).find(x=>x.id === gid); if(!g) return "";
+  const inv = svInvDe(pid, g), u = svInvTxt(inv), gem = SV_GEMELO[pid] && svProd(SV_GEMELO[pid]);
+  const ops = (g.ops || []).filter(o=> !(o.ins && insumoDe(o.ins)));
+  return '<section class="svGrp svNuevoProd icLlevaSel" data-icllevasel="'+esc(pid)+'|'+esc(gid)+'"><h3>¿Cuáles manejas? · '+esc(String(pr.nom).replace(/\s*\(h[ií]brido\)/i, ""))+'</h3>' +
+    '<p class="svCapaNota">Palomea sólo lo que sí tienes en el taller. Si ya sabes cuánto tienes, escríbelo; si no, déjalo en blanco y lo cargas con «Llegó».' +
+    (gem ? ' Lo que palomees también queda en ' + esc(SV_GEMELO[pid] === "lona" || SV_GEMELO[pid] === "vinil" ? "Impresión gran formato" : "el Plotter híbrido") + ', con la misma existencia.' : '') + '</p>' +
+    '<div class="icChecks">' + ops.map(o=>'<label class="icCheck"><input type="checkbox" data-icop="'+esc(o.id)+'"><span class="n">'+esc(o.nom)+'</span>' +
+      '<span class="icTengo">Tengo <input type="number" min="0" step="0.01" data-ictengo="'+esc(o.id)+'" placeholder="0" aria-label="Cuánto tienes de '+esc(o.nom)+'"> '+esc(u)+'</span></label>').join("") + '</div>' +
+    '<div class="svNpBtns"><button type="button" class="btn primary sm" data-icllevaok="1">Agregar al inventario</button>' +
+    '<button type="button" class="btn sm" data-icllevacancela="1">Cancelar</button></div></section>';
+}
+function icLlevaGuarda(){
+  const box = $("#icForm [data-icllevasel]"); if(!box) return;
+  const [pid, gid] = box.dataset.icllevasel.split("|"), pr = svProd(pid), g = pr && svGrupos(pr).find(x=>x.id === gid); if(!g) return;
+  const inv = svInvDe(pid, g), elegidas = [...box.querySelectorAll("[data-icop]:checked")].map(x=>x.dataset.icop);
+  if(!elegidas.length){ toast("Palomea al menos una."); return; }
+  if(!Array.isArray(cat.insumos)) cat.insumos = [];
+  const nombres = [];
+  elegidas.forEach(oid=>{
+    const o = (g.ops || []).find(x=>x.id === oid); if(!o) return;
+    const gem = icGemeloOp(pid, gid, o);
+    let ins = gem && gem.ins && insumoDe(gem.ins);
+    if(!ins){
+      ins = {id:uid(), nombre:icNomMat(pr, o), unidad:svInvUni(inv), costo:num(o.c), existencia:0, minimo:0, svc:{pid, gid}};
+      cat.insumos.push(ins);
+      const ex = num((box.querySelector('[data-ictengo="'+oid+'"]') || {}).value);
+      if(ex > 0) mueveInsumo(ins.id, ex, "Existencia inicial", "");
+    }
+    o.ins = ins.id;
+    if(gem && !(gem.ins && insumoDe(gem.ins))) gem.ins = ins.id;
+    nombres.push(o.nom);
+  });
+  IC.lleva = null; persist(); icPinta();
+  toast(nombres.join(", ") + (nombres.length === 1 ? " quedó" : " quedaron") + " en tu inventario." + (SV_GEMELO[pid] ? " También en su gemelo." : ""));
+}
+/* Dejar de llevar un material: se desliga de todas sus opciones (en los dos
+   gemelos) y sale del inventario. Las cotizaciones no cambian. */
+function icQuitaMaterial(id){
+  const i = insumoDe(id); if(!i) return;
+  const msg = "¿Dejar de llevar «" + i.nombre + "» en el inventario?" + (num(i.existencia) > 0 ? " Tiene " + cantIns(i.existencia) + " " + icUni(i) + " registrados y se pierden." : "") +
+    " Lo puedes volver a palomear cuando quieras.";
+  if(!confirm(msg)) return;
+  const c = svCat();
+  Object.keys(c.productos || {}).forEach(pid=>{ const pr = c.productos[pid];
+    (pr.grupos || []).forEach(g=> (g.ops || []).forEach(o=>{ if(o.ins === id) delete o.ins; })); });
+  cat.insumos = (cat.insumos || []).filter(x=>x.id !== id);
+  cat.consumos = (cat.consumos || []).filter(x=>x.insumoId !== id);
+  persist(); icPinta(); toast(i.nombre + " ya no está en el inventario.");
+}
 /* ---------- la ventana de un equipo ---------- */
 let IC = null;
 function icVelo(){
@@ -10163,10 +10230,10 @@ function icVelo(){
     '<footer class="svVPie"><span class="icPieTxt" id="icPie"></span><button class="btn primary" type="button" data-iccierra="1">Listo</button></footer></div></div>');
   return $("#icVelo");
 }
-function icAbre(T){
+function icAbre(T, lleva, alCerrar){
   icMigra();
   const x = T === "otros" ? {id:"otros", nom:"Otros consumibles"} : icTipos().find(t=>t.id === T); if(!x) return;
-  IC = {tipo:T, nuevo:false, origen:document.activeElement};
+  IC = {tipo:T, nuevo:false, origen:document.activeElement, lleva: lleva || null, alCerrar: alCerrar || null};
   const v = icVelo();
   $("#icIco").innerHTML = T === "otros" ? IC_ICO_OTROS : svIco(x.ico || x.id);
   $("#icTit").textContent = T === "otros" ? "Otros consumibles" : "Consumibles · " + x.nom;
@@ -10176,7 +10243,9 @@ function icAbre(T){
 }
 function icCierra(){
   const v = $("#icVelo"); if(v) v.hidden = true;
-  const o = IC && IC.origen; IC = null; document.body.style.overflow = "";
+  const o = IC && IC.origen, fn = IC && IC.alCerrar; IC = null;
+  const sv = $("#svVelo"); document.body.style.overflow = sv && !sv.hidden ? "hidden" : "";
+  if(fn){ try{ fn(); }catch(_){} }
   icPintaRej(); try{ renderInvInsumos(); }catch(_){}
   try{ if(typeof pintaLanzadorSec === "function") pintaLanzadorSec("inv"); }catch(_){}
   if(o && document.body.contains(o)) o.focus();
@@ -10200,7 +10269,9 @@ function icUniSel(i){
 }
 function icFilaMaterial(i){
   return '<div class="icFila" data-icins="'+esc(i.id)+'"><div class="icCab"><b>'+esc(i.nombre)+'</b><small>'+esc(icUni(i))+
-    (i.rig ? ' · lámina de ' + svN0(i.rig.w) + '×' + svN0(i.rig.h) + ' cm' : '')+'</small></div>' + icCampos(i) + '</div>';
+    (i.rig ? ' · lámina de ' + svN0(i.rig.w) + '×' + svN0(i.rig.h) + ' cm' : '')+'</small>' +
+    (i.rig ? '' : '<button type="button" class="svOpX" data-icmatx="'+esc(i.id)+'" title="Dejar de llevar en inventario" aria-label="Dejar de llevar '+esc(i.nombre)+' en inventario">✕</button>') +
+    '</div>' + icCampos(i) + '</div>';
 }
 function icFilaRegla(c, T){
   const i = insumoDe(c.insumoId);
@@ -10253,7 +10324,12 @@ function icPinta(){
     if(d.mat.length || d.pend.length){
       h += '<section class="svGrp icSec"><h3>Material <span class="gn">baja con el acomodo real de cada pedido</span></h3>' +
         d.mat.map(icFilaMaterial).join("") +
-        d.pend.map(p=>'<button type="button" class="btn sm icLleva" data-icllevar="'+esc(p.pid)+'|'+esc(p.gid)+'">Llevar en inventario · '+esc(p.nom)+' ('+p.faltan+(p.faltan === 1 ? ' opción' : ' opciones')+')</button>').join("") +
+        d.pend.map(p=>{
+          const k = p.pid + "|" + p.gid;
+          if(IC.lleva === k) return icLlevaHTML(p.pid, p.gid);
+          const ya = d.mat.some(i=> i.svc && i.svc.pid === p.pid) || (svProd(p.pid).grupos || []).some(g=>g.id === p.gid && (g.ops || []).some(o=>o.ins && insumoDe(o.ins)));
+          return '<button type="button" class="btn sm icLleva" data-icllevar="'+esc(k)+'">' + (ya ? '+ Otro · ' + esc(p.nom) + ' (' + p.faltan + ' sin inventario)' : 'Llevar en inventario · ' + esc(p.nom) + ' (' + p.faltan + (p.faltan === 1 ? ' opción' : ' opciones') + ')') + '</button>';
+        }).join("") +
         '</section>';
     }
     h += '<section class="svGrp icSec"><h3>Consumibles <span class="gn">tinta, polvo, hilo… con lo que gasta cada uno</span></h3>' +
@@ -10302,12 +10378,10 @@ document.addEventListener("click", e=>{
     toast((i ? i.nombre : "El consumible") + " ya no se descuenta en este equipo." + (sigue ? "" : " Sigue en Otros consumibles con su existencia."));
     return;
   }
-  if((b = e.target.closest("[data-icllevar]"))){
-    const [pid, gid] = b.dataset.icllevar.split("|"), pr = svProd(pid), g = pr && svGrupos(pr).find(x=>x.id === gid);
-    const n = g ? svLlevaInv(pid, g) : 0;
-    if(n){ persist(); icPinta(); toast(n + (n === 1 ? " material quedó" : " materiales quedaron") + " en tu inventario con existencia 0. Captura lo que tienes en «Llegó»."); }
-    return;
-  }
+  if((b = e.target.closest("[data-icllevar]"))){ IC.lleva = b.dataset.icllevar; icPinta(); const c = $("#icForm [data-icop]"); if(c) c.focus(); return; }
+  if(e.target.closest("[data-icllevaok]")){ icLlevaGuarda(); return; }
+  if(e.target.closest("[data-icllevacancela]")){ IC.lleva = null; icPinta(); return; }
+  if((b = e.target.closest("[data-icmatx]"))){ icQuitaMaterial(b.dataset.icmatx); return; }
   if(e.target.closest("[data-icnuevo]")){ IC.nuevo = true; icPinta(); const i = $("#icNDe") || $("#icNNom"); if(i) i.focus(); return; }
   if(e.target.closest("[data-icncancela]")){ IC.nuevo = false; icPinta(); return; }
   if(e.target.closest("[data-icnok]")){ icNuevoGuarda(); return; }
@@ -10325,6 +10399,7 @@ document.addEventListener("input", e=>{
   if(i && t.dataset.icf && t.dataset.icf !== "existencia" && t.tagName !== "SELECT"){
     i[t.dataset.icf] = t.dataset.icf === "nombre" ? t.value : Math.max(0, num(t.value)); svGuardaPronto(); return;
   }
+  if(t.dataset.ictengo){ const c = t.closest(".icCheck"), cb = c && c.querySelector("[data-icop]"); if(cb && num(t.value) > 0) cb.checked = true; return; }
   const rf = t.closest("[data-icr]");
   if(rf && t.dataset.icrf === "cant"){ const c = (cat.consumos || []).find(x=>x.id === rf.dataset.icr); if(c){ c.cant = Math.max(0, num(t.value)); svGuardaPronto(); } return; }
   const ra = t.closest("[data-icra]");
@@ -24723,6 +24798,8 @@ document.addEventListener("click", e=>{
   if(e.target.closest("[data-svnuevocancela]")){ SVV.nuevoEn = null; svPintaForm(); return; }
   if((b = e.target.closest("[data-svnuevook]"))){ svNuevaOpGuarda(b.dataset.svnuevook); return; }
   if((b = e.target.closest("[data-svllevainv]"))){
+    /* Se escoge cuáles sí se manejan, en la misma lista de Inventario de producción. */
+    if(typeof icAbre === "function"){ icAbre(svSecDe(SVV.pid), SVV.pid + "|" + b.dataset.svllevainv, ()=>{ if(SVV) svPintaForm(); }); return; }
     const pr = svProd(SVV.pid), g = svGrupos(pr).find(x=>x.id === b.dataset.svllevainv);
     const n = g ? svLlevaInv(SVV.pid, g) : 0;
     if(n){ if(typeof persist === "function") persist(); try{ if(typeof renderInsumos === "function") renderInsumos(); }catch(_){}
@@ -24732,9 +24809,10 @@ document.addEventListener("click", e=>{
 });
 function svInvBoton(g){
   const inv = svInvDe(SVV.pid, g); if(!inv || !(g.ops || []).length) return "";
-  const faltan = g.ops.filter(o=> !(o.ins && insumoDe(o.ins))).length;
-  return faltan ? '<button type="button" class="svLleva" data-svllevainv="'+esc(g.id)+'">Llevar en inventario</button>'
-                : '<span class="svInvOk">en inventario · se descuenta al confirmar</span>';
+  const faltan = g.ops.filter(o=> !(o.ins && insumoDe(o.ins))).length, ya = g.ops.length - faltan;
+  if(!faltan) return '<span class="svInvOk">en inventario · se descuenta al confirmar</span>';
+  return ya ? '<span class="svInvOk">' + ya + ' en inventario</span><button type="button" class="svLleva" data-svllevainv="'+esc(g.id)+'">+ otra</button>'
+            : '<button type="button" class="svLleva" data-svllevainv="'+esc(g.id)+'">Llevar en inventario</button>';
 }
 function svPintaForm(){
   if(SVV.modo === "app") return cv2PintaFormApp();
@@ -26787,10 +26865,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261114-2100";</script>
+<script>window.BUILD="20261114-2300";</script>
 <script>
 (function(){
-  var mio = "20261114-2100";
+  var mio = "20261114-2300";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
