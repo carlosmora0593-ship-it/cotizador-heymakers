@@ -58,9 +58,9 @@ No sustituir los MX de `nuvoor.mx`. Agregar únicamente los registros reales que
 
 La plantilla específica de Restaurant está preparada en `supabase/templates/invite-restaurant.html`. No se aplica globalmente mientras no se preserve el comportamiento de Imprenta y los demás productos.
 
-**Estado:** DNS y SMTP verificados, con una prueba real entregada. La función de invitación está desplegada, con sus dos secretos instalados y respuesta 401 sin sesión comprobada. Las pantallas del personal están implementadas y probadas localmente; faltan la publicación en su ventana autorizada, SQL 38 por Carlos y la prueba real de aceptación.
+**Estado:** DNS y SMTP verificados, con una prueba real entregada. La función de invitación está desplegada, con sus dos secretos instalados y respuesta 401 sin sesión comprobada. Las pantallas del personal están publicadas y verificadas en línea (b44fdce, sello 20261114-2330). Faltan SQL 38 por Carlos y la prueba real de aceptación.
 
-## Pruebas necesarias antes de publicar
+## Pruebas necesarias antes de activar el personal
 
 - Una invitación real autorizada: aceptación del proveedor, recepción confirmada por Carlos, enlace/código, creación de contraseña y entrada al perfil correcto.
 - Invitación repetida y reenvío sin duplicar usuarios, perfiles ni cupos; correo ya registrado en otro negocio.
@@ -91,3 +91,5 @@ El esquema actual no tiene una referencia explícita a una licencia compartida: 
 ## Entrega de pantallas 20261114-2330
 
 Incluye Restaurant, el acceso del personal y su administración en Lab. La función de invitación y los secretos de envío ya están instalados. SQL 38 está publicado en Lab, con la protección contra PIN compartidos (6792dba). Falta que Carlos lo ejecute y se complete una invitación real con la confirmación y contraseña de su destinatario. Las pruebas locales pasaron; la entrega no presenta esa aceptación real como comprobada. Los cobros del personal requieren conexión y la asistencia se registra en el checador del restaurante.
+
+Publicación de esta entrega confirmada: commit **b44fdce**, push a main y once archivos publicados coincidentes con la fuente. El portal real muestra el acceso de trabajo y el servidor rechaza una invitación sin sesión (401). Consulta de instalación al cierre: SQL 38 todavía ausente. No se envió una invitación real de personal ni se creó una contraseña por Carlos.

@@ -12,7 +12,7 @@ La dirección personal del remitente elegido se conserva en la configuración re
 
 ## Acceso del personal de Restaurant
 
-Pantallas de la entrega **20261114-2330**:
+Pantallas publicadas en **b44fdce**, sello **20261114-2330**, y verificadas en línea:
 
 - Invitación desde **Restaurant → Personal → Acceso desde celular** y **Lab → Negocios y cuentas → Personal Restaurant**.
 - Un perfil por persona y negocio; **15 accesos en Estándar**, **40 compartidos entre Restaurant con plan Multisucursal y el mismo administrador principal**.
