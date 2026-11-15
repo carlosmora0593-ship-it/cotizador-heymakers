@@ -1,56 +1,47 @@
-# Correos de acceso de Nuvoor con Resend
+# Correos de Nuvoor · estado del 14 de noviembre de 2026
 
-## Lo único que necesita hacer Carlos al comenzar
+## Listo y comprobado
 
-1. Entrar o crear su cuenta en [Resend](https://resend.com/signup) y verificar su correo.
-2. En [API Keys](https://resend.com/api-keys), crear una llave llamada **Configurar Nuvoor**, con permiso **Full access** para registrar y verificar el dominio por API.
-3. Abrir PowerShell y ejecutar estas dos líneas. La llave se escribe oculta en PowerShell; **no se pega en el chat ni en capturas**:
+- Dominio **nuvoor.mx** creado y verificado en Resend.
+- Los cuatro registros de Resend están guardados en GoDaddy. Se conservaron los MX, SPF, DKIM y DMARC del correo principal, y los registros del sitio.
+- SMTP personalizado de Supabase: `smtp.resend.com`, TLS por puerto `465`, usuario `resend`, nombre de envío **Nuvoor** y límite de **100 correos por hora**.
+- SMTP usa una llave separada de **Sending access**, restringida al dominio. Su copia temporal de recuperación se retiró del entorno local.
+- Una prueba real de SMTP fue aceptada y Resend la reportó **entregada**. Esto comprueba el transporte de correo; no constituye una invitación de personal aceptada.
 
-```powershell
-$clave = Read-Host 'Llave de Resend' -AsSecureString
-[Environment]::SetEnvironmentVariable('RESEND_API_KEY',[Net.NetworkCredential]::new('',$clave).Password,'User')
-```
+La dirección personal del remitente elegido se conserva en la configuración remota y en el contexto privado de la sesión. No se escribe aquí, en el repositorio ni en HISTORIAL-CODEX. La propuesta anterior de usar `correo.nuvoor.mx` se sustituyó por verificar el dominio principal, para autorizar el remitente solicitado.
 
-4. Decir **«llave guardada»**. Codex puede leer esa variable de usuario sin reiniciar la aplicación y sin mostrarla.
+## Acceso del personal de Restaurant
 
-No se crea una cuenta ni se escribe una contraseña por Carlos. La variable de entorno no está cifrada como una caja fuerte: después de terminar se debe eliminar y revocar la llave temporal en Resend. El SMTP usará una llave distinta de **Sending access**, limitada al dominio.
+Pantallas de la entrega **20261114-2330**:
 
-## Lo que hará Codex o Claude por API
+- Invitación desde **Restaurant → Personal → Acceso desde celular** y **Lab → Negocios y cuentas → Personal Restaurant**.
+- Un perfil por persona y negocio; **15 accesos en Estándar**, **40 compartidos entre Restaurant con plan Multisucursal y el mismo administrador principal**.
+- Confirmación mediante código de correo, contraseña propia y PIN diario. La aplicación no entrega las contraseñas al gerente ni las guarda en el navegador.
+- Permisos de operación validados en el servidor. El personal no recibe una membresía de administrador.
+- Desactivar el expediente o retirar el acceso invalida el acceso y libera su cupo.
+- Los cobros desde el perfil del personal se confirman con conexión. Si se pierde la red, el pedido conserva su estado pendiente. La caja del titular mantiene su respaldo sin conexión anterior.
 
-- Buscar o crear **correo.nuvoor.mx** en Resend. Obtener los registros reales; no inventar el DKIM ni copiar registros de ejemplos.
-- Agregar sólo esos registros en GoDaddy. No reemplazar la zona DNS ni cambiar los MX del correo principal de nuvoor.mx. Si no hay acceso API, Carlos inicia sesión en [DNS de nuvoor.mx](https://dcc.godaddy.com/control/nuvoor.mx/dns) y se le entrega una tabla exacta para agregar.
-- Ejecutar **Verify** y comprobar que el dominio quede verificado antes de cambiar el envío de Supabase.
-- Crear una llave SMTP de **Sending access**, mantenerla sólo en memoria/variable de entorno y en el secreto SMTP de Supabase.
-- Configurar únicamente estos campos, sin cambiar las altas, sesiones ni redirecciones existentes:
+La nueva función `invitar-personal-restaurant` genera el código con Supabase Auth y prepara un correo en español mediante Resend. La vinculación se guarda **antes** del envío; sólo se marca «Enviada» después de que el proveedor lo acepta. El botón abre la confirmación y el trabajador escribe su código, evitando consumir el acceso mediante la previsualización del correo.
 
-| Campo | Valor |
-|---|---|
-| Sender email | acceso@correo.nuvoor.mx |
-| Sender name | Nuvoor |
-| Host | smtp.resend.com |
-| Port | 465 |
-| Username | resend |
-| Password | llave SMTP de Resend, nunca en archivos |
-| Emails por hora en Supabase | 100 |
+Los dos secretos del servidor están instalados y comprobados por nombre: `RESTAURANT_EMAIL_KEY` (sólo envío, limitada al dominio) y `RESTAURANT_EMAIL_FROM`. La función `invitar-personal-restaurant` ya está desplegada. La llamada sin sesión devuelve 401 y la preconsulta de conexión responde correctamente. Nunca colocar los valores de los secretos en archivos, argumentos escritos con la llave literal, capturas ni mensajes.
 
-El límite de Supabase no amplía el cupo contratado en Resend.
+## Pendiente antes de activar
 
-## Invitación en español
+La última revisión del portal pasó en Chrome móvil: código, contraseña propia, primer PIN y perfil correcto. También pasaron mesero/cajero sobre la misma base, el cobro desde su perfil, la protección contra PIN compartidos y la caja anterior sin SQL 38. La operación del dueño conserva su funcionamiento mientras no esté instalado el SQL de personal.
 
-La plantilla preparada está en `supabase/templates/invite.html`. Asunto: **Te invitaron a Nuvoor**. Usa `{{ .ConfirmationURL }}` para aceptar la invitación. El flujo de correo una vez más PIN del personal se implementa en la tarea de Personal, después de su vista previa.
+1. Carlos ejecuta **38-restaurant-personal.sql**, incluido en **Lab → Base de datos**, después de las migraciones anteriores. No dejar una migración antigua de permisos como última versión. Antes de instalarlo, la tarjeta de invitaciones explica este requisito; no simula envíos.
+2. Hacer una invitación real al destinatario de prueba autorizado en el chat y verificar aceptación y entrada. El código y la contraseña los introduce su dueño; no pedirlos por chat. La prueba SMTP entregada no sustituye esta comprobación.
 
-Para aplicar por CLI, usar un proyecto temporal mínimo con los ajustes anteriores, contraseña como `env(NUVOOR_RESEND_SMTP_KEY)` y la plantilla. Revisar el diff mostrando sólo rutas, no valores remotos completos. La CLI ya conectada puede utilizar su sesión sin entregar ninguna llave del proyecto al navegador.
+El SQL 38 actualizado en Lab incluye la protección contra PIN compartidos (`6792dba`). Si se copió una revisión anterior, volver a copiar la actual; es repetible.
 
-## Estado comprobado el 7 de noviembre
+La revisión automática se restableció. La configuración y el despliegue se completaron mediante la misma vía autorizada, sin extraer credenciales de la sesión de la CLI. Se retiró la copia temporal de la llave de personal del entorno de usuario. No se ejecutó SQL en producción.
 
-- Fotos y logo publicados, sello **20261107-0738**; SQL35 disponible en Lab.
-- No hay llave de Resend ni credenciales API de GoDaddy disponibles para Codex.
-- Invitación preparada. Supabase rechazó aplicarla: el proyecto gratuito usa el proveedor de correo predeterminado y requiere SMTP propio para modificar plantillas. **No se aplicó la plantilla ni se cambió SMTP.**
-- Dominio, DNS, SMTP, límite de 100/h e invitación de prueba **pendientes**. No se ha enviado la invitación autorizada.
-- El destinatario de prueba está sólo en el chat, nunca en el repositorio ni en HISTORIAL-CODEX.
+## Plantillas generales de Auth
 
-## Comprobación final
+Los asuntos de invitación y código se actualizaron al español mediante la CLI. El cuerpo HTML remoto no quedó verificado; no presentarlo como instalado. Los archivos genéricos están en `supabase/templates/invite.html` y `supabase/templates/magic-link.html`. La invitación específica del personal usa su propia plantilla en la función nueva y no depende de reemplazar la de Imprenta.
 
-Leer de nuevo la configuración sin imprimir contraseñas; confirmar remitente, servidor, puerto, límite, asunto y contenido de invitación. Mandar una sola invitación real de prueba al destinatario autorizado y comprobar el envío en Resend. Que la API acepte un correo no prueba por sí solo que llegó a la bandeja: Carlos confirma su recepción.
+## Protección de las llaves
 
-Fuentes: [SMTP de Resend](https://resend.com/docs/send-with-smtp), [dominios de Resend](https://resend.com/docs/api-reference/domains/create-domain), [SMTP de Supabase](https://supabase.com/docs/guides/auth/auth-smtp), [límites de Supabase](https://supabase.com/docs/guides/auth/rate-limits).
+Las variables temporales de configuración deben retirarse cuando se complete y compruebe el despliegue. Revocar únicamente las llaves temporales identificadas, preservando las de envío que estén en uso. Nunca imprimir ni copiar su valor para verificarlo; revisar presencia, nombre, permiso o estado del proveedor.
+
+Las altas públicas y Stripe conservan su política vigente. Esta configuración de correo no autoriza cobros reales ni nuevos accesos administrativos.

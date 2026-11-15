@@ -1,4 +1,4 @@
-const CACHE_NAME = "nuvoor-restaurant-v53-logo-seguro";
+const CACHE_NAME = "nuvoor-restaurant-v54-personal";
 const MEDIOS_CACHE = "nuvoor-restaurant-medios-v1";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
@@ -7,6 +7,8 @@ const APP_ASSETS = [
   new URL("manifest.webmanifest", APP_SCOPE).href,
   new URL("tema-borgona.css?v=20261109-1510", APP_SCOPE).href,
   new URL("catalogo-alimentos.js?v=1", APP_SCOPE).href,
+  new URL("personal-api.js?v=1", APP_SCOPE).href,
+  new URL("personal-admin.js?v=1", APP_SCOPE).href,
   new URL("../config.js", APP_SCOPE).href,
   new URL("../facturacion-pos.js?v=20261104-2206", APP_SCOPE).href,
   new URL("icons/icon-192.png", APP_SCOPE).href,
@@ -43,6 +45,15 @@ self.addEventListener("fetch", event => {
   const fiscalPath = new URL("../facturacion-pos.js", APP_SCOPE).pathname;
   if (url.origin !== APP_SCOPE.origin || (!url.pathname.startsWith(APP_SCOPE.pathname) && url.pathname !== configPath && url.pathname !== fiscalPath)) return;
 
+  // La liga de una invitación puede traer un código privado. No se guarda
+  // su dirección ni la respuesta de acceso en el caché del dispositivo.
+  if (url.pathname === new URL("personal.html", APP_SCOPE).pathname) {
+    event.respondWith(fetch(new Request(request,{cache:"no-store"})).catch(()=>new Response(
+      '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><p>Conéctate a internet para confirmar tu acceso a Nuvoor.</p>',
+      {status:503,headers:{"Content-Type":"text/html;charset=utf-8","Cache-Control":"no-store"}}
+    )));
+    return;
+  }
   if (request.mode === "navigate") {
     event.respondWith(fetch(request).then(response => {
       if (response.ok) caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));

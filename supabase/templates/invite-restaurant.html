@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="es-MX">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tu invitación a Nuvoor</title></head>
+<body style="margin:0;padding:28px 12px;background:#f1f5fb;color:#0a0e1a;font-family:Arial,sans-serif">
+  <table role="presentation" style="width:100%;max-width:540px;margin:auto;border-spacing:0;background:#fff;border:1px solid #dbe4f3;border-radius:18px">
+    <tr><td style="padding:30px 28px 20px;color:#4458a4;font-size:23px;font-weight:700;letter-spacing:3px">NUVOOR</td></tr>
+    <tr><td style="padding:8px 28px"><h1 style="margin:0;font-size:26px;line-height:1.3">{{ if .Data.nombre }}Hola, {{ .Data.nombre }}.{{ else }}Hola.{{ end }}<br>Tu equipo te espera.</h1></td></tr>
+    <tr><td style="padding:12px 28px 22px;font-size:15px;line-height:1.7;color:#536580">Te invitaron a trabajar en <strong>{{ if .Data.negocio }}{{ .Data.negocio }}{{ else }}Nuvoor Restaurant{{ end }}</strong>. Confirma tu correo y crea tu contraseña para comenzar.</td></tr>
+    <tr><td style="padding:0 28px 24px"><a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:15px 24px;background:#4458a4;border-radius:10px;color:#fff;text-decoration:none;font-size:16px;font-weight:700">Aceptar invitación</a></td></tr>
+    <tr><td style="padding:0 28px 12px;font-size:13px;line-height:1.7;color:#536580">Si el botón no abre, escribe este código en la pantalla de acceso de Nuvoor:</td></tr>
+    <tr><td style="padding:2px 28px 24px;color:#4458a4;font-size:28px;font-weight:700;letter-spacing:5px">{{ .Token }}</td></tr>
+    <tr><td style="padding:0 28px 24px;font-size:12px;line-height:1.7;color:#536580">El enlace y el código son personales y de un solo uso. Nadie de Nuvoor necesita conocer tu contraseña. Si no esperabas esta invitación, puedes ignorarla.</td></tr>
+    <tr><td style="padding:18px 28px;border-top:1px solid #e5ecf5;color:#536580;font-size:12px">Nuvoor · Tu negocio, en orden.</td></tr>
+  </table>
+</body></html>

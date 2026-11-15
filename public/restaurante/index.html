@@ -1547,7 +1547,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 #modalMods .modIncomplete{font-size:11px;color:var(--ink-3);margin:8px 0 0}
 @media(max-width:450px){.configSaveBar{padding:13px}.configSaveBar>.btn{width:100%}#modalMods .modChips{gap:7px}#modalMods .modChip{padding:10px}}
 </style>
-<meta name="nuvoor-build" content="20261109-1510">
+<meta name="nuvoor-build" content="20261114-2330">
 <link rel="stylesheet" href="./tema-borgona.css?v=20261109-1510">
 </head>
 <body>
@@ -1722,6 +1722,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 
 <!-- ============ PERSONAL ============ -->
 <section id="tab-personal" hidden>
+  <div class="card" style="margin-bottom:16px" id="personalCorreoCard"><header><h2>Acceso desde celular</h2></header><div style="padding:18px"><p>Invita al correo de cada perfil. La persona confirma su correo y crea su contraseña; conserva su PIN de Personal.</p><button type="button" class="btn primary" id="personalCorreoAbrir">Administrar invitaciones</button><div id="personalCorreoLista" hidden style="margin-top:16px"></div></div></div>
   <div class="pageHeading"><div><span>EQUIPO</span><h1>Personas y turnos</h1><p>Asistencia, horarios y control del equipo de servicio.</p></div></div>
   <div class="card" id="cardEquipoPersonal" hidden>
     <header><h2>Equipo y claves</h2><button class="btn sm primary" type="button" id="userNuevo" style="margin-left:auto">+ Agregar persona</button></header>
@@ -1932,7 +1933,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     <p class="note" id="trasladoOrigen"></p>
     <label>Mesa de destino<select id="trasladoDestino" required></select></label>
     <p class="trasladoNota">Se conserva la misma cuenta, con sus platillos y comensales.</p>
-    <label>Tu PIN de acceso<input id="trasladoPin" class="restaurantPin" type="password" inputmode="numeric" pattern="[0-9]{4,12}" maxlength="12" autocomplete="off" spellcheck="false" required></label>
+    <label>Tu PIN de acceso<input id="trasladoPin" class="restaurantPin" type="text" inputmode="numeric" pattern="[0-9]{4,12}" maxlength="12" autocomplete="one-time-code" spellcheck="false" required></label>
     <p id="trasladoMensaje" role="status" hidden></p>
     <button class="btn primary" id="trasladoConfirmar" type="submit">Transferir cuenta</button>
   </form>
@@ -2281,7 +2282,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <div class="claveCaja" id="accesoClave" hidden>
         <label class="f">Clave de <b id="accesoQuien"></b></label>
         <div style="display:flex;gap:8px;margin-top:6px">
-          <input id="accesoPass" class="restaurantPin" type="password" inputmode="numeric" placeholder="Tu clave" autocomplete="off" autocapitalize="none" spellcheck="false">
+          <input id="accesoPass" class="restaurantPin" type="text" inputmode="numeric" placeholder="Tu clave" autocomplete="one-time-code" autocapitalize="none" spellcheck="false">
           <button class="btn primary" id="accesoEntrar">Entrar</button>
           <button class="btn" id="accesoVolver">Volver</button>
         </div>
@@ -2521,7 +2522,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <p class="note" id="autoQue" style="margin:0 0 14px"></p>
       <div id="autoLista" style="margin-bottom:14px"></div>
       <label class="f" for="autoPin">Clave de quien autoriza</label>
-      <input id="autoPin" class="restaurantPin" type="password" inputmode="numeric" maxlength="12" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="••••">
+      <input id="autoPin" class="restaurantPin" type="text" inputmode="numeric" maxlength="12" autocomplete="one-time-code" autocapitalize="none" spellcheck="false" placeholder="••••">
       <div class="fila" style="margin-top:16px">
         <button class="btn primary ancho" id="autoOk">Autorizar</button>
       </div>
@@ -2653,6 +2654,8 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 <script src="../config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
 <script src="./catalogo-alimentos.js?v=1"></script>
+<script src="./personal-api.js?v=1"></script>
+<script src="./personal-admin.js?v=1"></script>
 <script>
 (async function(){
 const RESTAURANT_ACCOUNT_CACHE_KEY="nuvoor_restaurant_account_v1";
@@ -2738,6 +2741,7 @@ async function restaurantResolveAccount(client,session){
 async function preparaCuentaRestaurant(){
   if(!window.CONFIG||!CONFIG.SUPABASE_URL)return restaurantGate("No se pudo cargar la conexión","Nuvoor Restaurant necesita la configuración de Supabase para abrir una cuenta.","Revisa que ../config.js cargue en esta publicación.");
   const cachedSession=restaurantCachedSupabaseSession(),cachedAccount=cachedSession&&restaurantCachedAccount(cachedSession.user.id),requested=new URLSearchParams(location.search).get("cuenta");
+  if(!navigator.onLine&&cachedAccount?.personal)return restaurantGate("Conéctate para entrar a tu perfil","El acceso del personal necesita confirmar sus permisos en la nube.");
   if(!navigator.onLine){if(cachedSession&&cachedAccount&&Array.isArray(cachedAccount.productos)&&cachedAccount.productos.includes("restaurant")&&(!requested||requested===cachedAccount.accountId)){RESTAURANT_SESSION=cachedSession;return cachedAccount;}return restaurantGate("Necesitas internet para elegir el negocio","Conéctate a internet para identificar tu cuenta Nuvoor. Restaurant podrá abrir sin conexión después de verificar el negocio en este dispositivo.");}
   if(!window.supabase){if(cachedSession&&cachedAccount&&restaurantEsErrorRed(new Error("network"))&&Array.isArray(cachedAccount.productos)&&cachedAccount.productos.includes("restaurant")&&(!requested||requested===cachedAccount.accountId)){RESTAURANT_SESSION=cachedSession;return cachedAccount;}return restaurantGate("No se pudo abrir la sesión","Nuvoor no pudo cargar su conexión de acceso. Conéctate a internet y vuelve a intentarlo.");}
   RESTAURANT_SB=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
@@ -2747,6 +2751,11 @@ async function preparaCuentaRestaurant(){
   }catch(e){if(cachedSession&&cachedAccount&&restaurantEsErrorRed(e)&&Array.isArray(cachedAccount.productos)&&cachedAccount.productos.includes("restaurant")&&(!requested||requested===cachedAccount.accountId)){RESTAURANT_SESSION=cachedSession;return cachedAccount;}return restaurantGate("No se pudo revisar la sesión","No pudimos confirmar el acceso a Nuvoor Restaurant. Revisa tu conexión e inténtalo otra vez.",String(e&&e.code?e.code+" · ":"")+(e&&e.message||""));}
   if(!RESTAURANT_SESSION){location.replace("../acceso.html?producto=restaurant");return null;}
   try{
+    if(window.NuvoorPersonal){
+      const personal=await NuvoorPersonal.boot(RESTAURANT_SB,RESTAURANT_SESSION,requested);
+      if(personal?.redireccion)return null;
+      if(personal?.account){RESTAURANT_SB=personal.client;window.RESTAURANT_PERSONAL=personal;return personal.account;}
+    }
     const cuenta=await restaurantWithTimeout(restaurantResolveAccount(RESTAURANT_SB,RESTAURANT_SESSION),7000);
     if(!cuenta)return null;
     if(cuenta.faltaMigracion)return restaurantGate("Falta preparar los negocios separados","No podemos identificar el negocio de Restaurant en esta cuenta todavía.","Desde el Lab → Base de datos, ejecuta sql/19-negocios-por-correo.sql y vuelve a entrar.");
@@ -2766,6 +2775,7 @@ function restaurantLegacyData(){
   return {mesas:Array.isArray(mesas)?mesas.length:0,platillos:countMenu(menu),ventas:Array.isArray(comandas)?comandas.filter(x=>x&&(x.estado==="cerrada"||x.cerrada||x.tipo==="venta")).length:Array.isArray(comandas)?comandas.length:0,impresoras:cfg&&cfg.impresoras&&Array.isArray(cfg.impresoras)?cfg.impresoras.length:0};
 }
 function migraDatosRestaurant(info){
+  if(info.personal)return;
   const accountBase=RESTAURANT_LEGACY_BASE+"_c_"+restaurantSafeId(info.accountId),decisionKey="nuvoor_restaurant_migration_v1_"+restaurantSafeId(info.accountId);
   if(localStorage.getItem(decisionKey))return;
   const legacyKeys=[];for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key===RESTAURANT_LEGACY_BASE||key.startsWith(RESTAURANT_LEGACY_BASE+"_")&&!key.startsWith(RESTAURANT_LEGACY_BASE+"_c_"))legacyKeys.push(key);}
@@ -2815,7 +2825,7 @@ function toast(txt){
 /* ---------------- guardado ----------------
    Primero el navegador, siempre. Un punto de venta que se cae cuando se cae
    el internet no sirve: se cobra local y, si hay nube, se sube después. */
-const LS_BASE = RESTAURANT_LEGACY_BASE + "_c_" + restaurantSafeId(RESTAURANT_ACCOUNT.accountId);
+const LS_BASE = RESTAURANT_LEGACY_BASE + "_c_" + restaurantSafeId(RESTAURANT_ACCOUNT.accountId)+(RESTAURANT_ACCOUNT.personal?"_personal_"+restaurantSafeId(RESTAURANT_ACCOUNT.userId):"");
 const EVENTOS_KEY = LS_BASE + "_eventos";
 const POS_CONTEXT_KEY = LS_BASE + "_active_context";
 const EVENTO_REPORT_PREFIX = LS_BASE + "_event_report_";
@@ -2954,7 +2964,7 @@ function nubeMarcaBaseSincronizada(){try{localStorage.setItem(REST_NUBE_SYNCED_K
 function nubeConOrigenMigracion(cuerpo,aparato){const body=Object.assign({},cuerpo||{});body[REST_NUBE_MIGRATION_FIELD]={aparato:String(aparato||"")};return body;}
 function nubeOrigenMigracion(cuerpo){return String(cuerpo&&cuerpo[REST_NUBE_MIGRATION_FIELD]&&cuerpo[REST_NUBE_MIGRATION_FIELD].aparato||"");}
 function nubeSinMarcaMigracion(cuerpo){const body=nubeClona(cuerpo||{});delete body[REST_NUBE_MIGRATION_FIELD];return body;}
-function nubeDeviceId(){let id="";try{id=localStorage.getItem(REST_NUBE_DEVICE_KEY)||"";if(!id){id=uid();localStorage.setItem(REST_NUBE_DEVICE_KEY,id);}}catch(_){id=uid();}return id;}
+function nubeDeviceId(){if(window.RESTAURANT_PERSONAL)return RESTAURANT_PERSONAL.device;let id="";try{id=localStorage.getItem(REST_NUBE_DEVICE_KEY)||"";if(!id){id=uid();localStorage.setItem(REST_NUBE_DEVICE_KEY,id);}}catch(_){id=uid();}return id;}
 REST_NUBE.deviceId=nubeDeviceId();
 REST_NUBE.queue=nubeLee(REST_NUBE_QUEUE_KEY,[]);
 try{const migFlag=localStorage.getItem(REST_NUBE_MIGRATION_FLAG),sinBase=nubeTieneBaseSincronizada(),marcarCola=migFlag==="si"||(!sinBase&&migFlag!=="local"&&migFlag!=="hecho");if(marcarCola){let changed=false;REST_NUBE.queue=REST_NUBE.queue.map(q=>{if(!q||String(q.cuenta_id)!==String(RESTAURANT_ACCOUNT.accountId))return q;const aparato=q.aparato||REST_NUBE.deviceId;if(q.migracion!==true||!q.aparato||nubeOrigenMigracion(q.cuerpo)!==aparato)changed=true;return Object.assign({},q,{migracion:true,aparato,cuerpo:nubeConOrigenMigracion(q.cuerpo,aparato)});});if(changed)nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);REST_NUBE.migrandoInicial=REST_NUBE.queue.some(q=>q&&String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)&&q.migracion===true);}}catch(_){}
@@ -3044,8 +3054,18 @@ async function proyectaRestaurant(){
     (c.cancelaciones||[]).forEach(x=>nubePut(out,"rest_lineas",nubeId("cancelacion",x.id),Object.assign({tipo:"cancelacion",comandaId:c.id,eventoId:ev},nubeClona(x))));
     if(c.estado==="cerrada"&&!c.cancelada) nubePut(out,"rest_tickets",nubeId("ticket",c.id),proyectaTicketRestaurant(c,ev));
   });
-  for(const u of EQUIPO||[]){const pin=String(u.pin||"").trim(),hash=u.pin_hash||u.pinHash|| (pin?nubeSha256(nubePinSalt()+pin):null);const pin_hash=hash&&typeof hash.then==="function"?await hash:hash;nubePut(out,"rest_equipo",nubeId("persona",u.id),{id:u.id,nombre:u.nombre||"",rol:u.rol||"mesero",pin_hash:pin_hash||null,activo:u.activo!==false,eventoId:ev});}
+  for(const u of (RESTAURANT_ACCOUNT.personal&&!esGerente()?[]:EQUIPO)||[]){const pin=String(u.pin||"").trim(),hash=u.pin_hash||u.pinHash|| (pin?nubeSha256(nubePinSalt()+pin):null);const pin_hash=hash&&typeof hash.then==="function"?await hash:hash;nubePut(out,"rest_equipo",nubeId("persona",u.id),{id:u.id,nombre:u.nombre||"",rol:u.rol||"mesero",pin_hash:pin_hash||null,activo:u.activo!==false,eventoId:ev});}
   (EVENTOS||[]).forEach(x=>nubePut(out,"rest_eventos",String(x.id),Object.assign({},nubeClona(x),{eventoId:""})));
+  if(RESTAURANT_ACCOUNT.personal){
+    const yo=usuarioActual(),rol=yo.rol;
+    for(const [key,row] of Object.entries(out)){
+      const col=row.coleccion,b=row.cuerpo;
+      const writable=rol==='gerente'&&['rest_config','rest_carta','rest_mesas','rest_equipo'].includes(col)
+        ||col==='rest_comandas'&&rol!=='cocina'&&(rol!=='mesero'||b.meseroId===yo.id)
+        ||col==='rest_lineas'&&b.tipo!=='cancelacion'&&(rol!=='mesero'||COMANDAS.find(c=>c.id===b.comandaId)?.meseroId===yo.id);
+      if(!writable)delete out[key];
+    }
+  }
   return out;
 }
 function nubeQueueDoc(doc){const key=nubeClave(doc.coleccion,doc.doc_id),idx=REST_NUBE.queue.findIndex(x=>x.key===key),old=idx>=0?REST_NUBE.queue[idx]:{},entry=Object.assign({key,creado:new Date().toISOString(),intentos:0},nubeClona(doc));if(idx>=0){entry.creado=old.creado;entry.intentos=old.intentos||0;if(!Object.prototype.hasOwnProperty.call(doc,"impresionOffline")&&old.impresionOffline)entry.impresionOffline=old.impresionOffline;if(!Object.prototype.hasOwnProperty.call(doc,"confirmarImpresion")&&old.confirmarImpresion)entry.confirmarImpresion=old.confirmarImpresion;}const aparato=entry.aparato||old.aparato||REST_NUBE.deviceId;if(entry.migracion||old.migracion||REST_NUBE.migrandoInicial){entry.migracion=true;entry.aparato=aparato;entry.cuerpo=nubeConOrigenMigracion(entry.cuerpo,aparato);}else{const origen=nubeOrigenMigracion(old.cuerpo)||nubeOrigenMigracion(REST_NUBE.serverDocs[key]&&REST_NUBE.serverDocs[key].cuerpo);if(origen)entry.cuerpo=nubeConOrigenMigracion(entry.cuerpo,origen);}if(idx>=0)REST_NUBE.queue[idx]=entry;else REST_NUBE.queue.push(entry);nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);}
@@ -3062,7 +3082,7 @@ async function sincronizaNubeLocal(){
     // Una edición nueva nunca queda tapada por un eco recibido mientras se calcula la instantánea.
     if(revision!==REST_NUBE.revision){REST_NUBE.localDirty=true;return;}
     Object.keys(current).forEach(key=>{const old=previous[key];if(!old||nubeCanon(old.cuerpo)!==nubeCanon(current[key].cuerpo)){if(current[key].coleccion==="rest_tickets"&&(REST_NUBE.ticketIds.has(current[key].doc_id)||REST_NUBE.queue.some(q=>q.key===key)))return;nubeQueueDoc(current[key]);}});
-    Object.keys(previous).forEach(key=>{if(current[key])return;const old=previous[key];if(!old||old.cuerpo&&old.cuerpo._eliminado)return;nubeQueueDoc({cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:old.coleccion,doc_id:old.doc_id,cuerpo:{_eliminado:true,eventoId:nubeEventoId(),borradoEn:new Date().toISOString()}});});
+    Object.keys(previous).forEach(key=>{if(RESTAURANT_ACCOUNT.personal&&(!esGerente()||!["rest_carta","rest_mesas","rest_equipo"].includes(previous[key]?.coleccion)))return;if(current[key])return;const old=previous[key];if(!old||old.cuerpo&&old.cuerpo._eliminado)return;nubeQueueDoc({cuenta_id:RESTAURANT_ACCOUNT.accountId,coleccion:old.coleccion,doc_id:old.doc_id,cuerpo:{_eliminado:true,eventoId:nubeEventoId(),borradoEn:new Date().toISOString()}});});
     REST_NUBE.projection=nubeClona(current);nubeGuarda(REST_NUBE_PROJECTION_KEY,REST_NUBE.projection);
     REST_NUBE.localDirty=false;actualizaEstadoNube();
   }finally{REST_NUBE.serializando=false;}
@@ -3098,6 +3118,16 @@ function vaciaColaNube(){
         const confirmado=REST_NUBE.queue.indexOf(q);if(confirmado>=0)REST_NUBE.queue.splice(confirmado,1);
         nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);REST_NUBE.subscriptionBlocked=false;clearTimeout(REST_NUBE.retryTimer);REST_NUBE.retryTimer=null;REST_NUBE.error="";actualizaEstadoNube();
       }catch(e){
+        // Un precio u opción que cambió en otro aparato requiere volver a
+        // elegir el platillo. Se conserva el intento local para revisión;
+        // una falla de red conserva la cola normal y se vuelve a intentar.
+        if(RESTAURANT_ACCOUNT.personal&&e.code==='22023'&&q.coleccion==='rest_lineas'&&!REST_NUBE.serverDocs[q.key]){
+          const rechazados=nubeLee(LS_BASE+"_personal_rechazados",[]);rechazados.push({fecha:new Date().toISOString(),documento:payload,motivo:e.message});
+          nubeGuarda(LS_BASE+"_personal_rechazados",rechazados.slice(-100));
+          const pos=REST_NUBE.queue.indexOf(q);if(pos>=0)REST_NUBE.queue.splice(pos,1);
+          nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);aplicaDocumentosRestaurant(nubeRebaseMap());
+          toast("No se guardó "+(q.cuerpo.nombre||"el platillo")+": "+e.message);continue;
+        }
         const current=REST_NUBE.queue.find(x=>x.key===q.key);
         if(current)current.intentos=(current.intentos||0)+1;
         nubeGuarda(REST_NUBE_QUEUE_KEY,REST_NUBE.queue);
@@ -3202,6 +3232,10 @@ async function iniciaNubeRestaurant(){
   const rawCloud=nubeDocsDesdeServidor(),cloud=nubeDocsDeContexto(rawCloud),remoteCfg=Object.values(cloud).find(d=>d.coleccion==="rest_config");guardaSalPinRestaurant(remoteCfg?.cuerpo.pinSalt);
   const local=await proyectaRestaurant(),esDemo=restauranteEsEjemploSinCambios(),hasMigration=REST_NUBE.queue.some(q=>q&&q.migracion===true&&String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)),migrationElegida=localStorage.getItem(REST_NUBE_MIGRATION_FLAG)==="si",hasLocal=REST_LOCAL_START_KEYS.size>0||Object.keys(REST_NUBE.projection).length>0||REST_NUBE.queue.length>0||esDemo;
   REST_NUBE.enabled=true;REST_NUBE.ready=true;
+  if(RESTAURANT_ACCOUNT.personal){
+    aplicaDocumentosRestaurant(nubeRebaseMap());nubeMarcaBaseSincronizada();
+    escuchaNubeRestaurant();if(REST_NUBE.queue.length)await vaciaColaNube();actualizaEstadoNube();return;
+  }
   await iniciaRegistroCocinaPOS();
   const hayNube=Object.keys(cloud).length>0;
   const teniaContexto=Object.values(REST_NUBE.projection).some(d=>d.coleccion==="rest_config"&&String(d.cuerpo?.eventoId||"")===nubeEventoId());
@@ -3322,7 +3356,7 @@ function aplicaDocumentosRestaurant(docs){
   const headers=by("rest_comandas"),lineDocs=by("rest_lineas"),linesBy={};lineDocs.filter(x=>!x.tipo).forEach(x=>{const l=Object.assign({},x);delete l.eventoId;const id=l.comandaId;(linesBy[id]||(linesBy[id]=[])).push(l);});
   const ticketDocs=by("rest_tickets"),ticketBy={};ticketDocs.forEach(x=>{const y=Object.assign({},x);delete y.eventoId;ticketBy[y.id]=y;REST_NUBE.ticketIds.add(y.id);});
   if(has("rest_comandas")||has("rest_lineas")||has("rest_tickets")){COMANDAS=headers.map(h=>{const c=Object.assign({},h);delete c.eventoId;c.estado=h.estado==="cobrada"||h.estado==="cancelada"?"cerrada":h.estado;if(h.estado==="cancelada")c.cancelada=true;c.lineas=(linesBy[c.id]||[]).filter(l=>l.comandaId===c.id);if(ticketBy[c.id])Object.assign(c,ticketBy[c.id]);c.cancelaciones=lineDocs.filter(x=>x.tipo==="cancelacion"&&x.comandaId===c.id).map(x=>{const y=Object.assign({},x);delete y.tipo;delete y.eventoId;delete y.comandaId;return y;});return c;});}
-  const remoteTeam=by("rest_equipo").map(x=>{const prev=oldEquipo.find(y=>y.id===x.id)||{},y=Object.assign({},prev,{id:x.id,nombre:x.nombre,rol:x.rol,pin_hash:x.pin_hash||"",activo:x.activo!==false});delete y.pin;return y;});if(has("rest_equipo"))EQUIPO=remoteTeam;
+  const remoteTeam=by("rest_equipo").map(x=>{const prev=oldEquipo.find(y=>y.id===x.id)||{},y=Object.assign({},prev,{id:x.id,nombre:x.nombre,rol:x.rol,pin_hash:x.pin_hash||"",pinConfigurado:!!x.pinConfigurado,activo:x.activo!==false});delete y.pin;return y;});if(has("rest_equipo"))EQUIPO=remoteTeam;
   EVENTOS=Object.values(docs).filter(d=>d&&d.coleccion==="rest_eventos"&&d.cuerpo&&!d.cuerpo._eliminado).map(d=>Object.assign({},d.cuerpo));EVENTOS.forEach(x=>delete x.eventoId);try{localStorage.setItem(EVENTOS_KEY,JSON.stringify(EVENTOS));}catch(_){}
   guardaEstadoLocal();REST_NUBE.projection=nubeClona(Object.fromEntries(Object.entries(docs).filter(([,d])=>d&&d.cuerpo).map(([k,d])=>[k,{cuenta_id:d.cuenta_id,coleccion:d.coleccion,doc_id:d.doc_id,cuerpo:d.cuerpo}])));nubeGuarda(REST_NUBE_PROJECTION_KEY,REST_NUBE.projection);
   aplicaMarca();aplicaRol(true);if(typeof renderMesas==="function")renderMesas();if(typeof renderCocina==="function")renderCocina();if(typeof renderComanda==="function"&&comandaActual())renderComanda();pintaTabs();actualizaAvisosReclamosNube();actualizaEstadoNube();procesaLineasEntrantes();
@@ -3656,10 +3690,11 @@ const ROLES = {
   cocina:  {nombre:"Cocina",  ve:["cocina","personal"]}
 };
 let usuarioId = null;
-const usuarioActual = () => EQUIPO.find(u=>u.id===usuarioId) || EQUIPO[0] ||
-  {id:"g", nombre:"Administrador", rol:"gerente"};
+const usuarioActual = () => RESTAURANT_ACCOUNT.personal
+  ? (EQUIPO.find(u=>u.id===RESTAURANT_ACCOUNT.personal.persona)||{id:RESTAURANT_ACCOUNT.personal.persona,nombre:RESTAURANT_ACCOUNT.personal.nombre,rol:RESTAURANT_ACCOUNT.personal.rol})
+  : EQUIPO.find(u=>u.id===usuarioId) || EQUIPO[0] || {id:"g", nombre:"Administrador", rol:"gerente"};
 const rolActual = () => usuarioActual().rol || "gerente";
-const puedeVer = s => (ROLES[rolActual()] || ROLES.gerente).ve.indexOf(s) >= 0;
+const puedeVer = s => (!RESTAURANT_ACCOUNT.personal||s!=="eventos")&&(ROLES[rolActual()] || ROLES.gerente).ve.indexOf(s) >= 0;
 const esGerente = () => rolActual() === "gerente";
 
 /* ---------------- las pestañas ---------------- */
@@ -4740,6 +4775,7 @@ $("#llevarNombreForm").addEventListener("submit",async e=>{
   entraAComanda(c);
 });
 function entraAComanda(c){
+  if(!c)return;
   comandaId = c.id;
   catVista = "";
   vaA("comanda");
@@ -4821,7 +4857,7 @@ async function nuevaComanda(m, personas, appId){
         if(existing)return existing;
         throw new Error("La mesa se reservó pero su comanda todavía no llegó.");
       }
-    }catch(e){nubeRegistraError(e);toast("No se pudo revisar la mesa en la nube. La comanda se guardará en este aparato y se intentará subir.");}
+    }catch(e){if(RESTAURANT_ACCOUNT.personal){nubeRegistraError(e);toast(e.message||"No se pudo abrir la mesa.");return null;}nubeRegistraError(e);toast("No se pudo revisar la mesa en la nube. La comanda se guardará en este aparato y se intentará subir.");}
   }
   COMANDAS.unshift(c); persist();
   if(REST_NUBE.enabled){
@@ -5095,7 +5131,7 @@ function reducePlatilloConAutorizacion(c,l,nueva,motivo,nota){
     $("#modalCorrige").hidden = true; corrigiendo = null;
     renderComanda(); pintaTabs();
     toast(nueva===0 ? "Platillo cancelado" : "Cantidad actualizada a " + (vendePorKilo(linea)?etiquetaPeso(nueva):nueva));
-  });
+  },{comanda:c.id,linea:l.id,cantidad:nueva,antes,enviada:enviada||"",motivo,nota:nota||""});
 }
 $("#corrCerrar").addEventListener("click", ()=>{ $("#modalCorrige").hidden = true; corrigiendo = null; });
 $("#corrCuerpo").addEventListener("click", e=>{
@@ -5118,6 +5154,7 @@ $("#corrCuerpo").addEventListener("click", e=>{
     const antes = num(l.cant,1);
     if(nueva === antes){ $("#modalCorrige").hidden = true; corrigiendo = null; return; }
     if(nueva < antes){ reducePlatilloConAutorizacion(c,l,nueva,motivo,nota); return; }
+    if(RESTAURANT_ACCOUNT.personal&&l.enviada){toast("Agrega las piezas adicionales desde el menú para enviarlas en una comanda nueva.");return;}
     l.cant = nueva;
     if(l.enviada) l.estado = "pedido";
     persist(); $("#modalCorrige").hidden = true; corrigiendo = null;
@@ -5178,7 +5215,7 @@ $("#comCancelar").addEventListener("click", ()=>{
   };
   /* Una mesa entera es la cancelacion mas cara que existe. */
   pideAutorizacion('Se va a cancelar <b>' + esc(c.mesaNombre) + '</b> completa' + (enCocina
-    ? ', con <b>' + enCocina + '</b> platillo(s) ya en cocina' : '') + '. Motivo: <b>' + esc(motivo) + '</b>.', hacerlo);
+    ? ', con <b>' + enCocina + '</b> platillo(s) ya en cocina' : '') + '. Motivo: <b>' + esc(motivo) + '</b>.', hacerlo,{comanda:c.id,mesa:true,lineas:vivas(c).map(l=>({id:l.id,cant:l.cant,enviada:l.enviada||""})),motivo,nota:""});
 });
 
 /* ---------------- modificadores ---------------- */
@@ -5219,7 +5256,7 @@ function modsElegidos(){
     const gid = ch.closest("[data-grupo]").dataset.grupo;
     const g = (MENU.grupos||[]).find(x=>x.id===gid); if(!g) return;
     const o = g.ops.find(x=>x.id === ch.dataset.op); if(!o) return;
-    if(String(o.nombre||"").trim())out.push({nombre:String(o.nombre).trim(), extra:num(o.extra)});
+    if(String(o.nombre||"").trim())out.push({grupoId:g.id,opcionId:o.id,nombre:String(o.nombre).trim(), extra:num(o.extra)});
   });
   return out;
 }
@@ -5720,6 +5757,10 @@ const cajaEsDeAqui = t => t?.aparato === REST_NUBE.deviceId;
 const cajaUsaNube = () => cajaInstalada === true || (cajaInstalada === null && !RESTAURANT_ACCOUNT.localOnly);
 
 function cajaPuedeCobrarAqui(){
+  if(RESTAURANT_ACCOUNT.personal&&!navigator.onLine){
+    toast("Conéctate para confirmar el cobro con tu perfil. El pedido sigue pendiente.");
+    return false;
+  }
   const pendiente = cajaPendiente();
   if(pendiente && ["activar","abrir","cerrar"].includes(pendiente.accion)){
     toast("Espera a que se confirme el cambio de turno en la nube.");
@@ -5744,6 +5785,11 @@ function cajaPuedeCobrarAqui(){
   return true;
 }
 async function guardaCobroConTurno(c,anterior){
+  if(RESTAURANT_ACCOUNT.personal&&(!navigator.onLine||!cajaEstado||!cajaFijaInstalada)){
+    const ix=COMANDAS.findIndex(x=>x.id===c.id);if(ix>=0&&anterior)COMANDAS[ix]=anterior;
+    toast("No se confirmó el cobro. Revisa la conexión de caja; el pedido sigue pendiente.");
+    return false;
+  }
   if(!cajaEstado){ persist(); return true; }
   c.cajaCompartida = true;
   c.cajaAparato = REST_NUBE.deviceId;
@@ -5942,7 +5988,7 @@ function tomarCajaAqui(){
   if(!t || !cajaFijaInstalada || rolActual()!=="gerente") return;
   $("#turnoTitulo").textContent = "Tomar la caja aquí";
   $("#turnoCuerpo").innerHTML = '<p class="note">Este dispositivo quedará como respaldo cuando se vaya internet.</p>'+
-    '<label class="f" for="turClaveCaja">Tu PIN</label><input id="turClaveCaja" type="password" inputmode="numeric" maxlength="12" autocomplete="off">'+
+    '<label class="f" for="turClaveCaja">Tu PIN</label><input class="restaurantPin" id="turClaveCaja" type="text" inputmode="numeric" maxlength="12" autocomplete="one-time-code">'+
     '<div class="fila" style="margin-top:16px"><button class="btn primary ancho" id="turToma">Confirmar cambio</button></div>';
   $("#modalTurno").hidden=false;
   $("#turToma").onclick=()=>{
@@ -6403,7 +6449,7 @@ function cierraTurno(){
     'no para confirmarlo.</p>' +
     '<label class="f" for="turContado">Dinero contado</label>' +
     '<input id="turContado" type="number" min="0" step="0.01" value="">' +
-    (cajaEstado && cajaFijaInstalada ? '<label class="f" for="turClaveCaja">Tu PIN</label><input id="turClaveCaja" type="password" inputmode="numeric" maxlength="12" autocomplete="off">' : '') +
+    (cajaEstado && cajaFijaInstalada ? '<label class="f" for="turClaveCaja">Tu PIN</label><input class="restaurantPin" id="turClaveCaja" type="text" inputmode="numeric" maxlength="12" autocomplete="one-time-code">' : '') +
     '<div class="fila" style="margin-top:16px"><button class="btn acento ancho" id="turCierra">Cerrar y ver el corte</button></div>';
   $("#modalTurno").hidden = false;
   setTimeout(()=>{ const f = $("#turContado"); if(f) f.focus(); }, 60);
@@ -7014,15 +7060,16 @@ function nvFiscalRestSnapshot(c){
   return {version:1,total:total/100,forma:FORMA_DE_PAGO[((c.pagos||[])[0]||{}).tipo]||'99',conceptos};
  }catch(_){return null;}
 }
-function nvFiscalRestAbre(){if(!window.NuvoorFiscal)return;NuvoorFiscal.montar($('#modalFacRest .body'),{
+function nvFiscalRestAbre(){if(RESTAURANT_ACCOUNT.personal){toast("La facturación la gestiona el titular de la cuenta.");return;}if(!window.NuvoorFiscal)return;NuvoorFiscal.montar($('#modalFacRest .body'),{
  context:()=>({cliente:RESTAURANT_SB,cuenta:RESTAURANT_ACCOUNT.accountId,sistema:'restaurant',documento:facFolio&&ticketDeFolio(facFolio)?nubeId('ticket',ticketDeFolio(facFolio).id):''}),
  receptor:()=>({rfc:$('#fr_rfc').value,razon:$('#fr_razon').value,cp:$('#fr_cp').value,regimen:$('#fr_regimen').value,uso:$('#fr_uso').value,metodo:$('#fr_metodo').value,forma:$('#fr_forma').value}),
  preparar:async()=>{const c=ticketDeFolio(facFolio);if(!c?.cfdi)throw Error('Esta cuenta no conserva su desglose fiscal. Puedes preparar los datos para tu PAC; las cuentas nuevas guardarán el desglose');if($('#fr_uuid').value.trim())throw Error('Conserva el UUID externo registrado; no generes otro comprobante');if(!navigator.onLine)throw Error('Conéctate a internet para facturar');await sincronizaNubeEnSerie(true);}
  });}
-if(window.NuvoorFiscal)NuvoorFiscal.emisor($('#restaurantFiscalSettings .body'),()=>({cliente:RESTAURANT_SB,cuenta:RESTAURANT_ACCOUNT.accountId,sistema:'restaurant'}));
+if(!RESTAURANT_ACCOUNT.personal&&window.NuvoorFiscal)NuvoorFiscal.emisor($('#restaurantFiscalSettings .body'),()=>({cliente:RESTAURANT_SB,cuenta:RESTAURANT_ACCOUNT.accountId,sistema:'restaurant'}));
 /* END FACTURACION POS */
 
 function abreFacturaRest(folio){
+  if(RESTAURANT_ACCOUNT.personal){toast("La facturación la gestiona el titular de la cuenta.");return;}
   const c=ticketDeFolio(folio);if(!c){toast("No encuentro esa venta");return;}
   facFolio=folio;const f=c.factura||{},tipo=((c.pagos||[])[0]||{}).tipo||"efectivo";
   $("#fr_resumen").innerHTML='<b>'+esc(c.folio)+'</b> · '+esc(c.mesaNombre||"")+' · '+esc(c.fecha)+'<br>'+((c.lineas||[]).length)+" platillo(s) · Total <b>"+mx(c.total)+"</b>"+(num(c.propina)?'<br><span style="color:var(--ink-3)">La propina de '+mx(c.propina)+' no se factura.</span>':'');
@@ -7199,9 +7246,30 @@ $("#trasladoForm").addEventListener("submit",async e=>{
 });
 
 let autoDestino = null;
+async function cancelaPersonalAutorizado(pin){
+  const solicitud=autoDestino,boton=$("#autoOk");if(!solicitud||boton.disabled)return;boton.disabled=true;
+  try{
+    await sincronizaNubeEnSerie(true);
+    if(REST_NUBE.queue.length)throw new Error("Hay cambios por guardar. Espera a que termine la sincronización.");
+    const r=await RESTAURANT_SB.personal.cancelar(solicitud.objetivo,solicitud.solicitud,pin);
+    if(r.error)throw r.error;if(!r.data?.ok)throw new Error(r.data?.error||"Revisa el PIN de autorización.");
+    for(const row of r.data.filas||[])REST_NUBE.serverDocs[nubeClave(row.coleccion,row.doc_id)]=row;
+    cierraAutorizacion();$("#modalCorrige").hidden=true;corrigiendo=null;
+    aplicaDocumentosRestaurant(nubeRebaseMap());if(solicitud.objetivo.mesa)vaA("mesas");toast("Cancelación guardada con autorización.");
+  }catch(e){toast(e.message||"No se pudo cancelar. El pedido se conserva.");$("#autoPin").value="";if(soyAutoridad())cierraAutorizacion();}
+  finally{boton.disabled=false;}
+}
 /* alAutorizar recibe {id, nombre}. Si el que opera ya manda, se le llama
    de inmediato con su propio nombre: su firma es el que haya entrado. */
-function pideAutorizacion(queTexto, alAutorizar){
+function pideAutorizacion(queTexto, alAutorizar, objetivo){
+  if(RESTAURANT_ACCOUNT.personal){
+    if(!objetivo||autoDestino)return;
+    autoDestino={operador:usuarioActual().id,objetivo,solicitud:uid()};
+    if(soyAutoridad()){cancelaPersonalAutorizado("");return;}
+    $("#autoQue").innerHTML=queTexto;
+    $("#autoLista").textContent="Debe autorizar un cajero o gerente con su PIN.";
+    $("#autoPin").value="";$("#modalAuto").hidden=false;$("#autoPin").focus();return;
+  }
   const operador = usuarioActual();
   if(operador.activo !== false && soyAutoridad()){
     alAutorizar({id: operador.id || "", nombre: operador.nombre || "", propio: true});
@@ -7233,6 +7301,7 @@ $("#autoOk").addEventListener("click", async()=>{
   if(!solicitud || boton.disabled) return;
   const pin = String($("#autoPin").value || "").trim();
   if(!pin) return;
+  if(RESTAURANT_ACCOUNT.personal){await cancelaPersonalAutorizado(pin);return;}
   boton.disabled = true;
   try{
     let u = null;
@@ -9402,6 +9471,7 @@ function imprimeCarta(titulo, cuerpo){
 let chQuien = null, chFoto = null, chTecleado = "", chCamara = null;
 let chValidando = false, chAbriendoCamara = false;
 function abreCheca(id){
+  if(RESTAURANT_ACCOUNT.personal){toast("Registra tu entrada o salida en el checador del restaurante.");return;}
   const u = EQUIPO.find(x=>x.id === id && x.activo !== false); if(!u) return;
   if(!tieneClave(u)){
     toast("A " + (u.nombre||"esta persona") + " le falta su PIN. El gerente lo configura en Personal → Equipo y claves.");
@@ -9493,6 +9563,7 @@ $("#chTeclado").addEventListener("click", e=>{
 $("#chCerrar").addEventListener("click", cierraCheca);
 $("#chOk").addEventListener("click", registraCheca);
 async function registraCheca(){
+  if(RESTAURANT_ACCOUNT.personal){cierraCheca();toast("Registra tu entrada o salida en el checador del restaurante.");return;}
   if(chValidando || $("#chOk").disabled || !chQuien) return;
   const intento = chQuien;
   const u = EQUIPO.find(x=>x.id === intento.id && x.activo !== false);
@@ -10248,6 +10319,10 @@ $("#formClavePersonal").addEventListener("submit", async e=>{
     const hash = await nubeSha256(sal+pin);
     if(editorClavePersonal !== editor || !esGerente() || !$("#acceso").hidden) return;
     if(sal !== nubePinSalt()) throw new Error();
+    if(EQUIPO.some(u=>u.activo!==false&&u.id!==editor.id&&((u.pin_hash||u.pinHash)===hash||String(u.pin||"")===pin))){
+      error.textContent="Ese PIN ya está en uso. Elige uno distinto para identificar a cada persona.";
+      error.hidden=false;$("#clavePersonalPin").value="";return;
+    }
     const persona = editor.id ? EQUIPO.find(u=>u.id === editor.id) : {id:uid(), nombre, rol, activo:true};
     if(!persona){
       cierraClavePersonal(); toast("Este perfil ya no está en el equipo."); return;
@@ -10677,6 +10752,8 @@ function aplicaMarca(){
 }
 function aplicaRol(desdeNube=false){
   const u = usuarioActual(), r = rolActual();
+  $("#personalCorreoCard").hidden=!esGerente();
+  $("#inicioEventos").hidden=!puedeVer("eventos");
   $("#userNombre").textContent = u.nombre || "Sin nombre";
   $("#userRol").textContent = (ROLES[r]||ROLES.gerente).nombre;
   const userAv=$("#userAv"); userAv.innerHTML=u.foto?'<img src="'+esc(u.foto)+'" alt="Foto de usuario">':esc((u.nombre||"?").trim().charAt(0).toUpperCase());
@@ -10702,8 +10779,8 @@ var relojBloqueoIntervalo = null;
 const MIN_BLOQUEO = 10;
 const tipoEntradaPinPOS = window.CSS?.supports("-webkit-text-security","disc") ? "text" : "password";
 ["#accesoPass","#autoPin","#clavePersonalPin","#trasladoPin"].forEach(id=>$(id).type=tipoEntradaPinPOS);
-const tieneClave = u => !!(String((u||{}).pin||"").trim()||String((u||{}).pin_hash||(u||{}).pinHash||"").trim());
-async function validaClavePerfil(u,clave){if(!u)return false;const hash=u.pin_hash||u.pinHash;if(hash){try{return await nubeSha256((REST_NUBE.pinSalt||localStorage.getItem(REST_NUBE_PIN_SALT_KEY)||"")+String(clave||""))===hash;}catch(_){return false;}}return String(clave||"")===String(u.pin||"");}
+const tieneClave = u => !!(u?.pinConfigurado||String((u||{}).pin||"").trim()||String((u||{}).pin_hash||(u||{}).pinHash||"").trim());
+async function validaClavePerfil(u,clave){if(!u)return false;if(RESTAURANT_ACCOUNT.personal){if(u.id!==RESTAURANT_ACCOUNT.personal.persona)return false;const r=await RESTAURANT_SB.personal.pin(String(clave||""));return !r.error&&r.data?.ok===true;}const hash=u.pin_hash||u.pinHash;if(hash){try{return await nubeSha256((REST_NUBE.pinSalt||localStorage.getItem(REST_NUBE_PIN_SALT_KEY)||"")+String(clave||""))===hash;}catch(_){return false;}}return String(clave||"")===String(u.pin||"");}
 const minutosBloqueo = () => { const n = num(P.bloqueoMin, MIN_BLOQUEO); return n > 0 ? n : 0; };
 const puedeBloquear = () => minutosBloqueo() > 0;
 
@@ -10754,6 +10831,7 @@ function pintaNotaBloqueo(){
 
 let perfilPendiente = null;
 function pideAcceso(opc){
+  if(RESTAURANT_ACCOUNT.personal){NuvoorPersonal.portal(RESTAURANT_ACCOUNT.accountId);return;}
   if(editorClavePersonal) cierraClavePersonal();
   const bloq = !!(opc && opc.bloqueo);
   bloqueado = bloq;
@@ -10804,6 +10882,7 @@ function pideAcceso(opc){
    checar es pedirle la clave dos veces. */
 function pintaAccesoReloj(){
   const caja = $("#accesoReloj"); if(!caja) return;
+  if(RESTAURANT_ACCOUNT.personal){caja.hidden=true;return;}
   const u = bloqueado ? usuarioActual()
                       : (perfilPendiente ? EQUIPO.find(x=>x.id === perfilPendiente) : null);
   if(!u || !tieneClave(u)){ caja.hidden = true; return; }
@@ -10930,6 +11009,7 @@ async function cargaAnuncios(){
    ARRANQUE
    =================================================================== */
 function arrancaEquipo(){
+  if(RESTAURANT_ACCOUNT.personal){usuarioId=RESTAURANT_ACCOUNT.personal.persona;cierraAcceso();aplicaRol();return;}
   if(!EQUIPO.length) EQUIPO = equipoPorDefecto();
   let rec = null;
   try{ rec = localStorage.getItem(LS+"_usuario"); }catch(e){}
@@ -10940,6 +11020,8 @@ function arrancaEquipo(){
   }else{ usuarioId = EQUIPO[0].id; pideAcceso(); }
 }
 function start(){
+  $("#personalCorreoAbrir").addEventListener("click",async()=>{const n=$("#personalCorreoLista");n.hidden=false;await NuvoorPersonalAdmin.mount(n,RESTAURANT_SB.personal?.raw||RESTAURANT_SB,RESTAURANT_ACCOUNT.accountId);});
+  $("#personalCorreoCard").hidden=!esGerente();
   const nombreCuenta=RESTAURANT_ACCOUNT.accountName||"Mi negocio";
   ["restaurantAccountName","restaurantAccountNameSettings"].forEach(id=>{const n=document.getElementById(id);if(n)n.textContent=nombreCuenta;});
   async function cambiarDePOS(){await detieneCocinaFondoPOS();const query=new URLSearchParams({producto:"restaurant"});if(new URLSearchParams(location.search).get("app")==="android")query.set("app","android");location.replace("../acceso.html?"+query.toString());}

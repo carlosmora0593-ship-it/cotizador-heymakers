@@ -36,6 +36,9 @@ function productosDe(row,detail){return lista(row&&row.productos).length?lista(r
 async function leerEmpresas(){
   const errores=[];let rows=[];
   try{const r=await sb.from("mis_empresas").select("*");if(r.error)errores.push(r.error);else rows=r.data||[];}catch(e){errores.push(e);}
+  // Los perfiles de Restaurant tienen permisos propios; nunca se convierten
+  // en miembros administradores para aparecer en el selector de negocios.
+  try{const r=await sb.rpc("rest_personal_mis_negocios");if(!r.error&&Array.isArray(r.data))for(const p of r.data){const old=rows.find(n=>n.id===p.cuenta);if(old?.rol==="admin")continue;if(old)rows=rows.filter(n=>n.id!==p.cuenta);rows.push({id:p.cuenta,nombre:p.negocio,producto:"restaurant",productos:["restaurant"],rol:p.rol,plan:p.plan,estado:p.estado,vence:p.vence,personal:true,activa:rows.length===0});}}catch(_){}
   try{const r=await sb.rpc("nuvoor_negocios_disponible");negociosDisponible=!r.error&&r.data===true;}catch(_){negociosDisponible=false;}
   let perfil=null;
   try{const r=await sb.from("perfiles").select("cuenta_id,cuenta_activa").eq("id",sesion.user.id).maybeSingle();if(r.error)errores.push(r.error);else perfil=r.data||null;}catch(e){errores.push(e);}
@@ -49,7 +52,7 @@ async function leerEmpresas(){
   for(const row of rows){
     if(!row||!row.id)continue;
     let detail=null;
-    try{const r=await sb.from("cuentas").select("*").eq("id",row.id).maybeSingle();if(!r.error)detail=r.data||null;else errores.push(r.error);}catch(e){errores.push(e);}
+    if(!row.personal)try{const r=await sb.from("cuentas").select("*").eq("id",row.id).maybeSingle();if(!r.error)detail=r.data||null;else errores.push(r.error);}catch(e){errores.push(e);}
     const productList=productosDe(row,detail);
     salida.push(Object.assign({},detail||{},row,{id:row.id,nombre:(detail&&detail.nombre)||row.nombre||"Mi negocio",producto:(detail&&detail.producto)||row.producto||productList[0]||"",productos:productList,activa:!!row.activa,rol:row.rol||""}));
   }
@@ -73,7 +76,7 @@ function renderNegocio(n,productoSolicitado){
   const products=productoSolicitado&&n.productos.includes(productoSolicitado)?[productoSolicitado]:n.productos,supported=products.length>0;
   const buttons=supported?products.map(k=>'<button class="businessOpen" type="button" data-open-product="'+k+'" data-business="'+esc(n.id)+'">Abrir '+esc(P[k].name.replace("Nuvoor ",""))+' →</button>').join(""):'<small class="businessMissing">Falta ejecutar sql/19-negocios-por-correo.sql para identificar este negocio.</small>';
   const rolVisible=n.rol==="dueno"?"dueño":n.rol||"miembro";
-  return '<article class="businessCard"><div class="businessHead"><span class="businessIcon" aria-hidden="true">'+(supported?products.map(k=>P[k].icon).join(" "):"•")+'</span><div><strong>'+esc(n.nombre)+'</strong><small>'+esc(badgeProductos(n))+' · '+esc(rolVisible)+'</small></div></div><div class="businessActions">'+buttons+(supported?'<button class="businessLicense" type="button" data-license-business="'+esc(n.id)+'">Ver licencias</button>':"")+'</div></article>';
+  return '<article class="businessCard"><div class="businessHead"><span class="businessIcon" aria-hidden="true">'+(supported?products.map(k=>P[k].icon).join(" "):"•")+'</span><div><strong>'+esc(n.nombre)+'</strong><small>'+esc(badgeProductos(n))+' · '+esc(rolVisible)+'</small></div></div><div class="businessActions">'+buttons+(supported&&!n.personal?'<button class="businessLicense" type="button" data-license-business="'+esc(n.id)+'">Ver licencias</button>':"")+'</div></article>';
 }
 let pagoPollStarted=false, pagoSeleccionado=null;
 function pintaCuenta(){
@@ -89,6 +92,7 @@ function pintaCuenta(){
   const pane=$("#productOptions"),businessesView=requestedProduct&&P[requestedProduct]?negocios.filter(n=>(!targetId||n.id===targetId)&&(!n.productos.length||n.productos.includes(requestedProduct))):negocios;
   pane.innerHTML='<p class="sub">'+(requestedProduct&&P[requestedProduct]?"Elige un negocio de "+P[requestedProduct].name+".":negocios.length>1?"Elige con qué negocio quieres trabajar.":negocios[0].productos.length>1?"Esta cuenta antigua conserva varios POS. Elige uno para continuar.":"Abre el sistema de tu negocio.")+'</p><div class="businessGrid">'+businessesView.map(n=>renderNegocio(n,requestedProduct&&P[requestedProduct]?requestedProduct:"")).join("")+'</div><p id="businessNotice" class="notice" hidden></p><div class="addBusinessRow"><button class="plain addBusinessButton" id="showAddBusiness" type="button">＋ Agregar un negocio</button></div>';
   $("#addBusinessPanel").hidden=true;
+  $("#showAddBusiness").hidden=negocios.every(n=>n.personal);
   pane.querySelectorAll("[data-open-product]").forEach(b=>b.addEventListener("click",()=>{const n=negocios.find(x=>x.id===b.dataset.business);abreNegocio(b.dataset.openProduct,n);}));
   pane.querySelectorAll("[data-license-business]").forEach(b=>b.addEventListener("click",()=>{cuenta=negocios.find(x=>x.id===b.dataset.licenseBusiness);productos=cuenta?cuenta.productos:[];pintaLicencias();$("#licensePanel").scrollIntoView({behavior:"smooth",block:"start"});}));
   $("#showAddBusiness").addEventListener("click",()=>{$("#addBusinessPanel").hidden=!$("#addBusinessPanel").hidden;});
@@ -109,6 +113,7 @@ function puedeContratar(){return !!cuenta&&["admin","dueno","owner"].includes(St
 function etiquetaPlan(plan,producto){return producto==="taller"?({basico:"imprenta_basico",maker:"imprenta_maker",pro:"imprenta_pro"}[plan]||plan):producto==="restaurant"?({basico:"restaurant_estandar",multiempresa:"restaurant_multi",maker:"restaurant_multi"}[plan]||plan):({basico:"store_estandar",multiempresa:"store_multi",maker:"store_multi"}[plan]||plan);}
 function formatoPrecio(n){return "$"+Number(n||0).toLocaleString("es-MX");}
 function pintaLicencias(){
+  if(cuenta?.personal){$("#licensePanel").hidden=true;return;}
   if(!cuenta){$("#licensePanel").hidden=true;return;}
   $("#licensePanel").hidden=false;
   const host=$("#licenseProducts"),notice=$("#paymentNotice"),cards=$("#licenseCards");

@@ -15,6 +15,10 @@ verify_jwt = false
 [functions.invitar-usuario]
 verify_jwt = false
 
+# Autentica el JWT contra Auth y valida el perfil, negocio y cupo en SQL.
+[functions.invitar-personal-restaurant]
+verify_jwt = false
+
 [functions.webhook-mercadopago]
 verify_jwt = false
 

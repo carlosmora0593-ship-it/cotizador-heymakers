@@ -679,3 +679,5 @@ window.__labPersonas={
   async cuenta(id){return (await leeColeccion("cuentas")).find(c=>c.id===id);}
 };
 arranca();
+
+window.__labPersonalRestaurant={mount:(node,cuenta)=>window.NuvoorPersonalAdmin.mount(node,SB,cuenta)};
