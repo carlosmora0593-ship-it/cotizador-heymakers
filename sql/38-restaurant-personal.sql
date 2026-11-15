@@ -411,6 +411,11 @@ begin
  and cuerpo->>'activo' is distinct from 'false' and cuerpo->>'_eliminado' is distinct from 'true'
  and (case when p_autorizar then cuerpo->>'rol' in ('gerente','cajero') else cuerpo->>'id'=v_ctx->>'persona' end)
  and coalesce(v_salt,'')<>'' and cuerpo->>'pin_hash'=v_hash limit 1;
+ -- Un PIN compartido no identifica a la autoridad. No permite usar el
+ -- PIN propio de un mesero que coincida con el de caja o gerencia.
+ if p_autorizar and (select count(*) from public.documentos where cuenta_id=p_cuenta and coleccion='rest_equipo'
+ and coalesce(cuerpo->>'eventoId','')='' and cuerpo->>'activo' is distinct from 'false' and cuerpo->>'_eliminado' is distinct from 'true'
+ and cuerpo->>'pin_hash'=v_hash)<>1 then v_p:=null;end if;
  if v_p is null then
   if p_autorizar then
    update public.rest_personal_accesos set fallos_autorizar=case when bloqueado_autorizar<clock_timestamp()-interval '15 minutes' then 1 else fallos_autorizar+1 end,
