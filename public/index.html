@@ -1979,6 +1979,71 @@ body.sinDetalleCostos .soloAdminCostos{display:none!important}
 .comVacio ul{margin:9px 0 0;padding-left:18px;color:var(--ink-3);font-size:12px}
 .comVacio li{margin:3px 0}
 .comVacio .comBoton{margin-top:14px}
+
+/* ---- ventas: un solo periodo, detalle que se abre y análisis por mes ---- */
+:root{--rojo:#C62828}
+:root[data-theme="dark"]{--rojo:#FF7A7A}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--rojo:#FF7A7A}}
+#venPeriodo.periodbar{align-items:center}
+#venPeriodo input[type="date"]{width:auto}
+#venPeriodo .venRangoBox{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--ink-3)}
+#venPeriodo .venRangoBox label{display:inline-flex;gap:6px;align-items:center}
+#venPeriodo .venEtiqueta{margin-left:auto}
+#tab-ven .seg{flex-wrap:wrap}
+#tab-ven .detFiltros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+#tab-ven .detFiltros input{flex:1 1 220px;width:auto;min-width:0}
+#tab-ven .detFiltros select{flex:0 1 210px;width:auto;min-width:0}
+#tab-ven .detVenta{border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
+#tab-ven .detVenta .saved-item{border:0;border-radius:0;flex-wrap:wrap;cursor:pointer}
+#tab-ven .detVenta .saved-item .meta{flex:1 1 170px}
+#tab-ven .detVenta .saved-item .meta small{display:block}
+#tab-ven .detTog{border:0;background:transparent;color:var(--ink-3);font-size:20px;line-height:1;padding:2px 6px;cursor:pointer;transition:transform .15s;flex:none}
+#tab-ven .detVenta.abierta .detTog{transform:rotate(90deg);color:var(--accent)}
+#tab-ven .detPart{padding:6px 13px 12px;background:var(--surface-2);border-top:1px solid var(--line-soft)}
+#tab-ven .detPart h5{margin:6px 0 4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:700}
+#tab-ven table.tbVen{min-width:0;width:100%;font-size:13px}
+#tab-ven table.tbVen th{text-align:right}
+#tab-ven table.tbVen th:first-child{text-align:left}
+#tab-ven table.tbVen td{text-align:right;font-family:"IBM Plex Mono";font-variant-numeric:tabular-nums;padding:7px 6px}
+#tab-ven table.tbVen td.nom{text-align:left;font-family:inherit;font-weight:500}
+#tab-ven table.tbVen td.nom small{display:block;color:var(--ink-3);font-size:11px;font-weight:400}
+#tab-ven table.tbVen tfoot td{font-weight:600;border-top:1px solid var(--line);border-bottom:0}
+#tab-ven .sube{color:var(--good)}
+#tab-ven .baja{color:var(--rojo)}
+#tab-ven .anaTop{display:flex;gap:14px 24px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:14px}
+#tab-ven .anaMesSel{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#tab-ven .anaMesSel b{font-family:"Fredoka";font-weight:500;font-size:20px;min-width:150px;text-align:center}
+#tab-ven .anaComp{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--ink-3)}
+#tab-ven .kpi .d{font-size:12px;margin-top:3px;font-weight:600;font-family:"Nunito Sans",system-ui,sans-serif;letter-spacing:0;font-variant-numeric:tabular-nums}
+#tab-ven .kpi .d small{font-weight:400;color:var(--ink-3)}
+#tab-ven .anaPista{text-transform:none;letter-spacing:0;font-weight:400;margin-left:6px}
+#tab-ven #anaMeses .bar{cursor:pointer}
+#tab-ven #anaMeses .bar.sel{background:var(--accent-soft);border-radius:6px}
+#tab-ven #anaMeses .bar:not(.sel) i{opacity:.6}
+#tab-ven #anaMesesEje span.sel{color:var(--ink);font-weight:700}
+#tab-ven .anaTit{font-family:"Fredoka";font-weight:500;font-size:17px;margin:26px 0 10px}
+#tab-ven .anaTres{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+#tab-ven .anaT{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:12px 14px;min-width:0}
+#tab-ven .anaT small{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:700}
+#tab-ven .anaT b{display:block;font-family:"Fredoka";font-weight:500;font-size:16px;margin:3px 0;overflow-wrap:anywhere}
+#tab-ven .anaT span{font-size:12px;color:var(--ink-2);font-family:"IBM Plex Mono"}
+#tab-ven .anaOrden{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0 8px;font-size:12px;color:var(--ink-3)}
+#tab-ven .anaMas{margin-top:10px}
+#tab-ven ul.anaIdeas{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+#tab-ven ul.anaIdeas li{border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;padding:9px 12px;font-size:13px;line-height:1.5}
+@media (max-width:640px){
+  #tab-ven table.tbVen{display:block}
+  #tab-ven table.tbVen thead{display:none}
+  #tab-ven table.tbVen tbody,#tab-ven table.tbVen tfoot{display:block}
+  #tab-ven table.tbVen tr{display:grid;grid-template-columns:1fr 1fr;gap:2px 14px;padding:9px 0;border-bottom:1px solid var(--line-soft)}
+  #tab-ven table.tbVen td{display:flex;justify-content:space-between;gap:8px;border:0;padding:1px 0}
+  #tab-ven table.tbVen td::before{content:attr(data-l);color:var(--ink-3);font-size:11px;font-family:"Nunito Sans",system-ui,sans-serif;text-align:left}
+  #tab-ven table.tbVen td.nom{grid-column:1/-1;display:block;padding-bottom:3px}
+  #tab-ven table.tbVen td.nom::before{content:none}
+  #tab-ven table.tbVen tfoot tr{border-bottom:0}
+  #venPeriodo .venEtiqueta{margin-left:0;flex:1 1 100%}
+  #tab-ven .anaMesSel b{min-width:0;flex:1 1 140px}
+}
 @media (max-width:560px){
   .comFila{grid-template-columns:1fr auto;gap:5px 10px}
   .comQuien{grid-column:1;grid-row:1}
@@ -3260,6 +3325,25 @@ body.rol-produccion #btnPrint{display:none!important}
 .icRej{margin-bottom:22px}
 .icAgota{position:absolute;top:8px;left:8px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:99px;background:#FEE2E2;color:#991B1B}
 .icTitResumen{font-family:"Fredoka",system-ui,sans-serif;font-weight:500;font-size:16px;margin:4px 0 8px}
+.icNumPed{font-size:13px;padding:3px 11px;background:#DC2626;color:#fff;letter-spacing:0}
+.svTile.icPedirTile.alerta{border-color:#EF4444;box-shadow:0 0 0 1px #EF4444 inset}
+.icRejPedir{margin-bottom:14px}
+.icPedBarra{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;justify-content:space-between;margin-bottom:6px}
+.icPedFila{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;cursor:pointer}
+.icPedFila input[type=checkbox]{width:20px;height:20px;flex:none;margin:0}
+.icPedTxt{display:flex;flex-direction:column;min-width:0;flex:1 1 170px}
+.icPedTxt b{font-size:14px}
+.icPedTxt small{font-size:11.5px;color:var(--ink-3)}
+.icPedDatos{display:flex;flex-wrap:wrap;gap:2px 14px}
+.icPedFila .icEstado{margin-left:0}
+.tecCard .btn.tecCalc{align-self:flex-end;margin-bottom:1px}
+#clcVelo{z-index:66}
+.clcRes{position:sticky;top:-16px;z-index:2;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin:0}
+.clcRes b{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:22px;display:block}
+.clcRes small{display:block;font-size:12px;color:var(--ink-3);line-height:1.5;margin-top:2px}
+.clcRej{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}
+.clcRej label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.clcRej label input{text-align:right;font-family:"IBM Plex Mono",ui-monospace,monospace}
 .icVentana{width:min(920px,100%)}
 .icPieTxt{font-size:12.5px;color:var(--ink-3);align-self:center;margin-right:auto}
 .icSec{margin-bottom:6px}
@@ -3726,7 +3810,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
         <button role="menuitem" data-tab="caj" aria-selected="false"><b>Caja</b><small>Apertura, movimientos y corte</small></button>
         <button role="menuitem" data-tab="ven" aria-selected="false"><b>Ventas y reportes</b><small>Cortes, análisis y proyección</small></button>
         <button role="menuitem" data-tab="cat" aria-selected="false"><b>Catálogo / Artículos</b><small>Artículos, técnicas, precios e inventario</small></button>
-        <button role="menuitem" data-tab="calc" aria-selected="false"><b>Calculadora de costos</b><small>Qué te cuesta producir, paso a paso</small></button>
+        
         <button role="menuitem" data-tab="inv" aria-selected="false"><b>Inventario de producción <span class="mbadge" id="invBadge" hidden>0</span></b><small>Qué hay en el taller y qué hay que pedir</small></button>
         <button role="menuitem" data-tab="com" aria-selected="false"><b>Compras <span class="mbadge" hidden>0</span></b><small>Requisiciones, proveedores y facturas</small></button>
         <button role="menuitem" data-tab="val" aria-selected="false"><b>Vales y préstamos <span class="mbadge" id="valBadge" hidden>0</span></b><small>Herramienta y dinero que sale, con su firma</small></button>
@@ -4523,7 +4607,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
     <header><h2>Mi inventario</h2></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Todo lo que tienes, en carpetas: los insumos de impresión por tipo de material y los artículos por
-        su categoría. Toca una carpeta para ver qué hay, cargar lo que llegó o contar.</p>
+        su categoría. Arriba está <b>Hay que pedir</b>, con lo que se está acabando. Toca una carpeta para ver qué hay, cargar lo que llegó o contar.</p>
       <div id="icCarpetas"></div>
     </div>
   </div>
@@ -4638,18 +4722,25 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
   <div class="secBarra" id="bar_ven" hidden><button class="secVolver" data-secvolver="ven"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Volver</button><span class="secMigas">Ventas</span></div>
   <div class="lanzador secLz" id="lz_ven"></div>
   <div class="card secOculta" data-ven="corte" style="margin-top:20px">
-    <header><h2>Corte de ventas</h2><span class="hint" id="venRango" style="margin-left:auto"></span><button class="btn sm" data-reporte="ventas">Reporte Excel</button></header>
+    <header><h2>Corte de ventas</h2><button class="btn sm" data-reporte="ventas" style="margin-left:auto">Reporte Excel</button></header>
     <div class="body">
-      <div class="periodbar">
+      <div class="periodbar" id="venPeriodo">
         <div class="seg" id="venSeg">
           <button data-per="dia" aria-pressed="true">Día</button>
           <button data-per="semana" aria-pressed="false">Semana</button>
           <button data-per="mes" aria-pressed="false">Mes</button>
+          <button data-per="anio" aria-pressed="false">Año</button>
+          <button data-per="rango" aria-pressed="false">Rango</button>
         </div>
-        <button class="btn sm" id="venPrev">‹ Anterior</button>
-        <input type="date" id="venFecha" style="width:auto">
-        <button class="btn sm" id="venNext">Siguiente ›</button>
+        <button class="btn sm" id="venPrev" aria-label="Periodo anterior">‹</button>
+        <input type="date" id="venFecha" aria-label="Fecha">
+        <span class="venRangoBox" id="venRangoBox" hidden>
+          <label>Desde <input type="date" id="venDesde"></label>
+          <label>hasta <input type="date" id="venHasta"></label>
+        </span>
+        <button class="btn sm" id="venNext" aria-label="Periodo siguiente">›</button>
         <button class="btn sm ghost" id="venHoy">Hoy</button>
+        <span class="hint venEtiqueta" id="venRango"></span>
       </div>
       <div class="kpis" id="venKpis"></div>
       <div style="margin-top:20px">
@@ -4685,38 +4776,78 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
     </div>
   </div>
   <div class="card secOculta" data-ven="analisis">
-    <header><h2>Análisis</h2><span class="hint">sobre todo lo registrado, no solo el periodo</span></header>
+    <header><h2>Análisis</h2><span class="hint">mes contra mes</span></header>
     <div class="body">
-      <div class="proy" id="proyBox" style="margin-bottom:18px"></div>
+      <div class="anaTop">
+        <div class="anaMesSel">
+          <button class="btn sm" id="anaPrev" aria-label="Mes anterior">‹</button>
+          <b id="anaMesEt"></b>
+          <button class="btn sm" id="anaNext" aria-label="Mes siguiente">›</button>
+          <button class="btn sm ghost" id="anaHoy">Este mes</button>
+        </div>
+        <div class="anaComp"><span>Comparar con</span>
+          <div class="seg" id="anaCompSeg">
+            <button data-comp="prev" aria-pressed="true">Mes anterior</button>
+            <button data-comp="anio" aria-pressed="false">Mismo mes del año pasado</button>
+            <button data-comp="nada" aria-pressed="false">Nada</button>
+          </div>
+        </div>
+      </div>
+      <p class="hint" id="anaNota" style="margin:0 0 10px" hidden></p>
+      <div class="kpis" id="anaKpis"></div>
+      <div class="proy" id="proyBox" style="margin-top:16px" hidden></div>
+      <div class="chartBox" style="margin-top:20px">
+        <h4>Ventas y utilidad por mes <span class="anaPista">toca una barra para ver ese mes</span></h4>
+        <div class="chart" id="anaMeses"></div>
+        <div class="xaxis" id="anaMesesEje"></div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>Ventas</span><span id="anaLegUtil"><i style="background:var(--cyan)"></i>Utilidad</span></div>
+      </div>
+      <h3 class="anaTit">Productos del mes</h3>
+      <div class="anaTres" id="anaTres"></div>
+      <div class="anaOrden"><span>Ordenar por</span>
+        <div class="seg" id="anaOrdSeg">
+          <button data-ord="vendido" aria-pressed="true">Más vendido</button>
+          <button data-ord="util" aria-pressed="false">Más utilidad</button>
+          <button data-ord="margen" aria-pressed="false">Menor margen</button>
+        </div>
+      </div>
+      <div id="anaProdBox"></div>
+      <h3 class="anaTit">Ideas para este mes</h3>
+      <div id="anaIdeas"></div>
+      <h3 class="anaTit">Del mes</h3>
       <div class="anaGrid">
         <div class="chartBox">
-          <h4>Ventas y utilidad por mes</h4>
-          <div class="chart" id="anaMeses"></div>
-          <div class="xaxis" id="anaMesesEje"></div>
-          <div class="legend"><span><i style="background:var(--accent)"></i>Ventas</span><span><i style="background:var(--cyan)"></i>Utilidad</span></div>
+          <h4>Mejores clientes</h4>
+          <div class="rank" id="anaClientes"></div>
         </div>
         <div class="chartBox">
           <h4>Cómo te pagan</h4>
           <div class="stack" id="anaPagos"></div>
           <div class="legend" id="anaPagosLeg"></div>
-          <h4 style="margin-top:22px">Estado de cobro</h4>
+        </div>
+        <div class="chartBox">
+          <h4>Estado de cobro</h4>
           <div class="stack" id="anaEstados"></div>
           <div class="legend" id="anaEstadosLeg"></div>
-        </div>
-        <div class="chartBox">
-          <h4>Artículos que más venden</h4>
-          <div class="rank" id="anaArticulos"></div>
-        </div>
-        <div class="chartBox">
-          <h4>Mejores clientes</h4>
-          <div class="rank" id="anaClientes"></div>
         </div>
       </div>
     </div>
   </div>
   <div class="card secOculta" data-ven="detalle">
     <header><h2>Detalle de ventas</h2><span class="hint" id="venCount"></span></header>
-    <div class="body"><div class="saved" id="venList"></div></div>
+    <div class="body">
+      <div class="detFiltros">
+        <input type="search" id="detBusca" placeholder="Buscar por cliente, folio o artículo" aria-label="Buscar venta">
+        <select id="detPago" aria-label="Forma de pago"><option value="">Todas las formas de pago</option></select>
+        <select id="detEstado" aria-label="Estado de cobro">
+          <option value="">Todos los estados</option>
+          <option value="pagado">Pagadas</option>
+          <option value="anticipo">Con anticipo</option>
+          <option value="pendiente">Pendientes</option>
+        </select>
+      </div>
+      <div class="saved" id="venList"></div>
+    </div>
   </div>
 </section>
 
@@ -6563,6 +6694,7 @@ async function initStore(){
      sin hacer esperar a nadie: la app ya arranco y las fotos aparecen
      cuando lleguen. */
   try{ refrescaFotos(); }catch(e){}
+  try{ migraCostoMin(); }catch(e){}
 }
 let saveT;
 function persist(what){
@@ -9632,7 +9764,7 @@ function tecCardHTML(t){
       propios = '<div class="tecBloque"><div class="tecTit">Se cobra por centímetro cuadrado'+
         '<span class="hint"> — esta técnica no tiene material amarrado</span></div>'+
         '<div class="tecRejilla">'+
-          campo("costoCm2","Costo / cm²","0.001")+campo("precioCm2","Precio / cm²","0.001")+
+          campo("costoCm2","Costo / cm²","0.001")+'<button type="button" class="btn sm tecCalc" data-tcalc="area">Calcular</button>'+campo("precioCm2","Precio / cm²","0.001")+
           campo("minimo","Costo mínimo")+campo("precioMin","Precio mínimo")+
         '</div></div>';
     } else if(t.modo==="tintas"){
@@ -9648,21 +9780,16 @@ function tecCardHTML(t){
           campo("minimo","Costo mínimo")+campo("precioMin","Precio mínimo")+
         '</div></div>';
     } else if(t.modo==="tiempo"){
-      const m = maqDe(t.maquinaId), d = desgloseMaq(m);
+      migraCostoMinTec(t);
+      const cm = costoMinutoTec(t);
       propios = '<div class="tecBloque"><div class="tecTit">Se cobra por tiempo de máquina'+
         '<span class="hint"> — los minutos se ponen en cada cotización</span></div>'+
-        '<label class="tecCampo tecAncho"><span>Con qué máquina</span>'+
-          '<select data-f="maquinaId">'+
-            '<option value="">— escoge una máquina —</option>'+
-            maquinas().map(x=>'<option value="'+esc(x.id)+'"'+(t.maquinaId===x.id?" selected":"")+'>'+
-              esc(x.nombre)+' · '+mx(costoMinutoMaq(x))+'/min</option>').join("")+
-          '</select></label>'+
-        (m
-          ? '<p class="tecNota">Un minuto de <b>'+esc(m.nombre)+'</b> cuesta <b>'+mx(d.minuto)+'</b> '+
-            '('+mx(d.hora)+' la hora: luz '+mx(d.luz)+' · consumibles '+mx(d.consumibles)+
-            ' · mantenimiento '+mx(d.mantenimiento)+' · depreciación '+mx(d.depreciacion)+'). '+
-            'Se cambia en <b>Calculadora de costos → Máquinas</b>.</p>'
-          : '<p class="tecNota" style="border-left-color:var(--warn)">Sin máquina, el minuto cuesta cero y esta técnica no te va a costear nada. Da una de alta en <b>Calculadora de costos → Máquinas</b>.</p>')+
+        '<div class="tecRejilla">'+campo("costoMin","Costo por minuto","0.0001")+
+          '<button type="button" class="btn sm tecCalc" data-tcalc="min">Calcular</button></div>'+
+        (cm > 0
+          ? '<p class="tecNota">Un minuto de esta técnica te cuesta <b>'+clcN(cm, 4)+'</b> ('+clcN(cm*60, 2)+' la hora). '+
+            'Si quieres sacarlo con los datos de tu máquina, toca «Calcular».</p>'
+          : '<p class="tecNota" style="border-left-color:var(--warn)">Sin costo por minuto, esta técnica no te va a costear el tiempo. Toca «Calcular» para sacarlo.</p>')+
         '<div class="tecRejilla">'+
           campo("precioMinuto","Precio / minuto","0.5")+
           campo("minimo","Costo mínimo")+campo("precioMin","Precio mínimo")+
@@ -9703,6 +9830,119 @@ function tecCardHTML(t){
         '<div class="tecRejilla">'+campo("setup","Costo de setup")+campo("precioSetup","Precio de setup")+'</div></div>'+
     '</div>';
 }
+
+/* ============ CALCULAR, DENTRO DE TIPOS DE IMPRESIÓN (nov 2026) ============
+   Es una herramienta, no una pantalla de costos: no cambia ninguna máquina ni
+   ningún costo hasta que tocas «Usar». Por tiempo saca el costo de un minuto
+   de máquina; por área, el de un m² (y de un cm²). */
+let CLC = null;
+function clcN(n, d){ const k = Math.pow(10, d); return "$" + (Math.round(num(n)*k)/k).toLocaleString("es-MX", {minimumFractionDigits:2, maximumFractionDigits:d}); }
+function clcMinuto(v){
+  const hAnio = Math.max(0, num(v.horas))*12, anios = Math.max(0, num(v.anios));
+  const dep = (hAnio > 0 && anios > 0) ? num(v.precio)/(anios*hAnio) : 0;
+  const luz = num(v.watts)/1000*num(v.tarifa);
+  const man = hAnio > 0 ? num(v.mant)/hAnio : 0;
+  const con = num(v.cons);
+  const hora = dep + luz + man + con;
+  return {dep, luz, man, con, hora, minuto: hora/60};
+}
+function clcArea(v){
+  const mat = num(v.material), tin = num(v.tintaMl)*num(v.tintaPrecio), pol = num(v.polvoG)*num(v.polvoPrecio);
+  const base = mat + tin + pol, merma = base*num(v.merma)/100, m2 = base + merma;
+  return {mat, tin, pol, merma, m2, cm2: m2/10000};
+}
+function clcInicio(t, modo){
+  if(modo === "min"){
+    const m = maqDe(t.maquinaId), v = {precio:0, anios:5, horas:100, watts:0, tarifa:tarifaKwh(), mant:0, cons:0};
+    if(m){
+      v.precio = num(m.inversion);
+      v.anios = Math.round(Math.max(1, num(m.vidaHoras, 10000))/(v.horas*12)*1000)/1000;
+      v.watts = Math.round(num(m.kw)*1000);
+      v.mant = Math.round(num(m.mantenimiento)*v.horas*12*100)/100;
+      v.cons = num(m.consumibles);
+    }
+    return v;
+  }
+  return {material:0, tintaMl:0, tintaPrecio:0, polvoG:0, polvoPrecio:0, merma:num(P.merma)};
+}
+const CLC_CAMPOS = {
+  min: [["precio","Precio de la máquina ($)"],["anios","Años de vida útil"],["horas","Horas de uso al mes"],
+        ["watts","Consumo (watts)"],["tarifa","Luz ($ por kWh)"],["mant","Mantenimiento al año ($)"],
+        ["cons","Consumibles por hora ($, si hay)"]],
+  area:[["material","Material ($ por m²)"],["tintaMl","Tinta (ml por m²)"],["tintaPrecio","Tinta ($ por ml)"],
+        ["polvoG","Polvo u otro (g por m²)"],["polvoPrecio","Polvo u otro ($ por g)"],["merma","Merma (%)"]]
+};
+function clcVelo(){
+  let v = $("#clcVelo"); if(v) return v;
+  document.body.insertAdjacentHTML("beforeend",
+    '<div class="svVelo" id="clcVelo" hidden><div class="svVentana angosta" role="dialog" aria-modal="true" aria-labelledby="clcTit">' +
+    '<header class="svVCab"><div style="min-width:0"><h2 id="clcTit"></h2><p id="clcSub"></p></div>' +
+    '<div class="der"><button class="btn icon sm" type="button" data-clccierra="1" aria-label="Cerrar">✕</button></div></header>' +
+    '<div class="svVForm" id="clcForm"></div>' +
+    '<footer class="svVPie"><button class="btn" type="button" data-clccierra="1">Cerrar</button>' +
+    '<button class="btn primary" type="button" id="clcUsa" data-clcusa="1"></button></footer></div></div>');
+  return $("#clcVelo");
+}
+function clcAbre(tid, modo){
+  const t = (cat.tecnicas || []).find(x=>x.id === tid); if(!t) return;
+  CLC = {tid, modo, v: clcInicio(t, modo), origen: document.activeElement};
+  const v = clcVelo();
+  $("#clcTit").textContent = modo === "min" ? "¿Cuánto te cuesta un minuto de máquina?" : "¿Cuánto te cuesta imprimir un m²?";
+  $("#clcSub").textContent = "Es sólo una calculadora: no cambia nada hasta que toques «Usar».";
+  $("#clcForm").innerHTML = '<div class="clcRes" id="clcRes" role="status" aria-live="polite"></div><div class="clcRej">' +
+    CLC_CAMPOS[modo].map(c=>'<label>'+esc(c[1])+'<input type="number" min="0" step="any" inputmode="decimal" data-clc="'+c[0]+'" value="'+num(CLC.v[c[0]])+'"></label>').join("") + '</div>';
+  clcRefresca(); v.hidden = false;
+  setTimeout(()=>{ const i = v.querySelector("[data-clc]"); if(i) i.focus(); }, 40);
+}
+function clcValor(){
+  if(!CLC) return 0;
+  return CLC.modo === "min" ? Math.round(clcMinuto(CLC.v).minuto*10000)/10000 : Math.round(clcArea(CLC.v).cm2*100000)/100000;
+}
+function clcRefresca(){
+  if(!CLC) return;
+  let h, uso;
+  if(CLC.modo === "min"){
+    const r = clcMinuto(CLC.v);
+    h = '<b>'+clcN(r.minuto, 4)+' por minuto</b><small>'+clcN(r.hora, 2)+' la hora · desgaste '+clcN(r.dep/60, 4)+' · luz '+clcN(r.luz/60, 4)+
+        ' · mantenimiento '+clcN(r.man/60, 4)+(r.con ? ' · consumibles '+clcN(r.con/60, 4) : '')+' (por minuto)</small>';
+    uso = "Usar " + clcN(clcValor(), 4) + " por minuto";
+  } else {
+    const r = clcArea(CLC.v);
+    h = '<b>'+clcN(r.m2, 2)+' por m² · '+clcN(r.cm2, 5)+' por cm²</b><small>material '+clcN(r.mat, 2)+' · tinta '+clcN(r.tin, 2)+
+        ' · polvo u otro '+clcN(r.pol, 2)+' · merma '+clcN(r.merma, 2)+' (por m²)</small>';
+    uso = "Usar " + clcN(clcValor(), 5) + " por cm²";
+  }
+  $("#clcRes").innerHTML = h; $("#clcUsa").textContent = uso;
+}
+function clcCierra(){
+  const v = $("#clcVelo"); if(v) v.hidden = true;
+  const o = CLC && CLC.origen; CLC = null;
+  if(o && document.body.contains(o)) try{ o.focus(); }catch(_){}
+}
+function clcUsa(){
+  if(!CLC) return;
+  const t = (cat.tecnicas || []).find(x=>x.id === CLC.tid); if(!t){ clcCierra(); return; }
+  const campo = CLC.modo === "min" ? "costoMin" : "costoCm2", val = clcValor();
+  t[campo] = val;
+  document.querySelectorAll('.tecCard[data-id="'+t.id+'"] [data-f="'+campo+'"]').forEach(inp=>{
+    inp.value = val; inp.dispatchEvent(new Event("input", {bubbles:true}));
+  });
+  persist(); try{ if(typeof refrescaCostos === "function") refrescaCostos(); }catch(_){}
+  clcCierra();
+  toast("Listo: " + (campo === "costoMin" ? clcN(val, 4) + " por minuto" : clcN(val, 5) + " por cm²") + " en " + (t.nombre || "la técnica"));
+}
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-tcalc]");
+  if(b){ const box = b.closest(".tecCard[data-id]"); if(box) clcAbre(box.dataset.id, b.dataset.tcalc); return; }
+  if(!CLC || !e.target.closest("#clcVelo")) return;
+  if(e.target.id === "clcVelo" || e.target.closest("[data-clccierra]")){ clcCierra(); return; }
+  if(e.target.closest("[data-clcusa]")) clcUsa();
+});
+document.addEventListener("input", e=>{
+  const i = e.target.closest && e.target.closest("#clcForm [data-clc]"); if(!i || !CLC) return;
+  CLC.v[i.dataset.clc] = num(i.value); clcRefresca();
+});
+document.addEventListener("keydown", e=>{ if(e.key === "Escape" && CLC && $("#clcVelo") && !$("#clcVelo").hidden){ e.stopPropagation(); clcCierra(); } }, true);
 
 /* ============ TIPOS DE IMPRESIÓN (nov 2026) ============
    Una sola lista. Cada tipo de impresión es una tarjeta con su icono, la
@@ -10460,7 +10700,7 @@ function icCierra(){
   const o = IC && IC.origen, fn = IC && IC.alCerrar; IC = null;
   const sv = $("#svVelo"); document.body.style.overflow = sv && !sv.hidden ? "hidden" : "";
   if(fn){ try{ fn(); }catch(_){} }
-  icPintaRej(); icPintaCarpetas(); try{ renderInvInsumos(); }catch(_){}
+  icPintaRej(); icPintaCarpetas(); try{ renderInvInsumos(); }catch(_){} try{ badgeInv(); }catch(_){}
   try{ if(typeof pintaLanzadorSec === "function") pintaLanzadorSec("inv"); }catch(_){}
   if(o && document.body.contains(o)) o.focus();
 }
@@ -10759,7 +10999,7 @@ function icPintaCarpetas(){
   const w = $("#icCarpetas"); if(!w) return;
   if(typeof icMigra === "function") icMigra();
   const c = icCarpetas();
-  w.innerHTML = '<h3 class="icTitResumen">Insumos de impresión</h3>' +
+  w.innerHTML = icTilePedir() + '<h3 class="icTitResumen">Insumos de impresión</h3>' +
     (c.ins.length ? '<div class="svRej icRej">' + c.ins.map(icCarpTile).join("") + '</div>' : '<p class="tpIntro">Todavía no cargas insumos. Empieza en «Consumibles por equipo».</p>') +
     '<h3 class="icTitResumen">Artículos</h3>' +
     (c.arts.length ? '<div class="svRej icRej">' + c.arts.map(icCarpTile).join("") + '</div>' : '<p class="tpIntro">Todavía no tienes artículos en tu catálogo.</p>');
@@ -10768,9 +11008,9 @@ function icAbreCarpeta(key){
   const [tipo, ...r] = String(key).split("|"), nom = r.join("|");
   IC = {carpeta:{tipo, nom}, origen:document.activeElement};
   const v = icVelo();
-  $("#icIco").innerHTML = icCarpIco(nom);
+  $("#icIco").innerHTML = tipo === "ped" ? icPedirIco(totalPorPedir() > 0) : icCarpIco(nom);
   $("#icTit").textContent = nom;
-  $("#icSub").textContent = tipo === "art" ? "Artículos · existencia de cada uno" : "Insumos de impresión · carga lo que llega y cuenta lo que hay";
+  $("#icSub").textContent = tipo === "ped" ? "Lo que se está acabando: artículos e insumos" : tipo === "art" ? "Artículos · existencia de cada uno" : "Insumos de impresión · carga lo que llega y cuenta lo que hay";
   icPinta(); v.hidden = false; document.body.style.overflow = "hidden";
   setTimeout(()=>{ const c = v.querySelector("[data-iccierra]"); if(c) c.focus(); }, 40);
 }
@@ -10785,6 +11025,7 @@ function icCarpSel(i){
 }
 function icPintaCarpeta(){
   const f = $("#icForm"), top = f.scrollTop, {tipo, nom} = IC.carpeta;
+  if(tipo === "ped"){ icPintaPedir(); return; }
   const g = (tipo === "art" ? icCarpetas().arts : icCarpetas().ins).find(x=> x.nom === nom) || {items:[]};
   let h = "";
   if(tipo === "art"){
@@ -10824,6 +11065,51 @@ document.addEventListener("change", e=>{
     i.cat = v; persist(); icPinta(); toast(i.nombre + " pasó a la carpeta nueva " + v + ".");
   }
 });
+
+/* ---------- la carpeta «Hay que pedir»: arriba de todo en Mi inventario ---------- */
+function icPedirIco(alerta){
+  const c = alerta ? "#EF4444" : "#22C55E";
+  return '<svg class="svIco" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="55" rx="20" ry="2.6" fill="rgba(0,0,0,.12)"/>' +
+    '<path d="M9 18a4 4 0 0 1 4-4h12l5 5h21a4 4 0 0 1 4 4v4H9Z" fill="'+c+'" opacity=".7"/>' +
+    '<rect x="9" y="23" width="46" height="29" rx="4" fill="'+c+'"/><rect x="9" y="23" width="46" height="6" rx="3" fill="rgba(255,255,255,.22)"/>' +
+    '<path d="M32 31v13M32 48.5v.5" stroke="#fff" stroke-width="3.4" stroke-linecap="round" fill="none"/></svg>';
+}
+function icTilePedir(){
+  const n = totalPorPedir();
+  return '<div class="svRej icRej icRejPedir"><button type="button" class="svTile icCarp icPedirTile'+(n ? ' alerta' : '')+'" data-iccarpeta="ped|Hay que pedir">' +
+    (n ? '<span class="icAgota icNumPed">' + n + '</span>' : '') + icPedirIco(n > 0) + '<b>Hay que pedir</b><small>' +
+    (n ? n + (n === 1 ? ' cosa por pedir' : ' cosas por pedir') : 'todo en orden') + '</small></button></div>';
+}
+function icPintaPedir(){
+  const f = $("#icForm"), top = f.scrollTop;
+  const arts = faltantesInv(), ins = insFaltantes(), n = arts.length + ins.length;
+  const fila = (key, nom, sub, datos, e)=>
+    '<label class="icFila icPedFila"><input type="checkbox" data-ivc="'+esc(key)+'"'+(ivMarcados[key] ? ' checked' : '')+' aria-label="Pedir '+esc(nom)+'">' +
+    '<span class="icPedTxt"><b>'+esc(nom)+'</b>'+(sub ? '<small>'+sub+'</small>' : '')+'</span>' +
+    '<span class="icPedDatos">'+datos+'</span><span class="icEstado '+e.cls+'">'+esc(e.txt)+'</span></label>';
+  let h;
+  if(!n) h = '<section class="svGrp icSec"><p class="tpIntro">Todo en orden: no hay nada por pedir.</p></section>';
+  else h = '<section class="svGrp icSec"><div class="icPedBarra"><p class="tpIntro" style="margin:0">Marca lo que quieres pedir. Si no marcas nada, se pide todo lo de la lista.</p>' +
+    '<button type="button" class="btn primary" id="icPedir">Pedir material</button></div>' +
+    (arts.length ? '<h3 class="icTitResumen">Artículos</h3>' + arts.map(a=>{
+      const vs = (a.invVariantes || []).filter(v=> num(v.existencia) !== 0);
+      return fila(a.id, a.nombre,
+        vs.length ? vs.slice(0, 6).map(v=> esc([v.talla, v.color].filter(Boolean).join(" ")) + ': ' + cantIns(v.existencia)).join(" · ") + (vs.length > 6 ? ' · …' : '') : '',
+        '<span class="icDato">Hay <b>'+cantIns(icArtEx(a))+' pza</b></span>' +
+        (num(a.minimo_inv) > 0 ? '<span class="icDato">Mínimo <b>'+cantIns(a.minimo_inv)+'</b></span>' : '') +
+        '<span class="icDato">Sugerido <b>'+cantIns(estadoStock(a).falta)+' pza</b></span>', icArtEstado(a));
+    }).join("") : '') +
+    (ins.length ? '<h3 class="icTitResumen">Insumos de impresión</h3>' + ins.map(i=>{
+      const u = abrevIns(i.unidad), e = estadoIns(i);
+      return fila("ins:"+i.id, i.nombre, esc(icCarpetaDe(i)),
+        '<span class="icDato">Hay <b>'+cantIns(i.existencia)+' '+esc(u)+'</b></span>' +
+        '<span class="icDato">Mínimo <b>'+cantIns(i.minimo)+' '+esc(u)+'</b></span>' +
+        '<span class="icDato">Sugerido <b>'+cantIns(pedirInsCant(i))+' '+esc(u)+'</b></span>', e);
+    }).join("") : '') + '</section>';
+  f.innerHTML = h; f.scrollTop = top;
+  $("#icPie").textContent = n ? n + (n === 1 ? " cosa por pedir" : " cosas por pedir") : "Nada por pedir";
+}
+document.addEventListener("click", e=>{ if(e.target.closest("#icPedir")){ abrePedido(); } });
 
 /* ============ LANZADOR DE SECCIONES ============ */
 /* Una sección declara sus tarjetas; esto hace el resto. */
@@ -10977,15 +11263,15 @@ registraLanzador("calc", [
 ], "Calculadora");
 
 registraLanzador("inv", [
-  {id:"todo", nombre:"Mi inventario", sub:"todo en carpetas", color:"#F59E0B",
+  {id:"todo", nombre:"Mi inventario", sub:"qué tengo y qué falta", color:"#F59E0B",
    icono:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M3 10h18"/>',
    card:'[data-inv="todo"]', cuenta:()=>(cat.insumos||[]).length + (cat.articulos||[]).length,
    alAbrir:()=>{ if(typeof icPintaCarpetas === "function") icPintaCarpetas(); }},
-  {id:"taller", nombre:"Inventario del taller", sub:"qué hay y qué falta", color:"#22C55E",
+  {id:"taller", visible:()=>false, nombre:"Inventario del taller", sub:"qué hay y qué falta", color:"#22C55E",
    icono:'<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5Z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>',
    card:'[data-inv="taller"]',
    cuenta:()=>{ try{ return faltantesInv().length; }catch(e){ return 0; } }},
-  {id:"ins", nombre:"Consumibles por equipo", sub:"tinta, film, lona, polvo", color:"#14B8A6",
+  {id:"ins", nombre:"Consumibles por equipo", sub:"qué gasta cada equipo", color:"#14B8A6",
    icono:'<path d="M12 3s6 6.4 6 10a6 6 0 0 1-12 0c0-3.6 6-10 6-10Z"/>',
    card:'[data-inv="ins"]', cuenta:()=>(cat.insumos||[]).length,
    alAbrir:()=>{ if(typeof icPintaRej === "function") icPintaRej(); if(typeof renderInvInsumos === "function") renderInvInsumos(); }},
@@ -10998,24 +11284,27 @@ registraLanzador("inv", [
 registraLanzador("ven", [
   {id:"corte", nombre:"Corte de ventas", sub:"lo vendido del periodo", color:"#0680AB",
    icono:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
-   card:'[data-ven="corte"]'},
+   card:'[data-ven="corte"]',
+   alAbrir:()=>{ venColoca("corte"); renderVentas(); }},
   {id:"cxc", nombre:"Cuentas por cobrar", sub:"quién te debe", color:"#D6127F",
    icono:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 12h.01M18 12h.01"/>',
    card:'[data-ven="cxc"]',
    cuenta:()=>{ try{ return ventas.filter(v=>saldoDe(v) > 0).length; }catch(e){ return 0; } },
-   alAbrir:()=>{ if(typeof renderCobranza === "function") renderCobranza(); }},
+   alAbrir:()=>{ venColoca("cxc"); if(typeof renderCobranza === "function") renderCobranza(); }},
   {id:"comis", nombre:"Comisiones", sub:"quién vendió y cuánto se le debe", color:"#8B5CF6",
    icono:'<circle cx="9" cy="8" r="3.4"/><path d="M3 20v-1.4A3.6 3.6 0 0 1 6.6 15h4.8a3.6 3.6 0 0 1 3.6 3.6V20"/><path d="M18 8v8M15 11h6"/>',
    card:'[data-ven="comis"]', destapa:true, soloAdmin:true,
    /* Sin esto la tarjeta ensena lo ultimo que se dibujo, que puede ser nada
       si cuando se cargo la seccion no habia comisiones. */
-   alAbrir:()=>{ try{ renderVentas(); }catch(e){} }},
+   alAbrir:()=>{ try{ venColoca("comis"); renderVentas(); }catch(e){} }},
   {id:"detalle", nombre:"Detalle de ventas", sub:"venta por venta", color:"#64748B",
    icono:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/>',
-   card:'[data-ven="detalle"]', cuenta:()=>(ventas||[]).length},
+   card:'[data-ven="detalle"]', cuenta:()=>(ventas||[]).length,
+   alAbrir:()=>{ try{ venColoca("detalle"); renderVentas(); }catch(e){} }},
   {id:"analisis", nombre:"Análisis", sub:"lo que más deja", color:"#0E7C57",
    icono:'<path d="M3 3v18h18"/><path d="M7 14l3.5-4 3 3L20 6"/>',
-   card:'[data-ven="analisis"]'}
+   card:'[data-ven="analisis"]',
+   alAbrir:()=>{ try{ venColoca("analisis"); renderAnalisis(); }catch(e){} }}
 ], "Ventas");
 
 registraLanzador("asi", [
@@ -13511,7 +13800,7 @@ function nvAbreIndicador(clave){
     if(vaATab("pro")) renderProduccion();
     return;
   }
-  if(clave === "inventario" && nvPuedeTablero("inv")) vaATab("inv");
+  if(clave === "inventario" && nvPuedeTablero("inv") && vaATab("inv")) abreHayQuePedir();
 }
 function renderTablero(){
   if(!$("#tab-inicio") || !window.NuvoorTablero) return;
@@ -13524,7 +13813,7 @@ function renderTablero(){
       return {hoy:hoyISO(), finanzas,
         ventas:finanzas ? ventas : [],
         pedidos:(nvPuedeTablero("pro") || nvPuedeTablero("sav") || nvPuedeTablero("dis")) ? guardadas : [],
-        faltantes:nvPuedeTablero("inv") ? faltantesInv().length : 0,
+        faltantes:nvPuedeTablero("inv") ? totalPorPedir() : 0,
         cajaAbierta:nvPuedeTablero("caj") ? cajaDe(hoyISO()).abierta : false,
         pendientes:pendientesMios().filter(p=>nvPuedeTablero(p.t))};
     },
@@ -13714,15 +14003,36 @@ function renderMisSolicitudes(){
         (s.nota ? '<div class="ivSolNota">'+esc(s.nota)+'</div>' : '')+
         (s.req ? '<div class="ivSolNota">Pasó a la requisición <b>'+esc(s.req)+'</b></div>' : '')+
       '</div>').join("")
-    : '<p style="color:var(--ink-3);font-size:13px;margin:6px 0">Todavía no has pedido nada. Marca lo que falte arriba y dale a «Pedir material».</p>';
+    : '<p style="color:var(--ink-3);font-size:13px;margin:6px 0">Todavía no has pedido nada. Abre Mi inventario › Hay que pedir, marca lo que falte y dale a «Pedir material».</p>';
 }
 
+/* ---------- HAY QUE PEDIR: artículos e insumos juntos ---------- */
+function insFaltantes(){ return (cat.insumos||[]).filter(i=> num(i.minimo) > 0 && num(i.existencia) <= num(i.minimo)); }
+function pedirTodo(){ return faltantesInv().concat(insFaltantes()); }
+function totalPorPedir(){ try{ return pedirTodo().length; }catch(e){ return 0; } }
+function pedirInsCant(i){ return Math.max(0, Math.round((num(i.minimo)*2 - num(i.existencia))*100)/100); }
+/* Lo que antes abría «Inventario del taller» ahora abre esta lista dentro de Mi inventario. */
+function abreHayQuePedir(){
+  try{ if(typeof abreTarjetaSec === "function" && SEC_LZ.inv && SEC_LZ.inv.abierta !== "todo") abreTarjetaSec("inv", "todo"); }catch(_){}
+  try{ icPintaCarpetas(); icAbreCarpeta("ped|Hay que pedir"); }catch(_){}
+}
 function abrePedido(){
-  const marcados = articulosVigilados().filter(a=> ivMarcados[a.id]);
-  const lista = marcados.length ? marcados : faltantesInv();
+  const marcados = articulosVigilados().filter(a=> ivMarcados[a.id]).map(a=>({k:a.id, a}))
+    .concat((cat.insumos||[]).filter(i=> ivMarcados["ins:"+i.id]).map(i=>({k:"ins:"+i.id, i})));
+  const lista = marcados.length ? marcados
+    : faltantesInv().map(a=>({k:a.id, a})).concat(insFaltantes().map(i=>({k:"ins:"+i.id, i})));
   if(!lista.length){ toast("Marca primero lo que necesitas"); return; }
-  $("#pedPartidas").innerHTML = lista.map(a=>{ const e = estadoStock(a);
-    return '<div class="pedFila" data-ped="'+esc(a.id)+'">'+
+  $("#pedPartidas").innerHTML = lista.map(x=>{
+    if(x.i){ const i = x.i, u = abrevIns(i.unidad);
+      return '<div class="pedFila" data-ped="'+esc(x.k)+'">'+
+        '<div class="pedNom"><b>'+esc(i.nombre)+'</b><small>hay '+cantIns(i.existencia)+' '+esc(u)+
+          (num(i.minimo)? ' · mínimo '+cantIns(i.minimo)+' '+esc(u) : '')+' · se pide en '+esc(u)+'</small></div>'+
+        '<input class="pedCant" type="number" min="0" step="any" value="'+pedirInsCant(i)+'" aria-label="Cuántos '+esc(u)+' de '+esc(i.nombre)+'">'+
+        '<button class="btn sm icon pedQuita" title="Quitar de la solicitud">✕</button>'+
+      '</div>';
+    }
+    const a = x.a, e = estadoStock(a);
+    return '<div class="pedFila" data-ped="'+esc(x.k)+'">'+
       '<div class="pedNom"><b>'+esc(a.nombre)+'</b><small>hay '+num(a.existencia)+
         (num(a.minimo_inv)? ' · mínimo '+num(a.minimo_inv) : '')+'</small></div>'+
       '<input class="pedCant" type="number" min="1" step="1" value="'+(e.falta||1)+'" aria-label="Cuántas piezas de '+esc(a.nombre)+'">'+
@@ -13733,12 +14043,19 @@ function abrePedido(){
   $("#modalPedir").hidden = false;
 }
 
+/* Cada partida lleva artId (vacío si es un insumo), desc y cant. Los insumos van como
+   partida de texto: «Tinta cyan (ml)» × cantidad, con insId y unidad por si se necesitan.
+   Compras (renderSolicitudesCompras, solAReq) sólo lee desc, cant y artId, así que no se rompe. */
 function guardaPedido(){
   const partidas = [...$("#pedPartidas").children].map(f=>{
-    const a = (cat.articulos||[]).find(x=>x.id===f.dataset.ped);
-    return {id:uid(), artId:f.dataset.ped, desc: a ? a.nombre : "",
-            cant: Math.max(1, num(f.querySelector(".pedCant").value,1))};
-  }).filter(p=>p.desc);
+    const k = f.dataset.ped, cant = num(f.querySelector(".pedCant").value, 1);
+    if(String(k).indexOf("ins:") === 0){
+      const i = insumoDe(k.slice(4)); if(!i) return null;
+      return {id:uid(), artId:"", insId:i.id, unidad:i.unidad||"", desc: (i.nombre||"") + " (" + abrevIns(i.unidad) + ")", cant: Math.max(0.01, cant)};
+    }
+    const a = (cat.articulos||[]).find(x=>x.id===k);
+    return {id:uid(), artId:k, desc: a ? a.nombre : "", cant: Math.max(1, cant)};
+  }).filter(p=>p && p.desc);
   if(!partidas.length){ toast("No quedó ningún renglón"); return; }
   const s = {folio:folioSol(), fecha:hoyISO(), hora:horaAhora(),
              quien: usuarioActual().nombre || "", rol: rolActual(),
@@ -13749,6 +14066,7 @@ function guardaPedido(){
   persist();
   $("#modalPedir").hidden = true;
   renderInvTaller(); renderCompras();
+  try{ if(IC && IC.carpeta) icPinta(); icPintaCarpetas(); pintaLanzadorSec("inv"); }catch(_){}
   toast("Solicitud " + s.folio + " mandada a Compras");
 }
 
@@ -13792,9 +14110,9 @@ function solAReq(folio){
    pestaña esté cerrada, que para eso sirve. */
 function badgeInv(){
   const b = $("#invBadge"); if(!b) return;
-  const n = faltantesInv().length;
+  const n = totalPorPedir();
   b.textContent = n; b.hidden = !n;
-  b.className = "mbadge" + (faltantesInv().some(a=>num(a.existencia)<=0) ? " malo" : "");
+  b.className = "mbadge" + (pedirTodo().some(a=>num(a.existencia)<=0) ? " malo" : "");
 }
 
 /* ---------- el aviso de existencia al cotizar ----------
@@ -13830,7 +14148,7 @@ document.addEventListener("click", e=>{
     P.vistaInv = vistaInv()==="tarjetas" ? "tabla" : "tarjetas";
     persist(); renderInvTaller(); return;
   }
-  if(e.target.closest("#ivPedir")){ abrePedido(); return; }
+  if(e.target.closest("#ivPedir")){ abreHayQuePedir(); return; }
   const quita = e.target.closest(".pedQuita");
   if(quita){ const fila = quita.closest(".pedFila"); if(fila){ delete ivMarcados[fila.dataset.ped]; fila.remove(); } return; }
   if(e.target.closest("#pedGuardar")){ guardaPedido(); return; }
@@ -15001,6 +15319,7 @@ async function cobraMostrador(conTicket){
     ahorro: t.ahorro,
     factura: {requiere:false}
   };
+  try{ venta.partidas = partidasDeLineas(venta.lineas, venta.total, venta.costo); }catch(e){}
   ventas.push(venta);
   if(DB){ try{ await DB.collection("ventas").doc(folio).set({venta, fecha:venta.fecha, total:venta.total}); }
           catch(e){ toast("No se pudo guardar la venta en la nube"); } }
@@ -15737,12 +16056,12 @@ function comisionesDe(lista){
 function porQueNoHayComisiones(enRango){
   const gente = (equipo||[]).filter(u=>pctDe(u)>0);
   if(!enRango.length){
-    return {texto:"<b>No hay ventas en este periodo.</b> Cambia el periodo arriba (día / semana / mes) "+
+    return {texto:"<b>No hay ventas en este periodo.</b> Cambia el periodo arriba (día, semana, mes, año o rango) "+
                   "o la fecha, y vuelve a mirar.", reparar:false};
   }
   if(!gente.length){
     return {texto:"<b>Nadie tiene comisión puesta todavía.</b> El porcentaje se pone persona por persona "+
-                  "en <b>Ajustes → Equipo</b>, columna <b>Comisión %</b>. Vacío quiere decir que esa "+
+                  "y es opcional. Vacío quiere decir que esa "+
                   "persona no comisiona, que es lo normal.", reparar:false};
   }
   /* Hay quien comisiona, pero ninguna venta del periodo trae porcentaje
@@ -15770,13 +16089,13 @@ function renderComisiones(enRango){
   const w = $("#venComis"); if(!w) return;
   const filas = comisionesDe(enRango);
   const card = $("#cardComis");
-  /* La tarjeta se sigue ocultando en la lista de Ventas cuando no hay nada,
-     pero su azulejo la destapa a la fuerza: por eso el texto se escribe
-     siempre, para que ahí adentro haya algo que leer. */
-  if(card) card.hidden = !filas.length;
+  /* La tarjeta no se esconde nunca: sin filas se explica por qué y dónde se
+     pone el porcentaje, que una página en blanco no le sirve a nadie. */
   if(!filas.length){
     const d = porQueNoHayComisiones(enRango);
     w.innerHTML = '<div class="comVacio">'+d.texto+
+      '<p class="comNota" style="margin:12px 0 0"><b>Dónde se pone el porcentaje:</b> en <b>Ajustes del negocio → Permisos y costos</b>, '+
+        'columna <b>Comisión %</b> de cada persona. Se guarda en cada venta al cobrarla.</p>'+
       (d.reparar && (typeof rolActual !== "function" || rolActual() === "admin")
         ? '<div class="comBoton"><button class="btn" id="comAplica">Aplicar el porcentaje de hoy a este periodo</button></div>'
         : '')+
@@ -17175,7 +17494,7 @@ function datoAcceso(t){
       return {n: sin, et: sin ? "sin confirmar" : "todas confirmadas", tono: sin ? "aviso" : ""};
     }
     if(t === "inv"){
-      const f = (typeof faltantesInv === "function") ? faltantesInv() : [];
+      const f = (typeof pedirTodo === "function") ? pedirTodo() : [];
       const cero = f.filter(a=>num(a.existencia) <= 0).length;
       return {n: f.length, et: f.length ? (cero ? cero+" agotado(s)" : "por pedir") : "todo surtido",
               tono: cero ? "mal" : f.length ? "aviso" : "bien"};
@@ -17318,8 +17637,8 @@ function pendientesMios(){
       if(sinPagar.length) p.push({t:"nom", que:"Nómina sin pagar", det: sinPagar.map(n=>n.etiqueta).join(", ")});
       const porFac = ventas.filter(v=>v.factura && v.factura.requiere && v.factura.estado !== "facturada");
       if(porFac.length) p.push({t:"ven", que:"Facturas pendientes", det: porFac.length+" venta(s) que pidieron factura"});
-      const f = (typeof faltantesInv === "function") ? faltantesInv() : [];
-      if(f.length) p.push({t:"inv", que:"Material por pedir", det: f.length+" artículo(s) abajo del mínimo"});
+      const f = (typeof pedirTodo === "function") ? pedirTodo() : [];
+      if(f.length) p.push({t:"inv", hay:1, que:"Material por pedir", det: f.length+" cosa(s) abajo del mínimo"});
       const sinClave = equipo.filter(u=>u.activo !== false && !String(u.pin||"").trim());
       if(sinClave.length) p.push({t:"set", que:"Falta clave", det: sinClave.map(u=>u.nombre||"").join(", ")+" no puede checar"});
     }
@@ -17352,7 +17671,7 @@ function pintaMio(){
   const c = $("#tbMioCuenta");
   if(c) c.textContent = p.length ? p.length+" cosa(s)" : "nada pendiente";
   w.innerHTML = p.length
-    ? p.map(x=>'<button class="tbMioFila" data-tbtab="'+esc(x.t)+'">'+
+    ? p.map(x=>'<button class="tbMioFila" data-tbtab="'+esc(x.t)+'"'+(x.hay ? ' data-tbhay="1"' : '')+'>'+
         '<span class="tbMioIco">'+icoSeccion(x.t)+'</span>'+
         '<span class="tbMioTxt"><b>'+esc(x.que)+'</b><small>'+esc(x.det)+'</small></span>'+
         '<span class="tbMioIr">›</span></button>').join("")
@@ -17428,8 +17747,8 @@ const HUBS = window.HUBS = {
     entradas:[
       {t:"pro",  ico:"pro",       d:"ordenes",  et:"Tablero de órdenes",     det:"Mueve el estatus, palomea el checklist y deja notas de bitácora"},
       {t:"dis",  ico:"dis",       d:"arte",     et:"Diseño y archivos",      det:"El arte de cada aplicación, listo para imprimir o bordar"},
-      {t:"inv",  ico:"inv",       d:"stock",    et:"Inventario del taller",  det:"Cuánto hay de cada artículo y qué está por acabarse"},
-      {t:"inv",  ico:"pedir",                   et:"Pedir material",         det:"Manda la solicitud a Compras con tu nombre y la hora", accion:"#ivPedir"},
+      {t:"inv",  ico:"inv",       d:"stock",    et:"Mi inventario",          det:"Qué tienes en carpetas y qué se está acabando"},
+      {t:"inv",  ico:"pedir",                   et:"Pedir material",         det:"Abre Hay que pedir y manda la solicitud a Compras", accion:"#ivPedir"},
       {t:"pro",  ico:"entrega",   d:"hoy",      et:"Entregas comprometidas", det:"Lo que vence en las próximas horas, antes de que venza"},
       {t:"arc",  ico:"historial", d:"entregadas", et:"Historial de pedidos", det:"Lo ya entregado, con su orden y sus documentos"}
     ]
@@ -17611,6 +17930,7 @@ function vaAEntrada(x){
 $("#tab-inicio").addEventListener("click", e=>{
   const b = e.target.closest("[data-tbtab]"); if(!b) return;
   if(!vaATab(b.dataset.tbtab)) toast("Esa sección no está disponible para tu usuario");
+  else if(b.dataset.tbhay) abreHayQuePedir();
 });
 
 /* ---------- eventos de las portadas ---------- */
@@ -18167,7 +18487,22 @@ function medidaApp(a, t){
    técnica lo dice: más vale un cero visible que un número inventado. */
 function costoMinutoTec(t){
   if(!t || t.modo !== "tiempo") return 0;
+  if(t.costoMin != null && t.costoMin !== "") return num(t.costoMin);
   return costoMinutoMaq(maqDe(t.maquinaId));
+}
+/* Cada técnica por tiempo guarda su propio costo por minuto. Si venía de una
+   máquina, se queda con lo que daba (4 decimales): ningún costo cambia. */
+function migraCostoMinTec(t){
+  if(!t || t.modo !== "tiempo") return false;
+  if(t.costoMin != null && t.costoMin !== "") return false;
+  const m = maqDe(t.maquinaId); if(!m) return false;
+  t.costoMin = Math.round(costoMinutoMaq(m)*10000)/10000; return true;
+}
+function migraCostoMin(){
+  let cambio = false;
+  (cat.tecnicas || []).forEach(t=>{ if(migraCostoMinTec(t)) cambio = true; });
+  if(cambio) persist();
+  return cambio;
 }
 
 function nuevaMaquina(tipo){
@@ -19454,7 +19789,7 @@ async function bajaCarpeta(cliente, mes, boton){
 
 /* ============ EQUIPO Y ROLES ============ */
 const ROLES = {
-  admin:      {nombre:"Administrador", ve:["inicio","cot","mos","sav","pro","dis","cli","arc","caj","ven","cat","calc","inv","com","val","asi","nom","set"]},
+  admin:      {nombre:"Administrador", ve:["inicio","cot","mos","sav","pro","dis","cli","arc","caj","ven","cat","inv","com","val","asi","nom","set"]},
   ventas:     {nombre:"Ventas",        ve:["inicio","cot","mos","sav","pro","dis","cli","arc","com","val","asi"]},
   diseno:     {nombre:"Diseño",        ve:["inicio","dis","pro","val","asi"]},
   produccion: {nombre:"Producción",    ve:["inicio","pro","inv","com","val","asi"]}
@@ -22332,6 +22667,7 @@ $("#cb_ok").addEventListener("click", async ()=>{
     } : {requiere:false}
   };
   venta.cfdi = nvFiscalCotSnapshot(q,venta);
+  try{ venta.partidas = partidasDeCot(q, venta.total, venta.costo); }catch(e){}
   const i = ventas.findIndex(v=>v.folio===venta.folio);
   if(i>=0) ventas[i]=venta; else ventas.push(venta);
   if(DB){ try{ await DB.collection("ventas").doc(venta.folio).set({venta,fecha:venta.fecha,total:venta.total}); }catch(e){ toast("No se pudo guardar la venta en la nube"); } }
@@ -22716,12 +23052,111 @@ function recuerdaCobro(folio){
 
 /* ---------- registro de ventas ---------- */
 let venPer = "dia", venRef = hoyISO();
+let venDesde = hoyISO().slice(0,8)+"01", venHasta = hoyISO();
+const MES_L = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+let detQ = "", detPago = "", detEstado = "";
+const detAbiertas = {};
+let anaMes = hoyISO().slice(0,7), anaComp = "prev", anaOrden = "vendido", anaTodos = false;
+
+/* ---------- partidas: qué se vendió dentro de cada venta ----------
+   Una venta nueva guarda sus partidas. Las viejas se arman al vuelo desde la
+   cotización guardada (o desde las líneas del mostrador) y se reparten
+   proporcionalmente para que la suma sea exactamente lo cobrado. */
+function partidasRepartidas(raw, vTotal, vCosto){
+  const r2 = n=>Math.round(n*100)/100;
+  const por = {}, orden = [];
+  (raw||[]).forEach(p=>{
+    if(!p) return;
+    const k = p.clave || ("nom:"+p.nom);
+    let o = por[k];
+    if(!o){ o = por[k] = {clave:k, nom:p.nom||"Venta", cat:p.cat||"", piezas:0, imp:0, cos:0}; orden.push(o); }
+    o.piezas += num(p.piezas); o.imp += Math.max(0, num(p.imp)); o.cos += Math.max(0, num(p.cos));
+  });
+  if(!orden.length) return [];
+  const sI = orden.reduce((s,o)=>s+o.imp,0), sC = orden.reduce((s,o)=>s+o.cos,0);
+  let aT = 0, aC = 0;
+  return orden.map((o,i)=>{
+    const ult = i === orden.length-1;
+    const wI = sI>0 ? o.imp/sI : 1/orden.length;
+    const wC = sC>0 ? o.cos/sC : wI;
+    const t = ult ? r2(num(vTotal)-aT) : r2(num(vTotal)*wI);
+    const c = ult ? r2(num(vCosto)-aC) : r2(num(vCosto)*wC);
+    aT += t; aC += c;
+    return {clave:o.clave, nom:o.nom, cat:o.cat, piezas:o.piezas, total:t, costo:c, utilidad:r2(t-c)};
+  });
+}
+function partesDeCot(q){
+  let r; try{ r = calcDe(q); }catch(e){ return []; }
+  return (r.partes||[]).map((p,i)=>{
+    const it = p.it || {};
+    let clave, nom, cx = "";
+    if(it.modo === "impresion" && it.svc && it.svc.pid){
+      const pr = svProd(it.svc.pid);
+      clave = "svc:"+it.svc.pid;
+      nom = (pr && pr.nom) || nombreItem(it, i+1);
+      const sec = svCat().secciones.find(s=>(s.prods||[]).indexOf(it.svc.pid) >= 0);
+      cx = sec ? (sec.nom||"") : "Servicios de impresión";
+    } else {
+      const a = (cat.articulos||[]).find(x=>x.id === it.articuloId);
+      nom = (a && a.nombre) || nombreItem(it, i+1);
+      clave = "art:"+(it.articuloId || nom);
+      cx = a ? (a.cat||"") : "";
+    }
+    return {clave, nom, cat:cx, piezas:num(p.r.qty), imp:num(p.r.total), cos:num(p.r.costoTotal)};
+  });
+}
+function partidasDeCot(q, total, costo){ return partidasRepartidas(partesDeCot(q), total, costo); }
+function partidasDeLineas(lineas, total, costo){
+  return partidasRepartidas((lineas||[]).map(l=>{
+    const a = (cat.articulos||[]).find(x=>x.id === l.artId);
+    const cant = num(l.cant);
+    return {clave:"art:"+(l.artId || l.nombre), nom:(a && a.nombre) || l.nombre || "Artículo", cat:a ? (a.cat||"") : "",
+            piezas:l.granel ? 1 : cant, imp:(l.neto != null ? num(l.neto) : num(l.precio)*cant), cos:num(l.costo)*cant};
+  }), total, costo);
+}
+const PARTIDAS_MEMO = new WeakMap();
+function partidasDe(v){
+  const sig = v.total+"|"+v.costo+"|"+(v.partidas ? v.partidas.length : 0);
+  const hit = PARTIDAS_MEMO.get(v);
+  if(hit && hit.sig === sig) return hit.p;
+  let p = null;
+  if(Array.isArray(v.partidas) && v.partidas.length){
+    const sT = v.partidas.reduce((s,x)=>s+num(x.total),0), sC = v.partidas.reduce((s,x)=>s+num(x.costo),0);
+    p = (Math.abs(sT-num(v.total)) <= 0.02 && Math.abs(sC-num(v.costo)) <= 0.02) ? v.partidas
+      : partidasRepartidas(v.partidas.map(x=>({clave:x.clave, nom:x.nom, cat:x.cat, piezas:x.piezas, imp:x.total, cos:x.costo})), v.total, v.costo);
+  } else if(Array.isArray(v.lineas) && v.lineas.length){
+    p = partidasDeLineas(v.lineas, v.total, v.costo);
+  } else {
+    const gs = guardadas || [];
+    const q = gs.find(g=>g.folio === v.folio) || (v.ref ? gs.find(g=>g.folio === v.ref) : null);
+    if(q){ try{ p = partidasDeCot(q, v.total, v.costo); }catch(e){ p = null; } }
+  }
+  if(!p || !p.length){
+    const nom = v.articulo || "Venta";
+    p = [{clave:"txt:"+nom, nom, cat:"", piezas:num(v.piezas), total:num(v.total), costo:num(v.costo), utilidad:num(v.utilidad)}];
+  }
+  PARTIDAS_MEMO.set(v, {sig, p});
+  return p;
+}
+/* Los abonos viven dentro de la misma venta (v.abonos). Si algún día un abono
+   llegara como registro aparte, aquí se deja fuera para no contarlo doble. */
+const ventasValidas = ()=> (ventas||[]).filter(v=>!v.abonoDe && !v.esAbono);
+
+/* La barra de periodo es una sola: se mueve a la tarjeta que se abre. */
+function venColoca(id){
+  const bar = $("#venPeriodo"); if(!bar) return;
+  if(id !== "corte" && id !== "comis" && id !== "detalle"){ bar.hidden = true; return; }
+  const body = document.querySelector('#tab-ven [data-ven="'+id+'"] > .body');
+  if(body){ body.prepend(bar); bar.hidden = false; }
+}
 function dmy(iso){ const [y,m,d] = iso.split("-").map(Number); return new Date(y,(m||1)-1,d||1); }
 function iso(d){ const p=n=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); }
 function rango(per, refISO){
   const d = dmy(refISO);
   if(per==="dia") return {ini:iso(d), fin:iso(d)};
   if(per==="semana"){ const dow=(d.getDay()+6)%7; const a=new Date(d); a.setDate(d.getDate()-dow); const b=new Date(a); b.setDate(a.getDate()+6); return {ini:iso(a),fin:iso(b)}; }
+  if(per==="anio") return {ini:d.getFullYear()+"-01-01", fin:d.getFullYear()+"-12-31"};
+  if(per==="rango"){ let a=venDesde||refISO, b=venHasta||refISO; if(b<a){ const t=a; a=b; b=t; } return {ini:a, fin:b}; }
   const a = new Date(d.getFullYear(), d.getMonth(), 1), b = new Date(d.getFullYear(), d.getMonth()+1, 0);
   return {ini:iso(a), fin:iso(b)};
 }
@@ -22730,11 +23165,18 @@ function etiquetaRango(per, R){
   const a = dmy(R.ini), b = dmy(R.fin);
   if(per==="dia") return a.getDate()+" de "+["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"][a.getMonth()]+" "+a.getFullYear();
   if(per==="semana") return "Semana del "+a.getDate()+" "+MES[a.getMonth()]+" al "+b.getDate()+" "+MES[b.getMonth()]+" "+b.getFullYear();
+  if(per==="anio") return "Año "+a.getFullYear();
+  if(per==="rango"){
+    const f = (x,y)=>x.getDate()+" "+MES[x.getMonth()]+(y ? " "+x.getFullYear() : "");
+    return "Del "+f(a, a.getFullYear()!==b.getFullYear())+" al "+f(b, true);
+  }
   return ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"][a.getMonth()]+" "+a.getFullYear();
 }
 function renderVentas(){
   const R = rango(venPer, venRef);
   $("#venFecha").value = venRef;
+  $("#venDesde").value = R.ini; $("#venHasta").value = R.fin;
+  $("#venFecha").hidden = venPer==="rango"; $("#venRangoBox").hidden = venPer!=="rango";
   $("#venRango").textContent = etiquetaRango(venPer, R);
   [...$("#venSeg").children].forEach(b=>b.setAttribute("aria-pressed", b.dataset.per===venPer));
   const enRango = ventas.filter(v=>v.fecha>=R.ini && v.fecha<=R.fin);
@@ -22753,9 +23195,15 @@ function renderVentas(){
     kpi("Piezas producidas", piezas.toLocaleString("es-MX")) + kpi("Órdenes", enRango.length) +
     kpi("Ticket promedio", mx(enRango.length? total/enRango.length : 0)) + kpi("Por cobrar", mx(porCobrar));
 
-  // barras: horas no; por día dentro de semana/mes, y últimos 14 días cuando el periodo es un día
+  // barras: por día en semana/mes/rango corto; por mes en año/rango largo; últimos 14 días cuando el periodo es un día
+  const nDias = Math.round((dmy(R.fin)-dmy(R.ini))/864e5)+1;
   let cubos = [];
-  if(venPer==="mes" || venPer==="semana"){
+  if(venPer==="anio" || (venPer==="rango" && nDias>62)){
+    const a = dmy(R.ini), b = dmy(R.fin);
+    for(let d=new Date(a.getFullYear(), a.getMonth(), 1); d<=b; d.setMonth(d.getMonth()+1))
+      cubos.push({k:iso(d).slice(0,7), lab:MES[d.getMonth()], mes:true});
+    $("#venChartTitle").textContent = "Ventas por mes";
+  } else if(venPer==="mes" || venPer==="semana" || venPer==="rango"){
     const a = dmy(R.ini), b = dmy(R.fin);
     for(let d=new Date(a); d<=b; d.setDate(d.getDate()+1)) cubos.push({k:iso(new Date(d)), lab:String(d.getDate())});
     $("#venChartTitle").textContent = "Ventas por día";
@@ -22765,8 +23213,9 @@ function renderVentas(){
     $("#venChartTitle").textContent = "Ventas de los últimos 14 días";
   }
   cubos.forEach(c=>{
-    c.v = ventas.filter(v=>v.fecha===c.k).reduce((s,v)=>s+num(v.total),0);
-    c.g = compras().filter(r=>!anulada(r) && r.fecha===c.k).reduce((s,r)=>s+totalReq(r),0);
+    const en = f=> c.mes ? (String(f).slice(0,7)===c.k && f>=R.ini && f<=R.fin) : f===c.k;
+    c.v = ventas.filter(v=>en(v.fecha)).reduce((s,v)=>s+num(v.total),0);
+    c.g = compras().filter(r=>!anulada(r) && en(r.fecha)).reduce((s,r)=>s+totalReq(r),0);
   });
   const max = Math.max(1, ...cubos.map(c=>Math.max(c.v, c.g)));
   $("#venChartTitle").textContent = $("#venChartTitle").textContent.replace("Ventas", "Ventas y compras");
@@ -22776,91 +23225,269 @@ function renderVentas(){
       '<i style="height:'+(c.v? Math.max(2,(c.v/max)*100) : 2)+'%"></i>' +
       (c.g ? '<i class="gasto" style="height:'+Math.max(2,(c.g/max)*100)+'%"></i>' : '') +
     '</div>').join("");
-  $("#venAxis").innerHTML = cubos.map((c,i)=>'<span>'+((cubos.length>16 && i%2) ? "" : c.lab)+'</span>').join("");
+  const paso = Math.max(1, Math.ceil(cubos.length/16));
+  $("#venAxis").innerHTML = cubos.map((c,i)=>'<span>'+((i%paso) ? "" : c.lab)+'</span>').join("");
 
   renderAnalisis();
   renderComisiones(enRango);
-  $("#venCount").textContent = enRango.length + " venta(s) · " + mx(total);
-  $("#venList").innerHTML = enRango.length ? enRango.slice().sort((a,b)=>b.fecha<a.fecha?-1:1).map(v=>{
-    const falta = num(v.total)-num(v.recibido);
-    const pill = v.estado==="pagado" ? '<span class="pill good">Pagado</span>'
-      : v.estado==="anticipo" ? '<span class="pill part">Anticipo · faltan '+mx(falta)+'</span>'
-      : '<span class="pill pend">Pendiente</span>';
-    return '<div class="saved-item"><div class="meta"><b>'+esc(v.cliente||"Sin cliente")+'</b>'+
-      '<small>'+esc(v.folio)+' · '+esc(v.fecha)+' · '+v.piezas+' pzas · '+esc(v.pago)+' · utilidad '+mx(v.utilidad)+'</small></div>'+
-      pill+
-      (v.factura && v.factura.requiere ? (v.factura.estado==="facturada"
-        ? '<span class="pill good">Facturada</span>'
-        : '<span class="pill pend">Por facturar</span>') : '')+
-      '<span class="amt">'+mx(v.total)+'</span>'+
-      (v.factura && v.factura.requiere ? '<button class="btn sm" data-fact="'+esc(v.folio)+'">Facturar</button>' : '')+
-      '<button class="btn sm icon" data-delven="'+esc(v.folio)+'" title="Quitar del registro">✕</button></div>';
-  }).join("") : '<div class="empty">No hay ventas en este periodo. Cobra una cotización desde el botón <b>Cobrar</b> o desde la pestaña Guardadas.</div>';
+  renderDetalle(enRango);
+}
+
+/* ---------- detalle: buscar, filtrar y abrir cada venta ---------- */
+const estadoDe = v => (v.estado==="pagado" || v.estado==="anticipo") ? v.estado : "pendiente";
+function detalleFiltrado(enRango){
+  const q = detQ.trim().toLowerCase();
+  return enRango.filter(v=>{
+    if(detPago && (v.pago||"Otro") !== detPago) return false;
+    if(detEstado && estadoDe(v) !== detEstado) return false;
+    if(q){
+      const hay = [v.cliente, v.folio, v.articulo].concat((v.partidas||[]).map(p=>p.nom)).join(" ").toLowerCase();
+      if(hay.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+}
+function detalleCuerpo(v){
+  const ps = partidasDe(v), adm = veDetalle();
+  const sT = ps.reduce((s,p)=>s+num(p.total),0), sC = ps.reduce((s,p)=>s+num(p.costo),0), sP = ps.reduce((s,p)=>s+num(p.piezas),0);
+  const mg = (t,u)=> t>0 ? Math.round(u/t*100)+"%" : "—";
+  return '<div class="detPart"><h5>Qué se vendió</h5><div class="tbl-wrap"><table class="tbVen"><thead><tr><th>Producto</th><th>Piezas</th><th>Importe</th>'+
+    (adm ? '<th>Costo</th><th>Utilidad</th><th>Margen</th>' : '')+'</tr></thead><tbody>'+
+    ps.map(p=>'<tr><td class="nom">'+esc(p.nom)+(p.cat ? '<small>'+esc(p.cat)+'</small>' : '')+'</td>'+
+      '<td data-l="Piezas">'+num(p.piezas).toLocaleString("es-MX")+'</td><td data-l="Importe">'+mx(p.total)+'</td>'+
+      (adm ? '<td data-l="Costo">'+mx(p.costo)+'</td><td data-l="Utilidad">'+mx(p.utilidad)+'</td><td data-l="Margen">'+mg(num(p.total), num(p.utilidad))+'</td>' : '')+
+    '</tr>').join("")+'</tbody>'+
+    (ps.length > 1 ? '<tfoot><tr><td class="nom">Suma</td><td data-l="Piezas">'+sP.toLocaleString("es-MX")+'</td><td data-l="Importe">'+mx(sT)+'</td>'+
+      (adm ? '<td data-l="Costo">'+mx(sC)+'</td><td data-l="Utilidad">'+mx(sT-sC)+'</td><td data-l="Margen">'+mg(sT, sT-sC)+'</td>' : '')+'</tr></tfoot>' : '')+
+    '</table></div></div>';
+}
+function detalleFila(v){
+  const falta = num(v.total)-num(v.recibido);
+  const ab = !!detAbiertas[v.folio];
+  const pill = v.estado==="pagado" ? '<span class="pill good">Pagado</span>'
+    : v.estado==="anticipo" ? '<span class="pill part">Anticipo · faltan '+mx(falta)+'</span>'
+    : '<span class="pill pend">Pendiente</span>';
+  return '<div class="detVenta'+(ab?' abierta':'')+'" data-detfolio="'+esc(v.folio)+'"><div class="saved-item">'+
+    '<button class="detTog" type="button" aria-expanded="'+ab+'" aria-label="Ver qué se vendió" title="Ver qué se vendió"><span aria-hidden="true">›</span></button>'+
+    '<div class="meta"><b>'+esc(v.cliente||"Sin cliente")+'</b>'+
+    '<small>'+esc(v.folio)+' · '+esc(v.fecha)+' · '+num(v.piezas)+' pzas · '+esc(v.pago)+(veDetalle() ? ' · utilidad '+mx(v.utilidad) : '')+'</small></div>'+
+    pill+
+    (v.factura && v.factura.requiere ? (v.factura.estado==="facturada"
+      ? '<span class="pill good">Facturada</span>'
+      : '<span class="pill pend">Por facturar</span>') : '')+
+    '<span class="amt">'+mx(v.total)+'</span>'+
+    (v.factura && v.factura.requiere ? '<button class="btn sm" data-fact="'+esc(v.folio)+'">Facturar</button>' : '')+
+    '<button class="btn sm icon" data-delven="'+esc(v.folio)+'" title="Quitar del registro">✕</button></div>'+
+    (ab ? detalleCuerpo(v) : '')+'</div>';
+}
+function renderDetalle(enRango){
+  if(!enRango){ const R = rango(venPer, venRef); enRango = ventas.filter(v=>v.fecha>=R.ini && v.fecha<=R.fin); }
+  const pagos = [...new Set(enRango.map(v=>v.pago||"Otro"))].sort();
+  if(detPago && pagos.indexOf(detPago) < 0) detPago = "";
+  $("#detPago").innerHTML = '<option value="">Todas las formas de pago</option>'+pagos.map(p=>'<option value="'+esc(p)+'">'+esc(p)+'</option>').join("");
+  $("#detPago").value = detPago;
+  $("#detEstado").value = detEstado;
+  if(document.activeElement !== $("#detBusca")) $("#detBusca").value = detQ;
+  const lista = detalleFiltrado(enRango);
+  const tot = lista.reduce((s,v)=>s+num(v.total),0), ut = lista.reduce((s,v)=>s+num(v.utilidad),0);
+  $("#venCount").textContent = lista.length+" venta(s) · "+mx(tot)+(veDetalle() ? " · utilidad "+mx(ut) : "")+
+    (lista.length !== enRango.length ? " (de "+enRango.length+")" : "");
+  $("#venList").innerHTML = lista.length
+    ? lista.slice().sort((a,b)=>b.fecha<a.fecha?-1:1).map(detalleFila).join("")
+    : '<div class="empty">'+(enRango.length
+        ? 'Ninguna venta coincide con lo que buscas. Cambia la búsqueda o los filtros.'
+        : 'No hay ventas en este periodo. Cambia el periodo de arriba, o cobra una cotización desde el botón <b>Cobrar</b> o desde la pestaña Guardadas.')+'</div>';
 }
 function kpi(k,v,lead){ return '<div class="kpi'+(lead?" lead":"")+'"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>'; }
 
-/* ---------- análisis ---------- */
+/* ---------- análisis por mes ---------- */
 const HUES = ["var(--accent)","var(--cyan)","var(--good)","var(--warn)","var(--ink-3)"];
-function renderAnalisis(){
-  if(!ventas.length){
-    $("#proyBox").innerHTML = '<b>Sin datos todavía.</b> En cuanto cobres tu primera venta, aquí aparece la tendencia y la proyección del mes.';
-    ["anaMeses","anaPagos","anaEstados","anaArticulos","anaClientes"].forEach(id=>{ const e=$("#"+id); if(e) e.innerHTML=""; });
-    $("#anaMesesEje").innerHTML=""; $("#anaPagosLeg").innerHTML=""; $("#anaEstadosLeg").innerHTML="";
-    return;
-  }
-  // --- meses ---
-  const meses = [];
-  const hoy = dmy(hoyISO());
-  for(let i=11;i>=0;i--){ const d=new Date(hoy.getFullYear(), hoy.getMonth()-i, 1);
-    meses.push({k: d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"), lab: MES[d.getMonth()], anio:d.getFullYear()}); }
-  meses.forEach(m=>{
-    const vs = ventas.filter(v=>String(v.fecha).slice(0,7)===m.k);
-    m.v = vs.reduce((s,x)=>s+num(x.total),0);
-    m.u = vs.reduce((s,x)=>s+num(x.utilidad),0);
+function mesDe(k, d){ const [y,m] = k.split("-").map(Number); const x = new Date(y, m-1+d, 1); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0"); }
+function etMes(k){ const [y,m] = k.split("-").map(Number); return MES_L[m-1]+" "+y; }
+function anaStats(vs){
+  const n = vs.length, t = vs.reduce((s,v)=>s+num(v.total),0), u = vs.reduce((s,v)=>s+num(v.utilidad),0), p = vs.reduce((s,v)=>s+num(v.piezas),0);
+  return {n, t, u, p, m: t>0 ? u/t*100 : 0, tk: n ? t/n : 0};
+}
+function anaProductos(vs, nombres){
+  const m = {};
+  const lista = []; vs.forEach(v=> partidasDe(v).forEach(p=> lista.push(p)));
+  /* Una venta vieja sin detalle sólo trae el nombre: si ese nombre ya es de un
+     producto conocido, se suma con él en vez de salir repetido. */
+  const porNom = nombres || {};
+  lista.forEach(p=>{ if(p.clave && p.clave.indexOf("txt:") !== 0) porNom[String(p.nom).toLowerCase()] = p.clave; });
+  lista.forEach(p=>{
+    let k = p.clave || ("nom:"+p.nom);
+    if(k.indexOf("txt:") === 0 && porNom[String(p.nom).toLowerCase()]) k = porNom[String(p.nom).toLowerCase()];
+    const o = m[k] || (m[k] = {k, nom:p.nom||"Venta", cat:p.cat||"", piezas:0, t:0, c:0, u:0});
+    o.piezas += num(p.piezas); o.t += num(p.total); o.c += num(p.costo); o.u += num(p.utilidad);
   });
+  return m;
+}
+/* El cambio contra el mes comparado: verde si mejora, rojo si empeora. */
+function anaDelta(cur, prev, conComp, puntos, etC){
+  if(!conComp) return "";
+  let d, txt;
+  if(puntos){ d = cur-prev; txt = Math.abs(d).toFixed(1)+" pts"; }
+  else if(prev > 0){ d = (cur/prev-1)*100; txt = Math.abs(d).toFixed(1)+"%"; }
+  else return '<div class="d"><small>sin dato en '+esc(etC)+'</small></div>';
+  const cls = Math.abs(d) < 0.05 ? "" : d > 0 ? "sube" : "baja";
+  return '<div class="d '+cls+'">'+(cls==="" ? "= igual" : (d>0?"▲ ":"▼ ")+txt)+' <small>vs '+esc(etC)+'</small></div>';
+}
+function renderAnalisis(){
+  const vu = veDetalle();
+  const todas = ventasValidas();
+  const hoyK = hoyISO().slice(0,7);
+  if(anaMes > hoyK) anaMes = hoyK;
+  const kComp = anaComp==="prev" ? mesDe(anaMes,-1) : anaComp==="anio" ? mesDe(anaMes,-12) : "";
+  const etA = etMes(anaMes), etC = kComp ? etMes(kComp) : "";
+  const delMes = k => todas.filter(v=>String(v.fecha).slice(0,7)===k);
+  const vsMes = delMes(anaMes), vsComp = kComp ? delMes(kComp) : [];
+  const st = anaStats(vsMes), cs = anaStats(vsComp);
+  const conComp = !!kComp && cs.n > 0;
+
+  $("#anaMesEt").textContent = etA;
+  $("#anaNext").disabled = anaMes >= hoyK;
+  [...$("#anaCompSeg").children].forEach(b=>b.setAttribute("aria-pressed", b.dataset.comp===anaComp));
+  [...$("#anaOrdSeg").children].forEach(b=>{ b.setAttribute("aria-pressed", b.dataset.ord===anaOrden); b.hidden = !vu && b.dataset.ord!=="vendido"; });
+  const nota = $("#anaNota");
+  nota.hidden = !(kComp && !conComp);
+  nota.textContent = (kComp && !conComp) ? "No hubo ventas en "+etC+": no hay con qué comparar." : "";
+
+  // --- KPIs ---
+  $("#anaKpis").innerHTML =
+    kpi("Ventas", mx(st.t)+anaDelta(st.t, cs.t, conComp, false, etC), true) +
+    (vu ? kpi("Utilidad", mx(st.u)+anaDelta(st.u, cs.u, conComp, false, etC)) : "") +
+    (vu ? kpi("Margen", st.m.toFixed(1)+"%"+anaDelta(st.m, cs.m, conComp, true, etC)) : "") +
+    kpi("Número de ventas", st.n+anaDelta(st.n, cs.n, conComp, false, etC)) +
+    kpi("Ticket promedio", mx(st.tk)+anaDelta(st.tk, cs.tk, conComp, false, etC)) +
+    kpi("Piezas", st.p.toLocaleString("es-MX")+anaDelta(st.p, cs.p, conComp, false, etC));
+
+  // --- 12 meses que terminan en el mes escogido ---
+  const meses = [];
+  for(let i=11;i>=0;i--){ const k = mesDe(anaMes,-i); const [y,m] = k.split("-").map(Number);
+    const vs = delMes(k); meses.push({k, lab:MES[m-1], anio:y, v:vs.reduce((s,x)=>s+num(x.total),0), u:vs.reduce((s,x)=>s+num(x.utilidad),0)}); }
   const maxM = Math.max(1, ...meses.map(m=>m.v));
   $("#anaMeses").className = "chart" + (meses.every(m=>!m.v) ? " vacio" : "");
   $("#anaMeses").innerHTML = meses.map(m=>
-    '<div class="bar'+(m.v?"":" zero")+'" data-tip="'+esc(m.lab+" "+m.anio+" · ventas "+mx(m.v)+" · utilidad "+mx(m.u))+'" '+
+    '<div class="bar'+(m.v?"":" zero")+(m.k===anaMes?" sel":"")+'" data-mes="'+m.k+'" data-tip="'+esc(m.lab+" "+m.anio+" · ventas "+mx(m.v)+(vu ? " · utilidad "+mx(m.u) : ""))+'" '+
     'style="flex-direction:row;align-items:flex-end;gap:2px">'+
       '<i style="flex:1;height:'+(m.v? Math.max(2,(m.v/maxM)*100):2)+'%"></i>'+
-      '<i style="flex:1;height:'+(m.u>0? Math.max(2,(m.u/maxM)*100):2)+'%;background:var(--cyan)"></i>'+
+      (vu ? '<i style="flex:1;height:'+(m.u>0? Math.max(2,(m.u/maxM)*100):2)+'%;background:var(--cyan)"></i>' : '')+
     '</div>').join("");
-  $("#anaMesesEje").innerHTML = meses.map(m=>'<span>'+m.lab+'</span>').join("");
+  $("#anaMesesEje").innerHTML = meses.map(m=>'<span'+(m.k===anaMes?' class="sel"':'')+'>'+m.lab+'</span>').join("");
+  $("#anaLegUtil").hidden = !vu;
 
-  // --- proyección del mes en curso ---
-  const kMes = hoyISO().slice(0,7);
-  const delMes = ventas.filter(v=>String(v.fecha).slice(0,7)===kMes);
-  const acum = delMes.reduce((s,v)=>s+num(v.total),0);
-  const diaHoy = hoy.getDate();
-  const diasMes = new Date(hoy.getFullYear(), hoy.getMonth()+1, 0).getDate();
-  const ritmo = diaHoy>0 ? (acum/diaHoy)*diasMes : 0;
-  const previos = meses.slice(0,11).filter(m=>m.v>0).slice(-3);
-  const prom = previos.length ? previos.reduce((s,m)=>s+m.v,0)/previos.length : 0;
-  const util = delMes.reduce((s,v)=>s+num(v.utilidad),0);
-  const margen = acum>0 ? util/acum*100 : 0;
-  $("#proyBox").innerHTML =
-    '<div style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-end">'+
-    '<div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--ink-2)">Proyección de cierre de mes</div>'+
-    '<div class="v">'+mx(ritmo)+'</div>'+
-    '<div style="font-size:12px;color:var(--ink-2)">Llevas '+mx(acum)+' en '+diaHoy+' de '+diasMes+' días, a ese ritmo.</div></div>'+
-    (prom>0 ? '<div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--ink-2)">Contra tu promedio</div>'+
-      '<div class="v" style="color:'+(ritmo>=prom?"var(--good)":"var(--warn)")+'">'+(ritmo>=prom?"+":"")+
-      (prom? Math.round((ritmo/prom-1)*100):0)+'%</div>'+
-      '<div style="font-size:12px;color:var(--ink-2)">Promedio de los últimos meses: '+mx(prom)+'</div></div>' : '')+
-    '<div><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--ink-2)">Margen del mes</div>'+
-    '<div class="v" style="color:var(--cyan)">'+margen.toFixed(1)+'%</div>'+
-    '<div style="font-size:12px;color:var(--ink-2)">Utilidad acumulada '+mx(util)+'</div></div></div>'+
-    '<p style="font-size:11px;color:var(--ink-2);margin:12px 0 0">La proyección es una estimación simple: lo vendido entre los días transcurridos, por los días del mes. No considera temporadas ni pedidos ya comprometidos.</p>';
+  // --- proyección: sólo si el mes escogido es el actual ---
+  const pb = $("#proyBox");
+  pb.hidden = anaMes !== hoyK;
+  if(anaMes === hoyK){
+    const hoy = dmy(hoyISO());
+    const diaHoy = hoy.getDate(), diasMes = new Date(hoy.getFullYear(), hoy.getMonth()+1, 0).getDate();
+    const ritmo = diaHoy>0 ? (st.t/diaHoy)*diasMes : 0;
+    const previos = meses.slice(0,11).filter(m=>m.v>0).slice(-3);
+    const prom = previos.length ? previos.reduce((s,m)=>s+m.v,0)/previos.length : 0;
+    const rot = 'font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--ink-2)';
+    pb.innerHTML =
+      '<div style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-end">'+
+      '<div><div style="'+rot+'">Proyección de cierre de mes</div><div class="v">'+mx(ritmo)+'</div>'+
+      '<div style="font-size:12px;color:var(--ink-2)">Llevas '+mx(st.t)+' en '+diaHoy+' de '+diasMes+' días, a ese ritmo.</div></div>'+
+      (prom>0 ? '<div><div style="'+rot+'">Contra tu promedio</div>'+
+        '<div class="v" style="color:'+(ritmo>=prom?"var(--good)":"var(--warn)")+'">'+(ritmo>=prom?"+":"")+Math.round((ritmo/prom-1)*100)+'%</div>'+
+        '<div style="font-size:12px;color:var(--ink-2)">Promedio de los últimos meses: '+mx(prom)+'</div></div>' : '')+
+      (vu ? '<div><div style="'+rot+'">Margen del mes</div><div class="v" style="color:var(--cyan)">'+st.m.toFixed(1)+'%</div>'+
+        '<div style="font-size:12px;color:var(--ink-2)">Utilidad acumulada '+mx(st.u)+'</div></div>' : '')+'</div>'+
+      '<p style="font-size:11px;color:var(--ink-2);margin:12px 0 0">La proyección es una estimación simple: lo vendido entre los días transcurridos, por los días del mes. No considera temporadas ni pedidos ya comprometidos.</p>';
+  }
 
-  // --- formas de pago y estados ---
-  barraApilada("#anaPagos", "#anaPagosLeg", agrupa(ventas, v=>v.pago||"Otro"));
-  barraApilada("#anaEstados", "#anaEstadosLeg", agrupa(ventas, v=>
+  // --- productos del mes ---
+  const nombres = {}; anaProductos(vsMes.concat(vsComp), nombres);
+  const pm = anaProductos(vsMes, nombres), pc = anaProductos(vsComp, nombres);
+  const arr = Object.keys(pm).map(k=>pm[k]);
+  arr.forEach(o=>{ o.mg = o.t>0 ? o.u/o.t*100 : null; o.pv = pc[o.k] ? pc[o.k].t : 0; });
+  const mejor = (lista, f, asc)=> lista.slice().sort((a,b)=> asc ? f(a)-f(b) : f(b)-f(a))[0];
+  const conVenta = arr.filter(o=>o.t>0);
+  if(!arr.length){
+    $("#anaTres").innerHTML = '<div class="empty" style="grid-column:1/-1">No hay ventas en '+esc(etA)+'.</div>';
+    $("#anaProdBox").innerHTML = "";
+  } else {
+    const tarj = (tit, o, linea)=> o ? '<div class="anaT"><small>'+tit+'</small><b>'+esc(o.nom)+'</b><span>'+linea+'</span></div>' : '';
+    const top = mejor(arr, o=>o.t), dej = mejor(arr, o=>o.u), bajo = mejor(conVenta, o=>o.mg, true);
+    $("#anaTres").innerHTML =
+      tarj("El que más vendes", top, mx(top.t)+" · "+top.piezas.toLocaleString("es-MX")+" pzas") +
+      (vu ? tarj("El que más te deja", dej, mx(dej.u)+(dej.mg!=null ? " · "+Math.round(dej.mg)+"%" : "")) : "") +
+      (vu ? tarj("El de menor margen", bajo, bajo ? Math.round(bajo.mg)+"% · vende "+mx(bajo.t) : "") : "");
+    const ord = {vendido:(a,b)=>b.t-a.t, util:(a,b)=>b.u-a.u, margen:(a,b)=>(a.mg==null?999:a.mg)-(b.mg==null?999:b.mg)};
+    const ordena = (vu ? anaOrden : "vendido");
+    const lista = arr.slice().sort(ord[ordena]);
+    const ver = anaTodos ? lista : lista.slice(0,10);
+    const dp = o=>{
+      if(!conComp) return "";
+      if(!(o.pv > 0)) return '<td data-l="vs '+esc(etC)+'">nuevo</td>';
+      const d = (o.t/o.pv-1)*100, cls = Math.abs(d)<0.05 ? "" : d>0 ? "sube" : "baja";
+      return '<td data-l="vs '+esc(etC)+'" class="'+cls+'">'+(cls==="" ? "=" : (d>0?"▲ ":"▼ ")+Math.abs(d).toFixed(0)+"%")+'</td>';
+    };
+    $("#anaProdBox").innerHTML =
+      '<div class="tbl-wrap"><table class="tbVen"><thead><tr><th>Producto</th><th>Piezas</th><th>Ventas</th>'+
+      (vu ? '<th>Utilidad</th><th>Margen</th>' : '')+(conComp ? '<th>vs comparado</th>' : '')+'</tr></thead><tbody>'+
+      ver.map(o=>'<tr><td class="nom">'+esc(o.nom)+(o.cat ? '<small>'+esc(o.cat)+'</small>' : '')+'</td>'+
+        '<td data-l="Piezas">'+o.piezas.toLocaleString("es-MX")+'</td><td data-l="Ventas">'+mx(o.t)+'</td>'+
+        (vu ? '<td data-l="Utilidad">'+mx(o.u)+'</td><td data-l="Margen">'+(o.mg!=null ? Math.round(o.mg)+"%" : "—")+'</td>' : '')+
+        dp(o)+'</tr>').join("")+'</tbody></table></div>'+
+      (lista.length > 10 ? '<button class="btn sm anaMas" id="anaMas">'+(anaTodos ? "Ver solo los 10 primeros" : "Ver todos ("+lista.length+")")+'</button>' : '');
+  }
+
+  // --- ideas ---
+  const ideas = [];
+  const esActual = anaMes === hoyK;
+  const estaEt = esActual ? "este mes" : "en "+etA;
+  if(!vsMes.length){
+    ideas.push("No hay ventas en <b>"+esc(etA)+"</b>. Escoge otro mes arriba o cobra una cotización.");
+  } else {
+    if(conComp && cs.t > 0){
+      const pct = (st.t/cs.t-1)*100;
+      if(Math.abs(pct) >= 5){
+        const difs = arr.map(o=>({o, d:o.t-o.pv}));
+        Object.keys(pc).forEach(k=>{ if(!pm[k]) difs.push({o:pc[k], d:-pc[k].t}); });
+        difs.sort((a,b)=> pct>0 ? b.d-a.d : a.d-b.d);
+        const tp = difs[0];
+        const causa = (tp && ((pct>0 && tp.d>0) || (pct<0 && tp.d<0)))
+          ? " Lo explica sobre todo <b>"+esc(tp.o.nom)+"</b> ("+(tp.d>0?"+":"−")+mx(Math.abs(tp.d))+")." : "";
+        ideas.push("Vendiste <b>"+Math.abs(Math.round(pct))+"% "+(pct>0?"más":"menos")+"</b> que en "+esc(etC)+"."+causa+
+          (esActual ? " El mes aún no termina." : ""));
+      } else {
+        ideas.push("Vas parejo con "+esc(etC)+": "+(pct>=0?"+":"")+pct.toFixed(1)+"% en ventas.");
+      }
+    }
+    const top3 = arr.slice().sort((a,b)=>b.t-a.t).slice(0,3);
+    if(vu){
+      const bajoMg = top3.find(o=>o.mg!=null && o.mg < 15);
+      if(bajoMg) ideas.push("<b>"+esc(bajoMg.nom)+"</b> se vende mucho pero deja sólo <b>"+Math.round(bajoMg.mg)+"%</b>: revisa su precio o su costo.");
+      const altoMg = arr.filter(o=>o.mg!=null && o.mg > 40 && top3.indexOf(o) < 0).sort((a,b)=>b.u-a.u)[0];
+      if(altoMg) ideas.push("<b>"+esc(altoMg.nom)+"</b> deja <b>"+Math.round(altoMg.mg)+"%</b> pero se vende poco: promociónalo.");
+    }
+    if(conComp){
+      const esPub = n => !n || /^p[uú]blico/i.test(n);
+      const ahora = {}; vsMes.forEach(v=>{ ahora[v.clienteId || v.cliente || ""] = 1; });
+      const antes = {};
+      vsComp.forEach(v=>{ const k = v.clienteId || v.cliente || ""; if(!k || esPub(v.cliente)) return;
+        const o = antes[k] || (antes[k] = {nom:v.cliente||"Cliente", t:0}); o.t += num(v.total); });
+      const perdido = Object.keys(antes).filter(k=>!ahora[k]).map(k=>antes[k]).sort((a,b)=>b.t-a.t)[0];
+      if(perdido) ideas.push("<b>"+esc(perdido.nom)+"</b> no te "+(esActual ? "ha comprado este mes" : "compró en "+esc(etA))+": dale seguimiento (en "+esc(etC)+" te compró "+mx(perdido.t)+").");
+    }
+    const porCobrar = vsMes.reduce((s,v)=>s+saldoDe(v),0), nCobrar = vsMes.filter(v=>saldoDe(v)>0).length;
+    if(porCobrar > 0) ideas.push("Te deben <b>"+mx(porCobrar)+"</b> de lo vendido "+estaEt+" ("+nCobrar+" venta"+(nCobrar===1?"":"s")+"). Míralo en Cuentas por cobrar.");
+    if(vu){
+      const emp = mejor(arr, o=>o.u);
+      if(emp && emp.u > 0) ideas.push("Empuja <b>"+esc(emp.nom)+"</b>: te deja <b>"+mx(emp.u)+"</b> ("+Math.round(emp.mg||0)+"%).");
+    }
+  }
+  $("#anaIdeas").innerHTML = '<ul class="anaIdeas">'+ideas.slice(0,5).map(t=>'<li>'+t+'</li>').join("")+'</ul>';
+
+  // --- del mes: clientes, pagos, estado de cobro ---
+  barraApilada("#anaPagos", "#anaPagosLeg", agrupa(vsMes, v=>v.pago||"Otro"));
+  barraApilada("#anaEstados", "#anaEstadosLeg", agrupa(vsMes, v=>
     v.estado==="pagado"?"Pagadas":v.estado==="anticipo"?"Con anticipo":"Pendientes"));
-
-  // --- rankings ---
-  ranking("#anaArticulos", agrupa(ventas, v=> (v.articulo||"Sin descripción").slice(0,46)));
-  ranking("#anaClientes",  agrupa(ventas, v=> v.cliente || "Público general"));
+  ranking("#anaClientes", agrupa(vsMes, v=> v.cliente || "Público general"));
 }
 function agrupa(arr, fn){
   const m = {}; arr.forEach(v=>{ const k = fn(v); m[k] = (m[k]||0) + num(v.total); });
@@ -22881,18 +23508,58 @@ function ranking(sel, datos){
     '<div class="rankRow"><div class="txt">'+esc(d.k)+'<div class="barra" style="width:'+(d.v/max*100)+'%;margin-top:4px"></div></div>'+
     '<div class="val">'+mx(d.v)+'</div></div>').join("") : '<div class="empty">Sin datos</div>';
 }
-$("#venSeg").addEventListener("click", e=>{ const b=e.target.closest("[data-per]"); if(!b) return; venPer=b.dataset.per; renderVentas(); });
+$("#venSeg").addEventListener("click", e=>{
+  const b = e.target.closest("[data-per]"); if(!b) return;
+  const antes = rango(venPer, venRef), eraRango = venPer==="rango";
+  venPer = b.dataset.per;
+  if(venPer==="rango" && !eraRango){ venDesde = antes.ini; venHasta = antes.fin; }
+  if(eraRango && venPer!=="rango") venRef = venHasta || venRef;
+  renderVentas();
+});
 $("#venFecha").addEventListener("change", e=>{ venRef = e.target.value || hoyISO(); renderVentas(); });
+$("#venDesde").addEventListener("change", e=>{ venDesde = e.target.value || venDesde; if(venHasta < venDesde) venHasta = venDesde; renderVentas(); });
+$("#venHasta").addEventListener("change", e=>{ venHasta = e.target.value || venHasta; if(venHasta < venDesde) venDesde = venHasta; renderVentas(); });
 $("#venHoy").addEventListener("click", ()=>{ venRef = hoyISO(); renderVentas(); });
 function mueve(dir){
+  if(venPer==="rango"){
+    const a = dmy(venDesde), b = dmy(venHasta), n = Math.round((b-a)/864e5)+1;
+    a.setDate(a.getDate()+n*dir); b.setDate(b.getDate()+n*dir);
+    venDesde = iso(a); venHasta = iso(b); renderVentas(); return;
+  }
   const d = dmy(venRef);
   if(venPer==="dia") d.setDate(d.getDate()+dir);
   else if(venPer==="semana") d.setDate(d.getDate()+7*dir);
+  else if(venPer==="anio") d.setFullYear(d.getFullYear()+dir);
   else d.setMonth(d.getMonth()+dir);
   venRef = iso(d); renderVentas();
 }
 $("#venPrev").addEventListener("click", ()=>mueve(-1));
 $("#venNext").addEventListener("click", ()=>mueve(1));
+/* Detalle: buscar, filtrar y abrir una venta para ver sus partidas. */
+$("#detBusca").addEventListener("input", e=>{ detQ = e.target.value; renderDetalle(); });
+$("#detPago").addEventListener("change", e=>{ detPago = e.target.value; renderDetalle(); });
+$("#detEstado").addEventListener("change", e=>{ detEstado = e.target.value; renderDetalle(); });
+$("#venList").addEventListener("click", e=>{
+  const w = e.target.closest(".detVenta"); if(!w) return;
+  const b = e.target.closest("button"); if(b && !b.classList.contains("detTog")) return;
+  const f = w.dataset.detfolio;
+  const v = ventas.find(x=>x.folio === f); if(!v) return;
+  const ab = !detAbiertas[f];
+  if(ab) detAbiertas[f] = true; else delete detAbiertas[f];
+  w.classList.toggle("abierta", ab);
+  w.querySelector(".detTog").setAttribute("aria-expanded", ab);
+  const p = w.querySelector(".detPart");
+  if(ab && !p) w.insertAdjacentHTML("beforeend", detalleCuerpo(v));
+  else if(!ab && p) p.remove();
+});
+/* Análisis: mes, comparación, orden de productos. */
+$("#anaMeses").addEventListener("click", e=>{ const b = e.target.closest("[data-mes]"); if(!b) return; anaMes = b.dataset.mes; anaTodos = false; renderAnalisis(); });
+$("#anaPrev").addEventListener("click", ()=>{ anaMes = mesDe(anaMes,-1); anaTodos = false; renderAnalisis(); });
+$("#anaNext").addEventListener("click", ()=>{ if(mesDe(anaMes,1) > hoyISO().slice(0,7)) return; anaMes = mesDe(anaMes,1); anaTodos = false; renderAnalisis(); });
+$("#anaHoy").addEventListener("click", ()=>{ anaMes = hoyISO().slice(0,7); anaTodos = false; renderAnalisis(); });
+$("#anaCompSeg").addEventListener("click", e=>{ const b = e.target.closest("[data-comp]"); if(!b) return; anaComp = b.dataset.comp; renderAnalisis(); });
+$("#anaOrdSeg").addEventListener("click", e=>{ const b = e.target.closest("[data-ord]"); if(!b) return; anaOrden = b.dataset.ord; renderAnalisis(); });
+$("#anaProdBox").addEventListener("click", e=>{ if(e.target.closest("#anaMas")){ anaTodos = !anaTodos; renderAnalisis(); } });
 $("#tab-ven").addEventListener("click", async e=>{
   const fb = e.target.closest("[data-fact]");
   if(fb){ const v = ventas.find(v=>v.folio===fb.dataset.fact); if(v) abreFactura(v); return; }
@@ -25840,6 +26507,7 @@ async function cv2RegistraPago(q){
          factura: fac, abonos: monto > 0 ? [{fecha:pg.fecha, monto, pago:pg.forma, nota: pg.tipo === "anticipo" ? "Anticipo al confirmar" : "Pago al confirmar"}] : [],
          origen:"confirmacion"};
     v.cfdi=nvFiscalCotSnapshot(q,v);
+    try{ v.partidas = partidasDeCot(q, v.total, v.costo); }catch(e){}
     ventas.push(v);
   }
   if(DB){ try{ await DB.collection("ventas").doc(v.folio).set({venta:v, fecha:v.fecha, total:v.total}); }catch(e){ toast("No se pudo guardar el pago en la nube"); } }
@@ -27270,10 +27938,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261115-1100";</script>
+<script>window.BUILD="20261116-1700";</script>
 <script>
 (function(){
-  var mio = "20261115-1100";
+  var mio = "20261116-1700";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
