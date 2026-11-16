@@ -11,6 +11,7 @@
 <link rel="apple-touch-icon" href="./icons/icon-180.png">
 <link rel="icon" type="image/png" href="../marca/n-64.png">
 <link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./personal-panel.css?v=20261116-1726">
 <style>#pwaInstall{background:#f8f6ec;color:#204a3b;border-color:#d8dece}#pwaInstall:hover{background:#fffdf7;border-color:#fffdf7}.pwaInstall+.turnoChip{margin-left:0}@media(max-width:540px){.pwaInstall{padding:6px 8px;font-size:10px}.turnoChip{font-size:10px}}</style>
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Nuvoor Restaurant</title>
@@ -1547,7 +1548,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 #modalMods .modIncomplete{font-size:11px;color:var(--ink-3);margin:8px 0 0}
 @media(max-width:450px){.configSaveBar{padding:13px}.configSaveBar>.btn{width:100%}#modalMods .modChips{gap:7px}#modalMods .modChip{padding:10px}}
 </style>
-<meta name="nuvoor-build" content="20261114-2330">
+<meta name="nuvoor-build" content="20261116-1726">
 <link rel="stylesheet" href="./tema-borgona.css?v=20261109-1510">
 </head>
 <body>
@@ -1722,49 +1723,24 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 
 <!-- ============ PERSONAL ============ -->
 <section id="tab-personal" hidden>
-  <div class="card" style="margin-bottom:16px" id="personalCorreoCard"><header><h2>Acceso desde celular</h2></header><div style="padding:18px"><p>Invita al correo de cada perfil. La persona confirma su correo y crea su contraseña; conserva su PIN de Personal.</p><button type="button" class="btn primary" id="personalCorreoAbrir">Administrar invitaciones</button><div id="personalCorreoLista" hidden style="margin-top:16px"></div></div></div>
-  <div class="pageHeading"><div><span>EQUIPO</span><h1>Personas y turnos</h1><p>Asistencia, horarios y control del equipo de servicio.</p></div></div>
-  <div class="card" id="cardEquipoPersonal" hidden>
-    <header><h2>Equipo y claves</h2><button class="btn sm primary" type="button" id="userNuevo" style="margin-left:auto">+ Agregar persona</button></header>
+  <article class="card personalHub" id="personalHub">
+    <header class="personalHubHeader"><div><span class="personalHubEyebrow">EQUIPO Y OPERACIÓN</span><h1>Personal</h1><p>Tu equipo, sus accesos, asistencias y horarios en un solo lugar.</p></div><div class="personalHubActions"><button class="btn" type="button" id="userNuevo">+ Agregar persona</button><button class="btn primary" type="button" data-save-config="personal">Guardar cambios</button></div></header>
+    <div class="personalHubTabs" role="tablist" aria-label="Secciones de Personal">
+      <button type="button" role="tab" id="personalTab_resumen" aria-controls="personalPanel_resumen" aria-selected="true" data-personal-tab="resumen" data-personal-admin>Resumen</button>
+      <button type="button" role="tab" id="personalTab_equipo" aria-controls="personalPanel_equipo" aria-selected="false" data-personal-tab="equipo" data-personal-admin>Equipo y acceso</button>
+      <button type="button" role="tab" id="personalTab_asistencias" aria-controls="personalPanel_asistencias" aria-selected="false" data-personal-tab="asistencias">Asistencias</button>
+      <button type="button" role="tab" id="personalTab_horarios" aria-controls="personalPanel_horarios" aria-selected="false" data-personal-tab="horarios" data-personal-admin>Horarios</button>
+      <button type="button" role="tab" id="personalTab_prenomina" aria-controls="personalPanel_prenomina" aria-selected="false" data-personal-tab="prenomina" data-personal-admin>Prenómina</button>
+      <button type="button" role="tab" id="personalTab_sucursales" aria-controls="personalPanel_sucursales" aria-selected="false" data-personal-tab="sucursales" data-personal-admin>Sucursales</button>
+    </div>
+    <section id="personalPanel_resumen" class="personalHubPanel" role="tabpanel" aria-labelledby="personalTab_resumen"><div class="personalHubPeriod"><label>Del <input id="personalDesde" type="date"></label><label>Al <input id="personalHasta" type="date"></label><button type="button" class="btn sm ghost" data-personal-periodo="hoy">Hoy</button><button type="button" class="btn sm ghost" data-personal-periodo="semana">Semana</button><button type="button" class="btn sm ghost" data-personal-periodo="mes">Mes</button></div><div id="personalResumenStats" class="personalHubStats"></div><div class="personalHubColumns"><div><h2>Personal frente a ventas</h2><div id="personalCostoComparado"></div><div class="personalHubLinks"><button class="btn sm ghost" type="button" data-personal-go="horarios">Ver horarios</button><button class="btn sm ghost" type="button" data-personal-go="prenomina">Revisar prenómina</button></div></div><div><h2>Tu equipo hoy</h2><div id="personalEquipoHoy"></div></div></div><p class="hint personalHubDataNote" id="personalResumenOrigen"></p></section>
+    <section id="personalPanel_equipo" class="personalHubPanel" role="tabpanel" aria-labelledby="personalTab_equipo" hidden><div class="personalBlock" id="cardEquipoPersonal" hidden>
+    <header><h2>Equipo y claves</h2></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">El mismo PIN sirve para entrar al perfil y checar entrada o salida.</p>
       <div class="tbl-wrap"><table id="t_equipo"></table></div>
     </div>
-  </div>
-  <div class="card" id="cardCoberturaPersonal">
-    <header><h2>Cobertura de turnos</h2><label class="coverageDate">Fecha <input id="personalFecha" type="date" aria-label="Fecha de la cobertura"></label></header>
-    <div class="body"><div class="coverageStats" id="personalCoberturaStats"></div><div class="coverageGrid" id="personalCobertura"></div>
-      <p class="note" style="margin:12px 0 0">Toca un nombre para consultar o ajustar su horario. La asistencia se compara con el horario registrado.</p>
-    </div>
-  </div>
-  <div class="card">
-    <header><h2>Reloj checador</h2><span class="hint" id="chHoy"></span></header>
-    <div class="body">
-      <p class="note" style="margin:0 0 14px">Elige tu nombre y usa el <b>PIN de tu perfil</b>. Si está activada la foto, tómala antes de registrar tu hora.</p>
-      <div class="chGente" id="chGente"></div>
-    </div>
-  </div>
-  <div class="card">
-    <header><h2>Horas de hoy</h2></header>
-    <div class="body"><div class="tbl-wrap"><table id="t_horas"></table></div></div>
-  </div>
-  <div class="card" id="cardRetardos" hidden>
-    <header><h2>Retardos</h2><span class="hint" id="retHint"></span>
-      <button class="btn sm ghost" id="retReporte" style="margin-left:auto">Imprimir reporte</button></header>
-    <div class="body">
-      <p class="note" style="margin:0 0 14px">Un retardo se mide contra <b>el horario de esa persona</b>, con la
-        tolerancia que pusiste. Justificarlo no lo borra: queda con su motivo y la firma de quien lo justifica,
-        que es lo que sirve el día que se discute.</p>
-      <div class="fila" style="margin-bottom:12px">
-        <label class="f" for="retDesde" style="margin:0">Desde</label>
-        <input id="retDesde" type="date" style="width:auto;flex:0 0 auto">
-        <label class="f" for="retHasta" style="margin:0">Hasta</label>
-        <input id="retHasta" type="date" style="width:auto;flex:0 0 auto">
-      </div>
-      <div class="tbl-wrap"><table id="t_retardos"></table></div>
-    </div>
-  </div>
-  <div class="card" id="cardExpedientes" hidden>
+  </div><div class="personalBlock"  id="personalCorreoCard"><header><h2>Acceso desde celular</h2></header><div style="padding:18px"><p>Invita al correo de cada perfil. La persona confirma su correo y crea su contraseña; conserva su PIN de Personal.</p><button type="button" class="btn primary" id="personalCorreoAbrir">Administrar invitaciones</button><div id="personalCorreoLista" hidden style="margin-top:16px"></div></div></div><div class="personalBlock" id="cardExpedientes" hidden>
     <header><h2>Expedientes</h2><span class="hint">datos, horario y cómo se le paga</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Esto vive <b>en esta computadora</b>, no se manda a ningún lado.
@@ -1779,8 +1755,39 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
           </select></div>
       </div>
     </div>
-  </div>
-  <div class="card" id="cardRecibos" hidden>
+  </div></section>
+    <section id="personalPanel_asistencias" class="personalHubPanel" role="tabpanel" aria-labelledby="personalTab_asistencias" hidden><div class="personalBlock">
+    <header><h2>Reloj checador</h2><span class="hint" id="chHoy"></span></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Elige tu nombre y usa el <b>PIN de tu perfil</b>. Si está activada la foto, tómala antes de registrar tu hora.</p>
+      <div class="chGente" id="chGente"></div>
+    </div>
+  </div><div class="personalBlock">
+    <header><h2>Horas de hoy</h2></header>
+    <div class="body"><div class="tbl-wrap"><table id="t_horas"></table></div></div>
+  </div><div class="personalBlock" id="cardRetardos" hidden>
+    <header><h2>Retardos</h2><span class="hint" id="retHint"></span>
+      <button class="btn sm ghost" id="retReporte" style="margin-left:auto">Imprimir reporte</button></header>
+    <div class="body">
+      <p class="note" style="margin:0 0 14px">Un retardo se mide contra <b>el horario de esa persona</b>, con la
+        tolerancia que pusiste. Justificarlo no lo borra: queda con su motivo y la firma de quien lo justifica,
+        que es lo que sirve el día que se discute.</p>
+      <div class="fila" style="margin-bottom:12px">
+        <label class="f" for="retDesde" style="margin:0">Desde</label>
+        <input id="retDesde" type="date" style="width:auto;flex:0 0 auto">
+        <label class="f" for="retHasta" style="margin:0">Hasta</label>
+        <input id="retHasta" type="date" style="width:auto;flex:0 0 auto">
+      </div>
+      <div class="tbl-wrap"><table id="t_retardos"></table></div>
+    </div>
+  </div></section>
+    <section id="personalPanel_horarios" class="personalHubPanel" role="tabpanel" aria-labelledby="personalTab_horarios" hidden><section class="personalBlock"><header><div><h2>Horario semanal</h2><span class="hint">El patrón se repite cada semana. Arrastra un turno o usa Mover.</span></div></header><div class="body"><div class="personalWeekWrap"><div id="personalSemana" class="personalWeek"></div></div><div class="personalMover"><label>Persona<select id="personalMoverPersona"></select></label><label>Del<select id="personalMoverOrigen"></select></label><label>Al<select id="personalMoverDestino"></select></label><button type="button" class="btn sm" id="personalMoverOk">Mover turno</button><button type="button" class="btn sm ghost" id="personalEditarHorario">Editar horario</button></div><p class="hint">Si el destino ya tiene horario, se intercambian los dos días. Revisa los horarios y guarda los cambios.</p></div></section><div class="personalBlock" id="cardCoberturaPersonal">
+    <header><h2>Cobertura de turnos</h2><label class="coverageDate">Fecha <input id="personalFecha" type="date" aria-label="Fecha de la cobertura"></label></header>
+    <div class="body"><div class="coverageStats" id="personalCoberturaStats"></div><div class="coverageGrid" id="personalCobertura"></div>
+      <p class="note" style="margin:12px 0 0">Toca un nombre para consultar o ajustar su horario. La asistencia se compara con el horario registrado.</p>
+    </div>
+  </div></section>
+    <section id="personalPanel_prenomina" class="personalHubPanel" role="tabpanel" aria-labelledby="personalTab_prenomina" hidden><section class="personalBlock"><header><div><h2>Prenómina del periodo</h2><span class="hint">Estimación según asistencias cerradas y sueldo configurado; revisa antes de pagar.</span></div></header><div class="body"><div class="personalHubPeriod"><label>Del <input type="date" id="personalPagoDesde"></label><label>Al <input type="date" id="personalPagoHasta"></label></div><div class="tbl-wrap"><table id="personalPrenomina"></table></div></div></section><div class="personalBlock" id="cardRecibos" hidden>
     <header><h2>Recibo de pago</h2><span class="hint">al terminar la jornada o el periodo</span></header>
     <div class="body">
       <p class="note" style="margin:0 0 14px">Cuenta los días y las horas que <b>de verdad</b> checó en el periodo,
@@ -1799,7 +1806,10 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       </div>
       <div id="recResumen" style="margin-top:16px"></div>
     </div>
-  </div>
+  </div></section>
+    <section id="personalPanel_sucursales" class="personalHubPanel" role="tabpanel" aria-labelledby="personalTab_sucursales" hidden><section class="personalBlock"><header><h2>Negocio actual</h2></header><div class="body" id="personalSucursalActual"></div></section></section>
+    <footer class="personalHubFooter"><span data-config-status="personal" role="status">Los cambios de esta sección conservan su guardado actual.</span><span id="personalAlcanceGuardado">Acceso y PIN en la nube; asistencia, horario y expediente en este aparato.</span></footer>
+  </article>
 </section>
 
 <!-- ============ COSTOS ============ -->
@@ -2656,6 +2666,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 <script src="./catalogo-alimentos.js?v=1"></script>
 <script src="./personal-api.js?v=1"></script>
 <script src="./personal-admin.js?v=1"></script>
+<script src="./personal-panel.js?v=20261116-1726"></script>
 <script>
 (async function(){
 const RESTAURANT_ACCOUNT_CACHE_KEY="nuvoor_restaurant_account_v1";
@@ -8972,6 +8983,7 @@ function renderPersonal(){
         '<td>'+pintaRetardoHoy(u)+'</td></tr>';
     }).join("") + '</tbody>';
   renderCoberturaPersonal(); renderRetardos(); renderExpedientes(); renderRecibos();
+  panelPersonal?.render();
 }
 function pintaRetardoHoy(u){
   const ev = primerEntrada(u.id, hoyISO());
@@ -9208,6 +9220,7 @@ function imprimeReporteRetardos(){
 let expId = null;
 function renderExpedientes(){
   const l = $("#expLista"); if(!l) return;
+  if(!esGerente()){l.replaceChildren();return;}
   $("#p_tolerancia").value = String(num(P.tolerancia,10));
   l.innerHTML = EQUIPO.map(u=>{
     const h = horarioDe(u), p = pagoDe(u);
@@ -9222,7 +9235,9 @@ function renderExpedientes(){
   }).join("") || '<div class="empty">No hay nadie en el equipo.</div>';
 }
 function abreExpediente(id){
+  if(!esGerente()){toast("Sólo gerencia puede abrir el expediente.");return;}
   const u = EQUIPO.find(x=>x.id === id); if(!u) return;
+  panelPersonal?.elegir("equipo");
   expId = id;
   const e = expDe(u), h = horarioDe(u), p = pagoDe(u);
   $("#expTitulo").textContent = "Expediente · " + (u.nombre || "");
@@ -9321,6 +9336,7 @@ $("#expCuerpo").addEventListener("click", e=>{
 /* ---------------- recibo de pago ---------------- */
 function renderRecibos(){
   const s = $("#recQuien"); if(!s) return;
+  if(!esGerente()){s.replaceChildren();$("#recResumen").replaceChildren();return;}
   const antes = s.value;
   s.innerHTML = EQUIPO.filter(u=>u.activo !== false).map(u=>
     '<option value="'+esc(u.id)+'">'+esc(u.nombre||"Sin nombre")+'</option>').join("");
@@ -9617,7 +9633,7 @@ function estadoGuardadoConfiguracion(ambito,texto,estado="pendiente"){
   $$('[data-config-status="'+ambito+'"]').forEach(el=>{el.textContent=texto;el.dataset.estado=estado;});
 }
 function marcaGuardadoConfiguracionPendiente(){
-  const ambito=!$("#tab-menu").hidden?"menu":!$("#tab-set").hidden?document.activeElement?.closest("[data-ajuste-panel]")?.id:"";
+  const ambito=!$("#tab-menu").hidden?"menu":!$("#tab-personal").hidden?"personal":!$("#tab-set").hidden?document.activeElement?.closest("[data-ajuste-panel]")?.id:"";
   if(ambito)estadoGuardadoConfiguracion(ambito,"Cambios pendientes de confirmar.");
 }
 function problemaMenuRestaurant(){
@@ -9659,7 +9675,7 @@ async function guardaConfiguracionRestaurant(ambito){
     }
     clearTimeout(guardaT);guardaEstadoLocal();
     if(!navigator.onLine){
-      estadoGuardadoConfiguracion(ambito,"Guardado en este aparato. Pendiente de enviar cuando vuelva internet.");return;
+      estadoGuardadoConfiguracion(ambito,ambito==="personal"?"Guardado en este aparato. Equipo y PIN pendientes de enviar al volver internet; horarios, expedientes y asistencias conservan su guardado local.":"Guardado en este aparato. Pendiente de enviar cuando vuelva internet.");return;
     }
     if(!REST_NUBE.enabled||REST_NUBE.localOnly||!REST_NUBE.verified){
       if(!RESTAURANT_ACCOUNT.localOnly)await iniciaNubeRestaurant();
@@ -9669,13 +9685,14 @@ async function guardaConfiguracionRestaurant(ambito){
     if(REST_NUBE.uploadPromise)await REST_NUBE.uploadPromise;
     await sincronizaNubeEnSerie(true);
     if(REST_NUBE.error||REST_NUBE.subscriptionBlocked||REST_NUBE.queue.some(q=>q.cuenta_id===RESTAURANT_ACCOUNT.accountId))throw new Error(REST_NUBE.error||"Los cambios siguen pendientes de confirmar. Vuelve a guardar.");
-    const revision=REST_NUBE.revision,coleccion=ambito==="menu"?"rest_carta":ambito==="ajusteMesas"?"rest_mesas":"rest_config";
+    const revision=REST_NUBE.revision,coleccion=ambito==="menu"?"rest_carta":ambito==="ajusteMesas"?"rest_mesas":ambito==="personal"?"rest_equipo":"rest_config";
     const esperados=Object.values(nubeDocsDeContexto(await proyectaRestaurant())).filter(d=>d.coleccion===coleccion);
     const {data,error}=await RESTAURANT_SB.from("documentos").select("doc_id,cuerpo").eq("cuenta_id",RESTAURANT_ACCOUNT.accountId).eq("coleccion",coleccion).limit(2000);
     if(error)throw error;
     const remotos=new Map((data||[]).map(d=>[d.doc_id,d.cuerpo]));
     if(esperados.some(d=>nubeCanon(nubeSinMarcaMigracion(remotos.get(d.doc_id)))!==nubeCanon(nubeSinMarcaMigracion(d.cuerpo))))throw new Error("La nube aún no coincide con esta edición. Tus cambios se conservan aquí; vuelve a guardar.");
     if(revision!==REST_NUBE.revision||REST_NUBE.localDirty){estadoGuardadoConfiguracion(ambito,"Se confirmó la edición anterior. Hay cambios nuevos: vuelve a guardar.");return;}
+    if(ambito==="personal"){estadoGuardadoConfiguracion(ambito,"Equipo y PIN confirmados en la nube. Expedientes, horarios y asistencias conservados en este aparato.","guardado");toast("Cambios de Personal guardados.");return;}
     await procesaMediosRestaurant();
     const pendientes=[...mediosPendientes.values()].filter(r=>r.evento===nubeEventoId()).length;
     estadoGuardadoConfiguracion(ambito,pendientes?"Datos confirmados en la nube. Hay "+pendientes+" imagen(es) pendientes de compartir.":"Guardado en la nube · disponible en todos los perfiles de este negocio.",pendientes?"pendiente":"guardado");
@@ -10257,6 +10274,7 @@ function renderMesasSet(){
 function renderEquipo(){
   const gerente = esGerente();
   $("#cardEquipoPersonal").hidden = !gerente;
+  if(gerente&&document.activeElement?.closest("#cardEquipoPersonal [data-uk]"))return;
   $("#t_equipo").innerHTML = gerente ? '<thead><tr><th>Nombre</th><th>Acceso</th><th>Rol</th><th>Foto</th>' +
     '<th style="width:80px">Activo</th><th style="width:60px"></th></tr></thead><tbody>' +
     EQUIPO.map(u=>'<tr data-usr="'+esc(u.id)+'">' +
@@ -10753,6 +10771,7 @@ function aplicaMarca(){
 function aplicaRol(desdeNube=false){
   const u = usuarioActual(), r = rolActual();
   $("#personalCorreoCard").hidden=!esGerente();
+  panelPersonal?.aplicaRol();
   $("#inicioEventos").hidden=!puedeVer("eventos");
   $("#userNombre").textContent = u.nombre || "Sin nombre";
   $("#userRol").textContent = (ROLES[r]||ROLES.gerente).nombre;
@@ -10875,6 +10894,7 @@ function pideAcceso(opc){
   pintaAnuncioBloqueo();
   $("#acceso").hidden = false;
   document.body.classList.add("sin-acceso");
+  panelPersonal?.aplicaRol();
   if(bloq) setTimeout(()=>{ const p = $("#accesoPass"); if(p) p.focus(); }, 60);
 }
 /* El checador vive también aquí: la pantalla bloqueada es la que está
@@ -10916,6 +10936,7 @@ function cierraAcceso(){
   $("#accesoPass").value = "";
   document.body.classList.remove("sin-acceso");
   bloqueado = false;
+  panelPersonal?.aplicaRol();
   reiniciaInactividad();
 }
 $("#accesoPerfiles").addEventListener("click", e=>{
@@ -11019,7 +11040,21 @@ function arrancaEquipo(){
     usuarioId = EQUIPO[0].id; cierraAcceso(); aplicaRol();
   }else{ usuarioId = EQUIPO[0].id; pideAcceso(); }
 }
+let panelPersonal=null;
 function start(){
+  panelPersonal=window.NuvoorRestaurantPersonal?.crear({
+    root:$("#personalHub"),
+    gerente:()=>esGerente()&&!bloqueado&&$("#acceso").hidden,
+    equipo:()=>EQUIPO, asistencias:()=>ASISTENCIAS, usuario:usuarioActual,
+    hoy:hoyISO, dentro:estaDentro, minutos:minutosDia, turnos:turnosDe, horario:horarioDe, pago:pagoDe, cuentaPeriodo,
+    ventas:(desde,hasta)=>sumaDatosVentas(datosVentasPeriodo(cerradasTodas().filter(c=>cuentaCobrada(c)&&fechaVenta(c)>=desde&&fechaVenta(c)<=hasta))),
+    nombre:()=>RESTAURANT_ACCOUNT.accountName||P.negocio.nombre||"Mi restaurante",
+    plan:()=>RESTAURANT_ACCOUNT.plan||"", contexto:()=>POS_EVENTO?.nombre||"",
+    hayNube:()=>REST_NUBE.enabled&&!REST_NUBE.localOnly,
+    abrirExpediente:abreExpediente, renderActual:renderPersonal, guardar:()=>{persist();guardaYa();},
+    mensaje:toast, dinero:mx, horas:horasTxt, escapar:esc
+  });
+  if(!panelPersonal){$$(".personalHubTabs").forEach(n=>n.hidden=true);$$(".personalHubPanel").forEach(n=>n.hidden=["personalPanel_resumen","personalPanel_sucursales"].includes(n.id));$("#personalSemana").closest(".personalBlock").hidden=true;}
   $("#personalCorreoAbrir").addEventListener("click",async()=>{const n=$("#personalCorreoLista");n.hidden=false;await NuvoorPersonalAdmin.mount(n,RESTAURANT_SB.personal?.raw||RESTAURANT_SB,RESTAURANT_ACCOUNT.accountId);});
   $("#personalCorreoCard").hidden=!esGerente();
   const nombreCuenta=RESTAURANT_ACCOUNT.accountName||"Mi negocio";

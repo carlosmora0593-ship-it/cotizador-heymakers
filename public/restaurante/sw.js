@@ -1,4 +1,4 @@
-const CACHE_NAME = "nuvoor-restaurant-v54-personal";
+const CACHE_NAME = "nuvoor-restaurant-v55-personal-tarjeta";
 const MEDIOS_CACHE = "nuvoor-restaurant-medios-v1";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
@@ -9,6 +9,8 @@ const APP_ASSETS = [
   new URL("catalogo-alimentos.js?v=1", APP_SCOPE).href,
   new URL("personal-api.js?v=1", APP_SCOPE).href,
   new URL("personal-admin.js?v=1", APP_SCOPE).href,
+  new URL("personal-panel.js?v=20261116-1726", APP_SCOPE).href,
+  new URL("personal-panel.css?v=20261116-1726", APP_SCOPE).href,
   new URL("../config.js", APP_SCOPE).href,
   new URL("../facturacion-pos.js?v=20261104-2206", APP_SCOPE).href,
   new URL("icons/icon-192.png", APP_SCOPE).href,

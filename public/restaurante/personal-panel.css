@@ -1,0 +1,73 @@
+/* Una sola tarjeta para Personal. Los apartados conservan sus controles e identidad. */
+.personalHub{overflow:hidden}
+.personalHub>.personalHubHeader{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;padding:22px 24px}
+.personalHubHeader h1{font:700 25px/1.2 var(--font-body,'DM Sans',sans-serif);margin:5px 0 6px;letter-spacing:-.6px}
+.personalHubHeader p{font-size:12px;color:var(--ink-3);margin:0}
+.personalHubEyebrow{font-size:10px;font-weight:700;letter-spacing:1.4px;color:var(--ink-3)}
+.personalHubActions{display:flex;gap:8px;flex-wrap:wrap}
+.personalHubTabs{display:flex;gap:4px;flex-wrap:wrap;padding:0 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.personalHubTabs button{font:600 12px 'DM Sans',sans-serif;background:transparent;color:var(--ink-3);padding:14px 11px 11px;border:0;border-bottom:3px solid transparent;min-height:45px;border-radius:0;cursor:pointer}
+.personalHubTabs button:hover{background:var(--accent-soft);color:var(--ink)}
+.personalHubTabs button[aria-selected=true]{border-bottom-color:var(--accent);color:var(--ink);background:var(--accent-soft)}
+.personalHubTabs button:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
+.personalHubPanel{padding:22px 24px;min-width:0}
+.personalBlock{min-width:0;margin:0;padding:0}
+.personalBlock+.personalBlock{border-top:1px solid var(--line);margin-top:23px;padding-top:19px}
+.personalBlock>header{display:flex;align-items:center;gap:14px;justify-content:space-between;flex-wrap:wrap;background:none;padding:0 0 15px;border:0}
+.personalBlock>header h2,.personalHubColumns h2{font-size:15px;margin:0}
+.personalBlock>header .hint{display:block;margin-top:5px}
+.personalBlock>.body{padding:0}
+.personalHubPeriod{display:flex;align-items:flex-end;gap:9px;flex-wrap:wrap;margin-bottom:20px}
+.personalHubPeriod label{display:grid;gap:5px;font-size:11px;color:var(--ink-3);min-width:120px}
+.personalHubPeriod input{max-width:180px;font-size:13px}
+.personalHubStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;padding:0 0 23px;border-bottom:1px solid var(--line)}
+.personalHubMetric{min-width:0}
+.personalHubMetric small{display:block;font-size:10px;color:var(--ink-3);font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.personalHubMetric strong{display:block;font-size:27px;line-height:1.25;letter-spacing:-.7px;margin:8px 0 5px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.personalHubMetric span{display:block;font-size:11px;color:var(--ink-3)}
+.personalHubColumns{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:24px}
+.personalHubColumns h2{margin-bottom:15px}
+.personalBudgetNumber{font-size:32px;font-weight:700;letter-spacing:-1px}
+.personalBudgetTrack{background:var(--line);height:11px;overflow:hidden;border-radius:8px;margin:11px 0}
+.personalBudgetTrack i{display:block;height:100%;background:var(--accent);border-radius:8px}
+.personalBudgetCaption{display:flex;gap:12px;justify-content:space-between;color:var(--ink-3);font-size:11px}
+.personalHubLinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.personalHubPerson{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)}
+.personalHubPerson:last-child{border-bottom:0}
+.personalHubPerson>span:nth-child(2){flex:1;min-width:0}
+.personalHubPerson b,.personalHubPerson small{display:block}
+.personalHubPerson b{font-size:12px}.personalHubPerson small{font-size:11px;color:var(--ink-3);margin-top:3px}
+.personalHubDataNote{display:block;border-top:1px solid var(--line);padding-top:16px;margin-top:22px;line-height:1.6}
+.personalHubFooter{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:15px 24px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-3)}
+.personalHubFooter [data-estado=error]{color:var(--mal)}.personalHubFooter [data-estado=guardado]{color:var(--good)}
+.personalWeekWrap{overflow-x:auto;border:1px solid var(--line);border-radius:11px}
+.personalWeek{display:grid;grid-template-columns:repeat(7,minmax(105px,1fr));min-width:780px}
+.personalDay{padding:10px 8px;min-height:150px;border-right:1px solid var(--line)}.personalDay:last-child{border-right:0}
+.personalDay>strong{display:block;text-align:center;font-size:11px;color:var(--ink-3);margin-bottom:13px}
+.personalDay.over{background:var(--good-soft)}
+.personalShift{background:var(--accent-soft);color:var(--ink);border-left:3px solid var(--accent);border-radius:8px;padding:9px;margin:0 0 8px;cursor:grab;position:relative}
+.personalShift b{display:block;font-size:11px;padding-right:17px;overflow-wrap:anywhere}.personalShift span,.personalShift small{display:block;font-size:10px;margin-top:4px;color:var(--ink-2)}
+.personalShiftGrip{position:absolute;right:2px;top:2px;border:0;background:transparent;color:var(--ink);padding:3px 5px;font-size:17px;min-height:30px;touch-action:none;cursor:grab}
+.personalShift.moving{opacity:.35}
+.personalShiftGhost{position:fixed;z-index:1500;pointer-events:none;width:145px;box-shadow:var(--sombra);transform:rotate(-2deg)}
+.personalMover{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin:16px 0}
+.personalMover label{display:grid;gap:5px;font-size:11px;color:var(--ink-3);min-width:110px;flex:1}
+.personalMover select{font-size:12px;min-height:38px}
+.personalInlineEmpty{font-size:12px;color:var(--ink-3);padding:18px 0}
+.personalHub .coverageStat{border:0;background:none;border-radius:0;padding:9px 0}
+.personalHub .coverageRow{background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none}
+.personalHub .nrPersonal .nrSummary{border:0;border-radius:0;padding:0 0 16px;margin-bottom:0}
+.personalHub .nrPersonal .nrPeople{display:block}
+.personalHub .nrPersonal article{border:0;border-top:1px solid var(--line);border-radius:0;background:none;padding:18px 0;margin:0}
+.personalHub .nrPersonal progress{max-width:420px}
+.personalHub .nrPersonal form{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap}
+.personalHub .nrPersonal label{flex:1;min-width:200px;max-width:420px;margin-top:8px}
+.personalHub .nrPersonal button{background:var(--accent);color:var(--accent-ink);border-color:var(--line);margin:0;min-height:42px}
+.personalHub .nrPersonal button.nrRevoke{color:var(--ink);background:transparent}
+.personalHub .nrPersonal .nrStatus{background:var(--accent-soft);color:var(--ink)}
+.personalHub .nrPersonal .nrMessage{margin-bottom:0}
+.personalHub .expFila{background:none;border:0;border-bottom:1px solid var(--line);border-radius:0}
+.personalInlineExp{border-top:1px solid var(--line);padding-top:20px;margin-top:23px}
+@media(max-width:1000px){.personalHubColumns{grid-template-columns:1fr}.personalHubStats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.personalHub>.personalHubHeader,.personalHubPanel{padding:18px 15px}.personalHubActions{width:100%}.personalHubActions .btn{flex:1}.personalHubTabs{padding:0 6px;gap:0}.personalHubTabs button{padding:12px 9px 9px;font-size:11px}.personalHubStats{gap:19px 14px}.personalHubMetric strong{font-size:25px}.personalHubFooter{padding:14px 15px}.personalMover label{min-width:calc(50% - 8px)}.personalHub .nrPersonal label{min-width:100%;max-width:none}.personalHubPerson{flex-wrap:wrap}}
+@media(pointer:coarse){.personalHubTabs button,.personalHubActions .btn,.personalShiftGrip{min-height:44px}}
