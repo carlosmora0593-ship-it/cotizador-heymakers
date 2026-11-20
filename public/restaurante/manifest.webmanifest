@@ -8,8 +8,8 @@
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
-  "theme_color": "#0E4A52",
-  "background_color": "#F3E6CF",
+  "theme_color": "#F2F6FB",
+  "background_color": "#F2F6FB",
   "categories": ["food", "business"],
   "icons": [
     { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },

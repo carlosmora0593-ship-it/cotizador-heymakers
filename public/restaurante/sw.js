@@ -1,11 +1,12 @@
-const CACHE_NAME = "nuvoor-restaurant-v55-personal-tarjeta";
+// Sello Restaurant: 20261119-1428
+const CACHE_NAME = "nuvoor-restaurant-v56-colores-nuvoor";
 const MEDIOS_CACHE = "nuvoor-restaurant-medios-v1";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,
   new URL("index.html", APP_SCOPE).href,
   new URL("manifest.webmanifest", APP_SCOPE).href,
-  new URL("tema-borgona.css?v=20261109-1510", APP_SCOPE).href,
+  new URL("tema-nuvoor.css?v=20261119-1428", APP_SCOPE).href,
   new URL("catalogo-alimentos.js?v=1", APP_SCOPE).href,
   new URL("personal-api.js?v=1", APP_SCOPE).href,
   new URL("personal-admin.js?v=1", APP_SCOPE).href,

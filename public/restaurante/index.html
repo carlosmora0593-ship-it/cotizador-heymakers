@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#FEC408">
+<meta name="theme-color" content="#F2F6FB">
+<script id="restaurantThemeBoot">(function(){'use strict';var key="nuvoor_restaurant_tema",root=document.documentElement,media=window.matchMedia?window.matchMedia("(prefers-color-scheme: dark)"):null,choice=null;function read(){try{var v=localStorage.getItem(key);return v==="day"||v==="dark"?v:null;}catch(_){return null;}}function apply(){var theme=choice||(media&&media.matches?"dark":"day");root.setAttribute("data-theme",theme);var meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute("content",theme==="dark"?"#0C1220":"#F2F6FB");document.querySelectorAll("[data-restaurant-theme]").forEach(function(b){var dark=theme==="dark",label=dark?"Modo día":"Modo oscuro";b.setAttribute("aria-label","Activar "+label.toLowerCase());b.setAttribute("aria-pressed",String(dark));b.title=label;var text=b.querySelector("[data-theme-label]"),icon=b.querySelector("[data-theme-icon]");if(text)text.textContent=label;if(icon)icon.textContent=dark?"☀":"☾";});}choice=read();apply();document.addEventListener("DOMContentLoaded",apply);document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-restaurant-theme]");if(!b)return;choice=root.getAttribute("data-theme")==="dark"?"day":"dark";try{localStorage.setItem(key,choice);}catch(_){}apply();});function system(){if(!choice)apply();}if(media){if(media.addEventListener)media.addEventListener("change",system);else if(media.addListener)media.addListener(system);}window.addEventListener("storage",function(e){if(e.key===key){choice=read();apply();}});})();</script>
 <meta name="description" content="Nuvoor Restaurant: mesas, comandas, caja y servicio para tu restaurante.">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1548,8 +1549,8 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 #modalMods .modIncomplete{font-size:11px;color:var(--ink-3);margin:8px 0 0}
 @media(max-width:450px){.configSaveBar{padding:13px}.configSaveBar>.btn{width:100%}#modalMods .modChips{gap:7px}#modalMods .modChip{padding:10px}}
 </style>
-<meta name="nuvoor-build" content="20261116-1726">
-<link rel="stylesheet" href="./tema-borgona.css?v=20261109-1510">
+<meta name="nuvoor-build" content="20261119-1428">
+<link rel="stylesheet" href="./tema-nuvoor.css?v=20261119-1428">
 </head>
 <body>
 
@@ -1564,7 +1565,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
     <div class="barraGrupo">Servicio</div>
     <nav class="tabs" id="tabs" role="menu"></nav>
   </div>
-  <div class="barraPie"><span id="barraVer" class="nuvoorPie"><img src="../marca/n-64.png" alt=""><span>Nuvoor</span></span></div>
+  <div class="barraPie"><button type="button" class="restaurantThemeButton restaurantThemeDesktop" data-restaurant-theme aria-label="Activar modo oscuro" aria-pressed="false"><span data-theme-icon aria-hidden="true">☾</span><span data-theme-label>Modo oscuro</span></button><span id="barraVer" class="nuvoorPie"><img src="../marca/n-64.png" alt=""><span>Nuvoor</span></span></div>
 </aside>
 
 <header class="top">
@@ -1573,6 +1574,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <span class="av" id="userAv">A</span>
       <span><span id="userNombre">Administrador</span> <span class="rolTxt" id="userRol">Admin</span></span>
     </button>
+    <button type="button" class="restaurantThemeButton restaurantThemeMobile" data-restaurant-theme aria-label="Activar modo oscuro" aria-pressed="false"><span data-theme-icon aria-hidden="true">☾</span><span data-theme-label>Modo oscuro</span></button>
     <div class="restaurantSessionActions" aria-label="Cuenta Nuvoor">
       <span id="restaurantAccountName"></span>
       <button class="btn sm ghost" id="restaurantChangePOS" type="button">Cambiar de POS</button>
@@ -2284,7 +2286,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
       <div class="lockClock" id="accesoRelojGrande" hidden aria-label="Hora actual">
         <time id="accesoHora">04:11:13 p.m.</time><span class="lockDate" id="accesoFecha"></span>
       </div>
-      <span class="plaque" style="width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:grid;place-items:center;font-family:'Fredoka';font-weight:700;font-size:19px" id="accesoIni">M</span>
+      <span class="plaque" style="width:44px;height:44px;border-radius:12px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:'Fredoka';font-weight:700;font-size:19px" id="accesoIni">M</span>
       <h1 id="accesoTitulo">¿Quién va a trabajar?</h1>
       <p class="sub" id="accesoSub">Elige tu perfil. Cada quien ve solo lo de su área.</p>
       <p class="note" id="accesoCocinaActiva" hidden>Tablet de cocina activa. Puedes dejar puesto el candado de Nuvoor.</p>
@@ -6700,8 +6702,8 @@ function animaRutaEvento(ev, modo="salida"){
   const labelInicio=$("#routeStartLabel"), labelDestino=$("#routeDestinationLabel");
   labelInicio.textContent="RESTAURANTE";
   labelDestino.textContent=regreso?"EVENTO":"DESTINO";
-  labelInicio.setAttribute("fill","#ccebd2");
-  labelDestino.setAttribute("fill",regreso?"#f4d7a1":"#f7b6dc");
+  labelInicio.setAttribute("fill","var(--ink-2)");
+  labelDestino.setAttribute("fill",regreso?"var(--warn)":"var(--accent-text)");
   const motion=$(".routeCartMotion animateMotion");
   const cart=$(".routeCart");
   if(cart) cart.setAttribute("transform",regreso?"translate(32 -25) scale(-1 1)":"translate(-32 -25)");

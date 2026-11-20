@@ -1,0 +1,799 @@
+/* Nuvoor Restaurant · misma paleta que Imprenta y Store. Sólo presentación. */
+:root{
+--nu-bg:#F2F6FB;--bg:var(--nu-bg);
+--nu-surface:#FFFFFF;--surface:var(--nu-surface);
+--nu-surface-2:#EDF2F8;--surface-2:var(--nu-surface-2);
+--nu-line:#D9E1EF;--line:var(--nu-line);
+--nu-line-soft:#E8EDF5;--line-soft:var(--nu-line-soft);
+--nu-ink:#0A0E1A;--ink:var(--nu-ink);
+--nu-ink-2:#44516B;--ink-2:var(--nu-ink-2);
+--nu-ink-3:#64738C;--ink-3:var(--nu-ink-3);
+--nu-accent:#4458A4;--accent:var(--nu-accent);
+--nu-accent-ink:#FFFFFF;--accent-ink:var(--nu-accent-ink);
+--nu-accent-text:#4458A4;--accent-text:var(--nu-accent-text);
+--nu-accent-soft:#EEEDF7;--accent-soft:var(--nu-accent-soft);
+--nu-accent-mid:#DCDFF2;--accent-mid:var(--nu-accent-mid);
+--nu-accent-hover:#4C4780;--accent-hover:var(--nu-accent-hover);
+--nu-cyan:#176C98;--cyan:var(--nu-cyan);
+--nu-cyan-soft:#E2F0F7;--cyan-soft:var(--nu-cyan-soft);
+--nu-good:#0E7C57;--good:var(--nu-good);
+--nu-good-soft:#E2F1EB;--good-soft:var(--nu-good-soft);
+--nu-warn:#966019;--warn:var(--nu-warn);
+--nu-warn-soft:#F8EEDC;--warn-soft:var(--nu-warn-soft);
+--nu-mal:#C62828;--mal:var(--nu-mal);
+--nu-mal-soft:#FBE5E5;--mal-soft:var(--nu-mal-soft);
+--nu-yellow:#E3B505;--yellow:var(--nu-yellow);
+--nu-yellow-ink:#231A00;--yellow-ink:var(--nu-yellow-ink);
+--nu-vidrio:rgba(255,255,255,.72);--vidrio:var(--nu-vidrio);
+--nu-vidrio-line:rgba(16,42,56,.09);--vidrio-line:var(--nu-vidrio-line);
+--nu-scrim:rgba(10,14,26,.55);--scrim:var(--nu-scrim);
+--nu-sombra:0 1px 2px rgba(36,52,85,.06), 0 12px 28px -20px rgba(36,52,85,.3);--sombra:var(--nu-sombra);
+--nu-focus:rgba(68,88,164,.20);--focus:var(--nu-focus);
+--nu-heading-ring-rgb:68,88,164;--heading-ring-rgb:var(--nu-heading-ring-rgb);
+--nu-heading-ring-accent-rgb:73,166,222;--heading-ring-accent-rgb:var(--nu-heading-ring-accent-rgb);
+--nu-toast:#1B2540;--toast:var(--nu-toast);
+--nu-on-toast:#FFFFFF;--on-toast:var(--nu-on-toast);
+--nu-event-mark:#4C4780;--event-mark:var(--nu-event-mark);
+--nu-event-soft:#EEEDF7;--event-soft:var(--nu-event-soft);
+--nu-canvas-paper:#FFFFFF;--canvas-paper:var(--nu-canvas-paper);
+--nu-canvas-ink:#111111;--canvas-ink:var(--nu-canvas-ink);
+--brand-purple:#4C4780;--brand-indigo:#4458A4;--brand-sky:#49A6DE;--brand-water:#79CCE0;
+--forest:var(--accent-text);--forest-2:var(--accent-hover);--cream:var(--surface-2);--clay:var(--accent-text);--gold:var(--warn);--olive:var(--cyan);--danger:var(--mal);--ok:var(--good);--paper:var(--surface);--muted:var(--ink-2);color-scheme:light;
+}
+:root[data-theme="dark"]{--nu-bg:#0C1220;--bg:var(--nu-bg);
+--nu-surface:#151E31;--surface:var(--nu-surface);
+--nu-surface-2:#1E2941;--surface-2:var(--nu-surface-2);
+--nu-line:#31405B;--line:var(--nu-line);
+--nu-line-soft:#25334C;--line-soft:var(--nu-line-soft);
+--nu-ink:#EEF4FF;--ink:var(--nu-ink);
+--nu-ink-2:#B6C3DC;--ink-2:var(--nu-ink-2);
+--nu-ink-3:#91A3C1;--ink-3:var(--nu-ink-3);
+--nu-accent:#79CCE0;--accent:var(--nu-accent);
+--nu-accent-ink:#0C1220;--accent-ink:var(--nu-accent-ink);
+--nu-accent-text:#A6B9F0;--accent-text:var(--nu-accent-text);
+--nu-accent-soft:#252C47;--accent-soft:var(--nu-accent-soft);
+--nu-accent-mid:#354163;--accent-mid:var(--nu-accent-mid);
+--nu-accent-hover:#A6B9F0;--accent-hover:var(--nu-accent-hover);
+--nu-cyan:#79CCE0;--cyan:var(--nu-cyan);
+--nu-cyan-soft:#173749;--cyan-soft:var(--nu-cyan-soft);
+--nu-good:#57D4B3;--good:var(--nu-good);
+--nu-good-soft:#13352F;--good-soft:var(--nu-good-soft);
+--nu-warn:#F2C66D;--warn:var(--nu-warn);
+--nu-warn-soft:#3B301E;--warn-soft:var(--nu-warn-soft);
+--nu-mal:#FF7A7A;--mal:var(--nu-mal);
+--nu-mal-soft:#3A1D24;--mal-soft:var(--nu-mal-soft);
+--nu-yellow:#F2C66D;--yellow:var(--nu-yellow);
+--nu-yellow-ink:#141414;--yellow-ink:var(--nu-yellow-ink);
+--nu-vidrio:rgba(21,30,49,.72);--vidrio:var(--nu-vidrio);
+--nu-vidrio-line:rgba(255,255,255,.08);--vidrio-line:var(--nu-vidrio-line);
+--nu-scrim:rgba(0,0,0,.62);--scrim:var(--nu-scrim);
+--nu-sombra:0 1px 2px rgba(0,0,0,.35), 0 14px 34px -18px rgba(0,0,0,.8);--sombra:var(--nu-sombra);
+--nu-focus:rgba(121,204,224,.22);--focus:var(--nu-focus);
+--nu-heading-ring-rgb:121,204,224;--heading-ring-rgb:var(--nu-heading-ring-rgb);
+--nu-heading-ring-accent-rgb:166,185,240;--heading-ring-accent-rgb:var(--nu-heading-ring-accent-rgb);
+--nu-toast:#EEF4FF;--toast:var(--nu-toast);
+--nu-on-toast:#0C1220;--on-toast:var(--nu-on-toast);
+--nu-event-mark:#B5AFE5;--event-mark:var(--nu-event-mark);
+--nu-event-soft:#252C47;--event-soft:var(--nu-event-soft);
+--nu-canvas-paper:#FFFFFF;--canvas-paper:var(--nu-canvas-paper);
+--nu-canvas-ink:#111111;--canvas-ink:var(--nu-canvas-ink);color-scheme:dark}
+@media(prefers-color-scheme:dark){:root:not([data-theme="day"]){--nu-bg:#0C1220;--bg:var(--nu-bg);
+--nu-surface:#151E31;--surface:var(--nu-surface);
+--nu-surface-2:#1E2941;--surface-2:var(--nu-surface-2);
+--nu-line:#31405B;--line:var(--nu-line);
+--nu-line-soft:#25334C;--line-soft:var(--nu-line-soft);
+--nu-ink:#EEF4FF;--ink:var(--nu-ink);
+--nu-ink-2:#B6C3DC;--ink-2:var(--nu-ink-2);
+--nu-ink-3:#91A3C1;--ink-3:var(--nu-ink-3);
+--nu-accent:#79CCE0;--accent:var(--nu-accent);
+--nu-accent-ink:#0C1220;--accent-ink:var(--nu-accent-ink);
+--nu-accent-text:#A6B9F0;--accent-text:var(--nu-accent-text);
+--nu-accent-soft:#252C47;--accent-soft:var(--nu-accent-soft);
+--nu-accent-mid:#354163;--accent-mid:var(--nu-accent-mid);
+--nu-accent-hover:#A6B9F0;--accent-hover:var(--nu-accent-hover);
+--nu-cyan:#79CCE0;--cyan:var(--nu-cyan);
+--nu-cyan-soft:#173749;--cyan-soft:var(--nu-cyan-soft);
+--nu-good:#57D4B3;--good:var(--nu-good);
+--nu-good-soft:#13352F;--good-soft:var(--nu-good-soft);
+--nu-warn:#F2C66D;--warn:var(--nu-warn);
+--nu-warn-soft:#3B301E;--warn-soft:var(--nu-warn-soft);
+--nu-mal:#FF7A7A;--mal:var(--nu-mal);
+--nu-mal-soft:#3A1D24;--mal-soft:var(--nu-mal-soft);
+--nu-yellow:#F2C66D;--yellow:var(--nu-yellow);
+--nu-yellow-ink:#141414;--yellow-ink:var(--nu-yellow-ink);
+--nu-vidrio:rgba(21,30,49,.72);--vidrio:var(--nu-vidrio);
+--nu-vidrio-line:rgba(255,255,255,.08);--vidrio-line:var(--nu-vidrio-line);
+--nu-scrim:rgba(0,0,0,.62);--scrim:var(--nu-scrim);
+--nu-sombra:0 1px 2px rgba(0,0,0,.35), 0 14px 34px -18px rgba(0,0,0,.8);--sombra:var(--nu-sombra);
+--nu-focus:rgba(121,204,224,.22);--focus:var(--nu-focus);
+--nu-heading-ring-rgb:121,204,224;--heading-ring-rgb:var(--nu-heading-ring-rgb);
+--nu-heading-ring-accent-rgb:166,185,240;--heading-ring-accent-rgb:var(--nu-heading-ring-accent-rgb);
+--nu-toast:#EEF4FF;--toast:var(--nu-toast);
+--nu-on-toast:#0C1220;--on-toast:var(--nu-on-toast);
+--nu-event-mark:#B5AFE5;--event-mark:var(--nu-event-mark);
+--nu-event-soft:#252C47;--event-soft:var(--nu-event-soft);
+--nu-canvas-paper:#FFFFFF;--canvas-paper:var(--nu-canvas-paper);
+--nu-canvas-ink:#111111;--canvas-ink:var(--nu-canvas-ink);color-scheme:dark}}
+body.modoEvento{--bg:var(--nu-bg);--surface:var(--nu-surface);--surface-2:var(--nu-surface-2);--line:var(--nu-line);--line-soft:var(--nu-line-soft);--ink:var(--nu-ink);--ink-2:var(--nu-ink-2);--ink-3:var(--nu-ink-3);--accent:var(--nu-accent);--accent-ink:var(--nu-accent-ink);--accent-text:var(--nu-accent-text);--accent-soft:var(--nu-accent-soft);--accent-mid:var(--nu-accent-mid);--accent-hover:var(--nu-accent-hover);--cyan:var(--nu-cyan);--cyan-soft:var(--nu-cyan-soft);--good:var(--nu-good);--good-soft:var(--nu-good-soft);--warn:var(--nu-warn);--warn-soft:var(--nu-warn-soft);--mal:var(--nu-mal);--mal-soft:var(--nu-mal-soft);--yellow:var(--nu-yellow);--yellow-ink:var(--nu-yellow-ink);--vidrio:var(--nu-vidrio);--vidrio-line:var(--nu-vidrio-line);--scrim:var(--nu-scrim);--sombra:var(--nu-sombra);--focus:var(--nu-focus);--heading-ring-rgb:var(--nu-heading-ring-rgb);--heading-ring-accent-rgb:var(--nu-heading-ring-accent-rgb);--toast:var(--nu-toast);--on-toast:var(--nu-on-toast);--event-mark:var(--nu-event-mark);--event-soft:var(--nu-event-soft);--canvas-paper:var(--nu-canvas-paper);--canvas-ink:var(--nu-canvas-ink);--forest:var(--accent-text);--forest-2:var(--cyan);--cream:var(--surface-2);--clay:var(--event-mark);--gold:var(--warn);--olive:var(--cyan);--event-bg:var(--bg);--event-surface:var(--surface);--event-light:var(--cyan-soft);--event-border:var(--line);--event-ink:var(--ink);--event-text:var(--ink-2);--event-muted:var(--ink-2);--event-deep:var(--surface);--event-forest:var(--event-mark);--event-blue:var(--cyan);--event-accent:var(--accent);--event-gold:var(--warn)}
+
+/* Colores literales de las capas antiguas: puente de lectura con tokens. */
+#pwaInstall{color:var(--ink-2)}
+
+
+
+.btn.primary{color:var(--ink-2)}
+.btn.bien{color:var(--ink-2)}
+.barraTop .plaque{color:var(--ink-2)}
+nav.tabs button[aria-selected="true"]{color:var(--ink-2)}
+nav.tabs .mbadge{color:var(--ink-2)}
+.userChip .av{color:var(--ink-2)}
+.contextPOS.is-active{color:var(--ink-2)}
+.contextPOS.is-active svg{color:var(--ink-2)}
+.eventBannerArt{color:var(--ink-2)}
+.eventGuideNum{color:var(--ink-2)}
+.eventRoute.returning .eventRouteEyebrow{color:var(--ink-2)}
+.eventRoute.returning .eventRouteStatus strong{color:var(--ink-2)}
+.eventRoute.returning #eventRouteProgress{color:var(--ink-2)}
+
+
+
+
+.salesInsightIcon{color:var(--ink-2)}
+
+
+
+.zonas button[aria-pressed="true"]{color:var(--ink-2)}
+
+
+
+.catFila button[aria-pressed="true"]{color:var(--ink-2)}
+
+
+
+.comenFila button[aria-pressed="true"]{color:var(--ink-2)}
+.kdsLin button.ir{color:var(--ink-2)}
+.kdsLin button.ok{color:var(--ink-2)}
+.decor.barra{color:var(--ink-2)}
+.decor.bano{color:var(--ink-2)}
+.grupoSello{color:var(--ink-2)}
+.chPersona .av{color:var(--ink-2)}
+.seg button[aria-pressed="true"]{color:var(--ink-2)}
+.modChip.si{color:var(--ink-2)}
+.propFila button[aria-pressed="true"]{color:var(--ink-2)}
+.pill.good{color:var(--ink-2)}
+.pill.warn{color:var(--ink-2)}
+.pill.mal{color:var(--ink-2)}
+.perfilBtn .av{color:var(--ink-2)}
+#toast{color:var(--ink-2)}
+
+nav.tabs button[aria-selected="true"]{color:var(--ink-2)}
+.btn.primary{color:var(--ink-2)}
+.btn.acento{color:var(--ink-2)}
+.btn.bien{color:var(--ink-2)}
+.heroR{color:var(--ink-2)}
+.heroR p{color:var(--ink-2)}
+.heroR h1{color:var(--ink)}
+.heroR .sub{color:var(--ink-2)}
+.tile .v{color:var(--ink)}
+.zonas button[aria-pressed="true"]{color:var(--ink-2)}
+.mesaIcon{color:var(--ink-2)}
+.mesa:hover .mesaIcon{color:var(--ink-2)}
+.mesa b{color:var(--ink-2)}
+.mesa small{color:var(--ink-2)}
+.mesa .pers{color:var(--ink-2)}
+.mesa .tot{color:var(--ink-2)}
+.mesa .sello{color:var(--ink-2)}
+.mesa.libre .mesaIcon{color:var(--ink-2)}
+.mesa.libre b{color:var(--ink-2)}
+.mesa.ocupada .mesaIcon{color:var(--ink-2)}
+.mesa.ocupada .pers{color:var(--ink-2)}
+.mesa.ocupada .tot, .mesa.ocupada .sello{color:var(--ink-2)}
+.mesa.cuenta .mesaIcon{color:var(--ink-2)}
+.mesa.cuenta .pers{color:var(--ink-2)}
+.mesa.cuenta .tot, .mesa.cuenta .sello{color:var(--ink-2)}
+.cmesa{color:var(--ink-2)}
+.cmesa .tot{color:var(--ink-2)}
+
+#barra{color:var(--ink-2)}
+.barraTop .plaque{color:var(--ink-2)}
+.barraTop b{color:var(--ink-2)}
+.barraTop small{color:var(--ink-2)}
+.barraGrupo{color:var(--ink-2)}
+nav.tabs button{color:var(--ink-2)}
+nav.tabs button:hover{color:var(--ink-2)}
+nav.tabs button[aria-selected="true"]{color:var(--ink-2)}
+nav.tabs .mbadge{color:var(--ink-2)}
+.barraPie{color:var(--ink-2)}
+header.top{color:var(--ink-2)}
+.userChip{color:var(--ink-2)}
+.userChip .av{color:var(--ink-2)}
+.userChip .rolTxt{color:var(--ink-2)}
+.candadoBtn{color:var(--ink-2)}
+.candadoBtn:hover{color:var(--ink-2)}
+.turnoChip{color:var(--ink-2)}
+.turnoChip b{color:var(--ink-2)}
+.turnoChip.cerrado b{color:var(--ink-2)}
+input, select, textarea{color:var(--ink-2)}
+input::placeholder, textarea::placeholder{color:var(--ink-2)}
+.btn{color:var(--ink-2)}
+.btn.primary{color:var(--ink-2)}
+.btn.acento{color:var(--ink-2)}
+.btn.bien{color:var(--ink-2)}
+.btn.mal{color:var(--ink-2)}
+.btn.ghost{color:var(--ink-2)}
+.seg button[aria-pressed="true"]{color:var(--ink-2)}
+.card > header h2{color:var(--ink)}
+.card > header .hint{color:var(--ink-2)}
+.note{color:var(--ink-2)}
+.empty{color:var(--ink-2)}
+.wrap > section > .fila:first-child h2{color:var(--ink)}
+.heroEyebrow{color:var(--ink-2)}
+.heroR h1{color:var(--ink)}
+.heroR .sub{color:var(--ink-2)}
+.androidApkLink{color:var(--ink-2)}
+.androidApkIcon{color:var(--ink-2)}
+.androidApkCopy small{color:var(--ink-2)}
+.androidApkArrow{color:var(--ink-2)}
+.heroRBadge{color:var(--ink-2)}
+.heroRBadge.abierta{color:var(--ink-2)}
+.heroRBadge.tenue{color:var(--ink-2)}
+.heroRBadge.hayPendientes{color:var(--ink-2)}
+.heroAction{color:var(--ink-2)}
+.heroAction.destacado{color:var(--ink-2)}
+.heroActionIcon{color:var(--ink-2)}
+.heroAction.destacado .heroActionIcon{color:var(--ink-2)}
+.heroActionCopy small{color:var(--ink-2)}
+.heroAction.destacado .heroActionCopy small{color:var(--ink-2)}
+.heroArrow{color:var(--ink-2)}
+.heroAction.destacado .heroArrow{color:var(--ink-2)}
+.dashboardHeading span{color:var(--ink-2)}
+.dashboardHeading h2{color:var(--ink)}
+.dashboardHeading small{color:var(--ink-2)}
+.pageHeading > div > span{color:var(--ink-2)}
+.pageHeading h1{color:var(--ink)}
+.pageHeading p{color:var(--ink-2)}
+.pageHeadingMark{color:var(--ink-2)}
+.tile .et{color:var(--ink-2)}
+.tile .v{color:var(--ink)}
+.tile .sub{color:var(--ink-2)}
+#inMesas thead th{color:var(--ink-2)}
+#inCat > div > div:first-child{color:var(--ink-2)}
+.zonas button, .catFila button{color:var(--ink-2)}
+.zonas button[aria-pressed="true"], .catFila button[aria-pressed="true"]{color:var(--ink-2)}
+.croqPista{color:var(--ink-2)}
+.cmesa b{color:var(--ink-2)}
+.cmesa small{color:var(--ink-2)}
+.cmesa.ocupada b, .cmesa.cuenta b{color:var(--ink-2)}
+.decor.barra{color:var(--ink-2)}
+.decor.cocina{color:var(--ink-2)}
+.decor.caja{color:var(--ink-2)}
+.decor.bano{color:var(--ink-2)}
+.decor.entrada{color:var(--ink-2)}
+.croqTool button{color:var(--ink-2)}
+.croqTool button:hover{color:var(--ink-2)}
+.plat b{color:var(--ink-2)}
+.plat span{color:var(--ink-2)}
+.comenFila .et{color:var(--ink-2)}
+.comenFila button{color:var(--ink-2)}
+.comenFila button[aria-pressed="true"]{color:var(--ink-2)}
+.ticket header h2{color:var(--ink)}
+.lin .cant{color:var(--ink-2)}
+.lin .imp{color:var(--ink-2)}
+.lin .acc button{color:var(--ink-2)}
+.sumaLin{color:var(--ink-2)}
+.sumaLin.total{color:var(--ink-2)}
+.kdsCard header b{color:var(--ink-2)}
+.kdsCard header .reloj{color:var(--ink-2)}
+.kdsCard.ambar header .reloj{color:var(--ink-2)}
+.kdsCard.rojo header .reloj{color:var(--ink-2)}
+.kdsSeat{color:var(--ink-2)}
+.kdsLin .c{color:var(--ink-2)}
+.kdsLin b{color:var(--ink-2)}
+.kdsLin small{color:var(--ink-2)}
+.kdsLin button{color:var(--ink-2)}
+.kdsLin button.ir{color:var(--ink-2)}
+.kdsLin button.ok{color:var(--ink-2)}
+.kdsPie{color:var(--ink-2)}
+th{color:var(--ink-2)}
+td{color:var(--ink-2)}
+.pill{color:var(--ink-2)}
+.pill.good{color:var(--ink-2)}
+.pill.warn{color:var(--ink-2)}
+.pill.mal{color:var(--ink-2)}
+.note b{color:var(--ink-2)}
+.satAviso{color:var(--ink-2)}
+.satAviso a{color:var(--ink-2)}
+.satProducto small{color:var(--ink-2)}
+#toast{color:var(--ink-2)}
+.propFila button, .teclado button{color:var(--ink-2)}
+.propFila button[aria-pressed="true"]{color:var(--ink-2)}
+.cobroTot .v{color:var(--ink)}
+.cambio b{color:var(--ink-2)}
+.cmesa{color:var(--ink-2)}
+.cmesaCentro b{color:var(--ink-2)}
+.cmesaCentro .cmesaConteo{color:var(--ink-2)}
+.mesaResponsable{color:var(--ink-2)}
+#comResponsable{color:var(--ink-2)}
+.cmesa.ocupada .cmesaConteo{color:var(--ink-2)}
+.cmesa.cuenta .cmesaConteo{color:var(--ink-2)}
+.silla{color:var(--ink-2)}
+.silla.ocupada{color:var(--ink-2)}
+.cmesa.ocupada .silla.libre{color:var(--ink-2)}
+.cmesa.ocupada .silla.ocupada{color:var(--ink-2)}
+.cobroPartesRapidas button{color:var(--ink-2)}
+.cobroAtajos .btn{color:var(--ink-2)}
+.cobroWhatsApp b{color:var(--ink-2)}
+.cobroWhatsApp small{color:var(--ink-2)}
+.cobroWhatsAppFila .btn{color:var(--ink-2)}
+
+
+
+
+
+
+body.modoEvento #barra{color:var(--ink-2)}
+body.modoEvento header.top{color:var(--ink-2)}
+body.modoEvento .barraTop b{color:var(--ink-2)}
+body.modoEvento .barraTop small, body.modoEvento .barraPie{color:var(--ink-2)}
+body.modoEvento .barraGrupo{color:var(--ink-2)}
+body.modoEvento nav.tabs button{color:var(--ink-2)}
+body.modoEvento nav.tabs button:hover{color:var(--ink-2)}
+body.modoEvento .barraTop .plaque{color:var(--ink-2)}
+body.modoEvento nav.tabs button[aria-selected="true"]{color:var(--ink-2)}
+body.modoEvento .heroR h1{color:var(--ink)}
+body.modoEvento .heroR .sub, body.modoEvento .heroEyebrow{color:var(--ink-2)}
+body.modoEvento .heroAction:not(.destacado){color:var(--ink-2)}
+body.modoEvento .heroAction:not(.destacado) .heroActionCopy small{color:var(--ink-2)}
+body.modoEvento .heroAction.destacado{color:var(--ink-2)}
+body.modoEvento .heroAction.destacado .heroActionIcon{color:var(--ink-2)}
+body.modoEvento .heroAction.destacado .heroActionCopy small{color:var(--ink-2)}
+body.modoEvento .heroAction.destacado .heroArrow{color:var(--ink-2)}
+body.modoEvento .dashboardHeading span{color:var(--ink-2)}
+body.modoEvento .dashboardHeading h2{color:var(--ink)}
+body.modoEvento .dashboardHeading small{color:var(--ink-2)}
+body.modoEvento #inTiles .tile .v{color:var(--ink)}
+body.modoEvento .eventPosGuide{color:var(--ink-2)}
+body.modoEvento .eventPosGuide h2, body.modoEvento .eventGuideStep b{color:var(--ink)}
+body.modoEvento .eventPosGuide p, body.modoEvento .eventGuideStep small, body.modoEvento .eventGuideBottom{color:var(--ink-2)}
+body.modoEvento .eventGuideNum{color:var(--ink-2)}
+body.modoEvento .pageHeading > div > span{color:var(--ink-2)}
+body.modoEvento .pageHeading h1{color:var(--ink)}
+body.modoEvento .pageHeading p{color:var(--ink-2)}
+body.modoEvento .card > header h2{color:var(--ink)}
+.eventBanner{color:var(--ink-2)}
+.eventBanner h2{color:var(--ink)}
+.eventBanner p{color:var(--ink-2)}
+.eventBanner small{color:var(--ink-2)}
+
+
+
+
+
+
+#tab-menu .menuProductVisual{color:var(--ink-2)}
+#tab-menu .menuMosaicIcon{color:var(--ink-2)}
+
+#tab-menu .menuPhotoPick{color:var(--ink-2)}
+#tab-menu .menuPhotoHint{color:var(--ink-2)}
+#tab-menu .menuDelete{color:var(--ink-2)}
+#tab-menu .menuActive{color:var(--ink-2)}
+#tab-menu .menuItemAdvanced > summary{color:var(--ink-2)}
+#tab-menu .menuModOption.si{color:var(--ink-2)}
+.coverageState{color:var(--ink-2)}
+.coverageRow.live .coverageState{color:var(--ink-2)}
+.coverageRow.soon .coverageState{color:var(--ink-2)}
+.coverageRow.attention .coverageState{color:var(--ink-2)}
+.coverageRow.done .coverageState{color:var(--ink-2)}
+.platPhoto{color:var(--ink-2)}
+.platTax{color:var(--ink-2)}
+
+
+
+
+
+
+.lockClock time{color:var(--ink-2)}
+.lockClock .lockDate{color:var(--ink-2)}
+.mesa.ocupada .mesaIcon{color:var(--ink-2)}
+.mesa.ocupada .pers{color:var(--ink-2)}
+.mesa.ocupada .tot, .mesa.ocupada .sello{color:var(--ink-2)}
+.cmesa.ocupada b, .cmesa.ocupada .cmesaConteo{color:var(--ink-2)}
+.cmesa.ocupada .tot{color:var(--ink-2)}
+.silla.ocupada, .cmesa.ocupada .silla.ocupada{color:var(--ink-2)}
+.businessLogoPreview{color:var(--ink-2)}
+.businessLogoControls p{color:var(--ink-2)}
+
+
+
+
+
+
+.lin .acc .comCorrige{color:var(--ink-2)}
+#comCancelar, #corrCancela{color:var(--ink-2)}
+
+
+
+
+
+body,body.modoEvento{background:var(--bg);color:var(--ink)}
+#barra,body.modoEvento #barra{background:var(--vidrio);color:var(--ink);border-color:var(--vidrio-line);box-shadow:none;-webkit-backdrop-filter:blur(26px) saturate(185%);backdrop-filter:blur(26px) saturate(185%)}
+.barraTop,.barraPie{border-color:var(--line)}.barraTop b,body.modoEvento .barraTop b{color:var(--ink)}.barraTop small,.barraGrupo,.barraPie,body.modoEvento .barraTop small,body.modoEvento .barraGrupo,body.modoEvento .barraPie{color:var(--ink-2)}
+.barraTop .plaque,body.modoEvento .barraTop .plaque{background:var(--accent-soft);color:var(--accent-text);box-shadow:none}
+.plaque.conLogo{background:var(--surface)!important}
+.barraCmyk i:nth-child(1){background:var(--brand-purple)}.barraCmyk i:nth-child(2){background:var(--brand-indigo)}.barraCmyk i:nth-child(3){background:var(--brand-sky)}.barraCmyk i:nth-child(4){background:var(--brand-water)}
+nav.tabs button,body.modoEvento nav.tabs button{color:var(--ink)}
+nav.tabs button:hover,body.modoEvento nav.tabs button:hover{background:var(--surface-2);color:var(--ink)}
+nav.tabs button[aria-selected=true],body.modoEvento nav.tabs button[aria-selected=true]{background:var(--accent-soft);color:var(--accent-text);box-shadow:inset 3px 0 var(--accent-text)}
+nav.tabs .mbadge{background:var(--accent-soft);color:var(--accent-text)}
+header.top,body.modoEvento header.top{background:var(--vidrio);color:var(--ink);border-color:var(--line);box-shadow:none}
+header.top .btn.ghost{background:transparent;color:var(--ink-2);border-color:var(--line)}header.top .btn.ghost:hover{background:var(--surface-2);color:var(--ink)}
+#restaurantAccountName,#restaurantCloudStatus,header.top #restaurantSync,header.top #restaurantSyncText{color:var(--ink-2)}
+.userChip,.candadoBtn,.contextPOS{background:var(--surface);color:var(--ink);border-color:var(--line)}.userChip:hover,.candadoBtn:hover{background:var(--accent-soft);border-color:var(--accent-text);color:var(--accent-text)}
+.userChip .av{background:var(--accent);color:var(--accent-ink)}.userChip .rolTxt,.turnoChip{color:var(--ink-2)}.turnoChip b{color:var(--good)}.turnoChip.cerrado b{color:var(--warn)}
+#pwaInstall{background:var(--accent-soft);color:var(--accent-text);border-color:var(--line)}
+input,select,textarea{background:var(--surface);border-color:var(--line);color:var(--ink);box-shadow:none}
+input::placeholder,textarea::placeholder{color:var(--ink-2);opacity:1}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--focus)}
+button:focus-visible,a:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent-text);outline-offset:3px}
+h1,h2,h3{color:var(--ink)}label.f,.hint,small,.muted,.sub,.pageHeading p,.pageHeading>div>span,.dashboardHeading span,.dashboardHeading small,.card>header .hint{color:var(--ink-2)}
+.btn{background:var(--surface);border-color:var(--line);color:var(--ink-2);box-shadow:none}
+.btn:hover:not(:disabled){background:var(--surface-2);border-color:var(--accent-text);box-shadow:var(--sombra)}
+.btn.primary,.btn.acento,.btn.bien,#comCobrar,.impPrinterActions .impSave,body.modoEvento .btn.primary,body.modoEvento .btn.acento{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:var(--sombra)}
+.btn.primary:hover:not(:disabled),.btn.acento:hover:not(:disabled),.btn.bien:hover:not(:disabled),body.modoEvento .btn.primary:hover:not(:disabled){background:var(--accent-hover);border-color:var(--accent-hover);color:var(--accent-ink)}
+.btn.mal,#comCancelar,#corrCancela{background:var(--mal-soft);border-color:var(--mal);color:var(--mal)}
+.btn.ghost{background:transparent;color:var(--ink-2);border-color:var(--line)}
+.btn.ghost:hover{background:var(--surface-2)}
+.card,.tile,.plat,.llevarCard,.kdsCard{background:var(--surface);border-color:var(--line);box-shadow:var(--sombra)}
+.card:hover,.tile:hover,.plat:hover,.llevarCard:hover{border-color:var(--line);box-shadow:var(--sombra)}
+.card>header,body.modoEvento .card>header,.kdsCard header{background:var(--surface-2);border-color:var(--line-soft)}
+.card>header h2,body.modoEvento .card>header h2,.wrap>section>.fila:first-child h2{color:var(--ink)}
+.note{background:var(--cyan-soft);color:var(--ink-2);border-left-color:var(--cyan)}
+.empty{background:var(--surface-2);color:var(--ink-2);border-color:var(--line)}
+.heroR,body.modoEvento .heroR{background:linear-gradient(120deg,var(--accent-soft),var(--cyan-soft));color:var(--ink);border-left-color:var(--accent);box-shadow:var(--sombra)}
+.heroR h1,body.modoEvento .heroR h1{color:var(--ink)}
+.heroR p,.heroR .sub,.heroEyebrow,body.modoEvento .heroR .sub,body.modoEvento .heroEyebrow{color:var(--ink-2)}
+.heroR:before,body.modoEvento .heroR:before{border-color:var(--line);box-shadow:0 0 0 24px var(--accent-soft),0 0 0 48px var(--cyan-soft)}
+.heroR:after,body.modoEvento .heroR:after{background:var(--cyan-soft)}
+.heroLiveDot,.heroRBadge:before,body.modoEvento .heroLiveDot{background:var(--accent-text);box-shadow:none}
+.heroAction,body.modoEvento .heroAction:not(.destacado){background:var(--surface);color:var(--ink);border-color:var(--line)}
+.heroAction:hover{background:var(--surface-2);border-color:var(--accent-text)}
+.heroAction.destacado,.heroAction.destacado:hover,body.modoEvento .heroAction.destacado{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.heroActionIcon,body.modoEvento .heroAction.destacado .heroActionIcon{background:var(--accent-soft);color:var(--accent-text)}
+.heroAction.destacado .heroActionIcon{background:var(--accent-hover);color:var(--accent-ink)}
+.heroAction small,.heroActionCopy small,.heroAction.destacado small,.heroAction.destacado .heroActionCopy small,body.modoEvento .heroAction.destacado .heroActionCopy small,body.modoEvento .heroAction:not(.destacado) .heroActionCopy small{color:inherit;opacity:1}
+.heroArrow,.heroAction.destacado .heroArrow,body.modoEvento .heroAction.destacado .heroArrow,body.modoEvento .heroAction:not(.destacado) .heroArrow{color:inherit}
+.heroRBadge,.heroRBadge.tenue{color:var(--ink-2);background:var(--surface);border-color:var(--line)}
+.heroRBadge.abierta{color:var(--good);background:var(--good-soft);border-color:var(--good)}
+.heroRBadge.abierta:before{background:var(--good)}
+.heroRBadge.hayPendientes{color:var(--warn);background:var(--warn-soft);border-color:var(--warn)}
+.heroRBadge.hayPendientes:before{background:var(--warn);box-shadow:none}
+.androidApkLink{background:var(--surface);color:var(--ink);border-color:var(--line)}.androidApkCopy small{color:var(--ink-2)}.androidApkIcon{background:var(--accent-soft);color:var(--accent-text)}
+.tile .v,body.modoEvento #inTiles .tile .v{color:var(--ink)}.tile:after,body.modoEvento #inTiles .tile.destacada:after{background:var(--accent-soft)}#tab-inicio .tile{border-top-color:var(--line)}body.modoEvento #inTiles .tile.destacada:before{background:var(--accent-soft)}
+.seg,.zonas button,.catFila button{background:var(--surface-2);border-color:var(--line);color:var(--ink-2)}
+.seg button{color:var(--ink-2)}.seg button[aria-pressed=true]{background:var(--surface);color:var(--accent-text)}
+.zonas button[aria-pressed=true],.catFila button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.mesa,.mesa.libre{background:var(--surface);border-color:var(--line)}.mesa b,.mesa.libre b{color:var(--ink)}
+.mesa small,.mesa .pers,.mesa .sello{color:var(--ink-2)}
+.mesa .tot{color:var(--ink)}.mesa .mesaIcon,.mesa.libre .mesaIcon{background:var(--good-soft);color:var(--good);border-color:var(--good)}
+.mesa.libre .sello{background:var(--good-soft);color:var(--good)}
+.mesa.ocupada{background:var(--accent-soft);border-color:var(--accent-text)}
+.mesa.ocupada .mesaIcon,.mesa.ocupada .pers,.mesa.ocupada .sello{background:var(--accent-mid);color:var(--accent-text);border-color:var(--accent-text)}
+.mesa.ocupada .tot,.mesa.ocupada small{color:var(--accent-text)}
+.mesa.cuenta{background:var(--warn-soft);border-color:var(--warn)}
+.mesa.cuenta .mesaIcon,.mesa.cuenta .pers,.mesa.cuenta .sello{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
+.mesa.cuenta .tot,.mesa.cuenta small{color:var(--warn)}
+.mesa .cocinaReloj{border-color:var(--line)}
+.mesa:hover{border-color:var(--accent-text);box-shadow:var(--sombra)}.mesa:hover .mesaIcon{background:var(--accent);color:var(--accent-ink)}.mesa:before{background:var(--accent-soft)}
+.croquis,.croquis.cuadricula,.croquis.madera,.croquis.concreto,.croquis.loseta,.croquis.liso{background:linear-gradient(var(--line-soft) 1px,transparent 1px) 0 0/42px 42px,linear-gradient(90deg,var(--line-soft) 1px,transparent 1px) 0 0/42px 42px,var(--surface-2);border-color:var(--line);box-shadow:var(--sombra)}
+.cmesa,.cmesa.cuadrada,.cmesa.redonda{background:var(--surface);color:var(--ink);border-color:var(--line);box-shadow:var(--sombra)}
+.cmesa.ocupada,.cmesa.ocupada.cuadrada,.cmesa.ocupada.redonda{background:var(--accent-mid);border-color:var(--accent-text);box-shadow:var(--sombra)}
+.cmesa.cuenta,.cmesa.cuenta.cuadrada,.cmesa.cuenta.redonda{background:var(--warn-soft);border-color:var(--warn)}
+.cmesa b,.cmesaCentro .cmesaConteo{color:var(--ink)}.cmesa.ocupada b,.cmesa.ocupada .cmesaConteo{color:var(--accent-text)}.cmesa.cuenta b,.cmesa.cuenta .cmesaConteo{color:var(--warn)}
+.cmesa .tot{background:var(--surface);color:var(--ink);border-color:var(--line);box-shadow:none}
+.cmesa.ocupada .tot{color:var(--accent-text);border-color:var(--line)}.cmesa.cuenta .tot{color:var(--warn)}
+.silla,.silla.libre,.cmesa.ocupada .silla.libre{background:var(--surface);color:var(--ink-2);border-color:var(--ink-2);opacity:1;box-shadow:none}
+.silla.ocupada,.cmesa.ocupada .silla.ocupada{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);box-shadow:none}
+.silla svg{stroke-width:2.2}
+.mesaAgarre{color:var(--ink-2)}.mesaDestinoLista,.mesa.mesaDestinoLista{border-color:var(--cyan);background:var(--cyan-soft)}.mesaDestinoCroquis{border-color:var(--cyan);background:var(--cyan-soft)}
+.croquisEnArrastre::after{background-image:linear-gradient(to right,var(--line) 1px,transparent 1px),linear-gradient(to bottom,var(--line) 1px,transparent 1px)}
+.mesa.mesaEnMano,.cmesa.mesaEnMano{border-color:var(--accent-text);box-shadow:var(--sombra)}
+.mesaEstado{background:var(--surface);border-color:var(--line);color:var(--ink-2)}.mesaEstado b{color:var(--ink)}.mesaEstado::before{background:var(--good)}.mesaEstado.ocupada::before{background:var(--accent-text)}.mesaEstado.cuenta::before{background:var(--warn)}
+.mesaEtiqueta,.mesaCabecera h2,.mesaGesto{color:var(--accent-text)}#mesasResumen{color:var(--ink-2)}
+.cmesa .mesaAtiende,.mesaAtiende{background:var(--accent);color:var(--accent-ink)}
+.kdsLin button{background:var(--surface-2);color:var(--ink);border-color:var(--line)}.kdsLin button.ir{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}.kdsLin button.ok{background:var(--good-soft);color:var(--good);border-color:var(--good)}
+.teclado button{background:var(--surface);color:var(--ink);border-color:var(--line)}
+#toast{background:var(--toast);color:var(--on-toast);border-color:var(--line)}
+.pageHeading,body.modoEvento .pageHeading{background:linear-gradient(110deg,var(--surface),var(--surface-2));border-color:var(--line);box-shadow:var(--sombra)}
+.pageHeading h1,body.modoEvento .pageHeading h1,.dashboardHeading h2,body.modoEvento .dashboardHeading h2{color:var(--ink)}
+body.modoEvento .pageHeading p,body.modoEvento .pageHeading>div>span,body.modoEvento .dashboardHeading span,body.modoEvento .dashboardHeading small{color:var(--ink-2)}
+.pageHeadingMark,.cajaMark{background:var(--accent-soft);color:var(--accent-text);border-color:var(--line)}
+table thead,th{background:var(--surface-2);color:var(--ink-2)}td{border-color:var(--line-soft);color:var(--ink)}tbody tr:hover{background:var(--surface-2)}
+.modal,.accesoWrap{background:var(--scrim)}.modal .caja{background:var(--surface);color:var(--ink);border-color:var(--line);box-shadow:var(--sombra)}
+.accesoCard,.accesoPanel,.accesoRight,.accesoReloj,.accesoAds,.accesoMarca,.lockClock,.cobroTot,.ticketPie,.perfil,.lockTop{background:var(--surface);color:var(--ink);border-color:var(--line);box-shadow:var(--sombra)}
+#accesoTitulo,.lockClock time,#accesoHora{color:var(--ink)}.lockClock .lockDate,.perfil small{color:var(--ink-2)}.perfil:hover{background:var(--accent-soft);border-color:var(--accent-text)}
+.cobroTot .v,.ticketPie .total{color:var(--ink)}.cobroTot .et,.ticketPie .ren{color:var(--ink-2)}
+.comenFila button,.propFila button,.modChip,.perfil{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.comenFila button[aria-pressed=true],.propFila button[aria-pressed=true],.modChip.si,#modalMods .modChip.si{background:var(--accent-soft);color:var(--accent-text);border-color:var(--accent-text)}
+#modalMods .modChip.si i{color:var(--accent-text);opacity:1}.lin .acc .comCorrige{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.lin .acc .comReimprime{background:var(--surface);color:var(--accent-text);border-color:var(--accent-text)}
+.cocinaReloj,.edo{background:var(--surface-2);color:var(--ink-2);border-color:var(--line)}
+.bien,.good,.edo.listo,.edo.lista,.edo.entregada{color:var(--good)}.mal,.edo.cancelada{color:var(--mal)}.aviso,.edo.preparando{color:var(--warn)}
+#modalAuto .autoPersona,#autoLista button{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.pageHeading .hint,.tile .et,.tile .pie,.tile .lab,.mesa .pers,.personalHubFooter,.personalHubFooter span,.personalHubTabs button,.personalHubEyebrow,.personalHubHeader p,.personalHubMetric small,.personalHubMetric span,.personalHubPeriod label,.personalHubNote,.personalHubCard small,.personalHubPanel small{color:var(--ink-2)}
+.personalHubTabs button[aria-selected=true]{color:var(--accent-text)}.personalHubMetric,.personalBlock{border-color:var(--line)}
+.menuSaveBar,.menuGroupCard,.menuItemCard,.menuCatItem,.businessLogoSetting,.impPrinterEditor,.impPrinterItem,.impPrinterNew,.impPrinterColumn,.impPrinterSummary,.setTile,.settingTile,.settingsTile,.setGroup,.profileAccess{background:var(--surface);color:var(--ink);border-color:var(--line);box-shadow:var(--sombra)}
+.menuGroupHead,.menuCatItem,.menuCategoryChip,.menuPhotoPick,.menuGroupOption,.menuItemNumbers,.impPrinterEmpty,.impPrinterStats,.impPrinterTag,.impPrinterCategory,.coverageDay,.coverageStat,.coverageSlot{background:var(--surface-2);color:var(--ink-2);border-color:var(--line)}
+.menuItemName,.menuGroupTitle,.menuItemCard h3,.impPrinterName,.impPrinterEditor h3{color:var(--ink)}
+.menuPhotoPick,.plat .foto,.plat .ico{background:var(--cyan-soft)}
+.impPrinterItem[aria-selected=true],.menuCatItem.activa{background:var(--accent-soft);color:var(--accent-text);border-color:var(--accent-text)}
+.impPrinterNote,.impPrinterNotice,.impPrinterStat small{color:var(--ink-2)}
+.impPrinterError{background:var(--mal-soft);color:var(--mal);border-color:var(--mal)}
+.setTile i,.settingsTile i,.setTileIcon{background:var(--accent-soft);color:var(--accent-text)}
+.eventPosGuide,body.modoEvento .eventPosGuide{background:var(--event-soft);color:var(--ink);border-color:var(--event-mark)}
+body.modoEvento .eventPosGuide h2,body.modoEvento .eventGuideStep b{color:var(--ink)}
+body.modoEvento .eventPosGuide p,body.modoEvento .eventGuideStep small,body.modoEvento .eventGuideBottom{color:var(--ink-2)}
+.eventGuideNum,body.modoEvento .eventGuideNum{background:var(--event-mark);color:var(--surface)}
+.eventGuideStep,body.modoEvento .eventGuideStep{background:var(--surface);border-color:var(--line)}
+.contextPOSDot{background:var(--event-mark)}
+.restaurantThemeButton{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 12px;min-height:40px;border:1px solid var(--line);border-radius:10px;background:var(--surface-2);color:var(--ink);font:600 12px "DM Sans",system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+.restaurantThemeButton:hover{background:var(--accent-soft);color:var(--accent-text);border-color:var(--accent-text)}[data-theme-icon]{font-size:19px;line-height:1}
+.barraPie{display:flex;flex-direction:column;gap:10px}.nuvoorPie{opacity:1;color:var(--ink-2)}
+.restaurantThemeMobile{display:none}
+body.restaurantPersonalAccess{padding:28px 16px;background:var(--bg);color:var(--ink)}
+.restaurantPersonalAccess main{background:var(--surface);border-color:var(--line);box-shadow:var(--sombra)}
+.restaurantPersonalAccess p,.restaurantPersonalAccess small,.restaurantPersonalAccess .brand{color:var(--ink-2)}
+.restaurantPersonalAccess button:not(.secondary):not(.restaurantThemeButton){background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.restaurantPersonalAccess button.secondary{background:var(--surface-2);color:var(--ink);border-color:var(--line)}
+.restaurantPersonalAccess #status,.restaurantPersonalAccess .badge{background:var(--accent-soft);color:var(--accent-text)}
+.restaurantPersonalAccess .restaurantThemeButton{width:auto;margin:16px 0 0;min-height:40px}
+@media(min-width:621px){.top-in{flex-wrap:wrap;row-gap:6px}.restaurantSessionActions{flex-shrink:0}.restaurantSyncIndicator{flex:0 1 auto}}
+@media(max-width:620px){.restaurantThemeMobile{display:inline-flex;margin-left:auto}.barraPie{display:none}#barra{backdrop-filter:blur(26px)}.top-in{flex-wrap:wrap}.restaurantSessionActions{flex-wrap:wrap;min-width:0}.restaurantSessionActions>span{max-width:100%}.turnoChip{flex-wrap:wrap}.heroAction{min-width:0}.wrap{min-width:0}.fila{flex-wrap:wrap}.grid>div,.card,.card .body{min-width:0}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* Se conserva el acomodo de mesas aprobado anteriormente. */
+.mesaCabecera{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:17px}
+.mesaEtiqueta{color:var(--forest);font-size:10px;font-weight:800;letter-spacing:.15em}
+.mesaCabecera h2{margin:4px 0 6px;color:var(--forest);font-size:clamp(29px,4vw,46px);line-height:1;letter-spacing:-.045em}
+#mesasResumen{color:var(--ink-3);font-size:12px}
+#mesaRapida{flex-shrink:0}
+.mesaEstados{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:13px}
+.mesaEstado{display:flex;align-items:center;gap:8px;min-width:0;padding:8px 12px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink-2);font-size:12px;font-weight:700}
+.mesaEstado::before{content:"";width:8px;height:8px;flex-shrink:0;border-radius:50%;background:var(--good)}
+.mesaEstado.ocupada::before{background:var(--forest)}
+.mesaEstado.cuenta::before{background:var(--cyan)}
+.mesaEstado b{color:var(--forest);font-size:20px;line-height:1}
+.mesasPanel{border:1px solid var(--line);border-radius:16px;padding:13px;background:var(--surface);box-shadow:var(--sombra)}
+.mesasPanel .croqBarra{padding:0 0 5px;margin-bottom:3px;border:0;background:transparent;box-shadow:none}
+.mesasPanel .zonas{margin:0;margin-right:auto}
+.mesasPanel .croqPista{flex-basis:100%}
+.mesaGesto{margin:3px 0 10px;font-size:12px;color:var(--forest);font-weight:700}
+.mesas{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.mesa{min-height:92px;padding:10px 78px 10px 54px;border-radius:12px;border-style:solid;gap:3px}
+.mesa b{font-family:inherit;font-size:15px;line-height:1.2;overflow-wrap:anywhere}
+.mesa .pers,.mesa.ocupada .pers,.mesa.cuenta .pers{position:static;padding:0;background:transparent;color:var(--ink-3);border-radius:0}
+.mesa .tot{font-size:13px;margin-top:0}
+.mesa .sello{left:auto;right:9px;top:11px;bottom:auto;max-width:none;padding:3px 7px;border-radius:99px;font-size:10px;text-transform:none;letter-spacing:0}
+.mesa.libre .sello{background:var(--good-soft);color:var(--good)}
+.mesa.ocupada .sello{background:var(--accent-mid);color:var(--forest)}
+.mesa.cuenta .sello{background:var(--warn-soft);color:var(--warn)}
+.mesaIcon{left:9px;top:11px;width:35px;height:35px;border-radius:9px}
+.mesaIcon svg{width:22px;height:22px}
+.mesa .cocinaReloj{max-width:100%;white-space:normal}
+.mesaAgarre{position:absolute;right:11px;bottom:10px;color:var(--ink-2);font-size:16px;line-height:1}
+.mesa,.cmesa{-webkit-touch-callout:none;user-select:none}
+.mesa:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
+.mesa.mesaDestinoLista{border:2px dashed var(--cyan);background:var(--warn-soft);box-shadow:none;transform:none}
+.mesaDestinoLista>*{visibility:hidden}
+.mesaDestinoLista::before{display:none}
+.mesaOrigenCroquis{opacity:.3}
+.cmesa.cuadrada,.cmesa.redonda{background:var(--cream);box-shadow:0 4px 12px var(--focus)}
+.cmesa.ocupada{background:var(--accent-mid)}
+.cmesa.cuenta{background:var(--warn-soft)}
+.cmesa b,.cmesa.ocupada b,.cmesa.cuenta b{color:var(--forest)}
+.cmesaCentro .cmesaConteo{color:var(--ink-3)}
+.croquisEnArrastre::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(to right,var(--focus) 1px,transparent 1px),linear-gradient(to bottom,var(--focus) 1px,transparent 1px);background-size:5% 5%}
+.mesaDestinoCroquis{position:absolute;z-index:2;pointer-events:none;transform:translate(-50%,-50%);border:2px dashed var(--cyan);border-radius:12px;background:var(--cyan-soft)}
+.mesa.mesaEnMano,.cmesa.mesaEnMano{position:fixed;z-index:2000;pointer-events:none;margin:0;border-color:var(--forest);box-shadow:0 12px 28px var(--focus);transform:translate(9px,-10px) rotate(1deg)!important;transition:none;cursor:grabbing}
+@media(max-width:1100px){.mesas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){
+  .mesaCabecera{align-items:center;margin-bottom:12px}
+  .mesaEstados{gap:5px}
+  .mesaEstado{gap:5px;padding:6px;font-size:10px}
+  .mesaEstado b{font-size:17px}
+  .mesasPanel{padding:9px}
+  .mesas{grid-template-columns:1fr;gap:6px}
+  .mesa{min-height:76px}
+}
+@media(prefers-reduced-motion:reduce){.mesa.mesaEnMano,.cmesa.mesaEnMano{transform:none!important}}
+
+
+/* Lectura y controles sobre las superficies finales. */
+.accesoWrap{background:var(--bg)}.modal .card{border-color:var(--line);box-shadow:var(--sombra)}.modal .card>header{background:var(--surface-2);border-color:var(--line-soft)}.mesa .pers,.mesa.ocupada .pers,.mesa.cuenta .pers,.cmesaCentro .cmesaConteo{color:var(--ink-2)}
+
+/* Superficies y estados que las capas antiguas especificaban por contexto. */
+:root{--brand-on:#FFFFFF}
+#tabs button[aria-selected=true],body.modoEvento #tabs button[aria-selected=true]{box-shadow:inset 3px 0 var(--accent-text)!important;color:var(--accent-text);background:var(--accent-soft)}
+#mesasResumen,.appsEyebrow,#croqPista,#comPersonas,#comFolio,#kdsResumen,.tile .sub{color:var(--ink-2)!important}
+[style*="color:var(--ink-3)"],[style*="color: var(--ink-3)"]{color:var(--ink-2)!important}
+table th{color:var(--ink-2)}table tbody tr,table tbody tr:nth-child(even),table tbody tr:nth-child(odd){background:var(--surface)}
+table tbody tr:hover{background:var(--surface-2)}
+.eventBanner,#inicioEventos{background:linear-gradient(120deg,var(--brand-purple),var(--brand-indigo));border-color:var(--brand-indigo);color:var(--brand-on)!important}
+.eventBanner h2,.eventBanner p,.eventBanner small{color:var(--brand-on);opacity:1}
+.heroR .androidApkLink,.heroR .androidApkLink:hover{background:var(--surface);color:var(--ink);border-color:var(--line);box-shadow:var(--sombra)}
+.heroR .androidApkLink b{color:var(--ink)}.heroR .androidApkLink small{color:var(--ink-2)}.androidApkArrow{color:var(--accent-text)}
+.heroRBadge.abierta,.mesa.libre .sello,.cocinaReloj.lista,.cocinaRelojCroquis.lista,.edo.listo,.edo.lista,.pill.good{background:var(--surface);color:var(--good);border-color:var(--good)}
+.pill{background:var(--surface-2);color:var(--ink-2)}
+.pill.warn,.pill.tarde,.cocinaReloj.ambar,.cocinaRelojCroquis.ambar{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
+.pill.mal,.cocinaReloj.rojo,.cocinaRelojCroquis.rojo{background:var(--mal-soft);color:var(--mal);border-color:var(--mal)}
+.edo.pedido,.edo.preparando{background:var(--surface-2);color:var(--ink-2)}
+.decor,.decor.cocina,.decor.entrada,.decor.planta,.decor.barra,.decor.caja,.decor.bano{background:var(--surface-2);color:var(--ink-2);border-color:var(--line)}
+#tab-comanda .ticket{background:var(--surface);border-color:var(--line)}
+#tab-comanda .ticket header{background:var(--surface-2);border-color:var(--line-soft)}#tab-comanda .ticket header h2{color:var(--ink)}
+.plat b{color:var(--ink)}.plat>span{color:var(--accent-text)}.platTax{color:var(--ink-2)!important}.plat .ph{background:var(--cyan-soft)}
+#comResponsable,.mesaResponsable{background:var(--accent);color:var(--accent-ink)}
+.lin .cant{color:var(--accent-text)}.lin .imp{color:var(--ink)}.ticketPie .ren,.ticketPie .ren span{color:var(--ink-2)}.ticketPie .total,.ticketPie .total span{color:var(--ink)}
+.kdsCard>header{background:var(--surface-2)!important}.kdsCard>header h2{color:var(--ink)}
+.kdsCard header small,.kdsSeat,.kdsLin small{color:var(--ink-2)}.kdsLin .c{color:var(--accent-text)}.kdsLin b{color:var(--ink)}
+.note b,.note strong{color:inherit}
+.cobroWhatsApp{background:var(--cyan-soft);border-color:var(--line)}.cobroWhatsApp b{color:var(--ink)}.cobroWhatsApp small{color:var(--ink-2)}
+.cobroWhatsAppFila .btn,.cobroWhatsAppFila .btn:hover{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.menuDelete{color:var(--mal)!important}
+#eventGuideCashState{background:var(--surface);color:var(--good)}
+
+.cmesaConteo,.cocinaRelojCroquis{opacity:1!important}.cocinaRelojCroquis{background:var(--surface)}
+
+/* Últimos contextos de lectura (menú, cobro y croquis). */
+.mesa .cocinaReloj.lista,.cmesa .cocinaRelojCroquis.lista{background:var(--surface);color:var(--good)}
+#tab-menu label span,#tab-menu label small,#tab-menu .menuSatHint,#tab-menu small{color:var(--ink-2)}
+.menuPhotoPick .menuPhotoHint{background:var(--brand-indigo);color:var(--brand-on)}
+table tbody tr td,table tbody tr:nth-child(even) td,table tbody tr:nth-child(odd) td{background:var(--surface)}
+table tbody tr:hover td{background:var(--surface-2)}
+.cmesaCentro{background:transparent!important}
+.cobroPartesRapidas button,.cobroAtajos .btn{background:var(--surface-2);color:var(--ink-2);border-color:var(--line)}
+.cobroPartesRapidas button[aria-pressed=true]{background:var(--accent-soft);color:var(--accent-text);border-color:var(--accent-text)}
+.kdsCard .reloj{background:var(--surface)!important;color:var(--ink-2)!important;border-color:var(--line)}
+.satAviso{background:var(--cyan-soft);color:var(--ink-2);border-color:var(--line)}.satAviso b{color:var(--ink-2)}.satAviso a{color:var(--accent-text)}
+body.modoEvento .contextPOS{background:var(--event-soft);color:var(--event-mark);border-color:var(--event-mark)}#contextPOSText{color:inherit}
+
+#tab-menu .menuModOption.si{background:var(--accent-soft);color:var(--accent-text);border-color:var(--accent-text)}#tab-menu .menuModOption.si span{color:inherit}
+#tab-menu .menuPhotoPick .menuPhotoHint,#tab-menu .menuPhotoPick:hover .menuPhotoHint{background:var(--brand-indigo);color:var(--brand-on)}
+.platPhoto{background:var(--cyan-soft);color:var(--ink)}.cmesaCentro b{text-shadow:none}
+.cobroPartesRapidas button:hover,.cobroAtajos .btn:hover{background:var(--accent-soft);color:var(--accent-text);border-color:var(--accent-text)}
+input[type=checkbox],input[type=radio]{accent-color:var(--accent)}
+
+/* El tercer tono se reserva para fondos blancos; los rótulos sobre rellenos usan el segundo. */
+
+
+
+label.f{color:var(--ink-2)}
+.barraTop small{color:var(--ink-2)}
+.barraGrupo{color:var(--ink-2)}
+.barraPie{color:var(--ink-2)}
+.userChip .rolTxt{color:var(--ink-2)}
+.turnoChip{color:var(--ink-2)}
+.eventEmpty{color:var(--ink-2)}
+.eventReport > summary small, .eventReportTicket small{color:var(--ink-2)}
+
+
+
+.card > header .hint{color:var(--ink-2)}
+.empty{color:var(--ink-2)}
+.heroR p{color:var(--ink-2)}
+.tile .et{color:var(--ink-2)}
+.tile .sub{color:var(--ink-2)}
+
+.salesInsightTop{color:var(--ink-2)}
+.salesInsightMetric span, .salesInsightSub{color:var(--ink-2)}
+.promoIdeasHeader small{color:var(--ink-2)}
+.salesInsightFootnote{color:var(--ink-2)}
+
+
+
+.mesa small{color:var(--ink-2)}
+.mesa .pers{color:var(--ink-2)}
+.mesa .sello{color:var(--ink-2)}
+
+.guestPickerTable small{color:var(--ink-2)}
+.guestPickerValue span{color:var(--ink-2)}
+.guestPickerHint{color:var(--ink-2)}
+
+
+#modsPeso small{color:var(--ink-2)}
+.lin small{color:var(--ink-2)}
+.appsFila .appsEyebrow{color:var(--ink-2)}
+.btnApp small{color:var(--ink-2)}
+
+.appRen .ci small{color:var(--ink-2)}
+
+
+.edo.pedido{color:var(--ink-2)}
+.kdsCard header small{color:var(--ink-2)}
+.decor{color:var(--ink-2)}
+.llevarCard small{color:var(--ink-2)}
+.cmesa small{color:var(--ink-2)}
+.croqPista{color:var(--ink-2)}
+.chPersona small{color:var(--ink-2)}
+.chPersona .acc{color:var(--ink-2)}
+.semaforo small{color:var(--ink-2)}
+.firmaPie .hint{color:var(--ink-2)}
+.horSem .lib{color:var(--ink-2)}
+.tkLin small{color:var(--ink-2)}
+.expFila small{color:var(--ink-2)}
+.expFila .der{color:var(--ink-2)}
+.modGrupo small{color:var(--ink-2)}
+.cobroTot .et{color:var(--ink-2)}
+th{color:var(--ink-2)}
+.accesoBody .sub{color:var(--ink-2)}
+.perfilBtn small{color:var(--ink-2)}
+
+
+.ajusteFlecha{color:var(--ink-2)}
+.ajusteTexto small{color:var(--ink-2)}
+#modalTrasladoMesa .trasladoNota{color:var(--ink-2)}
+
+
+
+
+
+
+
+
+
+
+
+
+#tab-menu .menuSearch{color:var(--ink-2)}
+#tab-menu .menuCount{color:var(--ink-2)}
+#tab-menu .menuSelectionBar span{color:var(--ink-2)}
+#tab-menu .menuSelectionBar small{color:var(--ink-2)}
+#tab-menu .menuCategoryEdit label > span, #tab-menu .menuGroupFields label > span, #tab-menu .menuOptionTile label > span{color:var(--ink-2)}
+#menuCatalogDialog .menuCatalogHelp{color:var(--ink-2)}
+#menuCatalogDialog .menuCatalogCount{color:var(--ink-2)}
+
+#tab-menu .menuOptionExtra > span{color:var(--ink-2)}
+#tab-menu .menuMosaicEmpty{color:var(--ink-2)}
+#tab-menu .menuItemTitle label > span, #tab-menu .menuItemNumbers label > span, #tab-menu .menuSatFields label > span{color:var(--ink-2)}
+#tab-menu .menuMoney{color:var(--ink-2)}
+#tab-menu .menuItemAdvanced > summary::after{color:var(--ink-2)}
+#tab-menu .menuItemAdvanced > summary small{color:var(--ink-2)}
+#tab-menu .menuSat > b small{color:var(--ink-2)}
+#tab-menu .menuNoMods, #tab-menu .menuSatHint{color:var(--ink-2)}
+#tab-menu .menuEmpty{color:var(--ink-2)}
+#tab-menu .menuAdvanced > summary small{color:var(--ink-2)}
+#tab-menu .menuAdvanced > summary::after{color:var(--ink-2)}
+.coverageDate{color:var(--ink-2)}
+.coverageStat small{color:var(--ink-2)}
+.coveragePerson small{color:var(--ink-2)}
+.coverageEmpty{color:var(--ink-2)}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.configSaveBar > span{color:var(--ink-2)}
+#modalMods .modIncomplete{color:var(--ink-2)}
+
+
+#tab-inicio table tbody,#tab-inicio table tbody tr,#tab-inicio table tbody td{background:var(--surface)!important}#tab-inicio table tbody tr:hover td{background:var(--surface-2)!important}
+
+/* Estado Listo en cocina: texto AA sobre tarjeta. */
+.kdsLin button.ok{background:var(--surface);color:var(--good);border-color:var(--good)}
+
+/* Categorías y grupos del menú: selección Nuvoor, sin el verde heredado. */
+#tab-menu .menuMosaicChoice:hover,#tab-menu .menuProductChoice:hover{border-color:var(--accent-text);box-shadow:var(--sombra)}
+#tab-menu .menuMosaicChoice[aria-pressed="true"],#tab-menu .menuProductChoice[aria-pressed="true"]{border-color:var(--accent-text);background:var(--accent-soft);box-shadow:0 0 0 3px var(--focus),var(--sombra)}
+#tab-menu .menuMosaicIcon{background:var(--cyan-soft);color:var(--ink-2)}
+
+#tab-menu .menuProductVisual{background:linear-gradient(145deg,var(--surface-2),var(--cyan-soft));color:var(--ink-2)}
+#tab-menu .menuProductSuggestion{border-color:var(--line);background:var(--surface);box-shadow:var(--sombra)}
+#tab-menu .menuProductEmoji{filter:drop-shadow(0 5px 5px var(--focus))}
