@@ -1551,6 +1551,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 </style>
 <meta name="nuvoor-build" content="20261119-1428">
 <link rel="stylesheet" href="./tema-nuvoor.css?v=20261119-1428">
+<link rel="stylesheet" href="./limpio.css?v=20261121-1445">
 </head>
 <body>
 
@@ -11121,6 +11122,621 @@ async function iniciaRestaurant(){
   await recargaCajaCompartida();
   start();cargaAnuncios();sincronizaCortesCaja();procesaMediosRestaurant();
 }
+/* <<LIMPIO 20261121-1445>> Restaurant limpio (aprobado por Carlos el 21 nov 2026). Va antes de iniciaRestaurant(): los ganchos quedan puestos antes del primer start(). */
+/* =====================================================================
+   Maqueta limpia (tipo Loyverse) · Nuvoor Restaurant · 21 nov 2026
+   Se pega dentro del Restaurant real, después de claude.js (Personal).
+   No cambia datos ni reglas: mueve los mismos botones a lugares más
+   tranquilos y pinta la venta como cuadrícula con el ticket a la derecha.
+   Todo lo que hace cada botón sigue siendo del Restaurant.
+   ===================================================================== */
+/* En la maqueta esta capa va después de Personal (claude.js, con datos de muestra); en producción va sola,
+   antes de iniciaRestaurant(). Lo que depende de Personal se revisa con typeof y tiene su versión sin él. */
+const LP_MAQUETA = typeof cxArranca === "function";
+const LP_TITULOS = {inicio:"Inicio",mesas:"Mesas",caja:"Caja",eventos:"Eventos y punto móvil",cocina:"Cocina",
+  menu:"El menú",ventas:"Ventas",personal:"Personal",costos:"Costos",set:"Ajustes",comanda:"Cuenta"};
+/* Colores de las fichas de la venta: texto blanco, todos pasan 4.5:1. */
+const LP_TONOS = ["#4458A4","#176C98","#0F766E","#2E7D32","#B45309","#C62828","#AD1457","#4C4780"];
+const LP_SVG = d => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+d+'</svg>';
+const LP_ICO = {
+  menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+  atras:'<path d="M15 5l-7 7 7 7"/>',
+  mas:'<circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none"/>',
+  candado:'<rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/>',
+  busca:'<circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/>',
+  cerrar:'<path d="M6 6l12 12M18 6 6 18"/>',
+  bolsa:'<path d="M5 7h14l-1.2 12H6.2L5 7Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>'
+};
+/* lpCat: "" = las categorías (lo primero que se ve al abrir una mesa), "*" = todos los platillos, o el id de una categoría. */
+let lpCat = "", lpBusca = "", lpLinea = "", lpMenuPanel = "platillos", lpFocoCajon = null, lpComandaVista = null, lpAnunIdx = 0, lpAnunReloj = null;
+const lpEl = id => document.getElementById(id);
+const lpAncho = () => matchMedia("(min-width: 900px)").matches;
+const lpCel = () => matchMedia("(max-width: 759px)").matches;
+const lpVista = () => { const s = [...document.querySelectorAll('.wrap > section[id^="tab-"]')].find(x=>!x.hidden); return s ? s.id.slice(4) : ""; };
+const lpTono = catId => { const cats = (MENU.cats||[]).slice().sort((a,b)=>num(a.orden)-num(b.orden)); const i = cats.findIndex(c=>c.id === catId); return LP_TONOS[(i < 0 ? 0 : i) % LP_TONOS.length]; };
+const lpMueve = (sel, destino) => { const n = typeof sel === "string" ? document.querySelector(sel) : sel; if(n && destino) destino.append(n); return n; };
+
+/* ---------- menú de muestra más completo (para ver la cuadrícula llena) ---------- */
+const LP_MUESTRA_IDS = ["taco","agua","taco-pastor","taco-suadero","gringa","torta-milanesa","torta-pierna","torta-cubana","quesa-chorizo","quesa-bistec","quesa-flor",
+  "menudo","costillas","arrachera","refresco","jamaica","horchata","cafe","flan","arroz-leche"];
+function lpMenuMuestra(){
+  if(!LP_MAQUETA) return;
+  /* Sólo toca el menú de muestra: el de la maqueta anterior (Taco y Agua fresca) o el de esta, sin los iconos de la versión 2. */
+  const ids = (MENU.plats||[]).map(p=>p.id);
+  const esMuestra = ids.length && ids.every(id=>LP_MUESTRA_IDS.includes(id));
+  if(!esMuestra || (ids.length > 2 && localStorage.getItem(LS+"_lp_menu") === "2")) return;
+  const cat = (id,nombre,orden,icono) => ({id,nombre,orden,icono});
+  const antes = Object.fromEntries((MENU.plats||[]).map(p=>[p.id,p]));
+  const pl = (id,catId,nombre,precio,costo,icono,mods=[]) => Object.assign({id,catId,nombre,precio,costo,mods,activo:true,icono}, antes[id] ? {activo:antes[id].activo, agotado:antes[id].agotado, foto:antes[id].foto} : {});
+  MENU.cats = [cat("tacos","Tacos",1,"🌮"),cat("tortas","Tortas",2,"🥪"),cat("quesadillas","Quesadillas",3,"🫔"),cat("platos","Platos fuertes",4,"🍲"),cat("bebidas","Bebidas",5,"🥤"),cat("postres","Postres",6,"🍰")];
+  MENU.plats = [
+    pl("taco","tacos","Taco",35,12,"🌮",["carne","extras"]), pl("taco-pastor","tacos","Taco al pastor",28,9,"🌮",["extras"]), pl("taco-suadero","tacos","Taco de suadero",30,10,"🌮",["extras"]),
+    pl("gringa","tacos","Gringa",65,22,"🫔",["carne"]),
+    pl("torta-milanesa","tortas","Torta de milanesa",85,30,"🥪"), pl("torta-pierna","tortas","Torta de pierna",80,28,"🥪"), pl("torta-cubana","tortas","Torta cubana",110,40,"🥪"),
+    pl("quesa-chorizo","quesadillas","Quesadilla de chorizo",45,15,"🫔"), pl("quesa-bistec","quesadillas","Quesadilla de bistec",50,17,"🫔"), pl("quesa-flor","quesadillas","Quesadilla de flor",45,14,"🫔"),
+    pl("menudo","platos","Menudo",120,38,"🍲"), pl("costillas","platos","Costillas de cerdo",165,60,"🥩"), pl("arrachera","platos","Hamburguesa de arrachera",145,52,"🍔"),
+    pl("agua","bebidas","Agua fresca",25,7,"🧃"), pl("refresco","bebidas","Refresco",30,12,"🥤"), pl("jamaica","bebidas","Agua de jamaica",25,6,"🧃"), pl("horchata","bebidas","Agua de horchata",25,7,"🧃"),
+    pl("cafe","bebidas","Café de olla",28,6,"☕"), pl("flan","postres","Flan napolitano",45,12,"🍰"), pl("arroz-leche","postres","Arroz con leche",40,10,"🍰")
+  ];
+  localStorage.setItem(LS+"_lp_menu","2");
+  persist();
+}
+
+/* ---------- barra de arriba y cajón (como Loyverse) ---------- */
+function lpMontaCascaron(){
+  document.body.classList.add("lp");
+  const wrap = document.querySelector(".wrap");
+  wrap.insertAdjacentHTML("beforebegin",
+    '<header class="lpBar" id="lpBar"><button type="button" class="lpIcono" id="lpMenuBtn" aria-label="Abrir el menú" aria-controls="barra" aria-expanded="false">'+LP_SVG(LP_ICO.menu)+'</button>'+
+    '<button type="button" class="lpIcono" id="lpAtras" aria-label="Volver a Mesas" hidden>'+LP_SVG(LP_ICO.atras)+'</button>'+
+    '<div class="lpTitulo"><h1 id="lpTitulo">Nuvoor Restaurant</h1><small id="lpSub"></small></div>'+
+    '<div class="lpAcciones" id="lpAcciones"></div></header>'+
+    '<div class="lpVelo" id="lpVelo" hidden></div>');
+  const acc = lpEl("lpAcciones");
+  /* Mesas: «Para llevar» y un menú ⋮ con lo que antes ocupaba renglones enteros. */
+  const llevar = lpMueve("#mesaRapida", acc);
+  if(llevar){ llevar.classList.add("lpBarBtn"); llevar.dataset.lpEn = "mesas"; llevar.innerHTML = LP_SVG(LP_ICO.bolsa)+'<span>Para llevar</span>'; llevar.setAttribute("aria-label","Venta para llevar"); }
+  acc.insertAdjacentHTML("beforeend",
+    '<span class="lpPopCaja" data-lp-en="mesas"><button type="button" class="lpIcono" id="lpMesasMas" aria-label="Más opciones del salón" aria-haspopup="true" aria-expanded="false" aria-controls="lpMesasPop">'+LP_SVG(LP_ICO.mas)+'</button>'+
+    '<div class="lpPop" id="lpMesasPop" role="menu" aria-label="Opciones del salón" hidden><p class="lpPopTit" id="lpAppsTit">Pedido por app</p></div></span>');
+  const pop = lpEl("lpMesasPop");
+  lpMueve("#appsFila", pop);
+  pop.insertAdjacentHTML("beforeend",'<p class="lpPopTit">El salón</p>');
+  ["#croqAcomodar","#croqJuntar","#croqSeparar"].forEach(s=>{ const b = lpMueve(s, pop); if(b) b.setAttribute("role","menuitem"); });
+  /* Cocina: «Por hacer / Todo» arriba a la derecha. */
+  const kds = lpMueve("#kdsVista", acc); if(kds){ kds.dataset.lpEn = "cocina"; kds.style.marginLeft = ""; }
+  /* El punto móvil activo (eventos) sigue avisando arriba. */
+  const ctx = lpMueve("#btnContextoPOS", acc); if(ctx) ctx.dataset.lpEn = "*";
+
+  /* El cajón es la misma barra lateral: arriba el negocio, quién está y el candado; abajo la cuenta. */
+  const barra = lpEl("barra");
+  barra.setAttribute("aria-label","Menú");
+  barra.insertAdjacentHTML("afterbegin",
+    '<div class="lpCajonTop"><div class="lpCajonFila"><div class="lpNegocioCaja" id="lpNegocioCaja"></div>'+
+    '<button type="button" class="lpCandado" id="lpCandado" aria-label="Bloquear la pantalla" title="Bloquear la pantalla">'+LP_SVG(LP_ICO.candado)+'</button></div>'+
+    '<button type="button" class="lpQuien" id="lpQuien" aria-label="Cambiar de usuario"><b id="lpQuienNombre"></b><small id="lpQuienRol"></small></button>'+
+    '<div class="lpTurno" id="lpTurno"></div></div>');
+  const top = barra.querySelector(".barraTop"); if(top) lpEl("lpNegocioCaja").append(top);
+  const franja = barra.querySelector(".barraCmyk"); if(franja) barra.prepend(franja);
+  lpMueve("#turnoChip", lpEl("lpTurno"));
+  const pie = barra.querySelector(".barraPie");
+  pie.insertAdjacentHTML("afterbegin",'<div class="lpCuenta" id="lpCuenta"></div>');
+  const cuenta = lpEl("lpCuenta");
+  ["#pwaInstall","#restaurantChangePOS","#restaurantSignOut"].forEach(s=>{ const b = lpMueve(s, cuenta); if(b){ b.classList.add("lpCajonItem"); b.style.marginLeft = ""; } });
+  lpMueve("#restaurantSync", cuenta);
+  const cinta = document.querySelector(".cxCinta");
+  if(cinta){ cinta.classList.add("lpCinta"); pie.prepend(cinta); }
+
+  lpEl("lpMenuBtn").addEventListener("click", ()=> document.body.classList.contains("lpCajon") ? lpCierraCajon() : lpAbreCajon());
+  lpEl("lpVelo").addEventListener("click", lpCierraCajon);
+  /* Al bloquear, el foco sale del cajón: si se queda en un botón escondido, «Enter» no llega al teclado de la puerta. */
+  lpEl("lpCandado").addEventListener("click", ()=>{ lpCierraCajon(false); lpEl("lpCandado").blur(); lpEl("btnBloquea").click(); });
+  lpEl("lpQuien").addEventListener("click", ()=>{ lpCierraCajon(false); lpEl("userChip").click(); });
+  lpEl("lpAtras").addEventListener("click", ()=> lpEl("comVolver").click());
+  barra.addEventListener("click", e=>{ if(e.target.closest("[data-tab], .lpCajonItem, #cxReiniciar")) lpCierraCajon(false); });
+  document.addEventListener("keydown", e=>{
+    if(e.key !== "Escape") return;
+    if(document.querySelector(".lpPop:not([hidden])")){ lpCierraPops(true); return; }
+    if(document.body.classList.contains("lpVerCuenta")){ lpCuentaCel(false); return; }
+    if(document.body.classList.contains("lpCajon")) lpCierraCajon();
+  });
+  /* Menús ⋮ */
+  document.addEventListener("click", e=>{
+    const b = e.target.closest("[aria-haspopup][aria-controls]");
+    if(b && b.closest(".lpPopCaja")){ const p = lpEl(b.getAttribute("aria-controls")); const abrir = p.hidden; lpCierraPops(); if(abrir) lpAbrePop(b, p); return; }
+    if(e.target.closest(".lpPop button, .lpPop a")){ setTimeout(()=>lpCierraPops(), 0); return; }
+    if(!e.target.closest(".lpPop")) lpCierraPops();
+  });
+}
+function lpAbreCajon(){
+  lpFocoCajon = document.activeElement;
+  lpPintaCajon();
+  lpEl("barra").scrollTop = 0;
+  document.body.classList.add("lpCajon");
+  lpEl("lpVelo").hidden = false;
+  lpEl("lpMenuBtn").setAttribute("aria-expanded","true");
+  const sel = lpEl("barra").querySelector('#tabs [aria-selected="true"]') || lpEl("barra").querySelector("#tabs button");
+  setTimeout(()=> sel && sel.focus({preventScroll:true}), 30);
+}
+function lpCierraCajon(regresaFoco = true){
+  if(!document.body.classList.contains("lpCajon")) return;
+  document.body.classList.remove("lpCajon");
+  lpEl("lpVelo").hidden = true;
+  lpEl("lpMenuBtn").setAttribute("aria-expanded","false");
+  if(regresaFoco) (lpFocoCajon && lpFocoCajon.isConnected ? lpFocoCajon : lpEl("lpMenuBtn")).focus();
+}
+function lpPintaCajon(){
+  const u = usuarioActual();
+  lpEl("lpQuienNombre").textContent = u.nombre || "Administrador";
+  lpEl("lpQuienRol").textContent = (ROLES[u.rol] || ROLES.gerente).nombre + " · Cambiar de usuario";
+}
+function lpAbrePop(b, p){
+  p.hidden = false; b.setAttribute("aria-expanded","true");
+  const primero = [...p.querySelectorAll("button")].find(x=>!x.hidden && !x.disabled && x.offsetParent);
+  if(primero) primero.focus();
+}
+function lpCierraPops(regresaFoco){
+  document.querySelectorAll(".lpPop:not([hidden])").forEach(p=>{
+    p.hidden = true;
+    const b = document.querySelector('[aria-controls="'+p.id+'"]');
+    if(b){ b.setAttribute("aria-expanded","false"); if(regresaFoco) b.focus(); }
+  });
+}
+
+/* ---------- el título de arriba sigue a la vista ---------- */
+function lpPintaBarra(){
+  const k = lpVista();
+  let t = LP_TITULOS[k] || "Nuvoor Restaurant", sub = "";
+  const head = document.querySelector("#tab-"+k+" .pageHeading h1");
+  if(head && head.textContent.trim()) t = head.textContent.trim();
+  if(k === "mesas"){ t = lpEl("mesasTitulo").textContent || "Mesas"; sub = lpEl("mesasResumen").textContent; }
+  if(k === "comanda"){
+    t = lpEl("comTitulo").textContent || "Cuenta";
+    sub = [lpEl("comPersonas").textContent, lpEl("comResponsable").hidden ? "" : lpEl("comResponsable").textContent].filter(Boolean).join(" · ");
+  }
+  if(k === "caja") sub = lpEl("cajaHint").textContent;
+  if(k === "cocina") sub = lpEl("kdsResumen").textContent;
+  lpEl("lpTitulo").textContent = t;
+  lpEl("lpSub").textContent = sub; lpEl("lpSub").hidden = !sub;
+  lpEl("lpAtras").hidden = k !== "comanda";
+  lpEl("lpMenuBtn").hidden = k === "comanda";
+  document.body.dataset.lpVista = k;
+  lpEl("lpAcciones").querySelectorAll(":scope > [data-lp-en]").forEach(n=>{
+    if(n.dataset.lpEn === "*") return;
+    n.classList.toggle("lpFuera", n.dataset.lpEn !== k);
+  });
+  if(k === "mesas") lpUbicaSalon();
+  /* El ⋮ del salón sólo aparece si tiene algo que ofrecer a este perfil. */
+  const pop = lpEl("lpMesasPop");
+  if(pop){
+    const apps = lpEl("appsFila"), hayApps = apps && !apps.hidden && apps.children.length;
+    lpEl("lpAppsTit").hidden = !hayApps;
+    const salon = ["croqAcomodar","croqJuntar","croqSeparar"].some(id=>lpEl(id) && !lpEl(id).hidden);
+    pop.querySelectorAll(".lpPopTit")[1].hidden = !salon;
+    pop.closest(".lpPopCaja").classList.toggle("lpVacio", !hayApps && !salon);
+  }
+  /* Al salir de la venta se olvida la categoría: cada vez que se entra a una mesa empieza en las categorías. */
+  if(k !== "comanda"){ lpCuentaCel(false); lpComandaVista = null; }
+}
+
+/* Acomodando o juntando mesas, «Listo, ya quedó» y la pista se quedan a la vista; si no, van al ⋮. */
+function lpUbicaSalon(){
+  const editando = !!(modoAcomodo || modoJuntar);
+  document.body.classList.toggle("lpEditandoSalon", editando);
+  const barra = document.querySelector("#tab-mesas .croqBarra"), pop = lpEl("lpMesasPop");
+  ["croqAcomodar","croqJuntar","croqSeparar"].forEach(id=>{
+    const b = lpEl(id); if(!b) return;
+    if(editando && b.parentElement !== barra) barra.insertBefore(b, lpEl("croqPista"));
+    if(!editando && b.parentElement !== pop){ pop.append(b); }
+    if(editando) b.removeAttribute("role"); else b.setAttribute("role","menuitem");
+  });
+}
+
+/* ---------- la venta: cuadrícula de platillos y el ticket a la derecha ---------- */
+function lpMontaVenta(){
+  const sec = lpEl("tab-comanda");
+  const ticket = sec.querySelector(".ticket");
+  const cab = ticket.querySelector("header");
+  cab.querySelector("h2").textContent = "Cuenta";
+  cab.insertAdjacentHTML("beforeend",
+    '<span class="lpPopCaja"><button type="button" class="lpIcono" id="lpCuentaMas" aria-label="Más opciones de la cuenta" aria-haspopup="true" aria-expanded="false" aria-controls="lpCuentaPop">'+LP_SVG(LP_ICO.mas)+'</button>'+
+    '<div class="lpPop" id="lpCuentaPop" role="menu" aria-label="Opciones de la cuenta" hidden></div></span>'+
+    '<button type="button" class="lpIcono lpSoloCel" id="lpCierraCuenta" aria-label="Volver a los platillos">'+LP_SVG(LP_ICO.cerrar)+'</button>');
+  cab.insertAdjacentHTML("afterend",'<div class="lpComensal"><label for="lpComensal">Para</label><select id="lpComensal"></select></div>');
+  const pop = lpEl("lpCuentaPop");
+  ["#comGente","#comTrasladar","#comClienteEditar","#comCancelar"].forEach(s=>{ const b = lpMueve(s, pop); if(b){ b.setAttribute("role","menuitem"); b.style.marginLeft = ""; } });
+  lpEl("comGente").textContent = "Comensales";
+  /* Arriba de la cuadrícula: categoría y búsqueda, en un solo renglón. */
+  lpEl("comCats").insertAdjacentHTML("beforebegin",
+    '<div class="lpCartaBarra"><button type="button" class="lpIcono lpVolverCat" id="lpVolverCat" aria-label="Ver las categorías" hidden>'+LP_SVG(LP_ICO.atras)+'</button>'+
+    '<label class="lpCatSel"><span class="lpOculto">Categoría</span><select id="lpCat" aria-label="Categoría"></select></label>'+
+    '<label class="lpBusca">'+LP_SVG(LP_ICO.busca)+'<span class="lpOculto">Buscar platillo</span><input id="lpBusca" type="search" placeholder="Buscar platillo" autocomplete="off"></label></div>');
+  lpEl("lpCat").addEventListener("change", e=>{ lpCat = e.target.value; lpCarta(); });
+  lpEl("lpVolverCat").addEventListener("click", ()=>{ lpCat = ""; lpBusca = ""; lpEl("lpBusca").value = ""; lpCarta(); const f = document.querySelector("#comPlatillos .lpCatFicha"); if(f) f.focus(); });
+  /* Tocar una categoría abre sus platillos. */
+  lpEl("comPlatillos").addEventListener("click", e=>{
+    const b = e.target.closest("[data-lp-cat]"); if(!b) return;
+    lpCat = b.dataset.lpCat; lpCarta();
+    const f = document.querySelector("#comPlatillos .lpFicha:not([disabled])"); if(f) f.focus({preventScroll:true});
+  });
+  lpEl("lpBusca").addEventListener("input", e=>{ lpBusca = e.target.value; lpCarta(); });
+  lpEl("lpComensal").addEventListener("change", e=>{ comensalVista = num(e.target.value); renderComanda(); });
+  /* En el celular el ticket es una hoja: abajo queda una barra con el total. */
+  sec.insertAdjacentHTML("beforeend",
+    '<div class="lpTicketBarra" id="lpTicketBarra"><button type="button" class="btn lpVerCuenta" id="lpVerCuentaBtn"><span id="lpTicketCuenta">Cuenta</span><b id="lpTicketTotal">$0.00</b></button></div>');
+  lpEl("lpVerCuentaBtn").addEventListener("click", ()=> lpCuentaCel(true));
+  lpEl("lpCierraCuenta").addEventListener("click", ()=> lpCuentaCel(false));
+  /* Las acciones de cada platillo aparecen al tocarlo, como en Loyverse. */
+  lpEl("comLineas").addEventListener("click", e=>{
+    if(e.target.closest("button")) return;
+    const l = e.target.closest(".lin[data-lin]"); if(!l) return;
+    lpLinea = lpLinea === l.dataset.lin ? "" : l.dataset.lin;
+    lpMarcaLinea();
+  });
+  lpEl("comLineas").addEventListener("keydown", e=>{
+    if(e.key !== "Enter" && e.key !== " ") return;
+    const l = e.target.closest(".lin[data-lin]"); if(!l || e.target !== l) return;
+    e.preventDefault(); l.click();
+  });
+}
+function lpCuentaCel(abrir){
+  document.body.classList.toggle("lpVerCuenta", !!abrir && lpCel());
+  if(abrir && lpCel()){ lpEl("comLineas").scrollTop = 0; setTimeout(()=> lpEl("lpCierraCuenta").focus(), 30); }
+  else if(abrir === false && document.activeElement && document.activeElement.closest && document.activeElement.closest(".ticket")) lpEl("lpVerCuentaBtn").focus();
+}
+const lpFotoOk = f => typeof f === "string" && /^(data:image\/(jpeg|png|webp);base64,|blob:|https?:|\.\.\/)/.test(f);
+function lpCarta(){
+  const c = comandaActual(); if(!c) return;
+  /* Cada mesa que se abre empieza en las categorías. */
+  if(c.id !== lpComandaVista){ lpComandaVista = c.id; lpCat = ""; lpBusca = ""; lpEl("lpBusca").value = ""; }
+  const cats = (MENU.cats||[]).slice().sort((a,b)=>num(a.orden)-num(b.orden));
+  if(lpCat && lpCat !== "*" && !cats.some(x=>x.id === lpCat)) lpCat = "";
+  const corto = matchMedia("(max-width: 479px)").matches;
+  const sel = lpEl("lpCat");
+  sel.innerHTML = '<option value="">Categorías</option><option value="*">'+(corto ? "Todos" : "Todos los platillos")+'</option>' +
+    cats.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.nombre)+'</option>').join("");
+  sel.value = lpCat;
+  const q = lpBusca.trim().toLocaleLowerCase();
+  lpEl("lpVolverCat").hidden = !lpCat && !q;
+  const caja = lpEl("comPlatillos");
+  caja.classList.toggle("lpEnCategorias", !lpCat && !q);
+  if(!lpCat && !q){
+    const conPlatillos = cats.filter(x=>(MENU.plats||[]).some(p=>p.catId === x.id));
+    caja.innerHTML = conPlatillos.map(x=>{
+      const n = (MENU.plats||[]).filter(p=>p.catId === x.id).length;
+      const foto = lpFotoOk(x.foto) ? '<img src="'+esc(x.foto)+'" alt="">' : '<i class="lpIco" aria-hidden="true">'+esc(x.icono||iconoSugeridoCategoria(x))+'</i>';
+      return '<button type="button" class="lpFicha lpCatFicha'+(lpFotoOk(x.foto)?" conFoto":"")+'" data-lp-cat="'+esc(x.id)+'" style="--lp-tono:'+lpTono(x.id)+'" aria-label="'+esc(x.nombre)+' · '+n+(n === 1 ? " platillo" : " platillos")+'">'+
+        foto+'<b>'+esc(x.nombre)+'</b><span>'+n+(n === 1 ? " platillo" : " platillos")+'</span></button>';
+    }).join("") || '<div class="empty">El menú todavía no tiene platillos.</div>';
+  }else{
+    const orden = id => { const i = cats.findIndex(x=>x.id === id); return i < 0 ? 99 : i; };
+    const plats = (MENU.plats||[]).filter(p=>(q || lpCat === "*" || p.catId === lpCat) && (!q || String(p.nombre||"").toLocaleLowerCase().includes(q)))
+      .sort((a,b)=>orden(a.catId)-orden(b.catId));
+    caja.innerHTML = plats.map(p=>{
+      const precio = mx(precioFinalPlatillo(p))+(vendePorKilo(p)?" / kg":"");
+      const foto = p.foto ? '<img src="'+esc(p.foto)+'" alt="">' : '<i class="lpIco" aria-hidden="true">'+esc(iconoSugeridoPlatillo(p, cats))+'</i>';
+      return '<button type="button" class="plat lpFicha'+(p.foto?" conFoto":"")+(p.activo===false?" agotado":"")+'" data-plat="'+esc(p.id)+'" style="--lp-tono:'+lpTono(p.catId)+'"'+
+        (p.activo===false?" disabled":"")+' aria-label="Agregar '+esc(p.nombre)+' · '+precio+'">'+foto+'<b>'+esc(p.nombre)+'</b><span>'+precio+'</span></button>';
+    }).join("") || '<div class="empty">'+(q ? "Ningún platillo se llama así." : "Esta categoría no tiene platillos.")+'</div>';
+  }
+  lpMarcaAgotados();
+  /* ¿Para quién es? como lista, igual que «Comer dentro» en Loyverse. */
+  const pc = porComensal(c);
+  const cs = lpEl("lpComensal");
+  cs.innerHTML = pc.lista.map(x=>'<option value="'+x.comensal+'">Comensal '+x.comensal+(x.consumo?' · '+mx(x.consumo):'')+'</option>').join("") +
+    '<option value="0">Para compartir'+(pc.compartido?' · '+mx(pc.compartido):'')+'</option>';
+  cs.value = String(comensalVista);
+}
+function lpMarcaAgotados(){
+  if(typeof cxMarcaAgotados === "function"){ cxMarcaAgotados(); return; }
+  document.querySelectorAll("#comPlatillos .plat").forEach(b=>{
+    const ag = b.classList.contains("agotado"), tag = b.querySelector(".cxAgotadoTag");
+    if(ag && !tag){ b.insertAdjacentHTML("beforeend", '<small class="cxAgotadoTag">Agotado</small>'); b.setAttribute("aria-label", (b.querySelector("b") || {}).textContent+" · agotado"); }
+    if(!ag && tag) tag.remove();
+  });
+}
+const lpEsCocina = () => typeof cxEsCocina === "function" ? cxEsCocina() : rolActual() === "cocina";
+function lpMarcaLinea(){
+  document.querySelectorAll("#comLineas .lin[data-lin]").forEach(l=>{
+    if(!l.hasAttribute("tabindex")){ l.tabIndex = 0; l.setAttribute("role","button"); }
+    const ab = l.dataset.lin === lpLinea && !l.classList.contains("cancelada");
+    l.classList.toggle("lpAbierta", ab);
+    l.setAttribute("aria-expanded", String(ab));
+    const nombre = (l.querySelector("b")||{}).textContent || "platillo";
+    l.setAttribute("aria-label", nombre+" · "+(ab ? "ocultar opciones" : "ver opciones"));
+  });
+}
+function lpPieTicket(){
+  const c = comandaActual(); if(!c) return;
+  const vivasN = (c.lineas||[]).filter(l=>!l.cancelada).reduce((s,l)=>s+(vendePorKilo(l)?1:num(l.cant,1)),0);
+  lpEl("lpTicketCuenta").textContent = "Ver cuenta" + (vivasN ? " · " + vivasN + (vivasN === 1 ? " platillo" : " platillos") : "");
+  lpEl("lpTicketTotal").textContent = mx(sumaComanda(c).total);
+}
+
+/* ---------- El menú y Ajustes: lista a la izquierda, detalle a la derecha ---------- */
+const LP_MENU_PANELES = [
+  {k:"platillos", t:"Platillos", sel:"#tab-menu > .card:has(#menuProductGrid)"},
+  {k:"categorias", t:"Categorías", sel:"#tab-menu > .card:has(#menuCategoryGrid)"},
+  {k:"opciones", t:"Preguntas y opciones", sel:"#menuGruposAdvanced"}
+];
+function lpMontaMenu(){
+  const sec = lpEl("tab-menu");
+  LP_MENU_PANELES.forEach(p=>{ const n = sec.querySelector(p.sel); if(n) n.dataset.lpPanel = p.k; });
+  const adv = lpEl("menuGruposAdvanced"); if(adv) adv.open = true;
+  const guarda = sec.querySelector(":scope > .menuSaveBar"); if(guarda) guarda.classList.add("lpGuardaArriba");
+  /* La ficha del platillo (lo que ya existía) va en su propia columna. */
+  const ficha = document.createElement("div"); ficha.className = "lpFichaCaja";
+  const selBar = lpEl("menuSelectionBar"), tp = lpEl("t_plats");
+  if(selBar && tp){ tp.before(ficha); ficha.append(selBar, tp); }
+  const head = sec.querySelector(".pageHeading");
+  head.insertAdjacentHTML("afterend",
+    '<nav class="lpSubnav" id="lpMenuNav" aria-label="Secciones del menú">'+LP_MENU_PANELES.map(p=>
+      '<button type="button" data-lp-ir="'+p.k+'" aria-pressed="false">'+p.t+'</button>').join("")+'</nav>');
+  sec.addEventListener("click", e=>{
+    const ico = e.target.closest("[data-lp-plat-icon],[data-lp-plat-icon-reset]"); if(!ico) return;
+    const id = ico.dataset.lpPlatIconReset || (document.querySelector("#t_plats .menuItemCard[data-plat]")||{dataset:{}}).dataset.plat;
+    const p = (MENU.plats||[]).find(x=>x.id === id); if(!p) return;
+    if(ico.dataset.lpPlatIcon) p.icono = ico.dataset.lpPlatIcon; else delete p.icono;
+    menuPlatilloActivo = p.id;
+    persist(); renderMenu();
+    toast(ico.dataset.lpPlatIcon ? (p.nombre||"El platillo")+" ya tiene su icono." : (p.nombre||"El platillo")+" usa el icono sugerido.");
+    const det = lpEl("lpIconosPlat"); if(det && ico.dataset.lpPlatIcon) det.open = true;
+    const sel = document.querySelector('#lpIconosPlat [data-lp-plat-icon][aria-pressed="true"]');
+    (sel || document.querySelector("#lpIconosPlat summary") || lpEl("t_plats")).focus();
+  });
+  lpEl("lpMenuNav").addEventListener("click", e=>{
+    const b = e.target.closest("[data-lp-ir]"); if(!b) return;
+    lpMenuPanel = b.dataset.lpIr; lpPintaMenu(); window.scrollTo(0,0);
+  });
+}
+function lpPintaMenu(){
+  const sec = lpEl("tab-menu"); if(!sec) return;
+  sec.querySelectorAll("[data-lp-panel]").forEach(n=> n.classList.toggle("lpFuera", n.dataset.lpPanel !== lpMenuPanel));
+  sec.querySelectorAll("#lpMenuNav [data-lp-ir]").forEach(b=> b.setAttribute("aria-pressed", String(b.dataset.lpIr === lpMenuPanel)));
+  /* Cada platillo de la lista dice su nombre, su categoría y su precio. */
+  const cats = MENU.cats || [];
+  sec.querySelectorAll("#menuProductGrid .menuProductChoice[data-menu-select]").forEach(b=>{
+    if(b.querySelector(".lpProdTxt")) return;
+    const p = (MENU.plats||[]).find(x=>x.id === b.dataset.menuSelect); if(!p) return;
+    const cat = cats.find(c=>c.id === p.catId);
+    b.style.setProperty("--lp-tono", lpTono(p.catId));
+    b.insertAdjacentHTML("beforeend",'<span class="lpProdTxt"><b>'+esc(p.nombre||"Platillo")+'</b><small>'+esc(cat ? cat.nombre : "Sin categoría")+(p.activo===false?" · agotado":"")+'</small></span><span class="lpProdPrecio">'+mx(precioFinalPlatillo(p))+'</span>');
+  });
+  lpIconoFicha();
+}
+/* El icono del platillo: el mismo juego de iconos que ya tienen las categorías. */
+function lpIconoFicha(){
+  const ficha = document.querySelector("#t_plats .menuItemCard[data-plat]"); if(!ficha || ficha.querySelector(".lpIconoPlat")) return;
+  const p = (MENU.plats||[]).find(x=>x.id === ficha.dataset.plat); if(!p) return;
+  const actual = iconoSugeridoPlatillo(p, MENU.cats||[]), elegido = p.icono && MENU_ICONOS.some(([i])=>i === p.icono);
+  const main = ficha.querySelector(".menuItemMain"); if(!main) return;
+  main.insertAdjacentHTML("afterend",
+    '<div class="lpIconoPlat"><span class="lpIconoActual" aria-hidden="true">'+esc(actual)+'</span>'+
+    '<span class="lpIconoTxt"><b>Icono en la venta</b><small>'+(p.foto ? "Con foto se ve la foto; el icono queda de respaldo." : elegido ? "Elegido para este platillo." : "Sugerido por el nombre.")+'</small></span>'+
+    (elegido ? '<button type="button" class="btn sm ghost" data-lp-plat-icon-reset="'+esc(p.id)+'">Usar icono sugerido</button>' : '')+
+    '<details class="menuCategoryIcons lpIconos" id="lpIconosPlat"><summary>Elegir icono</summary><div class="menuIconGrid" role="group" aria-label="Iconos para '+esc(p.nombre)+'">'+
+    MENU_ICONOS.map(([icono,nombre])=>'<button type="button" class="btn sm ghost" data-lp-plat-icon="'+esc(icono)+'" aria-label="'+esc(nombre)+'" title="'+esc(nombre)+'" aria-pressed="'+(elegido && p.icono === icono)+'">'+esc(icono)+'</button>').join("")+
+    '</div></details></div>');
+}
+function lpAjustesDosPaneles(){
+  const dos = lpAncho();
+  lpEl("tab-set").classList.toggle("lpDos", dos);
+  if(dos){
+    lpEl("ajustesMenu").hidden = false;
+    lpEl("ajustesRegreso").hidden = true;
+  }
+  lpEl("ajustesMenu").querySelectorAll("[data-abrir-ajuste]").forEach(b=>{
+    const es = b.dataset.abrirAjuste === ajusteAbierto;
+    if(es) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current");
+  });
+}
+
+/* ---------- Inicio: el mismo tablero que Imprenta («Tu taller hoy»), con su publicidad ---------- */
+const LP_MET_ICO = [
+  '<path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M21 19H3"/>',
+  '<rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  '<path d="M5 3h14v18l-3.5-2-3.5 2-3.5-2L5 21V3z"/><path d="M9 8h6M9 12h6"/>',
+  '<path d="M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10z"/>'
+];
+/* Anuncios de muestra (sólo de Nuvoor). En producción salen del Lab, igual que en Imprenta. */
+const lpArte = (fondo1, fondo2, texto, sub) => "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+fondo1+'"/><stop offset="1" stop-color="'+fondo2+'"/></linearGradient></defs>'+
+  '<rect width="640" height="320" fill="url(#g)"/><circle cx="560" cy="60" r="120" fill="#fff" opacity=".08"/><circle cx="600" cy="280" r="90" fill="#fff" opacity=".06"/>'+
+  '<text x="44" y="150" font-family="Inter,Arial,sans-serif" font-size="54" font-weight="800" fill="#fff">'+texto+'</text>'+
+  '<text x="46" y="200" font-family="Inter,Arial,sans-serif" font-size="24" fill="#fff" opacity=".92">'+sub+'</text></svg>');
+const LP_ANUN_MUESTRA = [
+  {titulo:"Nexus contesta los mensajes de tu restaurante mientras cocinas", imagen:lpArte("#4C4780","#4458A4","Nexus","WhatsApp y Messenger, sin pausa"), cta:"Conoce Nexus"},
+  {titulo:"¿También vendes en tienda? Nuvoor Store cobra con lector y cuida tu inventario", imagen:lpArte("#176C98","#1F5F8B","Nuvoor Store","Caja, lector e inventario"), cta:"Conoce Nuvoor Store"},
+  {titulo:"Tu marca aquí: llega a los restaurantes de tu ciudad", imagen:lpArte("#0F766E","#176C98","Anúnciate aquí","Restaurantes de Morelia"), cta:"Conoce esta propuesta"}
+];
+/* Si el Lab todavía no tiene anuncios para restaurant, el espacio se ofrece a anunciantes (es de Nuvoor). */
+const LP_ANUN_CASA = [{titulo:"Tu marca aquí: llega a los restaurantes de tu ciudad", imagen:lpArte("#0F766E","#176C98","Anúnciate aquí","Publicidad en Nuvoor"), cta:"Conoce esta propuesta", enlace:"https://nuvoor.mx"}];
+function lpAnuncios(){
+  const reales = (window.__ANUNCIOS_REST || []).filter(a=>{
+    if(!a || !a.imagen) return false;
+    const l = a.lugar || "cotizador"; if(l === "bloqueo") return false;
+    const g = a.giros || []; return !g.length || g.indexOf("restaurant") >= 0;
+  });
+  if(reales.length) return reales;
+  const puerta = typeof anunciosDe === "function" ? anunciosDe() : [];
+  if(puerta.length) return puerta;
+  return LP_MAQUETA ? LP_ANUN_MUESTRA : LP_ANUN_CASA;
+}
+function lpMontaInicio(){
+  const sec = lpEl("tab-inicio"); if(!sec) return;
+  sec.classList.add("lpTablero");
+  const tema = '<button type="button" class="nvTheme" data-restaurant-theme aria-pressed="false" aria-label="Activar modo oscuro">'+
+    '<svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></svg>'+
+    '<svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg></button>';
+  sec.insertAdjacentHTML("afterbegin",
+    '<header class="nvHeader"><div class="nvHeading"><img class="nvLogo" id="lpInLogo" src="../marca/n-64.png" alt="">'+
+    '<div><p class="nvDate" id="lpInFecha"></p><h1 id="lpInTitulo">Tu restaurante hoy</h1><p class="nvSub" id="lpInSub">Primero lo que necesita tu atención.</p></div></div>'+
+    '<div class="nvHeadTools"><div class="nvActions" id="lpInAcciones"></div>'+tema+'</div></header>');
+  const acc = lpEl("lpInAcciones");
+  ["#inicioVerMesas","#inicioCaja","#inicioVentaRapida"].forEach(id=>{ const b = lpMueve(id, acc); if(b) b.classList.add("nvBtn"); });
+  lpEl("inicioVentaRapida").classList.add("nvPrimary");
+  /* El orden de Imprenta: encabezado, indicadores, pendientes con publicidad, y lo demás abajo. */
+  const tiles = lpEl("inTiles"), hoy = lpEl("cxHoy") || lpCreaHoy(), guia = lpEl("eventPosGuide");
+  hoy.classList.add("lpHoy");
+  tiles.classList.add("nvMetrics");
+  sec.querySelector(".nvHeader").after(guia, tiles, hoy);
+  const grid = hoy.querySelector(".cxHoyGrid");
+  grid.classList.add("nvMain");
+  const aten = grid.querySelector(".card:not(#cxEquipoCard)");
+  if(aten){
+    aten.classList.add("lpAtencion");
+    const h = aten.querySelector("header h2"); if(h) h.textContent = "Qué necesita atención";
+    const hint = lpEl("cxAtencionHint") || lpEl("lpAtencionHint"); if(hint) hint.insertAdjacentHTML("beforebegin",'<p class="lpAtenSub">Abre cada pendiente y continúa desde ahí.</p>');
+  }
+  aten.insertAdjacentHTML("afterend",
+    '<aside class="lpAnuncios" id="lpAnuncios" aria-label="Publicidad" aria-roledescription="carrusel">'+
+    '<div class="anunTop"><span class="anunSello" id="lpAnunSello">Publicidad</span><div class="anunFlechas">'+
+    '<button type="button" id="lpAnunAnt" aria-label="Anuncio anterior">‹</button><button type="button" id="lpAnunSig" aria-label="Anuncio siguiente">›</button></div></div>'+
+    '<div class="lpAnunPieza" id="lpAnunPieza" aria-live="polite"></div><p class="lpAnunCuenta" id="lpAnunCuenta"></p></aside>');
+  lpEl("lpAnunAnt").addEventListener("click", ()=>{ lpPonAnuncio(-1); if(!lpEl("lpAnuncios").matches(":hover")) lpRelojAnuncios(); });
+  lpEl("lpAnunSig").addEventListener("click", ()=>{ lpPonAnuncio(1); if(!lpEl("lpAnuncios").matches(":hover")) lpRelojAnuncios(); });
+  const resto = sec.querySelector(":scope > .grid.g2"); if(resto) resto.classList.add("nvCharts");
+  /* Abajo: eventos y la app para Android. */
+  sec.insertAdjacentHTML("beforeend",'<div class="lpInicioMas" id="lpInicioMas"></div>');
+  const mas = lpEl("lpInicioMas");
+  lpMueve("#inicioEventos", mas);
+  sec.querySelectorAll(".androidApkLink").forEach(a=>mas.append(a));
+  lpEl("lpAnuncios").addEventListener("mouseenter", ()=>{ if(lpAnunReloj){ clearInterval(lpAnunReloj); lpAnunReloj = null; } });
+  lpEl("lpAnuncios").addEventListener("mouseleave", lpRelojAnuncios);
+  document.addEventListener("click", e=>{ if(e.target.closest("[data-restaurant-theme]")) setTimeout(lpPintaTema, 0); });
+  lpPonAnuncio(0); lpRelojAnuncios(); lpPintaTema();
+}
+/* Sin Personal (producción hoy): los pendientes salen de lo que ya sabe el Restaurant. Con Personal, los pinta claude.js (cxPintaHoy). */
+let lpHoyAcciones = [];
+function lpCreaHoy(){
+  const sec = lpEl("tab-inicio");
+  sec.insertAdjacentHTML("beforeend",
+    '<section class="cxHoy lpHoyPropio" id="lpHoy" aria-labelledby="lpAtencionTitulo"><div class="cxHoyGrid solo"><div class="card"><header><h2 id="lpAtencionTitulo">Qué necesita atención</h2>'+
+    '<span class="hint" id="lpAtencionHint"></span></header><div class="body"><ul class="cxLista" id="lpAtencion"></ul></div></div></div></section>');
+  lpEl("lpAtencion").addEventListener("click", e=>{
+    const b = e.target.closest("[data-lp-accion]"); if(!b) return;
+    const f = lpHoyAcciones[Number(b.dataset.lpAccion)]; if(f) f();
+  });
+  return lpEl("lpHoy");
+}
+function lpPintaHoy(){
+  const lista = lpEl("lpAtencion"); if(!lista) return;
+  const items = [];
+  if(puedeVer("mesas")) abiertas().filter(c=>c.estado === "cuenta").forEach(c=>items.push({area:"Servicio", tono:"warn", t:(c.mesaNombre||"Una mesa")+" pidió la cuenta",
+    d:(c.mesero ? c.mesero+" · " : "")+mx(sumaComanda(c).total)+" · abrió a las "+c.abre, b:"Cobrar", a:()=>{ comandaId = c.id; vaA("comanda"); renderComanda(); }}));
+  const enCocina = porHacer().length;
+  if(enCocina && puedeVer("cocina")) items.push({area:"Cocina", t:enCocina+(enCocina === 1 ? " pedido por preparar" : " pedidos por preparar"),
+    d:"Comandas enviadas a cocina que todavía no están listas.", b:"Ver cocina", a:()=>vaA("cocina")});
+  if(puedeVer("caja") && !turnoAbierto()) items.push({area:"Caja", tono:"warn", t:"La caja está cerrada",
+    d:"Ábrela antes de registrar el primer cobro del día.", b:"Abrir caja", a:()=>vaA("caja")});
+  const abiertasN = abiertas().filter(c=>c.estado !== "cuenta").length;
+  if(abiertasN && puedeVer("mesas")) items.push({area:"Servicio", t:abiertasN+(abiertasN === 1 ? " mesa en servicio" : " mesas en servicio"),
+    d:"Cuentas abiertas que todavía no piden la cuenta.", b:"Ver el salón", a:()=>vaA("mesas")});
+  lpHoyAcciones = items.map(x=>x.a);
+  lista.innerHTML = items.length ? items.map((x,i)=>
+    '<li class="cxItem'+(x.tono ? " "+x.tono : "")+'"><span class="cxArea">'+esc(x.area)+'</span><span class="cxTexto"><b>'+esc(x.t)+'</b><small>'+esc(x.d)+'</small></span>'+
+    '<span class="cxItemAcc"><button type="button" class="btn sm'+(x.tono === "warn" ? " primary" : " ghost")+'" data-lp-accion="'+i+'">'+esc(x.b)+'</button></span></li>').join("")
+    : '<li class="cxVacio">Todo en orden. No hay pendientes por ahora.</li>';
+  lpEl("lpAtencionHint").textContent = items.length ? items.length+" por revisar" : "al día";
+}
+function lpPintaTema(){
+  const b = document.querySelector("#tab-inicio .nvTheme"); if(!b) return;
+  b.setAttribute("aria-pressed", String(document.documentElement.getAttribute("data-theme") === "dark"));
+}
+function lpPonAnuncio(paso){
+  const lista = lpAnuncios(), caja = lpEl("lpAnunPieza"); if(!caja) return;
+  lpAnunIdx = (lpAnunIdx + paso + lista.length) % lista.length;
+  const a = lista[lpAnunIdx], muestra = lista === LP_ANUN_MUESTRA;
+  lpEl("lpAnunSello").textContent = muestra ? "Publicidad · Muestra" : "Publicidad";
+  const cuerpo = '<img class="nvAdImage" src="'+esc(a.imagen)+'" alt="'+esc(a.alt||a.titulo||"Anuncio")+'">'+
+    '<span class="nvAdBody"><b class="nvAdTitulo">'+esc(a.titulo||"")+'</b><span class="nvAdCta">'+esc(a.cta||"Conoce esta propuesta")+'</span></span>';
+  caja.innerHTML = a.enlace
+    ? '<a class="nvAdPiece" href="'+esc(a.enlace)+'" target="_blank" rel="noopener noreferrer nofollow sponsored">'+cuerpo+'</a>'
+    : '<div class="nvAdPiece">'+cuerpo+'</div>';
+  lpEl("lpAnunCuenta").textContent = (lpAnunIdx + 1) + " de " + lista.length;
+  const flechas = lista.length > 1; lpEl("lpAnunAnt").hidden = !flechas; lpEl("lpAnunSig").hidden = !flechas;
+  if(a.id){ try{ if(typeof window.__anuncioMarca === "function") window.__anuncioMarca(a.id, "vista"); }catch(_){} }
+}
+function lpRelojAnuncios(){
+  if(lpAnunReloj) clearInterval(lpAnunReloj);
+  lpAnunReloj = null;
+  if(lpAnuncios().length > 1 && !matchMedia("(prefers-reduced-motion: reduce)").matches)
+    lpAnunReloj = setInterval(()=>{ if(lpVista() === "inicio") lpPonAnuncio(1); }, 8000);
+}
+function lpPintaInicio(){
+  if(!lpEl("lpInFecha")) return;
+  const d = new Date();
+  lpEl("lpInFecha").textContent = d.toLocaleDateString("es-MX",{weekday:"long", day:"numeric", month:"long"});
+  lpEl("lpInTitulo").textContent = POS_EVENTO ? "Tu evento hoy" : "Tu restaurante hoy";
+  lpEl("lpInSub").textContent = POS_EVENTO ? "Punto móvil: " + POS_EVENTO.nombre : "Primero lo que necesita tu atención.";
+  lpEl("lpInLogo").src = (P.negocio && P.negocio.logo) || "../marca/n-64.png";
+  document.querySelectorAll("#inTiles .tile").forEach((t,i)=>{
+    t.classList.add("nvMetric");
+    if(!t.querySelector(".nvMetricIcon") && LP_MET_ICO[i]) t.insertAdjacentHTML("afterbegin",'<span class="nvMetricIcon" aria-hidden="true">'+LP_SVG(LP_MET_ICO[i])+'</span>');
+  });
+  lpPintaTema();
+  lpPintaHoy();
+}
+
+/* ---------- ganchos (sólo agregan; lo de adentro es el Restaurant) ---------- */
+const lpCargaAnunciosBase = cargaAnuncios;
+cargaAnuncios = async function(){ await lpCargaAnunciosBase(); if(lpEl("lpAnunPieza")){ lpAnunIdx = 0; lpPonAnuncio(0); lpRelojAnuncios(); } };
+const lpRenderInicioBase = renderInicio;
+renderInicio = function(){ lpRenderInicioBase(); lpPintaInicio(); };
+const lpVaABase = vaA;
+vaA = function(k){ lpVaABase(k); lpPintaBarra(); };
+const lpRenderMesasBase = renderMesas;
+renderMesas = function(){ lpRenderMesasBase(); if(lpEl("lpBar")) lpPintaBarra(); };
+const lpRenderCroquisBase = renderCroquis;
+renderCroquis = function(){ lpRenderCroquisBase(); if(lpEl("lpMesasPop")) lpUbicaSalon(); };
+const lpRenderComandaBase = renderComanda;
+renderComanda = function(){ lpRenderComandaBase(); if(!lpEl("lpCat")) return; lpCarta(); lpPintaBarra(); };
+const lpPintaLineasBase = pintaLineas;
+pintaLineas = function(){ lpPintaLineasBase(); if(!lpEl("lpTicketBarra")) return; lpMarcaLinea(); lpPieTicket(); };
+const lpRenderCajaBase = renderCaja;
+renderCaja = function(){ lpRenderCajaBase(); if(lpEl("lpBar")) lpPintaBarra(); };
+const lpRenderCocinaBase = renderCocina;
+renderCocina = function(){ lpRenderCocinaBase(); if(lpEl("lpBar") && lpVista() === "cocina") lpPintaBarra(); };
+const lpRenderMenuBase = renderMenu;
+renderMenu = function(){ lpRenderMenuBase(); if(lpEsCocina()) lpMenuPanel = "platillos"; lpPintaMenu(); if(lpEl("lpBar")) lpPintaBarra(); };
+const lpVistaAjustesBase = pintaVistaAjustes;
+pintaVistaAjustes = function(){
+  if(lpAncho() && !ajusteAbierto){
+    const primero = [...lpEl("ajustesMenu").querySelectorAll("[data-abrir-ajuste]")][0];
+    if(primero) ajusteAbierto = primero.dataset.abrirAjuste;
+  }
+  lpVistaAjustesBase();
+  lpAjustesDosPaneles();
+};
+const lpPintaTabsBase = pintaTabs;
+pintaTabs = function(){
+  lpPintaTabsBase();
+  const menu = document.querySelector('#tabs [data-tab="menu"]');
+  if(menu && !document.getElementById("cxGrupoAdmin") && !lpEl("lpGrupoAdmin")){
+    const g = document.createElement("div");
+    g.className = "barraGrupo cxGrupo"; g.id = "lpGrupoAdmin"; g.setAttribute("role","presentation"); g.textContent = "Administración";
+    menu.before(g);
+  }
+  if(lpEl("lpQuienNombre")) lpPintaCajon();
+};
+
+/* ---------- arranque ---------- */
+function lpArranca(){
+  lpMenuMuestra();
+  lpMontaCascaron();
+  lpMontaVenta();
+  lpMontaMenu();
+  lpMontaInicio();
+  addEventListener("resize", ()=>{
+    if(lpVista() === "set") pintaVistaAjustes();
+    if(!lpCel()) lpCuentaCel(false);
+  });
+  /* En la maqueta el Restaurant ya arrancó; en producción start() hace el primer vaA y la barra se pinta ahí. */
+  if(LP_MAQUETA){ const k = lpVista() || "mesas"; if(document.body.classList.contains("sin-acceso")) lpPintaBarra(); else vaA(k); }
+  window.__lpListo = true;
+}
+try{ lpArranca(); }catch(e){ console.error(e); const t = document.createElement("p"); t.className = "cxError"; t.textContent = "La maqueta limpia no pudo arrancar: "+e.message; document.body.prepend(t); }
+/* <</LIMPIO>> */
 iniciaRestaurant();
 })();
 </script>
