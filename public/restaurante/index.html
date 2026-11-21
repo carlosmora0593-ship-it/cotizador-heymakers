@@ -11022,6 +11022,34 @@ function ponAnuncioBloqueo(){
   }
 }
 function paraAnuncioBloqueo(){ if(anunBloqReloj){ clearInterval(anunBloqReloj); anunBloqReloj = null; } }
+/* ---------------- anuncios del Lab ----------------
+   Los anuncios son de Nuvoor (tabla "anuncios" del Lab), no del negocio.
+   Imprenta los lee con cuenta.js, pero el Restaurant no carga cuenta.js:
+   window.__anuncios nunca existia aqui y no llegaba ningun anuncio.
+   Se leen con la llave publica, igual para el dueno que para el personal
+   (su conexion sólo deja leer "documentos"); la base sólo deja ver los
+   activos y vigentes. */
+if(typeof window.__anuncios !== "function") window.__anuncios = async function(){
+  if(!window.CONFIG || !CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY || !navigator.onLine) return [];
+  try{
+    const u = String(CONFIG.SUPABASE_URL).replace(/\/+$/,"")+"/rest/v1/anuncios?select=id,titulo,imagen,enlace,alt,lugar,interna,giros,estados&order=orden.asc,id.asc";
+    const r = await restaurantWithTimeout(fetch(u,{headers:{apikey:CONFIG.SUPABASE_ANON_KEY,Authorization:"Bearer "+CONFIG.SUPABASE_ANON_KEY},cache:"no-store"}),8000);
+    if(!r.ok) return [];
+    const data = await r.json();
+    /* El Restaurant todavia no sabe en que estado esta: lo segmentado por estado no sale aqui. */
+    return Array.isArray(data) ? data.filter(a=>a && !(a.estados||[]).length) : [];
+  }catch(e){ return []; }
+};
+/* Contar la vista: la base sólo acepta a los miembros del negocio (el dueno y
+   su equipo con cuenta), asi que el personal con acceso de trabajo no cuenta. */
+if(typeof window.__anuncioMarca !== "function") window.__anuncioMarca = function(id, tipo){
+  if(!id || !RESTAURANT_SB || typeof RESTAURANT_SB.rpc !== "function" || !RESTAURANT_ACCOUNT || RESTAURANT_ACCOUNT.localOnly || RESTAURANT_ACCOUNT.personal) return;
+  try{
+    RESTAURANT_SB.rpc("anuncio_registra",{p_id:id,p_tipo:tipo,p_cuenta:RESTAURANT_ACCOUNT.accountId,p_evento:crypto.randomUUID()}).then(
+      r=>{ if(r && r.error) console.warn("No se pudo contar el anuncio", id, r.error.message); },
+      e=>{ console.warn("No se pudo contar el anuncio", id, e && e.message); });
+  }catch(e){}
+};
 async function cargaAnuncios(){
   try{
     if(typeof window.__anuncios === "function") window.__ANUNCIOS_REST = await window.__anuncios();

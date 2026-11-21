@@ -1,5 +1,5 @@
-// Sello Restaurant: 20261121-1445
-const CACHE_NAME = "nuvoor-restaurant-v57-limpio";
+// Sello Restaurant: 20261121-1710
+const CACHE_NAME = "nuvoor-restaurant-v58-anuncios";
 const MEDIOS_CACHE = "nuvoor-restaurant-medios-v1";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
