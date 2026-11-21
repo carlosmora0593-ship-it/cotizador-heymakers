@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#F2F6FB">
+<title>Acceso de empleados · Nuvoor</title>
+<link rel="icon" href="../marca/n-64.png">
+<script>
+/* El acceso de empleados para todo Nuvoor: entran con el correo con el que
+   los invitó su jefe y la página los lleva al sistema que contrató ese
+   negocio (Imprenta, Restaurant o Store). Mismo tema de día y de noche. */
+(function(){ var t = null; try{ t = localStorage.getItem("nuvoor_restaurant_tema"); }catch(e){}
+  var oscuro = t ? t === "dark" : !!(window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+  document.documentElement.dataset.theme = oscuro ? "dark" : "day";
+  var m = document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content", oscuro ? "#0C1220" : "#F2F6FB"); })();
+</script>
+<style>
+:root{--bg:#F2F6FB;--surface:#FFFFFF;--surface-2:#EDF2F8;--line:#D9E1EF;--ink:#0A0E1A;--ink-2:#44516B;--ink-3:#64738C;
+  --accent:#4458A4;--accent-ink:#FFFFFF;--accent-soft:#EEEDF7;--accent-text:#4458A4;--mal:#B42318;--bien:#0E7C57;
+  --sombra:0 16px 50px rgba(48,70,117,.08);color-scheme:light}
+:root[data-theme="dark"]{--bg:#0C1220;--surface:#151E31;--surface-2:#1E2941;--line:#31405B;--ink:#EEF4FF;--ink-2:#B6C3DC;--ink-3:#91A3C1;
+  --accent:#79CCE0;--accent-ink:#0C1220;--accent-soft:#252C47;--accent-text:#A6B9F0;--mal:#FF8A8A;--bien:#57D4B3;
+  --sombra:0 16px 50px rgba(0,0,0,.35);color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{overflow-x:clip}
+body{margin:0;min-height:100dvh;background:radial-gradient(ellipse at 12% 10%,rgba(121,204,224,.14),transparent 45%),radial-gradient(ellipse at 90% 88%,rgba(76,71,128,.1),transparent 45%),var(--bg);
+  color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,-apple-system,sans-serif;display:grid;place-items:center;padding:28px 16px}
+main{width:min(100%,460px);display:grid;gap:18px}
+.marca{display:flex;align-items:center;gap:12px;justify-content:center}
+.marca img.n{width:64px;height:64px}
+.marca .copia{display:grid;gap:6px}
+.marca img.palabra{width:132px;height:auto}
+[data-theme="dark"] .marca img.palabra{filter:invert(1)}
+.marca small{font-size:11.5px;color:var(--ink-2)}
+.tarjeta{background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:var(--sombra);overflow:hidden}
+.franja{height:4px;background:linear-gradient(90deg,#4c4780,#4458a4 35%,#49a6de 70%,#79cce0)}
+.cuerpo{padding:24px}
+.etiqueta{display:block;font-size:10px;font-weight:650;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);margin-bottom:12px}
+h1{margin:0 0 8px;font-size:23px;line-height:1.25;letter-spacing:-.5px}
+p{margin:0 0 14px;color:var(--ink-2);font-size:13.5px}
+label{display:grid;gap:6px;font-size:12px;font-weight:650;color:var(--ink-2);margin-top:10px}
+input{font:inherit;font-size:16px;min-height:48px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);color:var(--ink);width:100%}
+input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+input.codigo{letter-spacing:.3em;font-variant-numeric:tabular-nums;text-align:center;font-weight:700}
+button{font:inherit;font-weight:700;min-height:48px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button:disabled{opacity:.65;cursor:wait}
+button.primario{background:#4458A4 linear-gradient(135deg,#4c4780,#4458a4);border-color:#4458A4;color:#FFFFFF;width:100%;margin-top:14px}
+[data-theme="dark"] button.primario{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.liga{min-height:44px;border:0;background:transparent;color:var(--accent-text);padding:6px 0;text-decoration:underline;text-underline-offset:3px;font-weight:650}
+button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.ligas{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 14px;margin-top:6px}
+.aviso{margin:12px 0 0;padding:10px 12px;border-radius:12px;background:var(--surface-2);color:var(--ink-2);font-size:13px}
+.aviso:empty{display:none}
+.aviso.mal{color:var(--mal);font-weight:650}
+.lugares{display:grid;gap:10px;margin-top:6px}
+.lugar{display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--surface-2);text-decoration:none;color:var(--ink)}
+a.lugar:hover{border-color:var(--accent)}
+.lugar .ini{display:grid;place-items:center;width:46px;height:46px;border-radius:13px;background:var(--accent-soft);color:var(--accent-text);font-weight:800}
+.lugar b{display:block;font-size:15px;overflow-wrap:anywhere}
+.lugar small{display:block;color:var(--ink-2);font-size:12.5px}
+.chip{display:inline-block;margin:3px 0;padding:2px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:11px;font-weight:700;color:var(--accent-text)}
+.lugar .ir{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--line);font-weight:700;color:var(--accent-text);font-size:13px}
+.quien{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-2)}
+.quien span{overflow-wrap:anywhere}
+.pie{display:flex;justify-content:center;align-items:center;gap:6px;font-size:11px;color:var(--ink-2);margin:0}
+.duenos{margin:0;text-align:center;font-size:12px;color:var(--ink-2)}
+.duenos a{color:var(--accent-text);font-weight:650}
+@media(max-width:380px){ body{padding:20px 12px} .cuerpo{padding:20px 16px} h1{font-size:21px} }
+</style>
+</head>
+<body>
+<main>
+  <div class="marca"><img class="n" src="../marca/n-192.png" alt=""><span class="copia"><img class="palabra" src="../marca/palabra-96.png" alt="Nuvoor"><small>Acceso para equipos</small></span></div>
+
+  <section class="tarjeta" aria-labelledby="titulo"><div class="franja"></div><div class="cuerpo">
+    <span class="etiqueta">Acceso de empleados</span>
+
+    <div id="pasoCargando">
+      <h1 id="titulo">Entra a tu jornada</h1>
+      <p>Revisando tu sesión…</p>
+    </div>
+
+    <form id="pasoCorreo" novalidate hidden>
+      <h1>Entra a tu jornada</h1>
+      <p>Con el correo con el que te invitó tu jefe. Te llevamos al sistema Nuvoor que usa tu negocio: Imprenta, Restaurant o Store.</p>
+      <label for="correo">Tu correo</label>
+      <input id="correo" type="email" autocomplete="email" inputmode="email" placeholder="tucorreo@ejemplo.mx" required>
+      <div id="cajaClave" hidden>
+        <label for="clave">Tu contraseña</label>
+        <input id="clave" type="password" autocomplete="current-password" maxlength="128">
+      </div>
+      <p class="aviso" id="avisoCorreo" role="status" aria-live="polite"></p>
+      <button class="primario" type="submit" id="botonCorreo">Mandarme un código</button>
+      <div class="ligas"><button class="liga" type="button" id="cambiaModo">Entrar con contraseña</button></div>
+    </form>
+
+    <form id="pasoCodigo" novalidate hidden>
+      <h1>Escribe tu código</h1>
+      <p id="aQuien">Si tu correo tiene invitación, te llegó un correo de Nuvoor. Escribe el código o abre su enlace en este aparato.</p>
+      <label for="codigo">Código del correo</label>
+      <input id="codigo" class="codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="10" pattern="[0-9]*">
+      <p class="aviso" id="avisoCodigo" role="status" aria-live="polite"></p>
+      <button class="primario" type="submit" id="botonCodigo">Entrar</button>
+      <div class="ligas"><button class="liga" type="button" id="otroCodigo">Mandar otro código</button><button class="liga" type="button" id="otroCorreo">Usar otro correo</button></div>
+    </form>
+
+    <div id="pasoLugares" hidden>
+      <h1 id="hola">Hola</h1>
+      <p id="lugaresTexto">¿A dónde vas hoy? Cada lugar abre el sistema que contrató ese negocio.</p>
+      <div class="lugares" id="lugares" aria-live="polite"></div>
+      <p class="aviso" id="avisoLugares" role="status" aria-live="polite"></p>
+      <button class="primario" type="button" id="reintentar" hidden>Volver a intentar</button>
+      <div class="quien"><span id="sesionDe"></span><button class="liga" type="button" id="salir">Salir</button></div>
+    </div>
+  </div></section>
+
+  <p class="pie"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 3 8 7 10 4-2 7-5.5 7-10V6z"/><path d="m9 12 2 2 4-4"/></svg>Tu sesión está protegida. Tu código y tu contraseña son personales.</p>
+  <p class="duenos">¿Eres dueño de un negocio? <a href="../acceso.html">Entra aquí</a></p>
+</main>
+<script src="../config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var PRODUCTOS = {
+    taller:{nombre:"Nuvoor Imprenta"}, restaurant:{nombre:"Nuvoor Restaurant"}, tiendita:{nombre:"Nuvoor Store"}
+  };
+  var ROLES = {admin:"Administración", dueno:"Administración", gerente:"Gerente", cajero:"Caja", mesero:"Mesero", cocina:"Cocina",
+    ventas:"Ventas", produccion:"Producción", diseno:"Diseño", vendedor:"Ventas", operador:"Producción"};
+  var PASOS = ["pasoCargando","pasoCorreo","pasoCodigo","pasoLugares"];
+  var sb = null, correo = "", conClave = false, ocupado = false, esperaReloj = null, cargandoLugares = false;
+
+  function paso(id, enfoca){
+    PASOS.forEach(function(x){ $(x).hidden = x !== id; });
+    if(enfoca === false) return;
+    var f = $(id).querySelector("input:not([type=hidden]):not([disabled]), a, button.primario");
+    if(f) try{ f.focus({preventScroll:true}); }catch(e){ f.focus(); }
+  }
+  function aviso(id, texto, mal){ var a = $(id); a.textContent = texto || ""; a.classList.toggle("mal", !!mal); }
+  function oculta(c){ var p = String(c).split("@"); return p.length === 2 ? p[0].charAt(0) + "•••@" + p[1] : c; }
+  function correoValido(c){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c); }
+  function iniciales(nombre){
+    var w = String(nombre || "N").trim().split(/\s+/).filter(function(x){ return /[A-Za-zÁÉÍÓÚÑáéíóúñ0-9]/.test(x); });
+    return ((w[0] || "N").charAt(0) + (w[1] ? w[1].charAt(0) : "")).toUpperCase();
+  }
+  function rol(r){ r = String(r || "").toLowerCase(); return ROLES[r] || (r ? r.charAt(0).toUpperCase() + r.slice(1) : "Equipo"); }
+  function bloquea(boton, si, texto){
+    ocupado = si; if(!boton) return;
+    if(si){ boton.dataset.texto = boton.textContent; boton.textContent = texto || "Un momento…"; boton.disabled = true; }
+    else { boton.disabled = false; if(boton.dataset.texto) boton.textContent = boton.dataset.texto; }
+  }
+  function esLimite(e){ return e && (e.status === 429 || /rate limit|too many|seconds/i.test(e.message || "")); }
+  function sinInvitacion(e){ return e && /signups not allowed|user not found|not found|otp_disabled/i.test(e.message || ""); }
+
+  /* ---------- 1) correo: código por correo o contraseña ---------- */
+  function ponModo(clave){
+    conClave = clave;
+    $("cajaClave").hidden = !clave;
+    $("botonCorreo").textContent = clave ? "Entrar" : "Mandarme un código";
+    $("cambiaModo").textContent = clave ? "Mejor mándame un código" : "Entrar con contraseña";
+    $("clave").value = "";
+    aviso("avisoCorreo", "");
+  }
+  async function mandaCodigo(){
+    var destino = new URL("./", location.href); destino.search = ""; destino.hash = "";
+    var r = await sb.auth.signInWithOtp({email:correo, options:{shouldCreateUser:false, emailRedirectTo:destino.href}});
+    if(r.error && esLimite(r.error)) throw new Error("Ya pediste un código hace poco. Espera un minuto y vuelve a intentar.");
+    /* Si el correo no tiene invitación no lo decimos: así nadie puede averiguar quién trabaja dónde. */
+    if(r.error && !sinInvitacion(r.error)) throw new Error("No se pudo mandar el correo. Revisa tu conexión y vuelve a intentar.");
+  }
+  function cuentaRegresiva(){
+    var b = $("otroCodigo"), s = 60;
+    clearInterval(esperaReloj); b.disabled = true;
+    var pinta = function(){ b.textContent = s > 0 ? "Mandar otro código (" + s + " s)" : "Mandar otro código"; if(s <= 0){ b.disabled = false; clearInterval(esperaReloj); } s--; };
+    pinta(); esperaReloj = setInterval(pinta, 1000);
+  }
+  $("pasoCorreo").addEventListener("submit", async function(e){
+    e.preventDefault(); if(ocupado) return;
+    correo = String($("correo").value || "").trim().toLowerCase();
+    if(!correoValido(correo)){ aviso("avisoCorreo", "Escribe tu correo completo.", true); $("correo").focus(); return; }
+    aviso("avisoCorreo", "");
+    var boton = $("botonCorreo");
+    if(conClave){
+      var clave = $("clave").value;
+      if(!clave){ aviso("avisoCorreo", "Escribe tu contraseña.", true); $("clave").focus(); return; }
+      bloquea(boton, true, "Entrando…");
+      try{
+        var r = await sb.auth.signInWithPassword({email:correo, password:clave});
+        $("clave").value = "";
+        if(r.error) throw new Error(esLimite(r.error) ? "Demasiados intentos. Espera un minuto." : "Revisa tu correo y tu contraseña.");
+        await muestraLugares();
+      }catch(err){ aviso("avisoCorreo", err.message, true); }
+      finally{ bloquea(boton, false); }
+      return;
+    }
+    bloquea(boton, true, "Mandando…");
+    try{
+      await mandaCodigo();
+      $("aQuien").textContent = "Si " + oculta(correo) + " tiene invitación, te llegó un correo de Nuvoor. Escribe el código o abre su enlace en este aparato.";
+      $("codigo").value = ""; aviso("avisoCodigo", "");
+      paso("pasoCodigo"); cuentaRegresiva();
+    }catch(err){ aviso("avisoCorreo", err.message, true); }
+    finally{ bloquea(boton, false); }
+  });
+  $("cambiaModo").addEventListener("click", function(){ ponModo(!conClave); (conClave && correoValido($("correo").value.trim()) ? $("clave") : $("correo")).focus(); });
+
+  /* ---------- 2) código ---------- */
+  $("pasoCodigo").addEventListener("submit", async function(e){
+    e.preventDefault(); if(ocupado) return;
+    var codigo = String($("codigo").value || "").replace(/\D/g, "");
+    if(codigo.length < 6){ aviso("avisoCodigo", "Escribe el código completo del correo.", true); $("codigo").focus(); return; }
+    var boton = $("botonCodigo"); bloquea(boton, true, "Revisando…");
+    try{
+      var r = await sb.auth.verifyOtp({email:correo, token:codigo, type:"email"});
+      $("codigo").value = "";
+      if(r.error) throw new Error(esLimite(r.error) ? "Demasiados intentos. Espera un minuto." : "El código no coincide o ya venció. Revisa el correo más reciente o pide otro.");
+      await muestraLugares();
+    }catch(err){ aviso("avisoCodigo", err.message, true); $("codigo").focus(); }
+    finally{ bloquea(boton, false); }
+  });
+  $("otroCodigo").addEventListener("click", async function(){
+    if(ocupado) return; var b = this; bloquea(b, true, "Mandando…");
+    try{ await mandaCodigo(); aviso("avisoCodigo", "Listo, te mandamos otro. Usa el del correo más reciente."); bloquea(b, false); cuentaRegresiva(); }
+    catch(err){ bloquea(b, false); aviso("avisoCodigo", err.message, true); }
+  });
+  $("otroCorreo").addEventListener("click", function(){ clearInterval(esperaReloj); ponModo(false); paso("pasoCorreo"); });
+
+  /* ---------- 3) lugares de trabajo ---------- */
+  async function leeLugares(){
+    var lista = [], fallas = 0;
+    /* Negocios donde la persona es parte del equipo con su cuenta (Imprenta, Restaurant o Store). */
+    try{
+      var m = await sb.from("mis_empresas").select("id,nombre,rol,producto");
+      if(m.error) fallas++;
+      else (m.data || []).forEach(function(n){ if(n && n.id) lista.push({id:n.id, negocio:n.nombre || "Mi negocio", producto:n.producto || "taller", rol:n.rol, personal:false}); });
+    }catch(e){ fallas++; }
+    /* Perfiles de Personal (hoy, Restaurant): entran con su PIN de trabajo. */
+    var nombre = "";
+    try{
+      var p = await sb.rpc("rest_personal_mis_negocios");
+      if(p.error){ if(!/PGRST202|42883/.test(p.error.code || "")) fallas++; }
+      else (Array.isArray(p.data) ? p.data : []).forEach(function(x){
+        if(!x || !x.cuenta) return;
+        if(!nombre && x.nombre) nombre = x.nombre;
+        var igual = lista.filter(function(n){ return n.id === x.cuenta; })[0];
+        if(igual && igual.rol === "admin") return;
+        lista = lista.filter(function(n){ return n.id !== x.cuenta; });
+        lista.push({id:x.cuenta, negocio:x.negocio || "Mi restaurante", producto:x.producto || "restaurant", rol:x.rol, personal:true});
+      });
+    }catch(e){ fallas++; }
+    if(fallas >= 2 && !lista.length) throw new Error("No pudimos cargar tus lugares de trabajo. Revisa tu conexión y vuelve a intentar.");
+    return {lista:lista, nombre:nombre};
+  }
+  function destino(l){
+    if(l.personal) return new URL("../restaurante/personal.html?cuenta=" + encodeURIComponent(l.id), location.href).href;
+    var u = new URL("../acceso.html", location.href);
+    u.searchParams.set("producto", PRODUCTOS[l.producto] ? l.producto : "taller"); u.searchParams.set("cuenta", l.id);
+    return u.href;
+  }
+  function pintaLugar(l){
+    var a = document.createElement("a"), prod = PRODUCTOS[l.producto] || PRODUCTOS.taller;
+    a.className = "lugar"; a.href = destino(l);
+    a.innerHTML = '<span class="ini" aria-hidden="true"></span><span><b></b><span class="chip"></span><small></small></span><span class="ir"><span></span><span aria-hidden="true">›</span></span>';
+    a.querySelector(".ini").textContent = iniciales(l.negocio);
+    a.querySelector("b").textContent = l.negocio;
+    a.querySelector(".chip").textContent = prod.nombre;
+    a.querySelector("small").textContent = rol(l.rol) + (l.personal ? " · Acceso de trabajo" : "");
+    a.querySelector(".ir span").textContent = l.personal ? "Entrar con tu PIN" : "Abrir " + prod.nombre;
+    return a;
+  }
+  async function muestraLugares(){
+    if(cargandoLugares) return; cargandoLugares = true;
+    paso("pasoLugares", false);
+    var s = await sb.auth.getSession(), user = s.data && s.data.session && s.data.session.user;
+    if(!user){ cargandoLugares = false; paso("pasoCorreo"); return; }
+    $("sesionDe").textContent = "Entraste como " + (user.email || "");
+    $("hola").textContent = "Hola"; $("lugares").replaceChildren(); $("reintentar").hidden = true;
+    $("lugaresTexto").textContent = "Buscando tus lugares de trabajo…"; aviso("avisoLugares", "");
+    try{
+      var r = await leeLugares(), meta = user.user_metadata || {};
+      var nombre = r.nombre || meta.nombre || meta.name || "";
+      $("hola").textContent = nombre ? "Hola, " + String(nombre).split(/\s+/)[0] : "Hola";
+      if(!r.lista.length){
+        $("lugaresTexto").textContent = "Todavía no tienes un lugar de trabajo activo en Nuvoor.";
+        aviso("avisoLugares", "Si tu jefe te invitó, abre primero el correo de la invitación y acéptala. Si no, pídele que te invite desde Personal.");
+      }else{
+        $("lugaresTexto").textContent = "¿A dónde vas hoy? Cada lugar abre el sistema que contrató ese negocio.";
+        r.lista.forEach(function(l){ $("lugares").appendChild(pintaLugar(l)); });
+      }
+      var f = $("lugares").querySelector("a") || $("salir"); try{ f.focus({preventScroll:true}); }catch(e){}
+    }catch(err){
+      $("lugaresTexto").textContent = "";
+      aviso("avisoLugares", err.message, true); $("reintentar").hidden = false; $("reintentar").focus();
+    }finally{ cargandoLugares = false; }
+  }
+  $("reintentar").addEventListener("click", function(){ muestraLugares(); });
+  $("salir").addEventListener("click", async function(){
+    if(ocupado) return; bloquea(this, true, "Saliendo…");
+    try{ await sb.auth.signOut(); }catch(e){}
+    bloquea(this, false); correo = ""; $("pasoCorreo").reset(); ponModo(false); paso("pasoCorreo");
+  });
+
+  /* ---------- arranque ---------- */
+  async function arranca(){
+    if(!window.CONFIG || !CONFIG.SUPABASE_URL || !window.supabase){
+      paso("pasoCorreo", false); aviso("avisoCorreo", "No se pudo cargar la conexión de Nuvoor. Revisa tu internet y actualiza la página.", true);
+      $("botonCorreo").disabled = true; return;
+    }
+    sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    /* Si abrieron el enlace del correo en este aparato, la sesión llega sola. */
+    sb.auth.onAuthStateChange(function(evento, sesion){ if(evento === "SIGNED_IN" && sesion && $("pasoLugares").hidden) setTimeout(muestraLugares, 0); });
+    var s = null; try{ s = (await sb.auth.getSession()).data.session; }catch(e){}
+    if(s) await muestraLugares(); else { ponModo(false); paso("pasoCorreo"); }
+  }
+  window.addEventListener("storage", function(e){ if(e.key === "nuvoor_restaurant_tema" && e.newValue) document.documentElement.dataset.theme = e.newValue === "dark" ? "dark" : "day"; });
+  arranca();
+})();
+</script>
+</body>
+</html>
