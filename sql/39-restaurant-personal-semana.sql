@@ -128,7 +128,7 @@ begin
   if ctx is null and p_accion not in ('identificar','checar') and exists(select 1 from public.rest_personal_operadores where cuenta_id=p_cuenta and usuario=auth.uid() and aparato=p_aparato) then raise exception 'Confirma tu PIN para continuar.' using errcode='42501',hint='PIN_REQUERIDO';end if;
   if ctx is not null then persona:=ctx->>'id';nombre:=ctx->>'nombre';rol:=ctx->>'rol';gerente:=rol='gerente';end if;
  else ctx:=public.rest_personal_sesion(p_cuenta,p_aparato);persona:=ctx->>'persona';nombre:=ctx->>'nombre';rol:=ctx->>'rol';gerente:=rol='gerente';end if;
- if not exists(select 1 from public.cuentas where id=p_cuenta and estado='activa' and vence>now()) then raise exception 'El plan no está vigente.' using errcode='42501';end if;
+ if not exists(select 1 from public.cuentas where id=p_cuenta and estado='activa' and (vence is null or vence>=now())) then raise exception 'El plan no está vigente.' using errcode='42501';end if;
  sem:=coalesce((p_datos->>'semana')::date,date_trunc('week',ahora at time zone 'America/Mexico_City')::date);sur:=coalesce(nullif(p_datos->>'sucursal',''),'principal');
  if extract(isodow from sem)<>1 or length(sur)>120 then raise exception 'Revisa la semana y sucursal.';end if;
  -- Serializa decisiones, revisiones y checadas de cada negocio.

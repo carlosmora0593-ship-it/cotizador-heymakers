@@ -45,7 +45,7 @@ $$;
 -- Para SELECT por RLS/Storage se exige una sesión personal con PIN vigente.
 create or replace function public.rest_actividades_rls(c uuid,tip text,dest text,d date,h date default null)
 returns boolean language plpgsql stable security definer set search_path=public as $$declare x jsonb;ap text;begin
- if auth.uid() is null or not exists(select 1 from public.cuentas where id=c and producto='restaurant' and estado='activa' and vence>now()) then return false;end if;
+ if auth.uid() is null or not exists(select 1 from public.cuentas where id=c and producto='restaurant' and estado='activa' and (vence is null or vence>=now())) then return false;end if;
  if public.rest_personal_admin(c) then return true;end if;
  select q.aparato into ap from public.rest_personal_dispositivos q join public.rest_personal_accesos a on a.id=q.acceso_id where a.cuenta_id=c and a.usuario_id=auth.uid() and q.vence>clock_timestamp() and q.bloqueado is null and q.fecha_pin=(clock_timestamp() at time zone 'America/Mexico_City')::date limit 1;
  if ap is null then return false;end if;x:=public.rest_personal_sesion(c,ap);
