@@ -1,4 +1,4 @@
-const CACHE_NAME = "nuvoor-store-v12-bloqueo";
+const CACHE_NAME = "nuvoor-store-v13-caja-nueva";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,

@@ -7,12 +7,18 @@ html #acceso{--nvBg:#f2f6fb;--nvSurface:#fff;--nvSoft:#edf2f8;--nvLine:#d9e1ef;-
   font-family:"DM Sans",system-ui,sans-serif;font-size:14px;font-weight:400;line-height:1.55;letter-spacing:-.07px;color:var(--nvInk);text-align:start}
 html[data-theme="dark"] #acceso{--nvBg:#0c1220;--nvSurface:#151e31;--nvSoft:#1e2941;--nvLine:#31405b;--nvInk:#eef4ff;--nvMuted:#b6c3dc;--nvAccent:#79cce0;
   --nvError:#ff7a7a;--nvBoton:#79cce0;--nvBotonTinta:#0c1220;--nvBotonSombra:0 1px 2px rgba(0,0,0,.35),0 14px 34px -18px rgba(0,0,0,.8)}
+@media(prefers-color-scheme:dark){html:not([data-theme="day"]):not([data-theme="light"]) #acceso{--nvBg:#0c1220;--nvSurface:#151e31;--nvSoft:#1e2941;--nvLine:#31405b;--nvInk:#eef4ff;--nvMuted:#b6c3dc;--nvAccent:#79cce0;
+  --nvError:#ff7a7a;--nvBoton:#79cce0;--nvBotonTinta:#0c1220;--nvBotonSombra:0 1px 2px rgba(0,0,0,.35),0 14px 34px -18px rgba(0,0,0,.8)}}
 #acceso[hidden],#acceso [hidden]{display:none!important}
+#acceso .accesoCard{position:relative;isolation:isolate}
+#acceso .accesoCard::before{content:"";position:absolute;z-index:0;top:-145px;right:-105px;width:300px;height:300px;border-radius:50%;pointer-events:none;border-width:1px;border-style:solid}
+#acceso .accesoCard>*{position:relative;z-index:1}
 #acceso .anunBloqSello{display:block;align-self:stretch;font:700 9.5px/1.5 'Inter',system-ui,sans-serif;letter-spacing:.95px;text-transform:uppercase;color:var(--nvMuted)}
 
 /* El negocio: su logo (o la N de Nuvoor) y su nombre */
 #acceso .pfBusiness{display:flex;gap:12px;align-items:center;height:48px;margin:0 0 12px}
 #acceso .pfBusiness img,#acceso .pfBusiness #accesoLogo{display:block;flex:none;width:48px;height:48px;max-width:none;object-fit:contain;border:0;border-radius:0;background:none}
+#acceso .pfBusiness .pfIni{display:block;flex:none;width:48px;height:48px;margin:0;padding:0;overflow:hidden;border:0;border-radius:0;background:none;box-shadow:none}
 #acceso .pfBusiness h1{min-width:0;margin:0;font:750 20px/24px 'Inter',system-ui,sans-serif;letter-spacing:-.5px;color:var(--nvInk);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
