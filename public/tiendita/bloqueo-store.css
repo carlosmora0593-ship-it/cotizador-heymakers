@@ -1,0 +1,16 @@
+/* Store usa la misma pantalla de bloqueo que el Restaurant: el marco viene de ../bloqueo.css y la tarjeta
+   de ../bloqueo-pin.css (las dos compartidas). Aquí va sólo lo que el Store no trae en su hoja principal. */
+#acceso.accesoWrap{position:fixed;inset:0;z-index:9000;grid-auto-rows:min-content}
+#acceso,#acceso *,#acceso ::before,#acceso ::after{box-sizing:border-box}
+#acceso img{max-width:100%}
+#acceso p,#acceso form{margin:0}
+#acceso form{display:block}
+#acceso .accesoCard{position:relative;isolation:isolate}
+#acceso .accesoCard::before{content:"";position:absolute;z-index:0;top:-145px;right:-105px;width:300px;height:300px;border-radius:50%;pointer-events:none;border-width:1px;border-style:solid}
+#acceso .accesoCard>*{position:relative;z-index:1}
+#acceso .cmyk{display:flex}
+/* El anuncio del Lab: el Store lo pinta como .promoContent; aquí se ve como en el Restaurant. */
+#acceso .anunBloqPieza .promoContent{display:flex;flex-direction:column;flex:1;min-height:0;height:auto;overflow:visible;font-size:inherit;color:var(--nvInk)}
+#acceso .anunBloqPieza .promoContent b{display:block;margin-top:auto;padding:0;font-size:13px;line-height:1.45;overflow-wrap:anywhere}
+#acceso .anunBloqPieza .promoContent img{height:auto;max-height:none;margin-bottom:15px}
+@media(max-width:760px){#acceso .anunBloqPieza .promoContent b{font-size:12px}#acceso .anunBloqPieza .promoContent img{margin-bottom:11px}}

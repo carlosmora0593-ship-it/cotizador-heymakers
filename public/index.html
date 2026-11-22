@@ -3762,6 +3762,8 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
 <link rel="stylesheet" href="clientes-selector.css?v=20261104-1712">
 <link rel="stylesheet" href="tablero.css?v=20261104-1712">
 <link rel="stylesheet" href="bloqueo.css?v=20261104-1712">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="bloqueo-pin.css?v=20261121-2100">
 <style id="mvEstilo">
 .mvSeccionTitulo{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:20px 0 14px}.mvSeccionTitulo h2{font-size:17px;margin:0}.mvSeccionTitulo span{font-size:11px;color:var(--ink-3)}
 #mosRejilla.mvCategorias{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.mvCategoria{min-height:152px;padding:20px 10px 17px!important;gap:8px!important}.mvCategoria .svIco{width:62px;height:62px}.mvCategoria b{font-size:15px}.mvCategoria small{font-size:12px;color:var(--ink-3)}
@@ -5298,25 +5300,24 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
     <div class="cmyk"><i></i><i></i><i></i><i></i></div>
     <div class="accesoBody">
       <span class="nvLockEntryTitle">Registro de entrada</span>
-      <span class="plaque" style="display:inline-grid"><img id="accesoLogo" src="" alt=""></span>
-      <h1 id="accesoTitulo">¿Quién va a trabajar?</h1>
-      <p class="sub" id="accesoSub">Elige tu perfil. Cada quien ve solo lo de su área.</p>
+      <div class="pfBusiness"><img id="accesoLogo" src="marca/n-192.png" alt=""><h1 id="accesoNegocio">Mi negocio</h1></div>
+      <p class="f pfTitulo" id="accesoTitulo">¿Quién va a trabajar?</p>
       <div class="perfiles" id="accesoPerfiles"></div>
-      <div class="claveCaja" id="accesoClave" hidden>
-        <label class="f">Contraseña de <b id="accesoQuien"></b></label>
-        <div style="display:flex;gap:8px;margin-top:6px">
-          <input id="accesoPass" type="password" placeholder="Tu contraseña" autocomplete="current-password">
-          <button class="btn primary" id="accesoEntrar">Entrar</button>
-          <button class="btn" id="accesoVolver">Volver</button>
+      <div class="pfClave" id="accesoClave" hidden>
+        <label class="f" for="accesoPass">Contraseña de <b id="accesoQuien"></b></label>
+        <input id="accesoPass" class="pfPin" type="password" autocomplete="current-password" aria-describedby="accesoError">
+        <p id="accesoError" class="pfError" role="alert" hidden></p>
+        <div class="pfTeclado"><button type="button" data-pfkey="1" aria-label="1">1</button><button type="button" data-pfkey="2" aria-label="2">2</button><button type="button" data-pfkey="3" aria-label="3">3</button><button type="button" data-pfkey="4" aria-label="4">4</button><button type="button" data-pfkey="5" aria-label="5">5</button><button type="button" data-pfkey="6" aria-label="6">6</button><button type="button" data-pfkey="7" aria-label="7">7</button><button type="button" data-pfkey="8" aria-label="8">8</button><button type="button" data-pfkey="9" aria-label="9">9</button><button type="button" data-pfkey="borrar" aria-label="Borrar todo">Borrar</button><button type="button" data-pfkey="0" aria-label="0">0</button><button type="button" data-pfkey="←" aria-label="Borrar último número">←</button></div>
+        <div class="pfLockAcc">
+          <button class="btn primary" id="accesoEntrar" type="button">Entrar</button>
+          <button class="btn" id="accesoVolver" type="button">Volver</button>
+          <span class="pfReloj" id="accesoReloj" hidden><button class="btn" id="accesoCheca" type="button">Checar entrada</button></span>
         </div>
-        <p id="accesoError" class="authMsg" hidden style="color:var(--accent)"></p>
-        <label class="sw" id="accesoRecordarFila" style="margin-top:10px"><input type="checkbox" id="accesoRecordar" checked> Recordar en este dispositivo por 12 horas</label>
+        <label class="sw pfRecordar" id="accesoRecordarFila"><input type="checkbox" id="accesoRecordar" checked> Recordar en este dispositivo por 12 horas</label>
       </div>
-      <div class="accesoReloj" id="accesoReloj" hidden>
-        <p class="accesoRelojEstado" id="accesoRelojEstado"></p>
-        <button class="btn" id="accesoCheca" type="button">Checar entrada</button>
-      </div>
-      <button class="btn ghost accesoOtro" id="accesoOtro" hidden type="button">Entrar con otro usuario</button>
+      <p class="hint" id="accesoSub">Elige tu perfil. Cada quien ve solo lo de su área.</p>
+      <p class="hint" id="accesoRelojEstado"></p>
+      <button class="pfLink pfOtro" id="accesoOtro" hidden type="button">Entrar con otro usuario</button>
     </div>
   </div>
   <p class="nvLockFoot">Tu sesión está protegida.</p>
@@ -12325,7 +12326,8 @@ function aplicaMarca(){
   const titulo=$("#brandProducto"); if(titulo) titulo.textContent=nombre;
   const s=$("#brandSlogan"); if(s) s.textContent=String(P.empresa && P.empresa.eslogan || "").trim()||"Imprenta";
   const p=$("#logoPrev"); if(p){ p.hidden=!logo; if(logo)p.src=logo; const caja=p.closest(".plaque"); if(caja)caja.hidden=!logo; }
-  const al=$("#accesoLogo"); if(al){ al.hidden=!logo; if(logo){al.src=logo;al.alt="Logo de "+nombre;} if(al.parentElement)al.parentElement.hidden=!logo; }
+  const al=$("#accesoLogo"); if(al){ al.hidden=false; al.src=logo||"marca/n-192.png"; al.alt=logo?"Logo de "+nombre:""; }
+  const an=$("#accesoNegocio"); if(an) an.textContent=nombre;
 }
 $("#btnLogo").addEventListener("click", ()=>{
   if(!ASSETS){ toast("Para cambiar el logo necesitas permiso de edición en esta página"); return; }
@@ -20975,7 +20977,7 @@ function pintaAccesoReloj(){
   const caja = $("#accesoReloj"); if(!caja) return;
   const u = bloqueado ? usuarioActual()
                       : (perfilPendiente ? equipo.find(x=>x.id===perfilPendiente) : null);
-  if(!u || !String(u.pin||"").trim() || typeof estaDentro !== "function"){ caja.hidden = true; return; }
+  if(!u || !String(u.pin||"").trim() || typeof estaDentro !== "function"){ caja.hidden = true; const e0 = $("#accesoRelojEstado"); if(e0) e0.textContent = ""; return; }
   const dentro = estaDentro(u.id), min = minutosDia(u.id, hoyISO());
   const est = $("#accesoRelojEstado");
   if(est) est.textContent = dentro
@@ -20983,7 +20985,7 @@ function pintaAccesoReloj(){
     : (min ? "Hoy trabajaste " + horasTxt(min) + " · estás fuera" : "Todavía no checas hoy");
   const b = $("#accesoCheca");
   b.textContent = dentro ? "Terminar jornada" : "Checar entrada";
-  b.className = "btn" + (dentro ? "" : " primary");
+  b.className = "btn";
   b.dataset.quien = u.id;
   b.dataset.dentro = dentro ? "1" : "";
   caja.hidden = false;
@@ -21011,7 +21013,8 @@ function pideAcceso(opc){
       '<span><b>'+esc(u.nombre||"Sin nombre")+'</b><small>'+(ROLES[u.rol]||ROLES.ventas).nombre+'</small></span>'+
       '<span class="cand">'+(u.pin? "🔒" : "")+'</span></button>').join("");
   $("#accesoClave").hidden = true; perfilPendiente = null;
-  const al = $("#accesoLogo"); if(al) al.src = logoSrc();
+  const al = $("#accesoLogo"); if(al) al.src = logoSrc() || "marca/n-192.png";
+  const an = $("#accesoNegocio"); if(an) an.textContent = String(P.empresa && P.empresa.nombre || "").trim() || "Mi negocio";
 
   const at = $("#accesoTitulo"), sub = $("#accesoSub"), otro = $("#accesoOtro");
   if(bloq){
@@ -21020,8 +21023,9 @@ function pideAcceso(opc){
        que es lo honesto — proteger de verdad requiere una clave. */
     const yo = usuarioActual(), conClave = tieneClave(yo);
     if(at)  at.textContent  = conClave ? "Inserta tu código o PIN" : "Pantalla bloqueada";
+    if(at)  at.hidden = conClave;
     if(sub) sub.textContent = conClave
-      ? "Se bloqueó solo por inactividad. Escribe tu clave para seguir donde te quedaste."
+      ? "Si no tienes PIN, pídelo al gerente."
       : "Se bloqueó solo por inactividad. Elige tu perfil para seguir. Si quieres que pida clave, ponle una a tu usuario en Ajustes → Equipo.";
     $("#accesoPerfiles").hidden = conClave;
     if(conClave){
@@ -21036,8 +21040,7 @@ function pideAcceso(opc){
     const rec = $("#accesoRecordarFila"); if(rec) rec.hidden = true;
     if(otro) otro.hidden = !conClave;
   }else{
-    if(at)  at.textContent  = window.CONFIG ? "¿Quién va a trabajar en " + (String(P.empresa && P.empresa.nombre || "").trim() || "tu negocio") + "?"
-                                            : "¿Quién va a trabajar?";
+    if(at){ at.textContent = "¿Quién va a trabajar?"; at.hidden = false; }
     if(sub) sub.textContent = "Elige tu perfil. Cada quien ve solo lo de su área.";
     $("#accesoPerfiles").hidden = false;
     const vol = $("#accesoVolver"); if(vol) vol.hidden = false;
@@ -21078,6 +21081,12 @@ $("#accesoEntrar").addEventListener("click", ()=>{
   entraPerfil(u.id, $("#accesoRecordar").checked);
 });
 $("#accesoPass").addEventListener("keydown", e=>{ if(e.key==="Enter") $("#accesoEntrar").click(); });
+$("#accesoClave .pfTeclado").addEventListener("click", e=>{
+  const b = e.target.closest("[data-pfkey]"); if(!b) return;
+  const i = $("#accesoPass"), k = b.dataset.pfkey;
+  i.value = k==="borrar" ? "" : k==="←" ? i.value.slice(0,-1) : (i.value + k).slice(0,64);
+  $("#accesoError").hidden = true; i.focus();
+});
 $("#accesoVolver").addEventListener("click", ()=>{
   if(bloqueado){ pideAcceso({bloqueo:true}); return; }
   $("#accesoClave").hidden = true; perfilPendiente = null; pintaAccesoReloj();

@@ -1,4 +1,4 @@
-const CACHE_NAME = "nuvoor-store-v11-fiscal-test";
+const CACHE_NAME = "nuvoor-store-v12-bloqueo";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   APP_SCOPE.href,
@@ -6,8 +6,14 @@ const APP_ASSETS = [
   new URL("manifest.webmanifest", APP_SCOPE).href,
   new URL("icons/tiendita.svg", APP_SCOPE).href,
   new URL("../config.js", APP_SCOPE).href,
-  new URL("../facturacion-pos.js?v=20261104-2206", APP_SCOPE).href
+  new URL("../facturacion-pos.js?v=20261104-2206", APP_SCOPE).href,
+  new URL("bloqueo-store.css?v=20261121-2100", APP_SCOPE).href,
+  new URL("../bloqueo-pin.css?v=20261121-2100", APP_SCOPE).href,
+  new URL("../bloqueo.css?v=20261104-1712", APP_SCOPE).href,
+  new URL("../bloqueo.js?v=20261104-1712", APP_SCOPE).href
 ];
+/* La pantalla de bloqueo es la misma en todo Nuvoor: sus archivos viven fuera de /tiendita/ y también se guardan para que funcione sin internet. */
+const COMPARTIDOS = ["../bloqueo.css", "../bloqueo-pin.css", "../bloqueo.js"].map(r => new URL(r, APP_SCOPE).pathname);
 const CONFIG_URL = new URL("../config.js", APP_SCOPE).pathname;
 
 self.addEventListener("install", event => {
@@ -26,7 +32,7 @@ self.addEventListener("fetch", event => {
   const url = new URL(request.url);
   if (url.origin !== APP_SCOPE.origin) return;
   const inApp = url.pathname.startsWith(APP_SCOPE.pathname);
-  if (!inApp && url.pathname !== CONFIG_URL && url.pathname !== new URL("../facturacion-pos.js", APP_SCOPE).pathname) return;
+  if (!inApp && url.pathname !== CONFIG_URL && url.pathname !== new URL("../facturacion-pos.js", APP_SCOPE).pathname && !COMPARTIDOS.includes(url.pathname)) return;
 
   if (request.mode === "navigate") {
     event.respondWith(fetch(request).then(response => {
@@ -41,4 +47,3 @@ self.addEventListener("fetch", event => {
     return response;
   })));
 });
-

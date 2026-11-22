@@ -1,0 +1,62 @@
+/* Nuvoor · la tarjeta de entrada con PIN, igual en Imprenta, Restaurant y Store.
+   El marco (cabecera, reloj, publicidad y tarjeta) viene de bloqueo.css. Aquí van la letra, los colores
+   de Nuvoor y lo de adentro de la tarjeta, con las medidas del Restaurant, que es el modelo.
+   Cada producto la carga después de su hoja; los valores no dependen del tema de cada producto. */
+html #acceso{--nvBg:#f2f6fb;--nvSurface:#fff;--nvSoft:#edf2f8;--nvLine:#d9e1ef;--nvInk:#0a0e1a;--nvMuted:#44516b;--nvAccent:#4458a4;
+  --nvError:#c62828;--nvBoton:#4458a4;--nvBotonTinta:#fff;--nvBotonSombra:0 1px 2px rgba(36,52,85,.06),0 12px 28px -20px rgba(36,52,85,.3);
+  font-family:"DM Sans",system-ui,sans-serif;font-size:14px;font-weight:400;line-height:1.55;letter-spacing:-.07px;color:var(--nvInk);text-align:start}
+html[data-theme="dark"] #acceso{--nvBg:#0c1220;--nvSurface:#151e31;--nvSoft:#1e2941;--nvLine:#31405b;--nvInk:#eef4ff;--nvMuted:#b6c3dc;--nvAccent:#79cce0;
+  --nvError:#ff7a7a;--nvBoton:#79cce0;--nvBotonTinta:#0c1220;--nvBotonSombra:0 1px 2px rgba(0,0,0,.35),0 14px 34px -18px rgba(0,0,0,.8)}
+#acceso[hidden],#acceso [hidden]{display:none!important}
+#acceso .anunBloqSello{display:block;align-self:stretch;font:700 9.5px/1.5 'Inter',system-ui,sans-serif;letter-spacing:.95px;text-transform:uppercase;color:var(--nvMuted)}
+
+/* El negocio: su logo (o la N de Nuvoor) y su nombre */
+#acceso .pfBusiness{display:flex;gap:12px;align-items:center;height:48px;margin:0 0 12px}
+#acceso .pfBusiness img,#acceso .pfBusiness #accesoLogo{display:block;flex:none;width:48px;height:48px;max-width:none;object-fit:contain;border:0;border-radius:0;background:none}
+#acceso .pfBusiness h1{min-width:0;margin:0;font:750 20px/24px 'Inter',system-ui,sans-serif;letter-spacing:-.5px;color:var(--nvInk);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* El PIN */
+#acceso label.f,#acceso .pfTitulo{display:block;min-height:0;margin:0 0 5px;font:700 10px/1.55 "DM Sans",system-ui,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:var(--nvMuted)}
+#acceso .pfPin,#acceso #accesoPass.pfPin,#acceso #unlockPin.pfPin{flex:none;display:block;box-sizing:border-box;width:100%;min-width:0;height:auto;margin:0;padding:10px;font:400 24px/1.55 "DM Sans",system-ui,sans-serif;letter-spacing:8px;
+  text-align:center;color:var(--nvInk);background:var(--nvSoft);border:1px solid var(--nvLine);border-radius:9px;box-shadow:none;transition:border-color .18s,box-shadow .18s}
+#acceso .pfError{display:block;min-height:20px;margin:6px 0;font-size:12px;font-weight:400;line-height:1.6;color:var(--nvError)}
+#acceso .pfError[hidden]{display:block!important;visibility:hidden}
+
+/* El teclado */
+#acceso .pfTeclado{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}
+#acceso .pfTeclado button{min-height:44px;margin:0;padding:1px 6px;border:1px solid var(--nvLine);border-radius:9px;background:var(--nvSoft);color:var(--nvInk);
+  font:400 19px/1.55 "DM Sans",system-ui,sans-serif;letter-spacing:normal;text-align:center;box-shadow:none;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#acceso .pfTeclado button[data-pfkey="borrar"]{font-size:12px}
+#acceso .pfTeclado button:active{background:var(--nvLine)}
+
+/* Entrar y, donde se usa, checar */
+#acceso .pfLockAcc{display:flex;gap:8px}
+#acceso .pfLockAcc .btn{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;width:auto;min-width:0;min-height:44px;margin:0;padding:9px 16px;
+  border:1px solid var(--nvLine);border-radius:12px;background:var(--nvSurface);color:var(--nvMuted);font:700 13px/1.55 "DM Sans",system-ui,sans-serif;letter-spacing:normal;
+  text-transform:none;box-shadow:none;cursor:pointer;transform:none;transition:transform .18s,box-shadow .18s,border-color .18s,background .18s,color .18s}
+#acceso .pfLockAcc .btn.primary{background:var(--nvBoton);border-color:var(--nvBoton);color:var(--nvBotonTinta);box-shadow:var(--nvBotonSombra)}
+#acceso .pfLockAcc .btn:hover{transform:translateY(-1px)}
+#acceso .pfLockAcc .btn:active{transform:translateY(0) scale(.98)}
+#acceso .pfReloj{display:contents}
+#acceso .pfReloj>.btn{flex:1}
+#acceso .pfLockAcc .btn:focus-visible,#acceso .pfTeclado button:focus-visible,#acceso .pfLink:focus-visible{outline:3px solid var(--nvAccent);outline-offset:2px}
+
+/* Las notas de abajo */
+#acceso .hint{margin:14px 0;font-size:14px;font-weight:400;line-height:1.55;color:var(--nvMuted)}
+#acceso .hint:empty{display:none}
+#acceso .pfLink{display:inline;margin:0;padding:0;border:0;background:none;box-shadow:none;font:inherit;color:var(--nvInk);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+
+/* Imprenta: elegir perfil, recordar el aparato y entrar con otra cuenta */
+#acceso .pfTitulo{margin:0 0 8px}
+#acceso .perfiles{display:grid;gap:8px}
+#acceso .perfilBtn{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:8px 12px;border:1px solid var(--nvLine);border-radius:12px;background:var(--nvSoft);color:var(--nvInk);font:inherit;text-align:start;cursor:pointer}
+#acceso .perfilBtn .av,#acceso .perfilBtn b{font-family:"DM Sans",system-ui,sans-serif}
+#acceso .perfilBtn b{font-size:15px;font-weight:700}
+#acceso .perfilBtn small{display:block;font-size:12px;color:var(--nvMuted)}
+#acceso .perfiles:not([hidden])+.pfClave{margin-top:16px}
+#acceso .pfRecordar{display:flex;align-items:center;gap:8px;margin:12px 0 0;font-size:12px;line-height:1.55;color:var(--nvMuted)}
+#acceso .pfOtro{display:block;margin:14px 0;font-size:14px;line-height:1.55;text-align:start}
+
+@media(max-width:760px){#acceso .pfBusiness{margin-bottom:9px}#acceso .pfBusiness h1{font-size:18px;line-height:22.5px}}
+@media(prefers-reduced-motion:reduce){#acceso .pfLockAcc .btn,#acceso .pfPin{transition:none}#acceso .pfLockAcc .btn:hover,#acceso .pfLockAcc .btn:active{transform:none}}
