@@ -1549,9 +1549,14 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 #modalMods .modIncomplete{font-size:11px;color:var(--ink-3);margin:8px 0 0}
 @media(max-width:450px){.configSaveBar{padding:13px}.configSaveBar>.btn{width:100%}#modalMods .modChips{gap:7px}#modalMods .modChip{padding:10px}}
 </style>
-<meta name="nuvoor-build" content="20261119-1428">
+<meta name="nuvoor-build" content="20261121-2345">
 <link rel="stylesheet" href="./tema-nuvoor.css?v=20261119-1428">
 <link rel="stylesheet" href="./limpio.css?v=20261121-1445">
+<link rel="stylesheet" href="./personal-fase1.css">
+<link rel="stylesheet" href="../bloqueo.css?v=20261104-1712">
+<link rel="stylesheet" href="./puerta-imprenta.css">
+<link rel="stylesheet" href="../bloqueo-pin.css?v=20261121-2100">
+<link rel="stylesheet" href="./actividades.css">
 </head>
 <body>
 
@@ -2670,6 +2675,9 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 <script src="./personal-api.js?v=1"></script>
 <script src="./personal-admin.js?v=1"></script>
 <script src="./personal-panel.js?v=20261116-1726"></script>
+<script src="../bloqueo.js?v=20261104-1712"></script>
+<script src="./personal-semana.js"></script>
+<script src="./personal-semana-ui.js"></script><script src="./actividades.js"></script>
 <script>
 (async function(){
 const RESTAURANT_ACCOUNT_CACHE_KEY="nuvoor_restaurant_account_v1";
@@ -11150,6 +11158,188 @@ async function iniciaRestaurant(){
   await recargaCajaCompartida();
   start();cargaAnuncios();sincronizaCortesCaja();procesaMediosRestaurant();
 }
+/* <<PERSONAL-FASE1>> Integra sobre la base publicada; sin datos de muestra. */
+const PF_C=window.NuvoorSemana;
+let pfActividades=null;
+let pfPanel=null,pfDatos=null,pfTiene39=null,pfCargando=false,pfPin='',pfFallos=0,pfHasta=0,pfConfirmacion=null;
+const pfTerminalKey=LS_BASE+'_terminal39',pfAttemptKey=LS_BASE+'_pin39';
+async function pfRpc40(action,data={}){const client=RESTAURANT_SB?.personal?.raw||RESTAURANT_SB;if(!client||RESTAURANT_ACCOUNT.localOnly){const e=Error('SQL 40 pendiente');e.missing=true;throw e;}const r=await client.rpc('rest_actividades_rpc',{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_aparato:RESTAURANT_SB.personal?.device||REST_NUBE.deviceId,p_accion:action,p_datos:data});if(r.error){if(r.error.hint==='PIN_REQUERIDO')setTimeout(()=>pideAcceso({bloqueo:true}),0);const e=Error(r.error.message);e.missing=/PGRST202|42883/.test(r.error.code||'');throw e;}return r.data;}
+function pfAvisoActividades(){const target=$('#lpAtencion');if(!target)return;$('#acInicio')?.remove();const items=pfActividades?.pendientes()||[];if(esGerente()&&!bloqueado&&items.length){target.querySelector('.cxVacio')?.remove();const box=document.createElement('li');box.id='acInicio';box.className='cxItem acItem';box.innerHTML='<span class="cxArea">Equipo</span><span class="cxTexto"><b>'+items.length+' actividades y objetivos por revisar</b><small>'+esc([...new Set(items.map(x=>EQUIPO.find(u=>u.id===x.persona)?.nombre||'Equipo'))].join(', '))+'</small></span><span class="cxItemAcc"><button type="button" class="btn">Revisar</button></span>';box.querySelector('button').onclick=()=>{vaA('personal');panelPersonal.elegir('horarios');pfActividades.open();};target.prepend(box);}if($('#lpAtencionHint'))$('#lpAtencionHint').textContent=target.querySelectorAll('.cxItem').length+' por revisar';}
+const pfHoyLimpioAnterior=lpPintaHoy;
+lpPintaHoy=function(){pfHoyLimpioAnterior();pfAvisoActividades();};
+function pfToken(){let t=localStorage.getItem(pfTerminalKey);if(!t){t=crypto.randomUUID()+crypto.randomUUID();localStorage.setItem(pfTerminalKey,t);}return t;}
+try{const a=JSON.parse(sessionStorage.getItem(pfAttemptKey)||'{}');pfFallos=a.fallos||0;pfHasta=a.hasta||0;}catch(_){}
+async function pfRpc(action,data={}){
+  const client=RESTAURANT_SB?.personal?.raw||RESTAURANT_SB;
+  if(!client||RESTAURANT_ACCOUNT.localOnly){const e=Error('La nueva operación espera la conexión y SQL 39.');e.missing=true;throw e;}
+  const r=await client.rpc('rest_personal_fase1',{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_aparato:RESTAURANT_SB.personal?.device||REST_NUBE.deviceId,p_accion:action,p_datos:{terminal:pfToken(),...data}});
+  if(r.error){if(r.error.hint==='PIN_REQUERIDO')setTimeout(()=>pideAcceso({bloqueo:true}),0);const e=Error(r.error.message||'No se pudo guardar.');e.missing=/PGRST202|42883/.test(r.error.code||'');if(e.missing)pfTiene39=false;throw e;}
+  pfTiene39=true;return r.data;
+}
+function pfAplicaEstado(s){
+  pfDatos=s;
+  (s.equipo||[]).forEach(p=>{const u=EQUIPO.find(x=>x.id===p.id);if(u)u.horasSemana=p.horasSemana;});
+  let changed=false;
+  (s.disponibilidad||[]).forEach(d=>{const p=MENU.plats.find(p=>p.id===d.platillo);if(p&&JSON.stringify(p.agotado||null)!==JSON.stringify(d.agotado||null)){p.agotado=d.agotado;changed=true;}});
+  const map=new Map(ASISTENCIAS.map(a=>[a.id,a]));
+  (s.checadas||[]).filter(a=>!a.anulada_por).forEach(a=>{const d=new Date(a.instante),u=EQUIPO.find(p=>p.id===a.persona),key=a.legacy_id||a.id;map.set(key,{id:key,uid:a.persona,nombre:u?.nombre||'',fecha:d.toLocaleDateString('en-CA',{timeZone:'America/Mexico_City'}),hora:d.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'America/Mexico_City'}),tipo:a.tipo,foto:a.foto||map.get(key)?.foto||'',ts:d.getTime(),servidor39:true});});
+  const annulled=new Set((s.checadas||[]).filter(a=>a.anulada_por).map(a=>a.legacy_id||a.id));ASISTENCIAS=[...map.values()].filter(a=>!annulled.has(a.id));
+  if(changed){if(!$('#tab-menu').hidden)renderMenu();if(comandaActual())renderComanda();}
+  pfPintaHoy();pfPintaPuertaEstado();
+}
+function pfMonta(){
+  const host=document.createElement('section');host.id='pfPlan';host.className='pfBloque';
+  $('#personalPanel_horarios').prepend(host);
+  pfActividades=NuvoorActividades.crear({args:()=>pfPanel.args(),hoy:hoyISO,equipo:()=>pfDatos?.equipo||EQUIPO,gerente:()=>esGerente()&&!bloqueado,mensaje:toast,client:()=>RESTAURANT_SB?.personal?.raw||RESTAURANT_SB,rpc:pfRpc40,cambio:()=>pfAvisoActividades()});
+  pfPanel=NuvoorSemanaUI.crear({root:host,extra:(_state,root)=>pfActividades.mount(root),hoy:hoyISO,gerente:()=>esGerente()&&!bloqueado,persona:()=>usuarioActual().id,rpc:pfRpc,mensaje:toast,horario:id=>horarioDe(EQUIPO.find(p=>p.id===id)||{}),cambio:pfAplicaEstado});
+  pfPanel.load();
+  const action=document.createElement('button');action.type='button';action.className='btn sm ghost';action.id='pfMiJornada';action.textContent='Mi jornada';action.onclick=()=>{sessionStorage.setItem('nuvoor_jornada_aparato_'+RESTAURANT_ACCOUNT.accountId,RESTAURANT_SB.personal?.device||REST_NUBE.deviceId);location.href='./jornada.html?cuenta='+encodeURIComponent(RESTAURANT_ACCOUNT.accountId);};
+  action.classList.add('lpCajonItem');($('#lpCuenta')||$('#barra')).append(action);
+  const terminal=document.createElement('div');terminal.id='pfTerminal';terminal.className='pfBloque';terminal.innerHTML='<label><input type="checkbox" id="pfEsTerminal"> Este aparato es checador</label><p class="hint">Sólo gerencia puede autorizarlo. Las sesiones personales nunca checan desde su teléfono.</p><button class="btn" type="button" id="pfSincronizaPerfiles">Sincronizar sueldos y horarios para Mi jornada</button>';
+  $('#personalPanel_equipo').append(terminal);
+  $('#pfEsTerminal').onchange=async e=>{const wanted=e.target.checked;if(!esGerente()){e.target.checked=!wanted;return;}try{const r=await pfRpc('terminal',{activo:wanted,nombre:'Checador del negocio'});pfAplicaEstado(r);toast(wanted?'Este aparato puede registrar checadas.':'Checador desactivado.');}catch(x){e.target.checked=!wanted;toast(x.message);}};
+  $('#pfSincronizaPerfiles').onclick=async()=>{if(!esGerente())return;try{for(const u of EQUIPO.filter(u=>u.activo!==false))await pfRpc('perfil',{persona:u.id,horas:u.horasSemana??48,pago:{...pagoDe(u),tolerancia:num(P.tolerancia,10)},horario:horarioDe(u)});await pfImportaAsistencias();await pfPanel.load();toast('Sueldos, horarios y asistencias sincronizados.');}catch(e){toast(e.message);}};
+  setInterval(()=>{if(!document.hidden&&!pfCargando){pfCargando=true;pfPanel.load().finally(()=>{pfCargando=false;pfActividades.load();});}},5000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)pfPanel.load();});
+  pfMontaPuerta();
+}
+async function pfImportaAsistencias(){
+ const xs=ASISTENCIAS.filter(a=>!a.servidor39).map(a=>({id:a.id,uid:a.uid,fecha:a.fecha,hora:a.hora,tipo:a.tipo}));
+ for(let i=0;i<xs.length;i+=200)await pfRpc('importar_asistencias',{registros:xs.slice(i,i+200)});
+}
+const pfGuardaConfigAnterior=guardaConfiguracionRestaurant;
+guardaConfiguracionRestaurant=async function(ambito){await pfGuardaConfigAnterior(ambito);if(ambito==='personal'&&esGerente()&&pfTiene39){try{for(const u of EQUIPO.filter(u=>u.activo!==false))await pfRpc('perfil',{persona:u.id,horas:u.horasSemana??48,pago:{...pagoDe(u),tolerancia:num(P.tolerancia,10)},horario:horarioDe(u)});await pfImportaAsistencias();await pfPanel?.load();}catch(e){toast('Personal conserva el guardado local; falta sincronizar: '+e.message);}}};
+function pfPintaPuertaEstado(){
+  if($('#pfEsTerminal')){$('#pfEsTerminal').checked=!!pfDatos?.terminal;$('#pfTerminal').hidden=!esGerente();}
+  const b=$('#pfPinCheca');if(b){b.hidden=!!RESTAURANT_ACCOUNT.personal||!pfDatos?.terminal;}
+}
+function pfEstaDentro(id){const xs=(pfDatos?.checadas||[]).filter(a=>a.persona===id&&!a.anulada_por).sort((a,b)=>a.instante.localeCompare(b.instante));return xs.length?xs[xs.length-1].tipo==='entrada':estaDentro(id);}
+function pfMontaPuerta(){
+  let door=$('#acceso');if(!door||door.dataset.personalFase1==='1')return;
+  const ad=door.querySelector('#anunBloq'),replacement=document.createElement('div');replacement.id='acceso';replacement.className='accesoWrap';replacement.hidden=door.hidden;replacement.dataset.personalFase1='1';door.replaceWith(replacement);door=replacement;
+  const layout=document.createElement('div');layout.id='pfPuerta';layout.className='nvLockLayout';layout.innerHTML=
+   '<header class="nvLockHeader"><a class="nvLockBrand" href="https://nuvoor.mx" target="_blank" rel="noopener noreferrer" aria-label="Conoce Nuvoor"><img src="../marca/n-192.png" alt=""><span class="nvLockBrandCopy"><span class="nvLockWord" role="img" aria-label="Nuvoor"></span><span class="nvLockTag">Tu restaurante, en orden.</span></span></a><div class="nvLockClock" aria-label="Hora actual"><time id="nvLockHora"><span class="nvLockHoraMin"></span><span class="nvLockSeconds"></span><small class="nvLockPeriodo"></small></time><span id="nvLockFecha"></span></div></header><aside class="nvLockAside" id="pfAd" aria-label="Publicidad"></aside><div class="accesoCard"><div class="cmyk"><i></i><i></i><i></i><i></i></div><div class="accesoBody"><span class="nvLockEntryTitle">Registro de entrada</span><div class="pfBusiness"><img id="pfBusinessLogo" src="../marca/n-192.png" alt=""><h1 id="pfNegocio"></h1></div><label class="f" for="pfPin">Inserta tu PIN</label><input id="pfPin" class="pfPin" type="password" inputmode="numeric" autocomplete="off" maxlength="12" aria-describedby="pfPinError"><p id="pfPinError" class="pfError" role="status"></p><div class="pfTeclado">'+['1','2','3','4','5','6','7','8','9','borrar','0','←'].map(k=>'<button type="button" data-pfkey="'+k+'" aria-label="'+(k==='←'?'Borrar último número':k)+'">'+(k==='borrar'?'Borrar':k)+'</button>').join('')+'</div><div class="pfLockAcc"><button class="btn primary" type="button" id="pfPinEntra">Entrar</button><button class="btn" type="button" id="pfPinCheca">Checar turno</button></div><p class="hint">Si no tienes PIN, pídelo al gerente.</p><p id="pfTurnoDentro" class="hint"></p><p id="accesoCocinaActiva" class="hint" hidden></p><div id="pfChecaConfirm" hidden></div></div></div><p class="nvLockFoot">Tu sesión está protegida.</p>';
+  door.prepend(layout);if(ad){ad.removeAttribute('style');ad.querySelector('span').removeAttribute('style');ad.querySelector('span').className='anunBloqSello';const pieza=ad.querySelector('#anunBloqPieza');pieza.removeAttribute('style');pieza.className='anunBloqPieza';$('#pfAd').append(ad);}$('#pfNegocio').textContent=RESTAURANT_ACCOUNT.accountName||P.negocio.nombre||'Mi restaurante';
+  if(P.negocio.logo)$('#pfBusinessLogo').src=P.negocio.logo;
+  NuvoorBloqueo.activa(!door.hidden);setInterval(()=>{if(!door.hidden){const left=Math.ceil((pfHasta-Date.now())/1000);if(left>0)$('#pfPinError').textContent='Espera '+left+' segundos.';}},1000);
+  $('#pfPin').oninput=e=>{pfPin=e.target.value.replace(/\D/g,'').slice(0,12);e.target.value=pfPin;};
+  layout.addEventListener('click',e=>{const b=e.target.closest('[data-pfkey]');if(!b)return;const k=b.dataset.pfkey;pfPin=k==='borrar'?'':k==='←'?pfPin.slice(0,-1):(pfPin+k).slice(0,12);$('#pfPin').value=pfPin;$('#pfPin').focus();});
+  $('#pfPinEntra').onclick=()=>pfEntra(false);$('#pfPinCheca').onclick=()=>pfEntra(true);
+  door.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();e.stopImmediatePropagation();pfEntra(false);}else if(/^\d$/.test(e.key)&&e.target.id!=='pfPin'){e.preventDefault();pfPin=(pfPin+e.key).slice(0,12);$('#pfPin').value=pfPin;}},true);
+  pfPintaPuertaEstado();
+}
+const pfPonAnuncioAnterior=ponAnuncioBloqueo;
+ponAnuncioBloqueo=function(){pfPonAnuncioAnterior();const img=$('#anunBloqPieza img'),ad=ANUN_BLOQ[anunBloqIdx];if(img)img.removeAttribute('style');const link=$('#anunBloqPieza a')||$('#anunBloqPieza');if(ad&&link&&!link.querySelector('.nvLockAdText')){const text=document.createElement('div');text.className='nvLockAdText';text.innerHTML='<b>'+esc(ad.titulo||'')+'</b>'+(ad.enlace?'<span>Conoce esta propuesta →</span>':'');link.append(text);}};
+async function pfIdentifica(pin,solo_checar=false){
+  if(RESTAURANT_ACCOUNT.personal){const r=await RESTAURANT_SB.personal.pin(pin);if(r.error)throw r.error;return r.data;}
+  if(pfTiene39!==false&&navigator.onLine&&!RESTAURANT_ACCOUNT.localOnly){try{return await pfRpc('identificar',{pin,solo_checar});}catch(e){if(!e.missing)throw e;}}
+  const matches=[];for(const u of EQUIPO.filter(u=>u.activo!==false&&tieneClave(u)))if(await validaClavePerfil(u,pin))matches.push(u);
+  return matches.length===1?{ok:true,persona:matches[0].id,nombre:matches[0].nombre}:{ok:false,error:'PIN incorrecto.'};
+}
+async function pfEntra(check){
+  if(Date.now()<pfHasta)return;if($('#pfPinEntra').disabled)return;
+  const pin=pfPin;$('#pfPinEntra').disabled=true;$('#pfPinCheca').disabled=true;
+  try{
+   const active=EQUIPO.filter(u=>u.activo!==false);
+   if(!check&&!pin&&active.length===1&&active[0].rol==='gerente'&&!tieneClave(active[0])){entraPerfil(active[0].id);return;}
+   const r=await pfIdentifica(pin,check);
+   if(!r?.ok){pfFallos++;if(pfFallos>=5){pfHasta=Date.now()+30000;pfFallos=0;}if(r?.espera)pfHasta=Date.now()+r.espera*1000;sessionStorage.setItem(pfAttemptKey,JSON.stringify({fallos:pfFallos,hasta:pfHasta}));throw Error(r?.error||'PIN incorrecto.');}
+   pfFallos=0;sessionStorage.removeItem(pfAttemptKey);
+   if(check){
+    if(!pfDatos?.terminal||RESTAURANT_ACCOUNT.personal)throw Error('Este aparato no es checador del negocio.');
+    pfConfirmacion={id:r.persona,pin};const u=EQUIPO.find(u=>u.id===r.persona),h=u?horarioDe(u)[diaDe(hoyISO())]:null;
+    const box=$('#pfChecaConfirm');box.hidden=false;box.innerHTML='<p><b>'+esc(r.nombre)+'</b> · '+esc(u?.rol||'')+'</p><p>Turno de hoy: '+esc(h&&!h.libre?h.e+'–'+h.s:'Sin horario semanal')+'</p><p>Se registra tu '+(pfEstaDentro(r.persona)?'salida':'entrada')+' de las '+horaAhora()+'.</p><button type="button" class="btn primary" id="pfConfirmarCheca">Continuar</button><button type="button" class="btn" id="pfCancelarCheca">Cancelar</button>';
+    $('#pfCancelarCheca').onclick=()=>{pfConfirmacion=null;box.hidden=true;};
+    $('#pfConfirmarCheca').onclick=()=>{const f=pfConfirmacion;if(!f)return;box.hidden=true;abreCheca(f.id);chTecleado=f.pin;pintaChPin();revisaChOk();};
+   }else{entraPerfil(r.persona);}
+  }catch(e){$('#pfPinError').textContent=e.message||'No se pudo verificar.';}
+  finally{pfPin='';$('#pfPin').value='';$('#pfPinEntra').disabled=false;$('#pfPinCheca').disabled=false;}
+}
+activaRelojBloqueo=function(activo){if(relojBloqueoIntervalo){clearInterval(relojBloqueoIntervalo);relojBloqueoIntervalo=null;}NuvoorBloqueo.activa(activo);};
+pintaAccesoReloj=function(){pfPintaPuertaEstado();};
+pideAcceso=function(opc){if(RESTAURANT_ACCOUNT.personal){NuvoorPersonal.portal(RESTAURANT_ACCOUNT.accountId);return;}if(editorClavePersonal)cierraClavePersonal();bloqueado=!!opc?.bloqueo;perfilPendiente=null;if(!EQUIPO.some(u=>u.activo!==false)){if(!EQUIPO.length)EQUIPO=equipoPorDefecto();EQUIPO[0].activo=true;persist();}pfMontaPuerta();$('#acceso').hidden=false;document.body.classList.add('sin-acceso');panelPersonal?.aplicaRol();pintaAnuncioBloqueo();NuvoorBloqueo.activa(true);pfPin='';$('#pfPin').value='';$('#pfPinError').textContent='';pfPintaPuertaEstado();setTimeout(()=>$('#pfPin')?.focus(),60);};
+cierraAcceso=function(){paraAnuncioBloqueo();activaRelojBloqueo(false);$('#acceso').hidden=true;pfPin='';if($('#pfPin'))$('#pfPin').value='';document.body.classList.remove('sin-acceso');bloqueado=false;panelPersonal?.aplicaRol();reiniciaInactividad();};
+const pfAbreChecaAnterior=abreCheca;
+abreCheca=function(id){if(!pfDatos?.terminal||RESTAURANT_ACCOUNT.personal){toast('Checa en un aparato autorizado del negocio.');return;}pfAbreChecaAnterior(id);};
+const pfRegistraChecaAnterior=registraCheca;
+$('#chOk').removeEventListener('click',pfRegistraChecaAnterior);
+registraCheca=async function(){
+ if(chValidando||$('#chOk').disabled||!chQuien)return;
+ const before=chQuien;chValidando=true;revisaChOk();try{
+  const r=await pfRpc('checar',{pin:chTecleado,foto:chFoto||''});if(!r?.ok)throw Error(r?.error||'No se registró.');
+  if(chQuien!==before)return;cierraCheca();pfConfirmacion=null;await pfPanel.load();renderPersonal();if(!$('#acceso').hidden)$('#pfTurnoDentro').textContent=(r.registro.tipo==='entrada'?'Entrada':'Salida')+' registrada para '+r.nombre+'.';toast('Checada registrada.');
+ }catch(e){toast(e.message);chTecleado='';pintaChPin();}finally{chValidando=false;revisaChOk();}
+};
+$('#chOk').addEventListener('click',registraCheca);
+$('#userChip').addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();$('#modalUser').hidden=true;pideAcceso();},true);
+const pfCierraChecaAnterior=cierraCheca;
+cierraCheca=function(){pfConfirmacion=null;pfCierraChecaAnterior();};
+const pfRenderPersonalAnterior=renderPersonal;
+renderPersonal=function(){pfRenderPersonalAnterior();if($('#pfTerminal'))$('#pfTerminal').hidden=!esGerente();if(pfPanel&&esGerente())pfPanel.render();};
+const pfExpAnterior=abreExpediente;
+abreExpediente=function(id){pfExpAnterior(id);if(!esGerente())return;const u=EQUIPO.find(p=>p.id===id);if(!u)return;const box=document.createElement('div');box.className='pfBloque';box.innerHTML='<label>Horas disponibles por semana <input id="pfHorasPersona" type="number" min="1" max="168" value="'+num(u.horasSemana??48)+'"></label><button class="btn" type="button" id="pfGuardarHoras">Guardar horas, sueldo y horario en la nube</button>';$('#expCuerpo').append(box);$('#pfGuardarHoras').onclick=async()=>{try{const horas=Number($('#pfHorasPersona').value);const r=await pfRpc('perfil',{persona:u.id,horas,pago:{...pagoDe(u),tolerancia:num(P.tolerancia,10)},horario:horarioDe(u)});u.horasSemana=horas;pfAplicaEstado(r);await pfPanel.load();toast('Expediente sincronizado.');}catch(e){toast(e.message);}};};
+ROLES.cocina.ve=['cocina','menu'];
+const pfMenuVisibilidad=new Map();
+function pfPintaDispo(){
+ let host=$('#pfDisponibilidad');if(!host){host=document.createElement('div');host.id='pfDisponibilidad';$('#tab-menu').prepend(host);}host.innerHTML='<h2>Disponibilidad del menú</h2><div class="pfDisponibilidad">'+MENU.plats.filter(p=>p.activo!==false).map(p=>'<article><b>'+esc(p.nombre)+'</b><small>'+(p.agotado?'Agotado · '+esc(p.agotado.quien||'Cocina'):'Disponible')+'</small><button class="btn" type="button" data-pfdispo="'+esc(p.id)+'">'+(p.agotado?'Ya hay otra vez':'Marcar agotado')+'</button></article>').join('')+'</div>';
+ [...$('#tab-menu').children].forEach(el=>{if(el!==host){if(!pfMenuVisibilidad.has(el))pfMenuVisibilidad.set(el,el.hidden);el.hidden=true;}});
+}
+const pfMenuAnterior=renderMenu;
+renderMenu=function(){if(rolActual()==='cocina'){pfPintaDispo();return;}$('#pfDisponibilidad')?.remove();pfMenuVisibilidad.forEach((hidden,el)=>el.hidden=hidden);pfMenuVisibilidad.clear();pfMenuAnterior();};
+$('#menuBuscar').removeEventListener('input',pfMenuAnterior);$('#menuBuscar').addEventListener('input',renderMenu);$('#menuFiltroCategoria').removeEventListener('change',pfMenuAnterior);$('#menuFiltroCategoria').addEventListener('change',renderMenu);
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-pfdispo]');if(!b)return;b.disabled=true;try{const p=MENU.plats.find(p=>p.id===b.dataset.pfdispo),r=await pfRpc('disponibilidad',{platillo:p.id,agotado:!p.agotado});pfAplicaEstado(r);renderMenu();}catch(x){toast(x.message);}finally{b.disabled=false;}});
+function cxMarcaAgotados(){
+ document.querySelectorAll('#comPlatillos [data-plat]').forEach(b=>{const p=MENU.plats.find(p=>p.id===b.dataset.plat);if(p?.agotado){b.disabled=true;b.classList.add('pfAgotado');b.setAttribute('aria-label',p.nombre+' · Agotado');if(!b.querySelector('.pfEstado'))b.insertAdjacentHTML('beforeend','<span class="pfEstado">Agotado</span>');}});
+ const pending=comandaActual()?.lineas?.filter(l=>!l.enviada&&!l.cancelada&&MENU.plats.find(p=>p.id===l.platId)?.agotado)||[];
+ if(pending.length){$('#comEnviar').disabled=true;$('#comEnviar').dataset.pfBloqueado='1';$('#comEnviar').title='Quita los platillos agotados antes de enviar.';}else if($('#comEnviar').dataset.pfBloqueado){$('#comEnviar').disabled=false;delete $('#comEnviar').dataset.pfBloqueado;$('#comEnviar').removeAttribute('title');}
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-plat]'),p=b&&MENU.plats.find(x=>x.id===b.dataset.plat);
+ if(p?.agotado){e.preventDefault();e.stopImmediatePropagation();toast('Cocina marcó este platillo agotado.');}
+ if(e.target.closest('#comEnviar')&&comandaActual()?.lineas.some(l=>!l.enviada&&!l.cancelada&&MENU.plats.find(p=>p.id===l.platId)?.agotado)){e.preventDefault();e.stopImmediatePropagation();toast('Quita los platillos agotados antes de mandar a cocina.');}
+},true);
+const pfComandaAnterior=renderComanda;
+renderComanda=function(){pfComandaAnterior();cxMarcaAgotados();};
+function pfPintaHoy(){
+ pfPreparaIndicadores();const parent=$('#tab-inicio');if(!parent||!pfDatos)return;let host=$('#cxHoy');if(!host){host=document.createElement('section');host.id='cxHoy';host.className='pfBloque';parent.append(host);}
+ if(!puedeVer('inicio')||bloqueado){host.hidden=true;return;}host.hidden=false;
+ const solicitudes=esGerente()?(pfDatos.solicitudes||[]).filter(r=>r.estado==='Pendiente'):[];
+ const hoy=pfDatos.semana.publicado.filter(t=>t.fecha===hoyISO());
+ const avisos=[];
+ if(esGerente()){
+  const faltan=pfDatos.semana.borrador.filter(t=>!t.persona).length;
+  if(faltan)avisos.push(faltan+' turno(s) sin cubrir.');
+  if(JSON.stringify(pfDatos.semana.borrador)!==JSON.stringify(pfDatos.semana.publicado))avisos.push('Hay cambios de horario sin publicar.');
+  const tarde=hoy.filter(t=>t.persona&&!ASISTENCIAS.some(a=>a.uid===t.persona&&a.fecha===hoyISO()&&a.tipo==='entrada')&&Date.now()>new Date(t.fecha+'T'+t.entrada+':00').getTime()+10*60000).length;
+  if(tarde)avisos.push(tarde+' persona(s) sin entrada después de 10 minutos.');
+ }
+ host.innerHTML='<h2>Hoy en tu restaurante</h2><div class="pfBotones">'+(puedeVer('cocina')?'<button class="btn" data-pfgo="cocina">Cocina · '+porHacer().length+' por preparar</button>':'')+(puedeVer('caja')?'<button class="btn" data-pfgo="caja">Control de caja</button>':'')+(esGerente()?'<button class="btn" data-pfgo="personal">Revisar turnos y solicitudes</button>':'')+'</div>'+avisos.map(x=>'<p><button class="btn" data-pfgo="personal">'+esc(x)+' Revisar</button></p>').join('')+solicitudes.filter(r=>r.semana===pfDatos.semana.fecha).map(r=>pfPanel.requestCard(r)).join('')+(esGerente()?'<h3>Equipo de hoy</h3>'+hoy.map(t=>'<p>'+esc(EQUIPO.find(u=>u.id===t.persona)?.nombre||'Sin cubrir')+' · '+esc(t.puesto)+' · '+t.entrada+'–'+t.salida+' · '+(t.persona&&pfEstaDentro(t.persona)?'Dentro':'Sin entrada')+'</p>').join(''):'');
+ host.querySelectorAll('[data-pfgo]').forEach(b=>b.onclick=()=>{vaA(b.dataset.pfgo);if(b.dataset.pfgo==='personal')panelPersonal?.elegir('horarios');});
+ pfAvisoActividades();
+ host.querySelectorAll('[data-pf=approve],[data-pf=reject]').forEach(b=>b.onclick=()=>pfPanel.run('resolver',{id:b.dataset.id,aprobar:b.dataset.pf==='approve'}).catch(e=>toast(e.message)));
+}
+const pfInicioAnterior=renderInicio;
+renderInicio=function(){pfInicioAnterior();pfPintaHoy();};
+const pfStartAnterior=start;
+start=function(){pfStartAnterior();pfMonta();};
+
+
+function pfPreparaIndicadores(){
+ document.querySelectorAll('#inTiles .tile').forEach((el,i)=>{el.dataset.pfIndicador=i;el.tabIndex=0;el.setAttribute('role','button');el.setAttribute('aria-haspopup','dialog');});
+}
+function pfDetalle(i){
+ const xs=cerradasDe(hoyISO()),ab=abiertas(),total=xs.reduce((n,c)=>n+num(c.total),0),titles=['Vendido hoy','En el piso','Ticket promedio','Propinas'];
+ const d=document.createElement('dialog');d.className='pfDialog';
+ const data=i===1?ab:xs;const groups={};xs.forEach(c=>{if(i===3)groups[c.mesero||'Sin asignar']=(groups[c.mesero||'Sin asignar']||0)+num(c.propina);else(c.pagos||[]).forEach(p=>groups[p.tipo]=(groups[p.tipo]||0)+num(p.monto));});
+ const detail=i===1?ab.length+' mesas abiertas':i===2?mx(xs.length?total/xs.length:0)+' = '+mx(total)+' entre '+xs.length+' cuentas':Object.entries(groups).map(([k,v])=>esc(k)+': '+mx(v)).join('<br>');
+ d.innerHTML='<h2>'+titles[i]+'</h2><p>'+detail+'</p>'+data.map(c=>'<p>'+esc(c.folio||c.mesaNombre||'Pedido')+' · '+mx(sumaComanda(c).total)+(i===1?' <button class="btn" data-pfcom="'+esc(c.id)+'">Abrir cuenta</button>':'')+'</p>').join('')+'<button class="btn" data-pfcerrar>Cerrar</button>';
+ d.querySelector('[data-pfcerrar]').onclick=()=>d.close();d.querySelectorAll('[data-pfcom]').forEach(b=>b.onclick=()=>{comandaId=b.dataset.pfcom;d.close();vaA('comanda');});const go=document.createElement('button');go.className='btn';go.textContent=['Ver ventas','Ver mesas','Ver ventas','Ver caja'][i];go.onclick=()=>{d.close();vaA(['ventas','mesas','ventas','caja'][i]);};d.append(go);d.onclose=()=>d.remove();document.body.append(d);d.showModal();
+}
+document.addEventListener('click',e=>{const tile=e.target.closest('[data-pf-indicador]');if(tile)pfDetalle(Number(tile.dataset.pfIndicador));});
+document.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)&&e.target.matches('[data-pf-indicador]')){e.preventDefault();pfDetalle(Number(e.target.dataset.pfIndicador));}});
+
+/* <</PERSONAL-FASE1>> */
+
 /* <<LIMPIO 20261121-1445>> Restaurant limpio (aprobado por Carlos el 21 nov 2026). Va antes de iniciaRestaurant(): los ganchos quedan puestos antes del primer start(). */
 /* =====================================================================
    Maqueta limpia (tipo Loyverse) · Nuvoor Restaurant · 21 nov 2026

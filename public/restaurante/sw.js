@@ -1,5 +1,5 @@
-// Sello Restaurant: 20261121-1710
-const CACHE_NAME = "nuvoor-restaurant-v58-anuncios";
+// Sello Restaurant: 20261121-2345
+const CACHE_NAME = "nuvoor-restaurant-v60-personal-actividades";
 const MEDIOS_CACHE = "nuvoor-restaurant-medios-v1";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
@@ -13,6 +13,19 @@ const APP_ASSETS = [
   new URL("personal-admin.js?v=1", APP_SCOPE).href,
   new URL("personal-panel.js?v=20261116-1726", APP_SCOPE).href,
   new URL("personal-panel.css?v=20261116-1726", APP_SCOPE).href,
+  new URL("personal-semana.js", APP_SCOPE).href,
+  new URL("personal-semana-ui.js", APP_SCOPE).href,
+  new URL("personal-fase1.css", APP_SCOPE).href,
+  new URL("personal-jornada.js", APP_SCOPE).href,
+  new URL("actividades.js", APP_SCOPE).href,
+  new URL("actividades.css", APP_SCOPE).href,
+  new URL("puerta-imprenta.css", APP_SCOPE).href,
+  new URL("../bloqueo.css?v=20261104-1712", APP_SCOPE).href,
+  new URL("../bloqueo-pin.css?v=20261121-2100", APP_SCOPE).href,
+  new URL("../bloqueo.js?v=20261104-1712", APP_SCOPE).href,
+  new URL("../marca/n-64.png", APP_SCOPE).href,
+  new URL("../marca/n-192.png", APP_SCOPE).href,
+  new URL("../marca/palabra-96.png", APP_SCOPE).href,
   new URL("../config.js", APP_SCOPE).href,
   new URL("../facturacion-pos.js?v=20261104-2206", APP_SCOPE).href,
   new URL("icons/icon-192.png", APP_SCOPE).href,
@@ -47,11 +60,12 @@ self.addEventListener("fetch", event => {
   }
   const configPath = new URL("../config.js", APP_SCOPE).pathname;
   const fiscalPath = new URL("../facturacion-pos.js", APP_SCOPE).pathname;
-  if (url.origin !== APP_SCOPE.origin || (!url.pathname.startsWith(APP_SCOPE.pathname) && url.pathname !== configPath && url.pathname !== fiscalPath)) return;
+  const compartido = APP_ASSETS.some(ref=>new URL(ref).pathname===url.pathname);
+  if (url.origin !== APP_SCOPE.origin || (!url.pathname.startsWith(APP_SCOPE.pathname) && !compartido)) return;
 
   // La liga de una invitación puede traer un código privado. No se guarda
   // su dirección ni la respuesta de acceso en el caché del dispositivo.
-  if (url.pathname === new URL("personal.html", APP_SCOPE).pathname) {
+  if (["personal.html","jornada.html"].some(p=>url.pathname === new URL(p, APP_SCOPE).pathname)) {
     event.respondWith(fetch(new Request(request,{cache:"no-store"})).catch(()=>new Response(
       '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><p>Conéctate a internet para confirmar tu acceso a Nuvoor.</p>',
       {status:503,headers:{"Content-Type":"text/html;charset=utf-8","Cache-Control":"no-store"}}

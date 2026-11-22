@@ -1,0 +1,3 @@
+/* El marco, colores y tarjeta pertenecen a ../bloqueo.css y ../bloqueo-pin.css.
+   Sólo la confirmación de checada es específica de Restaurant. */
+#pfChecaConfirm{position:absolute;inset:12px;background:var(--nvSurface);border:1px solid var(--nvLine);border-radius:14px;padding:20px;z-index:2;display:flex;flex-direction:column;justify-content:center;gap:10px}
