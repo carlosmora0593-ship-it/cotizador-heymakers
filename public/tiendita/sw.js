@@ -1,6 +1,8 @@
-const CACHE_NAME = "nuvoor-store-v13-caja-nueva";
+const CACHE_NAME = "nuvoor-store-v14-cierre-remoto";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
+  new URL("../caja-concilia.js", APP_SCOPE).href,
+  new URL("../caja-concilia.css", APP_SCOPE).href,
   APP_SCOPE.href,
   new URL("index.html", APP_SCOPE).href,
   new URL("manifest.webmanifest", APP_SCOPE).href,
@@ -13,7 +15,7 @@ const APP_ASSETS = [
   new URL("../bloqueo.js?v=20261104-1712", APP_SCOPE).href
 ];
 /* La pantalla de bloqueo es la misma en todo Nuvoor: sus archivos viven fuera de /tiendita/ y también se guardan para que funcione sin internet. */
-const COMPARTIDOS = ["../bloqueo.css", "../bloqueo-pin.css", "../bloqueo.js"].map(r => new URL(r, APP_SCOPE).pathname);
+const COMPARTIDOS = ["../caja-concilia.js", "../caja-concilia.css", "../bloqueo.css", "../bloqueo-pin.css", "../bloqueo.js"].map(r => new URL(r, APP_SCOPE).pathname);
 const CONFIG_URL = new URL("../config.js", APP_SCOPE).pathname;
 
 self.addEventListener("install", event => {

@@ -1,8 +1,9 @@
-// Sello Restaurant: 20261121-2345
-const CACHE_NAME = "nuvoor-restaurant-v60-personal-actividades";
+// Sello Restaurant: 20261122-1435
+const CACHE_NAME = "nuvoor-restaurant-v61-cierre-remoto";
 const MEDIOS_CACHE = "nuvoor-restaurant-medios-v1";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
+  new URL("../caja-concilia.css", APP_SCOPE).href,
   APP_SCOPE.href,
   new URL("index.html", APP_SCOPE).href,
   new URL("manifest.webmanifest", APP_SCOPE).href,

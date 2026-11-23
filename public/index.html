@@ -3785,6 +3785,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
 
 </style>
 <script src="facturacion-pos.js?v=20261104-2206"></script>
+<script src="caja-concilia.js"></script><link rel="stylesheet" href="caja-concilia.css">
 </head>
 <body class="sin-sesion">
 <header class="top">
@@ -6677,9 +6678,11 @@ async function initStore(){
       ventas = v.docs.map(d=>d.data().venta).filter(Boolean);
       const cl = await DB.collection("clientes").limit(500).get();
       clientes = cl.docs.map(d=>d.data().cliente).filter(Boolean);
-      const cj = await DB.collection("caja").orderBy("fecha","desc").limit(400).get();
-      cajas = {}; cortes = [];
-      cj.docs.map(d=>d.data().caja).filter(Boolean).forEach(c=>{ cajas[c.fecha]=c; if(c.cierre) cortes.push(c); });
+      const ctxCaja41=crContexto41(),pendientesCaja41=crLee41(ctxCaja41,"cajas",{});
+      const cj=crCajaPlan41()?await DB.collection("caja").orderBy("fecha","desc").limit(400).get():{docs:[]};
+      if(!crActual41(ctxCaja41))throw Error("La cuenta cambió durante la carga de caja.");
+      cajas=JSON.parse(JSON.stringify(pendientesCaja41));cortes=[];
+      cj.docs.map(d=>d.data().caja).filter(Boolean).forEach(c=>{c=NuvoorCortes.dia(pendientesCaja41[c.fecha]||{},c); cajas[c.fecha]=c; if(c.cierre) cortes.push(c); });cortes=Object.values(cajas).filter(c=>c.cierre);for(const c of Object.values(cajas))crOrigen.set(c,ctxCaja41.ambito);crGuarda41(ctxCaja41,"cajas",cajas);
     }catch(e){ console.warn(e); }
     
   } else {
@@ -12025,6 +12028,8 @@ $("#ab_ok").addEventListener("click", async ()=>{
   if(monto <= 0){ toast("Escribe cuánto recibes"); return; }
   const fecha = $("#ab_fecha").value || hoyISO();
   const forma = $("#ab_pago").value;
+  if(!crPuedeCobrar(fecha))return;
+  crRegistraCobro(v,fecha,monto,forma,uid());
   v.recibido = Math.round((num(v.recibido) + monto)*100)/100;
   v.estado = saldoDe(v) <= 0 ? "pagado" : "anticipo";
   v.abonos = (v.abonos||[]).concat([{fecha, monto, pago:forma}]);
@@ -12032,7 +12037,7 @@ $("#ab_ok").addEventListener("click", async ()=>{
           catch(e){ toast("No se pudo guardar el abono en la nube"); } }
   else lsSet("ventas", ventas);
   // si entró en efectivo y la caja de ese día está abierta, se registra sola
-  if(forma === "Efectivo"){
+  if(crCajaPlan41() && forma === "Efectivo"){
     const c = cajaDe(fecha);
     if(c.abierta){
       c.movs.push({id:uid(), hora:horaAhora(), tipo:"venta",
@@ -15322,6 +15327,7 @@ async function cobraMostrador(conTicket){
     factura: {requiere:false}
   };
   try{ venta.partidas = partidasDeLineas(venta.lineas, venta.total, venta.costo); }catch(e){}
+  if(!crPuedeCobrar(venta.fecha))return;crRegistraCobro(venta,venta.fecha,num(venta.recibido??venta.total),venta.pago,venta.cobroId41||(venta.cobroId41=uid()));
   ventas.push(venta);
   if(DB){ try{ await DB.collection("ventas").doc(folio).set({venta, fecha:venta.fecha, total:venta.total}); }
           catch(e){ toast("No se pudo guardar la venta en la nube"); } }
@@ -15338,7 +15344,7 @@ async function cobraMostrador(conTicket){
   /* Y si cobró en efectivo con la caja abierta, el movimiento entra solo:
      un corte que no cuadra porque alguien se le olvidó anotar es el
      problema que esto viene a quitar. */
-  if(venta.pago === "Efectivo"){
+  if(crCajaPlan41() && venta.pago === "Efectivo"){
     const caja = cajaDe(venta.fecha);
     const tAb = usaTurnos() ? turnoAbierto(caja) : null;
     /* Con turnos el movimiento SIEMPRE se registra, haya turno o no. El
@@ -19352,6 +19358,7 @@ $("#btnConfirmar").addEventListener("click", async ()=>{
   const faltaConf = (typeof cv2FaltaConfirmar === "function") ? cv2FaltaConfirmar() : "";
   if(faltaConf){ toast(faltaConf); return; }
   if(typeof pgAbre === "function" && !cot._pagoListo){ pgAbre(); return; }
+  if(cot.pago&&!cot.pago.registrado&&num(cot.pago.monto)>0&&!crPuedeCobrar(cot.pago.fecha||hoyISO()))return;
   delete cot._pagoListo;
   cot.estado = "confirmada";
   cot.op = {folio: folioOP(), fecha: hoyISO(), cotizacion: cot.folio, estatus:"Pendiente",
@@ -22300,10 +22307,34 @@ $("#c_clienteSel").addEventListener("change", e=>{
 $("#btnGuardarCliente").addEventListener("click", fclGuarda);
 
 
+
+const crEnvios=new Map(),crRevisiones=new Map(),crOrigen=new WeakMap();let crLeyendo=false,crAmbito41=null;
+function crCuentaId41(){try{return window.__estadoLicenciaNuvoor?.().cuenta||null;}catch(_){return null;}}
+function crClave41(ctx,tipo){return ctx.db?(ctx.cuenta?LS+'_caja41_'+encodeURIComponent(ctx.cuenta)+'_'+tipo:null):LS+'_'+tipo;}
+function crLee41(ctx,tipo,fallback){try{const k=crClave41(ctx,tipo),v=k&&localStorage.getItem(k);return v?JSON.parse(v):fallback;}catch(_){return fallback;}}
+function crGuarda41(ctx,tipo,value){const key=crClave41(ctx,tipo);if(!key)return;try{localStorage.setItem(key,JSON.stringify(value));}catch(_){}}
+function crContexto41(){const ctx={db:DB,cuenta:DB?crCuentaId41():null};ctx.ambito=ctx.db?'nube:'+String(ctx.cuenta||'sin-cuenta'):'local';if(crAmbito41!==ctx.ambito){crAmbito41=ctx.ambito;cajas=crLee41(ctx,'cajas',{});cortes=Object.values(cajas).filter(x=>x.cierre);for(const c of Object.values(cajas))crOrigen.set(c,ctx.ambito);}return ctx;}
+function crActual41(ctx){return DB===ctx.db&&(!ctx.db||crCuentaId41()===ctx.cuenta);}
+function crCajaPlan41(){return !DB||!window.__enElPlan||!!window.__enElPlan('caj');}
+function crCorteSnapshot(c,t){return {id:uid(),en:new Date().toISOString(),salesAtClose:NuvoorCortes.resumen((c.cobros||[]).filter(x=>!t||x.shiftId===t.id)),movsAlCerrar:(c.movs||[]).filter(x=>!t||x.turnoId===t.id).map(x=>x.id),cerradoDesde:crAparato(),cerradoPor:usuarioActual().nombre||'Administrador'};}
+function crAparato(){let id=lsGet('aparatoCaja41','');if(!id){id='Imprenta-'+uid();lsSet('aparatoCaja41',id);}return id;}
+function crPuedeCobrar(fecha){if(!crCajaPlan41())return true;const c=cajaDe(fecha);if(c.cierre){toast('La caja del día está cerrada. Abre caja para seguir cobrando.');return false;}return true;}
+function crRegistraCobro(v,fecha,monto,forma,id){if(!(monto>0)||!crCajaPlan41())return;const c=cajaDe(fecha),t=usaTurnos()?turnoAbierto(c):null;c.cobros=NuvoorCortes.union([{id,folio:v.folio,fecha,total:num(monto),method:forma,shiftId:t?.id||'',aperturaRevision:num(c.aperturaRevision)}],c.cobros);guardaCaja(c);}
+function crInfoCorte(c,t){const cut=t?.cierre||c.cierre;return cut?'<p>Cerrado desde '+esc(cut.cerradoDesde||'otro aparato')+' por '+esc(cut.cerradoPor||'Administrador')+'</p>'+NuvoorCortes.html(NuvoorCortes.tardiosDia(c,t),mx,esc):'';}
+function crPermanente41(e){const code=String(e?.code||'').toUpperCase(),txt=String(e?.message||e||'').toUpperCase();if(code==='PRO'||/FUNCION_PRO|PLAN PRO|PLAN.*NO INCLUYE/.test(txt))return {code:'plan',texto:'Tu plan no incluye Caja en la nube. Los cambios quedan guardados en este aparato.'};if(code==='VENCIDA'||/SUSCRIPCION_VENCIDA|SUSCRIPCIÓN VENCI|SUSCRIPCION VENCI/.test(txt))return {code:'vencida',texto:'La suscripción venció. Los cambios de caja quedan guardados en este aparato.'};if(/42501|403|PERMISO|DENIED|NOT AUTHORIZED|NO TIENES ACCESO/.test(code+' '+txt))return {code:'permiso',texto:'Tu sesión no tiene permiso para subir la caja. Los cambios quedan guardados en este aparato.'};return null;}
+function crAparta41(ctx,fecha,error){const r=crPermanente41(error);if(!r)return false;const aside=crLee41(ctx,'cajasApartadas41',{});aside[fecha]={codigo:r.code,texto:r.texto};crGuarda41(ctx,'cajasApartadas41',aside);crGuarda41(ctx,'cajasPendientes41',crLee41(ctx,'cajasPendientes41',[]).filter(f=>f!==fecha));const avisos=crLee41(ctx,'cajasAvisos41',[]);if(!avisos.includes(r.code)&&crActual41(ctx)){crGuarda41(ctx,'cajasAvisos41',[...avisos,r.code]);toast(r.texto);}return true;}
+function crFusiona41(ctx,fecha,remota){if(!crActual41(ctx))return;const old=cajas[fecha],merged=NuvoorCortes.dia(old||{},remota);crOrigen.set(merged,ctx.ambito);cajas[fecha]=merged;if(old?.abierta&&!merged.abierta){const id=fecha+':'+NuvoorCortes.cierreId(merged),seen=crLee41(ctx,'cajasCierresVistos41',[]);if(!seen.includes(id)){crGuarda41(ctx,'cajasCierresVistos41',[...seen,id]);toast('La caja se cerró desde '+(merged.cierre?.cerradoDesde||'otro aparato')+'. Abre caja para seguir cobrando.');}}return JSON.stringify(old)!==JSON.stringify(merged);}
+function crEnvia41(ctx,fecha){if(!ctx.db||!ctx.cuenta||!crActual41(ctx)||!navigator.onLine||!crCajaPlan41()||crLee41(ctx,'cajasApartadas41',{})[fecha])return Promise.resolve();const key=ctx.ambito+':'+fecha;if(crEnvios.has(key))return crEnvios.get(key);let enviada=-1,exito=false;const work=(async()=>{try{const ref=ctx.db.collection('caja').doc(fecha),remote=await ref.get();if(!crActual41(ctx))return;crFusiona41(ctx,fecha,remote.exists?remote.data().caja:{});const snapshot=JSON.parse(JSON.stringify(cajas[fecha]));enviada=crRevisiones.get(key)||0;crGuarda41(ctx,'cajas',cajas);await ref.set({caja:snapshot,fecha});if(!crActual41(ctx))return;exito=true;if((crRevisiones.get(key)||0)===enviada)crGuarda41(ctx,'cajasPendientes41',crLee41(ctx,'cajasPendientes41',[]).filter(f=>f!==fecha));}catch(e){crAparta41(ctx,fecha,e);}finally{crEnvios.delete(key);if(crActual41(ctx)){cortes=Object.values(cajas).filter(c=>c.cierre);crPintaPendientes41();if(exito&&(crRevisiones.get(key)||0)>enviada)crEnvia41(ctx,fecha);}}})();crEnvios.set(key,work);return work;}
+function crPintaPendientes41(){const host=$('#cajaCuerpo');if(!host)return;$('#crEstado41')?.remove();const ctx=crContexto41(),apartadas=crLee41(ctx,'cajasApartadas41',{}),pendientes=crLee41(ctx,'cajasPendientes41',[]);if(!Object.keys(apartadas).length&&!pendientes.length)return;const box=document.createElement('div');box.id='crEstado41';box.className='nvCorteTardios';box.innerHTML='<b>Cambios de caja guardados en este aparato</b><p>'+esc(Object.values(apartadas)[0]?.texto||'Se subirán cuando haya conexión.')+'</p>'+(Object.keys(apartadas).length&&crCajaPlan41()?'<button class="btn" id="crReintenta41">Reintentar sincronización</button>':'');host.append(box);box.querySelector('button')?.addEventListener('click',()=>{if(!crActual41(ctx))return;crGuarda41(ctx,'cajasApartadas41',{});const fechas=[...new Set([...pendientes,...Object.keys(apartadas)])];crGuarda41(ctx,'cajasPendientes41',fechas);fechas.forEach(f=>crEnvia41(ctx,f));crPintaPendientes41();});}
+function crDiasRecientes41(){const fechas=new Set();for(let n=0;n<3;n++){const d=new Date(hoyISO()+'T12:00:00');d.setDate(d.getDate()-n);fechas.add(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));}for(const c of Object.values(cajas))if(c.abierta)fechas.add(c.fecha);return [...fechas];}
+async function crRecargaCajas(){if(!DB||crLeyendo||rolActual()!=='admin'||!navigator.onLine||document.hidden)return;const ctx=crContexto41();if(!ctx.cuenta||!crCajaPlan41())return;crLeyendo=true;try{for(const f of crLee41(ctx,'cajasPendientes41',[])){if(!crActual41(ctx))return;if(cajas[f])await crEnvia41(ctx,f);}let changed=false;for(const f of crDiasRecientes41()){if(!crActual41(ctx))return;const r=await ctx.db.collection('caja').doc(f).get();if(!crActual41(ctx))return;if(r.exists&&r.data().caja)changed=crFusiona41(ctx,f,r.data().caja)||changed;}if(!crActual41(ctx))return;cortes=Object.values(cajas).filter(c=>c.cierre);crGuarda41(ctx,'cajas',cajas);if(changed&&!$('#tab-caj').hidden){renderCaja();renderCortes();}}catch(_){}finally{crLeyendo=false;}}
+setInterval(crRecargaCajas,25000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)crRecargaCajas();});
+
 /* ============ CAJA ============ */
 let cajaFecha = hoyISO(), cajas = {}, cortes = [];
 function cajaVacia(f){ return {fecha:f, abierta:false, fondo:0, hora:"", movs:[], cierre:null}; }
-function cajaDe(f){ return cajas[f] || (cajas[f] = cajaVacia(f)); }
+function cajaDe(f){const ctx=crContexto41();const c=cajas[f]||(cajas[f]=cajaVacia(f));crOrigen.set(c,ctx.ambito);return c;}
 function horaAhora(){ const d=new Date(); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
 
 function saldoCaja(c){
@@ -22339,7 +22370,7 @@ function abreTurno(c, cajeroId, fondo){
 }
 function cierraTurno(c, t, contado, nota){
   const esperado = esperadoTurno(c, t);
-  t.cierre = {hora:horaAhora(), contado:num(contado), esperado,
+  t.cierre = {...crCorteSnapshot(c,t),hora:horaAhora(), contado:num(contado), esperado,
               dif: Math.round((num(contado) - esperado)*100)/100, nota:(nota||"").trim()};
   if(!turnoAbierto(c)) c.abierta = false;
   return t.cierre;
@@ -22352,7 +22383,8 @@ function turnoParaCobrar(){
   return turnoAbierto(cajaDe(hoyISO()));
 }
 
-function renderCaja(){
+function renderCaja(){crContexto41();renderCajaContenido41();crPintaPendientes41();}
+function renderCajaContenido41(){
   if(usaTurnos()) return renderCajaTurnos();
   $("#cajaFecha").value = cajaFecha;
   $("#cajaFechaTxt").textContent = etiquetaRango("dia", {ini:cajaFecha, fin:cajaFecha});
@@ -22374,7 +22406,7 @@ function renderCaja(){
       '<div style="margin-left:auto;text-align:right"><div class="k" style="font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;font-weight:700">Contado</div>'+
       '<div class="big">'+mx(c.cierre.contado)+'</div>'+
       '<div class="dif '+(Math.abs(d)<0.5?"ok":"mal")+'">'+(d===0?"Cuadró":(d>0?"Sobrante ":"Faltante ")+mx(Math.abs(d)))+'</div></div></div>'+
-      '<div class="movs">'+renderMovs(c)+'</div>'+
+      crInfoCorte(c)+'<div class="movs">'+renderMovs(c)+'</div>'+
       '<div class="row-actions" style="margin-top:14px"><button class="btn" id="cajaImprimir">Ver corte</button>'+
       (esHoy? '<button class="btn ghost" id="cajaReabrir">Reabrir caja</button>':'')+'</div>';
     return;
@@ -22394,13 +22426,13 @@ function renderCaja(){
    '</div>'+
    '<div class="movs">'+renderMovs(c)+'</div>'+
    '<div style="margin-top:20px;border-top:1px solid var(--line);padding-top:16px">'+
-     '<label class="f">Corte de caja</label>'+
+     '<label class="f">Corte de caja</label><p>Si hay cobros sin subir, se sumarán a este corte como cobros tardíos cuando el aparato se conecte.</p>'+
      '<div class="conteo" style="margin-top:6px">'+
        '<div><label class="f">Efectivo contado</label><input id="cajaContado" type="number" min="0" step="10" placeholder="0.00"></div>'+
        '<div><label class="f">Debe haber</label><input readonly class="num" value="'+mx(saldo)+'"></div>'+
        '<div style="grid-column:span 2"><label class="f">Nota del corte</label><input id="cajaNota" placeholder="Opcional"></div>'+
      '</div>'+
-     '<div class="row-actions" style="margin-top:12px"><button class="btn primary" id="cajaCerrar">Cerrar caja y hacer corte</button></div>'+
+     '<div class="row-actions" style="margin-top:12px"><button class="btn primary" id="cajaCerrar">Cerrar desde este aparato</button></div>'+
    '</div>';
 }
 /* La caja por turnos. Tres estados: sin turno, turno abierto, y el
@@ -22470,7 +22502,7 @@ function renderCajaTurnos(){
           '<input id="tnNota" placeholder="Opcional: por qué falta o sobra"></div>'+
       '</div>'+
       '<div class="row-actions" style="margin-top:12px">'+
-        '<button class="btn primary" id="tnCerrar">Entregar turno</button></div></div>';
+        '<button class="btn primary" id="tnCerrar">Cerrar desde este aparato</button></div></div>';
   }
 
   /* El dinero que entró sin turno abierto. Está en el cajón de alguien y
@@ -22500,7 +22532,7 @@ function renderCajaTurnos(){
           '<span class="tnDato"><small>Debía haber</small>'+mx(x.cierre.esperado)+'</span>'+
           '<span class="tnDato"><small>Contó</small>'+mx(x.cierre.contado)+'</span>'+
           '<span class="tnDif">'+(Math.abs(d)<0.5 ? "Cuadró" : (d>0?"Sobró ":"Faltó ")+mx(Math.abs(d)))+'</span>'+
-          (x.cierre.nota ? '<span class="tnNota">'+esc(x.cierre.nota)+'</span>' : '')+
+          crInfoCorte(c,x)+(x.cierre.nota ? '<span class="tnNota">'+esc(x.cierre.nota)+'</span>' : '')+
         '</div>';
       }).join("")+'</div>';
   }
@@ -22520,6 +22552,7 @@ function renderMovs(c){
 }
 $("#tab-caj").addEventListener("click", async e=>{
   const c = cajaDe(cajaFecha);
+  if(rolActual()!=="admin"){toast("Sólo el dueño o administrador puede cambiar la caja.");return;}
 
   if(e.target.closest("#tnAbrir")){
     const t = abreTurno(c, $("#tnQuien").value, $("#tnFondo").value);
@@ -22555,11 +22588,11 @@ $("#tab-caj").addEventListener("click", async e=>{
     await guardaCaja(c); renderCaja(); toast("Movimiento registrado"); return;
   }
   const dm = e.target.closest("[data-delmov]");
-  if(dm){ c.movs = c.movs.filter(m=>m.id!==dm.dataset.delmov); await guardaCaja(c); renderCaja(); return; }
+  if(dm){c.movsBorrados=[...(c.movsBorrados||[]),dm.dataset.delmov]; c.movs = c.movs.filter(m=>m.id!==dm.dataset.delmov); await guardaCaja(c); renderCaja(); return; }
   if(e.target.closest("#cajaCerrar")){
     const contado = num($("#cajaContado").value), esperado = saldoCaja(c);
     if(!$("#cajaContado").value){ toast("Captura cuánto efectivo contaste"); return; }
-    c.cierre = {hora:horaAhora(), contado, esperado, nota:($("#cajaNota").value||"").trim()};
+    c.cierre = {...crCorteSnapshot(c),hora:horaAhora(), contado, esperado, nota:($("#cajaNota").value||"").trim()};
     c.abierta = false;
     await guardaCaja(c);
     cortes = cortes.filter(x=>x.fecha!==c.fecha); cortes.push(JSON.parse(JSON.stringify(c)));
@@ -22568,18 +22601,19 @@ $("#tab-caj").addEventListener("click", async e=>{
     toast(Math.abs(d)<0.5 ? "Corte cerrado y cuadrado" : (d>0?"Corte cerrado · sobrante de ":"Corte cerrado · faltante de ")+mx(Math.abs(d)));
     return;
   }
-  if(e.target.closest("#cajaReabrir")){ c.cierre=null; c.abierta=true; await guardaCaja(c); renderCaja(); return; }
+  if(e.target.closest("#cajaReabrir")){c.reabreDe=NuvoorCortes.cierreId(c);c.aperturaRevision=num(c.aperturaRevision)+1;c.cierresAnteriores=[...(c.cierresAnteriores||[]),JSON.parse(JSON.stringify(c.cierre))];c.cierre=null; c.abierta=true; await guardaCaja(c); renderCaja(); return; }
   if(e.target.closest("#cajaImprimir")){ hojaCorte(c); return; }
   const vc = e.target.closest("[data-vercorte]");
   if(vc){ const x = cortes.find(x=>x.fecha===vc.dataset.vercorte); if(x) hojaCorte(x); return; }
 });
 $("#cajaFecha").addEventListener("change", e=>{ cajaFecha = e.target.value || hoyISO(); renderCaja(); });
 $("#cajaHoy").addEventListener("click", ()=>{ cajaFecha = hoyISO(); renderCaja(); });
-async function guardaCaja(c){
-  cajas[c.fecha] = c;
-  if(DB){ try{ await DB.collection("caja").doc(c.fecha).set({caja:c, fecha:c.fecha}); }catch(e){ toast("No se pudo guardar la caja"); } }
-  else lsSet("cajas", cajas);
+function guardaCaja(c){
+ const ctx=crContexto41();if(!crCajaPlan41()||ctx.db&&!ctx.cuenta||crOrigen.has(c)&&crOrigen.get(c)!==ctx.ambito)return;
+ crOrigen.set(c,ctx.ambito);cajas[c.fecha]=c;crGuarda41(ctx,'cajas',cajas);
+ if(!ctx.db)return;const key=ctx.ambito+':'+c.fecha;crRevisiones.set(key,(crRevisiones.get(key)||0)+1);if(!crLee41(ctx,'cajasApartadas41',{})[c.fecha]){const p=new Set(crLee41(ctx,'cajasPendientes41',[]));p.add(c.fecha);crGuarda41(ctx,'cajasPendientes41',[...p]);crEnvia41(ctx,c.fecha);}
 }
+
 function renderCortes(){
   const cs = cortes.filter(c=>c.cierre).sort((a,b)=> a.fecha<b.fecha?1:-1).slice(0,40);
   $("#cortesCount").textContent = cs.length + " corte(s)";
@@ -22589,12 +22623,12 @@ function renderCortes(){
       : d>0 ? '<span class="pill part">Sobrante '+mx(d)+'</span>' : '<span class="pill pend">Faltante '+mx(-d)+'</span>';
     return '<div class="saved-item"><div class="meta"><b>'+esc(c.fecha)+'</b><small>Fondo '+mx(c.fondo)+' · '+
       (c.movs||[]).length+' movimiento(s) · cerró '+esc(c.cierre.hora)+'</small></div>'+pill+
-      '<span class="amt">'+mx(c.cierre.contado)+'</span>'+
+      NuvoorCortes.html(NuvoorCortes.tardiosDia(c),mx,esc)+'<span class="amt">'+mx(c.cierre.contado)+'</span>'+
       '<button class="btn sm" data-vercorte="'+esc(c.fecha)+'">Ver corte</button></div>';
   }).join("") : '<div class="empty">Todavía no hay cortes cerrados.</div>';
 }
 function hojaCorte(c){
-  const esperado = saldoCaja(c), contado = c.cierre? num(c.cierre.contado) : esperado, d = contado-esperado;
+  const esperado = c.cierre?num(c.cierre.esperado):saldoCaja(c), contado = c.cierre? num(c.cierre.contado) : esperado, d = contado-esperado;
   const ent = (c.movs||[]).filter(m=>m.tipo!=="salida").reduce((s,m)=>s+num(m.monto),0);
   const sal = (c.movs||[]).filter(m=>m.tipo==="salida").reduce((s,m)=>s+num(m.monto),0);
   const vtas = ventas.filter(v=>v.fecha===c.fecha);
@@ -22604,7 +22638,7 @@ function hojaCorte(c){
    '<div class="hoja-head"><div><h1>CORTE DE CAJA</h1><div>'+esc(P.empresa.nombre)+'</div></div>'+
    '<div style="text-align:right"><b>'+esc(c.fecha)+'</b><br>Apertura: '+esc(c.hora||"—")+
    '<br>Cierre: '+esc(c.cierre?c.cierre.hora:"sin cerrar")+'</div></div>'+
-   '<h2>Resumen del efectivo</h2>'+
+   crInfoCorte(c)+'<h2>Resumen del efectivo</h2>'+
    '<div class="tot" style="margin-left:0;width:min(420px,100%)">'+
      '<div><span>Fondo inicial</span><span>'+mx(c.fondo)+'</span></div>'+
      '<div><span>Entradas (ventas y otros)</span><span>'+mx(ent)+'</span></div>'+
@@ -22677,6 +22711,7 @@ $("#cb_ok").addEventListener("click", async ()=>{
   };
   venta.cfdi = nvFiscalCotSnapshot(q,venta);
   try{ venta.partidas = partidasDeCot(q, venta.total, venta.costo); }catch(e){}
+  if(!crPuedeCobrar(venta.fecha))return;crRegistraCobro(venta,venta.fecha,num(venta.recibido),venta.pago,venta.cobroId41||(venta.cobroId41=uid()));
   const i = ventas.findIndex(v=>v.folio===venta.folio);
   if(i>=0) ventas[i]=venta; else ventas.push(venta);
   if(DB){ try{ await DB.collection("ventas").doc(venta.folio).set({venta,fecha:venta.fecha,total:venta.total}); }catch(e){ toast("No se pudo guardar la venta en la nube"); } }
@@ -22685,7 +22720,7 @@ $("#cb_ok").addEventListener("click", async ()=>{
   if(j<0){ const rec = JSON.parse(JSON.stringify(q)); rec._total = r.total; guardadas.push(rec); if(!DB) lsSet("cots",guardadas);
     if(DB){ try{ await DB.collection("cotizaciones").doc(rec.folio).set({cot:rec,fecha:rec.fecha,cliente:rec.cliente||"",total:r.total}); }catch(e){} } }
   // Si la caja del día está abierta y cobró en efectivo, entra sola.
-  if(venta.pago === "Efectivo" && num(venta.recibido) > 0){
+  if(crCajaPlan41() && venta.pago === "Efectivo" && num(venta.recibido) > 0){
     const c = cajaDe(venta.fecha);
     if(c.abierta){
       c.movs.push({id:uid(), hora:horaAhora(), tipo:"venta", concepto:"Venta a "+(venta.cliente||"público"), folio:venta.folio, monto:num(venta.recibido)});
@@ -26499,6 +26534,7 @@ async function cv2RegistraPago(q){
   const fac = pg.factura ? {requiere:true, estado:"pendiente", rfc:(pg.factura.rfc||"").toUpperCase().trim(), razon:pg.factura.razon||"",
     cp:pg.factura.cp||"", regimen:pg.factura.regimen, uso:pg.factura.uso, formaSAT: FORMAS_SAT[pg.forma] || "99",
     metodoPago: pg.tipo === "total" ? "PUE" : "PPD", anticipo: pg.tipo === "anticipo" ? monto : 0} : {requiere:false};
+  pg.cobroId41=pg.cobroId41||uid();crRegistraCobro({folio:q.folio},pg.fecha,monto,pg.forma,pg.cobroId41);
   let v = (ventas||[]).find(x=>x.folio === q.folio);
   if(v){
     if(monto > 0){
@@ -26521,7 +26557,7 @@ async function cv2RegistraPago(q){
   }
   if(DB){ try{ await DB.collection("ventas").doc(v.folio).set({venta:v, fecha:v.fecha, total:v.total}); }catch(e){ toast("No se pudo guardar el pago en la nube"); } }
   else lsSet("ventas", ventas);
-  if(pg.forma === "Efectivo" && monto > 0 && typeof cajaDe === "function"){
+  if(crCajaPlan41() && pg.forma === "Efectivo" && monto > 0 && typeof cajaDe === "function"){
     const c = cajaDe(pg.fecha);
     if(c.abierta){
       c.movs.push({id:uid(), hora:horaAhora(), tipo:"venta", concepto:(pg.tipo === "anticipo" ? "Anticipo de " : "Pago de ") + (q.cliente||"cliente"), folio:q.folio, monto});
@@ -27947,10 +27983,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261116-1700";</script>
+<script>window.BUILD="20261122-1435";</script>
 <script>
 (function(){
-  var mio = "20261116-1700";
+  var mio = "20261122-1435";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }

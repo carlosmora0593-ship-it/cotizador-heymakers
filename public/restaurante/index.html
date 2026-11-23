@@ -1549,10 +1549,11 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 #modalMods .modIncomplete{font-size:11px;color:var(--ink-3);margin:8px 0 0}
 @media(max-width:450px){.configSaveBar{padding:13px}.configSaveBar>.btn{width:100%}#modalMods .modChips{gap:7px}#modalMods .modChip{padding:10px}}
 </style>
-<meta name="nuvoor-build" content="20261121-2345">
+<meta name="nuvoor-build" content="20261122-1435">
 <link rel="stylesheet" href="./tema-nuvoor.css?v=20261119-1428">
 <link rel="stylesheet" href="./limpio.css?v=20261121-1445">
 <link rel="stylesheet" href="./personal-fase1.css">
+<link rel="stylesheet" href="../caja-concilia.css">
 <link rel="stylesheet" href="../bloqueo.css?v=20261104-1712">
 <link rel="stylesheet" href="./puerta-imprenta.css">
 <link rel="stylesheet" href="../bloqueo-pin.css?v=20261121-2100">
@@ -5887,7 +5888,9 @@ function recibeCajaCompartida(estado){
     return;
   }
   if(estado.revision <= (cajaEstado?.revision||0)) return;
+  const anterior41=cajaEstado?.turno;
   cajaEstado = estado;
+  if(anterior41&&anterior41.id!==estado.turno?.id&&estado.ultimoCierre?.id===anterior41.id){toast("La caja se cerró desde "+(estado.ultimoCierre.aparatoNombre||"otro aparato")+" a las "+estado.ultimoCierre.hora+". Abre caja para seguir cobrando.");sincronizaNubeEnSerie(true);sincronizaCortesCaja(true);}
   cajaInstalada = true;
   nubeGuarda(CAJA_ESTADO_KEY,estado);
   pintaEstadoCajaCompartida();
@@ -6109,6 +6112,7 @@ function pintaHistorialCortes(){
 function recibeCorteCaja(row){
   if(!row.cuerpo?.id || row.cuerpo.abierto || row.cuerpo._eliminado) return;
   cortesNube.set(row.doc_id,row.cuerpo);
+  if(!$("#modalTurno").hidden&&$("#modalTurno").dataset.corte41===row.cuerpo.id)muestraCorteCaja(row.cuerpo);
   if(row.cuerpo.aparato && row.cuerpo.eventoId === nubeEventoId()){
     const turnos = lsGet("turnos",TURNOS);
     if(turnos.some(t=>t.abierto && t.id===row.cuerpo.id)){
@@ -6163,6 +6167,8 @@ function detalleCorte(t){
   const efectivo = r.efectivoCaja ?? (t.deberia == null ? r.por?.efectivo : num(t.deberia)-num(t.fondo)-movs.movs);
   return [
     ["Tickets cobrados",String(num(r.cuentas))],
+    ...(t.cerradoDesde?[["Cerrado desde "+(t.cerradoDesde.aparatoNombre||t.cerradoDesde.aparato),"por "+(t.cerradoPor||"Administración")]]:[]),
+    ...(t.tardios?[["Cobros tardíos",String(num(t.tardios.cuentas))+" · "+mx(t.tardios.total)],...filasFormasCaja(t.tardios.por||{}).map(([k,v])=>["Tardíos · "+k,v]),["Diferencia con tardíos",mx(t.diferenciaConTardios??t.diferencia)]]:[]),
     ...(t.cerradoPor ? [["Cerró el turno",t.cerradoPor]] : []),
     ...(t.aparatosCobro||[]).map(a=>["Cobros · "+(a.nombre||"Dispositivo")+" ("+a.cuentas+")",mx(a.total)]),
     ["Venta neta",mx(r.venta ?? num(r.total)-num(r.propinas))],
@@ -6182,13 +6188,14 @@ function filasFormasCaja(por){
 function tablaDetalleCaja(filas){
   return '<tbody>'+filas.map(([clave,valor])=>'<tr><td>'+esc(clave)+'</td><td class="der mono">'+esc(valor)+'</td></tr>').join("")+'</tbody>';
 }
+function crResumenCorte(t){return t.cerradoDesde?'<small class="crCorteMini">Cerrado desde '+esc(t.cerradoDesde.aparatoNombre||t.cerradoDesde.aparato)+' por '+esc(t.cerradoPor||'Administración')+(t.tardios?'<br>Cobros tardíos: '+num(t.tardios.cuentas)+' · '+mx(t.tardios.total):'')+'</small>':'';}
 function pintaTablaCortes(tabla,cortes){
   tabla.innerHTML = '<thead><tr><th>Turno</th><th>Cajero</th><th>Fecha de corte</th><th>Horario</th>'+
     '<th class="der">Venta neta</th><th class="der">Diferencia</th><th></th></tr></thead><tbody>'+
-    (cortes.length ? cortes.map(t=>'<tr><td class="mono">'+esc(folioVisualPOS(t.folio))+'</td><td>'+esc(t.cajero||"—")+
+    (cortes.length ? cortes.map(t=>'<tr><td class="mono">'+esc(folioVisualPOS(t.folio))+crResumenCorte(t)+'</td><td>'+esc(t.cajero||"—")+
       '</td><td>'+esc(fechaDelCorte(t))+'</td><td>'+esc(t.abre||"")+'–'+esc(t.cierra||"")+
       '</td><td class="der mono">'+mx(t.resumen?.venta ?? num(t.resumen?.total)-num(t.resumen?.propinas))+
-      '</td><td class="der mono">'+mx(t.diferencia)+'</td><td><button class="btn sm" type="button" data-ver-corte="'+esc(t.id)+
+      '</td><td class="der mono">'+mx(t.diferencia)+(t.tardios?'<small class="crCorteMini">Con tardíos '+mx(t.diferenciaConTardios??t.diferencia)+'</small>':'')+'</td><td><button class="btn sm" type="button" data-ver-corte="'+esc(t.id)+
       '">Ver corte</button></td></tr>').join("") :
       '<tr><td colspan="7"><div class="empty">No hay cortes para estas fechas.</div></td></tr>')+'</tbody>';
 }
@@ -6207,6 +6214,7 @@ function renderHistorialCortesVentas(){
   }));
 }
 function muestraCorteCaja(t){
+  $("#modalTurno").dataset.corte41=t.id;
   $("#turnoTitulo").textContent = "Corte "+folioVisualPOS(t.folio);
   const movimientos = (t.movs||[]).map(m=>[
     [m.hora,m.tipo==="entrada"?"Ingreso":"Egreso",m.nota].filter(Boolean).join(" · "),
@@ -6321,7 +6329,7 @@ function renderCaja(){
       '<button class="btn" id="cajaEntrada"'+(turnoPorConfirmar||pendiente||sinConexion?' disabled':'')+'>Meter dinero</button>' +
       '<button class="btn" id="cajaSalida"'+(turnoPorConfirmar||pendiente||sinConexion?' disabled':'')+'>Sacar dinero</button>' +
       '<button class="btn acento" id="cajaCerrar" style="margin-left:auto"'+
-        (turnoPorConfirmar||pendiente||sinConexion||compartida&&!cajaFijaInstalada&&!cajaEsDeAqui(t)||t.espera&&t.espera.solicitante!==REST_NUBE.deviceId?' disabled':'')+'>Cerrar turno</button>' +
+        (turnoPorConfirmar||pendiente&&!crPuedeForzar()||sinConexion||compartida&&!cajaFijaInstalada&&!cajaEsDeAqui(t)&&!crPuedeForzar()||t.espera&&t.espera.solicitante!==REST_NUBE.deviceId&&!crPuedeForzar()?' disabled':'')+'>Cerrar turno</button>' +
       (compartida && cajaFijaInstalada && !cajaEsDeAqui(t) && rolActual()==="gerente" ?
         '<button class="btn" id="cajaTomar"'+(sinConexion||t.espera&&t.espera.solicitante!==REST_NUBE.deviceId?' disabled':'')+'>Tomar la caja aquí</button>' : '') +
       (t.espera && (t.espera.solicitante===REST_NUBE.deviceId || cajaEsDeAqui(t)) ?
@@ -6456,23 +6464,27 @@ function movimiento(tipo){
     toast((tipo==="entrada" ? "Entraron " : "Salieron ") + mx(m));
   };
 }
+function crPuedeForzar(){return !bloqueado&&["admin","gerente"].includes(rolActual());}
+function crDueno(){return !RESTAURANT_ACCOUNT.personal&&crPuedeForzar();}
+async function crCierraForzado(t,contado,pin){if(!crPuedeForzar()||cambioCajaFijaEnCurso)return;cambioCajaFijaEnCurso=true;try{if(!navigator.onLine)throw Error("Conéctate para cerrar desde este aparato.");const raw=RESTAURANT_SB?.personal?.raw||RESTAURANT_SB;const cap=await raw.rpc("nuvoor_cierre_remoto_disponible");if(cap.error&&!/PGRST202|42883/.test(cap.error.code||""))throw Error(cap.error.message||"No se pudo consultar la caja.");if(cap.error||cap.data!==true)throw Error("Falta correr el SQL 41 desde Lab → Base de datos para cerrar desde este aparato.");const data=await operaCajaNube("cerrar",{id:t.id,contado,forzar:true,...(crDueno()?{cerradoPor:usuarioActual().nombre}:{persona:usuarioActual().id,pin})});if(cajaPendiente()?.accion==="cerrar"&&cajaPendiente()?.datos?.id===t.id)localStorage.removeItem(CAJA_PENDIENTE_KEY);recibeCorteCaja({doc_id:nubeId("corte",data.corte.id),cuerpo:data.corte});nubeGuarda(CORTES_CACHE,Object.fromEntries(cortesNube));muestraCorteCaja(data.corte);}catch(e){toast(e.message||"No se pudo cerrar la caja.");}finally{cambioCajaFijaEnCurso=false;}}
 function cierraTurno(){
   const t = turnoAbierto(); if(!t) return;
-  if(cajaEstado && !cajaFijaInstalada && !cajaEsDeAqui(t)){ toast("Por ahora, cierra el turno en el dispositivo de caja."); return; }
+  if(cajaEstado && !cajaFijaInstalada && !cajaEsDeAqui(t) && !crPuedeForzar()){ toast("Por ahora, cierra el turno en el dispositivo de caja."); return; }
   const ab = abiertas();
   if(ab.length){
     toast("Hay " + ab.length + " comanda(s) abierta(s). Ciérralas antes de cerrar " + (POS_EVENTO ? "la caja móvil." : "el turno de caja."));
     vaA("mesas"); return;
   }
-  $("#turnoTitulo").textContent = "Cerrar turno " + t.folio;
+  const remoto=!!cajaEstado&&(!cajaEsDeAqui(t)||!!t.espera||cajaPendiente()?.accion==="cerrar"||crDueno()&&!tieneClave(usuarioActual()))&&crPuedeForzar();$("#modalTurno").dataset.corte41="";$("#turnoTitulo").textContent = "Cerrar turno " + t.folio;
   $("#turnoCuerpo").innerHTML =
     '<p class="note" style="margin:0 0 14px">Cuenta el dinero que hay en la caja y escríbelo. ' +
     '<b>Todavía no se enseña cuánto debería haber</b>: así el conteo sirve para encontrar un faltante, ' +
     'no para confirmarlo.</p>' +
+    (remoto?'<p class="note">La caja la tiene <b>'+esc(nombreRespaldoCaja(t))+'</b>. Si tiene cobros sin subir, se sumarán a este corte como cobros tardíos cuando se conecte.</p>':'')+
     '<label class="f" for="turContado">Dinero contado</label>' +
     '<input id="turContado" type="number" min="0" step="0.01" value="">' +
-    (cajaEstado && cajaFijaInstalada ? '<label class="f" for="turClaveCaja">Tu PIN</label><input class="restaurantPin" id="turClaveCaja" type="text" inputmode="numeric" maxlength="12" autocomplete="one-time-code">' : '') +
-    '<div class="fila" style="margin-top:16px"><button class="btn acento ancho" id="turCierra">Cerrar y ver el corte</button></div>';
+    (cajaEstado && (remoto?!crDueno():cajaFijaInstalada) ? '<label class="f" for="turClaveCaja">Tu PIN</label><input class="restaurantPin" id="turClaveCaja" type="text" inputmode="numeric" maxlength="12" autocomplete="one-time-code">' : '') +
+    '<div class="fila" style="margin-top:16px"><button class="btn acento ancho" id="turCierra">'+(remoto?"Cerrar desde este aparato":"Cerrar y ver el corte")+'</button></div>';
   $("#modalTurno").hidden = false;
   setTimeout(()=>{ const f = $("#turContado"); if(f) f.focus(); }, 60);
   $("#turCierra").onclick = ()=>{
@@ -6480,6 +6492,7 @@ function cierraTurno(){
     if(abiertas().length){ toast("Hay comandas abiertas. Ciérralas antes de hacer el corte."); return; }
     const campo = $("#turContado"), contado = campo.valueAsNumber;
     if(!Number.isFinite(contado) || contado<0){ toast("Escribe el efectivo contado, aunque sea cero."); campo.focus(); return; }
+    if(remoto){const pin=$("#turClaveCaja")?.value.trim()||"";if($("#turClaveCaja"))$("#turClaveCaja").value="";crCierraForzado(t,contado,pin);return;}
     if(cajaEstado && cajaFijaInstalada){
       const pin=$("#turClaveCaja").value.trim();
       $("#turClaveCaja").value="";

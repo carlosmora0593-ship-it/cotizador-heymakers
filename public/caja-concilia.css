@@ -1,0 +1,5 @@
+.nvCorteTardios{background:var(--surface,var(--white));color:var(--ink);margin:12px 0;padding:14px;border:1px solid var(--line,var(--border));border-radius:12px;overflow-wrap:anywhere}.nvCorteTardios p{margin:7px 0}#cajaCerrar,#tnCerrar,#turCierra,#cashSubmit,#closeCash,#imprimeCorteCaja,#turList{min-height:44px;min-width:44px}
+#cortesLista .saved-item:has(.nvCorteTardios){flex-wrap:wrap}#cortesLista .saved-item:has(.nvCorteTardios) .meta{flex:1 1 150px}#cortesLista .saved-item>.nvCorteTardios{box-sizing:border-box;flex:1 0 100%;order:3;min-width:0}.tnFila>.nvCorteTardios{box-sizing:border-box;flex:1 0 100%;order:5}.tnFila>p:has(+.nvCorteTardios){flex-basis:100%;order:4}
+
+.crCorteMini{display:block;white-space:normal;font:12px/1.6 system-ui;color:var(--ink-2);min-width:150px;margin-top:6px}
+.nvCorteTardios button{min-height:44px;min-width:44px}

@@ -154,8 +154,9 @@ function refDoc(path){
     id,
     path,
     async get(){
-      const {data} = await SB.from(TABLA).select("cuerpo")
+      const {data,error} = await SB.from(TABLA).select("cuerpo")
         .eq("cuenta_id",CUENTA.id).eq("coleccion",col).eq("doc_id",id).maybeSingle();
+      if(error&&col==="caja")throw traduce(error);
       return {exists: !!data, data: () => data ? data.cuerpo : undefined};
     },
     async set(cuerpo){
