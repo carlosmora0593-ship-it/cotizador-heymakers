@@ -115,6 +115,7 @@ const plan = () => (CUENTA && CUENTA.plan) || "prueba";
 const vigente = () => !!(CUENTA && CUENTA.plan !== "ninguno" &&
   CUENTA.estado === "activa" && new Date(CUENTA.vence) > new Date());
 window.__estadoLicenciaNuvoor=()=>({cargada:!!CUENTA,cuenta:CUENTA?CUENTA.id:null,suspendida:!!CUENTA&&!vigente()});
+window.__personalSesionImprenta=()=>CUENTA&&SESION ? {cuenta:CUENTA.id,usuario:SESION.user.id,cliente:SB,admin:rol()==='admin'} : null;
 function exigeEscrituraNuvoor(){
   if(!CUENTA||!vigente())throw {code:"vencida",message:"Tu plan está suspendido. Actualiza tu pago para guardar cambios."};
 }
@@ -428,6 +429,7 @@ function aplicaPermisos(){
   document.body.classList.toggle("rol-ventas", rol()==="ventas");
   document.body.classList.toggle("rol-diseno", rol()==="diseno");
   document.body.classList.toggle("rol-produccion", rol()==="produccion");
+  window.__aplicaPerfilPersonal?.();
   /* Sin acceso a Ajustes no tiene sentido ofrecerlos: un menú que enseña
      puertas cerradas hace perder el tiempo. */
   const hayAjustes = permitidas.indexOf("set") >= 0;
@@ -858,6 +860,8 @@ q("#authOlvide").addEventListener("click", async ()=>{
    la parte del correo antes de la arroba. "carlosmora0593" se lee mejor
    que un correo completo cortado a la mitad. */
 function nombreCorto(){
+  const empleado=window.__nombrePerfilPersonal?.();
+  if(empleado)return empleado;
   const n = (PERFIL && PERFIL.nombre || "").trim();
   if(n) return n;
   const c = (PERFIL && PERFIL.correo) || (SESION && SESION.user && SESION.user.email) || "";

@@ -38,7 +38,7 @@ async function leerEmpresas(){
   try{const r=await sb.from("mis_empresas").select("*");if(r.error)errores.push(r.error);else rows=r.data||[];}catch(e){errores.push(e);}
   // Los perfiles de Restaurant tienen permisos propios; nunca se convierten
   // en miembros administradores para aparecer en el selector de negocios.
-  try{const r=await sb.rpc("rest_personal_mis_negocios");if(!r.error&&Array.isArray(r.data))for(const p of r.data){const old=rows.find(n=>n.id===p.cuenta);if(old?.rol==="admin")continue;if(old)rows=rows.filter(n=>n.id!==p.cuenta);rows.push({id:p.cuenta,nombre:p.negocio,producto:"restaurant",productos:["restaurant"],rol:p.rol,plan:p.plan,estado:p.estado,vence:p.vence,personal:true,activa:rows.length===0});}}catch(_){}
+  try{let r=await sb.rpc("nuvoor_personal_mis_negocios");if(/PGRST202|42883/.test(r.error?.code||""))r=await sb.rpc("rest_personal_mis_negocios");if(!r.error&&Array.isArray(r.data))for(const p of r.data){const old=rows.find(n=>n.id===p.cuenta);if(old&&(old.rol==="admin"||(p.producto||"restaurant")!=="restaurant"))continue;if(old)rows=rows.filter(n=>n.id!==p.cuenta);rows.push({id:p.cuenta,nombre:p.negocio,producto:p.producto||"restaurant",productos:[p.producto||"restaurant"],rol:p.rol,plan:p.plan,estado:p.estado,vence:p.vence,personal:true,activa:rows.length===0});}}catch(_){}
   try{const r=await sb.rpc("nuvoor_negocios_disponible");negociosDisponible=!r.error&&r.data===true;}catch(_){negociosDisponible=false;}
   let perfil=null;
   try{const r=await sb.from("perfiles").select("cuenta_id,cuenta_activa").eq("id",sesion.user.id).maybeSingle();if(r.error)errores.push(r.error);else perfil=r.data||null;}catch(e){errores.push(e);}
@@ -65,6 +65,7 @@ function urlProducto(k,id){const url=new URL(P[k].href,location.href);if(k!=="ta
 function animarApertura(k,n){const overlay=$("#launchOverlay");if(!overlay){location.replace(urlProducto(k,n.id));return;}clearTimeout(launchTimer);$("#launchTitle").textContent="Abriendo "+P[k].name;$("#launchBusiness").textContent=n.nombre||"Mi negocio";overlay.hidden=false;overlay.setAttribute("aria-hidden","false");overlay.classList.remove("active");requestAnimationFrame(()=>overlay.classList.add("active"));const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;launchTimer=setTimeout(()=>location.replace(urlProducto(k,n.id)),reduced?400:2500);}
 async function abreNegocio(k,n){
   if(!P[k]||!n)return;
+  if(n.personal&&k!=="restaurant"){location.assign("restaurante/jornada.html?cuenta="+encodeURIComponent(n.id));return;}
   if(k==="taller"&&!n.activa){
     const {error}=await sb.rpc("cambiar_empresa",{destino:n.id});
     if(error){const note=$("#businessNotice");note.hidden=false;note.textContent="No se pudo abrir Nuvoor Imprenta: "+detalleError(error)+". Revisa que sql/19-negocios-por-correo.sql esté aplicado.";return;}

@@ -1,6 +1,15 @@
-const CACHE_NAME = "nuvoor-store-v14-cierre-remoto";
+const CACHE_NAME = "nuvoor-store-v15-personal";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
+  new URL("../personal/panel.css?v=20261125-1552", APP_SCOPE).href,
+  new URL("../personal/semana.js?v=20261125-1552", APP_SCOPE).href,
+  new URL("../personal/semana-ui.js?v=20261125-1552", APP_SCOPE).href,
+  new URL("../personal/actividades.js?v=20261125-1552", APP_SCOPE).href,
+  new URL("../personal/admin.js?v=20261125-1552", APP_SCOPE).href,
+  new URL("../personal/panel.js?v=20261125-1552", APP_SCOPE).href,
+  new URL("../restaurante/personal-panel.css", APP_SCOPE).href,
+  new URL("../restaurante/personal-fase1.css", APP_SCOPE).href,
+  new URL("../restaurante/actividades.css", APP_SCOPE).href,
   new URL("../caja-concilia.js", APP_SCOPE).href,
   new URL("../caja-concilia.css", APP_SCOPE).href,
   APP_SCOPE.href,
@@ -34,7 +43,8 @@ self.addEventListener("fetch", event => {
   const url = new URL(request.url);
   if (url.origin !== APP_SCOPE.origin) return;
   const inApp = url.pathname.startsWith(APP_SCOPE.pathname);
-  if (!inApp && url.pathname !== CONFIG_URL && url.pathname !== new URL("../facturacion-pos.js", APP_SCOPE).pathname && !COMPARTIDOS.includes(url.pathname)) return;
+  const personal = APP_ASSETS.some(asset => new URL(asset).pathname === url.pathname);
+  if (!inApp && !personal && url.pathname !== CONFIG_URL && url.pathname !== new URL("../facturacion-pos.js", APP_SCOPE).pathname && !COMPARTIDOS.includes(url.pathname)) return;
 
   if (request.mode === "navigate") {
     event.respondWith(fetch(request).then(response => {

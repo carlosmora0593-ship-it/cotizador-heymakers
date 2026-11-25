@@ -1,8 +1,12 @@
-// Sello Restaurant: 20261122-1435
-const CACHE_NAME = "nuvoor-restaurant-v61-cierre-remoto";
+// Sello Restaurant: 20261125-1552
+const CACHE_NAME = "nuvoor-restaurant-v62-personal";
 const MEDIOS_CACHE = "nuvoor-restaurant-medios-v1";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
+  new URL("../personal/semana.js?v=20261125-1552", APP_SCOPE).href,
+  new URL("../personal/semana-ui.js?v=20261125-1552", APP_SCOPE).href,
+  new URL("../personal/actividades.js?v=20261125-1552", APP_SCOPE).href,
+  new URL("personal-jornada.js?v=20261125-1552", APP_SCOPE).href,
   new URL("../caja-concilia.css", APP_SCOPE).href,
   APP_SCOPE.href,
   new URL("index.html", APP_SCOPE).href,
@@ -11,6 +15,7 @@ const APP_ASSETS = [
   new URL("limpio.css?v=20261121-1445", APP_SCOPE).href,
   new URL("catalogo-alimentos.js?v=1", APP_SCOPE).href,
   new URL("personal-api.js?v=1", APP_SCOPE).href,
+  new URL("personal-api.js?v=20261125-1552", APP_SCOPE).href,
   new URL("personal-admin.js?v=1", APP_SCOPE).href,
   new URL("personal-panel.js?v=20261116-1726", APP_SCOPE).href,
   new URL("personal-panel.css?v=20261116-1726", APP_SCOPE).href,

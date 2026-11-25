@@ -8,7 +8,7 @@
   async function boot(raw,session,requested){
     const r=await raw.rpc('rest_personal_mis_negocios');
     if(r.error){if(missing(r.error))return null;throw r.error;}
-    const list=r.data||[];
+    const list=(r.data||[]).filter(p=>!p.producto||p.producto==='restaurant');
     if(!list.length)return null;
     // Un miembro del negocio conserva la aplicación y permisos anteriores.
     const members=await raw.from('mis_empresas').select('*');

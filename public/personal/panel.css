@@ -1,0 +1,59 @@
+@import url('../restaurante/personal-panel.css');
+@import url('../restaurante/personal-fase1.css');
+@import url('../restaurante/actividades.css');
+
+.npPersonal {
+  --surface:var(--nu-surface,var(--white,#fff));
+  --surface-2:var(--nu-surface-2,var(--surface2,#eef2f8));
+  --accent:var(--nu-accent,var(--pine,#4458a4));
+  --accent-ink:var(--nu-accent-ink,var(--on-pine,#fff));
+  --accent-soft:var(--nu-accent-soft,var(--mint,#eeedf7));
+  --ink-2:var(--nu-ink-2,var(--ink2,#44516b));
+  --ink-3:var(--nu-ink-3,var(--ink2,#44516b));
+  --scrim:#0c12209c;
+  border:1px solid var(--line,#d9e1ef);
+  border-radius:18px;
+  background:var(--surface);
+  color:var(--ink);
+  margin:14px 0;
+}
+[data-theme="dark"] .npPersonal {
+  --surface:var(--nu-surface,var(--white,#151e31));
+  --surface-2:var(--nu-surface-2,var(--surface2,#1e2941));
+  --accent:var(--nu-accent,var(--pine,#a6b9f0));
+  --accent-ink:var(--nu-accent-ink,var(--on-pine,#0c1220));
+  --accent-soft:var(--nu-accent-soft,var(--mint,#252c47));
+  --ink-2:var(--nu-ink-2,var(--ink2,#b6c3dc));
+  --ink-3:var(--nu-ink-3,var(--ink2,#b6c3dc));
+}
+.npPersonal[hidden],.npPersonal [hidden],.npConfirm[hidden]{display:none!important}
+.npPersonal .btn{
+  border:1px solid var(--line,#d9e1ef);border-radius:10px;
+  background:var(--surface);color:var(--ink);padding:8px 12px;
+  min-height:44px;font:600 13px/1.25 system-ui,sans-serif;text-decoration:none;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.npPersonal .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.npPersonal .btn:focus-visible,.npPersonal [role="tab"]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.npPersonal h2{font-size:18px;margin:4px 0}
+.npHint{color:var(--ink-2);font-size:13px;margin:6px 0 10px}
+.npBar{display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap}
+.npBlock{margin-top:22px;padding-top:10px}
+.npPosts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:10px;margin:14px 0}
+.npPosts>div{display:grid;gap:5px;min-width:0;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2)}
+.npPosts small{color:var(--ink-2)}
+.npTable{overflow:auto;margin-top:12px}
+.npTable table{width:100%;border-collapse:collapse;font-size:13px}
+.npTable :is(th,td){padding:10px;text-align:left;border-bottom:1px solid var(--line)}
+.npTable th{background:var(--surface-2);color:var(--ink-2)}
+.npTable td .btn{margin:2px}
+.npPersonal.pfDialog{margin:auto}
+.npConfirm{margin:10px 0}
+.npConfirm p{margin:6px 0}
+@media(max-width:600px){
+  .npPersonal .personalHubPanel,.npPersonal>.personalHubHeader{padding:14px}
+  .npPersonal .personalHubStats{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .npPersonal .personalHubTabs{padding-inline:8px}
+  .npPersonal .personalHubTabs button{min-height:44px;padding-inline:8px}
+}
+.npLegado{margin-top:18px;padding:12px;border:1px solid var(--line);border-radius:12px}.npLegado>summary{font-weight:650;cursor:pointer}

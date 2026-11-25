@@ -239,10 +239,11 @@ a.lugar:hover{border-color:var(--accent)}
       if(m.error) fallas++;
       else (m.data || []).forEach(function(n){ if(n && n.id) lista.push({id:n.id, negocio:n.nombre || "Mi negocio", producto:n.producto || "taller", rol:n.rol, personal:false}); });
     }catch(e){ fallas++; }
-    /* Perfiles de Personal (hoy, Restaurant): entran con su PIN de trabajo. */
+    /* Perfiles de Personal: entran con su PIN de trabajo. */
     var nombre = "";
     try{
-      var p = await sb.rpc("rest_personal_mis_negocios");
+      var p = await sb.rpc("nuvoor_personal_mis_negocios");
+      if(p.error && /PGRST202|42883/.test(p.error.code || "")) p=await sb.rpc("rest_personal_mis_negocios");
       if(p.error){ if(!/PGRST202|42883/.test(p.error.code || "")) fallas++; }
       else (Array.isArray(p.data) ? p.data : []).forEach(function(x){
         if(!x || !x.cuenta) return;
@@ -257,7 +258,7 @@ a.lugar:hover{border-color:var(--accent)}
     return {lista:lista, nombre:nombre};
   }
   function destino(l){
-    if(l.personal) return new URL("../restaurante/personal.html?cuenta=" + encodeURIComponent(l.id), location.href).href;
+    if(l.personal) return new URL("../restaurante/jornada.html?cuenta=" + encodeURIComponent(l.id), location.href).href;
     var u = new URL("../acceso.html", location.href);
     u.searchParams.set("producto", PRODUCTOS[l.producto] ? l.producto : "taller"); u.searchParams.set("cuenta", l.id);
     return u.href;
@@ -270,7 +271,7 @@ a.lugar:hover{border-color:var(--accent)}
     a.querySelector("b").textContent = l.negocio;
     a.querySelector(".chip").textContent = prod.nombre;
     a.querySelector("small").textContent = rol(l.rol) + (l.personal ? " · Acceso de trabajo" : "");
-    a.querySelector(".ir span").textContent = l.personal ? "Entrar con tu PIN" : "Abrir " + prod.nombre;
+    a.querySelector(".ir span").textContent = l.personal ? "Abrir Mi jornada" : "Abrir " + prod.nombre;
     return a;
   }
   async function muestraLugares(){

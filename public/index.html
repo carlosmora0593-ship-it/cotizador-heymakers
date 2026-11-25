@@ -2099,7 +2099,8 @@ body.sinDetalleCostos .soloAdminCostos{display:none!important}
 .chTeclado button.chBorra{font-size:12px;font-family:inherit;font-weight:600;color:var(--ink-3)}
 
 body.quiosco > *:not(#tab-asi):not(.modal):not(.toast){display:none!important}
-body.quiosco #tab-asi > .card:not(:first-child){display:none}
+body.quiosco #tab-asi .card[data-asi]:not([data-asi="reloj"]){display:none}
+body.quiosco #personalNuvoor{display:none}
 body.quiosco #tab-asi{padding:0 16px}
 
 @media (max-width:560px){
@@ -3786,6 +3787,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
 </style>
 <script src="facturacion-pos.js?v=20261104-2206"></script>
 <script src="caja-concilia.js"></script><link rel="stylesheet" href="caja-concilia.css">
+<link rel="stylesheet" href="personal/panel.css?v=20261125-1552">
 </head>
 <body class="sin-sesion">
 <header class="top">
@@ -4856,6 +4858,8 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
 
 <!-- ============ AJUSTES ============ -->
 <section id="tab-asi" hidden>
+  <article id="personalNuvoor" hidden></article>
+  <div id="personalAsistenciaAnterior">
   <div class="secBarra" id="bar_asi" hidden><button class="secVolver" data-secvolver="asi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>Volver</button><span class="secMigas">Asistencia</span></div>
   <div class="lanzador secLz" id="lz_asi"></div>
   <div class="card secOculta" data-asi="reloj" style="margin-top:20px">
@@ -4897,6 +4901,7 @@ body:not(.conBarra) nav.tabs.nvNav{position:fixed;top:0;left:0;right:auto;bottom
       <div class="tbl-wrap" style="margin-top:18px"><table id="t_asis"></table></div>
     </div>
   </div>
+</div>
 </section>
 
 <section id="tab-nom" hidden>
@@ -27983,10 +27988,10 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 
 </script>
 
-<script>window.BUILD="20261122-1435";</script>
+<script>window.BUILD="20261125-1552";</script>
 <script>
 (function(){
-  var mio = "20261122-1435";
+  var mio = "20261125-1552";
   /* Un solo reintento por versión: si el servidor insistiera en
      mandar la vieja, mejor una página vieja que un parpadeo eterno. */
   function yaLoIntente(v){ try{ return sessionStorage.getItem("hm-recarga") === v; }catch(e){ return false; } }
@@ -28015,7 +28020,13 @@ setInterval(()=>{const panel=document.querySelector('#tab-sav');if(panel&&!panel
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
 <script src="suspension.js?v=20261104-1712"></script>
-<script src="cuenta.js?v=20261104-1712"></script>
+<script src="personal/semana.js?v=20261125-1552"></script>
+<script src="personal/semana-ui.js?v=20261125-1552"></script>
+<script src="personal/actividades.js?v=20261125-1552"></script>
+<script src="personal/admin.js?v=20261125-1552"></script>
+<script src="personal/panel.js?v=20261125-1552"></script>
+<script src="personal/imprenta.js?v=20261125-1552"></script>
+<script src="cuenta.js?v=20261125-1552"></script>
 <script src="diagnostico.js?v=20261026-2139"></script>
 <script src="uso.js?v=20261110-1700" data-producto="imprenta" defer></script>
 </body>
