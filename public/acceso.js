@@ -13,7 +13,7 @@ let ALTAS_ABIERTAS=false;
    canjea en cuanto hay sesión: así entra con su plan sin pagar. */
 let invitacion=null;const LS_INVITA="nuvoor_invitacion_pendiente";
 const nombrePlan=p=>p==="pro"?"Pro":p==="basico"?"Básico":"Maker";
-const textoAlta=()=>invitacion?"Crear cuenta · "+invitacion.dias+" días gratis":"Crear cuenta y probar 15 días";
+const textoAlta=()=>invitacion?"Crear cuenta · "+invitacion.dias+" días gratis":"Crear cuenta";
 let sb=null,sesion=null,negocios=[],cuenta=null,productos=[],modo="entrar",requested=[],negociosDisponible=false,skipAutoOpenOnce=false,accessMode="login",accessTransition=0,firstAccessReveal=true,launchTimer=null;
 function esc(s){return String(s||"").replace(/[&<>\"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 function lista(xs){return [...new Set((Array.isArray(xs)?xs:[]).filter(x=>validos.includes(x)))];}
@@ -53,6 +53,7 @@ async function leerEmpresas(){
     if(!row||!row.id)continue;
     let detail=null;
     if(!row.personal)try{const r=await sb.from("cuentas").select("*").eq("id",row.id).maybeSingle();if(!r.error)detail=r.data||null;else errores.push(r.error);}catch(e){errores.push(e);}
+    if(!row.personal&&!detail&&!row.producto&&!lista(row.productos).length)continue;
     const productList=productosDe(row,detail);
     salida.push(Object.assign({},detail||{},row,{id:row.id,nombre:(detail&&detail.nombre)||row.nombre||"Mi negocio",producto:(detail&&detail.producto)||row.producto||productList[0]||"",productos:productList,activa:!!row.activa,rol:row.rol||""}));
   }
@@ -70,11 +71,11 @@ async function abreNegocio(k,n){
   }
   animarApertura(k,n);
 }
-function vigencia(n){return n&&n.estado==="activa"&&new Date(n.vence)>new Date();}
+function vigencia(n){return n&&n.plan&&n.plan!=="ninguno"&&n.estado==="activa"&&(n.vence===null||new Date(n.vence)>new Date());}
 function badgeProductos(n){return n.productos.length?n.productos.map(k=>P[k].name.replace("Nuvoor ","")).join(" · "):"Sistema por identificar";}
 function renderNegocio(n,productoSolicitado){
   const products=productoSolicitado&&n.productos.includes(productoSolicitado)?[productoSolicitado]:n.productos,supported=products.length>0;
-  const buttons=supported?products.map(k=>'<button class="businessOpen" type="button" data-open-product="'+k+'" data-business="'+esc(n.id)+'">Abrir '+esc(P[k].name.replace("Nuvoor ",""))+' →</button>').join(""):'<small class="businessMissing">Falta ejecutar sql/19-negocios-por-correo.sql para identificar este negocio.</small>';
+  const buttons=supported?products.map(k=>'<button class="businessOpen" type="button" data-open-product="'+k+'" data-business="'+esc(n.id)+'">Abrir '+esc(P[k].name.replace("Nuvoor ",""))+' →</button>').join(""):'<small class="businessMissing">Nuvoor no pudo identificar este negocio. Pide apoyo para revisar su acceso.</small>';
   const rolVisible=n.rol==="dueno"?"dueño":n.rol||"miembro";
   return '<article class="businessCard"><div class="businessHead"><span class="businessIcon" aria-hidden="true">'+(supported?products.map(k=>P[k].icon).join(" "):"•")+'</span><div><strong>'+esc(n.nombre)+'</strong><small>'+esc(badgeProductos(n))+' · '+esc(rolVisible)+'</small></div></div><div class="businessActions">'+buttons+(supported&&!n.personal?'<button class="businessLicense" type="button" data-license-business="'+esc(n.id)+'">Ver licencias</button>':"")+'</div></article>';
 }
@@ -84,11 +85,13 @@ function pintaCuenta(){
   show("#accountPanel");$("#accountTitle").textContent=negocios.length>1?"Tus negocios":(negocios[0].nombre||"Tu cuenta Nuvoor");$("#accountEmail").textContent=sesion.user.email||"";
   const requestedProduct=params.get("producto"),targetId=params.get("cuenta");
   const matching=negocios.flatMap(n=>n.productos.filter(k=>(!requestedProduct||k===requestedProduct)&&(!targetId||n.id===targetId)).map(k=>({n,k})));
-  if(!preventDirect&&requestedProduct&&P[requestedProduct]&&matching.length===1&&!params.has("gestion")&&!params.has("planes")&&!params.has("pago")){abreNegocio(matching[0].k,matching[0].n);return;}
+  if(!preventDirect&&requestedProduct&&P[requestedProduct]&&matching.length===1&&matching[0].n.plan!=="ninguno"&&!params.has("gestion")&&!params.has("planes")&&!params.has("pago")){abreNegocio(matching[0].k,matching[0].n);return;}
   const singleLegacy=negocios.length===1&&negocios[0].productos.length===1;
-  if(!preventDirect&&singleLegacy&&!requestedProduct&&!params.has("gestion")&&!params.has("planes")&&!params.has("pago")){abreNegocio(negocios[0].productos[0],negocios[0]);return;}
+  if(!preventDirect&&singleLegacy&&negocios[0].plan!=="ninguno"&&!requestedProduct&&!params.has("gestion")&&!params.has("planes")&&!params.has("pago")){abreNegocio(negocios[0].productos[0],negocios[0]);return;}
   const active=(targetId&&negocios.find(n=>n.id===targetId))||negocios.find(n=>n.activa)||negocios[0],days=Math.max(0,Math.ceil((new Date(active.vence)-new Date())/86400000));
-  $("#accountStatus").innerHTML=vigencia(active)?'<strong>'+(active.plan==="prueba"?"Prueba gratis activa":"Licencia activa")+'</strong>'+(active.plan==="prueba"?"Te quedan "+days+" día(s), sin tarjeta.":"El negocio seleccionado conserva su licencia."):'<strong>Activa una licencia para seguir</strong>Tu información se conserva.';
+  const prueba=active.plan==="prueba"||active.es_prueba;
+  $("#accountStatus").innerHTML=vigencia(active)?'<strong>'+(prueba?"Prueba gratis activa":"Licencia activa")+'</strong>'+(prueba&&active.vence?"Te quedan "+days+" día(s), sin tarjeta.":"El negocio seleccionado conserva su licencia."):'<strong>Activa una licencia para seguir</strong>Tu información se conserva.';
+  $("#redeemPanel").hidden=!active.activa||active.personal||active.rol!=="admin"||!["ninguno","prueba"].includes(active.plan);
   const pane=$("#productOptions"),businessesView=requestedProduct&&P[requestedProduct]?negocios.filter(n=>(!targetId||n.id===targetId)&&(!n.productos.length||n.productos.includes(requestedProduct))):negocios;
   pane.innerHTML='<p class="sub">'+(requestedProduct&&P[requestedProduct]?"Elige un negocio de "+P[requestedProduct].name+".":negocios.length>1?"Elige con qué negocio quieres trabajar.":negocios[0].productos.length>1?"Esta cuenta antigua conserva varios POS. Elige uno para continuar.":"Abre el sistema de tu negocio.")+'</p><div class="businessGrid">'+businessesView.map(n=>renderNegocio(n,requestedProduct&&P[requestedProduct]?requestedProduct:"")).join("")+'</div><p id="businessNotice" class="notice" hidden></p><div class="addBusinessRow"><button class="plain addBusinessButton" id="showAddBusiness" type="button">＋ Agregar un negocio</button></div>';
   $("#addBusinessPanel").hidden=true;
@@ -212,11 +215,81 @@ async function revisaInvitacion(txt){
   }catch(e){di("No pude revisar el código. Revisa tu conexión e intenta otra vez.","error");return null;}
 }
 async function usaInvitacion(){const b=$("#inviteCheck");if(b)b.disabled=true;const ok=await revisaInvitacion($("#inviteCode").value);if(b)b.disabled=false;if(ok){setMode("alta");const p=$("#personName");if(p)p.focus();}}
-async function canjeaInvitacionPendiente(){let c="";try{c=localStorage.getItem(LS_INVITA)||"";}catch(_){}if(!c)return;try{const r=await sb.rpc("canjear_codigo",{p_codigo:c});if(!r.error){try{localStorage.removeItem(LS_INVITA);}catch(_){}}}catch(_){}}
-async function entra(session){sesion=session;show("#loadingPanel");await canjeaInvitacionPendiente();try{await leerEmpresas();$("#accountErrorDetail").hidden=true;$("#accountErrorDetail").textContent="";pintaCuenta();}catch(e){show("#accountPanel");$("#accountTitle").textContent="No pudimos abrir tu cuenta";$("#accountEmail").textContent=sesion.user.email||"";$("#accountStatus").textContent=e.message||"No pudimos abrir la cuenta de este negocio.";const d=$("#accountErrorDetail");d.textContent=e.detail||detalleError(e);d.hidden=false;$("#productOptions").innerHTML="";}}
+const correoSesion=()=>String(sesion?.user?.email||"").trim().toLowerCase();
+function leeInvitacionPendiente(){
+  try{
+    const saved=localStorage.getItem(LS_INVITA);
+    if(!saved)return null;
+    if(!saved.startsWith("{"))return {codigo:saved};
+    return JSON.parse(saved);
+  }catch(_){return null;}
+}
+function guardaInvitacionPendiente(codigo,email){
+  try{localStorage.setItem(LS_INVITA,JSON.stringify({codigo,email:email.trim().toLowerCase()}));}catch(_){}
+}
+function mensajeCanje(texto,tipo=""){
+  const n=$("#redeemMessage");n.textContent=texto;n.className="msg"+(tipo?" "+tipo:"");
+}
+async function intentaCanje(codigo){
+  const seleccionado=negocios.find(n=>n.activa&&!n.personal);
+  const solicitada=params.get("cuenta");
+  if(!seleccionado||seleccionado.rol!=="admin"||(solicitada&&solicitada!==seleccionado.id)){
+    throw Error("Abre primero el negocio donde quieres activar el código.");
+  }
+  const disponible=await sb.rpc("nuvoor_codigos_disponibles");
+  if(disponible.error||disponible.data!==true)throw Error("La activación por código no está disponible en este momento. Conserva tu código e inténtalo de nuevo más tarde.");
+  const {data,error}=await sb.rpc("canjear_codigo",{p_codigo:codigo});
+  if(error)throw Error("No se pudo activar el acceso. Conserva tu código e inténtalo otra vez.");
+  if(data?.ok!==true)throw Error(data?.motivo||"No se pudo activar este código.");
+  await leerEmpresas();
+  const activado=negocios.find(n=>n.id===data.cuenta&&n.plan===data.plan&&vigencia(n));
+  if(!activado)throw Error("No pudimos comprobar la activación. Intenta de nuevo con el mismo código.");
+  try{if(leeInvitacionPendiente()?.codigo===codigo)localStorage.removeItem(LS_INVITA);}catch(_){}
+  return activado;
+}
+async function canjeManual(e){
+  e.preventDefault();
+  const b=$("#redeemSubmit"),codigo=$("#redeemCode").value.trim().toUpperCase();
+  if(b.disabled)return;
+  if(codigo.length<4){mensajeCanje("Escribe el código que te dieron.","error");return;}
+  b.disabled=true;mensajeCanje("Activando tu acceso…");
+  guardaInvitacionPendiente(codigo,correoSesion());
+  try{
+    const negocio=await intentaCanje(codigo);
+    $("#redeemCode").value="";
+    mensajeCanje("");
+    skipAutoOpenOnce=true;
+    pintaCuenta();
+    $("#accountStatus").textContent="Código activado. Ya puedes abrir "+negocio.nombre+".";
+  }catch(err){mensajeCanje(err.message,"error");}
+  finally{b.disabled=false;}
+}
+async function entra(session){
+  sesion=session;show("#loadingPanel");$("#redeemPanel").hidden=true;
+  const pendiente=leeInvitacionPendiente(),coincide=pendiente?.email===correoSesion();
+  const recibido=params.get("invitacion")||((coincide||!pendiente?.email)?pendiente?.codigo:"")||"";
+  let errorCanje="";
+  try{
+    await leerEmpresas();
+    if(coincide&&pendiente?.codigo){
+      try{await intentaCanje(pendiente.codigo);}
+      catch(err){errorCanje=err.message;}
+    }
+    if(recibido&&(!coincide||errorCanje))skipAutoOpenOnce=true;
+    $("#accountErrorDetail").hidden=true;$("#accountErrorDetail").textContent="";
+    pintaCuenta();
+    $("#redeemCode").value=recibido.slice(0,64);
+    mensajeCanje(errorCanje,errorCanje?"error":"");
+  }catch(e){
+    show("#accountPanel");$("#accountTitle").textContent="Tu acceso necesita revisión";
+    $("#accountEmail").textContent=sesion.user.email||"";
+    $("#accountStatus").textContent="Tu sesión está abierta, pero no encontramos un negocio disponible. Pide al equipo de Nuvoor que revise tu acceso.";
+    $("#accountErrorDetail").hidden=true;$("#productOptions").innerHTML="";
+  }
+}
 async function envia(e){e.preventDefault();const alta=modo==="alta",email=$("#email").value.trim(),password=$("#password").value;if(alta){actualizaSeleccion();if(!requested.length){message("Selecciona el POS que quieres probar.","error");return;}}
   const b=$("#submit");b.disabled=true;b.textContent=alta?"Creando tu cuenta…":"Entrando…";message("");
-  try{let data,error;if(alta&&invitacion&&!(await revisaInvitacion(invitacion.codigo))){message("Ese código ya no sirve. Pide uno nuevo a quien te invitó.","error");b.disabled=false;b.textContent=textoAlta();return;}if(alta){({data,error}=await sb.auth.signUp({email,password,options:{data:{nombre:$("#personName").value.trim(),negocio:$("#businessName").value.trim()||P[requested[0]].name,producto:requested[0],productos:requested}}}));}else{({data,error}=await sb.auth.signInWithPassword({email,password}));}if(error)throw error;if(alta&&invitacion){try{localStorage.setItem(LS_INVITA,invitacion.codigo);}catch(_){}}if(!data.session){message("Te mandamos un correo para confirmar tu cuenta. Después vuelve aquí e inicia sesión para abrir tu POS.","good");setMode("entrar");$("#email").value=email;$("#password").value="";b.disabled=false;b.textContent="Iniciar sesión";return;}await entra(data.session);}
+  try{let data,error;if(alta&&invitacion&&!(await revisaInvitacion(invitacion.codigo))){message("Ese código ya no sirve. Pide uno nuevo a quien te invitó.","error");b.disabled=false;b.textContent=textoAlta();return;}if(alta){({data,error}=await sb.auth.signUp({email,password,options:{data:{nombre:$("#personName").value.trim(),negocio:$("#businessName").value.trim()||P[requested[0]].name,producto:requested[0],productos:requested}}}));}else{({data,error}=await sb.auth.signInWithPassword({email,password}));}if(error)throw error;if(alta&&invitacion)guardaInvitacionPendiente(invitacion.codigo,email);if(!data.session){message("Te mandamos un correo para confirmar tu cuenta. Después vuelve aquí e inicia sesión para abrir tu POS.","good");setMode("entrar");$("#email").value=email;$("#password").value="";b.disabled=false;b.textContent="Iniciar sesión";return;}await entra(data.session);}
   catch(e){message(/signups? not allowed|signup_disabled/i.test(String(e&&(e.code||e.message)||""))?"Las cuentas nuevas todavía están cerradas. Avísale a quien te dio el código.":(e.message||"No se pudo abrir la cuenta."),"error");b.disabled=false;b.textContent=alta?textoAlta():"Iniciar sesión";}}
 let correoCodigo="",ultimoEnvioCodigo=0,codigoOcupado=false;
 function mensajeCodigo(texto,clase=""){
@@ -288,7 +361,7 @@ function conectaAccesoCodigo(){
   $("#emailCodeResend").addEventListener("click",e=>usaCodigo(e,true));
   $("#emailCodeForm").addEventListener("submit",usaCodigo);
 }
-async function init(){show("#loadingPanel");if(!window.CONFIG||!window.supabase){show("#authPanel");message("Falta cargar la conexión de Nuvoor. Intenta actualizar la página.","error");return;}sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);conectaAccesoCodigo();try{const r=await sb.rpc("altas_abiertas");if(!r.error&&r.data===true)ALTAS_ABIERTAS=true;}catch(_){}const hint=$("#multiHint");if(hint)hint.textContent="Cada negocio es una cuenta independiente; sus datos no se mezclan.";$$('[data-mode]').forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));$("#authForm").addEventListener("submit",envia);const bi=$("#inviteCheck");if(bi)bi.addEventListener("click",usaInvitacion);const ic=$("#inviteCode");if(ic)ic.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();usaInvitacion();}});$("#addBusinessForm").addEventListener("submit",agregaNegocio);$$('input[name="producto"]').forEach(x=>x.addEventListener("change",actualizaSeleccion));$("#logout").addEventListener("click",async()=>{try{await sb.auth.signOut();}catch(_){}finally{limpiaSesionLocal();location.replace("./acceso.html");}});
+async function init(){show("#loadingPanel");if(!window.CONFIG||!window.supabase){show("#authPanel");message("Falta cargar la conexión de Nuvoor. Intenta actualizar la página.","error");return;}sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);conectaAccesoCodigo();$("#redeemForm").addEventListener("submit",canjeManual);try{const r=await sb.rpc("altas_abiertas");if(!r.error&&r.data===true)ALTAS_ABIERTAS=true;}catch(_){}const hint=$("#multiHint");if(hint)hint.textContent="Cada negocio es una cuenta independiente; sus datos no se mezclan.";$$('[data-mode]').forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));$("#authForm").addEventListener("submit",envia);const bi=$("#inviteCheck");if(bi)bi.addEventListener("click",usaInvitacion);const ic=$("#inviteCode");if(ic)ic.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();usaInvitacion();}});$("#addBusinessForm").addEventListener("submit",agregaNegocio);$$('input[name="producto"]').forEach(x=>x.addEventListener("change",actualizaSeleccion));$("#logout").addEventListener("click",async()=>{try{await sb.auth.signOut();}catch(_){}finally{limpiaSesionLocal();location.replace("./acceso.html");}});
   const {data,error}=await sb.auth.getSession();if(error){show("#authPanel");message("No pudimos revisar la sesión. Intenta iniciar sesión.","error");return;}if(data.session){await entra(data.session);return;}if(params.get("codigo")==="1")abreAccesoCodigo();const inv=params.get("invitacion");if(inv&&$("#inviteCode")){$("#inviteCode").value=inv.toUpperCase();setMode("alta");usaInvitacion();}else if(params.get("alta")==="1")setMode("alta");show("#authPanel");}
 init();
 })();

@@ -98,6 +98,14 @@
       <section class="pane accountPane" id="accountPanel" hidden>
         <div class="accountTop"><div><span class="eyebrow">TU ESPACIO NUVOOR</span><h2 id="accountTitle">Tus negocios</h2><p class="sub" id="accountEmail"></p></div><button class="logout" id="logout" type="button">Cerrar sesión</button></div>
         <div class="status" id="accountStatus"></div><small id="accountErrorDetail" class="help" hidden></small><div id="productOptions"></div>
+        <section class="addBusiness" id="redeemPanel" hidden>
+          <h3>¿Tienes un código de invitación?</h3>
+          <form id="redeemForm">
+            <div class="field"><label for="redeemCode">Código de Lab</label><input id="redeemCode" required maxlength="64" autocomplete="off" autocapitalize="characters" spellcheck="false"></div>
+            <button class="btn" id="redeemSubmit" type="submit">Activar mi acceso</button>
+            <p class="msg" id="redeemMessage" role="status" aria-live="polite"></p>
+          </form>
+        </section>
         <section class="addBusiness" id="addBusinessPanel" hidden><h3>Agregar un negocio</h3><p>Elige su sistema y asígnale un nombre. Tendrá su propia cuenta y sus propios datos.</p><form id="addBusinessForm"><div class="field"><label for="newBusinessProduct">Sistema</label><select id="newBusinessProduct"><option value="taller">Nuvoor Imprenta</option><option value="restaurant">Nuvoor Restaurant</option><option value="tiendita">Nuvoor Store</option></select></div><div class="field"><label for="newBusinessName">Nombre del negocio</label><input id="newBusinessName" maxlength="100" required placeholder="Mi nuevo negocio"></div><button class="btn" id="createBusiness" type="submit">Crear negocio</button><p class="msg" id="newBusinessMessage" role="status" aria-live="polite"></p></form></section>
         <section class="license" id="licensePanel" hidden><h3>Licencias del negocio</h3><p id="licenseIntro">Cada licencia cubre un sistema.</p><label class="licenseCycleLabel" for="licenseCycle">Periodo de pago</label><select id="licenseCycle"><option value="mensual">Mensual</option><option value="anual">Anual · paga 10 meses</option></select><div class="licProducts" id="licenseProducts"></div><div class="licGrid" id="licenseCards"></div><div class="notice" id="paymentNotice" hidden></div></section>
         <a class="backLink" href="https://nuvoor.mx">Ver todos los productos de Nuvoor</a>
@@ -136,6 +144,6 @@
 
 <script src="./config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="./acceso.js?v=20261114-2330"></script>
+<script src="./acceso.js?v=20261125-1507"></script>
 </body>
 </html>
