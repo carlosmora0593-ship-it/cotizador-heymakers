@@ -97,7 +97,9 @@
 
       <section class="pane accountPane" id="accountPanel" hidden>
         <div class="accountTop"><div><span class="eyebrow">TU ESPACIO NUVOOR</span><h2 id="accountTitle">Tus negocios</h2><p class="sub" id="accountEmail"></p></div><button class="logout" id="logout" type="button">Cerrar sesión</button></div>
-        <div class="status" id="accountStatus"></div><small id="accountErrorDetail" class="help" hidden></small><div id="productOptions"></div>
+        <div class="status" id="accountStatus"></div><small id="accountErrorDetail" class="help" hidden></small>
+        <p class="sub" id="androidVersiones" role="status" hidden></p>
+        <div id="productOptions"></div>
         <section class="addBusiness" id="redeemPanel" hidden>
           <h3>¿Tienes un código de invitación?</h3>
           <form id="redeemForm">
@@ -138,12 +140,13 @@
     <span class="launchWord" aria-label="Nuvoor"></span>
     <p class="launchTitle" id="launchTitle">Abriendo Nuvoor</p>
     <strong class="launchBusiness" id="launchBusiness"></strong>
+    <small class="launchBusiness" id="launchVersion" role="status" hidden></small>
     <div class="launchTrack" aria-hidden="true"><i></i></div>
   </div>
 </div>
 
 <script src="./config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="./acceso.js?v=20261127-2210"></script>
+<script src="./acceso.js?v=20261127-2215"></script>
 </body>
 </html>

@@ -9,18 +9,38 @@ const android=!!window.MakersPrinter||params.get("app")==="android";
 const sellosPos={taller:"cotizador",restaurant:"restaurant",tiendita:"store"};
 let aperturaEnCurso=0;
 
-async function versionDelSistema(producto){
-  if(!android||navigator.onLine===false)return "";
+async function consultaVersionesAndroid(){
+  if(!android||navigator.onLine===false)return null;
   const control=new AbortController();
   const limite=setTimeout(()=>control.abort(),1000);
   try{
     const respuesta=await fetch("./version.json",{cache:"no-store",credentials:"omit",mode:"same-origin",signal:control.signal});
-    if(!respuesta.ok)return "";
-    const versiones=await respuesta.json();
-    const sello=versiones?.[sellosPos[producto]]||versiones?.build;
-    return typeof sello==="string"&&/^\d{8}-\d{4}$/.test(sello)?sello:"";
-  }catch(_){return "";}
+    return respuesta.ok?await respuesta.json():null;
+  }catch(_){return null;}
   finally{clearTimeout(limite);}
+}
+
+function versionDelSistema(versiones,producto){
+  const sello=versiones?.[sellosPos[producto]]||versiones?.build;
+  return typeof sello==="string"&&/^\d{8}-\d{4}$/.test(sello)?sello:"";
+}
+
+function fechaVersion(sello){
+  return sello.replace(/^(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})$/,"$3/$2/$1 $4:$5");
+}
+
+async function muestraVersionesAndroid(){
+  const estado=$("#androidVersiones");
+  if(!android||!estado)return;
+  estado.hidden=false;
+  estado.textContent="Consultando versiones web…";
+  const versiones=await consultaVersionesAndroid();
+  const sistemas=new Set(negocios.flatMap(n=>n.productos));
+  const disponibles=Object.keys(P).filter(k=>sistemas.has(k)&&versionDelSistema(versiones,k))
+    .map(k=>P[k].name.replace("Nuvoor ","")+" "+fechaVersion(versionDelSistema(versiones,k)));
+  estado.textContent=disponibles.length
+    ?"Versión web disponible · "+disponibles.join(" · ")
+    :"No se pudo consultar la versión web. Puedes abrir tu negocio.";
 }
 /* Las altas las abre o cierra Lab (altas_abiertas() en la base). Si la base
    todavía no tiene esa función, se quedan cerradas como antes. */
@@ -86,7 +106,7 @@ function urlProducto(k,id,sello){
   return url.href;
 }
 function animarApertura(k,n){
-  const apertura=++aperturaEnCurso,consulta=versionDelSistema(k);
+  const apertura=++aperturaEnCurso,consulta=consultaVersionesAndroid().then(v=>versionDelSistema(v,k));
   const entrar=async()=>{
     const sello=await consulta;
     if(apertura===aperturaEnCurso)location.replace(urlProducto(k,n.id,sello));
@@ -96,6 +116,16 @@ function animarApertura(k,n){
   if(!overlay){entrar();return;}
   $("#launchTitle").textContent="Abriendo "+P[k].name;
   $("#launchBusiness").textContent=n.nombre||"Mi negocio";
+  const version=$("#launchVersion");
+  if(android&&version){
+    version.hidden=false;
+    version.textContent="Consultando versión web…";
+    consulta.then(sello=>{
+      if(apertura===aperturaEnCurso)version.textContent=sello
+        ?"Versión web disponible · "+fechaVersion(sello)
+        :"Versión web sin confirmar";
+    });
+  }
   overlay.hidden=false;
   overlay.setAttribute("aria-hidden","false");
   overlay.classList.remove("active");
@@ -122,13 +152,14 @@ function renderNegocio(n,productoSolicitado){
 }
 let pagoPollStarted=false, pagoSeleccionado=null;
 function pintaCuenta(){
-  const preventDirect=skipAutoOpenOnce;skipAutoOpenOnce=false;
+  const preventDirect=skipAutoOpenOnce||(android&&params.get("version")==="1");skipAutoOpenOnce=false;
   show("#accountPanel");$("#accountTitle").textContent=negocios.length>1?"Tus negocios":(negocios[0].nombre||"Tu cuenta Nuvoor");$("#accountEmail").textContent=sesion.user.email||"";
   const requestedProduct=params.get("producto"),targetId=params.get("cuenta");
   const matching=negocios.flatMap(n=>n.productos.filter(k=>(!requestedProduct||k===requestedProduct)&&(!targetId||n.id===targetId)).map(k=>({n,k})));
   if(!preventDirect&&requestedProduct&&P[requestedProduct]&&matching.length===1&&matching[0].n.plan!=="ninguno"&&!params.has("gestion")&&!params.has("planes")&&!params.has("pago")){abreNegocio(matching[0].k,matching[0].n);return;}
   const singleLegacy=negocios.length===1&&negocios[0].productos.length===1;
   if(!preventDirect&&singleLegacy&&negocios[0].plan!=="ninguno"&&!requestedProduct&&!params.has("gestion")&&!params.has("planes")&&!params.has("pago")){abreNegocio(negocios[0].productos[0],negocios[0]);return;}
+  muestraVersionesAndroid();
   const active=(targetId&&negocios.find(n=>n.id===targetId))||negocios.find(n=>n.activa)||negocios[0],days=Math.max(0,Math.ceil((new Date(active.vence)-new Date())/86400000));
   const prueba=active.plan==="prueba"||active.es_prueba;
   $("#accountStatus").innerHTML=vigencia(active)?'<strong>'+(prueba?"Prueba gratis activa":"Licencia activa")+'</strong>'+(prueba&&active.vence?"Te quedan "+days+" día(s), sin tarjeta.":"El negocio seleccionado conserva su licencia."):'<strong>Activa una licencia para seguir</strong>Tu información se conserva.';
