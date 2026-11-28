@@ -1,8 +1,10 @@
-// Sello Restaurant: 20261125-1552
-const CACHE_NAME = "nuvoor-restaurant-v62-personal";
+// Sello Restaurant: 20261127-2335
+const CACHE_NAME = "nuvoor-restaurant-v66-red-local";
 const MEDIOS_CACHE = "nuvoor-restaurant-medios-v1";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
+  new URL("red-local.js?v=20261127-2335", APP_SCOPE).href,
+  new URL("red-local.css?v=20261127-2335", APP_SCOPE).href,
   new URL("../personal/semana.js?v=20261125-1552", APP_SCOPE).href,
   new URL("../personal/semana-ui.js?v=20261125-1552", APP_SCOPE).href,
   new URL("../personal/actividades.js?v=20261125-1552", APP_SCOPE).href,

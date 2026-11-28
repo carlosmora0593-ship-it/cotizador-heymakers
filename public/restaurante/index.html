@@ -1549,9 +1549,10 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 #modalMods .modIncomplete{font-size:11px;color:var(--ink-3);margin:8px 0 0}
 @media(max-width:450px){.configSaveBar{padding:13px}.configSaveBar>.btn{width:100%}#modalMods .modChips{gap:7px}#modalMods .modChip{padding:10px}}
 </style>
-<meta name="nuvoor-build" content="20261125-1552">
+<meta name="nuvoor-build" content="20261127-2335">
 <link rel="stylesheet" href="./tema-nuvoor.css?v=20261119-1428">
 <link rel="stylesheet" href="./limpio.css?v=20261121-1445">
+<link rel="stylesheet" href="./red-local.css?v=20261127-2335">
 <link rel="stylesheet" href="./personal-fase1.css">
 <link rel="stylesheet" href="../caja-concilia.css">
 <link rel="stylesheet" href="../bloqueo.css?v=20261104-1712">
@@ -2118,6 +2119,13 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
   <div class="ajusteRegreso" id="ajustesRegreso" hidden>
     <button class="btn ghost" id="ajustesVolver" type="button">← Volver a Ajustes</button>
   </div>
+  <div class="card" id="ajusteRedLocal" data-ajuste-panel hidden>
+    <header><h2>Red sin internet</h2><span id="red47Capacidad" class="red47Chip" hidden></span></header>
+    <div class="body red47Ajuste">
+      <p id="red47EstadoAjustes" role="status"></p>
+      <button type="button" id="red47Config" class="btn primary" hidden>Usar esta tablet como central</button>
+    </div>
+  </div>
   <div class="card" id="restaurantAccountSettings" data-ajuste-panel hidden>
     <header><h2>Cuenta Nuvoor</h2><span class="hint">datos separados por negocio</span></header>
     <div class="body"><p>Este Restaurant está conectado a <strong id="restaurantAccountNameSettings"></strong>. Los datos de esta cuenta se conservan en este dispositivo.</p><div class="fila"><button class="btn sm ghost" id="restaurantChangePOSSettings" type="button">Cambiar de POS</button><button class="btn sm ghost" id="restaurantSignOutSettings" type="button">Cerrar sesión</button></div></div>
@@ -2678,6 +2686,7 @@ section[id^="tab-inicio"].module-entering #inTiles>*:nth-child(5){animation-dela
 <script src="./personal-panel.js?v=20261116-1726"></script>
 <script src="../bloqueo.js?v=20261104-1712"></script>
 <script src="../personal/semana.js?v=20261125-1552"></script>
+<script src="./red-local.js?v=20261127-2335"></script>
 <script src="../personal/semana-ui.js?v=20261125-1552"></script><script src="../personal/actividades.js?v=20261125-1552"></script>
 <script>
 (async function(){
@@ -3009,6 +3018,10 @@ function actualizaEstadoNube(){
 }
 function guardaEstadoLocal(){
   if(restaurando)return;
+  if(window.NuvoorRedLocal?.unida()){
+    red47GuardaBorradores();
+    return;
+  }
   lsSet("menu",MENU);lsSet("mesas",MESAS);lsSet("comandas",COMANDAS);
   lsSet("P",P);lsSet("equipo",EQUIPO);
   lsSet("asistencias",ASISTENCIAS);lsSet("compras",COMPRAS);lsSet("recetas",RECETAS);lsSet("decor",DECOR);
@@ -3097,6 +3110,7 @@ function nubeDocsDesdeServidor(){return Object.fromEntries(Object.entries(REST_N
 function nubeRebaseMap(){const out=nubeDocsDesdeServidor();REST_NUBE.queue.filter(q=>String(q.cuenta_id)===String(RESTAURANT_ACCOUNT.accountId)).forEach(q=>out[q.key]={cuenta_id:q.cuenta_id,coleccion:q.coleccion,doc_id:q.doc_id,cuerpo:q.cuerpo});return out;}
 function nubeDocsDeContexto(docs){const ev=nubeEventoId();return Object.fromEntries(Object.entries(docs).filter(([,d])=>d&&d.coleccion!=="rest_contadores"&&d.coleccion!=="rest_locks"&&(d.coleccion==="rest_eventos"||(d.cuerpo&&String(d.cuerpo.eventoId||"")===ev))));}
 async function sincronizaNubeLocal(){
+  if(window.NuvoorRedLocal?.unida())return;
   if(!REST_NUBE.enabled||REST_NUBE.localOnly||REST_NUBE.subscriptionBlocked||restaurando)return;
   const revision=REST_NUBE.revision;
   REST_NUBE.serializando=true;
@@ -3118,6 +3132,7 @@ function sincronizaNubeEnSerie(inmediato){
   REST_NUBE.flushPromise=(REST_NUBE.flushPromise||Promise.resolve()).catch(()=>{}).then(run);return REST_NUBE.flushPromise;
 }
 function vaciaColaNube(){
+  if(window.NuvoorRedLocal?.unida())return Promise.resolve();
   if(REST_NUBE.uploadPromise)return REST_NUBE.uploadPromise;
   REST_NUBE.uploadPromise=(async()=>{
     if(!REST_NUBE.enabled||REST_NUBE.subscriptionBlocked||!navigator.onLine||!RESTAURANT_SB||!REST_NUBE.queue.length){actualizaEstadoNube();return;}
@@ -3364,6 +3379,7 @@ function escuchaNubeRestaurant(){
 }
 
 function aplicaDocumentosRestaurant(docs){
+  if(window.NuvoorRedLocal?.unida())return;
   docs=nubeDocsDeContexto(docs);docs=Object.fromEntries(Object.entries(docs).map(([k,d])=>[k,Object.assign({},d,{cuerpo:nubeSinMarcaMigracion(d.cuerpo)})]));const raw=Object.values(docs),has=(col)=>raw.some(d=>d&&d.coleccion===col),ev=nubeEventoId(),all=raw.filter(d=>d&&d.cuerpo&&!d.cuerpo._eliminado),mine=all.filter(d=>d.coleccion!=="rest_eventos"&&(d.cuerpo.eventoId||"")===ev),by=(col)=>mine.filter(d=>d.coleccion===col).map(d=>d.cuerpo),oldMenu=MENU||{},oldMesas=MESAS||[],oldEquipo=EQUIPO||[],oldP=P||paramsPorDefecto();
   const cfg=by("rest_config")[0];if(cfg){P=Object.assign(paramsPorDefecto(),P,{negocio:Object.assign({},P.negocio,{nombre:cfg.nombre||P.negocio.nombre,tel:cfg.tel||"",dir:cfg.dir||""}),iva:num(cfg.iva,P.iva),propina:num(cfg.propina,P.propina),servicio:num(cfg.servicio,P.servicio),apps:Array.isArray(cfg.apps)?cfg.apps:P.apps,fiscal:cfg.fiscal||P.fiscal,ticket:Object.assign({},P.ticket,cfg.ticket||{}),folios:cfg.folios||P.folios});guardaSalPinRestaurant(cfg.pinSalt);
     if(Object.prototype.hasOwnProperty.call(cfg,"bloqueoMin"))P.bloqueoMin=num(cfg.bloqueoMin,10);
@@ -4859,6 +4875,8 @@ async function comandaReservadaDesdeNube(docId,draft){
   return COMANDAS.find(c=>c.id===id)||null;
 }
 async function nuevaComanda(m, personas, appId){
+  const redMesero=window.NuvoorRedLocal?.unida();
+  if(redMesero&&appId){toast("Abre los pedidos de plataformas desde la caja.");return null;}
   const c = {
     id: uid(), folio: folioNuevo("cta"), mesaId: m.id, mesaNombre: m.nombre,
     cliente:m.id==="llevar"?String(m.cliente||"").trim():"",
@@ -4868,7 +4886,7 @@ async function nuevaComanda(m, personas, appId){
   };
   if(appId){const app=appDe(appId);c.appId=appId;c.appNombre=app&&app.nombre||"Pedido";c.appColor=app&&app.color||"";c.comisionPct=num(app&&app.comision);c.appFolioPendiente=REST_NUBE.enabled;c.appOrderNo=REST_NUBE.enabled?"A-"+String(REST_NUBE.deviceId||"").slice(-4).toUpperCase()+"-0001":null;c.mesaNombre=c.appNombre+" "+(c.appOrderNo||"");}
   c.folioPendiente=REST_NUBE.enabled;
-  if(REST_NUBE.enabled&&navigator.onLine&&!POS_EVENTO&&!appId&&m.id!=="llevar"){
+  if(REST_NUBE.enabled&&navigator.onLine&&!redMesero&&!POS_EVENTO&&!appId&&m.id!=="llevar"){
     try{
       await sincronizaNubeEnSerie(true);
       const body=Object.assign({},c);delete body.lineas;delete body.cancelaciones;delete body.folioPendiente;delete body.appFolioPendiente;body.eventoId="";body.estado="abierta";
@@ -4882,7 +4900,9 @@ async function nuevaComanda(m, personas, appId){
       }
     }catch(e){if(RESTAURANT_ACCOUNT.personal){nubeRegistraError(e);toast(e.message||"No se pudo abrir la mesa.");return null;}nubeRegistraError(e);toast("No se pudo revisar la mesa en la nube. La comanda se guardará en este aparato y se intentará subir.");}
   }
+  if(redMesero)c.red47Borrador=true;
   COMANDAS.unshift(c); persist();
+  if(redMesero)return c;
   if(REST_NUBE.enabled){
     await sincronizaNubeEnSerie(true);
     let actual=COMANDAS.find(x=>x.id===c.id)||c;
@@ -5196,6 +5216,20 @@ $("#comEnviar").addEventListener("click", ()=>{
   const c = comandaActual(); if(!c) return;
   const h = horaAhora();
   const nuevas=(c.lineas||[]).filter(l=>!l.enviada&&!l.cancelada),n=nuevas.length,envioId=uid();
+  if(window.NuvoorRedLocal?.unida()){
+    const ocupado=window.NuvoorRedLocal.enviar({
+      id:envioId,cuenta:RESTAURANT_ACCOUNT.accountId,comanda:c.id,mesa:c.mesaId,
+      personas:c.personas,cliente:c.cliente||'',lineas:nuevas.map(l=>({
+        id:l.id,platId:l.platId,cant:l.cant,mods:(l.mods||[]).map(m=>[m.grupoId,m.opcionId]),
+        nota:l.nota,comensal:l.comensal
+      }))
+    });
+    if(!ocupado)return;
+    nuevas.forEach(l=>{l.enviada=h;l.enviadaTs=Date.now();l.envioId=envioId;l.envioTotal=n;l.estado="pedido";});
+    guardaEstadoLocal();pintaLineas();pintaTabs();
+    toast("Pedido guardado en la cola para la caja.");
+    return;
+  }
   nuevas.forEach(l=>{l.enviada=h;l.enviadaTs=Date.now();l.envioId=envioId;l.envioTotal=n;l.estado="pedido";});
   guardaYa(); pintaLineas(); pintaTabs();
   /* Sólo lo que se acaba de mandar: reimprimir la comanda entera hace que la
@@ -5208,6 +5242,7 @@ $("#comEnviar").addEventListener("click", ()=>{
     : "") + ". Para cambiarlos ahora se usa Corregir.");
 });
 $("#comCancelar").addEventListener("click", ()=>{
+  if(window.NuvoorRedLocal?.unida()){toast("Autoriza la cancelación desde la tablet de la caja.");return;}
   const c = comandaActual(); if(!c || c.estado === "cerrada") return;
   const lineas = JSON.stringify(vivas(c).map(l=>[l.id,l.cant,l.enviada]).sort());
   const enCocina = vivas(c).filter(l=>l.enviada).length;
@@ -5370,7 +5405,8 @@ function agregaLinea(p, mods, nota, cant){
                  cant: porPeso?cant:Math.max(1, num(cant,1)), mods: mods||[], nota: nota||"",
                  ...(porPeso?{unidadVenta:"kg",costoKg:num(p.costo)}:{}),
                  satClave:p.satClave||"", satNombre:p.satNombre||"", satUnidad:porPeso?"KGM":p.satUnidad||"",
-                 comensal: comensalVista, enviada:"", estado:"", ts: Date.now()});
+                 comensal: comensalVista, enviada:"", estado:"", ts: Date.now(),
+                 ...(window.NuvoorRedLocal?.unida()?{red47Local:true}:{})});
   persist(); pintaLineas();
   toast(p.nombre + " → " + (comensalVista ? "comensal " + comensalVista : "para compartir"));
 }
@@ -5780,6 +5816,10 @@ const cajaEsDeAqui = t => t?.aparato === REST_NUBE.deviceId;
 const cajaUsaNube = () => cajaInstalada === true || (cajaInstalada === null && !RESTAURANT_ACCOUNT.localOnly);
 
 function cajaPuedeCobrarAqui(){
+  if(window.NuvoorRedLocal?.unida()){
+    toast("Cobra desde la tablet de la caja mientras esté abierta la red.");
+    return false;
+  }
   if(RESTAURANT_ACCOUNT.personal&&!navigator.onLine){
     toast("Conéctate para confirmar el cobro con tu perfil. El pedido sigue pendiente.");
     return false;
@@ -5817,7 +5857,7 @@ async function guardaCobroConTurno(c,anterior){
   c.cajaCompartida = true;
   c.cajaAparato = REST_NUBE.deviceId;
   if(cajaFijaInstalada) c.cajaNombre = nombreAparatoCaja();
-  if(cajaFijaInstalada && navigator.onLine){
+  if(cajaFijaInstalada && navigator.onLine && !(window.NuvoorRedLocal?.central()&&window.NuvoorRedLocal.sinInternet())){
     const id = c.id, evento = nubeEventoId();
     COMANDAS[COMANDAS.indexOf(c)] = anterior;
     if(cobrosEnCurso.has(id)) return false;
@@ -8566,7 +8606,7 @@ async function imprimeComandaRutaNube(c,p,lineas,tipo,contenido,forzado,reclamoY
   const route=rutaImpresoraNube(p)+(tipo==="cancelacion"?"|cancelacion":"");
   const reintenta=()=>{lineas.forEach(linea=>REST_NUBE.failedPrints.delete(claveFallaImpresionNube(linea,route)));return imprimeComandaRutaNube(c,p,lineas,tipo,contenido,true,false);};
   let propias=lineas;
-  const sinRed=REST_NUBE.enabled&&!navigator.onLine;
+  const sinRed=REST_NUBE.enabled&&(!navigator.onLine||window.NuvoorRedLocal?.central()&&window.NuvoorRedLocal.sinInternet());
   if(REST_NUBE.enabled){
     propias=lineas.filter(linea=>forzado||!REST_NUBE.failedPrints.has(claveFallaImpresionNube(linea,route)));
     if(!propias.length)return {ok:true,omitida:true,pospuesta:true};
@@ -8589,7 +8629,7 @@ async function imprimeComandaCocina(c,lineas,yaEnNube){
   if(!c||!lineas||!lineas.length)return;
   const destinos=impresorasParaTicketPOS("comanda",false).filter(p=>lineasParaImpresoraPOS(lineas,p).length);
   if(!destinos.length)return;
-  if(REST_NUBE.enabled&&navigator.onLine&&!yaEnNube)await sincronizaNubeEnSerie(true);
+  if(REST_NUBE.enabled&&navigator.onLine&&!yaEnNube&&!(window.NuvoorRedLocal?.central()&&window.NuvoorRedLocal.sinInternet()))await sincronizaNubeEnSerie(true);
   const jobs=destinos.map(async p=>{const filtradas=lineasParaImpresoraPOS(lineas,p);if(filtradas.length)await imprimeComandaRutaNube(c,p,filtradas,"comanda");});
   await Promise.all(jobs);
 }
@@ -9724,7 +9764,7 @@ async function guardaConfiguracionRestaurant(ambito){
   }catch(err){estadoGuardadoConfiguracion(ambito,err.message||"No se confirmó el guardado. Tus cambios se conservan en este aparato.","error");}
   finally{botones.forEach(b=>{b.disabled=false;b.textContent="Guardar cambios";});}
 }
-$$('#tab-set [data-ajuste-panel]').forEach(panel=>{
+$$('#tab-set [data-ajuste-panel]:not(#ajusteRedLocal)').forEach(panel=>{
   const soloConsulta=["restaurantAccountSettings","ajusteRespaldo"].includes(panel.id);
   const pie=document.createElement("div");pie.className="configSaveBar";
   const mensaje=document.createElement("span");mensaje.dataset.configStatus=panel.id;mensaje.setAttribute("role","status");
@@ -9738,6 +9778,7 @@ const ajustesGrupos = [
     {id:"ajusteMesas", titulo:"Mesas y zonas", detalle:"Salones, mesas y lugares", icono:ICO.mesas},
     {id:"impresorasCard", titulo:"Impresoras", detalle:"Cocina, caja y pruebas", icono:'<path d="M6 8V3h12v5M6 17H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="7" rx="1"/><path d="M17 12h2"/>'},
     {id:"ajusteTickets", titulo:"Formato de tickets", detalle:"Papel, textos y datos impresos", icono:'<path d="M5 3h14v18l-3.5-2-3.5 2-3.5-2L5 21V3zM9 8h6M9 12h6"/>'},
+    {id:"ajusteRedLocal", titulo:"Red sin internet", detalle:"Configura la tablet central", icono:'<path d="M2 9a16 16 0 0 1 20 0M5 13a11 11 0 0 1 14 0M8 17a6 6 0 0 1 8 0M12 21h.01"/>', soloRestaurante:true},
     {id:"restaurantAppsSettings", titulo:"Pedidos por app", detalle:"Plataformas y comisiones", icono:ICO.eventos, soloRestaurante:true}
   ]},
   {titulo:"Cobro y facturación", tono:"cobro", tarjetas:[
@@ -11970,6 +12011,146 @@ function lpArranca(){
 }
 try{ lpArranca(); }catch(e){ console.error(e); const t = document.createElement("p"); t.className = "cxError"; t.textContent = "La maqueta limpia no pudo arrancar: "+e.message; document.body.prepend(t); }
 /* <</LIMPIO>> */
+const red47Id=/^[a-zA-Z0-9_-]{1,120}$/;
+let red47Base=null, red47Validando=false, red47Fallos=0, red47Bloqueo=0;
+function red47GuardaBorradores(){
+  lsSet("red47_borradores",COMANDAS.filter(c=>c.red47Borrador||c.lineas?.some(l=>l.red47Local)));
+}
+function red47Unida(){
+  if(red47Base)return;
+  red47Base={MENU,MESAS,COMANDAS};
+  MENU=nubeClona(MENU);MESAS=nubeClona(MESAS);
+  COMANDAS=lsGet("red47_borradores",[]).filter(c=>c.meseroId===usuarioActual().id);
+  vaA("mesas");
+}
+function red47Estado(foto){
+  if(!red47Base||!Array.isArray(foto?.mesas)||!Array.isArray(foto?.menu?.plats))return;
+  MENU=foto.menu;MESAS=foto.mesas;
+  const propias=COMANDAS.filter(c=>c.red47Borrador||c.lineas?.some(l=>l.red47Local));
+  const servidor=Array.isArray(foto.abiertas)?foto.abiertas:[];
+  COMANDAS=[...propias,...servidor.filter(s=>!propias.some(c=>c.id===s.id||c.mesaId!=="llevar"&&c.mesaId===s.mesaId))];
+  if(!$("#tab-mesas").hidden)renderMesas();
+}
+function red47Salida(){
+  if(red47Base){
+    red47GuardaBorradores();
+    ({MENU,MESAS,COMANDAS}=red47Base);
+    red47Base=null;
+    if(usuarioId||RESTAURANT_ACCOUNT.personal)vaA("mesas");
+  }
+  if(navigator.onLine)recargaCambiosNube();
+}
+function red47Foto(){
+  if(POS_EVENTO)return null;
+  const menu={
+    cats:(MENU.cats||[]).map(p=>({id:p.id,nombre:p.nombre,icono:p.icono})),
+    grupos:nubeClona(MENU.grupos||[]),
+    plats:(MENU.plats||[]).map(p=>({
+      id:p.id,catId:p.catId,nombre:p.nombre,icono:p.icono,precio:p.precio,unidadVenta:p.unidadVenta,
+      ivaModo:p.ivaModo,mods:p.mods,activo:p.activo,estacion:p.estacion
+    }))
+  };
+  return {menu,mesas:nubeClona(MESAS),abiertas:COMANDAS.filter(c=>c.estado!=="cerrada"&&!c.cancelada&&c.mesaId!=="llevar"&&!c.appId).map(c=>({
+    id:c.id,mesaId:c.mesaId,mesaNombre:c.mesaNombre,personas:c.personas,mesero:c.mesero,meseroId:c.meseroId,
+    folio:c.folio,abre:c.abre,fecha:c.fecha,ts:c.ts,estado:"abierta",lineas:[],pagos:[],propina:0
+  }))};
+}
+function red47CajaCentral(){
+  const t=turnoAbierto();
+  return !POS_EVENTO&&!RESTAURANT_ACCOUNT.personal&&!!t&&!t.espera&&!cajaPendiente()&&(!cajaEstado||cajaEsDeAqui(t));
+}
+async function red47Autoriza(pin){
+  if(!/^\d{4,12}$/.test(pin)||red47Validando||Date.now()<red47Bloqueo)return "";
+  red47Validando=true;
+  try{
+    const coincidencias=[];
+    for(const persona of EQUIPO.filter(u=>u.activo!==false&&tieneClave(u))){
+      if(await validaClavePerfil(persona,pin))coincidencias.push(persona);
+    }
+    if(coincidencias.length===1&&coincidencias[0].rol==="gerente"){
+      red47Fallos=0;
+      return coincidencias[0].id;
+    }
+    if(++red47Fallos>=5){red47Bloqueo=Date.now()+300_000;red47Fallos=0;}
+    return "";
+  }finally{red47Validando=false;}
+}
+function red47Linea(entrada,pedido,envioTotal){
+  const plat=(MENU.plats||[]).find(p=>p.id===entrada?.platId&&p.activo!==false);
+  const porPeso=plat&&vendePorKilo(plat),cant=Number(entrada?.cant);
+  if(!plat||!red47Id.test(entrada.id||"")||!Number.isFinite(cant)||cant<=0||cant>999||
+     (porPeso?pesoEnKilos(Math.round(cant*1000))!==cant:!Number.isInteger(cant))||!Array.isArray(entrada.mods)||entrada.mods.length>30)
+    throw Error("Hay un platillo pendiente. Revisa la carta de la tablet central.");
+  const mods=[],elegidos=new Set();
+  for(const par of entrada.mods){
+    const [grupoId,opcionId]=Array.isArray(par)?par:[];
+    const g=(MENU.grupos||[]).find(x=>x.id===grupoId&&(plat.mods||[]).includes(x.id));
+    const o=g?.ops?.find(x=>x.id===opcionId&&x.activo!==false&&String(x.nombre||"").trim());
+    const clave=JSON.stringify([grupoId,opcionId]);
+    if(!o||elegidos.has(clave))throw Error("Hay modificadores pendientes de revisar en la caja.");
+    elegidos.add(clave);
+    mods.push({grupoId,opcionId,nombre:String(o.nombre).trim(),extra:num(o.extra)});
+  }
+  for(const g of (MENU.grupos||[]).filter(x=>(plat.mods||[]).includes(x.id))){
+    const n=mods.filter(x=>x.grupoId===g.id).length;
+    if(n<num(g.min)||n>num(g.max,99))throw Error("Revisa las opciones de "+plat.nombre+" en la caja.");
+  }
+  return {id:entrada.id,platId:plat.id,categoria:plat.catId||"",nombre:plat.nombre,precio:num(plat.precio),
+    ivaModo:plat.ivaModo||"incluido",cant,mods,nota:String(entrada.nota||"").slice(0,200),
+    ...(porPeso?{unidadVenta:"kg",costoKg:num(plat.costo)}:{}),
+    satClave:plat.satClave||"",satNombre:plat.satNombre||"",satUnidad:porPeso?"KGM":plat.satUnidad||"",
+    comensal:Math.max(0,Math.min(pedido.personas||0,Math.floor(num(entrada.comensal)))),enviada:horaAhora(),
+    enviadaTs:Date.now(),envioId:pedido.id,envioTotal,estado:"pedido",ts:Date.now()};
+}
+async function red47Recibe(pedido){
+  if(!red47CajaCentral()||pedido.cuenta!==RESTAURANT_ACCOUNT.accountId)return {guardado:false};
+  const persona=EQUIPO.find(u=>u.id===pedido.persona&&u.activo!==false&&["gerente","cajero","mesero"].includes(u.rol));
+  if(!persona||!red47Id.test(pedido.comanda||"")||!Array.isArray(pedido.lineas)||!pedido.lineas.length||pedido.lineas.length>150)
+    throw Error("Hay una comanda sin perfil activo. Revisa el equipo de la caja.");
+  const ids=new Set(COMANDAS.flatMap(c=>(c.lineas||[]).map(l=>l.id)));
+  const pendientes=pedido.lineas.filter(l=>!ids.has(l?.id));
+  if(!pendientes.length)return {guardado:true,nuevo:false};
+  if(new Set(pendientes.map(l=>l?.id)).size!==pendientes.length)throw Error("Revisa la comanda repetida.");
+  const mesa=pedido.mesa==="llevar"?{id:"llevar",nombre:"Para llevar"}:MESAS.find(m=>m.id===pedido.mesa);
+  if(!mesa)throw Error("Hay una comanda de una mesa que la caja no encontró.");
+  const exacta=COMANDAS.find(c=>c.id===pedido.comanda);
+  if(exacta&&(exacta.estado==="cerrada"||exacta.cancelada||exacta.mesaId!==mesa.id))throw Error("La cuenta de una comanda ya está cerrada o cambió de mesa.");
+  const abierta=exacta||(mesa.id!=="llevar"?COMANDAS.find(c=>c.mesaId===mesa.id&&c.estado!=="cerrada"&&!c.cancelada):null);
+  const personas=Math.min(100,Math.max(1,Math.floor(num(pedido.personas,mesa.lugares||1))));
+  const nuevas=pendientes.map(p=>red47Linea(p,{...pedido,personas},pendientes.length));
+  const c=abierta?{...abierta,lineas:[...abierta.lineas,...nuevas]}:{
+    id:pedido.comanda,folio:folioNuevo("cta"),folioPendiente:REST_NUBE.enabled,mesaId:mesa.id,mesaNombre:mesa.nombre,
+    cliente:mesa.id==="llevar"?String(pedido.cliente||"").slice(0,80):"",personas,abre:horaAhora(),fecha:hoyISO(),
+    mesero:persona.nombre,meseroId:persona.id,lineas:nuevas,estado:"abierta",pagos:[],propina:0,ts:Date.now()
+  };
+  const siguiente=abierta?COMANDAS.map(x=>x.id===c.id?c:x):[c,...COMANDAS];
+  if(!nubeGuarda(LS+"_comandas",siguiente))throw Error("La caja no tiene espacio para guardar la comanda.");
+  COMANDAS=siguiente;
+  persist();pintaTabs();
+  if(!$("#tab-mesas").hidden)renderMesas();
+  if(!$("#tab-comanda").hidden&&comandaId===c.id)pintaLineas();
+  if(!$("#tab-cocina").hidden)renderCocina();
+  await imprimeComandaCocina(c,nuevas);
+  return {guardado:true,nuevo:true};
+}
+window.NuvoorRedLocal?.inicia({
+  identidad:()=>!POS_EVENTO&&RESTAURANT_SESSION?.user?.id===RESTAURANT_ACCOUNT.userId&&
+    (usuarioId||RESTAURANT_ACCOUNT.personal)?{
+    cuenta:RESTAURANT_ACCOUNT.accountId,aparato:RESTAURANT_SB?.personal?.device||REST_NUBE.deviceId,
+    persona:usuarioActual().id,nombre:usuarioActual().nombre||"Tablet"
+  }:null,
+  estadoNube:()=>!REST_NUBE.subscriptionBlocked&&$("#restaurantSync")?.classList.contains("error")?"error":"",
+  puedeMarcarCentral:()=>esGerente()&&!RESTAURANT_ACCOUNT.personal&&!POS_EVENTO,
+  cajaCentral:red47CajaCentral,autoriza:red47Autoriza,avisa:toast,
+  foto:red47Foto,recibe:red47Recibe,unida:red47Unida,salida:red47Salida,estado:red47Estado,
+  confirmado:()=>toast("Pedido recibido en la caja."),
+  registra:async resumen=>{
+    const raw=RESTAURANT_SB?.personal?.raw||RESTAURANT_SB;
+    if(!raw)return false;
+    const r=await raw.rpc("rest_red_local_registra",{p_cuenta:RESTAURANT_ACCOUNT.accountId,p_resumen:resumen});
+    return !r.error&&r.data===true;
+  }
+});
 iniciaRestaurant();
 })();
 </script>

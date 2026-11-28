@@ -1,0 +1,26 @@
+.red47Aviso{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;margin:0 0 16px;border-inline-start:4px solid var(--brand,#4458a4)}
+.red47Aviso p,.red47Ajuste p{margin:5px 0;color:var(--ink-2)}
+.red47Chip{border:1px solid currentColor;border-radius:99px;padding:4px 9px;font-size:12px;white-space:nowrap}
+.red47Aviso[data-estado="sin-internet"]{background:var(--mal-soft);border-inline-start-color:var(--mal)}
+.red47Aviso[data-estado="conexion"]{background:var(--good-soft);border-inline-start-color:var(--good)}
+#red47Capacidad{margin-inline-start:auto}
+.red47Ajuste .btn{margin-top:12px}
+.red47Dialog{color:var(--ink);background:var(--card,var(--bg,#fff));max-width:min(560px,calc(100vw - 26px));max-height:90vh;border:1px solid var(--line,#dbe2eb);border-radius:16px;padding:18px;box-shadow:0 12px 50px #0004}
+.red47Dialog::backdrop{background:#0a0e1a99}
+.red47Encabezado{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:240px}
+.red47Dialog p{margin:8px 0}
+.red47Dialog [data-red47],.red47Dialog form{display:none}
+.red47Dialog[data-vista="ayuda"] [data-red47="ayuda"],.red47Dialog[data-vista="unirse"] [data-red47="unirse"],.red47Dialog[data-vista="unida"] [data-red47="unida"]{display:block}
+.red47Dialog[data-vista="abrir"] form,.red47Dialog[data-vista="central"] form,.red47Dialog[data-vista="cierre"] form{display:grid;gap:9px}
+.red47Dialog[data-vista="abierta"] .red47Datos{display:grid;grid-template-columns:minmax(128px,0.9fr) minmax(0,1fr);gap:14px;align-items:center;margin-top:12px}
+.red47Datos figure{margin:0;text-align:center}
+.red47Datos img{display:block;width:100%;max-width:200px;aspect-ratio:1;object-fit:contain;margin:auto;border-radius:8px}
+.red47Datos figcaption{font-size:12px;margin-top:5px}
+#red47Codigo{font-size:clamp(20px,5vw,34px);font-variant-numeric:tabular-nums}
+.red47Botones{display:flex;gap:8px;flex-wrap:wrap;grid-column:1/-1}
+@media(max-width:520px){.red47Aviso{align-items:start;flex-direction:column}.red47Aviso .btn{width:100%}.red47Dialog{padding:14px}.red47Dialog[data-vista="abierta"] .red47Datos{gap:9px}.red47Botones .btn{flex:1 1 auto}}
+/* Botón «Red» anclado en la barra de arriba. */
+.red47Ancla{position:relative}
+.red47Ancla svg{width:18px;height:18px;flex:none}
+.red47Ancla.red47Activa{border-color:var(--good,#0e7c57)!important;color:var(--good,#0e7c57)!important}
+.red47Ancla.red47Activa::after{content:"";position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:var(--good,#0e7c57)}
