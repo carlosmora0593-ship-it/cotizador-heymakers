@@ -112,7 +112,13 @@
         <section class="license" id="licensePanel" hidden><h3>Licencias del negocio</h3><p id="licenseIntro">Cada licencia cubre un sistema.</p><label class="licenseCycleLabel" for="licenseCycle">Periodo de pago</label><select id="licenseCycle"><option value="mensual">Mensual</option><option value="anual">Anual · paga 10 meses</option></select><div class="licProducts" id="licenseProducts"></div><div class="licGrid" id="licenseCards"></div><div class="notice" id="paymentNotice" hidden></div></section>
         <a class="backLink" href="https://nuvoor.mx">Ver todos los productos de Nuvoor</a>
       </section>
-      <section class="loadingPane" id="loadingPanel" aria-label="Cargando"><div class="spinner"></div><span>Preparando tu espacio…</span></section>
+      <section class="loadingPane" id="loadingPanel" aria-label="Acceso a Nuvoor">
+        <div class="spinner" id="accessSpinner" aria-hidden="true"></div>
+        <span id="accessPreparing" role="status">Preparando tu espacio…</span>
+        <strong id="accessRetryMessage" role="status" hidden></strong>
+        <button class="btn secondaryBtn" id="accessRetry" type="button" hidden>Reintentar</button>
+        <a class="backLink" id="accessRestaurant" href="./restaurante/" hidden>Abrir Restaurant</a>
+      </section>
     </div>
   </div>
 </main>
@@ -145,8 +151,39 @@
   </div>
 </div>
 
-<script src="./config.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
-<script src="./acceso.js?v=20261127-2215"></script>
+<script>
+(()=>{
+  const $=id=>document.getElementById(id), params=new URLSearchParams(location.search);
+  const spinner=$("accessSpinner"), preparando=$("accessPreparing");
+  const mensaje=$("accessRetryMessage"), boton=$("accessRetry"), restaurant=$("accessRestaurant");
+  const android=params.get("app")==="android"||!!window.MakersPrinter;
+  const producto=params.get("producto");
+  if(android)restaurant.href="./restaurante/?app=android";
+  let timer;
+  function termina(){clearTimeout(timer);}
+  function fallo(texto){
+    termina();
+    spinner.hidden=true;
+    preparando.hidden=true;
+    mensaje.textContent=texto||(navigator.onLine===false?"Sin internet. Revisa la conexión de la tablet.":"Nuvoor está tardando en abrir. Puedes reintentar.");
+    mensaje.hidden=false;
+    boton.hidden=false;
+    restaurant.hidden=!(producto==="restaurant"||(android&&!producto));
+  }
+  function inicia(){
+    termina();
+    spinner.hidden=false;
+    preparando.hidden=false;
+    mensaje.hidden=boton.hidden=restaurant.hidden=true;
+    timer=setTimeout(fallo,8000);
+  }
+  boton.addEventListener("click",()=>location.reload());
+  window.NuvoorCargaAcceso={inicia,termina,fallo,demorada:()=>!mensaje.hidden};
+  inicia();
+})();
+</script>
+<script defer src="./config.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
+<script defer src="./acceso.js?v=20261127-2220"></script>
 </body>
 </html>

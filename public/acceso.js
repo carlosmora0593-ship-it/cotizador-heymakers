@@ -62,7 +62,30 @@ function cambiaVista(screen,inicial=false){
   if(entrada){card.dataset.screen="cover";card.dataset.phase="initial";setTimeout(destino,reduced?0:350);}
   else{card.dataset.phase="cover";card.dataset.screen="cover";setTimeout(destino,reduced?0:450);}
 }
-function show(id){["#authPanel","#accountPanel","#loadingPanel"].forEach(s=>$(s).hidden=s!==id);if(id==="#authPanel")cambiaVista(accessMode,firstAccessReveal);else if(id==="#accountPanel")cambiaVista("business",firstAccessReveal);}
+function show(id){
+  ["#authPanel","#accountPanel","#loadingPanel"].forEach(s=>$(s).hidden=s!==id);
+  if(id==="#loadingPanel")window.NuvoorCargaAcceso?.inicia();
+  else window.NuvoorCargaAcceso?.termina();
+  if(id==="#authPanel")cambiaVista(accessMode,firstAccessReveal);
+  else if(id==="#accountPanel")cambiaVista("business",firstAccessReveal);
+}
+function fallaInicio(texto){
+  if(window.NuvoorCargaAcceso){
+    show("#loadingPanel");
+    window.NuvoorCargaAcceso.fallo(texto);
+  }else{
+    show("#authPanel");
+    message(texto,"error");
+  }
+}
+async function consultaConLimite(consulta,ms){
+  let timer;
+  try{
+    return await Promise.race([consulta,new Promise((_,reject)=>{
+      timer=setTimeout(()=>reject(new Error("La consulta de acceso tardó demasiado.")),ms);
+    })]);
+  }finally{clearTimeout(timer);}
+}
 function message(t,k=""){const n=$("#msg");n.textContent=t;n.className="msg"+(k?" "+k:"");}
 function detalleError(e){const code=String(e&&e.code||"").trim(),msg=String(e&&e.message||"").trim().replace(/[\r\n\t]+/g," ").slice(0,240);return [code,msg].filter(Boolean).join(" · ")||"La base no devolvió más detalles.";}
 function limpiaSesionLocal(){try{const project=new URL(CONFIG.SUPABASE_URL).hostname.split(".")[0];localStorage.removeItem("sb-"+project+"-auth-token");}catch(_){}}
@@ -343,11 +366,11 @@ async function entra(session){
   let errorCanje="";
   try{
     await leerEmpresas();
-    if(coincide&&pendiente?.codigo){
+    if(coincide&&pendiente?.codigo&&!window.NuvoorCargaAcceso?.demorada()){
       try{await intentaCanje(pendiente.codigo);}
       catch(err){errorCanje=err.message;}
     }
-    if(recibido&&(!coincide||errorCanje))skipAutoOpenOnce=true;
+    if(window.NuvoorCargaAcceso?.demorada()||(recibido&&(!coincide||errorCanje)))skipAutoOpenOnce=true;
     $("#accountErrorDetail").hidden=true;$("#accountErrorDetail").textContent="";
     pintaCuenta();
     $("#redeemCode").value=recibido.slice(0,64);
@@ -433,7 +456,49 @@ function conectaAccesoCodigo(){
   $("#emailCodeResend").addEventListener("click",e=>usaCodigo(e,true));
   $("#emailCodeForm").addEventListener("submit",usaCodigo);
 }
-async function init(){show("#loadingPanel");if(!window.CONFIG||!window.supabase){show("#authPanel");message("Falta cargar la conexión de Nuvoor. Intenta actualizar la página.","error");return;}sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);conectaAccesoCodigo();$("#redeemForm").addEventListener("submit",canjeManual);try{const r=await sb.rpc("altas_abiertas");if(!r.error&&r.data===true)ALTAS_ABIERTAS=true;}catch(_){}const hint=$("#multiHint");if(hint)hint.textContent="Cada negocio es una cuenta independiente; sus datos no se mezclan.";$$('[data-mode]').forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));$("#authForm").addEventListener("submit",envia);const bi=$("#inviteCheck");if(bi)bi.addEventListener("click",usaInvitacion);const ic=$("#inviteCode");if(ic)ic.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();usaInvitacion();}});$("#addBusinessForm").addEventListener("submit",agregaNegocio);$$('input[name="producto"]').forEach(x=>x.addEventListener("change",actualizaSeleccion));$("#logout").addEventListener("click",async()=>{try{await sb.auth.signOut();}catch(_){}finally{limpiaSesionLocal();location.replace("./acceso.html");}});
-  const {data,error}=await sb.auth.getSession();if(error){show("#authPanel");message("No pudimos revisar la sesión. Intenta iniciar sesión.","error");return;}if(data.session){await entra(data.session);return;}if(params.get("codigo")==="1")abreAccesoCodigo();const inv=params.get("invitacion");if(inv&&$("#inviteCode")){$("#inviteCode").value=inv.toUpperCase();setMode("alta");usaInvitacion();}else if(params.get("alta")==="1")setMode("alta");show("#authPanel");}
-init();
+async function init(){
+  show("#loadingPanel");
+  if(!window.CONFIG||!window.supabase){
+    fallaInicio("No se pudo cargar la conexión de Nuvoor. Revisa el internet y reintenta.");
+    return;
+  }
+  sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
+  conectaAccesoCodigo();
+  $("#redeemForm").addEventListener("submit",canjeManual);
+  const hint=$("#multiHint");
+  if(hint)hint.textContent="Cada negocio es una cuenta independiente; sus datos no se mezclan.";
+  $$('[data-mode]').forEach(b=>b.addEventListener("click",()=>setMode(b.dataset.mode)));
+  $("#authForm").addEventListener("submit",envia);
+  const bi=$("#inviteCheck");
+  if(bi)bi.addEventListener("click",usaInvitacion);
+  const ic=$("#inviteCode");
+  if(ic)ic.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();usaInvitacion();}});
+  $("#addBusinessForm").addEventListener("submit",agregaNegocio);
+  $$('input[name="producto"]').forEach(x=>x.addEventListener("change",actualizaSeleccion));
+  $("#logout").addEventListener("click",async()=>{
+    try{await sb.auth.signOut();}catch(_){}
+    finally{limpiaSesionLocal();location.replace("./acceso.html");}
+  });
+
+  const estadoAltas=consultaConLimite(sb.rpc("altas_abiertas"),2500)
+    .then(r=>{ALTAS_ABIERTAS=!r.error&&r.data===true;})
+    .catch(()=>{});
+  const {data,error}=await consultaConLimite(sb.auth.getSession(),6000);
+  if(error){
+    show("#authPanel");
+    message("No pudimos revisar la sesión. Intenta iniciar sesión.","error");
+    return;
+  }
+  if(data.session){await entra(data.session);return;}
+  if(params.get("codigo")==="1")abreAccesoCodigo();
+  const inv=params.get("invitacion");
+  if(inv||params.get("alta")==="1")await estadoAltas;
+  if(inv&&$("#inviteCode")){
+    $("#inviteCode").value=inv.toUpperCase();
+    setMode("alta");
+    usaInvitacion();
+  }else if(params.get("alta")==="1")setMode("alta");
+  show("#authPanel");
+}
+init().catch(()=>fallaInicio("No se pudo revisar tu sesión. Revisa la conexión y reintenta."));
 })();
