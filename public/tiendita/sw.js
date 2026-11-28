@@ -1,4 +1,4 @@
-const CACHE_NAME = "nuvoor-store-v15-personal";
+const CACHE_NAME = "nuvoor-store-v16-menu";
 const APP_SCOPE = new URL(self.registration.scope);
 const APP_ASSETS = [
   new URL("../personal/panel.css?v=20261125-1552", APP_SCOPE).href,
@@ -12,6 +12,8 @@ const APP_ASSETS = [
   new URL("../restaurante/actividades.css", APP_SCOPE).href,
   new URL("../caja-concilia.js", APP_SCOPE).href,
   new URL("../caja-concilia.css", APP_SCOPE).href,
+  new URL("../menu-cajon.css?v=20261127-1900", APP_SCOPE).href,
+  new URL("../menu-cajon.js?v=20261127-1900", APP_SCOPE).href,
   APP_SCOPE.href,
   new URL("index.html", APP_SCOPE).href,
   new URL("manifest.webmanifest", APP_SCOPE).href,

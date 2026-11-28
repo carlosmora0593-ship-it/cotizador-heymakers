@@ -1,0 +1,100 @@
+/* Nuvoor · el menú en un cajón (☰), igual que el Restaurant (capa LIMPIO, 21 nov 2026). Imprenta y Store · 27 nov 2026.
+   La barra de arriba es de vidrio, con la franja de la marca. El cajón es la misma barra lateral de cada sistema, escondida:
+   arriba el negocio, el candado, quién está y la caja; en medio los módulos; abajo la cuenta, la empresa y el tema.
+   No cambia lo que hace ningún botón: sólo los acomoda. */
+:root{--mc-alto:58px;--mc-vidrio:rgba(255,255,255,.72);--mc-vidrio-linea:rgba(16,42,56,.09);--mc-surface:#fff;--mc-soft:#edf2f8;
+  --mc-line:#d9e1ef;--mc-line-soft:#e6ecf5;--mc-ink:#0a0e1a;--mc-ink-2:#44516b;--mc-accent:#4458a4;--mc-accent-soft:rgba(68,88,164,.1);
+  --mc-accent-text:#2f3f86;--mc-scrim:rgba(10,14,26,.55);--mc-bien:#1b7f4b;--mc-mal:#b3261e}
+html[data-theme="dark"]{--mc-vidrio:rgba(21,30,49,.78);--mc-vidrio-linea:rgba(255,255,255,.08);--mc-surface:#151e31;--mc-soft:#1e2941;
+  --mc-line:#31405b;--mc-line-soft:#25334c;--mc-ink:#eef4ff;--mc-ink-2:#b6c3dc;--mc-accent:#79cce0;--mc-accent-soft:rgba(121,204,224,.16);
+  --mc-accent-text:#9fdcec;--mc-scrim:rgba(0,0,0,.6);--mc-bien:#6fd39c;--mc-mal:#ff8a80}
+@media(prefers-color-scheme:dark){html:not([data-theme="day"]):not([data-theme="light"]){--mc-vidrio:rgba(21,30,49,.78);--mc-vidrio-linea:rgba(255,255,255,.08);
+  --mc-surface:#151e31;--mc-soft:#1e2941;--mc-line:#31405b;--mc-line-soft:#25334c;--mc-ink:#eef4ff;--mc-ink-2:#b6c3dc;--mc-accent:#79cce0;
+  --mc-accent-soft:rgba(121,204,224,.16);--mc-accent-text:#9fdcec;--mc-scrim:rgba(0,0,0,.6);--mc-bien:#6fd39c;--mc-mal:#ff8a80}}
+
+/* ---------- cascarón ---------- */
+body.mc{padding-left:0!important;padding-top:var(--mc-alto)!important}
+html:has(body.mc),body.mc{overflow-x:clip!important}
+body.sin-acceso .mcBar,body.sin-acceso .mcVelo,body.sin-sesion .mcBar,body.sin-sesion .mcVelo{display:none!important}
+body.mc.sin-acceso,body.mc.sin-sesion{padding-top:0!important}
+
+/* ---------- la barra de arriba ---------- */
+.mcBar{position:fixed;top:0;left:0;right:0;height:var(--mc-alto);z-index:60;display:flex;align-items:center;gap:6px;padding:3px 12px 0 6px;
+  background:var(--mc-vidrio);color:var(--mc-ink);border-bottom:1px solid var(--mc-vidrio-linea);font-family:"DM Sans",system-ui,sans-serif;
+  -webkit-backdrop-filter:blur(26px) saturate(185%);backdrop-filter:blur(26px) saturate(185%)}
+.mcBar::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#4c4780 0 25%,#4458a4 25% 50%,#5ab0e2 50% 75%,#79cce0 75% 100%)}
+.mcIcono{display:inline-grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:var(--mc-ink-2);cursor:pointer;flex:none;transition:background .18s,color .18s}
+.mcIcono svg{width:24px;height:24px}
+.mcIcono:hover{background:var(--mc-accent-soft);color:var(--mc-accent-text)}
+.mcIcono:focus-visible,.mcQuien:focus-visible,.mcCandado:focus-visible,.mcBarBtn:focus-visible,.mcItem:focus-visible{outline:3px solid var(--mc-accent);outline-offset:-3px}
+.mcTitulo{min-width:0;flex:1;display:flex;flex-direction:column;justify-content:center;padding-left:4px}
+.mcTitulo h1{margin:0;font-size:19px;font-weight:700;letter-spacing:-.2px;line-height:1.2;color:var(--mc-accent-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:inherit}
+.mcTitulo small{color:var(--mc-ink-2);font-size:12.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mcAcciones{display:flex;align-items:center;gap:8px;flex:none}
+.mcBarBtn{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 14px;border-radius:12px;border:1px solid var(--mc-line);background:var(--mc-surface);
+  color:var(--mc-ink);font:700 13.5px/1 "DM Sans",system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+.mcBarBtn svg{width:17px;height:17px;flex:none}
+.mcBarBtn.mcPrimario{background:var(--mc-accent);border-color:var(--mc-accent);color:#fff}
+html[data-theme="dark"] .mcBarBtn.mcPrimario{color:#0c1220}
+@media(prefers-color-scheme:dark){html:not([data-theme="day"]):not([data-theme="light"]) .mcBarBtn.mcPrimario{color:#0c1220}}
+.mcBarBtn:hover{border-color:var(--mc-accent)}
+@media(max-width:520px){.mcBarBtn{padding:0 11px}.mcBarBtn .mcTxtLargo{display:none}.mcTitulo h1{font-size:17px}}
+
+/* ---------- el cajón ---------- */
+.mcVelo{position:fixed;inset:0;z-index:75;background:var(--mc-scrim);animation:mcVelo .2s ease-out}
+@keyframes mcVelo{from{opacity:0}to{opacity:1}}
+.mcVelo[hidden]{display:none}
+body.mc .mcCajonBarra{position:fixed!important;top:0!important;bottom:0!important;left:0!important;width:min(320px,86vw)!important;max-width:none!important;z-index:80!important;
+  display:flex!important;flex-direction:column!important;overflow:auto!important;background:var(--mc-surface)!important;
+  transform:translateX(-102%)!important;visibility:hidden!important;transition:transform .28s cubic-bezier(.2,.8,.25,1),visibility 0s linear .28s!important}
+body.mc.mcCajon .mcCajonBarra{transform:none!important;visibility:visible!important;box-shadow:18px 0 50px rgba(10,14,26,.22)!important;transition:transform .28s cubic-bezier(.2,.8,.25,1)!important}
+.mcCajonTop{padding:14px 14px 12px 16px;border-bottom:1px solid var(--mc-line-soft);font-family:"DM Sans",system-ui,sans-serif}
+.mcCajonFila{display:flex;align-items:center;gap:10px}
+.mcNegocio{flex:1;min-width:0}
+.mcNegocio > *{padding:0!important;margin:0!important;border:0!important}
+.mcCandado{display:inline-grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--mc-line);background:var(--mc-surface);color:var(--mc-ink-2);cursor:pointer;flex:none;transition:background .18s,color .18s,border-color .18s}
+.mcCandado:hover{background:var(--mc-accent-soft);color:var(--mc-accent-text);border-color:var(--mc-accent)}
+.mcCandado svg{width:20px;height:20px}
+.mcQuien{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;margin-top:12px;padding:10px 12px;border:1px solid var(--mc-line-soft);border-radius:12px;
+  background:var(--mc-soft);color:var(--mc-ink);text-align:left;cursor:pointer;font-family:inherit}
+.mcQuien:hover{border-color:var(--mc-accent)}
+.mcQuien b{font-size:15px;color:var(--mc-ink)}
+.mcQuien small{color:var(--mc-ink-2);font-size:12.5px}
+.mcCaja{margin-top:8px;font-size:12.5px;color:var(--mc-ink-2)}
+.mcCaja b.abierta{color:var(--mc-bien)}
+.mcCaja b.cerrada{color:var(--mc-mal)}
+.mcCuenta{display:flex;flex-direction:column;gap:2px;padding:8px 8px 4px;border-top:1px solid var(--mc-line-soft);font-family:"DM Sans",system-ui,sans-serif}
+.mcCuentaQuien{padding:4px 10px 6px;font-size:12.5px;color:var(--mc-ink-2)}
+.mcCuentaQuien b{display:block;color:var(--mc-ink);font-size:13.5px}
+.mcItem{display:flex;align-items:center;gap:10px;width:100%;min-height:42px;padding:0 10px;border:0;border-radius:10px;background:transparent;color:var(--mc-ink);
+  font:500 14px/1.2 "DM Sans",system-ui,sans-serif;text-align:left;cursor:pointer;text-decoration:none}
+.mcItem:hover{background:var(--mc-soft)}
+.mcItem svg{width:18px;height:18px;color:var(--mc-ink-2);flex:none}
+.mcItem[hidden]{display:none}
+.mcCuenta .perfilEmp{padding:2px 10px 8px!important;border:0!important}
+.mcCuenta .perfilEmp label.f{display:block;margin:0 0 4px;font-size:12px;color:var(--mc-ink-2)}
+.mcCuenta .empresaSel{width:100%;min-height:38px;border-radius:10px}
+.mcCuenta .perfilEmp a{color:var(--mc-accent-text)}
+.mcItem.mcSalir{color:var(--mc-mal)}
+.mcItem.mcSalir svg{color:var(--mc-mal)}
+
+/* ---------- Imprenta ---------- */
+body.mc.mcImprenta header.top{display:none!important}
+body.mc.mcImprenta #barra .barraNav{flex:1 0 auto!important;min-height:auto!important;overflow:visible!important}
+body.mc.mcImprenta #barra .barraPie{position:static!important;flex:none!important}
+body.mc.mcImprenta .mcCajonTop .barraTop{display:flex!important;align-items:center;gap:10px}
+body.mc.mcImprenta .wrap{padding-top:6px}
+
+/* ---------- Store ---------- */
+body.mc.mcStore .n7Slim,body.mc.mcStore .n7Bottom,body.mc.mcStore .n7Vel,body.mc.mcStore #n7BarraX{display:none!important}
+body.mc.mcStore{padding-bottom:0!important}
+body.mc.mcStore .shell{margin-left:0!important}
+body.mc.mcStore .mcCajonTop .brand{display:flex!important;align-items:center;gap:10px}
+body.mc.mcStore #n7Barra .n7Nav{flex:1 0 auto!important;overflow:visible!important}
+
+@media(prefers-reduced-motion:reduce){body.mc .mcCajonBarra,.mcVelo{transition:none!important;animation:none!important}}
+body.mc.mcRapido .mcCajonBarra,body.mc.mcRapido .mcVelo{transition:none!important;animation:none!important}
+
+/* Con la puerta o el acceso en pantalla, el cajón nunca se asoma. */
+html body.mc.sin-acceso .mcCajonBarra,html body.mc.sin-sesion .mcCajonBarra{transform:translateX(-102%)!important;visibility:hidden!important}

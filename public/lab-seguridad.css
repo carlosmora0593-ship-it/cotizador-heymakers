@@ -1,0 +1,43 @@
+/* Nuvoor Lab · Seguridad (SQL 45). Usa los colores del Lab. */
+.lsSeg>header h2{margin:0;font-size:16px}
+.lsSeg .lsEspacio{flex:1}
+.lsRangos{display:inline-flex;gap:4px}
+.lsRangos .btn[aria-pressed="true"]{background:var(--acento);border-color:var(--acento);color:#fff}
+.lsMsg{margin:12px 16px 0;padding:9px 12px;border-radius:10px;background:var(--acento-suave);color:var(--ink);font-size:13px}
+.lsTiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;padding:14px 16px 4px}
+.lsTile{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2,var(--surface))}
+.lsTile span{font-size:12px;color:var(--ink-2);font-weight:600}
+.lsTile b{font-size:24px;line-height:1.2;color:var(--ink);font-variant-numeric:tabular-nums}
+.lsTile small{font-size:11.5px;color:var(--ink-3)}
+.lsTile.mal{border-color:var(--critico);background:var(--critico-suave)}
+.lsTile.mal b{color:var(--critico)}
+.lsTile.aviso{border-color:var(--aviso)}
+.lsTile.bien b{color:var(--bien)}
+.lsYo{margin:6px 16px 0;font-size:12.5px;color:var(--ink-2)}
+.lsBloque{padding:12px 16px 4px}
+.lsBloque h3{margin:0 0 8px;font-size:13px;letter-spacing:.2px;color:var(--ink-2);text-transform:uppercase}
+.lsTodoBien{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+.lsAlertas{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.lsAlertas li{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:9px 12px;border:1px solid var(--line);border-left:3px solid var(--critico);border-radius:10px;font-size:13px}
+.lsAlertas li small{flex-basis:100%;color:var(--ink-3);font-size:12px}
+.lsTabs{display:flex;gap:4px;padding:12px 16px 0;border-bottom:1px solid var(--line);overflow-x:auto}
+.lsTabs button{border:0;background:transparent;padding:9px 12px;border-bottom:2px solid transparent;color:var(--ink-2);font:600 13px/1.2 inherit;cursor:pointer;white-space:nowrap}
+.lsTabs button span{display:inline-block;min-width:18px;padding:1px 6px;margin-left:4px;border-radius:999px;background:var(--surface-3,var(--line));font-size:11px;color:var(--ink-2)}
+.lsTabs button[aria-selected="true"]{color:var(--acento);border-bottom-color:var(--acento)}
+.lsTabla{width:100%;border-collapse:collapse;font-size:13px}
+.lsTabla th{text-align:left;font-size:11.5px;color:var(--ink-3);font-weight:700;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.lsTabla td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink)}
+.lsTabla tr.ls-critico td:first-child{box-shadow:inset 3px 0 0 var(--critico)}
+.lsTabla tr.ls-alerta td:first-child{box-shadow:inset 3px 0 0 var(--critico)}
+.lsTabla tr.ls-aviso td:first-child{box-shadow:inset 3px 0 0 var(--aviso)}
+.lsCuando{display:flex;flex-direction:column;white-space:nowrap}
+.lsCuando small,.lsTenue{display:block;color:var(--ink-3);font-size:11.5px}
+.lsDetalle{display:block;margin-top:3px;color:var(--ink-2);font-size:12px;overflow-wrap:anywhere}
+.lsIp{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;white-space:nowrap}
+.lsIp small{font-family:inherit;color:var(--ink-3)}
+.lsDonde{font-size:11.5px;color:var(--acento)}
+.lsAyuda{margin:12px 16px 16px;font-size:12.5px;color:var(--ink-2)}
+.lsAyuda summary{cursor:pointer;font-weight:700;color:var(--ink)}
+.lsAyuda ul{margin:8px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.lsSeg .chip{display:inline-block;padding:2px 8px;font-size:11px;line-height:1.4;vertical-align:1px}
+@media(max-width:640px){.lsSeg>header{gap:8px}.lsSeg .lsEspacio{display:none}.lsTiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
