@@ -5,6 +5,23 @@ const P={
   tiendita:{name:"Nuvoor Store",example:"https://nuvoor.mx/#store",icon:"▤",sub:"Mostrador, caja e inventario",href:"./tiendita/"}
 };
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],params=new URLSearchParams(location.search),validos=Object.keys(P);
+const android=!!window.MakersPrinter||params.get("app")==="android";
+const sellosPos={taller:"cotizador",restaurant:"restaurant",tiendita:"store"};
+let aperturaEnCurso=0;
+
+async function versionDelSistema(producto){
+  if(!android||navigator.onLine===false)return "";
+  const control=new AbortController();
+  const limite=setTimeout(()=>control.abort(),1000);
+  try{
+    const respuesta=await fetch("./version.json",{cache:"no-store",credentials:"omit",mode:"same-origin",signal:control.signal});
+    if(!respuesta.ok)return "";
+    const versiones=await respuesta.json();
+    const sello=versiones?.[sellosPos[producto]]||versiones?.build;
+    return typeof sello==="string"&&/^\d{8}-\d{4}$/.test(sello)?sello:"";
+  }catch(_){return "";}
+  finally{clearTimeout(limite);}
+}
 /* Las altas las abre o cierra Lab (altas_abiertas() en la base). Si la base
    todavía no tiene esa función, se quedan cerradas como antes. */
 let ALTAS_ABIERTAS=false;
@@ -61,8 +78,31 @@ async function leerEmpresas(){
   if(!negocios.length){const cause=errores.find(Boolean),e=new Error("No pudimos abrir la cuenta de este negocio.");e.code=cause&&cause.code||"CUENTA_NO_ENCONTRADA";e.detail=detalleError(cause);throw e;}
   return negocios;
 }
-function urlProducto(k,id){const url=new URL(P[k].href,location.href);if(k!=="taller"&&id)url.searchParams.set("cuenta",id);if(params.get("app")==="android")url.searchParams.set("app","android");return url.href;}
-function animarApertura(k,n){const overlay=$("#launchOverlay");if(!overlay){location.replace(urlProducto(k,n.id));return;}clearTimeout(launchTimer);$("#launchTitle").textContent="Abriendo "+P[k].name;$("#launchBusiness").textContent=n.nombre||"Mi negocio";overlay.hidden=false;overlay.setAttribute("aria-hidden","false");overlay.classList.remove("active");requestAnimationFrame(()=>overlay.classList.add("active"));const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;launchTimer=setTimeout(()=>location.replace(urlProducto(k,n.id)),reduced?400:2500);}
+function urlProducto(k,id,sello){
+  const url=new URL(P[k].href,location.href);
+  if(k!=="taller"&&id)url.searchParams.set("cuenta",id);
+  if(android)url.searchParams.set("app","android");
+  if(sello)url.searchParams.set("v",sello);
+  return url.href;
+}
+function animarApertura(k,n){
+  const apertura=++aperturaEnCurso,consulta=versionDelSistema(k);
+  const entrar=async()=>{
+    const sello=await consulta;
+    if(apertura===aperturaEnCurso)location.replace(urlProducto(k,n.id,sello));
+  };
+  clearTimeout(launchTimer);
+  const overlay=$("#launchOverlay");
+  if(!overlay){entrar();return;}
+  $("#launchTitle").textContent="Abriendo "+P[k].name;
+  $("#launchBusiness").textContent=n.nombre||"Mi negocio";
+  overlay.hidden=false;
+  overlay.setAttribute("aria-hidden","false");
+  overlay.classList.remove("active");
+  requestAnimationFrame(()=>overlay.classList.add("active"));
+  const reduced=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  launchTimer=setTimeout(entrar,reduced?400:2500);
+}
 async function abreNegocio(k,n){
   if(!P[k]||!n)return;
   if(n.personal&&k!=="restaurant"){location.assign("restaurante/jornada.html?cuenta="+encodeURIComponent(n.id));return;}
