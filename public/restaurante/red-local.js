@@ -25,6 +25,14 @@
     return true;
   }
   function hora(ms){return new Date(ms).toLocaleTimeString('es-MX',{hour:'numeric',minute:'2-digit'});}
+  /* «hoy a las…», «mañana a las…» o la fecha: la red dura 24 h y la sola hora confundía. */
+  function cuando(ms){
+    const d=new Date(ms),hoy=new Date(),man=new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate()+1);
+    const mismo=(a,b)=>a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+    if(mismo(d,hoy))return 'hoy a las '+hora(ms);
+    if(mismo(d,man))return 'mañana a las '+hora(ms);
+    return d.toLocaleDateString('es-MX',{day:'numeric',month:'short'})+' a las '+hora(ms);
+  }
   function sinInternet(){
     if(!navigator.onLine)return true;
     return !!fallandoDesde&&Date.now()-fallandoDesde>=60_000;
@@ -72,7 +80,7 @@
       puente&&capacidad===null?'Revisando si esta tablet puede crear la red…':avisoAndroid;
     if(dialogo.open&&info&&central){
       q('red47Resumen').textContent=tablets+' tablet(s) · '+pedidos+' pedido(s) por la red';
-      q('red47Vence').textContent='Código vigente hasta las '+hora(info.codigoVence)+' · Red abierta hasta las '+hora(info.vence);
+      q('red47Vence').textContent='El código sirve hasta las '+hora(info.codigoVence)+' · La red sigue abierta hasta '+cuando(info.vence);
     }
   }
   function abre(vista){
@@ -227,7 +235,7 @@
       <button class="btn primary" type="button" id="red47Escanea">Escanear código QR</button></section>
       <section data-red47="unida"><h3>Estás en la red del restaurante</h3><p>Tus pedidos llegan a la caja. Cuando la caja cierre la red, esta tablet regresa sola a su Wi-Fi.</p>
       <button class="btn" type="button" id="red47Salir">Salir de la red</button></section>
-      <section data-red47="abierta" class="red47Datos"><figure><img alt="Código QR para conectar una tablet" id="red47QR"><figcaption>Escanéalo desde la otra tablet</figcaption></figure>
+      <section data-red47="abierta" class="red47Datos"><figure><img alt="Código QR para conectar una tablet" id="red47QR"><figcaption>En la otra tablet: botón «Red» → «Unirme a la red» → escanear. La cámara del celular no lo lee.</figcaption></figure>
       <div><p>Código de un solo uso</p><strong id="red47Codigo"></strong><p id="red47Vence"></p><p id="red47Resumen"></p><p id="red47Tablets"></p></div>
       <div class="red47Botones"><button type="button" class="btn" id="red47Nuevo">Nuevo código</button><button type="button" class="btn primary" id="red47Sube">Cerrar la red y subir</button></div></section>
       <p id="red47Mensaje" role="status" hidden></p>`;
